@@ -67,6 +67,7 @@
     ],
     "psi-header.changes-tracking": {
         "autoHeader": "autoSave",
+        "enforceHeader": true,
         "exclude": [
             "css",
             "json",

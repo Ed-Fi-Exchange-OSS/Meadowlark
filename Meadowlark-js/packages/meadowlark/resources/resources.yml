@@ -1,0 +1,59 @@
+Resources:
+  entityTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${self:provider.stage}
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: securityEdOrgId
+          AttributeType: S
+        - AttributeName: securityStudentId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      GlobalSecondaryIndexes:
+        - IndexName: SecurityStudentEdOrgGSI
+          KeySchema:
+          - AttributeName: securityStudentId
+            KeyType: HASH
+          - AttributeName: securityEdOrgId
+            KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+  ElasticSearchInstance:
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      EBSOptions:
+        EBSEnabled: true
+        VolumeType: gp2
+        VolumeSize: 10
+      ElasticsearchClusterConfig:
+        InstanceType: t2.small.elasticsearch
+        InstanceCount: 1
+        DedicatedMasterEnabled: false
+        ZoneAwarenessEnabled: false
+      ElasticsearchVersion: 7.4
+      DomainName: ${self:service}-${self:provider.stage}
+      AccessPolicies:      
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::#{AWS::AccountId}:role/meadowlarkLambdaRole"
+              },
+              "Action": "es:*",
+              "Resource": "arn:aws:es:#{AWS::Region}:#{AWS::AccountId}:domain/${self:service}-${self:provider.stage}/*"
+            }
+          ]
+        }

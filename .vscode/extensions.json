@@ -9,6 +9,9 @@
     "recommendations": [
         "psioniq.psi-header",
         "streetsidesoftware.code-spell-checker",
-        "editorconfig.editorconfig"
+        "editorconfig.editorconfig",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "humao.rest-client"
     ]
 }

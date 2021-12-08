@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Show All Typescript Errors",
+        "type": "shell",
+        "command": "npx",
+        "args": ["tsc", "-w", "-p", ".", "--noEmit"],
+        "presentation": {
+          "reveal": "silent"
+        },
+        "isBackground": true,
+        "problemMatcher": "$tsc-watch"
+      },
+      {
+        "type": "npm",
+        "script": "watch",
+        "problemMatcher": "$tsc-watch",
+        "isBackground": true,
+        "presentation": {
+          "reveal": "never"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }
+    ]
+  }

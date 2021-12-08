@@ -1,0 +1,87 @@
+service:
+  name: edfi-meadowlark
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-jetpack
+  - serverless-dynamodb-local
+  - serverless-plugin-offline-dynamodb-stream
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+package:
+  include:
+    - 'node_modules/**'
+    - 'edfi-descriptors/**'
+  exclude:
+    - 'src/**'
+    - 'test/**'
+    - 'resources/**'
+    - '.dynamodb/**'
+    - 'tsconfig.json'
+
+custom:
+  jetpack:
+    base: '../..'
+  serverless-offline:
+    host: 0.0.0.0
+    port: 4000
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: false
+      dbPath: '${env:DYNAMODB_DATA_DIR}'
+      migrate: true
+  dynamodbStream:
+      region: ${self:provider.region}
+      host: localhost
+      port: 8000
+      pollForever: true
+      streams:
+        - table: ${self:service}-${self:provider.stage}
+          functions:
+            - updateExternalStorage
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'local'}
+  timeout: 10
+
+  iam:
+    role:
+      # sets the name of the default lambda role
+      name: meadowlarkLambdaRole
+
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Reuse TCP connections - important for DynamoDB performance
+    REGION: ${self:provider.region}
+    STAGE: ${self:provider.stage}
+    DOMAIN_TABLE_NAME: ${self:service}-${self:provider.stage}
+    DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
+    ES_LOCAL_ENDPOINT: 'http://localhost:9200'
+    TOKEN_URL: 'http://localhost:3000/${self:provider.stage}/api/oauth/token'
+    IS_LOCAL: 'false'
+
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - dynamodb:*
+        - lambda:*
+        - s3:*
+        - es:*
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:*
+        - arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:*
+        - arn:aws:es:#{AWS::Region}:#{AWS::AccountId}:*
+
+functions:
+ - ${file(resources/functions.yml)}
+
+resources:
+ - ${file(resources/resources.yml)}

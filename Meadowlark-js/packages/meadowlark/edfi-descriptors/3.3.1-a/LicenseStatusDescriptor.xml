@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InterchangeDescriptors xmlns="http://ed-fi.org/3.3.1-a" xmlns:ann="http://ed-fi.org/annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ed-fi.org/3.3.1-a ../Schemas/Bulk/Interchange-Descriptors.xsd">
+	<LicenseStatusDescriptor>
+		<CodeValue>Exempt</CodeValue>
+		<ShortDescription>Exempt</ShortDescription>
+		<Description>Exempt</Description>
+		<Namespace>uri://ed-fi.org/LicenseStatusDescriptor</Namespace>
+	</LicenseStatusDescriptor>
+	<LicenseStatusDescriptor>
+		<CodeValue>Regulated</CodeValue>
+		<ShortDescription>Regulated</ShortDescription>
+		<Description>Regulated</Description>
+		<Namespace>uri://ed-fi.org/LicenseStatusDescriptor</Namespace>
+	</LicenseStatusDescriptor>
+	<LicenseStatusDescriptor>
+		<CodeValue>Unregulated</CodeValue>
+		<ShortDescription>Unregulated</ShortDescription>
+		<Description>Unregulated</Description>
+		<Namespace>uri://ed-fi.org/LicenseStatusDescriptor</Namespace>
+	</LicenseStatusDescriptor>
+</InterchangeDescriptors>

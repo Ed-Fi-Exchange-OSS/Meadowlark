@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InterchangeDescriptors xmlns="http://ed-fi.org/3.3.1-a" xmlns:ann="http://ed-fi.org/annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ed-fi.org/3.3.1-a ../Schemas/Bulk/Interchange-Descriptors.xsd">
+	<LearningStandardEquivalenceStrengthDescriptor>
+		<CodeValue>Equivalent</CodeValue>
+		<ShortDescription>Equivalent</ShortDescription>
+		<Description>Equivalent</Description>
+		<Namespace>uri://ed-fi.org/LearningStandardEquivalenceStrengthDescriptor</Namespace>
+	</LearningStandardEquivalenceStrengthDescriptor>
+	<LearningStandardEquivalenceStrengthDescriptor>
+		<CodeValue>Mostly equivalent</CodeValue>
+		<ShortDescription>Mostly equivalent</ShortDescription>
+		<Description>Mostly equivalent</Description>
+		<Namespace>uri://ed-fi.org/LearningStandardEquivalenceStrengthDescriptor</Namespace>
+	</LearningStandardEquivalenceStrengthDescriptor>
+	<LearningStandardEquivalenceStrengthDescriptor>
+		<CodeValue>Partially equivalent</CodeValue>
+		<ShortDescription>Partially equivalent</ShortDescription>
+		<Description>Partially equivalent</Description>
+		<Namespace>uri://ed-fi.org/LearningStandardEquivalenceStrengthDescriptor</Namespace>
+	</LearningStandardEquivalenceStrengthDescriptor>
+	<LearningStandardEquivalenceStrengthDescriptor>
+		<CodeValue>Minimally equivalent</CodeValue>
+		<ShortDescription>Minimally equivalent</ShortDescription>
+		<Description>Minimally equivalent</Description>
+		<Namespace>uri://ed-fi.org/LearningStandardEquivalenceStrengthDescriptor</Namespace>
+	</LearningStandardEquivalenceStrengthDescriptor>
+</InterchangeDescriptors>

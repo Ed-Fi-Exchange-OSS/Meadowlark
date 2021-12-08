@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import Joi from '@hapi/joi';
+import didYouMean from 'didyoumean2';
+import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from 'metaed-core';
+import { ResourceMatchResult } from '../model/ResourceMatchResult';
+import { getMatchingMetaEdModelFrom, getResourceNames } from './ResourceNameMapping';
+
+/**
+ * Creates a new empty ResourceMatchResult object
+ */
+export function newResourceMatchResult(): ResourceMatchResult {
+  return {
+    resourceName: '',
+    isDescriptor: false,
+    exact: false,
+    suggestion: false,
+    matchingMetaEdModel: NoTopLevelEntity,
+  };
+}
+
+/**
+ * Finds the MetaEd entity name that matches the endpoint of the API request, or provides a suggestion
+ * if no match is found.
+ */
+export function matchResourceNameToMetaEd(
+  resourceName: string,
+  metaEd: MetaEdEnvironment,
+  namespace: string,
+): ResourceMatchResult {
+  const matchingMetaEdModel: TopLevelEntity | undefined = getMatchingMetaEdModelFrom(resourceName, metaEd, namespace);
+  if (matchingMetaEdModel != null) {
+    return {
+      ...newResourceMatchResult(),
+      resourceName,
+      isDescriptor: matchingMetaEdModel.type === 'descriptor',
+      exact: true,
+      matchingMetaEdModel,
+    };
+  }
+
+  const suggestion = didYouMean(resourceName, getResourceNames(metaEd, namespace));
+  if (suggestion == null) return newResourceMatchResult();
+
+  const suggestedName = Array.isArray(suggestion) ? suggestion[0] : suggestion;
+  return { ...newResourceMatchResult(), resourceName: suggestedName, suggestion: true };
+}
+
+/**
+ * Validate the JSON body of the request against the Joi schema for the MetaEd entity corresponding
+ * to the API endpoint.
+ */
+export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): string[] {
+  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(body, {
+    abortEarly: false,
+  });
+  if (validationResult.error != null) {
+    return validationResult.error.details.map((item) => item.message.replace(/"/g, ''));
+  }
+
+  return [];
+}
