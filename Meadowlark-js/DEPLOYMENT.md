@@ -48,7 +48,7 @@ A Meadowlark deployment includes a large number of AWS resources which incur cos
 
 Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not required, must be loaded in order to use descriptor validation. 
 
-* Run `load:descriptors:aws-dev` to invoke the Meadowlark Lambda function that loads descriptors into the "dev" stage.
+* Run `yarn load:descriptors:aws-dev` to invoke the Meadowlark Lambda function that loads descriptors into the "dev" stage. Be patient, as this may take up to 90 seconds to complete.
 
 
 ### View the Meadowlark DynamoDB Table
@@ -60,11 +60,9 @@ Meadowlark uses a [single table design](https://aws.amazon.com/blogs/compute/cre
 
 Meadowlark is bundled with test scripts to exercise the API. Similar to Postman, these scripts are .http files that use the Visual Studio Code [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
 
-* Open a test/http/remote.*.http file and update the server portion of the URLs to match the deployment endpoints.
-* Use a test/http/remote.*.http file to make API calls. There are examples in the remote and local .http files on different way to access Meadowlark.
-    * An `Authorization` header is required to make API calls when `ACCESS_TOKEN_REQUIRED` is enabled in the enviroment variables.
-    * Reference validation can be disabled by adding the header `reference-validation: false`.
-    * Descriptor validation can be disabled by adding the header `descriptor-validation: false`.
+* Install Visual Studio Code and the REST Client extension. In Visual Studio Code, open the Meadowlark-js folder.
+* Open the [remote.deployment.test.http](packages/meadowlark/test/http/remote.deployment.test.http) file and update the @hostname entry to match your AWS deployment.
+* Follow the directions to exercise your deployment with several API scenarios.
 
 
 ### Deploy Meadowlark to a Different Stage

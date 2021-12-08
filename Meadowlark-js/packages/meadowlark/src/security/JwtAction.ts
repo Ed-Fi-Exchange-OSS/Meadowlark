@@ -61,6 +61,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
  * Verifies that a JWT is valid, not expired, and returns parsed claim data.
  */
 export function verifyJwt(authorization?: string): JwtStatus {
+  Logger.debug('JwtStatus.verifyJwt authorization header', null, null, authorization ?? '*None Supplied*');
   if (authorization == null || !authorization.startsWith('bearer ')) {
     return { ...newJwtStatus(), isMissing: true, isValid: false, isOwnershipEnabled: accessTokenRequired() };
   }

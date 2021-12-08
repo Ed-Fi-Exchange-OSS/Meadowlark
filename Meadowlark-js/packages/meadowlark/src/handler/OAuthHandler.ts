@@ -12,6 +12,7 @@ import { client1, client2 } from '../security/HardcodedCredential';
 import { createToken } from '../security/JwtAction';
 import { Jwt } from '../security/Jwt';
 import { validateJwt } from '../helpers/JwtValidator';
+import { authorizationHeader } from '../helpers/AuthorizationHeader';
 
 function createTokenResponse(token: Jwt): string {
   return JSON.stringify({
@@ -81,7 +82,7 @@ export async function createRandomSigningKey(): Promise<APIGatewayProxyResult> {
 export async function verify(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   Logger.debug(JSON.stringify(event.headers), context.awsRequestId, 'n/a');
 
-  const { jwtStatus, errorResponse } = validateJwt(event.headers.authorization);
+  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
 
   if (errorResponse == null) {
     return {

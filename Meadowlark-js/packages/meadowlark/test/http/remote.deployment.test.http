@@ -1,0 +1,240 @@
+# This file is meant to be used in Visual Studio Code with the popular "REST Client" extension.
+
+# This file will allow you to quickly exercise many of the basic features of the Meadowlark API,
+# Each HTTP request is part of a larger scenario, and is meant to be sent in order. The comment
+# above each HTTP action explains the request and expected result (sometimes an error). Click
+# on "Send Request" in between the comment and the HTTP action to execute the request.
+
+# Note that delays of a few seconds on the first call to an HTTP action are due to Lambda cold starts.
+# For this proof-of-concept, the MetaEd model is being loaded and Meadowlark's API surface
+# is being computed and cached on the Lambda. Subsequent calls to the same HTTP action (e.g. POST)
+# will be much faster, at least until AWS reclaims that Lambda due to inactivity.
+
+# Ensure you have followed the DEPLOYMENT.md instructions. You should have deployed with ACCESS_TOKEN_REQUIRED=true
+# and have loaded descriptors with "yarn load:descriptors:aws-dev".
+
+# **** Change this to be the hostname portion of the endpoint URLs displayed at the end of the deployment process.
+@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+
+
+# FYI, this is a non-expiring bearer token that is valid in the default configuration for the OAuth 2.0 proof-of-concept. 
+@token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+
+# -----------------------------------------------------------------------------
+# Authorization
+# -----------------------------------------------------------------------------
+
+
+### Try creating a new resource with authorization header - expect success.
+POST http://{{hostname}}/dev/v3.3b/ed-fi/educationContents
+Authorization: bearer {{token}}
+
+{
+    "contentIdentifier": "different",
+    "namespace": "4321",
+    "shortDescription": "abc",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "2143"
+}
+
+
+### Try creating a new resource without authorization header - expect 401 Unauthorized.
+POST http://{{hostname}}/dev/v3.3b/ed-fi/educationContents
+
+{
+    "contentIdentifier": "different2",
+    "namespace": "4321",
+    "shortDescription": "abc",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "2143"
+}
+
+
+### Try getting that resource using the same authorization header that created the record - expect success.
+GET http://{{hostname}}/dev/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+Authorization: bearer {{token}}
+
+
+### Try getting that resource without authorization header - expect 401 Unauthorized.
+GET http://{{hostname}}/dev/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+
+
+
+# -----------------------------------------------------------------------------
+# Schools - Create, Update (with descriptor validation), Delete
+# -----------------------------------------------------------------------------
+
+
+### Create a School
+POST http://{{hostname}}/dev/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+
+{
+    "schoolId": 122,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
+}
+
+
+### View all schools - should be one with id 7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+GET http://{{hostname}}/dev/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+
+
+### Attempt to update the school with an invalid educationOrganizationCategoryDescriptor - should fail
+PUT http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+Authorization: bearer {{token}}
+
+{
+    "schoolId": 122,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Invalid"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
+}
+
+
+### Attempt to update the school with a valid educationOrganizationCategoryDescriptor - should succeed
+PUT http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+Authorization: bearer {{token}}
+
+{
+    "schoolId": 122,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#School"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
+}
+
+
+### Attempt to delete the school - should succeed
+DELETE http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+Authorization: bearer {{token}}
+
+
+### View all schools - should be none
+GET http://{{hostname}}/dev/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+
+
+
+# -----------------------------------------------------------------------------
+# Students and EdOrgs - Create (with reference validation), Delete (with reference integrity)
+# -----------------------------------------------------------------------------
+
+
+
+### Create a Student
+POST  http://{{hostname}}/dev/v3.3b/ed-fi/students/
+Authorization: bearer {{token}}
+
+{ 
+    "studentUniqueId": "abc",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+
+### Create a local education agency
+POST http://{{hostname}}/dev/v3.3b/ed-fi/localEducationAgencies
+Authorization: bearer {{token}}
+
+{
+    "localEducationAgencyId": 123,
+    "nameOfInstitution": "A LEA",
+    "categories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency"
+        }
+    ],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+
+#### Create a Student EdOrg Association with an invalid educationOrganizationReference - should fail
+POST http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+Authorization: bearer {{token}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 1
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+
+#### Create a Student EdOrg Association with valid references - should succeed
+POST http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+Authorization: bearer {{token}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 123
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+
+### View all Students - should be one with id 60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
+GET  http://{{hostname}}/dev/v3.3b/ed-fi/students
+Authorization: bearer {{token}}
+
+
+### Attempt to delete the Student - should fail due to the Student EdOrg Association reference to this Student
+DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
+Authorization: bearer {{token}}
+
+
+### View all Student EdOrg Associations - should be one with id 3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
+GET  http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+Authorization: bearer {{token}}
+
+
+### Attempt to delete the Student EdOrg Association - should succeed
+DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations/3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
+Authorization: bearer {{token}}
+
+
+### Attempt to delete the Student again - should succeed
+DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
+Authorization: bearer {{token}}
+
+
+### View all Students - should be none
+GET  http://{{hostname}}/dev/v3.3b/ed-fi/students
+Authorization: bearer {{token}}
