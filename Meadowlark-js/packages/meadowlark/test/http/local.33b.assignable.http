@@ -1,0 +1,206 @@
+###
+POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "studentUniqueId": "abc",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+### 
+GET http://localhost:3000/local/v3.3b/ed-fi/schools
+
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+
+### 
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+reference-validation: true
+descriptor-validation: false
+
+{
+    "schoolId": 122,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
+}
+
+### 
+GET http://localhost:3000/local/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+
+### 
+PUT http://localhost:3000/local/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+reference-validation: true
+descriptor-validation: false
+
+{
+    "schoolId": 122,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#School"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
+}
+
+### 
+DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+
+
+### 
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
+reference-validation: true
+descriptor-validation: false
+
+{
+    "localEducationAgencyId": 12,
+    "nameOfInstitution": "A LEA",
+    "categories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "something"
+        }
+    ],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/bd096c7272c01bf1ca131468e2d9f6b914d85988c9031784af8f0f6f
+
+### 
+PUT http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/bd096c7272c01bf1ca131468e2d9f6b914d85988c9031784af8f0f6f
+reference-validation: true
+
+{
+    "localEducationAgencyId": 12,
+    "nameOfInstitution": "A LEA",
+    "categories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency"
+        }
+    ],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+### 
+DELETE http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/bd096c7272c01bf1ca131468e2d9f6b914d85988c9031784af8f0f6f
+
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/courses
+reference-validation: true
+
+{
+    "educationOrganizationReference": {
+        "educationOrganizationId": 12
+    },
+    "courseCode": "1234",
+    "courseTitle": "A Course",
+    "numberOfParts": 1,
+    "identificationCodes": []
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 122
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "schoolReference": {
+        "schoolId": 122
+    },
+    "entryDate": "2020-01-01",
+    "entryGradeLevelDescriptor": "10"
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/programs
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "programName": "p1",
+    "programTypeDescriptor": "pt1",
+    "educationOrganizationReference": {
+      "educationOrganizationId": 122
+    }
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentProgramAssociations
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "programReference": {
+        "educationOrganizationId": 122,
+        "programName": "p1",
+        "programTypeDescriptor": "pt1"
+    },
+    "beginDate": "2020-01-01",
+    "educationOrganizationReference": {
+        "educationOrganizationId": 122
+    }
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentTitleIPartAProgramAssociations
+reference-validation: true
+descriptor-validation: false
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc"
+    },
+    "programReference": {
+        "educationOrganizationId": 122,
+        "programName": "p1",
+        "programTypeDescriptor": "pt1"
+    },
+    "beginDate": "2020-01-02",
+    "educationOrganizationReference": {
+        "educationOrganizationId": 122
+    },
+    "titleIPartAParticipantDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}

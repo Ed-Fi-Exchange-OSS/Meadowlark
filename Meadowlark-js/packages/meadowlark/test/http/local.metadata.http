@@ -1,0 +1,21 @@
+### MetaEd model metadata with GET
+
+GET http://localhost:3000/local/metaed/v1
+
+### API Version
+GET http://localhost:3000/local/
+
+### Metadata - open API resource list
+
+GET http://localhost:3000/local/metadata/
+
+### Metadata - Swagger for resources
+
+GET http://localhost:3000/local/metadata/resources/swagger.json
+
+### Metadata - Swagger for descriptors
+
+GET http://localhost:3000/local/metadata/descriptors/swagger.json
+
+### OAuth token request
+POST http://localhost:3000/local/api/oauth/token

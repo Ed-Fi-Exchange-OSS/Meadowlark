@@ -1,0 +1,42 @@
+{
+  "configurations": [
+    {
+      "name": "Serverless Offline",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--inspect", "--debug-port=9229"],
+      "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
+      "args": ["offline", "start", "--printOutput", "--stage", "local", "--allowCache"],
+      "port": 9229,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/packages/meadowlark"
+    },
+    {
+      "name": "Jest :: File Linux",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--runInBand",
+        "${relativeFile}",
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest :: File Windows",
+      "program": "${workspaceRoot}/node_modules/jest-cli/bin/jest.js",
+      "args": [
+        "--runTestsByPath",
+        "${relativeFile}",
+        "--runInBand"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true
+    }
+  ]
+}

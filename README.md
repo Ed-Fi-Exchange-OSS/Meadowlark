@@ -17,6 +17,9 @@ production-like settings.
 
 See [Meadowlark-js/README.md](Meadowlark-js/README.md) for developer notes.
 
+See [Meadowlark-js/DEPLOYMENT.md](Meadowlark-js/DEPLOYMENT.md) for instructions
+on deployment to AWS.
+
 ## Legal Information
 
 Copyright (c) 2021 Ed-Fi Alliance, LLC and contributors.

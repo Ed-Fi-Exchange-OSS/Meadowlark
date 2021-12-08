@@ -1,0 +1,32 @@
+{
+  "eslint.enable": true,
+  "eslint.packageManager": "yarn",
+  "eslint.validate": [ "javascript", "typescript" ],
+  "editor.rulers": [ 125 ],
+
+  "typescript.tsdk": "./node_modules/typescript/lib",
+
+  "npm.packageManager": "yarn",
+  "npm.enableScriptExplorer": true,
+
+  "files.exclude": {
+    "**/.DS_Store": false,
+    "**/.git": true,
+    "**/.hg": false,
+    "**/.svn": false,
+    "**/CVS": false,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/.vscode": true
+  },
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "cSpell.words": [
+    "dynamodb",
+    "teamcity",
+    "metaed"
+  ],
+  "git.ignoreLimitWarning": true
+}
