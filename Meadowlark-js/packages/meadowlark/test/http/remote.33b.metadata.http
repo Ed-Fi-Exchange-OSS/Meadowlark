@@ -1,15 +1,16 @@
-### MetaEd model metadata with GET
+@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
 
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/metaed/v3.3b
+### MetaEd model metadata with GET
+GET https://{{hostname}}/dev/metaed/v3.3b
 
 ### API version
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/
+GET https://{{hostname}}/dev/
 
 ### Metadata list
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/metadata
+GET https://{{hostname}}/dev/metadata
 
 ### Open API Specification for Resources API
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/metadata/resources/swagger.json
+GET https://{{hostname}}/dev/metadata/resources/swagger.json
 
 ### Open API Specification for Descriptors API
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/metadata/descriptors/swagger.json
+GET https://{{hostname}}/dev/metadata/descriptors/swagger.json

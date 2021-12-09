@@ -112,7 +112,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const putResult: PutResult = await createEntity(
         documentIdForEntityInfo(descriptorEntityInfo),
         descriptorEntityInfo,
-        descriptorDocument,
+        { ...descriptorDocument, _isDescriptor: true },
         { referenceValidation: false, descriptorValidation: false },
         { ...newSecurity(), isOwnershipEnabled: false },
         '-',

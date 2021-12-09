@@ -1,5 +1,7 @@
+@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+
 ########
-POST https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/CourseOfferings
+POST https://{{hostname}}/dev/v3.3b/CourseOfferings
 reference-validation: false
 
 { 
@@ -19,16 +21,16 @@ reference-validation: false
 }
 
 ######## List all with GET
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/CourseOfferings
+GET https://{{hostname}}/dev/v3.3b/CourseOfferings
 
 
 ######## Query with GET
-GET http://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/CourseOfferings?_unvalidated=true
+GET http://{{hostname}}/dev/v3.3b/CourseOfferings?_unvalidated=true
 
 
 
 
 ######## GET by ID
 
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/CourseOfferings/
+GET https://{{hostname}}/dev/v3.3b/CourseOfferings/
 

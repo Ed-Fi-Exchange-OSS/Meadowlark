@@ -1,7 +1,8 @@
 ### Create with POST
+@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
 
 #####
-POST https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentEducationOrganizationAssociation
+POST https://{{hostname}}/dev/v3.3b/StudentEducationOrganizationAssociation
 reference-validation: false
 
 { 
@@ -15,7 +16,7 @@ reference-validation: false
 }
 
 ####
-POST https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentSchoolAssociation
+POST https://{{hostname}}/dev/v3.3b/StudentSchoolAssociation
 reference-validation: false
 
 { 
@@ -30,7 +31,7 @@ reference-validation: false
 }
 
 ### 
-POST https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentInterventionAssociations
+POST https://{{hostname}}/dev/v3.3b/StudentInterventionAssociations
 reference-validation: false
 
 { 
@@ -45,18 +46,18 @@ reference-validation: false
 
 
 ######## List all StudentInterventionAssociations
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentInterventionAssociations
+GET https://{{hostname}}/dev/v3.3b/StudentInterventionAssociations
 
 ######## List all StudentEducationOrganizationAssociations
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentEducationOrganizationAssociations
+GET https://{{hostname}}/dev/v3.3b/StudentEducationOrganizationAssociations
 
 ######## List all StudentSchoolAssociation
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentSchoolAssociations
+GET https://{{hostname}}/dev/v3.3b/StudentSchoolAssociations
 
 
 ######## GET by ID
 
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentInterventionAssociations/25fdd000-8a5d-452b-84be-02cfeb303e2d
+GET https://{{hostname}}/dev/v3.3b/StudentInterventionAssociations/25fdd000-8a5d-452b-84be-02cfeb303e2d
 #x-security-edorgid: 77,2423,234
 #
 #x-security-studentid: 2
@@ -67,13 +68,13 @@ x-security-through: StudentEducationOrganizationAssociation
 # View resolver, delete SEO 2-222
 
 ###### Query through SEO
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentInterventionAssociations?interventionReference.interventionIdentificationCode=1111
+GET https://{{hostname}}/dev/v3.3b/StudentInterventionAssociations?interventionReference.interventionIdentificationCode=1111
 x-security-edorgid: 111
 x-security-through: StudentEducationOrganizationAssociation
 
 
 ###### Query through SS
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentInterventionAssociations?interventionReference.interventionIdentificationCode=1111
+GET https://{{hostname}}/dev/v3.3b/StudentInterventionAssociations?interventionReference.interventionIdentificationCode=1111
 x-security-edorgid: 111
 x-security-through: StudentSchoolAssociation
 
@@ -82,11 +83,11 @@ x-security-through: StudentSchoolAssociation
 
 
 ### DELETE by ID
-DELETE https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/v3.3b/StudentEducationOrganizationAssociation/cdcc0d18-cfa7-4997-a66d-6f0914fedc16
+DELETE https://{{hostname}}/dev/v3.3b/StudentEducationOrganizationAssociation/cdcc0d18-cfa7-4997-a66d-6f0914fedc16
 
 
 
 ### MetaEd model metadata with GET
-GET https://ml7getsl3a.execute-api.us-east-1.amazonaws.com/braddev/metaed/v3.3b
+GET https://{{hostname}}/dev/metaed/v3.3b
 
 ###

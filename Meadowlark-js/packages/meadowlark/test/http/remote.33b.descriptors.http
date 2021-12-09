@@ -1,3 +1,5 @@
+@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+
 ######## List all with GET
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/ed-fi/populationServedDescriptors
+GET https://{{hostname}}/dev/v3.3b/ed-fi/populationServedDescriptors
 

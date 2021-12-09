@@ -9,7 +9,9 @@ deployment. For remote deployment instructions, please see
 
 ### Local Installation
 
-* Install Node.js 12.x, Yarn and Visual Studio Code.
+* Install [Node.js 14.x](https://nodejs.org/en/download/releases/)
+* Install [Yarn 1.x](https://classic.yarnpkg.com/lang/en/)
+* Install [Visual Studio Code](https://code.visualstudio.com/)
 * Install Java JRE version 11 or higher to run DynamoDB Local (Downloadable
   Version).
 * Install the [AWS
