@@ -81,7 +81,12 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
     const pathComponents = getPathComponents(event.path);
 
     // Does GitHub Code QL catch this?
-    eval(event.body ?? '');
+    const value = true;
+    const other = false;
+
+    if (value || other) {
+      Logger.error('something bad', '');
+    }
 
     if (pathComponents === null) {
       writeDebugStatusToLog(context, 'create', 404);
