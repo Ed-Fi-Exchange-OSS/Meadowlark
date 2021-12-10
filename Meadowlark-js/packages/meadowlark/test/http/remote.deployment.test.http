@@ -14,11 +14,16 @@
 # and have loaded descriptors with "yarn load:descriptors:aws-dev".
 
 # **** Change this to be the hostname portion of the endpoint URLs displayed at the end of the deployment process.
-@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
-
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
 
 # FYI, this is a non-expiring bearer token that is valid in the default configuration for the OAuth 2.0 proof-of-concept. 
 @token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+# -----------------------------------------------------------------------------
+# Verify service is running
+# -----------------------------------------------------------------------------
+GET https://{{hostname}}/{{stage}}/
 
 
 # -----------------------------------------------------------------------------
@@ -29,7 +34,7 @@
 ### Try creating a new resource with authorization header - expect success.
 ### (Cold start for POST means this may take up to 5 seconds. If you get a 400 error with invalid descriptor, see above
 ### on loading descriptors.)
-POST http://{{hostname}}/dev/v3.3b/ed-fi/educationContents
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents
 Authorization: bearer {{token}}
 
 {
@@ -42,7 +47,7 @@ Authorization: bearer {{token}}
 
 
 ### Try creating a new resource without authorization header - expect 401 Unauthorized.
-POST http://{{hostname}}/dev/v3.3b/ed-fi/educationContents
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents
 
 {
     "contentIdentifier": "different2",
@@ -55,12 +60,12 @@ POST http://{{hostname}}/dev/v3.3b/ed-fi/educationContents
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
 ### (Cold start for GET means this may take up to 5 seconds.)
-GET http://{{hostname}}/dev/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 Authorization: bearer {{token}}
 
 
 ### Try getting that resource without authorization header - expect 401 Unauthorized.
-GET http://{{hostname}}/dev/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 
 
 
@@ -70,7 +75,7 @@ GET http://{{hostname}}/dev/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a3
 
 
 ### Create a School
-POST http://{{hostname}}/dev/v3.3b/ed-fi/schools
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
 Authorization: bearer {{token}}
 
 {
@@ -91,23 +96,23 @@ Authorization: bearer {{token}}
 
 
 ### View all schools - should be one with id 7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
-GET http://{{hostname}}/dev/v3.3b/ed-fi/schools
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
 Authorization: bearer {{token}}
 
 
 ### Query for a school named 'School1' - should not return any
-GET http://{{hostname}}/dev/v3.3b/ed-fi/schools?nameOfInstitution=School1
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?nameOfInstitution=School1
 Authorization: bearer {{token}}
 
 
 ### Query for a school named 'School122' - should return result
-GET http://{{hostname}}/dev/v3.3b/ed-fi/schools?nameOfInstitution=School122
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?nameOfInstitution=School122
 Authorization: bearer {{token}}
 
 
 ### Attempt to update the school with an invalid educationOrganizationCategoryDescriptor - should fail
 ### (Cold start for PUT means this may take up to 5 seconds.)
-PUT http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
 Authorization: bearer {{token}}
 
 {
@@ -128,7 +133,7 @@ Authorization: bearer {{token}}
 
 
 ### Attempt to update the school with a valid educationOrganizationCategoryDescriptor - should succeed
-PUT http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
 Authorization: bearer {{token}}
 
 {
@@ -150,12 +155,13 @@ Authorization: bearer {{token}}
 
 ### Attempt to delete the school - should succeed
 ### (Cold start for DELETE means this may take up to 5 seconds.)
-DELETE http://{{hostname}}/dev/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+DELETE https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
 Authorization: bearer {{token}}
 
 
-### View all schools - should be none
-GET http://{{hostname}}/dev/v3.3b/ed-fi/schools
+### View all schools - should be none. If still there, try again - maybe went too fast
+# and DynamoDB eventual consistency is not yet consistent.
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
 Authorization: bearer {{token}}
 
 
@@ -167,7 +173,7 @@ Authorization: bearer {{token}}
 
 
 ### Create a Student
-POST  http://{{hostname}}/dev/v3.3b/ed-fi/students/
+POST  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/
 Authorization: bearer {{token}}
 
 { 
@@ -180,7 +186,7 @@ Authorization: bearer {{token}}
 
 
 ### Create a local education agency
-POST http://{{hostname}}/dev/v3.3b/ed-fi/localEducationAgencies
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/localEducationAgencies
 Authorization: bearer {{token}}
 
 {
@@ -196,7 +202,7 @@ Authorization: bearer {{token}}
 
 
 #### Create a Student EdOrg Association with an invalid educationOrganizationReference - should fail
-POST http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
 Authorization: bearer {{token}}
 
 { 
@@ -211,7 +217,7 @@ Authorization: bearer {{token}}
 
 
 #### Create a Student EdOrg Association with valid references - should succeed
-POST http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
 Authorization: bearer {{token}}
 
 { 
@@ -226,30 +232,30 @@ Authorization: bearer {{token}}
 
 
 ### View all Students - should be one with id 60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
-GET  http://{{hostname}}/dev/v3.3b/ed-fi/students
+GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students
 Authorization: bearer {{token}}
 
 
 ### Attempt to delete the Student - should fail due to the Student EdOrg Association reference to this Student
-DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
+DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
 Authorization: bearer {{token}}
 
 
 ### View all Student EdOrg Associations - should be one with id 3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
-GET  http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations
+GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
 Authorization: bearer {{token}}
 
 
 ### Attempt to delete the Student EdOrg Association - should succeed
-DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/studentEducationOrganizationAssociations/3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
+DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations/3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
 Authorization: bearer {{token}}
 
 
 ### Attempt to delete the Student now that the Student EdOrg Association is gone - should succeed
-DELETE  http://{{hostname}}/dev/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
+DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
 Authorization: bearer {{token}}
 
 
 ### View all Students - should be none
-GET  http://{{hostname}}/dev/v3.3b/ed-fi/students
+GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students
 Authorization: bearer {{token}}

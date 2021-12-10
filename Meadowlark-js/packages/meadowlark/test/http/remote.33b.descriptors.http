@@ -1,5 +1,6 @@
-@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
 
 ######## List all with GET
-GET https://{{hostname}}/dev/v3.3b/ed-fi/populationServedDescriptors
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/populationServedDescriptors
 

@@ -1,16 +1,17 @@
-@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
 
 ### MetaEd model metadata with GET
-GET https://{{hostname}}/dev/metaed/v3.3b
+GET https://{{hostname}}/{{stage}}/metaed/v3.3b
 
 ### API version
-GET https://{{hostname}}/dev/
+GET https://{{hostname}}/{{stage}}/
 
 ### Metadata list
-GET https://{{hostname}}/dev/metadata
+GET https://{{hostname}}/{{stage}}/metadata
 
 ### Open API Specification for Resources API
-GET https://{{hostname}}/dev/metadata/resources/swagger.json
+GET https://{{hostname}}/{{stage}}/metadata/resources/swagger.json
 
 ### Open API Specification for Descriptors API
-GET https://{{hostname}}/dev/metadata/descriptors/swagger.json
+GET https://{{hostname}}/{{stage}}/metadata/descriptors/swagger.json

@@ -1,7 +1,8 @@
-@hostname=abcdefg.execute-api.us-east-1.amazonaws.com
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
 
 ########
-POST https://{{hostname}}/dev/v3.3b/CourseOfferings
+POST https://{{hostname}}/{{stage}}/v3.3b/CourseOfferings
 reference-validation: false
 
 { 
@@ -21,16 +22,16 @@ reference-validation: false
 }
 
 ######## List all with GET
-GET https://{{hostname}}/dev/v3.3b/CourseOfferings
+GET https://{{hostname}}/{{stage}}/v3.3b/CourseOfferings
 
 
 ######## Query with GET
-GET http://{{hostname}}/dev/v3.3b/CourseOfferings?_unvalidated=true
+GET http://{{hostname}}/{{stage}}/v3.3b/CourseOfferings?_unvalidated=true
 
 
 
 
 ######## GET by ID
 
-GET https://{{hostname}}/dev/v3.3b/CourseOfferings/
+GET https://{{hostname}}/{{stage}}/v3.3b/CourseOfferings/
 
