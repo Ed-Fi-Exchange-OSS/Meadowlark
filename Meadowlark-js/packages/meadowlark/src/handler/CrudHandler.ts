@@ -80,6 +80,9 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
 
     const pathComponents = getPathComponents(event.path);
 
+    // Does GitHub Code QL catch this?
+    eval(event.body ?? '');
+
     if (pathComponents === null) {
       writeDebugStatusToLog(context, 'create', 404);
       return { body: '', statusCode: 404 };
