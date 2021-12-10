@@ -40,7 +40,7 @@ type RequestParamsType = { index: string; id: string };
  * A slice of Entity item information from a DynamoDB Stream event
  */
 type DynamoNewImage = {
-  info: object;
+  info: any;
   edOrgId?: string;
   studentId?: string;
   securityEdOrgId?: string;
@@ -142,12 +142,12 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
     }
     const keys = unmarshall(record.dynamodb.Keys) as DynamoKeys;
 
-    // Ignore if not an entity or descriptor item.
-    if (!keys.pk.startsWith('TYPE#') && !keys.pk.startsWith('DESC#')) {
+    // Ignore if not an entity item.
+    if (!keys.pk.startsWith('TYPE#')) {
       Logger.debug(
         `DynamoDbStreamHandler.updateExternalStorage Skipping ${JSON.stringify(
           record,
-        )} since it is not recognized as an entity or descriptor`,
+        )} since it is not recognized as an entity`,
         context.awsRequestId,
       );
       continue;
@@ -183,6 +183,16 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
         if (record.dynamodb?.NewImage == null) continue;
         Logger.debug(`DynamoDbStreamHandler.updateExternalStorage prepare insert to Elasticsearch`, context.awsRequestId);
         const newImage = unmarshall(record.dynamodb.NewImage) as DynamoNewImage;
+
+        // Ignore if a descriptor.
+        // eslint-disable-next-line no-underscore-dangle
+        if (newImage.info._isDescriptor) {
+          Logger.debug(
+            `DynamoDbStreamHandler.updateExternalStorage Skipping ${JSON.stringify(record)} since it is a descriptor entity`,
+            context.awsRequestId,
+          );
+          continue;
+        }
 
         await insertIntoElasticsearch(client, newImage, requestParams, context.awsRequestId);
 

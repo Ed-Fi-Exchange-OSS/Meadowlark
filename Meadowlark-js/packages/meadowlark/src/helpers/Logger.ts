@@ -49,8 +49,8 @@ export const Logger = {
   warn: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null) => {
     logger.warn({ message, lambdaRequestId, apiGatewayRequestId });
   },
-  info: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null) => {
-    logger.info({ message, lambdaRequestId, apiGatewayRequestId });
+  info: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
+    logger.info({ message, lambdaRequestId, apiGatewayRequestId, extra });
   },
   debug: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
     logger.debug({ message, lambdaRequestId, apiGatewayRequestId, extra });

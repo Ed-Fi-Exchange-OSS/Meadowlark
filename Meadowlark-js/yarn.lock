@@ -3638,13 +3638,6 @@
   resolved "https://www.myget.org/F/ed-fi/npm/@tootallnate/once/-/@tootallnate/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha1-zLkURTYBeaBOf+av94wA/8Hur4I=
 
-"@types/async-retry@^1.4.2":
-  version "1.4.2"
-  resolved "https://www.myget.org/F/ed-fi/npm/@types/async-retry/-/@types/async-retry-1.4.2.tgz#7f910188cd3893b51e32df51765ee8d5646053e3"
-  integrity sha1-f5EBiM04k7UeMt9Rdl7o1WRgU+M=
-  dependencies:
-    "@types/retry" "*"
-
 "@types/aws-lambda@^8.10.84":
   version "8.10.84"
   resolved "https://www.myget.org/F/ed-fi/npm/@types/aws-lambda/-/@types/aws-lambda-8.10.84.tgz#b1f391ceeb6908b28d8416d93f27afe8d1348d4e"
@@ -3715,11 +3708,6 @@
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
   integrity sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==
-
-"@types/faker@^4.1.12":
-  version "4.1.12"
-  resolved "https://www.myget.org/F/ed-fi/npm/@types/faker/-/@types/faker-4.1.12.tgz#065d37343677df1aa757c622650bd14666c42602"
-  integrity sha1-Bl03NDZ33xqnV8YiZQvRRmbEJgI=
 
 "@types/fs-extra@^8.1.0":
   version "8.1.0"
@@ -3849,7 +3837,7 @@
   dependencies:
     ts-toolbelt "^6.3.3"
 
-"@types/retry@*", "@types/retry@^0.12.0":
+"@types/retry@^0.12.0":
   version "0.12.0"
   resolved "https://www.myget.org/F/ed-fi/npm/@types/retry/-/@types/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
   integrity sha1-KzXsz87n04zXKtmSMvvVi/+zyE0=
@@ -3894,13 +3882,6 @@
   version "15.0.4"
   resolved "https://www.myget.org/F/ed-fi/npm/@types/yargs/-/@types/yargs-15.0.4.tgz#7e5d0f8ca25e9d5849f2ea443cf7c402decd8299"
   integrity sha1-fl0PjKJenVhJ8upEPPfEAt7Ngpk=
-  dependencies:
-    "@types/yargs-parser" "*"
-
-"@types/yargs@^15.0.5":
-  version "15.0.5"
-  resolved "https://www.myget.org/F/ed-fi/npm/@types/yargs/-/@types/yargs-15.0.5.tgz#947e9a6561483bdee9adffc983e91a6902af8b79"
-  integrity sha1-lH6aZWFIO97prf/Jg+kaaQKvi3k=
   dependencies:
     "@types/yargs-parser" "*"
 
@@ -4630,13 +4611,6 @@ async-limiter@~1.0.0:
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.1.tgz#dd379e94f0db8310b08291f9d64c3209766617fd"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
-async-retry@^1.3.1:
-  version "1.3.1"
-  resolved "https://www.myget.org/F/ed-fi/npm/async-retry/-/async-retry-1.3.1.tgz#139f31f8ddce50c0870b0ba558a6079684aaed55"
-  integrity sha1-E58x+N3OUMCHCwulWKYHloSq7VU=
-  dependencies:
-    retry "0.12.0"
-
 async@^1.5.2:
   version "1.5.2"
   resolved "https://www.myget.org/F/ed-fi/npm/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
@@ -4998,15 +4972,6 @@ before-after-hook@^2.0.0:
   resolved "https://www.myget.org/F/ed-fi/npm/before-after-hook/-/before-after-hook-2.1.0.tgz#b6c03487f44e24200dd30ca5e6a1979c5d2fb635"
   integrity sha1-tsA0h/ROJCAN0wyl5qGXnF0vtjU=
 
-bent@^7.3.2:
-  version "7.3.2"
-  resolved "https://www.myget.org/F/ed-fi/npm/bent/-/bent-7.3.2.tgz#4e4b3f71e44e4eb3409b811f51a2cd5ae59818ef"
-  integrity sha1-Tks/ceROTrNAm4EfUaLNWuWYGO8=
-  dependencies:
-    bytesish "^0.4.1"
-    caseless "~0.12.0"
-    is-stream "^2.0.0"
-
 big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
@@ -5366,11 +5331,6 @@ bytes@^3.1.0:
   version "3.1.0"
   resolved "https://www.myget.org/F/ed-fi/npm/bytes/-/bytes-3.1.0.tgz#f6cf7933a360e0588fa9fde85651cdc7f805d1f6"
   integrity sha1-9s95M6Ng4FiPqf3oVlHNx/gF0fY=
-
-bytesish@^0.4.1:
-  version "0.4.1"
-  resolved "https://www.myget.org/F/ed-fi/npm/bytesish/-/bytesish-0.4.1.tgz#5fe19b076037ffdfb63e083a53495b1d1c063f6f"
-  integrity sha1-X+GbB2A3/9+2Pgg6U0lbHRwGP28=
 
 cacache@^12.0.0, cacache@^12.0.2, cacache@^12.0.3:
   version "12.0.3"
@@ -7802,11 +7762,6 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://www.myget.org/F/ed-fi/npm/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
-
-faker@^4.1.0:
-  version "4.1.0"
-  resolved "https://www.myget.org/F/ed-fi/npm/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
-  integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
 
 fast-deep-equal@^3.1.1:
   version "3.1.1"
@@ -14550,15 +14505,15 @@ ret@~0.1.10:
   resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
   integrity sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
 
-retry@0.12.0, retry@^0.12.0:
-  version "0.12.0"
-  resolved "https://www.myget.org/F/ed-fi/npm/retry/-/retry-0.12.0.tgz#1b42a6266a21f07421d1b0b54b7dc167b01c013b"
-  integrity sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=
-
 retry@^0.10.0:
   version "0.10.1"
   resolved "https://www.myget.org/F/ed-fi/npm/retry/-/retry-0.10.1.tgz#e76388d217992c252750241d3d3956fed98d8ff4"
   integrity sha1-52OI0heZLCUnUCQdPTlW/tmNj/Q=
+
+retry@^0.12.0:
+  version "0.12.0"
+  resolved "https://www.myget.org/F/ed-fi/npm/retry/-/retry-0.12.0.tgz#1b42a6266a21f07421d1b0b54b7dc167b01c013b"
+  integrity sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=
 
 retry@^0.13.1:
   version "0.13.1"
@@ -17482,7 +17437,7 @@ yargs@^14.2.2:
     y18n "^4.0.0"
     yargs-parser "^15.0.1"
 
-yargs@^15.0.0, yargs@^15.3.1:
+yargs@^15.0.0:
   version "15.3.1"
   resolved "https://www.myget.org/F/ed-fi/npm/yargs/-/yargs-15.3.1.tgz#9505b472763963e54afe60148ad27a330818e98b"
   integrity sha1-lQW0cnY5Y+VK/mAUitJ6MwgY6Ys=

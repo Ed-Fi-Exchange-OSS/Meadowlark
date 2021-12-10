@@ -1,10 +1,13 @@
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
+
 ######## List all with GET
-GET https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/ed-fi/Sections
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/Sections
 
 
 
 ### Create with POST
-POST https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/ed-fi/Sections
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/Sections
 reference-validation: false
 
 { 
@@ -42,7 +45,7 @@ reference-validation: false
 }
 
 ### Update with PUT
-PUT https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/ed-fi/Sections/64ec13d5-305e-449a-a0a7-6e455784e3d1
+PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/Sections/64ec13d5-305e-449a-a0a7-6e455784e3d1
 reference-validation: false
 
 { 
@@ -81,4 +84,4 @@ reference-validation: false
 
 ### DELETE by ID
 
-DELETE https://9n5uuqc4p7.execute-api.us-east-1.amazonaws.com/dev/v3.3b/ed-fi/Sections/eb459cff-aafe-4099-8d4b-e7201fd6dcad
+DELETE https://{{hostname}}/{{stage}}/v3.3b/ed-fi/Sections/eb459cff-aafe-4099-8d4b-e7201fd6dcad

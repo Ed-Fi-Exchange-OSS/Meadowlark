@@ -24,6 +24,7 @@ import { isDocumentIdValid, documentIdForEntityInfo } from '../helpers/DocumentI
 import { NoEntityInfo } from '../model/EntityInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
+import { authorizationHeader } from '../helpers/AuthorizationHeader';
 
 function getPathComponents(path: string): PathComponents | null {
   // Matches all of the following sample expressions:
@@ -51,7 +52,7 @@ function getPathComponents(path: string): PathComponents | null {
 }
 
 function writeRequestToLog(event: APIGatewayProxyEvent, context: Context, method: string): void {
-  Logger.info(`CrudHandler.${method} ${event.path}`, context.awsRequestId, event.requestContext.requestId);
+  Logger.info(`CrudHandler.${method} ${event.path}`, context.awsRequestId, event.requestContext.requestId, event.headers);
 }
 
 function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
@@ -71,7 +72,7 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
   try {
     writeRequestToLog(event, context, 'create');
 
-    const { jwtStatus, errorResponse } = validateJwt(event.headers.authorization);
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
     if (errorResponse != null) {
       writeDebugStatusToLog(context, 'create', errorResponse.statusCode, JSON.stringify(jwtStatus));
       return errorResponse as APIGatewayProxyResult;
@@ -182,7 +183,7 @@ export async function getResolver(event: APIGatewayProxyEvent, context: Context)
   try {
     writeRequestToLog(event, context, 'getResolver');
 
-    const { jwtStatus, errorResponse } = validateJwt(event.headers.authorization);
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
     if (errorResponse != null) {
       writeDebugStatusToLog(context, 'create', errorResponse.statusCode, JSON.stringify(jwtStatus));
       return errorResponse as APIGatewayProxyResult;
@@ -237,7 +238,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
   try {
     writeRequestToLog(event, context, 'update');
 
-    const { jwtStatus, errorResponse } = validateJwt(event.headers.authorization);
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
     if (errorResponse != null) {
       writeDebugStatusToLog(context, 'update', errorResponse.statusCode, JSON.stringify(jwtStatus));
       return errorResponse as APIGatewayProxyResult;
@@ -343,7 +344,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
   try {
     writeRequestToLog(event, context, 'deleteIt');
 
-    const { jwtStatus, errorResponse } = validateJwt(event.headers.authorization);
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
     if (errorResponse != null) {
       writeDebugStatusToLog(context, 'deleteIt', errorResponse.statusCode, JSON.stringify(jwtStatus));
       return errorResponse as APIGatewayProxyResult;

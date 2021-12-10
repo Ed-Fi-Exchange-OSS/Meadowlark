@@ -4,6 +4,12 @@ Meadowlark currently supports deployment to AWS. Remote deployment is performed 
 
 ## Getting Started
 
+### Local Installation
+
+* Install [Node.js 14.x](https://nodejs.org/en/download/releases/)
+* Install [Yarn 1.x](https://classic.yarnpkg.com/lang/en/)
+
+
 ### Meadowlark API Security 
 
 Note: Meadowlark API security is in the proof-of-concept stage.
@@ -26,7 +32,9 @@ Set up your environment for command-line interaction with AWS.
 
 The Meadowlark [package.json](packages/meadowlark/package.json) includes scripts that use the [Serverless Framework](https://www.serverless.com/framework/docs) tool to deploy to a stage in your AWS environment. These scripts may be run with `npm` or `yarn` from the `packages/meadowlark` directory.
 
-There are scripts to deploy to a "dev" stage and a "stg" stage. Note that publishing to a stage overwrites any previous deployment to that stage. Also note that Elasticsearch provisioning takes at least 5 minutes on the initial publish to a stage, so please be patient.
+There are scripts to deploy to a "dev" stage and a "stg" stage. Note that publishing to a stage overwrites any previous deployment to that stage.
+
+The first publish of a stage may take 10-15 minutes to complete. This is the time it takes for AWS to provision a new Elasticsearch instance, so please be patient. Follow-on deployments to the same stage will be much faster.
 
 * Run `yarn deploy:aws-dev` to deploy to the "dev" stage.
 * Note the server portion of the endpoint URLs displayed at the end of the deployment process for access to the deployed API.
@@ -48,7 +56,7 @@ A Meadowlark deployment includes a large number of AWS resources which incur cos
 
 Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not required, must be loaded in order to use descriptor validation. 
 
-* Run `load:descriptors:aws-dev` to invoke the Meadowlark Lambda function that loads descriptors into the "dev" stage.
+* Run `yarn load:descriptors:aws-dev` to invoke the Meadowlark Lambda function that loads descriptors into the "dev" stage. Be patient, as this may take up to 90 seconds to complete.
 
 
 ### View the Meadowlark DynamoDB Table
@@ -58,13 +66,11 @@ Meadowlark uses a [single table design](https://aws.amazon.com/blogs/compute/cre
 
 ### Test a Meadowlark AWS Deployment
 
-Meadowlark is bundled with test scripts to exercise the API. Similar to Postman, these scripts are .http files that use the Visual Studio Code [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
+Meadowlark is bundled with test scripts to exercise the API. Similar to Postman, these scripts are .http files that use the Visual Studio Code REST Client extension.
 
-* Open a test/http/remote.*.http file and update the server portion of the URLs to match the deployment endpoints.
-* Use a test/http/remote.*.http file to make API calls. There are examples in the remote and local .http files on different way to access Meadowlark.
-    * An `Authorization` header is required to make API calls when `ACCESS_TOKEN_REQUIRED` is enabled in the enviroment variables.
-    * Reference validation can be disabled by adding the header `reference-validation: false`.
-    * Descriptor validation can be disabled by adding the header `descriptor-validation: false`.
+* Install [Visual Studio Code](https://code.visualstudio.com/) and the [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension. In Visual Studio Code, open the Meadowlark-js folder.
+* Open the [remote.deployment.test.http](packages/meadowlark/test/http/remote.deployment.test.http) file and update the @hostname entry to match your AWS deployment.
+* Follow the directions to exercise your deployment with several API scenarios.
 
 
 ### Deploy Meadowlark to a Different Stage
