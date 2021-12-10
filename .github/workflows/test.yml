@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # Allow running on any branch through button-click
+  workflow_dispatch:
 
 jobs:
   analyze:
