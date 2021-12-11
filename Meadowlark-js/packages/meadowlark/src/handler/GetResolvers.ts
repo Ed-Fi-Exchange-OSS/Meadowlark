@@ -8,7 +8,6 @@
 
 // eslint-disable-next-line import/no-unresolved
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
-import { int } from 'aws-sdk/clients/datapipeline';
 
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
@@ -17,7 +16,7 @@ import { getEntityById, getEntityList } from '../repository/DynamoEntityReposito
 import { queryEntityList } from '../repository/ElasticsearchRepository';
 import { validateResource } from './RequestValidator';
 
-function writeDebugStatusToLog(context: Context, method: string, status: int, message: string = ''): void {
+function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
   Logger.debug(`Get.${method} ${status} ${message || ''}`.trimEnd(), context.awsRequestId);
 }
 

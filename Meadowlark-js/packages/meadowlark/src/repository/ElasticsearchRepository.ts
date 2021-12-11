@@ -3,10 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable no-console */
 import R from 'ramda';
-import { createAWSConnection, awsGetCredentials } from '@acuris/aws-es-connection';
-import { Client } from '@elastic/elasticsearch';
+import { ClientRequestArgs, request } from 'http';
+import { Client, Connection } from '@elastic/elasticsearch';
+import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
+import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
+import type { Credentials } from '@aws-sdk/types';
+import { sign } from 'aws4';
 import { EntityInfo, entityTypeStringFrom } from '../model/EntityInfo';
 import { Security } from '../model/Security';
 import { Logger } from '../helpers/Logger';
@@ -15,6 +18,19 @@ export type GetResult = {
   success: boolean;
   results: Array<object>;
 };
+
+/**
+ * A replacement for @acuris/aws-es-connection's "createAWSConnection", using aws4.
+ * Allows us to use @aws-sdk/credential-provider-node instead of aws-sdk v2 dependency.
+ */
+function createESConnection(credentials: Credentials) {
+  return class extends Connection {
+    public constructor(opts: ConnectionOptions) {
+      super(opts);
+      this.makeRequest = (reqParams: ClientRequestArgs) => request(sign({ ...reqParams, service: 'es' }, credentials));
+    }
+  };
+}
 
 /**
  * Returns Elasticsearch index name for a given entity type, as defined by a
@@ -61,11 +77,11 @@ export async function getElasticsearchClient(awsRequestId: string): Promise<Clie
   }
 
   Logger.debug('ElasticsearchRepository.getElasticsearchClient creating Elasticsearch client', awsRequestId);
-  const awsCredentials = await awsGetCredentials();
-  const awsConnection = createAWSConnection(awsCredentials);
-  const client: Client = new Client({ ...awsConnection, node: `https://${process.env.ES_ENDPOINT}` });
 
-  return client;
+  return new Client({
+    Connection: createESConnection(await AWSCredentialProvider()()),
+    node: `https://${process.env.ES_ENDPOINT}`,
+  });
 }
 
 /**

@@ -1,7 +1,5 @@
 ### MetaEd model metadata with GET
 
-GET http://localhost:3000/local/metaed/v1
-
 ### API Version
 GET http://localhost:3000/local/
 
