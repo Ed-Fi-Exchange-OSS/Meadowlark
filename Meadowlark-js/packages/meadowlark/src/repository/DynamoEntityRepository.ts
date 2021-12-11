@@ -16,7 +16,6 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
-import { NextToken } from 'aws-sdk/clients/acm';
 import { EntityInfo, entityTypeStringFrom } from '../model/EntityInfo';
 import { Security } from '../model/Security';
 import {
@@ -42,6 +41,8 @@ import { NoOutput, TransactWriteItem } from '../types/AwsSdkLibDynamoDb';
 import { Logger } from '../helpers/Logger';
 import { ValidationOptions } from '../model/ValidationOptions';
 import { ForeignKeyItem } from '../model/ForeignKeyItem';
+
+type NextToken = string;
 
 /**
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
