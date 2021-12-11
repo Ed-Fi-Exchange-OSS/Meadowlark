@@ -3,7 +3,6 @@ service:
 
 plugins:
   - serverless-pseudo-parameters
-  - serverless-jetpack
   - serverless-dynamodb-local
   - serverless-plugin-offline-dynamodb-stream
   - serverless-offline
@@ -21,8 +20,6 @@ package:
     - 'tsconfig.json'
 
 custom:
-  jetpack:
-    base: '../..'
   serverless-offline:
     host: 0.0.0.0
     port: 4000
