@@ -62,10 +62,13 @@ jobs:
       working-directory: Meadowlark-js
 
     - name: Unit tests with code coverage
-      run: yarn test:coverage --ci
+      uses: mattallty/jest-github-action@43bbcd073fa43a927322f188220b6592acae003b
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        changes-only: true
+        test-command: yarn test:coverage --ci
       working-directory: Meadowlark-js
-
 
     # TODO:
     # - integration testing
-    # - consider coverage
