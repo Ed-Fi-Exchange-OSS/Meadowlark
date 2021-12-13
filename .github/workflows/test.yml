@@ -74,5 +74,6 @@ jobs:
         name: code-coverage-report
         path: $${{ env.SRC_DIR}}/Meadowlark-js/coverage/lcov-report
 
-    # TODO:
-    # - integration testing
+    - name: Integration tests
+      run: yarn test:integration
+      working-directory: Meadowlark-js
