@@ -74,10 +74,4 @@ jobs:
         name: code-coverage-report
         path: Meadowlark-js/coverage/lcov-report
 
-    - name: Integration tests
-      run: yarn test:integration
-      env:
-        AMAZON_ACCESS_KEY_ID: S3RVER
-        AMAZON_SECRET_KEY: S3RVER
-        DYNAMODB_DATA_DIR: .dynamoDb
-      working-directory: Meadowlark-js
+    # TODO: add integration testing RND-199
