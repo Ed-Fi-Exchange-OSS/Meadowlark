@@ -10836,11 +10836,6 @@ jest-snapshot@^27.2.0:
     pretty-format "^27.2.0"
     semver "^7.3.2"
 
-jest-teamcity-reporter@^0.9.0:
-  version "0.9.0"
-  resolved "https://www.myget.org/F/ed-fi/npm/jest-teamcity-reporter/-/jest-teamcity-reporter-0.9.0.tgz#a9f337a928a14e7e84163817456b930ecf7cbce8"
-  integrity sha1-qfM3qSihTn6EFjgXRWuTDs98vOg=
-
 jest-util@^24.9.0:
   version "24.9.0"
   resolved "https://www.myget.org/F/ed-fi/npm/jest-util/-/jest-util-24.9.0.tgz#7396814e48536d2e85a37de3e4c431d7cb140162"
