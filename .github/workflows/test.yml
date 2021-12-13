@@ -1,0 +1,77 @@
+name: "Test"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow running on any branch through button-click
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Full testing process
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: write
+      statuses: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'typescript' ]
+
+    steps:
+    - name: Checkout repository
+      # Commit hash is for https://github.com/actions/checkout/releases/tag/v2.4.0
+      uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+
+    - name: NPM caching
+      # Commit hash is for https://github.com/actions/setup-node/releases/tag/v2.5.0
+      uses: actions/setup-node@04c56d2f954f1e4c69436aa54cfef261a018f458
+      with:
+        node-version: '14'
+        cache: 'yarn'
+        cache-dependency-path: '**/yarn.lock'
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+
+    # Note: we want this to occur _before_ the build so that it doesn't
+    # have to wade through the generated *.js output
+    - name: Perform CodeQL Analysis
+      # Commit hash is for https://github.com/github/codeql-action/releases/tag/v1.0.26
+      uses: github/codeql-action/analyze@5f532563584d71fdef14ee64d17bafb34f751ce5
+
+    - name: Build
+      run: |
+        yarn install
+        yarn bootstrap
+      working-directory: Meadowlark-js
+
+    - name: Linter
+      run: yarn test:lint
+      working-directory: Meadowlark-js
+
+    - name: Build
+      run: yarn build
+      working-directory: Meadowlark-js
+
+    - name: Unit tests with code coverage
+      run: yarn test:coverage --ci
+      working-directory: Meadowlark-js
+
+    - name: Archive coverage results
+      # Commit hash is for https://github.com/actions/upload-artifact/releases/tag/v2.3.0
+      uses: actions/upload-artifact@da838ae9595ac94171fa2d4de5a2f117b3e7ac32
+      with:
+        name: code-coverage-report
+        path: Meadowlark-js/coverage/lcov-report
+
+    # TODO: add integration testing RND-199

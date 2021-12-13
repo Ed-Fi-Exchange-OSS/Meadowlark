@@ -1,6 +1,5 @@
 module.exports = {
   preset: 'ts-jest',
-  testResultsProcessor: 'jest-teamcity-reporter',
   testEnvironment: 'node',
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*metaed-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
