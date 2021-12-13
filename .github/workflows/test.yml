@@ -61,9 +61,10 @@ jobs:
       run: yarn build
       working-directory: Meadowlark-js
 
-    - name: Unit tests
-      run: yarn test:unit
+    - name: Unit tests with code coverage
+      run: yarn test:coverage --ci
       working-directory: Meadowlark-js
+
 
     # TODO:
     # - integration testing
