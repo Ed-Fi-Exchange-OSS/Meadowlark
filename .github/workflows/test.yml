@@ -68,7 +68,7 @@ jobs:
       with:
         changes-only: true
         test-command: yarn test:coverage --ci
-      working-directory: Meadowlark-js
+        working-directory: Meadowlark-js
 
     # TODO:
     # - integration testing
