@@ -9,13 +9,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  analyze:
+  test:
     name: Full testing process
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       security-events: write
+      pull-requests: write
+      statuses: write
 
     strategy:
       fail-fast: false
@@ -67,7 +69,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         changes-only: true
-        test-command: yarn test:coverage --ci --json --outputFile=jest.results.json
+        test-command: yarn test:coverage --ci --testLocationInResults --json --outputFile=jest.results.json
         working-directory: Meadowlark-js
 
     # TODO:
