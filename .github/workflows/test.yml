@@ -32,8 +32,8 @@ jobs:
       uses: actions/setup-node@04c56d2f954f1e4c69436aa54cfef261a018f458
       with:
         node-version: '14'
-        cache: 'npm'
-        cache-dependency-path: Meadowlark-js/yarn.lock
+        cache: 'yarn'
+        cache-dependency-path: '**/yarn.lock'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
