@@ -67,7 +67,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         changes-only: true
-        test-command: yarn test:coverage --ci
+        test-command: yarn test:coverage --ci --json --outputFile=jest.results.json
         working-directory: Meadowlark-js
 
     # TODO:
