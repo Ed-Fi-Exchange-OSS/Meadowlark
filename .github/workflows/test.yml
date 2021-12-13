@@ -72,7 +72,7 @@ jobs:
       uses: actions/upload-artifact@da838ae9595ac94171fa2d4de5a2f117b3e7ac32
       with:
         name: code-coverage-report
-        path: $${{ env.SRC_DIR}}/Meadowlark-js/coverage/lcov-report
+        path: Meadowlark-js/coverage/lcov-report
 
     - name: Integration tests
       run: yarn test:integration
