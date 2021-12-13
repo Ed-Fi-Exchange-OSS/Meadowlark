@@ -24,9 +24,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      # Commit hash is for https://github.com/actions/checkout/releases/tag/v2.4.0
+      uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
-    - uses: actions/setup-node@04c56d2f954f1e4c69436aa54cfef261a018f458 # 2.5.0
+    - name: NPM caching
+      # Commit hash is for https://github.com/actions/setup-node/releases/tag/v2.5.0
+      uses: actions/setup-node@04c56d2f954f1e4c69436aa54cfef261a018f458
       with:
         node-version: '14'
         cache: 'npm'
@@ -41,7 +44,8 @@ jobs:
     # Note: we want this to occur _before_ the build so that it doesn't
     # have to wade through the generated *.js output
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      # Commit hash is for https://github.com/github/codeql-action/releases/tag/v1.0.26
+      uses: github/codeql-action/analyze@5f532563584d71fdef14ee64d17bafb34f751ce5
 
     - name: Build
       run: |
