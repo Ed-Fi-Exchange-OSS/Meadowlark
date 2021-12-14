@@ -46,10 +46,6 @@ provider:
   stage: ${opt:stage, 'local'}
   timeout: 10
 
-  iam:
-    role:
-      name: ${self:service}-${self:provider.stage}-${aws:region}-lambdaRole
-
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
 
