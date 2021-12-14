@@ -89,3 +89,7 @@
 
 ## OTHER
 *.xlsx  binary
+
+## Yarn Modern
+/.yarn/releases/** binary
+/.yarn/plugins/** binary
