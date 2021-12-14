@@ -1,12 +1,11 @@
-service:
-  name: edfi-meadowlark
+service: edfi-meadowlark
+
+useDotenv: true
 
 plugins:
-  - serverless-pseudo-parameters
   - serverless-dynamodb-local
   - serverless-plugin-offline-dynamodb-stream
   - serverless-offline
-  - serverless-dotenv-plugin
 
 package:
   include:
@@ -29,10 +28,10 @@ custom:
     start:
       port: 8000
       inMemory: false
-      dbPath: '${env:DYNAMODB_DATA_DIR}'
+      dbPath: ${env:DYNAMODB_DATA_DIR}
       migrate: true
   dynamodbStream:
-      region: ${self:provider.region}
+      region: ${aws:region}
       host: localhost
       port: 8000
       pollForever: true
@@ -49,15 +48,14 @@ provider:
 
   iam:
     role:
-      # sets the name of the default lambda role
-      name: meadowlarkLambdaRole
+      name: ${self:service}-${self:provider.stage}-${aws:region}-lambdaRole
 
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
 
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Reuse TCP connections - important for DynamoDB performance
-    REGION: ${self:provider.region}
+    REGION: ${aws:region}
     STAGE: ${self:provider.stage}
     DOMAIN_TABLE_NAME: ${self:service}-${self:provider.stage}
     DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
@@ -73,9 +71,11 @@ provider:
         - s3:*
         - es:*
       Resource:
-        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:*
-        - arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:*
-        - arn:aws:es:#{AWS::Region}:#{AWS::AccountId}:*
+        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:*
+        - arn:aws:lambda:${aws:region}:${aws:accountId}:*
+        - arn:aws:es:${aws:region}:${aws:accountId}:*
+
+  lambdaHashingVersion: 20201221
 
 functions:
  - ${file(resources/functions.yml)}
