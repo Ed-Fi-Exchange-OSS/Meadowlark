@@ -52,5 +52,6 @@
     "hooks": {
       "pre-push": "yarn test:lint"
     }
-  }
+  },
+  "packageManager": "yarn@3.1.1"
 }
