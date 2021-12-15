@@ -8,25 +8,18 @@ plugins:
   - serverless-offline
 
 package:
-  include:
+  patterns:
+    - '!**'
+    - 'dist/**'
     - 'node_modules/**'
     - 'edfi-descriptors/**'
-  exclude:
-    - 'src/**'
-    - 'test/**'
-    - 'resources/**'
-    - '.dynamodb/**'
-    - 'tsconfig.json'
+    - 'package.json'
 
 custom:
-  bundle:
-    linting: false
-    disableForkTsChecker: true
-    fixPackages:
-      - "formidable@1.x"
   serverless-offline:
     host: 0.0.0.0
     port: 4000
+
   dynamodb:
     stages:
       - local
@@ -35,6 +28,7 @@ custom:
       inMemory: false
       dbPath: ${env:DYNAMODB_DATA_DIR}
       migrate: true
+
   dynamodbStream:
       region: ${aws:region}
       host: localhost
