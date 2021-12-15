@@ -2483,10 +2483,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:13.13.52":
-  version: 13.13.52
-  resolution: "@types/node@npm:13.13.52::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-13.13.52.tgz"
-  checksum: 8f1afff497ebeba209e2dc340d823284e087a47632afe99a7daa30eaff80893e520f222ad400cd1f2d3b8288e93cf3eaded52a8e64eaefb8aacfe6c35de98f42
+"@types/node@npm:14.14.31":
+  version: 14.14.31
+  resolution: "@types/node@npm:14.14.31::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-14.14.31.tgz"
+  checksum: 5b9ab3660ee63abc57affc836c0d50b2941a862c5b6c241c02762d8e1ad610f6b0d350d7426218dc401b5abc7d6294ee1b475da7c331e486d59a5608d1a0b777
   languageName: node
   linkType: hard
 
@@ -3109,7 +3109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aws-sdk@npm:^2.1036.0, aws-sdk@npm:^2.1041.0, aws-sdk@npm:^2.7.0":
+"aws-sdk@npm:^2.1036.0, aws-sdk@npm:^2.1046.0, aws-sdk@npm:^2.7.0":
   version: 2.1046.0
   resolution: "aws-sdk@npm:2.1046.0"
   dependencies:
@@ -3868,7 +3868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-progress-footer@npm:^2.1.1, cli-progress-footer@npm:^2.2.0":
+"cli-progress-footer@npm:^2.1.1, cli-progress-footer@npm:^2.3.0":
   version: 2.3.0
   resolution: "cli-progress-footer@npm:2.3.0"
   dependencies:
@@ -8616,7 +8616,7 @@ __metadata:
     "@types/inflection": ^1.13.0
     "@types/jest": 27.0.3
     "@types/js-yaml": ^4.0.5
-    "@types/node": 13.13.52
+    "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
     "@types/ramda": 0.27.60
     "@types/semver": ^7.3.9
@@ -8657,7 +8657,7 @@ __metadata:
     rimraf: ^3.0.2
     secure-random: ^1.1.2
     semver: ^7.2.1
-    serverless: 2.68.0
+    serverless: 2.69.1
     serverless-dynamodb-local: 0.2.40
     serverless-offline: 8.3.1
     serverless-plugin-offline-dynamodb-stream: 1.0.20
@@ -10933,9 +10933,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"serverless@npm:2.68.0":
-  version: 2.68.0
-  resolution: "serverless@npm:2.68.0"
+"serverless@npm:2.69.1":
+  version: 2.69.1
+  resolution: "serverless@npm:2.69.1"
   dependencies:
     "@serverless/cli": ^1.5.3
     "@serverless/components": ^3.18.1
@@ -10945,14 +10945,14 @@ __metadata:
     ajv: ^6.12.6
     ajv-keywords: ^3.5.2
     archiver: ^5.3.0
-    aws-sdk: ^2.1041.0
+    aws-sdk: ^2.1046.0
     bluebird: ^3.7.2
     boxen: ^5.1.2
     cachedir: ^2.3.0
     chalk: ^4.1.2
     child-process-ext: ^2.1.1
     ci-info: ^3.3.0
-    cli-progress-footer: ^2.2.0
+    cli-progress-footer: ^2.3.0
     d: ^1.0.1
     dayjs: ^1.10.7
     decompress: ^4.2.1
@@ -10996,7 +10996,7 @@ __metadata:
   bin:
     serverless: bin/serverless.js
     sls: bin/serverless.js
-  checksum: 93cc25f616e567c80ae9464bef9a3e8361f28948230ed46aaa559d0d2651d3217cd7add5722b3c0879b6c982ac95da08e34fff1ebca47301c5357321eaa54999
+  checksum: 0fa9ee894a7ff7620cc55b10c56779ac74a3bd25d21dfa0d448575c720cc1361cf54c019b79e413003584bd1c7a9de959f218972d42feaab549593816465e3d5
   languageName: node
   linkType: hard
 
