@@ -1301,7 +1301,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/code@npm:^8.0.1":
+"@hapi/code@npm:^8.0.5":
   version: 8.0.5
   resolution: "@hapi/code@npm:8.0.5::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40hapi%2Fcode%2F-%2F%40hapi%2Fcode-8.0.5.tgz"
   dependencies:
@@ -1605,7 +1605,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/core@npm:^27.4.4, @jest/core@npm:^27.4.5":
+"@jest/core@npm:^27.4.5":
   version: 27.4.5
   resolution: "@jest/core@npm:27.4.5::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40jest%2Fcore%2F-%2F%40jest%2Fcore-27.4.5.tgz"
   dependencies:
@@ -2274,7 +2274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/aws-lambda@npm:^8.10.84":
+"@types/aws-lambda@npm:^8.10.88":
   version: 8.10.88
   resolution: "@types/aws-lambda@npm:8.10.88::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Faws-lambda%2F-%2F%40types%2Faws-lambda-8.10.88.tgz"
   checksum: db2b12c5c216e28c704f456840276363441a52c22dde8a6ea3e9cb3bbfd12d71ce8a4ca6e8b19e3a2c5d87a5f71ae9e4f7173838d7963570883a90deadeecc2a
@@ -2365,7 +2365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:^8.1.0":
+"@types/fs-extra@npm:^8.1.2":
   version: 8.1.2
   resolution: "@types/fs-extra@npm:8.1.2::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Ffs-extra%2F-%2F%40types%2Ffs-extra-8.1.2.tgz"
   dependencies:
@@ -2397,7 +2397,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/inflection@npm:^1.5.28":
+"@types/inflection@npm:^1.13.0":
   version: 1.13.0
   resolution: "@types/inflection@npm:1.13.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Finflection%2F-%2F%40types%2Finflection-1.13.0.tgz"
   checksum: 0c7cb5b31d0b9418db5c391af07c1d9bfc56daa3a7d6b7c4697e5ea59f24933e19fbcbd8eb921053c0d8db9146b26e166e8f21feed1d5ae020cc3308c10587e2
@@ -2439,7 +2439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.3":
+"@types/js-yaml@npm:^4.0.5":
   version: 4.0.5
   resolution: "@types/js-yaml@npm:4.0.5::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fjs-yaml%2F-%2F%40types%2Fjs-yaml-4.0.5.tgz"
   checksum: 7dcac8c50fec31643cc9d6444b5503239a861414cdfaa7ae9a38bc22597c4d850c4b8cec3d82d73b3fbca408348ce223b0408d598b32e094470dfffc6d486b4d
@@ -2483,10 +2483,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:13.9.3":
-  version: 13.9.3
-  resolution: "@types/node@npm:13.9.3::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-13.9.3.tgz"
-  checksum: 365b9f98f64dc23b51e943e5b3d67fae013b14af8a72a8f7ef27c3b3362363bcd99c84979a1bdf449534be0a05a5a0eb488bde92dcf221cb7417f326aa05af7b
+"@types/node@npm:13.13.52":
+  version: 13.13.52
+  resolution: "@types/node@npm:13.13.52::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-13.13.52.tgz"
+  checksum: 8f1afff497ebeba209e2dc340d823284e087a47632afe99a7daa30eaff80893e520f222ad400cd1f2d3b8288e93cf3eaded52a8e64eaefb8aacfe6c35de98f42
   languageName: node
   linkType: hard
 
@@ -2511,12 +2511,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ramda@npm:0.27.0":
-  version: 0.27.0
-  resolution: "@types/ramda@npm:0.27.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Framda%2F-%2F%40types%2Framda-0.27.0.tgz"
+"@types/ramda@npm:0.27.60":
+  version: 0.27.60
+  resolution: "@types/ramda@npm:0.27.60::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Framda%2F-%2F%40types%2Framda-0.27.60.tgz"
   dependencies:
-    ts-toolbelt: ^6.3.3
-  checksum: e7bf0e8810a3aad8e01b4342c18d4f3eeb3c8aaa9db57055fe578f1dedf97c8c071eea33911aa7d2f2bb3366d907a1dc49d99121ab7d4e1b1b548f085eed24fe
+    ts-toolbelt: ^6.15.1
+  checksum: 442cce67b91ad42753ba47929918284dfc1792a3557038b3a0c816c1c874adeafe62daf3b80055044f0092054736ab211e14e2e1cef922378bce129b68ae9870
   languageName: node
   linkType: hard
 
@@ -2557,7 +2557,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.1.0":
+"@types/semver@npm:^7.3.9":
   version: 7.3.9
   resolution: "@types/semver@npm:7.3.9::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fsemver%2F-%2F%40types%2Fsemver-7.3.9.tgz"
   checksum: 60bfcfdfa7f937be2c6f4b37ddb6714fb0f27b05fe4cbdfdd596a97d35ed95d13ee410efdd88e72a66449d0384220bf20055ab7d6b5df10de4990fbd20e5cbe0
@@ -3149,12 +3149,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.22.0":
-  version: 0.22.0
-  resolution: "axios@npm:0.22.0"
+"axios@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "axios@npm:0.24.0"
   dependencies:
     follow-redirects: ^1.14.4
-  checksum: 83dc4d02e180f69aa9f0d1d0d50b84ec3603517230d58b4c3720ebd440c7e64ea86c5e892dc6e19061608e8e1103504a709d8baa4051c4b7652101b523d04b63
+  checksum: 468cf496c08a6aadfb7e699bebdac02851e3043d4e7d282350804ea8900e30d368daa6e3cd4ab83b8ddb5a3b1e17a5a21ada13fc9cebd27b74828f47a4236316
   languageName: node
   linkType: hard
 
@@ -4654,7 +4654,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"didyoumean2@npm:^4.0.0":
+"didyoumean2@npm:^4.2.0":
   version: 4.2.0
   resolution: "didyoumean2@npm:4.2.0"
   dependencies:
@@ -6549,7 +6549,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^7.0.0":
+"husky@npm:^7.0.4":
   version: 7.0.4
   resolution: "husky@npm:7.0.4"
   bin:
@@ -7298,7 +7298,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-cli@npm:^27.4.4":
+"jest-cli@npm:^27.4.5":
   version: 27.4.5
   resolution: "jest-cli@npm:27.4.5"
   dependencies:
@@ -7737,13 +7737,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:27.4.4":
-  version: 27.4.4
-  resolution: "jest@npm:27.4.4"
+"jest@npm:27.4.5":
+  version: 27.4.5
+  resolution: "jest@npm:27.4.5"
   dependencies:
-    "@jest/core": ^27.4.4
+    "@jest/core": ^27.4.5
     import-local: ^3.0.2
-    jest-cli: ^27.4.4
+    jest-cli: ^27.4.5
   peerDependencies:
     node-notifier: ^8.0.1 || ^9.0.0 || ^10.0.0
   peerDependenciesMeta:
@@ -7751,7 +7751,7 @@ __metadata:
       optional: true
   bin:
     jest: bin/jest.js
-  checksum: 0af09bd42c1ecef555dbc4a8cdd2b77b4bfff9ab3d7d2ee01e343067f443eb5743c7acdf2f28e8d2d268c8e058b129c79b1eda99d7c8b06a6a0e9e1fd04cb741
+  checksum: 57ee4be68650dd1f89e077cca48813d824779a07626e84178c672727ace1ef3cd489f124a27dc02b88601774413330e6d35080b11919efa6460ee61d378c6610
   languageName: node
   linkType: hard
 
@@ -8607,28 +8607,28 @@ __metadata:
     "@aws-sdk/types": 3.40.0
     "@aws-sdk/util-dynamodb": 3.44.0
     "@elastic/elasticsearch": 7.13.0
-    "@hapi/code": ^8.0.1
+    "@hapi/code": ^8.0.5
     "@hapi/joi": ^17.1.1
-    "@types/aws-lambda": ^8.10.84
+    "@types/aws-lambda": ^8.10.88
     "@types/eslint": ^8.2.1
-    "@types/fs-extra": ^8.1.0
+    "@types/fs-extra": ^8.1.2
     "@types/hapi__joi": ^16.0.12
-    "@types/inflection": ^1.5.28
+    "@types/inflection": ^1.13.0
     "@types/jest": 27.0.3
-    "@types/js-yaml": ^4.0.3
-    "@types/node": 13.9.3
+    "@types/js-yaml": ^4.0.5
+    "@types/node": 13.13.52
     "@types/pluralize": ^0.0.29
-    "@types/ramda": 0.27.0
-    "@types/semver": ^7.1.0
+    "@types/ramda": 0.27.60
+    "@types/semver": ^7.3.9
     "@types/xml2js": ^0.4.9
     "@typescript-eslint/eslint-plugin": 2.25.0
     "@typescript-eslint/parser": 2.25.0
     aws4: ^1.11.0
-    axios: ^0.22.0
+    axios: ^0.24.0
     copyfiles: ^2.4.1
     cross-env: ^7.0.3
     deep-freeze: ^0.0.1
-    didyoumean2: ^4.0.0
+    didyoumean2: ^4.2.0
     dynamodb-localhost: ^0.0.9
     ed-fi-model-3.3b: ^2.0.2
     eslint: 6.8.0
@@ -8641,10 +8641,10 @@ __metadata:
     eslint-plugin-prettier: 3.1.2
     fast-memoize: ^2.5.2
     fs-extra: ^9.0.0
-    husky: ^7.0.0
+    husky: ^7.0.4
     inflection: ^1.12.0
     invariant: ^2.2.4
-    jest: 27.4.4
+    jest: 27.4.5
     js-yaml: ^4.1.0
     jsinspect: ^0.12.7
     jssha: ^3.2.0
@@ -8652,7 +8652,7 @@ __metadata:
     metaed-plugin-edfi-unified: 2.6.0
     njwt: ^1.1.0
     prettier: 2.0.2
-    ramda: ^0.27.0
+    ramda: ^0.27.1
     regenerator-runtime: ^0.13.9
     rimraf: ^3.0.2
     secure-random: ^1.1.2
@@ -8661,11 +8661,11 @@ __metadata:
     serverless-dynamodb-local: 0.2.40
     serverless-offline: 8.3.1
     serverless-plugin-offline-dynamodb-stream: 1.0.20
-    source-map-support: ^0.5.16
+    source-map-support: ^0.5.21
     ts-jest: ^27.1.1
     ts-loader: ^6.2.2
     ts-node: 8.8.1
-    typescript: 4.5.3
+    typescript: 4.5.4
     winston: ^3.3.3
     xml2js: ^0.4.23
     yargs: ^17.1.1
@@ -10317,7 +10317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ramda@npm:^0.27.0, ramda@npm:^0.27.1":
+"ramda@npm:^0.27.1":
   version: 0.27.1
   resolution: "ramda@npm:0.27.1"
   checksum: 31a0c0ef739b2525d7615f84cbb5d3cb89ee0c795469b711f729ea1d8df0dccc3cd75d3717a1e9742d42315ce86435680b7c87743eb7618111c60c144a5b8059
@@ -11231,7 +11231,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-support@npm:^0.5.16, source-map-support@npm:^0.5.6":
+"source-map-support@npm:^0.5.21, source-map-support@npm:^0.5.6":
   version: 0.5.21
   resolution: "source-map-support@npm:0.5.21"
   dependencies:
@@ -12098,7 +12098,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-toolbelt@npm:^6.3.3":
+"ts-toolbelt@npm:^6.15.1":
   version: 6.15.5
   resolution: "ts-toolbelt@npm:6.15.5"
   checksum: 24ad00cfd9ce735c76c873a9b1347eac475b94e39ebbdf100c9019dce88dd5f4babed52884cf82bb456a38c28edd0099ab6f704b84b2e5e034852b618472c1f3
@@ -12216,23 +12216,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.5.3":
-  version: 4.5.3
-  resolution: "typescript@npm:4.5.3"
+"typescript@npm:4.5.4":
+  version: 4.5.4
+  resolution: "typescript@npm:4.5.4"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 2ac278c20418882816789ad94a5d9e7f11969db7a2a23fa09e61f2fedf3814265cbd4f89d7f5b6e1f0e7be2b5f169becf5dab913d0da255b073ea3c8c324e6d4
+  checksum: 59f3243f9cd6fe3161e6150ff6bf795fc843b4234a655dbd938a310515e0d61afd1ac942799e7415e4334255e41c2c49b7dd5d9fd38a17acd25a6779ca7e0961
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.5.3#~builtin<compat/typescript>":
-  version: 4.5.3
-  resolution: "typescript@patch:typescript@npm%3A4.5.3#~builtin<compat/typescript>::version=4.5.3&hash=493e53"
+"typescript@patch:typescript@4.5.4#~builtin<compat/typescript>":
+  version: 4.5.4
+  resolution: "typescript@patch:typescript@npm%3A4.5.4#~builtin<compat/typescript>::version=4.5.4&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 3c3a664dfb66e7c45d3823cc1a4038dc506415041f39249ed3af1799a64b3065448549d9e9ba509c94335d1e2dfbe311a4b9e36574e87d248f9381d541cb8626
+  checksum: 2e488dde7d2c4a2fa2e79cf2470600f8ce81bc0563c276b72df8ff412d74456ae532ba824650ae936ce207440c79720ddcfaa25e3cb4477572b8534fa4e34d49
   languageName: node
   linkType: hard
 
