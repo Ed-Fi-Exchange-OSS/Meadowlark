@@ -23,8 +23,7 @@ deployment. For remote deployment instructions, please see
 
 * Start Visual Studio Code and open the `meadowlark-js` directory.
 * Install all extension recommendations.
-* Open a terminal in the meadowlark-js directory and run `yarn install` then
-  `yarn bootstrap`.
+* Open a terminal in the meadowlark-js directory and run `yarn install`.
   * Note that `yarn install` will add a git hook to run linters before pushing
     with git.
 

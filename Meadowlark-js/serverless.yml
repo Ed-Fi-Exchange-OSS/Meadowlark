@@ -3,7 +3,6 @@ service: edfi-meadowlark
 useDotenv: true
 
 plugins:
-  - serverless-bundle
   - serverless-dynamodb-local
   - serverless-plugin-offline-dynamodb-stream
   - serverless-offline
