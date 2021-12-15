@@ -1,8 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  transform: {
-    '^.+\\.(t|j)s$': ['@swc/jest'],
-  },
+  preset: 'ts-jest',
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*metaed-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   moduleFileExtensions: ['js', 'ts'],

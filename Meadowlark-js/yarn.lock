@@ -1646,15 +1646,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/create-cache-key-function@npm:^27.3.1":
-  version: 27.4.2
-  resolution: "@jest/create-cache-key-function@npm:27.4.2::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40jest%2Fcreate-cache-key-function%2F-%2F%40jest%2Fcreate-cache-key-function-27.4.2.tgz"
-  dependencies:
-    "@jest/types": ^27.4.2
-  checksum: 46eeb4460798c6bba9da5bba6d07030012a9290ee6d2e3537e49110e57e6bcb118d9075a942ec3c1b1a2eebb50746d231bc9b15749980dd3817c41db3179c27a
-  languageName: node
-  linkType: hard
-
 "@jest/environment@npm:^27.4.4":
   version: 27.4.4
   resolution: "@jest/environment@npm:27.4.4::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40jest%2Fenvironment%2F-%2F%40jest%2Fenvironment-27.4.4.tgz"
@@ -1814,22 +1805,6 @@ __metadata:
   version: 1.1.1
   resolution: "@kwsites/promise-deferred@npm:1.1.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40kwsites%2Fpromise-deferred%2F-%2F%40kwsites%2Fpromise-deferred-1.1.1.tgz"
   checksum: 07455477a0123d9a38afb503739eeff2c5424afa8d3dbdcc7f9502f13604488a4b1d9742fc7288832a52a6422cf1e1c0a1d51f69a39052f14d27c9a0420b6629
-  languageName: node
-  linkType: hard
-
-"@napi-rs/triples@npm:^1.0.3":
-  version: 1.1.0
-  resolution: "@napi-rs/triples@npm:1.1.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40napi-rs%2Ftriples%2F-%2F%40napi-rs%2Ftriples-1.1.0.tgz"
-  checksum: 8da77d47ec15704b1936f5f3995951459fc5d604bf2ed400d9579e3356dc0aeb486b217a503f675dda653221751e1fd5dcaaf8de1bab3c71853e8cfd72309709
-  languageName: node
-  linkType: hard
-
-"@node-rs/helper@npm:^1.0.0":
-  version: 1.2.1
-  resolution: "@node-rs/helper@npm:1.2.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40node-rs%2Fhelper%2F-%2F%40node-rs%2Fhelper-1.2.1.tgz"
-  dependencies:
-    "@napi-rs/triples": ^1.0.3
-  checksum: c7b96e46df8a4195e62e51b6f60ed05aff398653c270dc9cffaed749303a4c428215d5826de8511b57cf66f2b0165fb3544fb2aec2aaf385c13ac3b9468bb000
   languageName: node
   linkType: hard
 
@@ -2252,168 +2227,6 @@ __metadata:
   dependencies:
     "@sinonjs/commons": ^1.7.0
   checksum: 09b5a158ce013a6c37613258bad79ca4efeb99b1f59c41c73cca36cac00b258aefcf46eeea970fccf06b989414d86fe9f54c1102272c0c3bdd51a313cea80949
-  languageName: node
-  linkType: hard
-
-"@swc/cli@npm:^0.1.54":
-  version: 0.1.55
-  resolution: "@swc/cli@npm:0.1.55::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcli%2F-%2F%40swc%2Fcli-0.1.55.tgz"
-  dependencies:
-    commander: ^7.1.0
-    fast-glob: ^3.2.5
-    slash: 3.0.0
-    source-map: ^0.7.3
-  peerDependencies:
-    "@swc/core": ^1.2.66
-    chokidar: ^3.5.1
-  peerDependenciesMeta:
-    chokidar:
-      optional: true
-  bin:
-    spack: bin/spack.js
-    swc: bin/swc.js
-  checksum: db6a727716acffd6202158bb47ab1541f9b43f1a8146c8588b33a969330f08ffbc59d813bad192929acb67f6675aabeee20618522b0b7533a9f77b35c49edaa1
-  languageName: node
-  linkType: hard
-
-"@swc/core-android-arm64@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-android-arm64@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-android-arm64%2F-%2F%40swc%2Fcore-android-arm64-1.2.120.tgz"
-  conditions: os=android & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@swc/core-darwin-arm64@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-darwin-arm64@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-darwin-arm64%2F-%2F%40swc%2Fcore-darwin-arm64-1.2.120.tgz"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@swc/core-darwin-x64@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-darwin-x64@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-darwin-x64%2F-%2F%40swc%2Fcore-darwin-x64-1.2.120.tgz"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@swc/core-freebsd-x64@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-freebsd-x64@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-freebsd-x64%2F-%2F%40swc%2Fcore-freebsd-x64-1.2.120.tgz"
-  conditions: os=freebsd & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@swc/core-linux-arm-gnueabihf@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-linux-arm-gnueabihf%2F-%2F%40swc%2Fcore-linux-arm-gnueabihf-1.2.120.tgz"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@swc/core-linux-arm64-gnu@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-linux-arm64-gnu@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-linux-arm64-gnu%2F-%2F%40swc%2Fcore-linux-arm64-gnu-1.2.120.tgz"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@swc/core-linux-arm64-musl@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-linux-arm64-musl@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-linux-arm64-musl%2F-%2F%40swc%2Fcore-linux-arm64-musl-1.2.120.tgz"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@swc/core-linux-x64-gnu@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-linux-x64-gnu@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-linux-x64-gnu%2F-%2F%40swc%2Fcore-linux-x64-gnu-1.2.120.tgz"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@swc/core-linux-x64-musl@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-linux-x64-musl@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-linux-x64-musl%2F-%2F%40swc%2Fcore-linux-x64-musl-1.2.120.tgz"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@swc/core-win32-arm64-msvc@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-win32-arm64-msvc@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-win32-arm64-msvc%2F-%2F%40swc%2Fcore-win32-arm64-msvc-1.2.120.tgz"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@swc/core-win32-ia32-msvc@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-win32-ia32-msvc@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-win32-ia32-msvc%2F-%2F%40swc%2Fcore-win32-ia32-msvc-1.2.120.tgz"
-  conditions: os=win32 & cpu=ia32
-  languageName: node
-  linkType: hard
-
-"@swc/core-win32-x64-msvc@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core-win32-x64-msvc@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore-win32-x64-msvc%2F-%2F%40swc%2Fcore-win32-x64-msvc-1.2.120.tgz"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@swc/core@npm:^1.2.120":
-  version: 1.2.120
-  resolution: "@swc/core@npm:1.2.120::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fcore%2F-%2F%40swc%2Fcore-1.2.120.tgz"
-  dependencies:
-    "@node-rs/helper": ^1.0.0
-    "@swc/core-android-arm64": ^1.2.120
-    "@swc/core-darwin-arm64": ^1.2.120
-    "@swc/core-darwin-x64": ^1.2.120
-    "@swc/core-freebsd-x64": ^1.2.120
-    "@swc/core-linux-arm-gnueabihf": ^1.2.120
-    "@swc/core-linux-arm64-gnu": ^1.2.120
-    "@swc/core-linux-arm64-musl": ^1.2.120
-    "@swc/core-linux-x64-gnu": ^1.2.120
-    "@swc/core-linux-x64-musl": ^1.2.120
-    "@swc/core-win32-arm64-msvc": ^1.2.120
-    "@swc/core-win32-ia32-msvc": ^1.2.120
-    "@swc/core-win32-x64-msvc": ^1.2.120
-  dependenciesMeta:
-    "@swc/core-android-arm64":
-      optional: true
-    "@swc/core-darwin-arm64":
-      optional: true
-    "@swc/core-darwin-x64":
-      optional: true
-    "@swc/core-freebsd-x64":
-      optional: true
-    "@swc/core-linux-arm-gnueabihf":
-      optional: true
-    "@swc/core-linux-arm64-gnu":
-      optional: true
-    "@swc/core-linux-arm64-musl":
-      optional: true
-    "@swc/core-linux-x64-gnu":
-      optional: true
-    "@swc/core-linux-x64-musl":
-      optional: true
-    "@swc/core-win32-arm64-msvc":
-      optional: true
-    "@swc/core-win32-ia32-msvc":
-      optional: true
-    "@swc/core-win32-x64-msvc":
-      optional: true
-  checksum: ae18b240e177eca66b90c91569a850f0620b7e1401f2bb5a6c0832395ce29deddf24dc658802b34dbd5ed92ae9bee4f0604ee6053e090bfab437209039cebcae
-  languageName: node
-  linkType: hard
-
-"@swc/jest@npm:^0.2.15":
-  version: 0.2.15
-  resolution: "@swc/jest@npm:0.2.15::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40swc%2Fjest%2F-%2F%40swc%2Fjest-0.2.15.tgz"
-  dependencies:
-    "@jest/create-cache-key-function": ^27.3.1
-  peerDependencies:
-    "@swc/core": "*"
-  checksum: 37cc4012df91fbcb583131c0c8b399475c3bb6d85a4328bf5ac4207fa94d7b5a172347d038911d28655de23038ee3c566f9d392382bd8c837706a0dc62262be8
   languageName: node
   linkType: hard
 
@@ -3617,6 +3430,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bs-logger@npm:0.x":
+  version: 0.2.6
+  resolution: "bs-logger@npm:0.2.6"
+  dependencies:
+    fast-json-stable-stringify: 2.x
+  checksum: d34bdaf68c64bd099ab97c3ea608c9ae7d3f5faa1178b3f3f345acd94e852e608b2d4f9103fb2e503f5e69780e98293df41691b84be909b41cf5045374d54606
+  languageName: node
+  linkType: hard
+
 "bser@npm:2.1.1":
   version: 2.1.1
   resolution: "bser@npm:2.1.1"
@@ -4251,13 +4073,6 @@ __metadata:
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
   checksum: ab8c07884e42c3a8dbc5dd9592c606176c7eb5c1ca5ff274bcf907039b2c41de3626f684ea75ccf4d361ba004bbaff1f577d5384c155f3871e456bdf27becf9e
-  languageName: node
-  linkType: hard
-
-"commander@npm:^7.1.0":
-  version: 7.2.0
-  resolution: "commander@npm:7.2.0"
-  checksum: 53501cbeee61d5157546c0bef0fedb6cdfc763a882136284bed9a07225f09a14b82d2a84e7637edfd1a679fb35ed9502fd58ef1d091e6287f60d790147f68ddc
   languageName: node
   linkType: hard
 
@@ -5761,7 +5576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:^3.1.1, fast-glob@npm:^3.2.4, fast-glob@npm:^3.2.5, fast-glob@npm:^3.2.7":
+"fast-glob@npm:^3.1.1, fast-glob@npm:^3.2.4, fast-glob@npm:^3.2.7":
   version: 3.2.7
   resolution: "fast-glob@npm:3.2.7"
   dependencies:
@@ -5774,7 +5589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-json-stable-stringify@npm:^2.0.0":
+"fast-json-stable-stringify@npm:2.x, fast-json-stable-stringify@npm:^2.0.0":
   version: 2.1.0
   resolution: "fast-json-stable-stringify@npm:2.1.0"
   checksum: b191531e36c607977e5b1c47811158733c34ccb3bfde92c44798929e9b4154884378536d26ad90dfecd32e1ffc09c545d23535ad91b3161a27ddbb8ebe0cbecb
@@ -7868,7 +7683,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-util@npm:^27.4.2":
+"jest-util@npm:^27.0.0, jest-util@npm:^27.4.2":
   version: 27.4.2
   resolution: "jest-util@npm:27.4.2"
   dependencies:
@@ -8154,6 +7969,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json5@npm:2.x, json5@npm:^2.1.2":
+  version: 2.2.0
+  resolution: "json5@npm:2.2.0"
+  dependencies:
+    minimist: ^1.2.5
+  bin:
+    json5: lib/cli.js
+  checksum: e88fc5274bb58fc99547baa777886b069d2dd96d9cfc4490b305fd16d711dabd5979e35a4f90873cefbeb552e216b041a304fe56702bedba76e19bc7845f208d
+  languageName: node
+  linkType: hard
+
 "json5@npm:^1.0.1":
   version: 1.0.1
   resolution: "json5@npm:1.0.1"
@@ -8162,17 +7988,6 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: e76ea23dbb8fc1348c143da628134a98adf4c5a4e8ea2adaa74a80c455fc2cdf0e2e13e6398ef819bfe92306b610ebb2002668ed9fc1af386d593691ef346fc3
-  languageName: node
-  linkType: hard
-
-"json5@npm:^2.1.2":
-  version: 2.2.0
-  resolution: "json5@npm:2.2.0"
-  dependencies:
-    minimist: ^1.2.5
-  bin:
-    json5: lib/cli.js
-  checksum: e88fc5274bb58fc99547baa777886b069d2dd96d9cfc4490b305fd16d711dabd5979e35a4f90873cefbeb552e216b041a304fe56702bedba76e19bc7845f208d
   languageName: node
   linkType: hard
 
@@ -8547,6 +8362,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.memoize@npm:4.x":
+  version: 4.1.2
+  resolution: "lodash.memoize@npm:4.1.2"
+  checksum: 9ff3942feeccffa4f1fafa88d32f0d24fdc62fd15ded5a74a5f950ff5f0c6f61916157246744c620173dddf38d37095a92327d5fd3861e2063e736a5c207d089
+  languageName: node
+  linkType: hard
+
 "lodash.once@npm:^4.0.0":
   version: 4.1.1
   resolution: "lodash.once@npm:4.1.1"
@@ -8725,7 +8547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"make-error@npm:^1.1.1":
+"make-error@npm:1.x, make-error@npm:^1.1.1":
   version: 1.3.6
   resolution: "make-error@npm:1.3.6"
   checksum: b86e5e0e25f7f777b77fabd8e2cbf15737972869d852a22b7e73c17623928fccb826d8e46b9951501d3f20e51ad74ba8c59ed584f610526a48f8ccf88aaec402
@@ -8787,9 +8609,6 @@ __metadata:
     "@elastic/elasticsearch": 7.13.0
     "@hapi/code": ^8.0.1
     "@hapi/joi": ^17.1.1
-    "@swc/cli": ^0.1.54
-    "@swc/core": ^1.2.120
-    "@swc/jest": ^0.2.15
     "@types/aws-lambda": ^8.10.84
     "@types/eslint": ^8.2.1
     "@types/fs-extra": ^8.1.0
@@ -8843,6 +8662,7 @@ __metadata:
     serverless-offline: 8.3.1
     serverless-plugin-offline-dynamodb-stream: 1.0.20
     source-map-support: ^0.5.16
+    ts-jest: ^27.1.1
     ts-loader: ^6.2.2
     ts-node: 8.8.1
     typescript: 4.5.3
@@ -11029,16 +10849,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^6.0.0, semver@npm:^6.1.1, semver@npm:^6.1.2, semver@npm:^6.2.0, semver@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "semver@npm:6.3.0"
-  bin:
-    semver: ./bin/semver.js
-  checksum: 1b26ecf6db9e8292dd90df4e781d91875c0dcc1b1909e70f5d12959a23c7eebb8f01ea581c00783bbee72ceeaad9505797c381756326073850dc36ed284b21b9
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.2.1, semver@npm:^7.3.0, semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5":
+"semver@npm:7.x, semver@npm:^7.2.1, semver@npm:^7.3.0, semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5":
   version: 7.3.5
   resolution: "semver@npm:7.3.5"
   dependencies:
@@ -11046,6 +10857,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 5eafe6102bea2a7439897c1856362e31cc348ccf96efd455c8b5bc2c61e6f7e7b8250dc26b8828c1d76a56f818a7ee907a36ae9fb37a599d3d24609207001d60
+  languageName: node
+  linkType: hard
+
+"semver@npm:^6.0.0, semver@npm:^6.1.1, semver@npm:^6.1.2, semver@npm:^6.2.0, semver@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "semver@npm:6.3.0"
+  bin:
+    semver: ./bin/semver.js
+  checksum: 1b26ecf6db9e8292dd90df4e781d91875c0dcc1b1909e70f5d12959a23c7eebb8f01ea581c00783bbee72ceeaad9505797c381756326073850dc36ed284b21b9
   languageName: node
   linkType: hard
 
@@ -11298,7 +11118,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slash@npm:3.0.0, slash@npm:^3.0.0":
+"slash@npm:^3.0.0":
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 94a93fff615f25a999ad4b83c9d5e257a7280c90a32a7cb8b4a87996e4babf322e469c42b7f649fd5796edd8687652f3fb452a86dc97a816f01113183393f11c
@@ -12209,6 +12029,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-jest@npm:^27.1.1":
+  version: 27.1.1
+  resolution: "ts-jest@npm:27.1.1"
+  dependencies:
+    bs-logger: 0.x
+    fast-json-stable-stringify: 2.x
+    jest-util: ^27.0.0
+    json5: 2.x
+    lodash.memoize: 4.x
+    make-error: 1.x
+    semver: 7.x
+    yargs-parser: 20.x
+  peerDependencies:
+    "@babel/core": ">=7.0.0-beta.0 <8"
+    "@types/jest": ^27.0.0
+    babel-jest: ">=27.0.0 <28"
+    esbuild: ~0.14.0
+    jest: ^27.0.0
+    typescript: ">=3.8 <5.0"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    "@types/jest":
+      optional: true
+    babel-jest:
+      optional: true
+    esbuild:
+      optional: true
+  bin:
+    ts-jest: cli.js
+  checksum: 3aea68083399c49e9079dbd1583ee5cce7da9648a6cdaef96c2b5f2f85de375c186227724336f359ecd2bc7871bff0911667d1f4867e0e275417b3e4887841d9
+  languageName: node
+  linkType: hard
+
 "ts-loader@npm:^6.2.2":
   version: 6.2.2
   resolution: "ts-loader@npm:6.2.2"
@@ -13114,7 +12968,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs-parser@npm:^20.2.2":
+"yargs-parser@npm:20.x, yargs-parser@npm:^20.2.2":
   version: 20.2.9
   resolution: "yargs-parser@npm:20.2.9"
   checksum: 8bb69015f2b0ff9e17b2c8e6bfe224ab463dd00ca211eece72a4cd8a906224d2703fb8a326d36fdd0e68701e201b2a60ed7cf81ce0fd9b3799f9fe7745977ae3
