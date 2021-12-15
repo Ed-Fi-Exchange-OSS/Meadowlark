@@ -10,7 +10,7 @@ getResolver:
   handler: dist/handler/CrudHandler.getResolver
   environment:
     ES_ENDPOINT:
-      Fn::GetAtt: [ ElasticSearchInstance, DomainEndpoint ]
+      Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]
   events:
     - http:
         method: get
@@ -81,7 +81,7 @@ updateExternalStorage:
   handler: dist/handler/DynamoDbStreamHandler.updateExternalStorage
   environment:
     ES_ENDPOINT:
-      Fn::GetAtt: [ ElasticSearchInstance, DomainEndpoint ]
+      Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]
   events:
     - stream:
         type: dynamodb
