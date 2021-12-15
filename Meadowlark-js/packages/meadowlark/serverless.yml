@@ -3,6 +3,7 @@ service: edfi-meadowlark
 useDotenv: true
 
 plugins:
+  - serverless-bundle
   - serverless-dynamodb-local
   - serverless-plugin-offline-dynamodb-stream
   - serverless-offline
@@ -19,6 +20,11 @@ package:
     - 'tsconfig.json'
 
 custom:
+  bundle:
+    linting: false
+    disableForkTsChecker: true
+    fixPackages:
+      - "formidable@1.x"
   serverless-offline:
     host: 0.0.0.0
     port: 4000
