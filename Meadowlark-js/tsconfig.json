@@ -16,12 +16,12 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "outDir": "dist",
-    "rootDir": ".",
-    "paths": {
-      "~/*": ["packages/*"]
-    }
+    "rootDir": "./src",
+    "outDir": "./dist",
   },
+  "include": [
+    "./src"
+  ],
   "exclude": [
     "node_modules",
     "**/dist",
