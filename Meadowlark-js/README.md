@@ -30,7 +30,7 @@ deployment. For remote deployment instructions, please see
 ### Environment Variables
 
 Meadowlark uses environment variables from a `.env` file for API security and
-local DynamoDB and OpenSearch/Elasticsearch configuration. You will also need to set dummy
+local DynamoDB and OpenSearch configuration. You will also need to set dummy
 AWS credentials if you do not intend to deploy Meadowlark to an AWS account.
 
 * In the `packages/meadowlark` directory, Copy the `.env.example` file to
@@ -54,11 +54,9 @@ already have the AWS CLI configured, uncomment the `AWS_ACCESS_KEY_ID` and
 * Change directories to `packages/meadowlark`.
 * Run `yarn init:local-dynamodb`.
 
-### Elasticsearch Installation
+### OpenSearch Installation
 
-Although this solution uses OpenSearch on AWS, for local development we use Open
-Distro for Elasticsearch via Docker (to be replaced with OpenSearch,
-[RND-202](https://tracker.ed-fi.org/browse/RND-202)). See the
+The quickest way to get OpenSearch running locally is with Docker. See the
 [docker-local README.md](docker-local/readme.md) in the docker-local directory
 for instructions.
 
