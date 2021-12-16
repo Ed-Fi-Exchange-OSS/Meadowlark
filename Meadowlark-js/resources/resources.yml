@@ -29,31 +29,17 @@ Resources:
             KeyType: RANGE
           Projection:
             ProjectionType: KEYS_ONLY
-  ElasticSearchInstance:
-    Type: AWS::Elasticsearch::Domain
+  OpenSearchInstance:
+    Type: AWS::OpenSearchService::Domain
     Properties:
       EBSOptions:
         EBSEnabled: true
         VolumeType: gp2
         VolumeSize: 10
-      ElasticsearchClusterConfig:
-        InstanceType: t2.small.elasticsearch
+      ClusterConfig:
+        InstanceType: t2.small.search
         InstanceCount: 1
         DedicatedMasterEnabled: false
         ZoneAwarenessEnabled: false
-      ElasticsearchVersion: 7.4
+      EngineVersion: "OpenSearch_1.0"
       DomainName: ${self:service}-${self:provider.stage}
-      AccessPolicies:      
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": "arn:aws:iam::#{AWS::AccountId}:role/meadowlarkLambdaRole"
-              },
-              "Action": "es:*",
-              "Resource": "arn:aws:es:#{AWS::Region}:#{AWS::AccountId}:domain/${self:service}-${self:provider.stage}/*"
-            }
-          ]
-        }

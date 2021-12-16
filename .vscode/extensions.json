@@ -12,6 +12,8 @@
         "editorconfig.editorconfig",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "humao.rest-client"
+        "humao.rest-client",
+        "davidanson.vscode-markdownlint",
+        "stkb.rewrap"
     ]
 }

@@ -1,41 +1,36 @@
-service:
-  name: edfi-meadowlark
+service: edfi-meadowlark
+
+useDotenv: true
 
 plugins:
-  - serverless-pseudo-parameters
-  - serverless-jetpack
   - serverless-dynamodb-local
   - serverless-plugin-offline-dynamodb-stream
   - serverless-offline
-  - serverless-dotenv-plugin
 
 package:
-  include:
+  patterns:
+    - '!**'
+    - 'dist/**'
     - 'node_modules/**'
     - 'edfi-descriptors/**'
-  exclude:
-    - 'src/**'
-    - 'test/**'
-    - 'resources/**'
-    - '.dynamodb/**'
-    - 'tsconfig.json'
+    - 'package.json'
 
 custom:
-  jetpack:
-    base: '../..'
   serverless-offline:
     host: 0.0.0.0
     port: 4000
+
   dynamodb:
     stages:
       - local
     start:
       port: 8000
       inMemory: false
-      dbPath: '${env:DYNAMODB_DATA_DIR}'
+      dbPath: ${env:DYNAMODB_DATA_DIR}
       migrate: true
+
   dynamodbStream:
-      region: ${self:provider.region}
+      region: ${aws:region}
       host: localhost
       port: 8000
       pollForever: true
@@ -50,23 +45,21 @@ provider:
   stage: ${opt:stage, 'local'}
   timeout: 10
 
-  iam:
-    role:
-      # sets the name of the default lambda role
-      name: meadowlarkLambdaRole
-
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
 
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Reuse TCP connections - important for DynamoDB performance
-    REGION: ${self:provider.region}
+    REGION: ${aws:region}
     STAGE: ${self:provider.stage}
     DOMAIN_TABLE_NAME: ${self:service}-${self:provider.stage}
     DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
     ES_LOCAL_ENDPOINT: 'http://localhost:9200'
     TOKEN_URL: 'http://localhost:3000/${self:provider.stage}/api/oauth/token'
-    IS_LOCAL: 'false'
+    IS_LOCAL: ${env:IS_LOCAL, 'false'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    ACCESS_TOKEN_REQUIRED: ${env:ACCESS_TOKEN_REQUIRED, 'true'}
+    SIGNING_KEY: ${env:SIGNING_KEY}
 
   iamRoleStatements:
     - Effect: 'Allow'
@@ -76,9 +69,11 @@ provider:
         - s3:*
         - es:*
       Resource:
-        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:*
-        - arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:*
-        - arn:aws:es:#{AWS::Region}:#{AWS::AccountId}:*
+        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:*
+        - arn:aws:lambda:${aws:region}:${aws:accountId}:*
+        - arn:aws:es:${aws:region}:${aws:accountId}:domain/${self:service}-${self:provider.stage}/*
+
+  lambdaHashingVersion: 20201221
 
 functions:
  - ${file(resources/functions.yml)}

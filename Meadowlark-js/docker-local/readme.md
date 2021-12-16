@@ -5,9 +5,9 @@ external network access to the workstation.
 
 Provisions:
 
-* Elasticsearch
+* Open Distro for Elasticsearch
 * Kibana
-* Elasticsearch storage volume
+* Storage volume
 
 ## Before Starting
 
@@ -24,7 +24,7 @@ To access Kibana, open http://localhost:5601.
 
 ## Monitor
 
-```
+```bash
 docker logs kibana
 docker logs elasticsearch
 ```

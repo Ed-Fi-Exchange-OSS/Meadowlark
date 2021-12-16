@@ -23,15 +23,14 @@ deployment. For remote deployment instructions, please see
 
 * Start Visual Studio Code and open the `meadowlark-js` directory.
 * Install all extension recommendations.
-* Open a terminal in the meadowlark-js directory and run `yarn install` then
-  `yarn bootstrap`.
+* Open a terminal in the meadowlark-js directory and run `yarn install`.
   * Note that `yarn install` will add a git hook to run linters before pushing
     with git.
 
 ### Environment Variables
 
 Meadowlark uses environment variables from a `.env` file for API security and
-local DynamoDB and Elasticsearch configuration. You will also need to set dummy
+local DynamoDB and OpenSearch/Elasticsearch configuration. You will also need to set dummy
 AWS credentials if you do not intend to deploy Meadowlark to an AWS account.
 
 * In the `packages/meadowlark` directory, Copy the `.env.example` file to
@@ -57,7 +56,9 @@ already have the AWS CLI configured, uncomment the `AWS_ACCESS_KEY_ID` and
 
 ### Elasticsearch Installation
 
-The quickest way to get Elasticsearch running locally is with Docker. See the
+Although this solution uses OpenSearch on AWS, for local development we use Open
+Distro for Elasticsearch via Docker (to be replaced with OpenSearch,
+[RND-202](https://tracker.ed-fi.org/browse/RND-202)). See the
 [docker-local README.md](docker-local/readme.md) in the docker-local directory
 for instructions.
 
