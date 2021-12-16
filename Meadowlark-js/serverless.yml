@@ -56,7 +56,7 @@ provider:
     DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
     ES_LOCAL_ENDPOINT: 'http://localhost:9200'
     TOKEN_URL: 'http://localhost:3000/${self:provider.stage}/api/oauth/token'
-    IS_LOCAL: 'false'
+    IS_LOCAL: ${env:IS_LOCAL, 'false'}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
     ACCESS_TOKEN_REQUIRED: ${env:ACCESS_TOKEN_REQUIRED, 'true'}
     SIGNING_KEY: ${env:SIGNING_KEY}
