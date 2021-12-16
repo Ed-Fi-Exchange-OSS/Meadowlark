@@ -1,2 +1,0 @@
-# https://opensearch.org/docs/latest/security-plugin/configuration/disable/
-plugins.security.disabled: true
