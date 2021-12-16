@@ -49,10 +49,8 @@ jobs:
       # Commit hash is for https://github.com/github/codeql-action/releases/tag/v1.0.26
       uses: github/codeql-action/analyze@5f532563584d71fdef14ee64d17bafb34f751ce5
 
-    - name: Build
-      run: |
-        yarn install
-        yarn bootstrap
+    - name: Install dependencies
+      run: yarn install
       working-directory: Meadowlark-js
 
     - name: Linter
