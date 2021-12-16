@@ -47,13 +47,13 @@ In this configuration, you need to build a new OpenSearch image with TLS
 * Windows: Open a PowerShell prompt and switch to the `unsecured` directory, then run `.\build.ps1`
 * Linux: Open a terminal in the `-unsecured` directory, then run `docker build --tag=kibana-unsecured .`
 
-## Start Services
+## Operations
 
-In this directory, run `docker compose up -d`
+At a command prompt, running in this directory:
 
-## Monitor
-
-```bash
-docker logs opensearch-dashboards
-docker logs opensearch-node1
-```
+| Operation | Command |
+| -- | -- |
+| start containers | `docker compose up -d` |
+| stop containers | `docker compose down` |
+| view OpenSearch logs | `docker logs opensearch-node1` |
+| view Dashboard logs | `docker logs opensearch-dashboards` |
