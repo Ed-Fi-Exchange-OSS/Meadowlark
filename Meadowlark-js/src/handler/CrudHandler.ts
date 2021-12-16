@@ -5,7 +5,6 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import R from 'ramda';
 import { validateResource } from './RequestValidator';
 import {
   createEntity,
@@ -19,7 +18,7 @@ import {
 
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
-import { getById, list, query } from './GetResolvers';
+import { getById, query } from './GetResolvers';
 import { isDocumentIdValid, documentIdForEntityInfo } from '../helpers/DocumentId';
 import { NoEntityInfo } from '../model/EntityInfo';
 import { validateJwt } from '../helpers/JwtValidator';
@@ -172,8 +171,6 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
   }
 }
 
-const removeDisallowedQueryParameters = R.omit(['offset', 'limit', 'totalCount']);
-
 /**
  * Entry point for all API GET requests
  *
@@ -212,17 +209,7 @@ export async function getResolver(event: APIGatewayProxyEvent, context: Context)
         clientName: jwtStatus.subject,
       });
 
-    const cleanQueryParameters: object = removeDisallowedQueryParameters(event.queryStringParameters) ?? {};
-
-    if (Object.keys(cleanQueryParameters).length === 0) return await list(pathComponents, context);
-
-    return await query(pathComponents, cleanQueryParameters, context, {
-      edOrgIds,
-      studentIds,
-      throughAssociation,
-      isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
-      clientName: jwtStatus.subject,
-    });
+    return await query(pathComponents, event.queryStringParameters ?? {}, context);
   } catch (e) {
     writeErrorToLog(context, event, 'getResolver', 500, e);
     return { body: '', statusCode: 500 };

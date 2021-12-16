@@ -217,13 +217,13 @@ describe('given a valid list request', () => {
     mockQuery.mockRestore();
   });
 
-  it('called list', () => {
-    expect(mockList).toHaveBeenCalled();
+  it('called query', () => {
+    expect(mockQuery).toHaveBeenCalled();
   });
 
-  it('did not call getById or query', () => {
+  it('did not call getById or list', () => {
     expect(mockGetById).not.toHaveBeenCalled();
-    expect(mockQuery).not.toHaveBeenCalled();
+    expect(mockList).not.toHaveBeenCalled();
   });
 });
 
@@ -258,50 +258,6 @@ describe('given a valid query request', () => {
 
   it('called query', () => {
     expect(mockQuery).toHaveBeenCalled();
-  });
-
-  it('did not call getById or list', () => {
-    expect(mockGetById).not.toHaveBeenCalled();
-    expect(mockList).not.toHaveBeenCalled();
-  });
-});
-
-describe('given a valid query request with disallowed limit/offset/totalCount parameters', () => {
-  let mockGetById;
-  let mockList;
-  let mockQuery;
-
-  let sentQueryParameters;
-
-  beforeAll(async () => {
-    mockGetById = jest.spyOn(GetResolvers, 'getById').mockImplementation((() => null) as any);
-    mockList = jest.spyOn(GetResolvers, 'list').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(GetResolvers, 'query').mockImplementation(((_, queryParameters) => {
-      sentQueryParameters = queryParameters;
-    }) as any);
-
-    const event: APIGatewayProxyEvent = {
-      body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
-      path: '/v3.3b/ed-fi/students/',
-      queryStringParameters: { lastSurname: 'World', limit: '10', offset: '11', totalCount: '100' },
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
-
-    // Act
-    await getResolver(event, context);
-  });
-
-  afterAll(() => {
-    mockGetById.mockRestore();
-    mockList.mockRestore();
-    mockQuery.mockRestore();
-  });
-
-  it('called query without limit/offset/totalCount', () => {
-    expect(mockQuery).toHaveBeenCalled();
-    expect(sentQueryParameters).toEqual({ lastSurname: 'World' });
   });
 
   it('did not call getById or list', () => {

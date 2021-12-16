@@ -8,12 +8,13 @@
 
 // eslint-disable-next-line import/no-unresolved
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
+import R from 'ramda';
 
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { Security } from '../model/Security';
 import { getEntityById, getEntityList } from '../repository/DynamoEntityRepository';
-import { queryEntityList } from '../repository/ElasticsearchRepository';
+import { PaginationParameters, queryEntityList } from '../repository/ElasticsearchRepository';
 import { validateResource } from './RequestValidator';
 
 function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
@@ -97,6 +98,9 @@ export async function getById(
   };
 }
 
+const removeDisallowedQueryParameters = R.omit(['offset', 'limit', 'totalCount']);
+const onlyPaginationParameters = R.pick(['offset', 'limit']);
+
 /**
  * Handler for API GET requests that represent queries
  *
@@ -106,7 +110,6 @@ export async function query(
   pathComponents: PathComponents,
   queryStringParameters: object,
   context: Context,
-  security: Security,
 ): Promise<APIGatewayProxyResult> {
   const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
@@ -114,10 +117,13 @@ export async function query(
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
+  const cleanQueryParameters: object = removeDisallowedQueryParameters(queryStringParameters);
+  const paginationParameters: PaginationParameters = onlyPaginationParameters(queryStringParameters);
+
   const { success, results } = await queryEntityList(
     entityInfo,
-    queryStringParameters ?? {},
-    security,
+    cleanQueryParameters,
+    paginationParameters,
     context.awsRequestId,
   );
 
