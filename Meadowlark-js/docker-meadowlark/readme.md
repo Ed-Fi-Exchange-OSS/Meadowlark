@@ -34,16 +34,8 @@ Ensure that you have sufficient resources allocated to Docker:
         $processes[0].Kill()
         $processes[0].WaitForExit()
     }
-    Start-Process "$Env:ProgramFiles\\Docker\Docker\Docker Desktop.exe"
+    Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
     ```
-
-## Before Starting
-
-In this configuration, you need to build a new OpenSearch image with TLS
-(certificate) security disabled.
-
-* Windows: Open a PowerShell prompt and switch to the `unsecured` directory, then run `.\build.ps1`
-* Linux: Open a terminal in the `-unsecured` directory, then run `docker build --tag=kibana-unsecured .`
 
 ## Operations
 
