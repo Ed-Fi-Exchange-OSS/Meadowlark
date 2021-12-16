@@ -56,7 +56,7 @@ There are scripts to deploy to a "dev" stage and a "stg" stage. Note that
 publishing to a stage overwrites any previous deployment to that stage.
 
 The first publish of a stage may take 10-15 minutes to complete. This is the
-time it takes for AWS to provision a new Elasticsearch instance, so please be
+time it takes for AWS to provision a new OpenSearch instance, so please be
 patient. Follow-on deployments to the same stage will be much faster.
 
 * Run `yarn deploy:aws-dev` to deploy to the "dev" stage.
