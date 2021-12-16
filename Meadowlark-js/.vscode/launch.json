@@ -9,7 +9,7 @@
       "args": ["offline", "start", "--printOutput", "--stage", "local", "--allowCache"],
       "port": 9229,
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/packages/meadowlark"
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "Jest :: File Linux",
