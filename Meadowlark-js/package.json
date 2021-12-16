@@ -28,19 +28,18 @@
     "didyoumean2": "^4.2.0",
     "ed-fi-model-3.3b": "^2.0.2",
     "fast-memoize": "^2.5.2",
-    "fs-extra": "^9.0.0",
-    "inflection": "^1.12.0",
+    "fs-extra": "^10.0.0",
+    "inflection": "^1.13.1",
     "invariant": "^2.2.4",
     "jssha": "^3.2.0",
     "metaed-core": "2.6.0",
     "metaed-plugin-edfi-unified": "2.6.0",
-    "njwt": "^1.1.0",
+    "njwt": "^1.2.0",
     "ramda": "^0.27.1",
     "secure-random": "^1.1.2",
     "semver": "^7.2.1",
     "winston": "^3.3.3",
-    "xml2js": "^0.4.23",
-    "yargs": "^17.1.1"
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@hapi/code": "^8.0.5",
