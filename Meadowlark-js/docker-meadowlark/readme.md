@@ -15,6 +15,7 @@ Ensure that you have sufficient resources allocated to Docker:
 * macOS: set RAM to at least 4 GB [user manual](https://docs.docker.com/desktop/mac/).
 * Linux, including Windows Subsystem for Linux (WSL/WSL2): Ensure vm.max_map_count is set to at least 262144 as [per the
   documentation](https://opensearch.org/docs/opensearch/install/important-settings/).
+  * On Linux: ```sudo sysctl -w vm.max_map_count=262144```
   * Permanently setting this on WSL is more challenging than expected. Recipe:
 
     ```powershell
@@ -43,8 +44,8 @@ At a command prompt, running in this directory:
 
 | Operation | Command |
 | -- | -- |
-| start containers | `docker compose up -d` |
-| stop containers | `docker compose down` |
+| start containers | `docker-compose up -d` |
+| stop containers | `docker-compose down` |
 | view OpenSearch logs | `docker logs opensearch-node1` |
 | view Dashboard logs | `docker logs opensearch-dashboards` |
 
