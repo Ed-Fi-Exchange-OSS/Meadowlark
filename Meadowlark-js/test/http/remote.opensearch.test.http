@@ -1,0 +1,170 @@
+# **** Change this to be the hostname portion of the endpoint URLs displayed at the end of the deployment process.
+@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@stage=dev
+
+# FYI, this is a non-expiring bearer token that is valid in the default configuration for the OAuth 2.0 proof-of-concept. 
+@token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+@other_school_info="educationOrganizationCategories": [{"educationOrganizationCategoryDescriptor": "x"}], "schoolCategories": [{"schoolCategoryDescriptor": "x"}],"gradeLevels": []
+
+### Create School 1
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 1,
+    "nameOfInstitution": "School1",
+    {{other_school_info}}
+}
+
+### Create School 2
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 2,
+    "nameOfInstitution": "School2",
+    {{other_school_info}}
+}
+
+### Create School 3
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 3,
+    "nameOfInstitution": "School3",
+    {{other_school_info}}
+}
+
+### Create School 4
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 4,
+    "nameOfInstitution": "School4",
+    {{other_school_info}}
+}
+
+### Create School 5
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 5,
+    "nameOfInstitution": "School5",
+    {{other_school_info}}
+}
+
+### Create School 6
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 6,
+    "nameOfInstitution": "School6",
+    {{other_school_info}}
+}
+
+### Create School 7
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 7,
+    "nameOfInstitution": "School7",
+    {{other_school_info}}
+}
+
+### Create School 8
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 8,
+    "nameOfInstitution": "School8",
+    {{other_school_info}}
+}
+
+### Create School 9
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 9,
+    "nameOfInstitution": "School9",
+    {{other_school_info}}
+}
+
+### Create School 10
+POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+descriptor-validation: false
+
+{
+    "schoolId": 10,
+    "nameOfInstitution": "School10",
+    {{other_school_info}}
+}
+
+
+
+
+###### Get all with limit/offset
+
+### View all schools - should return 10 results
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+Authorization: bearer {{token}}
+
+
+### View all schools limit 5 - should return first 5 results of full set
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?limit=5
+Authorization: bearer {{token}}
+
+
+### View all schools limit 5 offset 5 - should return last 5 results of full set
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?limit=5&offset=5
+Authorization: bearer {{token}}
+
+
+### View all schools limit 5 offset 2 - should return results 3 through 7 of full set
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?limit=5&offset=2
+Authorization: bearer {{token}}
+
+
+
+
+###### Query for exactly one
+
+### Query for a school named 'School1' - should return one result
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?nameOfInstitution=School1
+Authorization: bearer {{token}}
+
+
+### Query for a school named 'School123' - should return empty result
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?nameOfInstitution=School123
+Authorization: bearer {{token}}
+
+
+
+###### Query with limit/offset
+
+### Query for a school with SchoolCategoryDescriptor "x" - should return all results
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?schoolCategories.schoolCategoryDescriptor=x
+Authorization: bearer {{token}}
+
+
+### Query for a school with SchoolCategoryDescriptor "x" limit 3 offset 2 - should return results 3 through 5 from above
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools?schoolCategories.schoolCategoryDescriptor=x&limit=3&offset=2
+Authorization: bearer {{token}}
+

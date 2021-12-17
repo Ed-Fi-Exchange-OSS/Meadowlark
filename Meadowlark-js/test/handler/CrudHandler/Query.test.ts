@@ -7,17 +7,8 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import { Security } from '../../../src/model/Security';
 import * as ElasticsearchRepository from '../../../src/repository/ElasticsearchRepository';
 import { query } from '../../../src/handler/GetResolvers';
-
-const mockSecurity: Security = {
-  edOrgIds: [],
-  studentIds: [],
-  throughAssociation: '',
-  isOwnershipEnabled: false,
-  clientName: null,
-};
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -44,7 +35,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context, {} as Security);
+    response = await query(pathComponents, {}, context);
   });
 
   afterAll(() => {
@@ -92,7 +83,7 @@ describe('given persistence fails', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context, mockSecurity);
+    response = await query(pathComponents, {}, context);
   });
 
   afterAll(() => {
@@ -143,7 +134,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context, mockSecurity);
+    response = await query(pathComponents, {}, context);
   });
 
   afterAll(() => {

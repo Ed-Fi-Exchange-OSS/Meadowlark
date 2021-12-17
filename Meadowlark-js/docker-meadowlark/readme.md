@@ -3,7 +3,8 @@
 (!) This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-This compose file provisions:
+This compose file requires [Docker Compose v2](https://github.com/docker/compose)
+(which comes with Docker Desktop for Windows users). It provisions:
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
@@ -15,6 +16,7 @@ Ensure that you have sufficient resources allocated to Docker:
 * macOS: set RAM to at least 4 GB [user manual](https://docs.docker.com/desktop/mac/).
 * Linux, including Windows Subsystem for Linux (WSL/WSL2): Ensure vm.max_map_count is set to at least 262144 as [per the
   documentation](https://opensearch.org/docs/opensearch/install/important-settings/).
+  * On Linux: ```sudo sysctl -w vm.max_map_count=262144```
   * Permanently setting this on WSL is more challenging than expected. Recipe:
 
     ```powershell
