@@ -3,7 +3,8 @@
 (!) This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-This compose file requires [Docker Compose v2](https://github.com/docker/compose). It provisions:
+This compose file requires [Docker Compose v2](https://github.com/docker/compose)
+(which comes with Docker Desktop for Windows users). It provisions:
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
