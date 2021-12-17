@@ -119,7 +119,9 @@ export async function queryEntityList(
   let results: any = {};
   try {
     let query = `SELECT info FROM ${indexFromEntityInfo(entityInfo)}`;
-    if (Object.entries(queryStringParameters).length > 0) query += ` WHERE ${whereConditionsFrom(queryStringParameters)}`;
+    if (Object.entries(queryStringParameters).length > 0) {
+      query += ` WHERE ${whereConditionsFrom(queryStringParameters)} ORDER BY _doc`;
+    }
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 

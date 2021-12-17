@@ -3,7 +3,7 @@
 (!) This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-This compose file provisions:
+This compose file requires [Docker Compose v2](https://github.com/docker/compose). It provisions:
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
@@ -44,8 +44,8 @@ At a command prompt, running in this directory:
 
 | Operation | Command |
 | -- | -- |
-| start containers | `docker-compose up -d` |
-| stop containers | `docker-compose down` |
+| start containers | `docker compose up -d` |
+| stop containers | `docker compose down` |
 | view OpenSearch logs | `docker logs opensearch-node1` |
 | view Dashboard logs | `docker logs opensearch-dashboards` |
 
