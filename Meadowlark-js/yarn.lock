@@ -2274,10 +2274,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/aws-lambda@npm:^8.10.88":
-  version: 8.10.88
-  resolution: "@types/aws-lambda@npm:8.10.88::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Faws-lambda%2F-%2F%40types%2Faws-lambda-8.10.88.tgz"
-  checksum: db2b12c5c216e28c704f456840276363441a52c22dde8a6ea3e9cb3bbfd12d71ce8a4ca6e8b19e3a2c5d87a5f71ae9e4f7173838d7963570883a90deadeecc2a
+"@types/aws-lambda@npm:^8.10.89":
+  version: 8.10.89
+  resolution: "@types/aws-lambda@npm:8.10.89::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Faws-lambda%2F-%2F%40types%2Faws-lambda-8.10.89.tgz"
+  checksum: 426c5cce2f2786e51c2c27712876ed6d4f152133cb4c77da323e417c86ed8e44c99247244b41c37b7762d14ebc6c594c85f9624a3e40ffe8f19cd31baffdfe1b
   languageName: node
   linkType: hard
 
@@ -2348,13 +2348,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:^8.2.1":
-  version: 8.2.1
-  resolution: "@types/eslint@npm:8.2.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Feslint%2F-%2F%40types%2Feslint-8.2.1.tgz"
+"@types/eslint@npm:^8.2.2":
+  version: 8.2.2
+  resolution: "@types/eslint@npm:8.2.2::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Feslint%2F-%2F%40types%2Feslint-8.2.2.tgz"
   dependencies:
     "@types/estree": "*"
     "@types/json-schema": "*"
-  checksum: f32753ba184c212056f2bb7ee16937150a36e01da7eed15e2e179b7df76d0bbcbfa49972f30e9336f22be471c7f67fd91bcc8c25ff532462598de0f489df0cd8
+  checksum: acbbaecea2675b63cc4b067df499bb15906a56379a3603a9f6afffe2eb688b30bb73b1f5a402e44de36c5dc76abf59027a9f557b171d0b544ad01fa333118b6b
   languageName: node
   linkType: hard
 
@@ -2511,12 +2511,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ramda@npm:0.27.60":
-  version: 0.27.60
-  resolution: "@types/ramda@npm:0.27.60::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Framda%2F-%2F%40types%2Framda-0.27.60.tgz"
+"@types/ramda@npm:0.27.64":
+  version: 0.27.64
+  resolution: "@types/ramda@npm:0.27.64::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Framda%2F-%2F%40types%2Framda-0.27.64.tgz"
   dependencies:
     ts-toolbelt: ^6.15.1
-  checksum: 442cce67b91ad42753ba47929918284dfc1792a3557038b3a0c816c1c874adeafe62daf3b80055044f0092054736ab211e14e2e1cef922378bce129b68ae9870
+  checksum: 8512be3bf220d63df398fe333aafb21a48e1967300afa629f21de5e35e757bdf37323bd59a67da025ab549520bc9c9119e6ca9702a95948eef5bd17ae9b319d2
   languageName: node
   linkType: hard
 
@@ -3149,12 +3149,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.24.0":
-  version: 0.24.0
-  resolution: "axios@npm:0.24.0"
+"axios@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "axios@npm:0.25.0"
   dependencies:
-    follow-redirects: ^1.14.4
-  checksum: 468cf496c08a6aadfb7e699bebdac02851e3043d4e7d282350804ea8900e30d368daa6e3cd4ab83b8ddb5a3b1e17a5a21ada13fc9cebd27b74828f47a4236316
+    follow-redirects: ^1.14.7
+  checksum: 2a8a3787c05f2a0c9c3878f49782357e2a9f38945b93018fb0c4fd788171c43dceefbb577988628e09fea53952744d1ecebde234b561f1e703aa43e0a598a3ad
   languageName: node
   linkType: hard
 
@@ -5883,7 +5883,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.4":
+"follow-redirects@npm:1.14.7, follow-redirects@npm:^1.14.7":
+  version: 1.14.7
+  resolution: "follow-redirects@npm:1.14.7"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: f6d03e5e30877431065bca0d1b2e3db93949eb799d368a5c07ea8a4b71205f0349a3f8f0191bf13a07c93885522834dca1dc8e527dc99a772c6911fba24edc5f
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.14.0":
   version: 1.14.6
   resolution: "follow-redirects@npm:1.14.6"
   peerDependenciesMeta:
@@ -8620,8 +8630,8 @@ __metadata:
     "@elastic/elasticsearch": 7.13.0
     "@hapi/code": ^8.0.5
     "@hapi/joi": ^17.1.1
-    "@types/aws-lambda": ^8.10.88
-    "@types/eslint": ^8.2.1
+    "@types/aws-lambda": ^8.10.89
+    "@types/eslint": ^8.2.2
     "@types/fs-extra": ^8.1.2
     "@types/hapi__joi": ^16.0.12
     "@types/inflection": ^1.13.0
@@ -8629,13 +8639,13 @@ __metadata:
     "@types/js-yaml": ^4.0.5
     "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
-    "@types/ramda": 0.27.60
+    "@types/ramda": 0.27.64
     "@types/semver": ^7.3.9
     "@types/xml2js": ^0.4.9
     "@typescript-eslint/eslint-plugin": 2.25.0
     "@typescript-eslint/parser": 2.25.0
     aws4: ^1.11.0
-    axios: ^0.24.0
+    axios: ^0.25.0
     copyfiles: ^2.4.1
     cross-env: ^7.0.3
     deep-freeze: ^0.0.1
@@ -8651,6 +8661,7 @@ __metadata:
     eslint-plugin-json: 2.1.1
     eslint-plugin-prettier: 3.1.2
     fast-memoize: ^2.5.2
+    follow-redirects: 1.14.7
     fs-extra: ^10.0.0
     husky: ^7.0.4
     inflection: ^1.13.1
@@ -8663,7 +8674,7 @@ __metadata:
     metaed-plugin-edfi-unified: 2.6.0
     njwt: ^1.2.0
     prettier: 2.0.2
-    ramda: ^0.27.1
+    ramda: ^0.27.2
     regenerator-runtime: ^0.13.9
     rimraf: ^3.0.2
     secure-random: ^1.1.2
@@ -8673,7 +8684,7 @@ __metadata:
     serverless-offline: 8.3.1
     serverless-plugin-offline-dynamodb-stream: 1.0.20
     source-map-support: ^0.5.21
-    ts-jest: ^27.1.1
+    ts-jest: ^27.1.3
     ts-loader: ^6.2.2
     ts-node: 8.8.1
     typescript: 4.5.4
@@ -10331,6 +10342,13 @@ __metadata:
   version: 0.27.1
   resolution: "ramda@npm:0.27.1"
   checksum: 31a0c0ef739b2525d7615f84cbb5d3cb89ee0c795469b711f729ea1d8df0dccc3cd75d3717a1e9742d42315ce86435680b7c87743eb7618111c60c144a5b8059
+  languageName: node
+  linkType: hard
+
+"ramda@npm:^0.27.2":
+  version: 0.27.2
+  resolution: "ramda@npm:0.27.2"
+  checksum: 28d6735dd1eea1a796c56cf6111f3673c6105bbd736e521cdd7826c46a18eeff337c2dba4668f6eed990d539b9961fd6db19aa46ccc1530ba67a396c0a9f580d
   languageName: node
   linkType: hard
 
@@ -12039,9 +12057,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^27.1.1":
-  version: 27.1.1
-  resolution: "ts-jest@npm:27.1.1"
+"ts-jest@npm:^27.1.3":
+  version: 27.1.3
+  resolution: "ts-jest@npm:27.1.3"
   dependencies:
     bs-logger: 0.x
     fast-json-stable-stringify: 2.x
@@ -12069,7 +12087,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 3aea68083399c49e9079dbd1583ee5cce7da9648a6cdaef96c2b5f2f85de375c186227724336f359ecd2bc7871bff0911667d1f4867e0e275417b3e4887841d9
+  checksum: eb54e5b8fc5f06e4cc20ecec7891201ddc78a3537d5eb3775e29ffbc7e83fd2a68f91db801b6a8c820c872060b24dc41fb6decac800b76256d3cdda6520b5c4f
   languageName: node
   linkType: hard
 
