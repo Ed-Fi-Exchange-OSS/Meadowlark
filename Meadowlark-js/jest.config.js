@@ -15,4 +15,5 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['<rootDir>/jest/setEnvVars.js'],
+  testTimeout: 6000,
 };
