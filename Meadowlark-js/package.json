@@ -101,13 +101,11 @@
     "test:coverage": "yarn test:unit --collectCoverage",
     "prepare": "cd .. && husky install",
     "init:local-dynamodb": "yarn serverless dynamodb install",
-    "deploy:aws-dev": "yarn build && yarn serverless deploy --aws-profile default --stage dev",
-    "teardown:aws-dev": "yarn serverless remove --aws-profile default --stage dev",
-    "deploy:aws-stg": "yarn build && yarn serverless deploy --aws-profile default --stage stg",
-    "teardown:aws-stg": "yarn serverless remove --aws-profile default --stage stg",
+    "deploy:aws": "yarn build && yarn serverless deploy --aws-profile default --stage",
+    "teardown:aws": "yarn serverless remove --aws-profile default --stage",
     "start:local": "yarn build && yarn serverless offline start --printOutput --stage local --allowCache",
     "load:descriptors:local": "yarn serverless invoke local -f loadDescriptors",
-    "load:descriptors:aws-dev": "yarn serverless invoke --function loadDescriptors --stage dev"
+    "load:descriptors:aws": "yarn serverless invoke --function loadDescriptors --stage"
   },
   "husky": {
     "hooks": {
