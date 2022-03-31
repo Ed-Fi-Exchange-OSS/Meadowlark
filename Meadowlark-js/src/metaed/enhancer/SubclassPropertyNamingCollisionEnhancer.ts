@@ -5,7 +5,7 @@
 
 import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType, NoEntityProperty } from 'metaed-core';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
-import { fullName, isCollection, dropPrefix } from '../Utility';
+import { isCollection, dropPrefix } from '../Utility';
 
 /**
  * This enhancer flags properties on subclasses that will have naming collision issues due to a superclass property
@@ -29,7 +29,7 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
 
     const superclassEntity: TopLevelEntity = subclassEntity.baseEntity;
     const superclassPrefixedCollectionProperties = superclassEntity.properties.filter(
-      (p) => fullName(p).startsWith(superclassEntity.metaEdName) && isCollection(p),
+      (p) => p.fullPropertyName.startsWith(superclassEntity.metaEdName) && isCollection(p),
     );
 
     subclassEntity.properties
@@ -37,7 +37,7 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
       .forEach((subclassCollectionProperty) => {
         const subclassPropertyNameSuffix = dropPrefix(
           subclassCollectionProperty.parentEntityName,
-          fullName(subclassCollectionProperty),
+          subclassCollectionProperty.fullPropertyName,
         );
 
         // Set in the subclass -> superclass direction if exists
@@ -45,7 +45,7 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
         subclassPropertyMeadowlark.namingCollisionWithSuperclassProperty =
           superclassPrefixedCollectionProperties.find(
             (superclassProperty) =>
-              dropPrefix(superclassEntity.metaEdName, fullName(superclassProperty)) === subclassPropertyNameSuffix,
+              dropPrefix(superclassEntity.metaEdName, superclassProperty.fullPropertyName) === subclassPropertyNameSuffix,
           ) ?? NoEntityProperty;
 
         // Add in the superclass -> subclass direction if exists

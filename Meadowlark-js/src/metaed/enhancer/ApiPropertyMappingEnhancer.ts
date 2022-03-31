@@ -10,8 +10,9 @@ import {
   getAllProperties,
   isReferentialProperty,
   ReferentialProperty,
+  normalizeDescriptorSuffix,
 } from 'metaed-core';
-import { fullName, isTopLevelReference, isCollection, isDescriptor, uncapitalize, pluralize } from '../Utility';
+import { isTopLevelReference, isCollection, isDescriptor, uncapitalize, pluralize } from '../Utility';
 import { ApiPropertyMapping } from '../model/ApiPropertyMapping';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 
@@ -23,7 +24,7 @@ const enhancerName = 'ApiPropertyMappingEnhancer';
  * This is derived from the ODS/API JSON naming pattern for collections.
  */
 function parentPrefixRemovalConvention(property: EntityProperty): string {
-  const name = fullName(property);
+  const name = property.fullPropertyName;
 
   // collections from association and domain entity properties don't get table names collapsed
   if (property.type === 'association' || property.type === 'domainEntity') return name;
@@ -36,7 +37,7 @@ function parentPrefixRemovalConvention(property: EntityProperty): string {
  * API descriptor reference property names are suffixed with "Descriptor"
  */
 function apiDescriptorReferenceName(property): string {
-  return `${uncapitalize(fullName(property))}Descriptor`;
+  return normalizeDescriptorSuffix(uncapitalize(property.fullPropertyName));
 }
 
 /**
@@ -48,18 +49,18 @@ function apiFullName(property: EntityProperty, { removeCollectionPrefixes }): st
     return uncapitalize(pluralize(parentPrefixRemovalConvention(property)));
   }
   if (isCollection(property) && !removeCollectionPrefixes) {
-    return uncapitalize(pluralize(fullName(property)));
+    return uncapitalize(pluralize(property.fullPropertyName));
   }
   if (isDescriptor(property)) return apiDescriptorReferenceName(property);
 
-  return uncapitalize(fullName(property));
+  return uncapitalize(property.fullPropertyName);
 }
 
 /**
  * API reference property names are suffixed with "Reference"
  */
 function apiReferenceName(property): string {
-  return `${uncapitalize(fullName(property))}Reference`;
+  return `${uncapitalize(property.fullPropertyName)}Reference`;
 }
 
 /**

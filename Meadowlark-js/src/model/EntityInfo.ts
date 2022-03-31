@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { normalizeDescriptorSuffix } from 'metaed-core';
 import { AssignableInfo } from './AssignableInfo';
 import { ReferentialConstraint } from './ReferentialConstraint';
 
@@ -17,7 +18,9 @@ export function entityTypeStringFromComponents(projectName: string, projectVersi
 }
 
 export function entityTypeStringFrom(entityInfo: EntityTypeInfo): string {
-  const adjustedEntityName = entityInfo.isDescriptor ? `${entityInfo.entityName}Descriptor` : entityInfo.entityName;
+  const adjustedEntityName = entityInfo.isDescriptor
+    ? normalizeDescriptorSuffix(entityInfo.entityName)
+    : entityInfo.entityName;
   return entityTypeStringFromComponents(entityInfo.projectName, entityInfo.projectVersion, adjustedEntityName);
 }
 
@@ -36,7 +39,7 @@ export interface EntityTypeInfo {
   projectVersion: string;
   /**
    * The name of the entity. Typically, this is the same as the entity metaEdName. However,
-   * there are expections, for example descriptors have a "Descriptor" suffix to their name
+   * there are exceptions, for example descriptors have a "Descriptor" suffix to their name
    * to avoid name collisions with entities of the same metaEdName.
    */
   entityName: string;

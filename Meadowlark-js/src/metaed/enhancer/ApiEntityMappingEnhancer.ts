@@ -4,7 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType } from 'metaed-core';
-import { fullName } from '../Utility';
 import { ApiEntityMapping } from '../model/ApiEntityMapping';
 import {
   assignabilityFor,
@@ -19,8 +18,10 @@ import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
  * Collects all of the API shape metadata for a MetaEd non-subclass entity.
  */
 function buildApiEntityMapping(entity: TopLevelEntity): ApiEntityMapping {
-  const identityProperties = [...entity.identityProperties].sort((a, b) => fullName(a).localeCompare(fullName(b)));
-  const properties = [...entity.properties].sort((a, b) => fullName(a).localeCompare(fullName(b)));
+  const identityProperties = [...entity.identityProperties].sort((a, b) =>
+    a.fullPropertyName.localeCompare(b.fullPropertyName),
+  );
+  const properties = [...entity.properties].sort((a, b) => a.fullPropertyName.localeCompare(b.fullPropertyName));
   return {
     flattenedIdentityProperties: flattenedIdentityPropertiesFrom(identityProperties),
     identityReferenceComponents: identityReferenceComponentsFrom(identityProperties),

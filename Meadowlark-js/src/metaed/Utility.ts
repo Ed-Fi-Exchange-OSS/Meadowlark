@@ -8,15 +8,6 @@ import inflection from 'inflection';
 import { EntityPropertyMeadowlarkData } from './model/EntityPropertyMeadowlarkData';
 
 /**
- * Simplified MetaEd naming prefixes the metaEdName with the roleName
- */
-export function fullName(property: EntityProperty): string {
-  // In the MetaEd model, role names are ignored if same as metaed name
-  if (property.roleName === property.metaEdName) return property.metaEdName;
-  return property.roleName + property.metaEdName;
-}
-
-/**
  * Simplified MetaEd top level reference checking, supporting
  * Association and Domain Entity
  */
