@@ -11,8 +11,8 @@ import {
   NamespaceBuilder,
   DomainEntitySubclassBuilder,
   NoEntityProperty,
-} from 'metaed-core';
-import { domainEntitySubclassBaseClassEnhancer } from 'metaed-plugin-edfi-unified';
+} from '@edfi/metaed-core';
+import { domainEntitySubclassBaseClassEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
 import { enhance } from '../../../src/metaed/enhancer/SubclassPropertyNamingCollisionEnhancer';

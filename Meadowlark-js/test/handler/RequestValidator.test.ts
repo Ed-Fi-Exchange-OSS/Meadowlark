@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { newDomainEntity, NoTopLevelEntity } from 'metaed-core';
+import { newDomainEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { validateResource, ResourceValidationResult } from '../../src/handler/RequestValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
 import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';

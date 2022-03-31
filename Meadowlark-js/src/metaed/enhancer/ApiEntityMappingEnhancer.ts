@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType } from 'metaed-core';
+import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType } from '@edfi/metaed-core';
 import { ApiEntityMapping } from '../model/ApiEntityMapping';
 import {
   assignabilityFor,

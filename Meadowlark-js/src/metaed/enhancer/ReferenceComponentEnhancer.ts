@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 // may be a candidate for future addition to metaed-plugin-edfi-unified-advanced
-import { EnhancerResult, MetaEdEnvironment, ReferentialProperty, EntityProperty, getAllProperties } from 'metaed-core';
+import { EnhancerResult, MetaEdEnvironment, ReferentialProperty, EntityProperty, getAllProperties } from '@edfi/metaed-core';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 import { newReferenceElement, ReferenceComponent, newReferenceGroup } from '../model/ReferenceComponent';
 

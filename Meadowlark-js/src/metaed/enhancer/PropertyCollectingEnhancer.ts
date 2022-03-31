@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAllEntitiesOfType, MetaEdEnvironment, EnhancerResult, TopLevelEntity } from 'metaed-core';
+import { getAllEntitiesOfType, MetaEdEnvironment, EnhancerResult, TopLevelEntity } from '@edfi/metaed-core';
 import { CollectedProperty } from '../model/CollectedProperty';
 import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 import { defaultPropertyModifier } from '../model/PropertyModifier';

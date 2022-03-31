@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import Joi from '@hapi/joi';
-import { MetaEdEnvironment, EnhancerResult, getAllEntitiesOfType, ModelBase } from 'metaed-core';
+import { MetaEdEnvironment, EnhancerResult, getAllEntitiesOfType, ModelBase } from '@edfi/metaed-core';
 import { ApiEntityMapping, NoApiEntityMapping } from './ApiEntityMapping';
 import { CollectedProperty } from './CollectedProperty';
 

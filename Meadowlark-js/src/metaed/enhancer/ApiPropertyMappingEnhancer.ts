@@ -11,8 +11,8 @@ import {
   isReferentialProperty,
   ReferentialProperty,
   normalizeDescriptorSuffix,
-} from 'metaed-core';
-import { isTopLevelReference, isCollection, isDescriptor, uncapitalize, pluralize } from '../Utility';
+} from '@edfi/metaed-core';
+import { isTopLevelReference, isDescriptor, uncapitalize, pluralize } from '../Utility';
 import { ApiPropertyMapping } from '../model/ApiPropertyMapping';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 
@@ -45,10 +45,10 @@ function apiDescriptorReferenceName(property): string {
  * first character lower cased, and pluralized if an array.
  */
 function apiFullName(property: EntityProperty, { removeCollectionPrefixes }): string {
-  if (isCollection(property) && removeCollectionPrefixes) {
+  if (property.isCollection && removeCollectionPrefixes) {
     return uncapitalize(pluralize(parentPrefixRemovalConvention(property)));
   }
-  if (isCollection(property) && !removeCollectionPrefixes) {
+  if (property.isCollection && !removeCollectionPrefixes) {
     return uncapitalize(pluralize(property.fullPropertyName));
   }
   if (isDescriptor(property)) return apiDescriptorReferenceName(property);

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityProperty, NoEntityProperty, TopLevelEntity } from 'metaed-core';
+import { EntityProperty, NoEntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import inflection from 'inflection';
 import { EntityPropertyMeadowlarkData } from './model/EntityPropertyMeadowlarkData';
 
@@ -13,13 +13,6 @@ import { EntityPropertyMeadowlarkData } from './model/EntityPropertyMeadowlarkDa
  */
 export function isTopLevelReference(property: EntityProperty): boolean {
   return property.type === 'association' || property.type === 'domainEntity';
-}
-
-/**
- * When specific type of MetaEd collection property doesn't matter
- */
-export function isCollection(property: EntityProperty): boolean {
-  return property.isRequiredCollection || property.isOptionalCollection;
 }
 
 /**

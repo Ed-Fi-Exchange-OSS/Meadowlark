@@ -6,7 +6,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import { deriveNamespaceFromProjectName } from 'metaed-core';
+import { deriveNamespaceFromProjectName } from '@edfi/metaed-core';
 import { Constants } from '../Constants';
 
 const PROJECT_SETTINGS_FILE_NAME = 'package.json';
@@ -38,8 +38,7 @@ export interface MetaEdProjectMetadata {
  * A hardcoded mapping of abbreviations to Ed-Fi Model npm package names
  */
 export function modelPackageFor(projectAbbreviation: string): string {
-  if (projectAbbreviation === Constants.version22) return 'ed-fi-model-2.2';
-  if (projectAbbreviation === Constants.version33b) return 'ed-fi-model-3.3b';
+  if (projectAbbreviation === Constants.version33b) return '@edfi/ed-fi-model-3.3b';
   return 'ed-fi-model-undefined';
 }
 

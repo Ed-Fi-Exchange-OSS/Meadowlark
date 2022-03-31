@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Enhancer } from 'metaed-core';
+import { Enhancer } from '@edfi/metaed-core';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer } from '../model/EntityMeadowlarkData';
 import { enhance as subclassPropertyNamingCollisionEnhancer } from './SubclassPropertyNamingCollisionEnhancer';

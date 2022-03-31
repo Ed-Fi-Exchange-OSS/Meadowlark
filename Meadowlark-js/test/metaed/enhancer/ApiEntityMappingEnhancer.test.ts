@@ -11,8 +11,8 @@ import {
   NamespaceBuilder,
   DescriptorBuilder,
   CommonBuilder,
-} from 'metaed-core';
-import { domainEntityReferenceEnhancer, inlineCommonReferenceEnhancer } from 'metaed-plugin-edfi-unified';
+} from '@edfi/metaed-core';
+import { domainEntityReferenceEnhancer, inlineCommonReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
 import { enhance as referenceComponentEnhancer } from '../../../src/metaed/enhancer/ReferenceComponentEnhancer';

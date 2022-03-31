@@ -13,7 +13,7 @@ import {
   MetaEdEnvironment,
   normalizeDescriptorSuffix,
   TopLevelEntity,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 
 import { uncapitalize, pluralize } from './Utility';
 

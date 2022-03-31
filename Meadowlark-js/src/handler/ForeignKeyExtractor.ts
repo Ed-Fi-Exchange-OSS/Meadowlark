@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { TopLevelEntity, ReferentialProperty } from 'metaed-core';
+import { TopLevelEntity, ReferentialProperty } from '@edfi/metaed-core';
 import { isReferenceElement, ReferenceComponent, ReferenceGroup } from '../metaed/model/ReferenceComponent';
 import { ApiPropertyMapping } from '../metaed/model/ApiPropertyMapping';
 import { ReferentialConstraint } from '../model/ReferentialConstraint';

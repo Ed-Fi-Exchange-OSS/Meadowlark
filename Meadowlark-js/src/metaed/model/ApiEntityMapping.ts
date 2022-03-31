@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import deepFreeze from 'deep-freeze';
-import { EntityProperty, TopLevelEntity } from 'metaed-core';
+import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import { CollectedProperty } from './CollectedProperty';
 import { ReferenceComponent, ReferenceGroup } from './ReferenceComponent';
 

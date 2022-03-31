@@ -3,9 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType, NoEntityProperty } from 'metaed-core';
+import {
+  MetaEdEnvironment,
+  EnhancerResult,
+  TopLevelEntity,
+  getAllEntitiesOfType,
+  NoEntityProperty,
+} from '@edfi/metaed-core';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
-import { isCollection, dropPrefix } from '../Utility';
+import { dropPrefix } from '../Utility';
 
 /**
  * This enhancer flags properties on subclasses that will have naming collision issues due to a superclass property
@@ -29,11 +35,11 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
 
     const superclassEntity: TopLevelEntity = subclassEntity.baseEntity;
     const superclassPrefixedCollectionProperties = superclassEntity.properties.filter(
-      (p) => p.fullPropertyName.startsWith(superclassEntity.metaEdName) && isCollection(p),
+      (p) => p.fullPropertyName.startsWith(superclassEntity.metaEdName) && p.isCollection,
     );
 
     subclassEntity.properties
-      .filter((p) => isCollection(p))
+      .filter((p) => p.isCollection)
       .forEach((subclassCollectionProperty) => {
         const subclassPropertyNameSuffix = dropPrefix(
           subclassCollectionProperty.parentEntityName,

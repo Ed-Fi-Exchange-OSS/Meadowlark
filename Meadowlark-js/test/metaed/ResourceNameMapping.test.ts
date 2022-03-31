@@ -13,7 +13,7 @@ import {
   AssociationBuilder,
   AssociationSubclassBuilder,
   DescriptorBuilder,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 import { getMatchingMetaEdModelFrom } from '../../src/metaed/ResourceNameMapping';
 
 describe('when looking for a MetaEd model matching a resource name', () => {

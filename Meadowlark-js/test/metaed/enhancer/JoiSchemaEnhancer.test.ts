@@ -12,12 +12,12 @@ import {
   CommonBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 import {
   domainEntityReferenceEnhancer,
   choiceReferenceEnhancer,
   inlineCommonReferenceEnhancer,
-} from 'metaed-plugin-edfi-unified';
+} from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
 import {
   enhance as entityMeadowlarkDataSetupEnhancer,

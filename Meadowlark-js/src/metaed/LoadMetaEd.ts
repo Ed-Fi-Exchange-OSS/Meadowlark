@@ -13,7 +13,7 @@ import {
   State,
   MetaEdConfiguration,
   Enhancer,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 import { findMetaEdProjectMetadata, MetaEdProjectMetadata } from './MetaEdProjectMetadata';
 import { enhancerList } from './enhancer/EnhancerList';
 
@@ -91,7 +91,8 @@ export async function loadMetaEdState(projectNpmPackageName: string): Promise<St
       runValidators: true,
       runEnhancers: true,
     }),
-    pluginScanDirectory: nodeModules,
+    // Load all @edfi MetaEd plugins
+    pluginScanDirectory: `${nodeModules}/@edfi`,
   };
 
   // run MetaEd with downloaded packages

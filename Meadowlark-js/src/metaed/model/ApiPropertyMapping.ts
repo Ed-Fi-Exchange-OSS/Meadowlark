@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import deepFreeze from 'deep-freeze';
-import { ModelType, PropertyType } from 'metaed-core';
+import { ModelType, PropertyType } from '@edfi/metaed-core';
 
 /**
  * API shape metadata for a MetaEd property.
