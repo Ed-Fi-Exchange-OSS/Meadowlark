@@ -38,6 +38,7 @@ export interface MetaEdProjectMetadata {
  * A hardcoded mapping of abbreviations to Ed-Fi Model npm package names
  */
 export function modelPackageFor(projectAbbreviation: string): string {
+  if (projectAbbreviation === Constants.version31) return '@edfi/ed-fi-model-3.1';
   if (projectAbbreviation === Constants.version33b) return '@edfi/ed-fi-model-3.3b';
   return 'ed-fi-model-undefined';
 }
