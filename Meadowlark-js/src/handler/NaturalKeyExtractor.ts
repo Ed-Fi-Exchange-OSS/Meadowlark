@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { EntityProperty, TopLevelEntity } from 'metaed-core';
+import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import { ReferenceComponent, isReferenceElement } from '../metaed/model/ReferenceComponent';
 import { topLevelNameOnEntity, uncapitalize } from '../metaed/Utility';
 import { AssignableInfo } from '../model/AssignableInfo';

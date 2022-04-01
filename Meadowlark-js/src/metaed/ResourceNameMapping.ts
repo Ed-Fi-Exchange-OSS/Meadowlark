@@ -11,8 +11,9 @@ import {
   DomainEntity,
   DomainEntitySubclass,
   MetaEdEnvironment,
+  normalizeDescriptorSuffix,
   TopLevelEntity,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 
 import { uncapitalize, pluralize } from './Utility';
 
@@ -74,7 +75,7 @@ function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<str
   const descriptors: IterableIterator<Descriptor> | undefined = metaEd.namespace.get(namespace)?.entity.descriptor.values();
   if (descriptors != null) {
     for (const descriptor of descriptors) {
-      mappingForNamespace.set(`${uncapitalize(descriptor.metaEdName)}Descriptors`, descriptor);
+      mappingForNamespace.set(pluralize(normalizeDescriptorSuffix(uncapitalize(descriptor.metaEdName))), descriptor);
     }
   }
 

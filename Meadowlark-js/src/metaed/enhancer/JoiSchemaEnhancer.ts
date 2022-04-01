@@ -13,7 +13,7 @@ import {
   EntityProperty,
   CommonProperty,
   TopLevelEntity,
-} from 'metaed-core';
+} from '@edfi/metaed-core';
 import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 import { PropertyModifier, prefixedName } from '../model/PropertyModifier';

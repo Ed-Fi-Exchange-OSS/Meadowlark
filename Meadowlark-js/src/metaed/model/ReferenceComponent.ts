@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import deepFreeze from 'deep-freeze';
-import { EntityProperty, newEntityProperty, NoEntityProperty } from 'metaed-core';
+import { EntityProperty, newEntityProperty, NoEntityProperty } from '@edfi/metaed-core';
 
 /**
  * A ReferenceComponent is a graph of objects derived from a MetaEd property reference,

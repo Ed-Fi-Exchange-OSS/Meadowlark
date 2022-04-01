@@ -5,7 +5,7 @@
 
 import Joi from '@hapi/joi';
 import didYouMean from 'didyoumean2';
-import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from 'metaed-core';
+import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMatchingMetaEdModelFrom, getResourceNames } from './ResourceNameMapping';
 

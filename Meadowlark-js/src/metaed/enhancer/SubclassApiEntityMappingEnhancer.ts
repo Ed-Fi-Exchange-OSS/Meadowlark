@@ -3,8 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MetaEdEnvironment, EnhancerResult, EntityProperty, getAllEntitiesOfType, TopLevelEntity } from 'metaed-core';
-import { fullName } from '../Utility';
+import { MetaEdEnvironment, EnhancerResult, EntityProperty, getAllEntitiesOfType, TopLevelEntity } from '@edfi/metaed-core';
 
 import { ApiEntityMapping, NoApiEntityMapping } from '../model/ApiEntityMapping';
 import {
@@ -20,7 +19,9 @@ import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
  * Returns properties sorted by name ascending, optionally with the given property removed
  */
 function sortedPropertiesWithExclusion(properties: EntityProperty[], excludedProperty: EntityProperty | undefined) {
-  return [...properties].filter((p) => p !== excludedProperty).sort((a, b) => fullName(a).localeCompare(fullName(b)));
+  return [...properties]
+    .filter((p) => p !== excludedProperty)
+    .sort((a, b) => a.fullPropertyName.localeCompare(b.fullPropertyName));
 }
 
 /**

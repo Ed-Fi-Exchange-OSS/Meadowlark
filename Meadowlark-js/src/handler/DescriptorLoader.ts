@@ -38,7 +38,7 @@ type DescriptorDocument = {
 /**
  * Reads Ed-Fi Data Standard XML descriptor files and combines into a single object
  * where keys are the descriptor entity name (e.g. CountryDescriptor) and values
- * are arrays of desriptor values (CodeValue, ShortDescription, etc.)
+ * are arrays of descriptor values (CodeValue, ShortDescription, etc.)
  */
 async function readDescriptors(directoryPath: string): Promise<XmlDescriptorData> {
   const filenamesToLoad: string[] = fs.readdirSync(directoryPath).filter((filename) => filename.endsWith('.xml'));

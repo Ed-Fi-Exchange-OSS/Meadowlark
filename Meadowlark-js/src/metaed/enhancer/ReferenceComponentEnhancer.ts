@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 // may be a candidate for future addition to metaed-plugin-edfi-unified-advanced
-import { EnhancerResult, MetaEdEnvironment, ReferentialProperty, EntityProperty, getAllProperties } from 'metaed-core';
+import { EnhancerResult, MetaEdEnvironment, ReferentialProperty, EntityProperty, getAllProperties } from '@edfi/metaed-core';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 import { newReferenceElement, ReferenceComponent, newReferenceGroup } from '../model/ReferenceComponent';
-import { fullName } from '../Utility';
 
 const enhancerName = 'ReferenceComponentEnhancer';
 
@@ -19,7 +18,7 @@ function buildReferenceComponent(sourceProperty: EntityProperty): ReferenceCompo
     const referenceComponents: ReferenceComponent[] = (sourceProperty as ReferentialProperty).referencedEntity.identityProperties.map(
       (identityProperty) => buildReferenceComponent(identityProperty),
     );
-    referenceComponents.sort((a, b) => fullName(a.sourceProperty).localeCompare(fullName(b.sourceProperty)));
+    referenceComponents.sort((a, b) => a.sourceProperty.fullPropertyName.localeCompare(b.sourceProperty.fullPropertyName));
     return {
       ...newReferenceGroup(),
       sourceProperty,

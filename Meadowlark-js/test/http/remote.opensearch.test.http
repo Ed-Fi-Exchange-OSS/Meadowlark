@@ -1,5 +1,5 @@
 # **** Change this to be the hostname portion of the endpoint URLs displayed at the end of the deployment process.
-@hostname=changeMe.execute-api.us-east-1.amazonaws.com
+@hostname=changeme.execute-api.us-east-1.amazonaws.com
 @stage=dev
 
 # FYI, this is a non-expiring bearer token that is valid in the default configuration for the OAuth 2.0 proof-of-concept. 

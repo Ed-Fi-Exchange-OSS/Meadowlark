@@ -7,7 +7,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import axios from 'axios';
-import { Namespace } from 'metaed-core';
+import { Namespace } from '@edfi/metaed-core';
 
 import { Logger } from '../helpers/Logger';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';

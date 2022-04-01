@@ -10,8 +10,9 @@ import {
   getAllProperties,
   isReferentialProperty,
   ReferentialProperty,
-} from 'metaed-core';
-import { fullName, isTopLevelReference, isCollection, isDescriptor, uncapitalize, pluralize } from '../Utility';
+  normalizeDescriptorSuffix,
+} from '@edfi/metaed-core';
+import { isTopLevelReference, isDescriptor, uncapitalize, pluralize } from '../Utility';
 import { ApiPropertyMapping } from '../model/ApiPropertyMapping';
 import { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
 
@@ -23,7 +24,7 @@ const enhancerName = 'ApiPropertyMappingEnhancer';
  * This is derived from the ODS/API JSON naming pattern for collections.
  */
 function parentPrefixRemovalConvention(property: EntityProperty): string {
-  const name = fullName(property);
+  const name = property.fullPropertyName;
 
   // collections from association and domain entity properties don't get table names collapsed
   if (property.type === 'association' || property.type === 'domainEntity') return name;
@@ -36,7 +37,7 @@ function parentPrefixRemovalConvention(property: EntityProperty): string {
  * API descriptor reference property names are suffixed with "Descriptor"
  */
 function apiDescriptorReferenceName(property): string {
-  return `${uncapitalize(fullName(property))}Descriptor`;
+  return normalizeDescriptorSuffix(uncapitalize(property.fullPropertyName));
 }
 
 /**
@@ -44,22 +45,22 @@ function apiDescriptorReferenceName(property): string {
  * first character lower cased, and pluralized if an array.
  */
 function apiFullName(property: EntityProperty, { removeCollectionPrefixes }): string {
-  if (isCollection(property) && removeCollectionPrefixes) {
+  if (property.isCollection && removeCollectionPrefixes) {
     return uncapitalize(pluralize(parentPrefixRemovalConvention(property)));
   }
-  if (isCollection(property) && !removeCollectionPrefixes) {
-    return uncapitalize(pluralize(fullName(property)));
+  if (property.isCollection && !removeCollectionPrefixes) {
+    return uncapitalize(pluralize(property.fullPropertyName));
   }
   if (isDescriptor(property)) return apiDescriptorReferenceName(property);
 
-  return uncapitalize(fullName(property));
+  return uncapitalize(property.fullPropertyName);
 }
 
 /**
  * API reference property names are suffixed with "Reference"
  */
 function apiReferenceName(property): string {
-  return `${uncapitalize(fullName(property))}Reference`;
+  return `${uncapitalize(property.fullPropertyName)}Reference`;
 }
 
 /**

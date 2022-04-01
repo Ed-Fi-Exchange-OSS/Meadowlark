@@ -10,8 +10,8 @@ import {
   DescriptorBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
-} from 'metaed-core';
-import { domainEntityReferenceEnhancer, descriptorReferenceEnhancer } from 'metaed-plugin-edfi-unified';
+} from '@edfi/metaed-core';
+import { domainEntityReferenceEnhancer, descriptorReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
   enhance as entityPropertyMeadowlarkDataSetupEnhancer,
   EntityPropertyMeadowlarkData,
