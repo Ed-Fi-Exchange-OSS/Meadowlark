@@ -4,6 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export abstract class Constants {
+  static readonly version31: string = 'v3.1';
+
   static readonly version33b: string = 'v3.3b';
 
   static readonly swaggerResourceUrl: string =

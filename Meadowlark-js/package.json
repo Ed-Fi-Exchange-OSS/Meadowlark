@@ -20,6 +20,7 @@
     "@aws-sdk/smithy-client": "3.41.0",
     "@aws-sdk/types": "3.40.0",
     "@aws-sdk/util-dynamodb": "3.44.0",
+    "@edfi/ed-fi-model-3.1": "3.0.1",
     "@edfi/ed-fi-model-3.3b": "3.0.1",
     "@edfi/metaed-core": "3.0.1-dev.12",
     "@edfi/metaed-plugin-edfi-unified": "3.0.1-dev.12",
