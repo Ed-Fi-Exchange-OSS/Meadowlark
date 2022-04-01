@@ -1,6 +1,7 @@
 service: edfi-meadowlark
 
 useDotenv: true
+variablesResolutionMode: 20210326
 
 plugins:
   - serverless-dynamodb-local

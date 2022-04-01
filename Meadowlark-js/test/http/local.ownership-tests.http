@@ -14,6 +14,20 @@ POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
     "learningResourceMetadataURI": "2143"
 }
 
+##
+## Create WITH authorization header
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+{
+    "contentIdentifier": "first",
+    "namespace": "4321",
+    "shortDescription": "abc",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "2143"
+}
+
 ## NOTE: next one assumes you already created the EducationContents resource
 ## from local.33b.http before turning on ACCESS_TOKEN_REQUIRED.
 
