@@ -1,6 +1,6 @@
 {
   "name": "meadowlark",
-  "version": "0.1.0",
+  "version": "0.2.0-dev.0",
   "description": "The Ed-Fi Meadowlark project",
   "license": "SEE LICENSE IN LICENSE.md",
   "publishConfig": {
