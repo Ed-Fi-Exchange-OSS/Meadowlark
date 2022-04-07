@@ -8,7 +8,8 @@ This compose file requires [Docker Compose v2](https://github.com/docker/compose
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
-* External storage volume
+* MongoDB on default local port 27017 
+* External storage volumes
 
 Ensure that you have sufficient resources allocated to Docker:
 
@@ -46,9 +47,11 @@ At a command prompt, running in this directory:
 | Operation | Command |
 | -- | -- |
 | start containers | `docker compose up -d` |
+| view running containers | `docker container ls` |
 | stop containers | `docker compose down` |
 | view OpenSearch logs | `docker logs opensearch-node1` |
-| view Dashboard logs | `docker logs opensearch-dashboards` |
+| view OpenSearch Dashboard logs | `docker logs opensearch-dashboards` |
+| view MongoDB logs | `docker logs mongodb-node1` |
 
 ## Visualizations in OpenSearch Dashboards
 
@@ -67,3 +70,9 @@ visualizations with the OpenSearch Dashboards. Basic steps:
    * Tip: above the metric display you'll find "+ Add Filter". Use this if you
      want to filter on a particular entity type, such as `studentUniqueId:
      exists`.
+
+## Browsing MongoDB
+[MongoDB Compass](https://www.mongodb.com/docs/compass/current/) is a freely available UI tool
+for browsing and importing data into MongoDB. `mongodb://localhost:27017` is the connection
+string to use for this MongoDB instance. Login/password security is disabled in the default
+MongoDB container configuration.

@@ -25,6 +25,8 @@ services:
       - 9600:9600 # required for Performance Analyzer
     networks:
       - opensearch-net
+    restart: unless-stopped
+
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:latest
     container_name: opensearch-dashboards
@@ -37,9 +39,20 @@ services:
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
     networks:
       - opensearch-net
+    restart: unless-stopped
+
+  mongodb-node1:
+    image : mongo:4.0.28
+    container_name: mongodb-node1
+    volumes:
+      -  mongodb-data1:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
 
 volumes:
   opensearch-data1:
+  mongodb-data1:
 
 networks:
   opensearch-net:
