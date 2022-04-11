@@ -47,7 +47,7 @@ At a command prompt, running in this directory:
 | Operation | Command |
 | -- | -- |
 | start containers | `docker compose up -d` |
-| view running containers | `docker container ls` |
+| view running containers | `docker ps` |
 | stop containers | `docker compose down` |
 | view OpenSearch logs | `docker logs opensearch-node1` |
 | view OpenSearch Dashboard logs | `docker logs opensearch-dashboards` |
