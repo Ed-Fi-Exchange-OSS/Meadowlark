@@ -446,18 +446,16 @@ export async function createEntity(
 export async function deleteItems(items: { pk: string; sk: string }[], awsRequestId: string): Promise<DeleteResult> {
   Logger.debug('DynamoEntityRepository.deleteItems', awsRequestId);
 
-  const transactItems = items.map((item) => {
-    return {
-      Delete: {
-        TableName: tableOpts.tableName,
-        Key: {
-          pk: item.pk,
-          sk: item.sk,
-        },
-        ConditionExpression: 'attribute_exists(sk)',
+  const transactItems = items.map((item) => ({
+    Delete: {
+      TableName: tableOpts.tableName,
+      Key: {
+        pk: item.pk,
+        sk: item.sk,
       },
-    };
-  });
+      ConditionExpression: 'attribute_exists(sk)',
+    },
+  }));
 
   const batches = R.splitEvery(25, transactItems);
 

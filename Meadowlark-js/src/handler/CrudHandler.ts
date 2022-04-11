@@ -14,7 +14,7 @@ import {
   getForeignKeyReferences,
   deleteItems,
   validateEntityOwnership,
-} from '../repository/DynamoEntityRepository';
+} from '../repository/MongoEntityRepository';
 
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
@@ -409,16 +409,12 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
     if (fkSuccess) {
       // Delete the (FREF, TREF) records
       await deleteItems(
-        foreignKeys.map((i) => {
-          return { pk: i.From, sk: i.To };
-        }),
+        foreignKeys.map((i) => ({ pk: i.From, sk: i.To })),
         awsRequestId,
       );
       // And now reverse that, to delete the (TREF, FREF) records
       await deleteItems(
-        foreignKeys.map((i) => {
-          return { pk: i.To, sk: i.From };
-        }),
+        foreignKeys.map((i) => ({ pk: i.To, sk: i.From })),
         awsRequestId,
       );
     } // Else: user can't resolve this error, and it should be logged already. Ignore.

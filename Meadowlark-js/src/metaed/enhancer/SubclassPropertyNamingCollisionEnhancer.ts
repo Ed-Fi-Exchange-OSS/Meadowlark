@@ -56,10 +56,9 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
 
         // Add in the superclass -> subclass direction if exists
         if (subclassPropertyMeadowlark.namingCollisionWithSuperclassProperty !== NoEntityProperty) {
-          (subclassPropertyMeadowlark.namingCollisionWithSuperclassProperty.data
-            .meadowlark as EntityPropertyMeadowlarkData).namingCollisionWithSubclassProperties.push(
-            subclassCollectionProperty,
-          );
+          (
+            subclassPropertyMeadowlark.namingCollisionWithSuperclassProperty.data.meadowlark as EntityPropertyMeadowlarkData
+          ).namingCollisionWithSubclassProperties.push(subclassCollectionProperty);
         }
       });
   });

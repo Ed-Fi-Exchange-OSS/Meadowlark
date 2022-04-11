@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
-import { createEntity } from '../repository/DynamoEntityRepository';
+import { createEntity } from '../repository/MongoEntityRepository';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { PutResult } from '../repository/BaseDynamoRepository';
 import { Logger } from '../helpers/Logger';

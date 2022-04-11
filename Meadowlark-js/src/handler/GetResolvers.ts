@@ -13,7 +13,7 @@ import R from 'ramda';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { Security } from '../model/Security';
-import { getEntityById, getEntityList } from '../repository/DynamoEntityRepository';
+import { getEntityById, getEntityList } from '../repository/MongoEntityRepository';
 import { PaginationParameters, queryEntityList } from '../repository/ElasticsearchRepository';
 import { validateResource } from './RequestValidator';
 
