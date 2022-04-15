@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo, newEntityInfo } from '../../../src/model/EntityInfo';
-import { generateReferenceItems } from '../../../src/repository/BaseDynamoRepository';
-import { TransactWriteItem } from '../../../src/types/AwsSdkLibDynamoDb';
+import { EntityInfo, newEntityInfo } from '../../../../src/model/EntityInfo';
+import { generateReferenceItems } from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
+import { TransactWriteItem } from '../../../../src/types/AwsSdkLibDynamoDb';
 
 describe('when collecting foreign key references', () => {
   describe('given a item with no references', () => {

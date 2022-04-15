@@ -7,8 +7,9 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import * as ElasticsearchRepository from '../../../src/repository/ElasticsearchRepository';
+import * as ElasticsearchRepository from '../../../src/packages/dynamodb-opensearch/ElasticsearchRepository';
 import { query } from '../../../src/handler/GetResolvers';
+import { SearchResult } from '../../../src/plugin/backend/SearchResult';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -27,11 +28,11 @@ describe('given the endpoint is not in the MetaEd model', () => {
 
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: validationError,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Act
@@ -67,19 +68,19 @@ describe('given persistence fails', () => {
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: null,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Setup the Elasticsearch operation to fail
     mockElasticsearch = jest.spyOn(ElasticsearchRepository, 'queryEntityList').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         success: false,
         results: [],
-      } as unknown) as ElasticsearchRepository.GetResult),
+      } as unknown as SearchResult),
     );
 
     // Act
@@ -118,19 +119,19 @@ describe('given successful fetch from persistence', () => {
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: null,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Setup the Elasticsearch operation to succeed
     mockElasticsearch = jest.spyOn(ElasticsearchRepository, 'queryEntityList').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         success: true,
         results: [goodResult],
-      } as unknown) as ElasticsearchRepository.GetResult),
+      } as unknown as SearchResult),
     );
 
     // Act

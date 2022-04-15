@@ -7,7 +7,7 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import * as DynamoEntityRepository from '../../../src/repository/DynamoEntityRepository';
+import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
 import { list } from '../../../src/handler/GetResolvers';
 
 describe('given the endpoint is not in the MetaEd model', () => {
@@ -27,11 +27,11 @@ describe('given the endpoint is not in the MetaEd model', () => {
 
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: validationError,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Act
@@ -65,11 +65,11 @@ describe('given an error on list fetch from persistence', () => {
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: null,
         metaEdProjectHeaders: {},
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Setup the Dynamo operation to fail
@@ -114,11 +114,11 @@ describe('given successful fetch from persistence', () => {
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: null,
         metaEdProjectHeaders: {},
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Setup the Dynamo operation to succeed

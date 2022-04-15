@@ -9,13 +9,16 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
+import { initializeBackendPlugin } from '../packages/dynamodb-opensearch/index';
 import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
-import { createEntity } from '../repository/MongoEntityRepository';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
-import { PutResult } from '../repository/BaseDynamoRepository';
 import { Logger } from '../helpers/Logger';
 import { documentIdForEntityInfo } from '../helpers/DocumentId';
 import { newSecurity } from '../model/Security';
+import { MeadowlarkBackendPlugin } from '../plugin/backend/MeadowlarkBackendPlugin';
+import { PutResult } from '../plugin/backend/PutResult';
+
+const backendPlugin: MeadowlarkBackendPlugin = initializeBackendPlugin();
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -109,7 +112,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         naturalKey: buildNKString(`${descriptorDocument.namespace}#${descriptorDocument.codeValue}`),
       };
 
-      const putResult: PutResult = await createEntity(
+      const putResult: PutResult = await backendPlugin.createEntity(
         documentIdForEntityInfo(descriptorEntityInfo),
         descriptorEntityInfo,
         { ...descriptorDocument, _isDescriptor: true },

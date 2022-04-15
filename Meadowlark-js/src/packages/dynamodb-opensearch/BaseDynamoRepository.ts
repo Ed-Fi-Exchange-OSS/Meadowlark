@@ -7,7 +7,7 @@ import R from 'ramda';
 import invariant from 'invariant';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { documentIdForEntityInfo, documentIdFromNaturalKeyString } from '../helpers/DocumentId';
+import { documentIdForEntityInfo, documentIdFromNaturalKeyString } from '../../helpers/DocumentId';
 import {
   EntityInfo,
   entityTypeStringFrom,
@@ -15,12 +15,12 @@ import {
   buildNKString,
   EntityIdentifyingInfo,
   EntityTypeInfo,
-} from '../model/EntityInfo';
-import { PutItemInputAttributeMap, TransactWriteItem } from '../types/AwsSdkLibDynamoDb';
+} from '../../model/EntityInfo';
+import { PutItemInputAttributeMap, TransactWriteItem } from '../../types/AwsSdkLibDynamoDb';
 
-import { ForeignKeyItem } from '../model/ForeignKeyItem';
-import { ReferentialConstraint } from '../model/ReferentialConstraint';
-import { Logger } from '../helpers/Logger';
+import { ForeignKeyItem } from '../../model/ForeignKeyItem';
+import { ReferentialConstraint } from '../../model/ReferentialConstraint';
+import { Logger } from '../../helpers/Logger';
 
 // setup to switch between local and cloud dynamodb based on stage flag
 export const dynamoOpts: any = {};
@@ -34,32 +34,6 @@ export const tableOpts: any = {
   tableName: process.env.DOMAIN_TABLE_NAME ?? 'DefaultTableName',
 };
 
-export type DeleteResult = {
-  success: boolean;
-};
-
-export type PutResult = {
-  result:
-    | 'INSERT_SUCCESS'
-    | 'INSERT_FAILURE_REFERENCE'
-    | 'INSERT_FAILURE_ASSIGNABLE_COLLISION'
-    | 'UPDATE_SUCCESS'
-    | 'UPDATE_FAILURE_REFERENCE'
-    | 'UPDATE_FAILURE_NOT_EXISTS'
-    | 'UNKNOWN_FAILURE';
-  failureMessage?: string;
-};
-
-export type OwnershipResult = {
-  result: 'ERROR' | 'NOT_FOUND' | 'SUCCESS';
-  isOwner: boolean;
-};
-
-export type GetResult = {
-  result: 'ERROR' | 'NOT_FOUND' | 'SUCCESS' | 'AUTHORIZATION_FAILURE' | 'LEGACY_AUTHORIZATION_FAILURE';
-  documents: Array<object>;
-  securityResolved?: string[];
-};
 let dynamoDBClient: DynamoDBClient | null = null;
 
 export function getDynamoDBClient(): DynamoDBClient {

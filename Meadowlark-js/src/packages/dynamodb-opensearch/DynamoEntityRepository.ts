@@ -16,15 +16,12 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
-import { EntityInfo, entityTypeStringFrom } from '../model/EntityInfo';
-import { Security } from '../model/Security';
+import { EntityInfo, entityTypeStringFrom } from '../../model/EntityInfo';
+import { Security } from '../../model/Security';
 import {
   getDynamoDBDocumentClient,
-  DeleteResult,
   entityIdPrefixRemoved,
   foreignKeyConditions,
-  GetResult,
-  PutResult,
   sortKeyFromId,
   tableOpts,
   descriptorValueConditions,
@@ -34,13 +31,16 @@ import {
   constructAssignablePutItem,
   constructAssignableDeleteItem,
   getDynamoDBClient,
-  OwnershipResult,
 } from './BaseDynamoRepository';
-import { NoOutput, TransactWriteItem } from '../types/AwsSdkLibDynamoDb';
+import { NoOutput, TransactWriteItem } from '../../types/AwsSdkLibDynamoDb';
 
-import { Logger } from '../helpers/Logger';
-import { ValidationOptions } from '../model/ValidationOptions';
-import { ForeignKeyItem } from '../model/ForeignKeyItem';
+import { Logger } from '../../helpers/Logger';
+import { ValidationOptions } from '../../model/ValidationOptions';
+import { ForeignKeyItem } from '../../model/ForeignKeyItem';
+import { DeleteResult } from '../../plugin/backend/DeleteResult';
+import { GetResult } from '../../plugin/backend/GetResult';
+import { PutResult } from '../../plugin/backend/PutResult';
+import { OwnershipResult } from '../../plugin/backend/OwnershipResult';
 
 type NextToken = string;
 

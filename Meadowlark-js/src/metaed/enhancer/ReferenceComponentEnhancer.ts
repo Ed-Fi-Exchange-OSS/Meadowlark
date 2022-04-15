@@ -15,9 +15,9 @@ const enhancerName = 'ReferenceComponentEnhancer';
  */
 function buildReferenceComponent(sourceProperty: EntityProperty): ReferenceComponent {
   if (sourceProperty.type === 'association' || sourceProperty.type === 'domainEntity') {
-    const referenceComponents: ReferenceComponent[] = (sourceProperty as ReferentialProperty).referencedEntity.identityProperties.map(
-      (identityProperty) => buildReferenceComponent(identityProperty),
-    );
+    const referenceComponents: ReferenceComponent[] = (
+      sourceProperty as ReferentialProperty
+    ).referencedEntity.identityProperties.map((identityProperty) => buildReferenceComponent(identityProperty));
     referenceComponents.sort((a, b) => a.sourceProperty.fullPropertyName.localeCompare(b.sourceProperty.fullPropertyName));
     return {
       ...newReferenceGroup(),

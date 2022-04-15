@@ -5,18 +5,18 @@
 
 import { Jwt as nJwt, JwtBody as nJwtBody } from 'njwt';
 
-/**
- * Improve on nJwt's typings
- */
-export interface Jwt extends nJwt {
-  message: string;
-  body: JwtBody;
-}
-
 interface JwtBody extends nJwtBody {
   iss?: string;
   aud?: string;
   sub?: string;
   iat?: number;
   exp?: number;
+}
+
+/**
+ * Improve on nJwt's typings
+ */
+export interface Jwt extends nJwt {
+  message: string;
+  body: JwtBody;
 }

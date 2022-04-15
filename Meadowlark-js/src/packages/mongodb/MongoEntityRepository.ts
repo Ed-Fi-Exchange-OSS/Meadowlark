@@ -4,11 +4,16 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, Db, MongoClient, WithId } from 'mongodb';
-import { ForeignKeyItem } from '../model/ForeignKeyItem';
-import { EntityInfo } from '../model/EntityInfo';
-import { Security } from '../model/Security';
-import { ValidationOptions } from '../model/ValidationOptions';
-import { DeleteResult, GetResult, OwnershipResult, PutResult } from './BaseDynamoRepository';
+import { ForeignKeyItem } from '../../model/ForeignKeyItem';
+import { EntityInfo } from '../../model/EntityInfo';
+import { Security } from '../../model/Security';
+import { ValidationOptions } from '../../model/ValidationOptions';
+import { DeleteResult } from '../../plugin/backend/DeleteResult';
+import { GetResult } from '../../plugin/backend/GetResult';
+import { PutResult } from '../../plugin/backend/PutResult';
+import { OwnershipResult } from '../../plugin/backend/OwnershipResult';
+import { PaginationParameters } from '../../plugin/backend/PaginationParameters';
+import { SearchResult } from '../../plugin/backend/SearchResult';
 
 interface Entity {
   // A string hash of the project name, entity type, entity version and body of
@@ -142,4 +147,13 @@ export async function validateEntityOwnership(
   _lambdaRequestId: string,
 ): Promise<OwnershipResult> {
   return { result: 'ERROR', isOwner: false };
+}
+
+export async function queryEntityList(
+  _entityInfo: EntityInfo,
+  _queryStringParameters: object,
+  _paginationParameters: PaginationParameters,
+  _awsRequestId: string,
+): Promise<SearchResult> {
+  return { success: false, results: [] };
 }

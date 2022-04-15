@@ -6,11 +6,6 @@
 import { verifyJwt } from '../security/JwtAction';
 import { JwtStatus } from '../security/JwtStatus';
 
-export type JwtValidation = {
-  jwtStatus: JwtStatus;
-  errorResponse?: ErrorResponse;
-};
-
 type ErrorResponse = {
   statusCode: number;
   body: string;
@@ -19,6 +14,11 @@ type ErrorResponse = {
         [header: string]: boolean | number | string;
       }
     | undefined;
+};
+
+export type JwtValidation = {
+  jwtStatus: JwtStatus;
+  errorResponse?: ErrorResponse;
 };
 
 export function validateJwt(authorizationHeader: string | undefined): JwtValidation {

@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 // Validate against Joi schemas
+// eslint-disable-next-line import/no-import-module-exports
 import { expect } from '@hapi/code';
 
 const thrownAt = () => {

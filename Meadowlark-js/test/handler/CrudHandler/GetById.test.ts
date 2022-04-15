@@ -9,8 +9,8 @@ import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import { getById } from '../../../src/handler/GetResolvers';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { Security } from '../../../src/model/Security';
-import { GetResult } from '../../../src/repository/BaseDynamoRepository';
-import * as DynamoEntityRepository from '../../../src/repository/DynamoEntityRepository';
+import { GetResult } from '../../../src/plugin/backend/GetResult';
+import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -29,11 +29,11 @@ describe('given the endpoint is not in the MetaEd model', () => {
 
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: validationError,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Act
@@ -69,11 +69,11 @@ describe('given database lookup fails', () => {
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {},
         errorBody: null,
         metaEdProjectHeaders: metaEdHeaders,
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Setup the Dynamo operation to fail

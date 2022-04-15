@@ -3,8 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export const CreateApiVersionObject = (serverBaseUrl: string) => {
-  return `{
+export const CreateApiVersionObject = (serverBaseUrl: string) => `{
     "version": "5.3",
     "informationalVersion": "5.3",
     "suite": "3",
@@ -24,7 +23,6 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => {
       "xsdMetadata": ""
     }
   }`;
-};
 
 export const OpenApiListTemplate = `[
   {

@@ -9,21 +9,10 @@ import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
-import { EntityInfo, entityTypeStringFrom } from '../model/EntityInfo';
-import { Logger } from '../helpers/Logger';
-
-export type GetResult = {
-  success: boolean;
-  results: Array<object>;
-};
-
-/**
- * The special query parameters used to drive pagination
- */
-export type PaginationParameters = {
-  limit?: string;
-  offset?: string;
-};
+import { EntityInfo, entityTypeStringFrom } from '../../model/EntityInfo';
+import { Logger } from '../../helpers/Logger';
+import { PaginationParameters } from '../../plugin/backend/PaginationParameters';
+import { SearchResult } from '../../plugin/backend/SearchResult';
 
 /**
  * A replacement for @acuris/aws-es-connection's "createAWSConnection", using aws4.
@@ -111,7 +100,7 @@ export async function queryEntityList(
   queryStringParameters: object,
   paginationParameters: PaginationParameters,
   awsRequestId: string,
-): Promise<GetResult> {
+): Promise<SearchResult> {
   const client = await getElasticsearchClient(awsRequestId);
 
   Logger.debug(`Building query`, awsRequestId);

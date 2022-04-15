@@ -10,9 +10,9 @@ import { Context } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { Client as EsClient } from '@elastic/elasticsearch';
-import { indexFromEntityTypeString, getElasticsearchClient } from '../repository/ElasticsearchRepository';
-import { entityIdPrefixRemoved } from '../repository/BaseDynamoRepository';
-import { Logger } from '../helpers/Logger';
+import { indexFromEntityTypeString, getElasticsearchClient } from './ElasticsearchRepository';
+import { entityIdPrefixRemoved } from './BaseDynamoRepository';
+import { Logger } from '../../helpers/Logger';
 
 /** A locally-defined slice of a DynamoDBRecord's StreamRecord */
 interface StreamRecord {

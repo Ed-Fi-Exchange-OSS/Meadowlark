@@ -24,8 +24,9 @@ function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[
   const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
 
   // pathEndings are the property names of all the scalar identity fields
-  const pathEndings: string[] = (referencedEntity.data
-    .meadowlark as EntityMeadowlarkData).apiMapping.flattenedIdentityProperties.map(
+  const pathEndings: string[] = (
+    referencedEntity.data.meadowlark as EntityMeadowlarkData
+  ).apiMapping.flattenedIdentityProperties.map(
     (property) => (property.data.meadowlark as EntityPropertyMeadowlarkData).apiMapping.fullName,
   );
 

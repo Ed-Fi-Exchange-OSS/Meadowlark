@@ -10,10 +10,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb';
-import * as DynamoRepository from '../../../../src/repository/BaseDynamoRepository';
-import { createEntity } from '../../../../src/repository/DynamoEntityRepository';
+import * as DynamoRepository from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
+import { createEntity } from '../../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
 import { EntityInfo, entityTypeStringFrom, newEntityInfo } from '../../../../src/model/EntityInfo';
-import { sortKeyFromId } from '../../../../src/repository/BaseDynamoRepository';
+import { sortKeyFromId } from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
 import { documentIdForEntityInfo } from '../../../../src/helpers/DocumentId';
 import { newSecurity } from '../../../../src/model/Security';
 
@@ -67,6 +67,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
     dynamodbLocal.start({ port: TEST_DYNAMO_PORT, inMemory: true });
 
     // give local Dynamo time to start up
+    // eslint-disable-next-line no-promise-executor-return
     await new Promise((r) => setTimeout(r, 2000));
 
     const tableDefinition: CreateTableInput = loadCreateTableInputFromResourcesYaml();

@@ -11,7 +11,7 @@ import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { loadDescriptors } from '../../src/handler/DescriptorLoader';
-import * as DynamoRepository from '../../src/repository/BaseDynamoRepository';
+import * as DynamoRepository from '../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
 
 jest.setTimeout(120000);
 
@@ -49,6 +49,7 @@ describe('given the set of descriptors to load into DynamoDB', () => {
     dynamodbLocal.start({ port: TEST_DYNAMO_PORT, inMemory: true });
 
     // give local Dynamo time to start up
+    // eslint-disable-next-line no-promise-executor-return
     await new Promise((r) => setTimeout(r, 2000));
 
     const tableDefinition: CreateTableInput = loadCreateTableInputFromResourcesYaml();

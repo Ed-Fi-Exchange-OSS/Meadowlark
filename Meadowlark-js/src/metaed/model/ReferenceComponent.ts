@@ -15,6 +15,7 @@ import { EntityProperty, newEntityProperty, NoEntityProperty } from '@edfi/metae
  * when parts of the identity of the entity being referenced are themselves references, and
  * so on in a Russian doll-like hierarchy.  ReferenceGroups capture this hierarchy.
  */
+// eslint-disable-next-line no-use-before-define
 export type ReferenceComponent = ReferenceElement | ReferenceGroup;
 
 /**

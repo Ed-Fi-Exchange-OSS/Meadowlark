@@ -78,7 +78,7 @@ swaggerForDescriptorsAPI:
         cors: true
 
 updateExternalStorage:
-  handler: dist/handler/DynamoDbStreamHandler.updateExternalStorage
+  handler: dist/packages/dynamodb-opensearch/DynamoDbStreamHandler.updateExternalStorage
   environment:
     ES_ENDPOINT:
       Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]
@@ -111,4 +111,3 @@ oauthToken:
         method: get
         path: /verify
         cors: true
- 

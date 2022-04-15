@@ -9,8 +9,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import * as Get from '../../../src/handler/GetResolvers';
 import { update } from '../../../src/handler/CrudHandler';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import { PutResult } from '../../../src/repository/BaseDynamoRepository';
-import * as DynamoEntityRepository from '../../../src/repository/DynamoEntityRepository';
+import { PutResult } from '../../../src/plugin/backend/PutResult';
+import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -80,14 +80,14 @@ describe('given a completely missing resource path', () => {
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-      Promise.resolve(({
+      Promise.resolve({
         entityInfo: {
           foreignKeys: ['NK#schoolId=1'],
           naturalKey: 'NK#123',
         },
         errorBody: null,
         metaEdProjectHeaders: {},
-      } as unknown) as RequestValidator.ResourceValidationResult),
+      } as unknown as RequestValidator.ResourceValidationResult),
     );
 
     // Act
@@ -125,14 +125,14 @@ describe('given a valid object', () => {
 
       // Setup the request validation to succeed
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-        Promise.resolve(({
+        Promise.resolve({
           entityInfo: {
             foreignKeys: ['NK#schoolId=1'],
             naturalKey: 'NK#123',
           },
           errorBody: null,
           metaEdProjectHeaders: metaEdHeaders,
-        } as unknown) as RequestValidator.ResourceValidationResult),
+        } as unknown as RequestValidator.ResourceValidationResult),
       );
 
       // Setup the Dynamo operation to fail
@@ -182,14 +182,14 @@ describe('given a valid object', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
@@ -239,14 +239,14 @@ describe('given a valid object', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the GET request to succeed
@@ -298,22 +298,22 @@ describe('given a valid object', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to succeed
         mockDynamo = jest.spyOn(DynamoEntityRepository, 'updateEntityById').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
-          } as unknown) as PutResult),
+          } as unknown as PutResult),
         );
 
         // Act

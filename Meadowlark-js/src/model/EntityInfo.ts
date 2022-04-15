@@ -7,23 +7,6 @@ import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { AssignableInfo } from './AssignableInfo';
 import { ReferentialConstraint } from './ReferentialConstraint';
 
-export function buildNKString(naturalKey: string): string {
-  if (naturalKey.startsWith('NK#')) return naturalKey;
-
-  return `NK#${naturalKey}`;
-}
-
-export function entityTypeStringFromComponents(projectName: string, projectVersion: string, entityName: string): string {
-  return `TYPE#${projectName}#${projectVersion}#${entityName}`;
-}
-
-export function entityTypeStringFrom(entityInfo: EntityTypeInfo): string {
-  const adjustedEntityName = entityInfo.isDescriptor
-    ? normalizeDescriptorSuffix(entityInfo.entityName)
-    : entityInfo.entityName;
-  return entityTypeStringFromComponents(entityInfo.projectName, entityInfo.projectVersion, adjustedEntityName);
-}
-
 /**
  * Type information for a MetaEd entity
  */
@@ -118,3 +101,20 @@ export const NoEntityInfo = {
   projectName: 'NoProjectName',
   projectVersion: '0.0.0',
 };
+
+export function buildNKString(naturalKey: string): string {
+  if (naturalKey.startsWith('NK#')) return naturalKey;
+
+  return `NK#${naturalKey}`;
+}
+
+export function entityTypeStringFromComponents(projectName: string, projectVersion: string, entityName: string): string {
+  return `TYPE#${projectName}#${projectVersion}#${entityName}`;
+}
+
+export function entityTypeStringFrom(entityInfo: EntityTypeInfo): string {
+  const adjustedEntityName = entityInfo.isDescriptor
+    ? normalizeDescriptorSuffix(entityInfo.entityName)
+    : entityInfo.entityName;
+  return entityTypeStringFromComponents(entityInfo.projectName, entityInfo.projectVersion, adjustedEntityName);
+}

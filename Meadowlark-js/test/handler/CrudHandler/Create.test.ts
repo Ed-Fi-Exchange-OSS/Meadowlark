@@ -8,8 +8,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 
 import { create } from '../../../src/handler/CrudHandler';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import { PutResult } from '../../../src/repository/BaseDynamoRepository';
-import * as DynamoEntityRepository from '../../../src/repository/DynamoEntityRepository';
+import { PutResult } from '../../../src/plugin/backend/PutResult';
+import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -78,11 +78,11 @@ describe('when posting a request to create a new resource', () => {
       const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-        Promise.resolve(({
+        Promise.resolve({
           entityInfo: {},
           errorBody: expectedError,
           metaEdProjectHeaders: expectedHeaders,
-        } as unknown) as RequestValidator.ResourceValidationResult),
+        } as unknown as RequestValidator.ResourceValidationResult),
       );
 
       response = await create(event, context);
@@ -122,14 +122,14 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
@@ -179,14 +179,14 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
@@ -236,14 +236,14 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
@@ -294,14 +294,14 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
@@ -352,22 +352,22 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
         mockDynamo = jest.spyOn(DynamoEntityRepository, 'createEntity').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             result: 'INSERT_SUCCESS',
             failureMessage: null,
-          } as unknown) as PutResult),
+          } as unknown as PutResult),
         );
 
         // Act
@@ -415,22 +415,22 @@ describe('when posting a request to create a new resource', () => {
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             entityInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,
-          } as unknown) as RequestValidator.ResourceValidationResult),
+          } as unknown as RequestValidator.ResourceValidationResult),
         );
 
         // Setup the Dynamo operation to fail
         mockDynamo = jest.spyOn(DynamoEntityRepository, 'createEntity').mockReturnValue(
-          Promise.resolve(({
+          Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
-          } as unknown) as PutResult),
+          } as unknown as PutResult),
         );
 
         // Act

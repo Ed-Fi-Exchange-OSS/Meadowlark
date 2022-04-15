@@ -88,9 +88,10 @@ function naturalKeysFrom(
  * extracts the natural key information from the JSON body. Also extracts security information, if any.
  */
 export function extractNaturalKey(entity: TopLevelEntity, body: object): NaturalKeyWithSecurity {
-  const naturalKeysWithSecurity: NaturalKeyWithSecurity[] = (entity.data
-    .meadowlark as EntityMeadowlarkData).apiMapping.identityReferenceComponents.flatMap(
-    (identityReferenceComponent: ReferenceComponent) => naturalKeysFrom(identityReferenceComponent, body, entity, []),
+  const naturalKeysWithSecurity: NaturalKeyWithSecurity[] = (
+    entity.data.meadowlark as EntityMeadowlarkData
+  ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>
+    naturalKeysFrom(identityReferenceComponent, body, entity, []),
   );
 
   return naturalKeysWithSecurity.reduce(
@@ -122,8 +123,8 @@ export function extractNaturalKey(entity: TopLevelEntity, body: object): Natural
  * TODO: Bring this behavior into extractNaturalKey, correctly managing for natural key component ordering.
  */
 export function deriveAssignableFrom(entity: TopLevelEntity, naturalKey: string): AssignableInfo | null {
-  const { assignableTo }: { assignableTo: TopLevelEntity | null } = (entity.data
-    .meadowlark as EntityMeadowlarkData).apiMapping;
+  const { assignableTo }: { assignableTo: TopLevelEntity | null } = (entity.data.meadowlark as EntityMeadowlarkData)
+    .apiMapping;
   if (assignableTo == null) return null;
   const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
   if (identityRename == null) return { assignableToName: assignableTo.metaEdName, assignableNaturalKey: naturalKey };

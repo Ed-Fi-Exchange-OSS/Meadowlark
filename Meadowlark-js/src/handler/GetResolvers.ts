@@ -9,13 +9,15 @@
 // eslint-disable-next-line import/no-unresolved
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import R from 'ramda';
-
+import { initializeBackendPlugin } from '../packages/dynamodb-opensearch/index';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { Security } from '../model/Security';
-import { getEntityById, getEntityList } from '../repository/MongoEntityRepository';
-import { PaginationParameters, queryEntityList } from '../repository/ElasticsearchRepository';
 import { validateResource } from './RequestValidator';
+import { MeadowlarkBackendPlugin } from '../plugin/backend/MeadowlarkBackendPlugin';
+import { PaginationParameters } from '../plugin/backend/PaginationParameters';
+
+const backendPlugin: MeadowlarkBackendPlugin = initializeBackendPlugin();
 
 function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
   Logger.debug(`Get.${method} ${status} ${message || ''}`.trimEnd(), context.awsRequestId);
@@ -33,7 +35,7 @@ export async function list(pathComponents: PathComponents, context: Context): Pr
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
-  const { result, documents } = await getEntityList(entityInfo, context.awsRequestId);
+  const { result, documents } = await backendPlugin.getEntityList(entityInfo, context.awsRequestId);
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(context, 'list', 500);
@@ -69,7 +71,7 @@ export async function getById(
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
-  const { result, documents, securityResolved } = await getEntityById(
+  const { result, documents, securityResolved } = await backendPlugin.getEntityById(
     entityInfo,
     pathComponents.resourceId,
     security,
@@ -120,7 +122,7 @@ export async function query(
   const cleanQueryParameters: object = removeDisallowedQueryParameters(queryStringParameters);
   const paginationParameters: PaginationParameters = onlyPaginationParameters(queryStringParameters);
 
-  const { success, results } = await queryEntityList(
+  const { success, results } = await backendPlugin.queryEntityList(
     entityInfo,
     cleanQueryParameters,
     paginationParameters,
