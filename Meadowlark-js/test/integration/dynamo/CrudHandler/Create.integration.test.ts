@@ -10,10 +10,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb';
-import * as DynamoRepository from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
-import { createEntity } from '../../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
+import * as DynamoRepository from '../../../../src/packages/meadowlark-plugin-dynamodb-opensearch/BaseDynamoRepository';
+import { createEntity } from '../../../../src/packages/meadowlark-plugin-dynamodb-opensearch/DynamoEntityRepository';
 import { EntityInfo, entityTypeStringFrom, newEntityInfo } from '../../../../src/model/EntityInfo';
-import { sortKeyFromId } from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
+import { sortKeyFromId } from '../../../../src/packages/meadowlark-plugin-dynamodb-opensearch/BaseDynamoRepository';
 import { documentIdForEntityInfo } from '../../../../src/helpers/DocumentId';
 import { newSecurity } from '../../../../src/model/Security';
 

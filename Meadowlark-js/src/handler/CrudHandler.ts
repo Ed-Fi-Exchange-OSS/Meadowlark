@@ -6,7 +6,6 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from './RequestValidator';
-import { initializeBackendPlugin } from '../packages/dynamodb-opensearch/index';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { getById, query } from './GetResolvers';
@@ -15,9 +14,7 @@ import { NoEntityInfo } from '../model/EntityInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
 import { authorizationHeader } from '../helpers/AuthorizationHeader';
-import { MeadowlarkBackendPlugin } from '../plugin/backend/MeadowlarkBackendPlugin';
-
-const backendPlugin: MeadowlarkBackendPlugin = initializeBackendPlugin();
+import { backendPlugin } from '../plugin/PluginLoader';
 
 function getPathComponents(path: string): PathComponents | null {
   // Matches all of the following sample expressions:

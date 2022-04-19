@@ -9,16 +9,13 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { initializeBackendPlugin } from '../packages/dynamodb-opensearch/index';
+import { backendPlugin } from '../plugin/PluginLoader';
 import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
 import { documentIdForEntityInfo } from '../helpers/DocumentId';
 import { newSecurity } from '../model/Security';
-import { MeadowlarkBackendPlugin } from '../plugin/backend/MeadowlarkBackendPlugin';
 import { PutResult } from '../plugin/backend/PutResult';
-
-const backendPlugin: MeadowlarkBackendPlugin = initializeBackendPlugin();
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 

@@ -18,6 +18,9 @@ module.exports = {
     // originally required in the early days of monorepos -- consider revisiting
     'import/no-cycle': 'off',
 
+    // need to dynamically load plugins
+    'import/no-dynamic-require': 'off',
+
     // prettier is handling this
     'max-len': 'off',
 

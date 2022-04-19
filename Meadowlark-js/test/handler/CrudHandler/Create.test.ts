@@ -9,7 +9,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { create } from '../../../src/handler/CrudHandler';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
-import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
+import * as DynamoEntityRepository from '../../../src/packages/meadowlark-plugin-dynamodb-opensearch/DynamoEntityRepository';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 

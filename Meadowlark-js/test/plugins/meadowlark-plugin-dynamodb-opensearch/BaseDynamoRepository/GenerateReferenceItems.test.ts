@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { EntityInfo, newEntityInfo } from '../../../../src/model/EntityInfo';
-import { generateReferenceItems } from '../../../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
+import { generateReferenceItems } from '../../../../src/packages/meadowlark-plugin-dynamodb-opensearch/BaseDynamoRepository';
 import { TransactWriteItem } from '../../../../src/types/AwsSdkLibDynamoDb';
 
 describe('when collecting foreign key references', () => {

@@ -7,7 +7,7 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import * as ElasticsearchRepository from '../../../src/packages/dynamodb-opensearch/ElasticsearchRepository';
+import * as ElasticsearchRepository from '../../../src/packages/meadowlark-plugin-dynamodb-opensearch/ElasticsearchRepository';
 import { query } from '../../../src/handler/GetResolvers';
 import { SearchResult } from '../../../src/plugin/backend/SearchResult';
 

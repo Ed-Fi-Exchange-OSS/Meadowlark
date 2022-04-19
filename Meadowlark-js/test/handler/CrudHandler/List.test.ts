@@ -7,7 +7,7 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
-import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
+import * as DynamoEntityRepository from '../../../src/packages/meadowlark-plugin-dynamodb-opensearch/DynamoEntityRepository';
 import { list } from '../../../src/handler/GetResolvers';
 
 describe('given the endpoint is not in the MetaEd model', () => {

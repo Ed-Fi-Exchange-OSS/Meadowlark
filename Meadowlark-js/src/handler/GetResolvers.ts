@@ -9,15 +9,12 @@
 // eslint-disable-next-line import/no-unresolved
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import R from 'ramda';
-import { initializeBackendPlugin } from '../packages/dynamodb-opensearch/index';
+import { backendPlugin } from '../plugin/PluginLoader';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { Security } from '../model/Security';
 import { validateResource } from './RequestValidator';
-import { MeadowlarkBackendPlugin } from '../plugin/backend/MeadowlarkBackendPlugin';
 import { PaginationParameters } from '../plugin/backend/PaginationParameters';
-
-const backendPlugin: MeadowlarkBackendPlugin = initializeBackendPlugin();
 
 function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
   Logger.debug(`Get.${method} ${status} ${message || ''}`.trimEnd(), context.awsRequestId);

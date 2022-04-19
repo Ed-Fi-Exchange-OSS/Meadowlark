@@ -10,7 +10,7 @@ import { getById } from '../../../src/handler/GetResolvers';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { Security } from '../../../src/model/Security';
 import { GetResult } from '../../../src/plugin/backend/GetResult';
-import * as DynamoEntityRepository from '../../../src/packages/dynamodb-opensearch/DynamoEntityRepository';
+import * as DynamoEntityRepository from '../../../src/packages/meadowlark-plugin-dynamodb-opensearch/DynamoEntityRepository';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;

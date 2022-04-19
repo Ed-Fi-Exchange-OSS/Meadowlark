@@ -11,7 +11,7 @@ import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { loadDescriptors } from '../../src/handler/DescriptorLoader';
-import * as DynamoRepository from '../../src/packages/dynamodb-opensearch/BaseDynamoRepository';
+import * as DynamoRepository from '../../src/packages/meadowlark-plugin-dynamodb-opensearch/BaseDynamoRepository';
 
 jest.setTimeout(120000);
 
