@@ -69,9 +69,9 @@
     "init:local-dynamodb": "yarn serverless dynamodb install",
     "deploy:aws": "yarn build && yarn serverless deploy --aws-profile default --stage",
     "teardown:aws": "yarn serverless remove --aws-profile default --stage",
-    "start:local": "yarn build && yarn serverless offline start --printOutput --stage local --allowCache",
     "load:descriptors:local": "yarn serverless invoke local -f loadDescriptors",
-    "load:descriptors:aws": "yarn serverless invoke --function loadDescriptors --stage"
+    "load:descriptors:aws": "yarn serverless invoke --function loadDescriptors --stage",
+    "start:local": "yarn workspace @edfi/meadowlark-core serverless offline start --printOutput --stage local --allowCache"
   },
   "husky": {
     "hooks": {
