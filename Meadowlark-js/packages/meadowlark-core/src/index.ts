@@ -1,4 +1,5 @@
 export { MeadowlarkBackendPlugin } from './plugin/backend/MeadowlarkBackendPlugin';
+export { NoMeadowlarkBackendPlugin } from './plugin/backend/NoMeadowlarkBackendPlugin';
 export { GetResult } from './plugin/backend/GetResult';
 export { DeleteResult } from './plugin/backend/DeleteResult';
 export { OwnershipResult } from './plugin/backend/OwnershipResult';
@@ -21,3 +22,4 @@ export {
 } from './model/EntityInfo';
 export { Logger } from './helpers/Logger';
 export { loadDescriptors } from './handler/DescriptorLoader';
+export * as PluginLoader from './plugin/PluginLoader';

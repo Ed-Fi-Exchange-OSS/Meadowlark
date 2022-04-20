@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { loadDescriptors } from '@edfi/meadowlark-core';
+import { loadDescriptors, MeadowlarkBackendPlugin, PluginLoader } from '@edfi/meadowlark-core';
 import * as DynamoRepository from '../../src/BaseDynamoRepository';
 
 jest.setTimeout(120000);
@@ -36,7 +36,13 @@ async function createTable(tableDefinition: CreateTableInput): Promise<CreateTab
 }
 
 describe('given the set of descriptors to load into DynamoDB', () => {
+  let mockBackendPlugin;
   beforeAll(async () => {
+    // Set the backendPlugin to DynamoDB
+    // eslint-disable-next-line global-require
+    const dynamoBackendPlugin: MeadowlarkBackendPlugin = require(`../../src/index`).initializeBackendPlugin();
+    mockBackendPlugin = jest.spyOn(PluginLoader, 'backendPlugin').mockReturnValue(dynamoBackendPlugin);
+
     // Overwrite the dynamodb configuration with testing config
     Object.assign(DynamoRepository.dynamoOpts, {
       endpoint: `http://localhost:${TEST_DYNAMO_PORT}`,
@@ -60,6 +66,8 @@ describe('given the set of descriptors to load into DynamoDB', () => {
   });
 
   afterAll(async () => {
+    // Unload the backend plugin
+    mockBackendPlugin.mockRestore();
     await dynamodbLocal.stop(TEST_DYNAMO_PORT);
   });
 

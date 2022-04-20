@@ -109,7 +109,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         naturalKey: buildNKString(`${descriptorDocument.namespace}#${descriptorDocument.codeValue}`),
       };
 
-      const putResult: PutResult = await backendPlugin.createEntity(
+      const putResult: PutResult = await backendPlugin().createEntity(
         documentIdForEntityInfo(descriptorEntityInfo),
         descriptorEntityInfo,
         { ...descriptorDocument, _isDescriptor: true },

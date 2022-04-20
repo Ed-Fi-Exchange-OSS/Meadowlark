@@ -77,7 +77,7 @@ describe('given database lookup fails', () => {
     );
 
     // Setup the get operation to fail
-    mockDynamo = jest.spyOn(backendPlugin, 'getEntityById').mockReturnValue(
+    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityById').mockReturnValue(
       Promise.resolve({
         result: 'ERROR',
         documents: [],
@@ -128,7 +128,7 @@ describe('given a valid request', () => {
     );
 
     // Setup the get operation to succeed
-    mockDynamo = jest.spyOn(backendPlugin, 'getEntityById').mockReturnValue(
+    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityById').mockReturnValue(
       Promise.resolve({
         result: 'SUCCESS',
         failureMessage: null,

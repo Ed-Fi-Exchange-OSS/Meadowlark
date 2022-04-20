@@ -32,7 +32,7 @@ export async function list(pathComponents: PathComponents, context: Context): Pr
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
-  const { result, documents } = await backendPlugin.getEntityList(entityInfo, context.awsRequestId);
+  const { result, documents } = await backendPlugin().getEntityList(entityInfo, context.awsRequestId);
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(context, 'list', 500);
@@ -68,7 +68,7 @@ export async function getById(
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
-  const { result, documents, securityResolved } = await backendPlugin.getEntityById(
+  const { result, documents, securityResolved } = await backendPlugin().getEntityById(
     entityInfo,
     pathComponents.resourceId,
     security,
@@ -119,7 +119,7 @@ export async function query(
   const cleanQueryParameters: object = removeDisallowedQueryParameters(queryStringParameters);
   const paginationParameters: PaginationParameters = onlyPaginationParameters(queryStringParameters);
 
-  const { success, results } = await backendPlugin.queryEntityList(
+  const { success, results } = await backendPlugin().queryEntityList(
     entityInfo,
     cleanQueryParameters,
     paginationParameters,

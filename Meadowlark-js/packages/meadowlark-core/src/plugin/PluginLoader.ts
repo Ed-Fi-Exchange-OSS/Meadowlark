@@ -4,10 +4,15 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 /* eslint-disable global-require */
 import dotenv from 'dotenv';
-import { MeadowlarkBackendPlugin, NoMeadowlarkBackendPlugin } from './backend/MeadowlarkBackendPlugin';
+import { MeadowlarkBackendPlugin } from './backend/MeadowlarkBackendPlugin';
+import { NoMeadowlarkBackendPlugin } from './backend/NoMeadowlarkBackendPlugin';
 
 dotenv.config();
 
-export const backendPlugin: MeadowlarkBackendPlugin = process.env.BACKEND_PLUGIN_MODULE
+const loadedBackendPlugin = process.env.BACKEND_PLUGIN_MODULE
   ? require(`../packages/${process.env.BACKEND_PLUGIN_MODULE}/index`).initializeBackendPlugin()
   : NoMeadowlarkBackendPlugin;
+
+export function backendPlugin(): MeadowlarkBackendPlugin {
+  return loadedBackendPlugin;
+}

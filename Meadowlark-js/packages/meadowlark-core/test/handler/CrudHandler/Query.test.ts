@@ -76,7 +76,7 @@ describe('given persistence fails', () => {
     );
 
     // Setup the query operation to fail
-    mockElasticsearch = jest.spyOn(backendPlugin, 'queryEntityList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(backendPlugin(), 'queryEntityList').mockReturnValue(
       Promise.resolve({
         success: false,
         results: [],
@@ -127,7 +127,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the query operation to succeed
-    mockElasticsearch = jest.spyOn(backendPlugin, 'queryEntityList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(backendPlugin(), 'queryEntityList').mockReturnValue(
       Promise.resolve({
         success: true,
         results: [goodResult],

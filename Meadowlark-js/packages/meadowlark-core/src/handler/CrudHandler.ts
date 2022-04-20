@@ -98,7 +98,7 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
     }
 
     const resourceId = documentIdForEntityInfo(entityInfo);
-    const { result, failureMessage } = await backendPlugin.createEntity(
+    const { result, failureMessage } = await backendPlugin().createEntity(
       resourceId,
       entityInfo,
       body,
@@ -261,7 +261,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       };
     }
 
-    const { result, failureMessage } = await backendPlugin.updateEntityById(
+    const { result, failureMessage } = await backendPlugin().updateEntityById(
       pathComponents.resourceId,
       entityInfo,
       body,
@@ -342,7 +342,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
     }
 
     if (jwtStatus.isOwnershipEnabled) {
-      const { isOwner, result: ownershipResult } = await backendPlugin.validateEntityOwnership(
+      const { isOwner, result: ownershipResult } = await backendPlugin().validateEntityOwnership(
         pathComponents.resourceId,
         entityInfo,
         jwtStatus.subject,
@@ -365,7 +365,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       }
     }
 
-    const foreignKeysLookup = await backendPlugin.getReferencesToThisItem(
+    const foreignKeysLookup = await backendPlugin().getReferencesToThisItem(
       pathComponents.resourceId,
       entityInfo,
       awsRequestId,
@@ -381,7 +381,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body, statusCode: 409, headers: metaEdProjectHeaders };
     }
 
-    const { success } = await backendPlugin.deleteEntityById(pathComponents.resourceId, entityInfo, awsRequestId);
+    const { success } = await backendPlugin().deleteEntityById(pathComponents.resourceId, entityInfo, awsRequestId);
 
     if (!success) {
       writeDebugStatusToLog(context, 'deleteIt', 500);
@@ -395,7 +395,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       null,
       foreignKeysLookup.foreignKeys,
     );
-    const { success: fkSuccess, foreignKeys } = await backendPlugin.getForeignKeyReferences(
+    const { success: fkSuccess, foreignKeys } = await backendPlugin().getForeignKeyReferences(
       pathComponents.resourceId,
       entityInfo,
       awsRequestId,
@@ -403,12 +403,12 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
 
     if (fkSuccess) {
       // Delete the (FREF, TREF) records
-      await backendPlugin.deleteItems(
+      await backendPlugin().deleteItems(
         foreignKeys.map((i) => ({ pk: i.From, sk: i.To })),
         awsRequestId,
       );
       // And now reverse that, to delete the (TREF, FREF) records
-      await backendPlugin.deleteItems(
+      await backendPlugin().deleteItems(
         foreignKeys.map((i) => ({ pk: i.To, sk: i.From })),
         awsRequestId,
       );

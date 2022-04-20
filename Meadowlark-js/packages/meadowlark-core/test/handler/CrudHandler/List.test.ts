@@ -73,7 +73,7 @@ describe('given an error on list fetch from persistence', () => {
     );
 
     // Setup the get operation to fail
-    mockDynamo = jest.spyOn(backendPlugin, 'getEntityList').mockReturnValue(
+    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityList').mockReturnValue(
       Promise.resolve({
         result: 'ERROR',
         documents: [],
@@ -122,7 +122,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the get operation to succeed
-    mockDynamo = jest.spyOn(backendPlugin, 'getEntityList').mockReturnValue(
+    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityList').mockReturnValue(
       Promise.resolve({
         result: 'SUCCESS',
         documents: [goodResult],
