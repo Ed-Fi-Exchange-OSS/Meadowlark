@@ -1,5 +1,6 @@
 {
   "name": "@edfi/meadowlark-core",
+  "main": "dist/index.js",
   "version": "0.2.0-dev.0",
   "description": "Meadowlark core functionality",
   "license": "Apache-2.0",
@@ -54,29 +55,12 @@
     "copyfiles": "^2.4.1",
     "jsinspect": "^0.12.7",
     "regenerator-runtime": "^0.13.9",
-    "rimraf": "^3.0.2",
-    "serverless": "2.69.1",
-    "serverless-dynamodb-local": "0.2.40",
-    "serverless-offline": "8.3.1",
-    "serverless-plugin-offline-dynamodb-stream": "1.0.20",
-    "source-map-support": "^0.5.21"
+    "rimraf": "^3.0.2"
   },
   "scripts": {
     "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
-    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
-    "init:local-dynamodb": "yarn serverless dynamodb install",
-    "deploy:aws": "yarn build && yarn serverless deploy --aws-profile default --stage",
-    "teardown:aws": "yarn serverless remove --aws-profile default --stage",
-    "load:descriptors:local": "yarn serverless invoke local -f loadDescriptors",
-    "load:descriptors:aws": "yarn serverless invoke --function loadDescriptors --stage",
-    "start:local": "yarn workspace @edfi/meadowlark-core serverless offline start --printOutput --stage local --allowCache"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "yarn test:lint"
-    }
-  },
-  "packageManager": "yarn@3.1.1"
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  }
 }

@@ -10,7 +10,7 @@ import * as Get from '../../../src/handler/GetResolvers';
 import { update } from '../../../src/handler/CrudHandler';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
-import { backendPlugin } from '../../../src/plugin/PluginLoader';
+import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -136,7 +136,7 @@ describe('given a valid object', () => {
       );
 
       // Setup the update operation to fail
-      mockDynamo = jest.spyOn(backendPlugin(), 'updateEntityById').mockReturnValue(
+      mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
         Promise.resolve({
           result: 'UPDATE_FAILURE_NOT_EXISTS',
           failureMessage: 'Does not exist',
@@ -193,7 +193,7 @@ describe('given a valid object', () => {
         );
 
         // Setup the update operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: expectedError,
@@ -253,7 +253,7 @@ describe('given a valid object', () => {
         jest.spyOn(Get, 'getById').mockReturnValue(Promise.resolve({ body: '', statusCode: 200 }));
 
         // Setup the update operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
           Promise.resolve({
             result: 'UNKNOWN_FAILURE',
             failureMessage: expectedError,
@@ -309,7 +309,7 @@ describe('given a valid object', () => {
         );
 
         // Setup the update operation to succeed
-        mockDynamo = jest.spyOn(backendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,

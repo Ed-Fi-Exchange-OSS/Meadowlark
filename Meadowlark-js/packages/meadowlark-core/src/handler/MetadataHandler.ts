@@ -63,7 +63,7 @@ export async function metaed(event: APIGatewayProxyEvent, _context: Context): Pr
 /**
  * Base endpoint that returns the DS version and supported extensions
  */
-export async function apiVersion(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function apiVersion(event: APIGatewayProxyEvent, _context: Context): Promise<APIGatewayProxyResult> {
   const baseUrl = buildBaseUrlFromRequest(event);
   return {
     body: CreateApiVersionObject(baseUrl),

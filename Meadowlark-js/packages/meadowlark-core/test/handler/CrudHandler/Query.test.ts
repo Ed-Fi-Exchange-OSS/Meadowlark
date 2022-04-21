@@ -9,7 +9,7 @@ import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { query } from '../../../src/handler/GetResolvers';
 import { SearchResult } from '../../../src/plugin/backend/SearchResult';
-import { backendPlugin } from '../../../src/plugin/PluginLoader';
+import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -76,7 +76,7 @@ describe('given persistence fails', () => {
     );
 
     // Setup the query operation to fail
-    mockElasticsearch = jest.spyOn(backendPlugin(), 'queryEntityList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryEntityList').mockReturnValue(
       Promise.resolve({
         success: false,
         results: [],
@@ -127,7 +127,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the query operation to succeed
-    mockElasticsearch = jest.spyOn(backendPlugin(), 'queryEntityList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryEntityList').mockReturnValue(
       Promise.resolve({
         success: true,
         results: [goodResult],

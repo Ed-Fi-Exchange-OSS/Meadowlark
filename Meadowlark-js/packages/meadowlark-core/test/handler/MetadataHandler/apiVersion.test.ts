@@ -41,9 +41,12 @@ describe('when getting API version information', () => {
           stage: 'outside',
         },
       } as any;
+      const context = {
+        awsRequestId: 'aaaa',
+      } as any;
 
       // Act
-      response = await apiVersion(event);
+      response = await apiVersion(event, context);
     });
 
     it('returns status 200', () => {
@@ -87,9 +90,12 @@ describe('when getting API version information', () => {
           stage: 'local',
         },
       } as any;
+      const context = {
+        awsRequestId: 'aaaa',
+      } as any;
 
       // Act
-      response = await apiVersion(event);
+      response = await apiVersion(event, context);
     });
 
     it('returns status 200', () => {

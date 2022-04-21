@@ -10,7 +10,7 @@ import { getById } from '../../../src/handler/GetResolvers';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { Security } from '../../../src/model/Security';
 import { GetResult } from '../../../src/plugin/backend/GetResult';
-import { backendPlugin } from '../../../src/plugin/PluginLoader';
+import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -77,7 +77,7 @@ describe('given database lookup fails', () => {
     );
 
     // Setup the get operation to fail
-    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityById').mockReturnValue(
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getEntityById').mockReturnValue(
       Promise.resolve({
         result: 'ERROR',
         documents: [],
@@ -128,7 +128,7 @@ describe('given a valid request', () => {
     );
 
     // Setup the get operation to succeed
-    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityById').mockReturnValue(
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getEntityById').mockReturnValue(
       Promise.resolve({
         result: 'SUCCESS',
         failureMessage: null,

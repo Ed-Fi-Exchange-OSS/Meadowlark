@@ -8,7 +8,7 @@ import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { list } from '../../../src/handler/GetResolvers';
-import { backendPlugin } from '../../../src/plugin/PluginLoader';
+import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -73,7 +73,7 @@ describe('given an error on list fetch from persistence', () => {
     );
 
     // Setup the get operation to fail
-    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityList').mockReturnValue(
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getEntityList').mockReturnValue(
       Promise.resolve({
         result: 'ERROR',
         documents: [],
@@ -122,7 +122,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the get operation to succeed
-    mockDynamo = jest.spyOn(backendPlugin(), 'getEntityList').mockReturnValue(
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getEntityList').mockReturnValue(
       Promise.resolve({
         result: 'SUCCESS',
         documents: [goodResult],

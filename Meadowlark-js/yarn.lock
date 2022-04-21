@@ -1941,6 +1941,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@edfi/meadowlark-aws-frontend@workspace:packages/meadowlark-aws-frontend":
+  version: 0.0.0-use.local
+  resolution: "@edfi/meadowlark-aws-frontend@workspace:packages/meadowlark-aws-frontend"
+  dependencies:
+    "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@types/aws-lambda": ^8.10.89
+    copyfiles: ^2.4.1
+    rimraf: ^3.0.2
+    serverless: 2.69.1
+    serverless-dynamodb-local: 0.2.40
+    serverless-offline: 8.3.1
+    serverless-plugin-offline-dynamodb-stream: 1.0.20
+    source-map-support: ^0.5.21
+  languageName: unknown
+  linkType: soft
+
 "@edfi/meadowlark-core@0.2.0-dev.0, @edfi/meadowlark-core@workspace:packages/meadowlark-core":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-core@workspace:packages/meadowlark-core"
@@ -1984,11 +2000,6 @@ __metadata:
     rimraf: ^3.0.2
     secure-random: ^1.1.2
     semver: ^7.3.6
-    serverless: 2.69.1
-    serverless-dynamodb-local: 0.2.40
-    serverless-offline: 8.3.1
-    serverless-plugin-offline-dynamodb-stream: 1.0.20
-    source-map-support: ^0.5.21
     winston: ^3.3.3
     xml2js: ^0.4.23
   languageName: unknown

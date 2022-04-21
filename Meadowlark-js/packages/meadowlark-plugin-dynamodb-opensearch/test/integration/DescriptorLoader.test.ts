@@ -18,7 +18,7 @@ jest.setTimeout(120000);
 // An experiment in integration testing with a live DynamoDB instance
 const TEST_DYNAMO_PORT = Math.floor(Math.random() * 2000) + 8000;
 const tableName = 'edfi-meadowlark-test';
-export const resourceYamlPath: string = resolve(__dirname, '../../../meadowlark-core/resources/resources.yml');
+export const resourceYamlPath: string = resolve(__dirname, '../../../meadowlark-aws-frontend/resources/resources.yml');
 
 function loadCreateTableInputFromResourcesYaml(): CreateTableInput {
   const resourceYaml: any = loadYaml(readFileSync(resourceYamlPath, 'utf8'));
@@ -38,10 +38,10 @@ async function createTable(tableDefinition: CreateTableInput): Promise<CreateTab
 describe('given the set of descriptors to load into DynamoDB', () => {
   let mockBackendPlugin;
   beforeAll(async () => {
-    // Set the backendPlugin to DynamoDB
+    // Set the getBackendPlugin to DynamoDB
     // eslint-disable-next-line global-require
     const dynamoBackendPlugin: MeadowlarkBackendPlugin = require(`../../src/index`).initializeBackendPlugin();
-    mockBackendPlugin = jest.spyOn(PluginLoader, 'backendPlugin').mockReturnValue(dynamoBackendPlugin);
+    mockBackendPlugin = jest.spyOn(PluginLoader, 'getBackendPlugin').mockReturnValue(dynamoBackendPlugin);
 
     // Overwrite the dynamodb configuration with testing config
     Object.assign(DynamoRepository.dynamoOpts, {

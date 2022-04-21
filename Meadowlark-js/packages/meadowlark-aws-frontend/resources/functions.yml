@@ -78,7 +78,7 @@ swaggerForDescriptorsAPI:
         cors: true
 
 updateExternalStorage:
-  handler: dist/packages/dynamodb-opensearch/DynamoDbStreamHandler.updateExternalStorage
+  handler: ../packages/meadowlark-plugin-dynamodb-opensearch/dist/DynamoDbStreamHandler.updateExternalStorage
   environment:
     ES_ENDPOINT:
       Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]

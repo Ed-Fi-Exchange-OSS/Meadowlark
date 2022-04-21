@@ -21,5 +21,16 @@ export {
   EntityTypeInfo,
 } from './model/EntityInfo';
 export { Logger } from './helpers/Logger';
-export { loadDescriptors } from './handler/DescriptorLoader';
 export * as PluginLoader from './plugin/PluginLoader';
+
+// Handlers
+export { create, deleteIt, getResolver, update } from './handler/CrudHandler';
+export { loadDescriptors } from './handler/DescriptorLoader';
+export {
+  apiVersion,
+  metaed,
+  openApiUrlList,
+  swaggerForDescriptorsAPI,
+  swaggerForResourcesAPI,
+} from './handler/MetadataHandler';
+export { handler as oauthHandler } from './handler/OAuthHandler';

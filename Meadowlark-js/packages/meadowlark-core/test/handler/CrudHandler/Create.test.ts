@@ -9,7 +9,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { create } from '../../../src/handler/CrudHandler';
 import * as RequestValidator from '../../../src/handler/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
-import { backendPlugin } from '../../../src/plugin/PluginLoader';
+import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -133,7 +133,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: expectedError,
@@ -190,7 +190,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: 'Reference failure',
@@ -247,7 +247,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_NOT_EXISTS',
             failureMessage: 'Does not exist',
@@ -305,7 +305,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'UNKNOWN_FAILURE',
             failureMessage: expectedError,
@@ -363,7 +363,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'INSERT_SUCCESS',
             failureMessage: null,
@@ -426,7 +426,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Setup the create operation to fail
-        mockDynamo = jest.spyOn(backendPlugin(), 'createEntity').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'createEntity').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
