@@ -31,6 +31,6 @@ async function loadBackendPlugin(pluginNpmName: string) {
   }
 })();
 
-export function backendPlugin(): MeadowlarkBackendPlugin {
+export function getBackendPlugin(): MeadowlarkBackendPlugin {
   return loadedBackendPlugin;
 }

@@ -2,7 +2,7 @@
   "name": "@edfi/meadowlark-core",
   "version": "0.2.0-dev.0",
   "description": "Meadowlark core functionality",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://www.myget.org/F/ed-fi/npm/"
   },

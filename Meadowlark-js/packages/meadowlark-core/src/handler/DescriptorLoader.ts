@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { backendPlugin } from '../plugin/PluginLoader';
+import { getBackendPlugin } from '../plugin/PluginLoader';
 import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
@@ -109,7 +109,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         naturalKey: buildNKString(`${descriptorDocument.namespace}#${descriptorDocument.codeValue}`),
       };
 
-      const putResult: PutResult = await backendPlugin().createEntity(
+      const putResult: PutResult = await getBackendPlugin().createEntity(
         documentIdForEntityInfo(descriptorEntityInfo),
         descriptorEntityInfo,
         { ...descriptorDocument, _isDescriptor: true },

@@ -3,7 +3,7 @@
   "main": "dist/index.js",
   "version": "0.2.0-dev.0",
   "description": "Meadowlark backend plugin for MongoDB",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://www.myget.org/F/ed-fi/npm/"
   },
