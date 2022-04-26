@@ -5,14 +5,18 @@
 
 import R from 'ramda';
 import { TopLevelEntity, ReferentialProperty } from '@edfi/metaed-core';
-import { isReferenceElement, ReferenceComponent, ReferenceGroup } from '../metaed/model/ReferenceComponent';
-import { ApiPropertyMapping } from '../metaed/model/ApiPropertyMapping';
+import {
+  EntityMeadowlarkData,
+  EntityPropertyMeadowlarkData,
+  ApiPropertyMapping,
+  topLevelNameOnEntity,
+  isReferenceElement,
+  ReferenceComponent,
+  ReferenceGroup,
+} from '@edfi/metaed-plugin-edfi-meadowlark';
 import { ReferentialConstraint } from '../model/ReferentialConstraint';
 import { deriveAssignableFrom } from './NaturalKeyExtractor';
 import { AssignableInfo } from '../model/AssignableInfo';
-import { EntityMeadowlarkData } from '../metaed/model/EntityMeadowlarkData';
-import { EntityPropertyMeadowlarkData } from '../metaed/model/EntityPropertyMeadowlarkData';
-import { topLevelNameOnEntity } from '../metaed/Utility';
 
 // body paths shaped as an array for ramdajs 'path' function
 // return value is arrays of body paths, grouped (with arrays) by path endings to line up with namePath array

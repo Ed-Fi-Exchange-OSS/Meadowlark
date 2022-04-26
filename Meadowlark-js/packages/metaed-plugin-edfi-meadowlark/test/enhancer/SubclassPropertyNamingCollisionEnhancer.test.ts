@@ -13,9 +13,9 @@ import {
   NoEntityProperty,
 } from '@edfi/metaed-core';
 import { domainEntitySubclassBaseClassEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
-import { enhance } from '../../../src/metaed/enhancer/SubclassPropertyNamingCollisionEnhancer';
+import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
+import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/model/EntityMeadowlarkData';
+import { enhance } from '../../src/enhancer/SubclassPropertyNamingCollisionEnhancer';
 
 describe('when superclass and subclass have a naming collision issue', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();

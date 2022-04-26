@@ -4,11 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { TopLevelEntity } from '@edfi/metaed-core';
-import { CollectedProperty } from '../metaed/model/CollectedProperty';
-import { EntityMeadowlarkData } from '../metaed/model/EntityMeadowlarkData';
-import { EntityPropertyMeadowlarkData } from '../metaed/model/EntityPropertyMeadowlarkData';
-import { prefixedName } from '../metaed/model/PropertyModifier';
-import { topLevelNameOnEntity } from '../metaed/Utility';
+import {
+  CollectedProperty,
+  EntityMeadowlarkData,
+  EntityPropertyMeadowlarkData,
+  prefixedName,
+  topLevelNameOnEntity,
+} from '@edfi/metaed-plugin-edfi-meadowlark';
 import { ReferentialConstraint } from '../model/ReferentialConstraint';
 
 // TODO: The behavior of calculating the body names of descriptors for an entity can be pushed into a

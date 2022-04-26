@@ -12,10 +12,10 @@ import {
   DomainEntitySubclassBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
-import { enhance as referenceComponentEnhancer } from '../../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { enhance } from '../../../src/metaed/enhancer/ApiPropertyMappingEnhancer';
+import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
+import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/model/EntityMeadowlarkData';
+import { enhance as referenceComponentEnhancer } from '../../src/enhancer/ReferenceComponentEnhancer';
+import { enhance } from '../../src/enhancer/ApiPropertyMappingEnhancer';
 
 describe('when building simple domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();

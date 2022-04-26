@@ -5,11 +5,17 @@
 
 import R from 'ramda';
 import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
-import { ReferenceComponent, isReferenceElement } from '../metaed/model/ReferenceComponent';
-import { topLevelNameOnEntity, uncapitalize } from '../metaed/Utility';
+import {
+  topLevelNameOnEntity,
+  ReferenceComponent,
+  isReferenceElement,
+  EntityMeadowlarkData,
+  EntityPropertyMeadowlarkData,
+} from '@edfi/metaed-plugin-edfi-meadowlark';
+import { decapitalize } from '../Utility';
 import { AssignableInfo } from '../model/AssignableInfo';
-import { EntityMeadowlarkData } from '../metaed/model/EntityMeadowlarkData';
-import { EntityPropertyMeadowlarkData } from '../metaed/model/EntityPropertyMeadowlarkData';
+
+type NullableTopLevelEntity = { assignableTo: TopLevelEntity | null };
 
 /**
  * The natural key of a JSON document, along with security information
@@ -123,14 +129,13 @@ export function extractNaturalKey(entity: TopLevelEntity, body: object): Natural
  * TODO: Bring this behavior into extractNaturalKey, correctly managing for natural key component ordering.
  */
 export function deriveAssignableFrom(entity: TopLevelEntity, naturalKey: string): AssignableInfo | null {
-  const { assignableTo }: { assignableTo: TopLevelEntity | null } = (entity.data.meadowlark as EntityMeadowlarkData)
-    .apiMapping;
+  const { assignableTo }: NullableTopLevelEntity = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
   if (assignableTo == null) return null;
   const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
   if (identityRename == null) return { assignableToName: assignableTo.metaEdName, assignableNaturalKey: naturalKey };
 
-  const renamedPropertyName = uncapitalize(identityRename.metaEdName);
-  const originalName = uncapitalize(identityRename.baseKeyName);
+  const renamedPropertyName = decapitalize(identityRename.metaEdName);
+  const originalName = decapitalize(identityRename.baseKeyName);
 
   // Substitution regex is lookbehind for "#" and lookahead for first "=" afterward, with renamed property
   // in between. Using string concatenation to improve readability

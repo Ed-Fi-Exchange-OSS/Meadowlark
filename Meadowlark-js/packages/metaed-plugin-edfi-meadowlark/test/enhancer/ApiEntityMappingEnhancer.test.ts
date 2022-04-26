@@ -13,12 +13,12 @@ import {
   CommonBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer, inlineCommonReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
-import { enhance as referenceComponentEnhancer } from '../../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { enhance as apiPropertyMappingEnhancer } from '../../../src/metaed/enhancer/ApiPropertyMappingEnhancer';
-import { enhance as propertyCollectingEnhancer } from '../../../src/metaed/enhancer/PropertyCollectingEnhancer';
-import { enhance } from '../../../src/metaed/enhancer/ApiEntityMappingEnhancer';
+import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
+import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/model/EntityMeadowlarkData';
+import { enhance as referenceComponentEnhancer } from '../../src/enhancer/ReferenceComponentEnhancer';
+import { enhance as apiPropertyMappingEnhancer } from '../../src/enhancer/ApiPropertyMappingEnhancer';
+import { enhance as propertyCollectingEnhancer } from '../../src/enhancer/PropertyCollectingEnhancer';
+import { enhance } from '../../src/enhancer/ApiEntityMappingEnhancer';
 
 describe('when demonstrating key unification via entity referencing two entities each referencing a 3rd as their identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();

@@ -11,12 +11,14 @@ import {
   NamespaceBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/metaed/model/EntityMeadowlarkData';
-import { enhance as referenceComponentEnhancer } from '../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { enhance as apiPropertyMappingEnhancer } from '../../src/metaed/enhancer/ApiPropertyMappingEnhancer';
-import { enhance as propertyCollectingEnhancer } from '../../src/metaed/enhancer/PropertyCollectingEnhancer';
-import { enhance as apiEntityMappingEnhancer } from '../../src/metaed/enhancer/ApiEntityMappingEnhancer';
+import {
+  entityPropertyMeadowlarkDataSetupEnhancer,
+  apiEntityMappingEnhancer,
+  entityMeadowlarkDataSetupEnhancer,
+  referenceComponentEnhancer,
+  apiPropertyMappingEnhancer,
+  propertyCollectingEnhancer,
+} from '@edfi/metaed-plugin-edfi-meadowlark';
 import { extractNaturalKey, NaturalKeyWithSecurity } from '../../src/handler/NaturalKeyExtractor';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {

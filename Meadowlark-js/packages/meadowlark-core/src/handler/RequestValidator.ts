@@ -8,7 +8,7 @@ import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractForeignKeys } from './ForeignKeyExtractor';
 import { extractNaturalKey, deriveAssignableFrom, NaturalKeyWithSecurity } from './NaturalKeyExtractor';
-import { uncapitalize } from '../metaed/Utility';
+import { decapitalize } from '../Utility';
 import { EntityInfo, NoEntityInfo } from '../model/EntityInfo';
 import { ReferentialConstraint } from '../model/ReferentialConstraint';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
@@ -47,7 +47,7 @@ export async function validateResource(
   body: object | null,
 ): Promise<ResourceValidationResult> {
   // Equally supporting resources with either upper or lower case names
-  const lowerResourceName = uncapitalize(pathComponents.endpointName);
+  const lowerResourceName = decapitalize(pathComponents.endpointName);
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 

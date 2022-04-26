@@ -1967,8 +1967,8 @@ __metadata:
     "@edfi/ed-fi-model-3.1": 3.0.1
     "@edfi/ed-fi-model-3.3b": 3.0.1
     "@edfi/metaed-core": 3.0.1
+    "@edfi/metaed-plugin-edfi-meadowlark": 0.2.0-dev.0
     "@edfi/metaed-plugin-edfi-unified": 3.0.1
-    "@hapi/code": ^8.0.5
     "@hapi/joi": ^17.1.1
     "@types/aws-lambda": ^8.10.89
     "@types/fs-extra": ^8.1.2
@@ -1983,13 +1983,11 @@ __metadata:
     aws4: ^1.11.0
     axios: ^0.25.0
     copyfiles: ^2.4.1
-    deep-freeze: ^0.0.1
     didyoumean2: ^5.0.0
     dotenv: ^16.0.0
     fast-memoize: ^2.5.2
     follow-redirects: ^1.14.7
     fs-extra: ^10.0.0
-    inflection: ^1.13.1
     inquirer: ^8.2.0
     invariant: ^2.2.4
     jsinspect: ^0.12.7
@@ -2060,6 +2058,21 @@ __metadata:
   checksum: f93b68fc1dae9daeff49499e2233b556de0791d7b33440b7432bee6a841516f6cdff11d0295154b01607716c6a9bdc4b5f1b3d23e15e3d1888dfac93451ad9bc
   languageName: node
   linkType: hard
+
+"@edfi/metaed-plugin-edfi-meadowlark@0.2.0-dev.0, @edfi/metaed-plugin-edfi-meadowlark@workspace:packages/metaed-plugin-edfi-meadowlark":
+  version: 0.0.0-use.local
+  resolution: "@edfi/metaed-plugin-edfi-meadowlark@workspace:packages/metaed-plugin-edfi-meadowlark"
+  dependencies:
+    "@edfi/metaed-core": 3.0.1
+    "@edfi/metaed-plugin-edfi-unified": 3.0.1
+    "@hapi/code": ^8.0.5
+    "@hapi/joi": ^17.1.1
+    copyfiles: ^2.4.1
+    deep-freeze: ^0.0.1
+    inflection: ^1.13.1
+    rimraf: ^3.0.2
+  languageName: unknown
+  linkType: soft
 
 "@edfi/metaed-plugin-edfi-unified@npm:3.0.1":
   version: 3.0.1

@@ -15,10 +15,10 @@ import { domainEntityReferenceEnhancer, descriptorReferenceEnhancer } from '@edf
 import {
   enhance as entityPropertyMeadowlarkDataSetupEnhancer,
   EntityPropertyMeadowlarkData,
-} from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityMeadowlarkData';
-import { enhance } from '../../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { isReferenceGroup, ReferenceGroup, isReferenceElement } from '../../../src/metaed/model/ReferenceComponent';
+} from '../../src/model/EntityPropertyMeadowlarkData';
+import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/model/EntityMeadowlarkData';
+import { enhance } from '../../src/enhancer/ReferenceComponentEnhancer';
+import { isReferenceGroup, ReferenceGroup, isReferenceElement } from '../../src/model/ReferenceComponent';
 
 describe('when building simple domain entity referencing another', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();

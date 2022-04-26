@@ -14,8 +14,9 @@ import {
   MetaEdConfiguration,
   Enhancer,
 } from '@edfi/metaed-core';
+import { initialize as metaEdMeadowlarkInitialize } from '@edfi/metaed-plugin-edfi-meadowlark';
+
 import { findMetaEdProjectMetadata, MetaEdProjectMetadata } from './MetaEdProjectMetadata';
-import { enhancerList } from './enhancer/EnhancerList';
 
 /**
  * Determine whether we are in a deployed Lambda environment or in a development monorepo environment,
@@ -98,8 +99,8 @@ export async function loadMetaEdState(projectNpmPackageName: string): Promise<St
   // run MetaEd with downloaded packages
   state = (await executePipeline(state)).state;
 
-  // run local enhancers like we are a package
-  enhancerList().forEach((enhancer: Enhancer) => {
+  // run MetaEd plugin for Meadowlark enhancers
+  metaEdMeadowlarkInitialize().enhancer.forEach((enhancer: Enhancer) => {
     enhancer(state.metaEd);
   });
 

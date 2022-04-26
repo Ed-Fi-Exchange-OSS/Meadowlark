@@ -14,15 +14,15 @@ import {
   normalizeDescriptorSuffix,
   TopLevelEntity,
 } from '@edfi/metaed-core';
-
-import { uncapitalize, pluralize } from './Utility';
+import { pluralize } from '@edfi/metaed-plugin-edfi-meadowlark';
+import { decapitalize } from '../Utility';
 
 // simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
 /** This is a mapping of resource names to MetaEd model objects, partitioned by namespace */
 const resourceMappingCache: Map<string, Map<string, TopLevelEntity>> = new Map();
 
 function resourceNameFrom(metaEdName: string): string {
-  return pluralize(uncapitalize(metaEdName));
+  return pluralize(decapitalize(metaEdName));
 }
 
 function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<string, TopLevelEntity> {
@@ -75,7 +75,7 @@ function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<str
   const descriptors: IterableIterator<Descriptor> | undefined = metaEd.namespace.get(namespace)?.entity.descriptor.values();
   if (descriptors != null) {
     for (const descriptor of descriptors) {
-      mappingForNamespace.set(pluralize(normalizeDescriptorSuffix(uncapitalize(descriptor.metaEdName))), descriptor);
+      mappingForNamespace.set(pluralize(normalizeDescriptorSuffix(decapitalize(descriptor.metaEdName))), descriptor);
     }
   }
 

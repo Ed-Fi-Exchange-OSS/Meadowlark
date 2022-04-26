@@ -13,15 +13,17 @@ import {
   DomainEntitySubclassBuilder,
 } from '@edfi/metaed-core';
 import { descriptorReferenceEnhancer, domainEntitySubclassBaseClassEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/metaed/model/EntityPropertyMeadowlarkData';
-import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/metaed/model/EntityMeadowlarkData';
-import { enhance as subclassPropertyNamingCollisionEnhancer } from '../../src/metaed/enhancer/SubclassPropertyNamingCollisionEnhancer';
-import { enhance as referenceComponentEnhancer } from '../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { enhance as apiPropertyMappingEnhancer } from '../../src/metaed/enhancer/ApiPropertyMappingEnhancer';
-import { enhance as propertyCollectingEnhancer } from '../../src/metaed/enhancer/PropertyCollectingEnhancer';
-import { enhance as subclassPropertyCollectingEnhancer } from '../../src/metaed/enhancer/SubclassPropertyCollectingEnhancer';
-import { enhance as apiEntityMappingEnhancer } from '../../src/metaed/enhancer/ApiEntityMappingEnhancer';
-import { enhance as subclassApiEntityMappingEnhancer } from '../../src/metaed/enhancer/SubclassApiEntityMappingEnhancer';
+import {
+  entityPropertyMeadowlarkDataSetupEnhancer,
+  apiEntityMappingEnhancer,
+  entityMeadowlarkDataSetupEnhancer,
+  referenceComponentEnhancer,
+  apiPropertyMappingEnhancer,
+  propertyCollectingEnhancer,
+  subclassPropertyNamingCollisionEnhancer,
+  subclassPropertyCollectingEnhancer,
+  subclassApiEntityMappingEnhancer,
+} from '@edfi/metaed-plugin-edfi-meadowlark';
 
 import { extractDescriptorValues } from '../../src/handler/DescriptorValueExtractor';
 import { ReferentialConstraint } from '../../src/model/ReferentialConstraint';

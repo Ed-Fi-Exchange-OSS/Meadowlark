@@ -18,16 +18,13 @@ import {
   choiceReferenceEnhancer,
   inlineCommonReferenceEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
-import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../../src/metaed/model/EntityPropertyMeadowlarkData';
-import {
-  enhance as entityMeadowlarkDataSetupEnhancer,
-  EntityMeadowlarkData,
-} from '../../../src/metaed/model/EntityMeadowlarkData';
-import { enhance as referenceComponentEnhancer } from '../../../src/metaed/enhancer/ReferenceComponentEnhancer';
-import { enhance as apiPropertyMappingEnhancer } from '../../../src/metaed/enhancer/ApiPropertyMappingEnhancer';
-import { enhance as apiEntityMappingEnhancer } from '../../../src/metaed/enhancer/ApiEntityMappingEnhancer';
-import { enhance as propertyCollectingEnhancer } from '../../../src/metaed/enhancer/PropertyCollectingEnhancer';
-import { enhance } from '../../../src/metaed/enhancer/JoiSchemaEnhancer';
+import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
+import { enhance as entityMeadowlarkDataSetupEnhancer, EntityMeadowlarkData } from '../../src/model/EntityMeadowlarkData';
+import { enhance as referenceComponentEnhancer } from '../../src/enhancer/ReferenceComponentEnhancer';
+import { enhance as apiPropertyMappingEnhancer } from '../../src/enhancer/ApiPropertyMappingEnhancer';
+import { enhance as apiEntityMappingEnhancer } from '../../src/enhancer/ApiEntityMappingEnhancer';
+import { enhance as propertyCollectingEnhancer } from '../../src/enhancer/PropertyCollectingEnhancer';
+import { enhance } from '../../src/enhancer/JoiSchemaEnhancer';
 import { expectSubschemas, expectSubschemaReferenceArray, expectSubschemaScalarArray } from './JoiTestHelper';
 import { validate } from './JoiTestValidator';
 
