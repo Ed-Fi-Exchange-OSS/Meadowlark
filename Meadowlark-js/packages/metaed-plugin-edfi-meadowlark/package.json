@@ -18,7 +18,9 @@
     "authorName": "Ed-Fi Alliance",
     "metaEdVersion": "3.x",
     "technologyVersion": "*",
-    "dependencies": []
+    "dependencies": [
+      "@edfi/metaed-plugin-edfi-unified"
+    ]
   },
   "dependencies": {
     "@edfi/metaed-core": "3.0.1",

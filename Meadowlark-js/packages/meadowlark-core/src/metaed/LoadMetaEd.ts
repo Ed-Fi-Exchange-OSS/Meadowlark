@@ -12,9 +12,7 @@ import {
   newState,
   State,
   MetaEdConfiguration,
-  Enhancer,
 } from '@edfi/metaed-core';
-import { initialize as metaEdMeadowlarkInitialize } from '@edfi/metaed-plugin-edfi-meadowlark';
 
 import { findMetaEdProjectMetadata, MetaEdProjectMetadata } from './MetaEdProjectMetadata';
 
@@ -98,11 +96,6 @@ export async function loadMetaEdState(projectNpmPackageName: string): Promise<St
 
   // run MetaEd with downloaded packages
   state = (await executePipeline(state)).state;
-
-  // run MetaEd plugin for Meadowlark enhancers
-  metaEdMeadowlarkInitialize().enhancer.forEach((enhancer: Enhancer) => {
-    enhancer(state.metaEd);
-  });
 
   setStateCache(projectNpmPackageName, state);
   return state;
