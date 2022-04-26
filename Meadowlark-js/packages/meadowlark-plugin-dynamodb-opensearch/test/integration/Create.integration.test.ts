@@ -72,7 +72,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
 
     // give local Dynamo time to start up
     // eslint-disable-next-line no-promise-executor-return
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 4000));
 
     const tableDefinition: CreateTableInput = loadCreateTableInputFromResourcesYaml();
     const result: CreateTableCommandOutput = await createTable(tableDefinition);
