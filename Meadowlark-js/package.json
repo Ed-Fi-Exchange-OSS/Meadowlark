@@ -35,7 +35,8 @@
     "test:lint": "yarn test:lint:ts && yarn test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",
-    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest",
+    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest \"packages/(?!meadowlark-plugin-dynamodb-opensearch/test/integration)\"",
+    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest \"packages/meadowlark-plugin-dynamodb-opensearch/test/integration\"",
     "test:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
     "prepare": "cd .. && husky install"
   },
