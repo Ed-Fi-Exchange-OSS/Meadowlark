@@ -1,0 +1,43 @@
+{
+  "name": "@edfi/metaed-plugin-edfi-meadowlark",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "MetaEd plugin for generating Meadowlark object models",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "metaed-plugin": {
+    "pluginType": "artifact-specific",
+    "shortName": "meadowlark",
+    "authorName": "Ed-Fi Alliance",
+    "metaEdVersion": "3.x",
+    "technologyVersion": "*",
+    "dependencies": [
+      "@edfi/metaed-plugin-edfi-unified"
+    ]
+  },
+  "dependencies": {
+    "@edfi/metaed-core": "3.0.1",
+    "@edfi/metaed-plugin-edfi-unified": "3.0.1",
+    "@hapi/joi": "^17.1.1",
+    "deep-freeze": "^0.0.1",
+    "inflection": "^1.13.1"
+  },
+  "devDependencies": {
+    "@hapi/code": "^8.0.5",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  }
+}

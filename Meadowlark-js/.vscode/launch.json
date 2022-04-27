@@ -9,7 +9,8 @@
       "args": ["offline", "start", "--printOutput", "--stage", "local", "--allowCache"],
       "port": 9229,
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}/packages/meadowlark-aws-frontend",
+      "justMyCode": false
     },
     {
       "name": "Jest :: File Linux",

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["es2021", "DOM"],
     "target": "es2021",
-    "module": "CommonJS",
+    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "declaration": true,
@@ -16,15 +16,15 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": ".",
+    "outDir": "dist",
   },
-  "include": [
-    "./src"
-  ],
+  "paths": {
+    "~/*": ["packages/*"]
+  },
   "exclude": [
     "node_modules",
-    "**/dist",
+    "dist",
     ".serverless/**/*",
     "_warmup/**/*"
   ]
