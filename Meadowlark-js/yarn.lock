@@ -1986,7 +1986,6 @@ __metadata:
     didyoumean2: ^5.0.0
     dotenv: ^16.0.0
     fast-memoize: ^2.5.2
-    follow-redirects: ^1.14.7
     fs-extra: ^10.0.0
     inquirer: ^8.2.0
     invariant: ^2.2.4
