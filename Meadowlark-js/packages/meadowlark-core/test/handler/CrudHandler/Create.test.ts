@@ -27,7 +27,7 @@ describe('when posting a request to create a new resource', () => {
       const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
       response = await create(event, context);
-    });
+    }, 6000);
 
     it('returns status 400', () => {
       expect(response.statusCode).toEqual(400);

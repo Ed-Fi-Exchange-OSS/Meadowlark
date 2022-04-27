@@ -23,7 +23,7 @@ describe('given a missing resource path', () => {
 
     // Act
     response = await getResolver(event, context);
-  });
+  }, 6000);
 
   it('returns status 404', () => {
     expect(response.statusCode).toEqual(404);
