@@ -1,0 +1,65 @@
+{
+  "name": "@edfi/meadowlark-core",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark core functionality",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.72.0",
+    "@aws-sdk/types": "^3.55.0",
+    "@aws-sdk/util-dynamodb": "^3.72.0",
+    "@edfi/ed-fi-model-3.1": "3.0.1",
+    "@edfi/ed-fi-model-3.3b": "3.0.1",
+    "@edfi/metaed-core": "3.0.1",
+    "@edfi/metaed-plugin-edfi-meadowlark": "0.2.0-dev.0",
+    "@edfi/metaed-plugin-edfi-unified": "3.0.1",
+    "@hapi/joi": "^17.1.1",
+    "aws4": "^1.11.0",
+    "axios": "^0.25.0",
+    "didyoumean2": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "fast-memoize": "^2.5.2",
+    "follow-redirects": "^1.14.7",
+    "fs-extra": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "invariant": "^2.2.4",
+    "jssha": "^3.2.0",
+    "njwt": "^1.2.0",
+    "ramda": "^0.27.2",
+    "secure-random": "^1.1.2",
+    "semver": "^7.3.6",
+    "winston": "^3.3.3",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "@edfi/metaed-plugin-edfi-meadowlark": "0.2.0-dev.0",
+    "@types/aws-lambda": "^8.10.89",
+    "@types/fs-extra": "^8.1.2",
+    "@types/hapi__joi": "^16.0.12",
+    "@types/inflection": "^1.13.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "14.14.31",
+    "@types/pluralize": "^0.0.29",
+    "@types/ramda": "0.27.64",
+    "@types/semver": "^7.3.9",
+    "@types/xml2js": "^0.4.9",
+    "copyfiles": "^2.4.1",
+    "jsinspect": "^0.12.7",
+    "regenerator-runtime": "^0.13.9",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  }
+}

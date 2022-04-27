@@ -1,9 +1,8 @@
 module.exports = {
   testEnvironment: 'node',
   preset: 'ts-jest',
-  transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*metaed-.*).*$'],
+  transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
-  moduleFileExtensions: ['js', 'ts'],
   collectCoverageFrom: ['packages/**/src/**/*.ts'],
   coverageThreshold: {
     global: {
@@ -14,6 +13,4 @@ module.exports = {
     },
   },
   modulePathIgnorePatterns: ['dist*', 'docs*'],
-  setupFiles: ['<rootDir>/jest/setEnvVars.js'],
-  testTimeout: 6000,
 };

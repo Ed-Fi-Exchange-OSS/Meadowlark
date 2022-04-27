@@ -64,6 +64,9 @@ jobs:
     - name: Unit tests with code coverage
       run: yarn test:coverage --ci
       working-directory: Meadowlark-js
+      env:
+        AWS_ACCESS_KEY_ID: abc
+        AWS_SECRET_ACCESS_KEY: 123
 
     - name: Archive coverage results
       # Commit hash is for https://github.com/actions/upload-artifact/releases/tag/v2.3.0

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2019", "dom"],
-    "target": "es2017",
-    "module": "CommonJS",
+    "lib": ["es2021", "DOM"],
+    "target": "es2021",
+    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "declaration": true,
@@ -16,15 +16,15 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": ".",
+    "outDir": "dist",
   },
-  "include": [
-    "./src"
-  ],
+  "paths": {
+    "~/*": ["packages/*"]
+  },
   "exclude": [
     "node_modules",
-    "**/dist",
+    "dist",
     ".serverless/**/*",
     "_warmup/**/*"
   ]
