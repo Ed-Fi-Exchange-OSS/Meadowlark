@@ -42,7 +42,7 @@ interface Entity {
 }
 
 async function naiveGetEntities(): Promise<Collection<Entity>> {
-  const client = new MongoClient('mongodb://localhost:27017');
+  const client = new MongoClient('mongodb://localhost:27017,localhost:27018,localhost:27019');
 
   await client.connect();
   const db: Db = client.db('meadowlark');
