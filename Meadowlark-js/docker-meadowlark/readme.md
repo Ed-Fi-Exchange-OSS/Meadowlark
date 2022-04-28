@@ -8,7 +8,7 @@ This compose file requires [Docker Compose v2](https://github.com/docker/compose
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
-* MongoDB on default local port 27017 
+* MongoDB 3-node replica set on ports 27017, 27018, 27019 
 * External storage volumes
 
 Ensure that you have sufficient resources allocated to Docker:
@@ -71,8 +71,16 @@ visualizations with the OpenSearch Dashboards. Basic steps:
      want to filter on a particular entity type, such as `studentUniqueId:
      exists`.
 
+## MongoDB network setup
+
+MongoDB replica sets require the hostname in the connection string to match the hostname of each node.
+Because the container hostnames are mongo1, mongo2 and mongo3, add the following line to your
+hosts file:
+
+`127.0.0.1 mongo1 mongo2 mongo3`
+
 ## Browsing MongoDB
 [MongoDB Compass](https://www.mongodb.com/docs/compass/current/) is a freely available UI tool
-for browsing and importing data into MongoDB. `mongodb://localhost:27017` is the connection
-string to use for this MongoDB instance. Login/password security is disabled in the default
+for browsing and importing data into MongoDB. `mongodb://mongo1:27017,mongo2:27018,mongo3:27019` is the connection
+string to use for this MongoDB replica set. Login/password security is disabled in the default
 MongoDB container configuration.
