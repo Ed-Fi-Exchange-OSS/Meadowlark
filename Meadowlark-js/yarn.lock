@@ -1966,9 +1966,9 @@ __metadata:
     "@aws-sdk/util-dynamodb": ^3.72.0
     "@edfi/ed-fi-model-3.1": 3.0.1
     "@edfi/ed-fi-model-3.3b": 3.0.1
-    "@edfi/metaed-core": 3.0.1
+    "@edfi/metaed-core": 3.0.2-dev.1
     "@edfi/metaed-plugin-edfi-meadowlark": 0.2.0-dev.0
-    "@edfi/metaed-plugin-edfi-unified": 3.0.1
+    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.1
     "@hapi/joi": ^17.1.1
     "@types/aws-lambda": ^8.10.89
     "@types/fs-extra": ^8.1.2
@@ -1986,7 +1986,6 @@ __metadata:
     didyoumean2: ^5.0.0
     dotenv: ^16.0.0
     fast-memoize: ^2.5.2
-    follow-redirects: ^1.14.7
     fs-extra: ^10.0.0
     inquirer: ^8.2.0
     invariant: ^2.2.4
@@ -2036,9 +2035,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/metaed-core@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@edfi/metaed-core@npm:3.0.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.1.tgz"
+"@edfi/metaed-core@npm:3.0.2-dev.1":
+  version: 3.0.2-dev.1
+  resolution: "@edfi/metaed-core@npm:3.0.2-dev.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.2-dev.1.tgz"
   dependencies:
     ajv: ^6.12.6
     antlr4: 4.6.1-patched.0
@@ -2054,8 +2053,8 @@ __metadata:
     semver: ^7.3.5
     sugar: ^2.0.6
     topo: 2.0.2
-    winston: 3.5.1
-  checksum: f93b68fc1dae9daeff49499e2233b556de0791d7b33440b7432bee6a841516f6cdff11d0295154b01607716c6a9bdc4b5f1b3d23e15e3d1888dfac93451ad9bc
+    winston: 3.7.2
+  checksum: 6a385e967b3c060f78e731a538e18fd8b7c488c9fad3f275b9f119981f18863821ac9e9f86eb4c85b1059e3e4e6f3a2fc314bbb260e0e187ceeec3a04acc8380
   languageName: node
   linkType: hard
 
@@ -2063,8 +2062,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@edfi/metaed-plugin-edfi-meadowlark@workspace:packages/metaed-plugin-edfi-meadowlark"
   dependencies:
-    "@edfi/metaed-core": 3.0.1
-    "@edfi/metaed-plugin-edfi-unified": 3.0.1
+    "@edfi/metaed-core": 3.0.2-dev.1
+    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.1
     "@hapi/code": ^8.0.5
     "@hapi/joi": ^17.1.1
     copyfiles: ^2.4.1
@@ -2074,14 +2073,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/metaed-plugin-edfi-unified@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@edfi/metaed-plugin-edfi-unified@npm:3.0.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-plugin-edfi-unified%2F-%2F%40edfi%2Fmetaed-plugin-edfi-unified-3.0.1.tgz"
+"@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.1":
+  version: 3.0.2-dev.1
+  resolution: "@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-plugin-edfi-unified%2F-%2F%40edfi%2Fmetaed-plugin-edfi-unified-3.0.2-dev.1.tgz"
   dependencies:
-    "@edfi/metaed-core": 3.0.1
+    "@edfi/metaed-core": 3.0.2-dev.1
     ramda: ^0.28.0
-    winston: 3.5.1
-  checksum: 84834abe76ef843d33c57ce87ee137dd0761eea26bfd02e89984a2576aaf49c3ebe551bf0c42771ef08c5c40ddfa6223e47978f0f1547ce90151e61ae3fde2a2
+    winston: 3.7.2
+  checksum: 6c6536c6330c53e7ac1abccd19f8aebc388bc1dee5e9ad6a0c6b0cb74aadd01338ff41d32a8e5a8379dd6883c8d869cdf9a6a6870d13de518d5973a6c4fdfd6a
   languageName: node
   linkType: hard
 
@@ -12233,7 +12232,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"logform@npm:^2.3.2":
+"logform@npm:^2.3.2, logform@npm:^2.4.0":
   version: 2.4.0
   resolution: "logform@npm:2.4.0"
   dependencies:
@@ -18028,7 +18027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-transport@npm:^4.4.2":
+"winston-transport@npm:^4.5.0":
   version: 4.5.0
   resolution: "winston-transport@npm:4.5.0"
   dependencies:
@@ -18056,21 +18055,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:3.5.1":
-  version: 3.5.1
-  resolution: "winston@npm:3.5.1"
+"winston@npm:3.7.2":
+  version: 3.7.2
+  resolution: "winston@npm:3.7.2"
   dependencies:
     "@dabh/diagnostics": ^2.0.2
     async: ^3.2.3
     is-stream: ^2.0.0
-    logform: ^2.3.2
+    logform: ^2.4.0
     one-time: ^1.0.0
     readable-stream: ^3.4.0
     safe-stable-stringify: ^2.3.1
     stack-trace: 0.0.x
     triple-beam: ^1.3.0
-    winston-transport: ^4.4.2
-  checksum: 12253f1644c46f90b36b8e675f397b29f862778c6a76cce11ad901c35d7a9b556fe371bfd0c22e180f6aa2e23d7a726a6f4ec1eec637dac3fe76390a0cd5ed09
+    winston-transport: ^4.5.0
+  checksum: f1f1a860d2fa228b50880b20aaa6cc121085907791fe0d814ff9c062640f6b65da321726322094e7667eb63088b3bb67e7b4e219d998f29efcc6f583185a1cd3
   languageName: node
   linkType: hard
 

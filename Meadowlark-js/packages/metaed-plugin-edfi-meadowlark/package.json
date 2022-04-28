@@ -23,8 +23,8 @@
     ]
   },
   "dependencies": {
-    "@edfi/metaed-core": "3.0.1",
-    "@edfi/metaed-plugin-edfi-unified": "3.0.1",
+    "@edfi/metaed-core": "3.0.2-dev.1",
+    "@edfi/metaed-plugin-edfi-unified": "3.0.2-dev.1",
     "@hapi/joi": "^17.1.1",
     "deep-freeze": "^0.0.1",
     "inflection": "^1.13.1"
