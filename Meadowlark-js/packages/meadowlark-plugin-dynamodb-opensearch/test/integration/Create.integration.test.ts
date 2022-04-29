@@ -26,7 +26,10 @@ jest.setTimeout(120000);
 // An experiment in integration testing with a live DynamoDB instance
 const TEST_DYNAMO_PORT = Math.floor(Math.random() * 2000) + 8000;
 const tableName = 'edfi-meadowlark-test';
-export const resourceYamlPath: string = resolve(__dirname, '../../../meadowlark-aws-frontend/resources/resources.yml');
+export const resourceYamlPath: string = resolve(
+  __dirname,
+  '../../../../services/meadowlark-aws-lambda/resources/resources.yml',
+);
 
 function loadCreateTableInputFromResourcesYaml(): CreateTableInput {
   const resourceYaml: any = loadYaml(readFileSync(resourceYamlPath, 'utf8'));

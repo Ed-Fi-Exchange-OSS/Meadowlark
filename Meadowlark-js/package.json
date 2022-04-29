@@ -26,7 +26,8 @@
     "typescript": "4.6.3"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "services/*"
   ],
   "scripts": {
     "build": "lerna run build --stream",

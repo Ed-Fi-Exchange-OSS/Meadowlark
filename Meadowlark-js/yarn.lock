@@ -2143,9 +2143,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@edfi/meadowlark-aws-frontend@workspace:packages/meadowlark-aws-frontend":
+"@edfi/meadowlark-aws-frontend@workspace:services/meadowlark-aws-lambda":
   version: 0.0.0-use.local
-  resolution: "@edfi/meadowlark-aws-frontend@workspace:packages/meadowlark-aws-frontend"
+  resolution: "@edfi/meadowlark-aws-frontend@workspace:services/meadowlark-aws-lambda"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
     "@types/aws-lambda": ^8.10.89
