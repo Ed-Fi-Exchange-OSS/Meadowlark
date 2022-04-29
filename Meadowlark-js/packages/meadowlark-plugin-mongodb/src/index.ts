@@ -4,18 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
-import {
-  createEntity,
-  deleteEntityById,
-  deleteItems,
-  getEntityById,
-  getEntityList,
-  getForeignKeyReferences,
-  getReferencesToThisItem,
-  updateEntityById,
-  validateEntityOwnership,
-  queryEntityList,
-} from './MongoEntityRepository';
+import { createEntity } from './repository/Create';
+import { deleteEntityById, deleteItems } from './repository/Delete';
+import { getEntityById } from './repository/Read';
+import { getEntityList, queryEntityList } from './repository/Query';
+import { updateEntityById } from './repository/Update';
+import { getForeignKeyReferences, getReferencesToThisItem, validateEntityOwnership } from './repository/Unknown';
 
 export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
   return {

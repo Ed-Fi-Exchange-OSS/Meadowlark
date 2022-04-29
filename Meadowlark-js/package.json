@@ -32,6 +32,7 @@
   "scripts": {
     "build": "lerna run build --stream",
     "build:clean": "lerna run build:clean --stream",
+    "test:all": "yarn test && yarn test:integration",
     "test": "yarn test:lint && yarn test:unit",
     "test:lint": "yarn test:lint:ts && yarn test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
