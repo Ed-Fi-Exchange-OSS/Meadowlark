@@ -1,8 +1,8 @@
 {
-  "name": "@edfi/meadowlark-plugin-dynamodb-opensearch",
+  "name": "@edfi/meadowlark-local-mongodb-opensearch",
   "main": "dist/index.js",
   "version": "0.2.0-dev.0",
-  "description": "Meadowlark backend plugin for DynamoDB + OpenSearch",
+  "description": "Meadowlark backend plugin for local MongoDB and OpenSearch",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://www.myget.org/F/ed-fi/npm/"
@@ -19,22 +19,11 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.44.0",
-    "@aws-sdk/credential-provider-node": "3.41.0",
-    "@aws-sdk/lib-dynamodb": "3.44.0",
-    "@aws-sdk/smithy-client": "3.41.0",
-    "@aws-sdk/types": "3.40.0",
-    "@aws-sdk/util-dynamodb": "3.44.0",
     "@edfi/meadowlark-core": "0.2.0-dev.0",
-    "@elastic/elasticsearch": "7.13.0",
-    "aws4": "^1.11.0",
-    "invariant": "^2.2.4",
-    "ramda": "^0.28.0"
+    "mongodb": "^4.5.0"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
-    "dynamodb-localhost": "^0.0.9",
-    "js-yaml": "^4.1.0",
     "rimraf": "^3.0.2"
   }
 }

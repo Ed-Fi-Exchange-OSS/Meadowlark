@@ -9,7 +9,7 @@
       "args": ["offline", "start", "--printOutput", "--stage", "local", "--allowCache"],
       "port": 9229,
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/packages/meadowlark-aws-frontend",
+      "cwd": "${workspaceFolder}/services/meadowlark-aws-lambda",
       "justMyCode": false
     },
     {

@@ -7,6 +7,10 @@ import { Collection, Db, MongoClient } from 'mongodb';
 import { EntityInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
 import { Entity } from '../model/Entity';
 
+/**
+ * No connection pooling and even worse, a new connection per query
+ *
+ */
 async function naiveGetEntities(): Promise<Collection<Entity>> {
   const client = new MongoClient('mongodb://mongo1:27017,mongo2:27018,mongo3:27019');
 

@@ -1,7 +1,7 @@
 {
-  "name": "@edfi/meadowlark-aws-frontend",
+  "name": "@edfi/meadowlark-aws-lambda",
   "version": "0.2.0-dev.0",
-  "description": "Meadowlark AWS frontend",
+  "description": "Meadowlark service using AWS lambda",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://www.myget.org/F/ed-fi/npm/"
@@ -34,7 +34,7 @@
     "teardown:aws": "yarn serverless remove --aws-profile default --stage",
     "load:descriptors:local": "yarn serverless invoke local -f loadDescriptors",
     "load:descriptors:aws": "yarn serverless invoke --function loadDescriptors --stage",
-    "start:local": "yarn workspace @edfi/meadowlark-aws-frontend serverless offline start --printOutput --stage local --allowCache"
+    "start:local": "yarn workspace @edfi/meadowlark-aws-lambda serverless offline start --printOutput --stage local --allowCache"
   },
   "husky": {
     "hooks": {
