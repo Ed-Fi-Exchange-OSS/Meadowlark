@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { getBackendPlugin } from '../plugin/PluginLoader';
-import { buildNKString, DocumentInfo, newEntityInfo } from '../model/DocumentInfo';
+import { DocumentInfo, newEntityInfo } from '../model/DocumentInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
 import { documentIdForEntityInfo } from '../helpers/DocumentId';
@@ -106,7 +106,12 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         entityName: descriptorName,
         projectName: 'Ed-Fi',
         projectVersion: '3.3.1-b',
-        naturalKey: buildNKString(`${descriptorDocument.namespace}#${descriptorDocument.codeValue}`),
+        documentIdentity: [
+          {
+            name: 'descriptor',
+            value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
+          },
+        ],
       };
 
       const putResult: PutResult = await getBackendPlugin().createEntity(
@@ -118,12 +123,16 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         '-',
       );
       Logger.debug(
-        `Loading descriptor ${descriptorName} with natural key ${descriptorEntityInfo.naturalKey}: ${putResult.failureMessage}`,
+        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorEntityInfo.documentIdentity)}: ${
+          putResult.failureMessage
+        }`,
         '-',
       );
       if (!(putResult.result === 'INSERT_SUCCESS' || putResult.result === 'UPDATE_SUCCESS')) {
         Logger.error(
-          `Attempt to load descriptor ${descriptorName} with natural key ${descriptorEntityInfo.naturalKey} failed: ${putResult.failureMessage}`,
+          `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
+            descriptorEntityInfo.documentIdentity,
+          )} failed: ${putResult.failureMessage}`,
           'n/a',
         );
       } else {

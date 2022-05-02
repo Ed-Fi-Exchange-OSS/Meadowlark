@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
+import { invariant } from 'ts-invariant';
 import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import {
   topLevelNameOnEntity,
@@ -13,25 +14,25 @@ import {
   EntityPropertyMeadowlarkData,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { decapitalize } from '../Utility';
-import { AssignableInfo } from '../model/AssignableInfo';
+import { Assignable } from '../model/Assignable';
+import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
 
 type NullableTopLevelEntity = { assignableTo: TopLevelEntity | null };
 
 /**
- * The natural key of a JSON document, along with security information
+ * The identity of a document, along with security information
  */
-export type NaturalKeyWithSecurity = {
+export type DocumentIdentityWithSecurity = {
   /**
-   * A natural key string for a JSON document, in the form of:
-   * <path1>=<value1>#<path2>=<value2>#<path3>=<value3>#...
+   * The identity of a document
    */
-  naturalKey: string;
+  documentIdentity: DocumentIdentity;
   /**
-   * The student id value in the JSON document, or null if one does not exist
+   * The student id value in the document, or null if one does not exist
    */
   studentId: string | null;
   /**
-   * The education organization id value in the JSON document, or null if one does not exist
+   * The education organization id value in the document, or null if one does not exist
    */
 
   edOrgId: string | null;
@@ -40,50 +41,55 @@ export type NaturalKeyWithSecurity = {
 /**
  * Takes a non-reference property representing a portion of the identity of a MetaEd entity,
  * an API JSON body matching that entity, and a path to the location of the property value
- * in the JSON body, and returns that portion of the natural key extracted from the JSON body.
+ * in the JSON body, and returns that portion of the document identity extracted from the JSON body.
  *
- * bodyPath is a path in the JSON body as a string array with one path segment per array element.
+ * documentPath is a path in the JSON body as a string array with one path segment per array element.
  */
-function singleNaturalKeyFrom(property: EntityProperty, body: object, bodyPath: string[]): NaturalKeyWithSecurity {
+function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentityWithSecurity {
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
-  const bodyPathAsString: string = [...bodyPath, apiMapping.fullName].join('.');
-  let naturalKeyValue: string | undefined = R.path([...bodyPath, apiMapping.fullName], body);
-  if (naturalKeyValue == null) naturalKeyValue = ''; // TODO: fatal error?
+  const documentPathAsString: string = [...documentPath, apiMapping.fullName].join('.');
+  const elementValue: string | undefined = R.path([...documentPath, apiMapping.fullName], body);
+
+  invariant(
+    elementValue != null,
+    `Identity element value for ${property.metaEdName} not found in ${JSON.stringify(body)} at ${documentPathAsString}`,
+  );
+
   return {
-    naturalKey: `${bodyPathAsString}=${naturalKeyValue}`,
-    studentId: apiMapping.fullName === 'studentUniqueId' ? naturalKeyValue : null,
-    edOrgId: ['schoolId', 'educationOrganizationId'].includes(apiMapping.fullName) ? naturalKeyValue : null,
+    documentIdentity: [{ name: documentPathAsString, value: elementValue }],
+    studentId: apiMapping.fullName === 'studentUniqueId' ? elementValue : null,
+    edOrgId: ['schoolId', 'educationOrganizationId'].includes(apiMapping.fullName) ? elementValue : null,
   };
 }
 
 /**
  * Takes a ReferenceComponent representing an identity of a MetaEd entity along with
- * an API JSON body matching that entity and returns the natural key extracted
+ * an API JSON body matching that entity and returns the document identity extracted
  * from the JSON body.
  *
- * bodyPath is an accumulator allowing this function to recursively build up paths in the
+ * documentPath is an accumulator allowing this function to recursively build up paths in the
  * JSON body as a string array with one path segment per array element. This allows use
  * of the path() function of the ramdajs library (https://ramdajs.com/docs/#path) to extract
  * values from the JSON body.
  */
-function naturalKeysFrom(
+function documentIdentitiesFrom(
   identityReferenceComponent: ReferenceComponent,
   body: object,
   entity: TopLevelEntity,
-  bodyPath: string[],
-): NaturalKeyWithSecurity[] {
+  documentPath: string[],
+): DocumentIdentityWithSecurity[] {
   if (isReferenceElement(identityReferenceComponent)) {
-    return [singleNaturalKeyFrom(identityReferenceComponent.sourceProperty, body, bodyPath)];
+    return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
   }
 
-  const result: NaturalKeyWithSecurity[] = [];
+  const result: DocumentIdentityWithSecurity[] = [];
   identityReferenceComponent.referenceComponents.forEach((childComponent: ReferenceComponent) => {
     const identityTopLevelName = topLevelNameOnEntity(entity, identityReferenceComponent.sourceProperty);
-    const newBodyPath: string[] = bodyPath.length > 0 ? bodyPath : [identityTopLevelName];
+    const newDocumentPath: string[] = documentPath.length > 0 ? documentPath : [identityTopLevelName];
     if (isReferenceElement(childComponent)) {
-      result.push(singleNaturalKeyFrom(childComponent.sourceProperty, body, newBodyPath));
+      result.push(singleIdentityFrom(childComponent.sourceProperty, body, newDocumentPath));
     } else {
-      result.push(...naturalKeysFrom(childComponent, body, entity, newBodyPath));
+      result.push(...documentIdentitiesFrom(childComponent, body, entity, newDocumentPath));
     }
   });
   return result;
@@ -91,58 +97,58 @@ function naturalKeysFrom(
 
 /**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
- * extracts the natural key information from the JSON body. Also extracts security information, if any.
+ * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
-export function extractNaturalKey(entity: TopLevelEntity, body: object): NaturalKeyWithSecurity {
-  const naturalKeysWithSecurity: NaturalKeyWithSecurity[] = (
+export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentityWithSecurity {
+  const naturalKeysWithSecurity: DocumentIdentityWithSecurity[] = (
     entity.data.meadowlark as EntityMeadowlarkData
   ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>
-    naturalKeysFrom(identityReferenceComponent, body, entity, []),
+    documentIdentitiesFrom(identityReferenceComponent, body, entity, []),
   );
 
   return naturalKeysWithSecurity.reduce(
-    (acc: NaturalKeyWithSecurity, current: NaturalKeyWithSecurity) => {
-      acc.naturalKey = `${acc.naturalKey}#${current.naturalKey}`;
+    (acc: DocumentIdentityWithSecurity, current: DocumentIdentityWithSecurity) => {
+      acc.documentIdentity = [...acc.documentIdentity, ...current.documentIdentity];
       // Note that last non-null studentId/edOrgId wins
       if (current.studentId != null) acc.studentId = current.studentId;
       if (current.edOrgId != null) acc.edOrgId = current.edOrgId;
       return acc;
     },
-    { naturalKey: 'NK', studentId: null, edOrgId: null },
+    { documentIdentity: NoDocumentIdentity, studentId: null, edOrgId: null },
   );
 }
 
 /**
- * This is a bit of a post-processing hack to substitute to create an assignableNaturalKey from an
- * already constructed natural key. If the entity should have one (see description in DocumentInfo),
- * it starts as a copy of the natural key. If the entity is a subclass with an identity rename,
- * string substitution replaces the renamed identity property with the original superclass identity
- * property, thereby putting it in superclass form.
+ * Substitute an assignableIdentity from an already constructed DocumentIdentity, if the entity should have one.
+ * If the entity is a subclass with an identity rename, replace the renamed identity property with the original
+ * superclass identity property name, thereby putting it in superclass form.
  *
- * For example, School is a subclass of EducationOrganization. School renames educationOrganizationId
- * to schoolId. An example natural key for a School is NK#schoolId=123. The equivalent assignable natural
- * key for this School would be NK#educationOrganizationId=123.
+ * For example, School is a subclass of EducationOrganization which renames educationOrganizationId
+ * to schoolId. An example document identity for a School is { name: schoolId, value: 123 }. The equivalent assignable identity
+ * for this School would be { name: educationOrganizationId, value: 123 }.
  *
- * Simple substitution can break down if there are ordering differences in natural key components,
- * however the DS has never had subclasses with multiple identity properties AND identity renames.
- *
- * TODO: Bring this behavior into extractNaturalKey, correctly managing for natural key component ordering.
  */
-export function deriveAssignableFrom(entity: TopLevelEntity, naturalKey: string): AssignableInfo | null {
+export function deriveAssignableFrom(entity: TopLevelEntity, documentIdentity: DocumentIdentity): Assignable | null {
   const { assignableTo }: NullableTopLevelEntity = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
   if (assignableTo == null) return null;
   const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
-  if (identityRename == null) return { assignableToName: assignableTo.metaEdName, assignableNaturalKey: naturalKey };
+  if (identityRename == null) return { assignableToName: assignableTo.metaEdName, assignableIdentity: documentIdentity };
 
-  const renamedPropertyName = decapitalize(identityRename.metaEdName);
-  const originalName = decapitalize(identityRename.baseKeyName);
+  const subclassName = decapitalize(identityRename.metaEdName);
+  const superclassName = decapitalize(identityRename.baseKeyName);
 
-  // Substitution regex is lookbehind for "#" and lookahead for first "=" afterward, with renamed property
-  // in between. Using string concatenation to improve readability
-  // eslint-disable-next-line prefer-template
-  const renamedRegex = new RegExp('(?<=#)' + renamedPropertyName + '?(?=\\=)');
+  const elementToSubstitute: number = documentIdentity.findIndex((element) => element.name === subclassName);
+  if (elementToSubstitute === -1) return { assignableToName: assignableTo.metaEdName, assignableIdentity: documentIdentity };
+
+  // copy both DocumentIdentity and the individual DocumentElement so original is not mutated
+  const identityCopy: DocumentIdentity = [...documentIdentity];
+  identityCopy[elementToSubstitute] = {
+    ...documentIdentity[elementToSubstitute],
+    name: superclassName,
+  };
+
   return {
     assignableToName: assignableTo.metaEdName,
-    assignableNaturalKey: naturalKey.replace(renamedRegex, originalName),
+    assignableIdentity: identityCopy,
   };
 }

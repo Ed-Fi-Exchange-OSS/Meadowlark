@@ -51,7 +51,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
     ...newEntityInfo(),
     edOrgId: 'edOrg id',
     entityName: 'test name',
-    naturalKey: 'NK#a#natural#key',
+    documentIdentity: [{ name: 'natural', value: 'key' }],
     projectName: 'a#project#name',
     projectVersion: '1',
     studentId: '1',

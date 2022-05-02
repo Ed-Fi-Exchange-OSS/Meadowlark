@@ -9,16 +9,17 @@ export { SearchResult } from './plugin/backend/SearchResult';
 export { ForeignKeyItem } from './model/ForeignKeyItem';
 export { Security, newSecurity } from './model/Security';
 export { ValidationOptions } from './model/ValidationOptions';
+export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';
-export { documentIdForEntityInfo, documentIdFromNaturalKeyString } from './helpers/DocumentId';
+export { DocumentIdentity } from './model/DocumentIdentity';
+export { documentIdForEntityInfo, idFromDocumentElements } from './helpers/DocumentId';
 export {
   DocumentInfo,
   newEntityInfo,
-  entityTypeStringFrom,
-  entityTypeStringFromComponents,
-  buildNKString,
   DocumentIdentifyingInfo,
   DocumentTypeInfo,
+  entityTypeStringFrom,
+  entityTypeStringFromComponents,
 } from './model/DocumentInfo';
 export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';

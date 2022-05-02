@@ -127,7 +127,7 @@ export async function getEntityById(
   security: Security,
   lambdaRequestId: string,
 ): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityById for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, lambdaRequestId);
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,
@@ -233,7 +233,10 @@ export async function updateEntityById(
   security: Security,
   lambdaRequestId: string,
 ): Promise<PutResult> {
-  Logger.debug(`DynamoEntityRepository.updateEntityById for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(
+    `DynamoEntityRepository.updateEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`,
+    lambdaRequestId,
+  );
   const { referenceValidation, descriptorValidation } = validationOptions;
 
   const infoWithMetadata = referenceValidation ? info : { ...info, _unvalidated: true };
@@ -299,7 +302,9 @@ export async function updateEntityById(
           const failureForeignKey = documentInfo.foreignKeys[failureIndex];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: `Foreign key constraint failure for entity ${failureForeignKey.metaEdName}. Expected natural key was ${failureForeignKey.constraintKey}`,
+            failureMessage: `Foreign key constraint failure for entity ${
+              failureForeignKey.metaEdName
+            }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
         if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
@@ -307,7 +312,9 @@ export async function updateEntityById(
           const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: `${failureDescriptorValue.constraintKey} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
+            failureMessage: `${JSON.stringify(
+              failureDescriptorValue.documentIdentity,
+            )} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
           };
         }
       }
@@ -331,7 +338,7 @@ export async function createEntity(
   security: Security,
   lambdaRequestId: string,
 ): Promise<PutResult> {
-  Logger.debug(`DynamoEntityRepository.createEntity for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.createEntity for ${JSON.stringify(documentInfo.documentIdentity)}`, lambdaRequestId);
   const { referenceValidation, descriptorValidation } = validationOptions;
 
   const putItem = constructPutEntityItem(
@@ -382,7 +389,9 @@ export async function createEntity(
         // Another assignable subclass is using this natural key
         return {
           result: 'INSERT_FAILURE_ASSIGNABLE_COLLISION',
-          failureMessage: `Another subclass of entity ${documentInfo.assignableInfo?.assignableToName} is already using the natural key ${documentInfo.assignableInfo?.assignableNaturalKey}`,
+          failureMessage: `Another subclass of entity ${
+            documentInfo.assignableInfo?.assignableToName
+          } is already using the natural key ${JSON.stringify(documentInfo.assignableInfo?.assignableIdentity)}`,
         };
       }
 
@@ -394,7 +403,9 @@ export async function createEntity(
           const failureForeignKey = documentInfo.foreignKeys[failureIndex];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
-            failureMessage: `Foreign key constraint failure for entity ${failureForeignKey.metaEdName}. Expected natural key was ${failureForeignKey.constraintKey}`,
+            failureMessage: `Foreign key constraint failure for entity ${
+              failureForeignKey.metaEdName
+            }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
         if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
@@ -402,7 +413,9 @@ export async function createEntity(
           const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
-            failureMessage: `${failureDescriptorValue.constraintKey} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
+            failureMessage: `${JSON.stringify(
+              failureDescriptorValue.documentIdentity,
+            )} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
           };
         }
       }
@@ -414,7 +427,10 @@ export async function createEntity(
 
   // Additional foreign key reference items that must be saved _after_ a
   // successful save of the main item.
-  Logger.debug(`DynamoEntityRepository.createEntity Begin reference items for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(
+    `DynamoEntityRepository.createEntity Begin reference items for ${JSON.stringify(documentInfo.documentIdentity)}`,
+    lambdaRequestId,
+  );
 
   const referenceItems = generateReferenceItems(putItem?.sk, documentInfo);
   Logger.debug('DynamoEntityRepository.createEntity reference items', lambdaRequestId, null, referenceItems);
@@ -427,7 +443,7 @@ export async function createEntity(
 
     try {
       Logger.debug(
-        `DynamoEntityRepository.createEntity Writing reference items for ${documentInfo.naturalKey}`,
+        `DynamoEntityRepository.createEntity Writing reference items for ${JSON.stringify(documentInfo.documentIdentity)}`,
         lambdaRequestId,
       );
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
@@ -550,7 +566,10 @@ export async function getReferencesToThisItem(
   documentInfo: DocumentInfo,
   lambdaRequestId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
-  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(
+    `DynamoEntityRepository.getReferencesToThisItem for ${JSON.stringify(documentInfo.documentIdentity)}`,
+    lambdaRequestId,
+  );
 
   const foreignKeys: ForeignKeyItem[] = [];
 
@@ -594,7 +613,10 @@ export async function getForeignKeyReferences(
   documentInfo: DocumentInfo,
   lambdaRequestId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
-  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(
+    `DynamoEntityRepository.getForeignKeyReferences for ${JSON.stringify(documentInfo.documentIdentity)}`,
+    lambdaRequestId,
+  );
 
   const foreignKeys: ForeignKeyItem[] = [];
 
@@ -636,7 +658,10 @@ export async function validateEntityOwnership(
   clientName: string | null,
   lambdaRequestId: string,
 ): Promise<OwnershipResult> {
-  Logger.debug(`DynamoEntityRepository.validateEntityOwnership for ${documentInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(
+    `DynamoEntityRepository.validateEntityOwnership for ${JSON.stringify(documentInfo.documentIdentity)}`,
+    lambdaRequestId,
+  );
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,

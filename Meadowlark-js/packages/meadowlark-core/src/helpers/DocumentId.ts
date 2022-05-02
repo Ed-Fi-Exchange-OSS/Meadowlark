@@ -4,20 +4,23 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import JsSha from 'jssha';
-import invariant from 'invariant';
+import { DocumentElement } from '../model/DocumentElement';
+import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DocumentInfo } from '../model/DocumentInfo';
 
 /**
  * Returns a SHAKE128 hash of length 224 bits for the given naturalKeyString for use as a document id.
- * naturalKeyString must be of the form "NK#<hash-separated key-value pairs>"
  */
-export function documentIdFromNaturalKeyString(naturalKeyString: string): string {
-  invariant(naturalKeyString.startsWith('NK#'), `naturalKeyString "${naturalKeyString}" did not start with "NK#"`);
-  // Hack that might be better addressed elsewhere
-  const nks = naturalKeyString.replace(/\.school=/g, '.schoolId=');
+export function idFromDocumentElements(documentIdentity: DocumentIdentity): string {
+  // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
+  // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
+
+  const stringifiedIdentity: string = documentIdentity
+    .map((element: DocumentElement) => `${element.name}=${element.value}`)
+    .join('#');
 
   const shaObj = new JsSha('CSHAKE128', 'TEXT');
-  shaObj.update(nks);
+  shaObj.update(stringifiedIdentity);
   return shaObj.getHash('HEX', { outputLen: 224 });
 }
 
@@ -27,10 +30,10 @@ export function documentIdFromNaturalKeyString(naturalKeyString: string): string
  */
 export function documentIdForEntityInfo(documentInfo: DocumentInfo): string {
   // If this is an assignable entity, use the assignableNaturalKey for the id instead of the actual natural key
-  const naturalKey =
-    documentInfo.assignableInfo == null ? documentInfo.naturalKey : documentInfo.assignableInfo.assignableNaturalKey;
+  const documentIdentity: DocumentIdentity =
+    documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 
-  return documentIdFromNaturalKeyString(naturalKey);
+  return idFromDocumentElements(documentIdentity);
 }
 
 /**

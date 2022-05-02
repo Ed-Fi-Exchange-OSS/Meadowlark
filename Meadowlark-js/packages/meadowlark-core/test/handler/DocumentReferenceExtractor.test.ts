@@ -100,19 +100,46 @@ describe('when extracting foreign keys from domain entity referencing one as ide
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "constraintKey": "NK#classPeriodName=z1#schoolReference.schoolId=24",
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "z1",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "24",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "ClassPeriod",
           "metaEdType": "domainEntity",
         },
         Object {
-          "constraintKey": "NK#classPeriodName=z2#schoolReference.schoolId=25",
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "z2",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "25",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "ClassPeriod",
           "metaEdType": "domainEntity",
         },
         Object {
-          "constraintKey": "NK#localCourseCode=abc#schoolReference.schoolId=23",
+          "documentIdentity": Array [
+            Object {
+              "name": "localCourseCode",
+              "value": "abc",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "23",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "CourseOffering",
           "metaEdType": "domainEntity",
@@ -170,7 +197,12 @@ describe('when extracting with optional reference in body', () => {
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "constraintKey": "NK#localCourseCode=abc",
+          "documentIdentity": Array [
+            Object {
+              "name": "localCourseCode",
+              "value": "abc",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "CourseOffering",
           "metaEdType": "domainEntity",
@@ -280,21 +312,31 @@ describe('when extracting optional collection in body', () => {
 
   it('should have references', () => {
     expect(result).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "constraintKey": "NK#classPeriodName=z1",
-    "isAssignableFrom": false,
-    "metaEdName": "ClassPeriod",
-    "metaEdType": "domainEntity",
-  },
-  Object {
-    "constraintKey": "NK#classPeriodName=z2",
-    "isAssignableFrom": false,
-    "metaEdName": "ClassPeriod",
-    "metaEdType": "domainEntity",
-  },
-]
-`);
+      Array [
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "z1",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "ClassPeriod",
+          "metaEdType": "domainEntity",
+        },
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "z2",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "ClassPeriod",
+          "metaEdType": "domainEntity",
+        },
+      ]
+    `);
   });
 });
 

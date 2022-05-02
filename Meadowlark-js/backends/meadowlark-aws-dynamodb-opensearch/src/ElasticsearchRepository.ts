@@ -9,7 +9,7 @@ import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
-import { DocumentInfo, entityTypeStringFrom, Logger, PaginationParameters, SearchResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, Logger, PaginationParameters, SearchResult, entityTypeStringFrom } from '@edfi/meadowlark-core';
 
 /**
  * A replacement for @acuris/aws-es-connection's "createAWSConnection", using aws4.

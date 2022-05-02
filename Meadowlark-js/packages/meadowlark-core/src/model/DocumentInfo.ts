@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { AssignableInfo } from './AssignableInfo';
+import { Assignable } from './Assignable';
+import { DocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
 import { DocumentReference } from './DocumentReference';
 
 /**
@@ -37,10 +38,10 @@ export interface DocumentTypeInfo {
  */
 export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
   /**
-   * The natural key of the entity extracted from the JSON body, in a bodyPathString=naturalKeyValue
+   * The natural key of the entity extracted from the JSON body, in a documentPathString=naturalKeyValue
    * form, hash-separated when their are multiple path/value pairs. The string is prefixed with "NK#".
    */
-  naturalKey: string;
+  documentIdentity: DocumentIdentity;
 }
 
 /**
@@ -61,7 +62,7 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
    * If this entity is assignable to another entity (meaning it is part of a subclass/superclass relationship)
    * this is the assignable natural key and superclass information.
    */
-  assignableInfo: AssignableInfo | null;
+  assignableInfo: Assignable | null;
 
   /**
    * The student id extracted from the JSON body, if any (for security)
@@ -83,7 +84,7 @@ export function newEntityInfo(): DocumentInfo {
     isDescriptor: false,
     projectName: '',
     projectVersion: '',
-    naturalKey: '',
+    documentIdentity: NoDocumentIdentity,
     assignableInfo: null,
     foreignKeys: [],
     descriptorValues: [],
@@ -101,12 +102,6 @@ export const NoEntityInfo = {
   projectName: 'NoProjectName',
   projectVersion: '0.0.0',
 };
-
-export function buildNKString(naturalKey: string): string {
-  if (naturalKey.startsWith('NK#')) return naturalKey;
-
-  return `NK#${naturalKey}`;
-}
 
 export function entityTypeStringFromComponents(projectName: string, projectVersion: string, entityName: string): string {
   return `TYPE#${projectName}#${projectVersion}#${entityName}`;

@@ -252,7 +252,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
 
     const resourceIdFromBody = documentIdForEntityInfo(documentInfo);
     if (resourceIdFromBody !== pathComponents.resourceId) {
-      const failureMessage = 'The natural key of the resource does not match the natural key in the updated document.';
+      const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(context, 'update', 400, failureMessage);
       return {
         body: JSON.stringify({ message: failureMessage }),

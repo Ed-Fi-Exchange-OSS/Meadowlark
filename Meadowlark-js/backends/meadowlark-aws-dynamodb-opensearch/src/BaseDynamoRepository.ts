@@ -4,21 +4,22 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import invariant from 'invariant';
+import { invariant } from 'ts-invariant';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import {
   ForeignKeyItem,
+  DocumentElement,
   DocumentReference,
+  DocumentIdentity,
   documentIdForEntityInfo,
-  documentIdFromNaturalKeyString,
+  idFromDocumentElements,
   DocumentInfo,
-  entityTypeStringFrom,
-  entityTypeStringFromComponents,
-  buildNKString,
   DocumentIdentifyingInfo,
   DocumentTypeInfo,
   Logger,
+  entityTypeStringFrom,
+  entityTypeStringFromComponents,
 } from '@edfi/meadowlark-core';
 import { PutItemInputAttributeMap, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
 
@@ -48,6 +49,23 @@ export function getDynamoDBDocumentClient(): DynamoDBDocumentClient {
   return dynamoDBDocumentClient;
 }
 
+export function buildNKString(naturalKey: string): string {
+  if (naturalKey.startsWith('NK#')) return naturalKey;
+
+  return `NK#${naturalKey}`;
+}
+
+/**
+ * Converts document identity to string in DynamoDB natual key form
+ * For example, converts:
+ * [{name: 'classPeriodName', value: 'z1'}, {name: 'schoolId', value: '24'}, {name: 'studentId', value: '333'}]
+ * to 'NK#classPeriodName=z1#schoolId=24#studentId=333'
+ */
+export function dynamoIdentityToString(documentIdentity: DocumentIdentity): string {
+  const stringifiedValues: string[] = documentIdentity.map((element: DocumentElement) => `${element.name}=${element.value}`);
+  return `NK#${stringifiedValues.join('#')}`;
+}
+
 export function entityIdPrefixRemoved(prefixedId: string): string {
   invariant(prefixedId.startsWith('ID#'), `prefixedId ${prefixedId} must start with "ID#"`);
   return prefixedId.replace(/^ID#/, '');
@@ -68,33 +86,25 @@ export function sortKeyFromEntityIdentity(documentInfo: DocumentInfo): string {
 }
 
 export function conditionCheckFrom(entityIdentifyingInfo: DocumentIdentifyingInfo) {
-  invariant(
-    entityIdentifyingInfo.naturalKey.startsWith('NK#'),
-    `entityIdentifyingInfo.naturalKey "${entityIdentifyingInfo.naturalKey}" did not start with "NK#"`,
-  );
   return {
     ConditionCheck: {
       TableName: tableOpts.tableName,
       Key: {
         pk: entityTypeStringFrom(entityIdentifyingInfo),
-        sk: sortKeyFromId(documentIdFromNaturalKeyString(entityIdentifyingInfo.naturalKey)),
+        sk: sortKeyFromId(idFromDocumentElements(entityIdentifyingInfo.documentIdentity)),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
   };
 }
 
-export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeInfo, foreignKey: DocumentReference) {
-  invariant(
-    foreignKey.constraintKey.startsWith('NK#'),
-    `foreignKey.constraintKey "${foreignKey.constraintKey}" did not start with "NK#"`,
-  );
+export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeInfo, documentIdentity: DocumentIdentity) {
   return {
     ConditionCheck: {
       TableName: tableOpts.tableName,
       Key: {
         pk: entityTypeStringFrom(assignableToTypeInfo),
-        sk: assignableSortKeyFromId(documentIdFromNaturalKeyString(foreignKey.constraintKey)),
+        sk: assignableSortKeyFromId(idFromDocumentElements(documentIdentity)),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
@@ -102,22 +112,22 @@ export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeI
 }
 
 export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
-  return documentInfo.foreignKeys.map((foreignKey) => {
+  return documentInfo.foreignKeys.map((documentReference) => {
     const entityTypeInfo: DocumentTypeInfo = {
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
       projectName: documentInfo.projectName,
       projectVersion: documentInfo.projectVersion,
-      entityName: foreignKey.metaEdName,
+      entityName: documentReference.metaEdName,
       isDescriptor: false,
     };
 
-    if (foreignKey.isAssignableFrom) {
-      return conditionCheckFromAssignable(entityTypeInfo, foreignKey);
+    if (documentReference.isAssignableFrom) {
+      return conditionCheckFromAssignable(entityTypeInfo, documentReference.documentIdentity);
     }
 
     return conditionCheckFrom({
       ...entityTypeInfo,
-      naturalKey: buildNKString(foreignKey.constraintKey),
+      documentIdentity: documentReference.documentIdentity,
     });
   });
 }
@@ -130,7 +140,7 @@ export function descriptorValueConditions(documentInfo: DocumentInfo): TransactW
       projectVersion: documentInfo.projectVersion,
       entityName: descriptorValue.metaEdName,
       isDescriptor: true,
-      naturalKey: buildNKString(descriptorValue.constraintKey),
+      documentIdentity: descriptorValue.documentIdentity,
     }),
   );
 }
@@ -151,7 +161,7 @@ export function constructPutEntityItem(
   const putItem: PutItemInputAttributeMap = {
     pk: entityTypeStringFrom(documentInfo),
     sk: sortKeyFromId(id),
-    naturalKey: documentInfo.naturalKey,
+    naturalKey: dynamoIdentityToString(documentInfo.documentIdentity),
     info: infoWithMetadata,
   };
 
@@ -192,7 +202,7 @@ export function constructAssignablePutItem(documentInfo: DocumentInfo): Transact
       TableName: tableOpts.tableName,
       Item: {
         pk: assignableToType,
-        sk: assignableSortKeyFromId(documentIdFromNaturalKeyString(documentInfo.assignableInfo.assignableNaturalKey)),
+        sk: assignableSortKeyFromId(idFromDocumentElements(documentInfo.assignableInfo.assignableIdentity)),
       },
       ConditionExpression: 'attribute_not_exists(sk)',
     },
@@ -254,17 +264,16 @@ export function generatePutEntityForUpsert(item: PutItemInputAttributeMap): Tran
 export function generateReferenceItems(naturalKeyHash: string, item: DocumentInfo): TransactWriteItem[] {
   const collection: TransactWriteItem[] = [];
   const referenceType = entityTypeStringFromComponents(item.projectName, item.projectVersion, item.entityName);
-  const { naturalKey } = item;
 
-  const extractReferences = R.forEach((reference: DocumentReference) => {
-    const referenceId = sortKeyFromId(documentIdFromNaturalKeyString(reference.constraintKey));
+  const extractReferences = R.forEach((documentReference: DocumentReference) => {
+    const referenceId = sortKeyFromId(idFromDocumentElements(documentReference.documentIdentity));
 
     const fk = new ForeignKeyItem({
       From: naturalKeyHash,
       To: referenceId,
       Description: {
         Type: referenceType,
-        NaturalKey: naturalKey,
+        NaturalKey: dynamoIdentityToString(item.documentIdentity),
       },
     });
 

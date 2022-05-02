@@ -7,13 +7,14 @@ import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import { extractNaturalKey, deriveAssignableFrom, NaturalKeyWithSecurity } from './NaturalKeyExtractor';
+import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './NaturalKeyExtractor';
 import { decapitalize } from '../Utility';
 import { DocumentInfo, NoEntityInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { PathComponents } from '../model/PathComponents';
-import { AssignableInfo } from '../model/AssignableInfo';
+import { Assignable } from '../model/Assignable';
+import { NoDocumentIdentity } from '../model/DocumentIdentity';
 
 export type ResourceValidationResult = {
   /**
@@ -85,8 +86,12 @@ export async function validateResource(
   }
 
   let errorBody: string | null = null;
-  let naturalKeyWithSecurity: NaturalKeyWithSecurity = { naturalKey: '', studentId: null, edOrgId: null };
-  let assignableInfo: AssignableInfo | null = null;
+  let documentIdentityWithSecurity: DocumentIdentityWithSecurity = {
+    documentIdentity: NoDocumentIdentity,
+    studentId: null,
+    edOrgId: null,
+  };
+  let assignableInfo: Assignable | null = null;
   const foreignKeys: DocumentReference[] = [];
   const descriptorValues: DocumentReference[] = [];
 
@@ -95,7 +100,7 @@ export async function validateResource(
     if (bodyValidation.length > 0) {
       errorBody = JSON.stringify({ message: bodyValidation });
     } else {
-      naturalKeyWithSecurity = extractNaturalKey(matchingMetaEdModel, body);
+      documentIdentityWithSecurity = extractDocumentIdentity(matchingMetaEdModel, body);
       foreignKeys.push(...extractDocumentReferences(matchingMetaEdModel, body));
       descriptorValues.push(...extractDescriptorValues(matchingMetaEdModel, body));
     }
@@ -103,7 +108,7 @@ export async function validateResource(
 
   if (!isDescriptor) {
     // We need to do this even if no body for deletes
-    assignableInfo = deriveAssignableFrom(matchingMetaEdModel, naturalKeyWithSecurity.naturalKey);
+    assignableInfo = deriveAssignableFrom(matchingMetaEdModel, documentIdentityWithSecurity.documentIdentity);
   }
 
   return {
@@ -116,7 +121,7 @@ export async function validateResource(
       isDescriptor,
       foreignKeys,
       descriptorValues,
-      ...naturalKeyWithSecurity,
+      ...documentIdentityWithSecurity,
       assignableInfo,
     },
     errorBody,

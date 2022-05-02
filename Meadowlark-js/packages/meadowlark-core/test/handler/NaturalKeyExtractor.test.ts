@@ -19,12 +19,12 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractNaturalKey, NaturalKeyWithSecurity } from '../../src/handler/NaturalKeyExtractor';
+import { extractDocumentIdentity, DocumentIdentityWithSecurity } from '../../src/handler/NaturalKeyExtractor';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: NaturalKeyWithSecurity | null = null;
+  let result: DocumentIdentityWithSecurity | null = null;
 
   const body = {
     notImportant: false,
@@ -81,12 +81,33 @@ describe('when extracting natural key from domain entity referencing another ref
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractNaturalKey(section, body);
+    result = extractDocumentIdentity(section, body);
   });
 
   it('should be correct', () => {
-    expect(result?.naturalKey).toMatchInlineSnapshot(
-      `"NK#classPeriodReference.classPeriodName=z#classPeriodReference.schoolId=23#courseOfferingReference.localCourseCode=abc#courseOfferingReference.schoolId=23#sectionIdentifier=Bob"`,
-    );
+    expect(result?.documentIdentity).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "name": "classPeriodReference.classPeriodName",
+          "value": "z",
+        },
+        Object {
+          "name": "classPeriodReference.schoolId",
+          "value": "23",
+        },
+        Object {
+          "name": "courseOfferingReference.localCourseCode",
+          "value": "abc",
+        },
+        Object {
+          "name": "courseOfferingReference.schoolId",
+          "value": "23",
+        },
+        Object {
+          "name": "sectionIdentifier",
+          "value": "Bob",
+        },
+      ]
+    `);
   });
 });

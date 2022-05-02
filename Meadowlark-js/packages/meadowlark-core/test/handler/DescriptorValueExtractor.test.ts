@@ -75,7 +75,12 @@ describe('when extracting single descriptor value from domain entity', () => {
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "constraintKey": "NK#uri://ed-fi.org/grade",
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/grade",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "GradingPeriod",
           "metaEdType": "descriptor",
@@ -133,7 +138,12 @@ describe('when extracting descriptor values from domain entity with the same nam
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "constraintKey": "NK#uri://ed-fi.org/grade",
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/grade",
+            },
+          ],
           "isAssignableFrom": false,
           "metaEdName": "GradingPeriod",
           "metaEdType": "descriptor",
@@ -200,17 +210,35 @@ describe('when extracting array of descriptor values from domain entity', () => 
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "constraintKey": "NK#uri://ed-fi.org/grade1",
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/grade1",
+            },
+          ],
+          "isAssignableFrom": false,
           "metaEdName": "GradingPeriod",
           "metaEdType": "descriptor",
         },
         Object {
-          "constraintKey": "NK#uri://ed-fi.org/grade2",
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/grade2",
+            },
+          ],
+          "isAssignableFrom": false,
           "metaEdName": "GradingPeriod",
           "metaEdType": "descriptor",
         },
         Object {
-          "constraintKey": "NK#uri://ed-fi.org/grade3",
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/grade3",
+            },
+          ],
+          "isAssignableFrom": false,
           "metaEdName": "GradingPeriod",
           "metaEdType": "descriptor",
         },
@@ -284,19 +312,31 @@ describe('when extracting collection from domain entity subclass with naming col
 
   it('should have values for body without collection prefix removal', () => {
     expect(result).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "constraintKey": "NK#uri://ed-fi.org/schoolValue",
-    "metaEdName": "SchoolCategory",
-    "metaEdType": "descriptor",
-  },
-  Object {
-    "constraintKey": "NK#uri://ed-fi.org/edOrgValue",
-    "metaEdName": "EducationOrganizationCategory",
-    "metaEdType": "descriptor",
-  },
-]
-`);
+      Array [
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/schoolValue",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "SchoolCategory",
+          "metaEdType": "descriptor",
+        },
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/edOrgValue",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "EducationOrganizationCategory",
+          "metaEdType": "descriptor",
+        },
+      ]
+    `);
   });
 });
 
@@ -361,19 +401,30 @@ describe('when extracting collection from domain entity subclass with no naming 
 
   it('should have values for body with collection prefix removal and without collection', () => {
     expect(result).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "constraintKey": "NK#uri://ed-fi.org/schoolValue",
-    "isAssignableFrom": false,
-    "metaEdName": "SchoolCategory",
-    "metaEdType": "descriptor",
-  },
-  Object {
-    "constraintKey": "NK#uri://ed-fi.org/edOrgValue",
-    "metaEdName": "EducationOrganizationCategory",
-    "metaEdType": "descriptor",
-  },
-]
-`);
+      Array [
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/schoolValue",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "SchoolCategory",
+          "metaEdType": "descriptor",
+        },
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "descriptor",
+              "value": "uri://ed-fi.org/edOrgValue",
+            },
+          ],
+          "isAssignableFrom": false,
+          "metaEdName": "EducationOrganizationCategory",
+          "metaEdType": "descriptor",
+        },
+      ]
+    `);
   });
 });

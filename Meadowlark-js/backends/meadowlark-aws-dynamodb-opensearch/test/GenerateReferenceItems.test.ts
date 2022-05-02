@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo, newEntityInfo } from '@edfi/meadowlark-core';
+import { DocumentIdentity, DocumentInfo, newEntityInfo } from '@edfi/meadowlark-core';
 import { generateReferenceItems } from '../src/BaseDynamoRepository';
 import { TransactWriteItem } from '../src/types/AwsSdkLibDynamoDb';
 
@@ -37,7 +37,8 @@ describe('when collecting foreign key references', () => {
     let result: TransactWriteItem[];
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
     const parentKey: string = 'parentId=asdfasdf';
-    const personNK: string = 'NK#person.personId=b';
+    const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
+    const personNK: DocumentIdentity = [{ name: 'person.personId', value: 'b' }];
     const info: DocumentInfo = newEntityInfo();
 
     info.projectName = 'Ed-Fi';
@@ -46,16 +47,16 @@ describe('when collecting foreign key references', () => {
     info.foreignKeys.push({
       metaEdType: 'domainEntity',
       metaEdName: 'Person',
-      constraintKey: personNK,
+      documentIdentity: personNK,
       isAssignableFrom: false,
     });
     info.foreignKeys.push({
       metaEdType: 'domainEntity',
       metaEdName: 'EducationOrganization',
-      constraintKey: 'NK#educationOrganization.educationOrganizationId=234',
+      documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],
       isAssignableFrom: false,
     });
-    info.naturalKey = parentKey;
+    info.documentIdentity = parentIdentity;
 
     const fromParent = 'FREF#ID#09876554tuiolkjasdfasdfwe2w33afss';
     const toPerson = 'TREF#ID#26b4072eee7f4833cdaa66670e79c9e0a32776cbecc71db4814319e9';
@@ -103,7 +104,7 @@ describe('when collecting foreign key references', () => {
   describe('given an item with one descriptor and no references', () => {
     let result: TransactWriteItem[];
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
-    const parentKey: string = 'parentId=asdfasdf';
+    const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
     const info: DocumentInfo = newEntityInfo();
 
     info.projectName = 'Ed-Fi';
@@ -112,10 +113,15 @@ describe('when collecting foreign key references', () => {
     info.descriptorValues.push({
       metaEdType: 'domainEntity',
       metaEdName: 'Something',
-      constraintKey: 'NK#SomethingElse',
+      documentIdentity: [
+        {
+          name: 'descriptor',
+          value: 'something',
+        },
+      ],
       isAssignableFrom: false,
     });
-    info.naturalKey = parentKey;
+    info.documentIdentity = parentIdentity;
 
     beforeAll(() => {
       result = generateReferenceItems(parentHash, info);

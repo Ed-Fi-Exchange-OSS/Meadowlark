@@ -35,9 +35,13 @@ function extractForDescriptorCollection(
   return bodyDescriptorArray.map((bodyDescriptorObject) => ({
     metaEdType: apiMapping.metaEdType,
     metaEdName: apiMapping.metaEdName,
-    constraintKey: `NK#${
-      bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)]
-    }`,
+    isAssignableFrom: false,
+    documentIdentity: [
+      {
+        name: 'descriptor',
+        value: bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
+      },
+    ],
   }));
 }
 
@@ -57,7 +61,12 @@ function extractDescriptorValuesFromBody(
       metaEdType: apiMapping.metaEdType,
       metaEdName: apiMapping.metaEdName,
       isAssignableFrom: false,
-      constraintKey: `NK#${body[bodyDescriptorName]}`,
+      documentIdentity: [
+        {
+          name: 'descriptor',
+          value: body[bodyDescriptorName],
+        },
+      ],
     },
   ];
 }

@@ -82,8 +82,8 @@ describe('given a completely missing resource path', () => {
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
         documentInfo: {
-          foreignKeys: ['NK#schoolId=1'],
-          naturalKey: 'NK#123',
+          foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+          documentIdentity: [{ name: 'x', value: '123' }],
         },
         errorBody: null,
         metaEdProjectHeaders: {},
@@ -112,7 +112,7 @@ describe('given a valid object', () => {
   describe('given the object does not exist', () => {
     let mockDynamo: any;
     const metaEdHeaders = { header: 'one' };
-    const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
+    const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
 
     beforeAll(async () => {
       const event: APIGatewayProxyEvent = {
@@ -127,8 +127,8 @@ describe('given a valid object', () => {
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
         Promise.resolve({
           documentInfo: {
-            foreignKeys: ['NK#schoolId=1'],
-            naturalKey: 'NK#123',
+            foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+            documentIdentity: [{ name: 'x', value: '123' }],
           },
           errorBody: null,
           metaEdProjectHeaders: metaEdHeaders,
@@ -164,12 +164,13 @@ describe('given a valid object', () => {
       expect(response.headers).toEqual(metaEdHeaders);
     });
   });
+
   describe('given the object does exist', () => {
     describe('given persistence is going to throw an error', () => {
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
+      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -184,8 +185,8 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['NK#schoolId=1'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -226,7 +227,7 @@ describe('given a valid object', () => {
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
+      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -241,8 +242,8 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['NK#schoolId=1'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -285,7 +286,7 @@ describe('given a valid object', () => {
     describe('given persistence succeeds', () => {
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
+      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -300,8 +301,8 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['NK#schoolId=1'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,

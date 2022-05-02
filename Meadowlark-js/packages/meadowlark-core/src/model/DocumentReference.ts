@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { PropertyType, ModelType } from '@edfi/metaed-core';
+import { DocumentIdentity } from './DocumentIdentity';
 
 export type DocumentReference = {
   /**
@@ -11,11 +12,13 @@ export type DocumentReference = {
    * Example: 'domainEntity'
    */
   metaEdType: PropertyType | ModelType;
+
   /**
    * The MetaEd name of the referenced entity.
    * Example: 'School'
    */
   metaEdName: string;
+
   /**
    * True if the referenced entity is assignable from other entities (meaning it is a superclass),
    *
@@ -25,9 +28,9 @@ export type DocumentReference = {
    *            would be true if the reference was to an EducationOrganization.
    */
   isAssignableFrom: boolean;
+
   /**
-   * The constraint string for this referential constraint.
-   * For example, this could be a natural key string or a full descriptor URI.
+   * The document identity representing this reference.
    */
-  constraintKey: string;
+  documentIdentity: DocumentIdentity;
 };

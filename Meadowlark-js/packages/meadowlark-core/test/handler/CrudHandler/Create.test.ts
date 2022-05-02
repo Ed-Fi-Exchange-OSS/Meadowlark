@@ -124,8 +124,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -181,8 +181,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -238,8 +238,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -296,8 +296,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: expectedHeaders,
@@ -339,7 +339,7 @@ describe('when posting a request to create a new resource', () => {
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const location = `/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb`;
+      const location = `/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3`;
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -354,8 +354,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,
@@ -402,7 +402,7 @@ describe('when posting a request to create a new resource', () => {
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const location = `/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb`;
+      const location = `/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3`;
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -417,8 +417,8 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: ['school'],
-              naturalKey: 'NK#123',
+              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
             metaEdProjectHeaders: metaEdHeaders,

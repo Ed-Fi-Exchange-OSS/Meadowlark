@@ -29,12 +29,12 @@
     "fast-memoize": "^2.5.2",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
-    "invariant": "^2.2.4",
     "jssha": "^3.2.0",
     "njwt": "^1.2.0",
     "ramda": "^0.27.2",
     "secure-random": "^1.1.2",
     "semver": "^7.3.6",
+    "ts-invariant": "^0.9.4",
     "winston": "^3.7.2",
     "xml2js": "^0.4.23"
   },

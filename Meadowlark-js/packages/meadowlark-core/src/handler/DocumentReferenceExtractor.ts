@@ -16,16 +16,17 @@ import {
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { DocumentReference } from '../model/DocumentReference';
 import { deriveAssignableFrom } from './NaturalKeyExtractor';
-import { AssignableInfo } from '../model/AssignableInfo';
-import { ExtractedValue, DocumentIdentity } from '../model/DocumentIdentity';
+import { Assignable } from '../model/Assignable';
+import { DocumentIdentity } from '../model/DocumentIdentity';
+import { DocumentElement } from '../model/DocumentElement';
 
-// body paths shaped as an array for ramdajs 'path' function
-// return value is arrays of body paths, grouped (with arrays) by path endings to line up with namePath array
-function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[][][] {
+// document paths shaped as an array for ramdajs 'path' function
+// return value is arrays of document paths, grouped (with arrays) by path endings to line up with name array
+function extractRawDocumentPaths(referenceGroup: ReferenceGroup, document: object): string[][][] {
   const result: string[][][] = [];
   const { apiMapping }: { apiMapping: ApiPropertyMapping } = referenceGroup.sourceProperty.data.meadowlark;
 
-  const topLevelBodyField: string = apiMapping.topLevelName;
+  const topLevelDocumentField: string = apiMapping.topLevelName;
   const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
 
   // pathEndings are the property names of all the scalar identity fields
@@ -36,19 +37,19 @@ function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[
   );
 
   if (apiMapping.isReferenceCollection) {
-    // pathEndings line up with ReferenceGroup documentBodyPaths
+    // pathEndings line up with ReferenceGroup documentDocumentPaths
     pathEndings.forEach((pathEnding: string) => {
       const pathEndingResult: string[][] = [];
       // check for omitted optional collection
-      if (body[topLevelBodyField] != null) {
-        // use the body just to get the count of references in the collection
-        body[topLevelBodyField].forEach((_collectionObject, index) => {
-          pathEndingResult.push([topLevelBodyField, index, apiMapping.referenceCollectionName, pathEnding]);
-          // example individual pathEndingResult entry, which is a path to a single value in the body to be extracted:
+      if (document[topLevelDocumentField] != null) {
+        // use the document just to get the count of references in the collection
+        document[topLevelDocumentField].forEach((_collectionObject, index) => {
+          pathEndingResult.push([topLevelDocumentField, index, apiMapping.referenceCollectionName, pathEnding]);
+          // example individual pathEndingResult entry, which is a path to a single value in the document to be extracted:
           // ['classPeriods', 0, 'classPeriodReference', 'schoolId']
         });
       }
-      // example pathEndingResult, multiple paths to same value, differing by array element in the body:
+      // example pathEndingResult, multiple paths to same value, differing by array element in the document:
       // [
       //   ['classPeriods', 0, 'classPeriodReference', 'schoolId'],
       //   ['classPeriods', 1, 'classPeriodReference', 'schoolId']
@@ -59,8 +60,8 @@ function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[
     // apiMapping is not a collection
     pathEndings.forEach((pathEnding) => {
       // check for omitted optional reference
-      if (R.path([topLevelBodyField, pathEnding], body) != null) {
-        result.push([[topLevelBodyField, pathEnding]]);
+      if (R.path([topLevelDocumentField, pathEnding], document) != null) {
+        result.push([[topLevelDocumentField, pathEnding]]);
       }
     });
   }
@@ -70,7 +71,7 @@ function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[
 
 /**
  * Zip an arbitrary number of arrays.  Used to transpose arrays of extractions of the same path endpoint from
- * multiple document locations (such as the repetition of values in a collection in an API body) into document identities.
+ * multiple document locations (such as the repetition of values in a collection in an API document) into document identities.
  */
 const multiZip = (...theArrays) => {
   const [firstArray, ...restArrays] = theArrays;
@@ -79,11 +80,11 @@ const multiZip = (...theArrays) => {
 
 /**
  * Takes the list of ReferenceComponents in a ReferenceGroup and the specific entity this is on, and returns a list
- * of dot-separated JSON body paths for each ReferenceComponent.
+ * of dot-separated JSON document paths for each ReferenceComponent.
  *
- * Note that a ReferenceComponent can resolve to multiple body paths.
+ * Note that a ReferenceComponent can resolve to multiple document paths.
  */
-function extractDocumentBodyPaths(referenceComponents: ReferenceComponent[], entity: TopLevelEntity): string[] {
+function documentPathsFromReferenceComponents(referenceComponents: ReferenceComponent[], entity: TopLevelEntity): string[] {
   const result: string[] = [];
   referenceComponents.forEach((referenceComponent) => {
     if (isReferenceElement(referenceComponent)) {
@@ -105,7 +106,7 @@ function extractDocumentBodyPaths(referenceComponents: ReferenceComponent[], ent
 
 /**
  * Takes a ReferenceGroup representing a reference on a MetaEd entity, along with
- * an API JSON body matching that entity, and returns an array of foreign key bundles
+ * an API JSON document matching that entity, and returns an array of foreign key bundles
  * for all of the portions of the reference.
  *
  * Example of document identities, representing a collection of two references to the same entity type
@@ -116,28 +117,28 @@ function extractDocumentBodyPaths(referenceComponents: ReferenceComponent[], ent
  */
 function documentIdentitiesFromReferenceGroup(
   referenceGroup: ReferenceGroup,
-  body: object,
+  document: object,
   entity: TopLevelEntity,
 ): DocumentIdentity[] {
-  // The body paths of the reference group, which matches the API document body paths to the
+  // The document paths of the reference group, which matches the API document body paths to the
   // foreign key elements of the entity being referenced.
-  const documentBodyPaths: string[] = extractDocumentBodyPaths(referenceGroup.referenceComponents, entity);
+  const documentPaths: string[] = documentPathsFromReferenceComponents(referenceGroup.referenceComponents, entity);
 
-  const bodyPathSets: string[][][] = extractBodyPaths(referenceGroup, body);
+  const documentPathSets: string[][][] = extractRawDocumentPaths(referenceGroup, document);
   // if lengths are different, something optional was not present, so we are done
-  if (documentBodyPaths.length !== bodyPathSets.length) return [];
+  if (documentPaths.length !== documentPathSets.length) return [];
 
-  const orderedAndGroupedByEnding: ExtractedValue[][] = R.zipWith(
-    (namePath: string, bodyPathSet: string[][]) =>
-      bodyPathSet.map((bodyPath) => ({ namePath, bodyValue: R.path(bodyPath, body) as string })),
-    documentBodyPaths,
-    bodyPathSets,
+  const orderedAndGroupedByEnding: DocumentElement[][] = R.zipWith(
+    (name: string, documentPathSet: string[][]) =>
+      documentPathSet.map((documentPath) => ({ name, value: R.path(documentPath, document) as string })),
+    documentPaths,
+    documentPathSets,
   );
   // example result for orderedAndGroupedByEnding after R.zipWith():
   // [
-  //   [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'classPeriodName', value: 'z2'}],
-  //   [{namePath: 'schoolId', value: '24'}, {namePath: 'schoolId', value: '25'}],
-  //   [{namePath: 'studentId', value: '333'}, {namePath: 'studentId', value: '444'}]
+  //   [{name: 'classPeriodName', value: 'z1'}, {name: 'classPeriodName', value: 'z2'}],
+  //   [{name: 'schoolId', value: '24'}, {name: 'schoolId', value: '25'}],
+  //   [{name: 'studentId', value: '333'}, {name: 'studentId', value: '444'}]
   // ]
 
   if (orderedAndGroupedByEnding.length === 0) return [];
@@ -145,22 +146,11 @@ function documentIdentitiesFromReferenceGroup(
   const documentIdentities: DocumentIdentity[] = multiZip(...orderedAndGroupedByEnding);
   // example result for documentIdentities after multiZip():
   // [
-  //   [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}],
-  //   [{namePath: 'classPeriodName', value: 'z2'}, {namePath: 'schoolId', value: '25'}, {namePath: 'studentId', value: '444'}],
+  //   [{name: 'classPeriodName', value: 'z1'}, {name: 'schoolId', value: '24'}, {name: 'studentId', value: '333'}],
+  //   [{name: 'classPeriodName', value: 'z2'}, {name: 'schoolId', value: '25'}, {name: 'studentId', value: '444'}],
   // ]
 
   return documentIdentities;
-}
-
-/**
- * Converts document identity to string in DynamoDB natual key form
- * For example, converts:
- * [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}]
- * to 'NK#classPeriodName=z1#schoolId=24#studentId=333'
- */
-function documentIdentityToString(documentIdentity: DocumentIdentity): string {
-  const stringifiedValues: string[] = documentIdentity.map((value) => `${value.namePath}=${value.bodyValue}`);
-  return `NK#${stringifiedValues.join('#')}`;
 }
 
 /**
@@ -176,22 +166,21 @@ function documentReferencesFromReferenceGroup(
   const documentIdentities: DocumentIdentity[] = documentIdentitiesFromReferenceGroup(referenceGroup, body, entity);
   // Example of DocumentIdentities representing a collection of references to the same entity type
   // [
-  //   [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}],
-  //   [{namePath: 'classPeriodName', value: 'z2'}, {namePath: 'schoolId', value: '25'}, {namePath: 'studentId', value: '444'}],
+  //   [{name: 'classPeriodName', value: 'z1'}, {name: 'schoolId', value: '24'}, {name: 'studentId', value: '333'}],
+  //   [{name: 'classPeriodName', value: 'z2'}, {name: 'schoolId', value: '25'}, {name: 'studentId', value: '444'}],
   // ]
 
   const result: DocumentReference[] = [];
 
   const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
-  documentIdentities.forEach((bundle) => {
-    const identityString: string = documentIdentityToString(bundle);
-    // Check if this reference is to an assignable entity. If so, the identity string is in superclass form
-    const assignableInfo: AssignableInfo | null = deriveAssignableFrom(referencedEntity, identityString);
+  documentIdentities.forEach((documentIdentity) => {
+    // Check if this reference is to an assignable entity. If so, the identity to a superclass
+    const assignable: Assignable | null = deriveAssignableFrom(referencedEntity, documentIdentity);
 
     result.push({
       metaEdType: referenceGroup.sourceProperty.type,
       metaEdName: referenceGroup.sourceProperty.metaEdName,
-      constraintKey: assignableInfo == null ? identityString : assignableInfo.assignableNaturalKey,
+      documentIdentity: assignable == null ? documentIdentity : assignable.assignableIdentity,
       isAssignableFrom: referencedEntity.subclassedBy.length > 0,
     });
   });
