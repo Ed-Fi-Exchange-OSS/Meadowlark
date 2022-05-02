@@ -11,7 +11,7 @@ import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb';
 import {
-  EntityInfo,
+  DocumentInfo,
   entityTypeStringFrom,
   newEntityInfo,
   newSecurity,
@@ -47,7 +47,7 @@ async function createTable(tableDefinition: CreateTableInput): Promise<CreateTab
 }
 
 describe('given the PUT run successfully in DynamoDb', () => {
-  const entityInfo: EntityInfo = {
+  const documentInfo: DocumentInfo = {
     ...newEntityInfo(),
     edOrgId: 'edOrg id',
     entityName: 'test name',
@@ -58,7 +58,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
     descriptorValues: [],
   };
 
-  const id = documentIdForEntityInfo(entityInfo);
+  const id = documentIdForEntityInfo(documentInfo);
   const bodyEntry = 'test';
 
   beforeAll(async () => {
@@ -83,7 +83,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
 
     await createEntity(
       id,
-      entityInfo,
+      documentInfo,
       { bodyEntry },
       { referenceValidation: false, descriptorValidation: false },
       { ...newSecurity(), isOwnershipEnabled: false },
@@ -101,7 +101,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
       new GetCommand({
         TableName: tableName,
         Key: {
-          pk: entityTypeStringFrom(entityInfo),
+          pk: entityTypeStringFrom(documentInfo),
           sk: sortKeyFromId(id),
         },
       }),

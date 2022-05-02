@@ -5,7 +5,7 @@
 
 import JsSha from 'jssha';
 import invariant from 'invariant';
-import { EntityInfo } from '../model/EntityInfo';
+import { DocumentInfo } from '../model/DocumentInfo';
 
 /**
  * Returns a SHAKE128 hash of length 224 bits for the given naturalKeyString for use as a document id.
@@ -22,13 +22,13 @@ export function documentIdFromNaturalKeyString(naturalKeyString: string): string
 }
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given entityInfo for use as a document id.
- * If the given entityInfo is assignable, uses that information for the document id.
+ * Returns a SHAKE128 hash of length 224 bits for the given documentInfo for use as a document id.
+ * If the given documentInfo is assignable, uses that information for the document id.
  */
-export function documentIdForEntityInfo(entityInfo: EntityInfo): string {
+export function documentIdForEntityInfo(documentInfo: DocumentInfo): string {
   // If this is an assignable entity, use the assignableNaturalKey for the id instead of the actual natural key
   const naturalKey =
-    entityInfo.assignableInfo == null ? entityInfo.naturalKey : entityInfo.assignableInfo.assignableNaturalKey;
+    documentInfo.assignableInfo == null ? documentInfo.naturalKey : documentInfo.assignableInfo.assignableNaturalKey;
 
   return documentIdFromNaturalKeyString(naturalKey);
 }

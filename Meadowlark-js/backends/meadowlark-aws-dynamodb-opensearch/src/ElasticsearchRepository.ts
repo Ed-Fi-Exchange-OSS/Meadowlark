@@ -9,7 +9,7 @@ import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
-import { EntityInfo, entityTypeStringFrom, Logger, PaginationParameters, SearchResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, entityTypeStringFrom, Logger, PaginationParameters, SearchResult } from '@edfi/meadowlark-core';
 
 /**
  * A replacement for @acuris/aws-es-connection's "createAWSConnection", using aws4.
@@ -36,13 +36,13 @@ export function indexFromEntityTypeString(pk: string): string {
 }
 
 /**
- * Returns Elasticsearch index name for an entity type, from the given EntityInfo.
+ * Returns Elasticsearch index name for an entity type, from the given DocumentInfo.
  *
  * Elasticsearch indexes are required to be lowercase only, with no pound signs,
  * wheras pound signs separators are commonly used in DynamoDB
  */
-export function indexFromEntityInfo(entityInfo: EntityInfo): string {
-  return indexFromEntityTypeString(entityTypeStringFrom(entityInfo));
+export function indexFromEntityInfo(documentInfo: DocumentInfo): string {
+  return indexFromEntityTypeString(entityTypeStringFrom(documentInfo));
 }
 
 // TODO: RND-203 unsafe for SQL injection
@@ -93,7 +93,7 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
  * request query parameters, and a Security object for possible filtering
  */
 export async function queryEntityList(
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   queryStringParameters: object,
   paginationParameters: PaginationParameters,
   awsRequestId: string,
@@ -104,7 +104,7 @@ export async function queryEntityList(
 
   let results: any = {};
   try {
-    let query = `SELECT info FROM ${indexFromEntityInfo(entityInfo)}`;
+    let query = `SELECT info FROM ${indexFromEntityInfo(documentInfo)}`;
     if (Object.entries(queryStringParameters).length > 0) {
       query += ` WHERE ${whereConditionsFrom(queryStringParameters)} ORDER BY _doc`;
     }

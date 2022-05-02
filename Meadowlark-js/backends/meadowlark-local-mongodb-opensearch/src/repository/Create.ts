@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, Db, MongoClient } from 'mongodb';
-import { EntityInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
 import { Entity } from '../model/Entity';
 
 /**
@@ -27,7 +27,7 @@ async function naiveGetEntities(): Promise<Collection<Entity>> {
 
 export async function createEntity(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   info: object,
   _validationOptions: ValidationOptions,
   _security: Security,
@@ -37,9 +37,9 @@ export async function createEntity(
 
   const entity: Entity = {
     id,
-    project_name: entityInfo.projectName,
-    entity_type: entityInfo.entityName,
-    entity_version: entityInfo.projectVersion,
+    project_name: documentInfo.projectName,
+    entity_type: documentInfo.entityName,
+    entity_version: documentInfo.projectVersion,
     edfi_doc: info,
     out_refs: [], // TODO
   };

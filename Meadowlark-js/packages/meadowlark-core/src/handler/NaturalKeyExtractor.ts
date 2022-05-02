@@ -114,7 +114,7 @@ export function extractNaturalKey(entity: TopLevelEntity, body: object): Natural
 
 /**
  * This is a bit of a post-processing hack to substitute to create an assignableNaturalKey from an
- * already constructed natural key. If the entity should have one (see description in EntityInfo),
+ * already constructed natural key. If the entity should have one (see description in DocumentInfo),
  * it starts as a copy of the natural key. If the entity is a subclass with an identity rename,
  * string substitution replaces the renamed identity property with the original superclass identity
  * property, thereby putting it in superclass form.

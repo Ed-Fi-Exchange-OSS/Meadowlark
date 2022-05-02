@@ -81,7 +81,7 @@ describe('given a completely missing resource path', () => {
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
-        entityInfo: {
+        documentInfo: {
           foreignKeys: ['NK#schoolId=1'],
           naturalKey: 'NK#123',
         },
@@ -126,7 +126,7 @@ describe('given a valid object', () => {
       // Setup the request validation to succeed
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
         Promise.resolve({
-          entityInfo: {
+          documentInfo: {
             foreignKeys: ['NK#schoolId=1'],
             naturalKey: 'NK#123',
           },
@@ -183,7 +183,7 @@ describe('given a valid object', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },
@@ -240,7 +240,7 @@ describe('given a valid object', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },
@@ -299,7 +299,7 @@ describe('given a valid object', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['NK#schoolId=1'],
               naturalKey: 'NK#123',
             },

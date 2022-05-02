@@ -12,14 +12,14 @@ export { ValidationOptions } from './model/ValidationOptions';
 export { DocumentReference } from './model/DocumentReference';
 export { documentIdForEntityInfo, documentIdFromNaturalKeyString } from './helpers/DocumentId';
 export {
-  EntityInfo,
+  DocumentInfo,
   newEntityInfo,
   entityTypeStringFrom,
   entityTypeStringFromComponents,
   buildNKString,
-  EntityIdentifyingInfo,
-  EntityTypeInfo,
-} from './model/EntityInfo';
+  DocumentIdentifyingInfo,
+  DocumentTypeInfo,
+} from './model/DocumentInfo';
 export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 

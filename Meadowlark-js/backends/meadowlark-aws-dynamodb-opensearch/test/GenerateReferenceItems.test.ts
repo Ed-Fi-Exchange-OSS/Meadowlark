@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo, newEntityInfo } from '@edfi/meadowlark-core';
+import { DocumentInfo, newEntityInfo } from '@edfi/meadowlark-core';
 import { generateReferenceItems } from '../src/BaseDynamoRepository';
 import { TransactWriteItem } from '../src/types/AwsSdkLibDynamoDb';
 
@@ -11,7 +11,7 @@ describe('when collecting foreign key references', () => {
   describe('given a item with no references', () => {
     let result: TransactWriteItem[];
     const pkHash: string = 'ID#asdfqwer;lkj';
-    const info: EntityInfo = newEntityInfo();
+    const info: DocumentInfo = newEntityInfo();
 
     beforeAll(() => {
       result = generateReferenceItems(pkHash, info);
@@ -38,7 +38,7 @@ describe('when collecting foreign key references', () => {
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
     const parentKey: string = 'parentId=asdfasdf';
     const personNK: string = 'NK#person.personId=b';
-    const info: EntityInfo = newEntityInfo();
+    const info: DocumentInfo = newEntityInfo();
 
     info.projectName = 'Ed-Fi';
     info.entityName = 'Parent';
@@ -104,7 +104,7 @@ describe('when collecting foreign key references', () => {
     let result: TransactWriteItem[];
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
     const parentKey: string = 'parentId=asdfasdf';
-    const info: EntityInfo = newEntityInfo();
+    const info: DocumentInfo = newEntityInfo();
 
     info.projectName = 'Ed-Fi';
     info.entityName = 'Parent';

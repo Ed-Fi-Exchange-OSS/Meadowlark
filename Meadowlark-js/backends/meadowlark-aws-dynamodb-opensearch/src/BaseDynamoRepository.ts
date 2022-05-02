@@ -12,12 +12,12 @@ import {
   DocumentReference,
   documentIdForEntityInfo,
   documentIdFromNaturalKeyString,
-  EntityInfo,
+  DocumentInfo,
   entityTypeStringFrom,
   entityTypeStringFromComponents,
   buildNKString,
-  EntityIdentifyingInfo,
-  EntityTypeInfo,
+  DocumentIdentifyingInfo,
+  DocumentTypeInfo,
   Logger,
 } from '@edfi/meadowlark-core';
 import { PutItemInputAttributeMap, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
@@ -63,11 +63,11 @@ export function assignableSortKeyFromId(id: string): string {
   return `ASSIGN#ID#${id}`;
 }
 
-export function sortKeyFromEntityIdentity(entityInfo: EntityInfo): string {
-  return sortKeyFromId(documentIdForEntityInfo(entityInfo));
+export function sortKeyFromEntityIdentity(documentInfo: DocumentInfo): string {
+  return sortKeyFromId(documentIdForEntityInfo(documentInfo));
 }
 
-export function conditionCheckFrom(entityIdentifyingInfo: EntityIdentifyingInfo) {
+export function conditionCheckFrom(entityIdentifyingInfo: DocumentIdentifyingInfo) {
   invariant(
     entityIdentifyingInfo.naturalKey.startsWith('NK#'),
     `entityIdentifyingInfo.naturalKey "${entityIdentifyingInfo.naturalKey}" did not start with "NK#"`,
@@ -84,7 +84,7 @@ export function conditionCheckFrom(entityIdentifyingInfo: EntityIdentifyingInfo)
   };
 }
 
-export function conditionCheckFromAssignable(assignableToTypeInfo: EntityTypeInfo, foreignKey: DocumentReference) {
+export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeInfo, foreignKey: DocumentReference) {
   invariant(
     foreignKey.constraintKey.startsWith('NK#'),
     `foreignKey.constraintKey "${foreignKey.constraintKey}" did not start with "NK#"`,
@@ -101,12 +101,12 @@ export function conditionCheckFromAssignable(assignableToTypeInfo: EntityTypeInf
   };
 }
 
-export function foreignKeyConditions(entityInfo: EntityInfo): TransactWriteItem[] {
-  return entityInfo.foreignKeys.map((foreignKey) => {
-    const entityTypeInfo: EntityTypeInfo = {
+export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
+  return documentInfo.foreignKeys.map((foreignKey) => {
+    const entityTypeInfo: DocumentTypeInfo = {
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
-      projectName: entityInfo.projectName,
-      projectVersion: entityInfo.projectVersion,
+      projectName: documentInfo.projectName,
+      projectVersion: documentInfo.projectVersion,
       entityName: foreignKey.metaEdName,
       isDescriptor: false,
     };
@@ -122,12 +122,12 @@ export function foreignKeyConditions(entityInfo: EntityInfo): TransactWriteItem[
   });
 }
 
-export function descriptorValueConditions(entityInfo: EntityInfo): TransactWriteItem[] {
-  return entityInfo.descriptorValues.map((descriptorValue) =>
+export function descriptorValueConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
+  return documentInfo.descriptorValues.map((descriptorValue) =>
     conditionCheckFrom({
       // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
-      projectName: entityInfo.projectName,
-      projectVersion: entityInfo.projectVersion,
+      projectName: documentInfo.projectName,
+      projectVersion: documentInfo.projectVersion,
       entityName: descriptorValue.metaEdName,
       isDescriptor: true,
       naturalKey: buildNKString(descriptorValue.constraintKey),
@@ -140,7 +140,7 @@ export function descriptorValueConditions(entityInfo: EntityInfo): TransactWrite
  */
 export function constructPutEntityItem(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   info: object,
   ownerId: string | null,
   referenceValidation: boolean,
@@ -149,26 +149,26 @@ export function constructPutEntityItem(
 
   // Start constructing the Entity item
   const putItem: PutItemInputAttributeMap = {
-    pk: entityTypeStringFrom(entityInfo),
+    pk: entityTypeStringFrom(documentInfo),
     sk: sortKeyFromId(id),
-    naturalKey: entityInfo.naturalKey,
+    naturalKey: documentInfo.naturalKey,
     info: infoWithMetadata,
   };
 
   if (ownerId != null) putItem.ownerId = ownerId;
 
   // Potential security contexts for all entities
-  if (entityInfo.studentId != null) putItem.studentId = entityInfo.studentId;
-  if (entityInfo.edOrgId != null) putItem.edOrgId = entityInfo.edOrgId;
+  if (documentInfo.studentId != null) putItem.studentId = documentInfo.studentId;
+  if (documentInfo.edOrgId != null) putItem.edOrgId = documentInfo.edOrgId;
 
   // Security relationships for relevant associations
-  if (entityInfo.entityName === 'StudentEducationOrganizationAssociation') {
-    putItem.securityStudentId = `Student#${entityInfo.studentId}`;
-    putItem.securityEdOrgId = `StudentEducationOrganizationAssociation#${entityInfo.edOrgId}`;
+  if (documentInfo.entityName === 'StudentEducationOrganizationAssociation') {
+    putItem.securityStudentId = `Student#${documentInfo.studentId}`;
+    putItem.securityEdOrgId = `StudentEducationOrganizationAssociation#${documentInfo.edOrgId}`;
   }
-  if (entityInfo.entityName === 'StudentSchoolAssociation') {
-    putItem.securityStudentId = `Student#${entityInfo.studentId}`;
-    putItem.securityEdOrgId = `StudentSchoolAssociation#${entityInfo.edOrgId}`;
+  if (documentInfo.entityName === 'StudentSchoolAssociation') {
+    putItem.securityStudentId = `Student#${documentInfo.studentId}`;
+    putItem.securityEdOrgId = `StudentSchoolAssociation#${documentInfo.edOrgId}`;
   }
 
   return putItem;
@@ -177,14 +177,14 @@ export function constructPutEntityItem(
 /*
  * Returns the attribute map to PUT an assignable item if applicable, null otherwise
  */
-export function constructAssignablePutItem(entityInfo: EntityInfo): TransactWriteItem | null {
-  if (entityInfo.assignableInfo == null) return null;
+export function constructAssignablePutItem(documentInfo: DocumentInfo): TransactWriteItem | null {
+  if (documentInfo.assignableInfo == null) return null;
 
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
-    entityInfo.projectName,
-    entityInfo.projectVersion,
-    entityInfo.assignableInfo.assignableToName,
+    documentInfo.projectName,
+    documentInfo.projectVersion,
+    documentInfo.assignableInfo.assignableToName,
   );
 
   return {
@@ -192,7 +192,7 @@ export function constructAssignablePutItem(entityInfo: EntityInfo): TransactWrit
       TableName: tableOpts.tableName,
       Item: {
         pk: assignableToType,
-        sk: assignableSortKeyFromId(documentIdFromNaturalKeyString(entityInfo.assignableInfo.assignableNaturalKey)),
+        sk: assignableSortKeyFromId(documentIdFromNaturalKeyString(documentInfo.assignableInfo.assignableNaturalKey)),
       },
       ConditionExpression: 'attribute_not_exists(sk)',
     },
@@ -202,14 +202,14 @@ export function constructAssignablePutItem(entityInfo: EntityInfo): TransactWrit
 /*
  * Returns the attribute map to DELETE an assignable item if applicable, null otherwise
  */
-export function constructAssignableDeleteItem(id: string, entityInfo: EntityInfo): TransactWriteItem | null {
-  if (entityInfo.assignableInfo == null) return null;
+export function constructAssignableDeleteItem(id: string, documentInfo: DocumentInfo): TransactWriteItem | null {
+  if (documentInfo.assignableInfo == null) return null;
 
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
-    entityInfo.projectName,
-    entityInfo.projectVersion,
-    entityInfo.assignableInfo.assignableToName,
+    documentInfo.projectName,
+    documentInfo.projectVersion,
+    documentInfo.assignableInfo.assignableToName,
   );
 
   return {
@@ -251,7 +251,7 @@ export function generatePutEntityForUpsert(item: PutItemInputAttributeMap): Tran
 /*
  * Creates an array of reference information for use in creating foreign key reference items in Dynamo.
  */
-export function generateReferenceItems(naturalKeyHash: string, item: EntityInfo): TransactWriteItem[] {
+export function generateReferenceItems(naturalKeyHash: string, item: DocumentInfo): TransactWriteItem[] {
   const collection: TransactWriteItem[] = [];
   const referenceType = entityTypeStringFromComponents(item.projectName, item.projectVersion, item.entityName);
   const { naturalKey } = item;

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo } from '../../model/EntityInfo';
+import { DocumentInfo } from '../../model/DocumentInfo';
 import { ForeignKeyItem } from '../../model/ForeignKeyItem';
 import { Security } from '../../model/Security';
 import { ValidationOptions } from '../../model/ValidationOptions';
@@ -19,7 +19,7 @@ import { MeadowlarkBackendPlugin } from './MeadowlarkBackendPlugin';
 export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
   createEntity: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
@@ -30,7 +30,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
   },
 
   getEntityById: (
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _id: string,
     _security: Security,
     lambdaRequestId: string,
@@ -39,14 +39,14 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
-  getEntityList: (_entityInfo: EntityInfo, lambdaRequestId: string): Promise<GetResult> => {
+  getEntityList: (_documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> => {
     Logger.warn('NoMeadowlarkBackendPlugin.getEntityList(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
   updateEntityById: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
@@ -56,14 +56,14 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  deleteEntityById: (_id: string, _entityInfo: EntityInfo, lambdaRequestId: string): Promise<DeleteResult> => {
+  deleteEntityById: (_id: string, _documentInfo: DocumentInfo, lambdaRequestId: string): Promise<DeleteResult> => {
     Logger.warn('NoMeadowlarkBackendPlugin.deleteEntityById(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ success: false });
   },
 
   getReferencesToThisItem: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     lambdaRequestId: string,
   ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> => {
     Logger.warn(
@@ -75,7 +75,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
 
   getForeignKeyReferences: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     lambdaRequestId: string,
   ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> => {
     Logger.warn(
@@ -92,7 +92,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
 
   validateEntityOwnership: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _clientName: string | null,
     lambdaRequestId: string,
   ): Promise<OwnershipResult> => {
@@ -104,7 +104,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
   },
 
   queryEntityList: (
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _queryStringParameters: object,
     _paginationParameters: PaginationParameters,
     lambdaRequestId: string,

@@ -25,7 +25,7 @@ import {
   PutResult,
   OwnershipResult,
   Security,
-  EntityInfo,
+  DocumentInfo,
   entityTypeStringFrom,
 } from '@edfi/meadowlark-core';
 import {
@@ -49,14 +49,14 @@ type NextToken = string;
 /**
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
  */
-export async function getEntityList(entityInfo: EntityInfo, lambdaRequestId: string): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityList for ${entityInfo.entityName}`, lambdaRequestId);
+export async function getEntityList(documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> {
+  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.entityName}`, lambdaRequestId);
 
   const queryParams: QueryCommandInput = {
     TableName: tableOpts.tableName,
     KeyConditionExpression: 'pk = :pk',
     ExpressionAttributeValues: {
-      ':pk': entityTypeStringFrom(entityInfo),
+      ':pk': entityTypeStringFrom(documentInfo),
     },
   };
 
@@ -122,17 +122,17 @@ async function edOrgsForStudent(
  * the claims in the Security object.
  */
 export async function getEntityById(
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   id: string,
   security: Security,
   lambdaRequestId: string,
 ): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityById for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getEntityById for ${documentInfo.naturalKey}`, lambdaRequestId);
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,
     Key: {
-      pk: entityTypeStringFrom(entityInfo),
+      pk: entityTypeStringFrom(documentInfo),
       sk: sortKeyFromId(id),
     },
   };
@@ -227,13 +227,13 @@ export async function getEntityById(
  */
 export async function updateEntityById(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   info: object,
   validationOptions: ValidationOptions,
   security: Security,
   lambdaRequestId: string,
 ): Promise<PutResult> {
-  Logger.debug(`DynamoEntityRepository.updateEntityById for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.updateEntityById for ${documentInfo.naturalKey}`, lambdaRequestId);
   const { referenceValidation, descriptorValidation } = validationOptions;
 
   const infoWithMetadata = referenceValidation ? info : { ...info, _unvalidated: true };
@@ -258,7 +258,7 @@ export async function updateEntityById(
     Update: {
       TableName: tableOpts.tableName,
       Key: {
-        pk: entityTypeStringFrom(entityInfo),
+        pk: entityTypeStringFrom(documentInfo),
         sk: sortKeyFromId(id),
       },
       ExpressionAttributeNames,
@@ -269,9 +269,9 @@ export async function updateEntityById(
   };
 
   // Construct foreign key condition checks if reference validation is on
-  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(entityInfo) : [];
+  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(entityInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order, as a single transaction
   const transactParams: TransactWriteCommandInput = {
@@ -293,18 +293,18 @@ export async function updateEntityById(
         };
 
       if (error.CancellationReasons.length > 1) {
-        const submittedForeignKeysLength = referenceValidation ? entityInfo.foreignKeys.length : 0;
+        const submittedForeignKeysLength = referenceValidation ? documentInfo.foreignKeys.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
-          const failureForeignKey = entityInfo.foreignKeys[failureIndex];
+          const failureForeignKey = documentInfo.foreignKeys[failureIndex];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${failureForeignKey.metaEdName}. Expected natural key was ${failureForeignKey.constraintKey}`,
           };
         }
-        if (failureIndex - submittedForeignKeysLength < entityInfo.descriptorValues.length) {
+        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
           // failure was with one of the descriptor condition check actions
-          const failureDescriptorValue = entityInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
+          const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `${failureDescriptorValue.constraintKey} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
@@ -325,18 +325,18 @@ export async function updateEntityById(
  */
 export async function createEntity(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   info: object,
   validationOptions: ValidationOptions,
   security: Security,
   lambdaRequestId: string,
 ): Promise<PutResult> {
-  Logger.debug(`DynamoEntityRepository.createEntity for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.createEntity for ${documentInfo.naturalKey}`, lambdaRequestId);
   const { referenceValidation, descriptorValidation } = validationOptions;
 
   const putItem = constructPutEntityItem(
     id,
-    entityInfo,
+    documentInfo,
     info,
     security.clientName,
     referenceValidation || descriptorValidation,
@@ -344,15 +344,15 @@ export async function createEntity(
   const tryPutEntity: TransactWriteItem = generatePutEntityThatFailsIfExists(putItem);
 
   // Construct foreign key condition checks if reference validation is on
-  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(entityInfo) : [];
+  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(entityInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order
   const transactItems: TransactWriteItem[] = [...checkForeignKeys, ...checkDescriptorValues, tryPutEntity];
 
   // if entity info is assignable, add an assignable item
-  const assignableItem: TransactWriteItem | null = constructAssignablePutItem(entityInfo);
+  const assignableItem: TransactWriteItem | null = constructAssignablePutItem(documentInfo);
   if (assignableItem != null) transactItems.push(assignableItem);
 
   try {
@@ -369,7 +369,7 @@ export async function createEntity(
         // Entity already exists, try as update
         return updateEntityById(
           id,
-          entityInfo,
+          documentInfo,
           info,
           { referenceValidation, descriptorValidation },
           security,
@@ -382,24 +382,24 @@ export async function createEntity(
         // Another assignable subclass is using this natural key
         return {
           result: 'INSERT_FAILURE_ASSIGNABLE_COLLISION',
-          failureMessage: `Another subclass of entity ${entityInfo.assignableInfo?.assignableToName} is already using the natural key ${entityInfo.assignableInfo?.assignableNaturalKey}`,
+          failureMessage: `Another subclass of entity ${documentInfo.assignableInfo?.assignableToName} is already using the natural key ${documentInfo.assignableInfo?.assignableNaturalKey}`,
         };
       }
 
       const hasForeignKeyOrDescriptorChecks: boolean = checkForeignKeys.length > 0 || checkDescriptorValues.length > 0;
       if (hasForeignKeyOrDescriptorChecks) {
-        const submittedForeignKeysLength = referenceValidation ? entityInfo.foreignKeys.length : 0;
+        const submittedForeignKeysLength = referenceValidation ? documentInfo.foreignKeys.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
-          const failureForeignKey = entityInfo.foreignKeys[failureIndex];
+          const failureForeignKey = documentInfo.foreignKeys[failureIndex];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${failureForeignKey.metaEdName}. Expected natural key was ${failureForeignKey.constraintKey}`,
           };
         }
-        if (failureIndex - submittedForeignKeysLength < entityInfo.descriptorValues.length) {
+        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
           // failure was with one of the descriptor condition check actions
-          const failureDescriptorValue = entityInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
+          const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `${failureDescriptorValue.constraintKey} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
@@ -414,9 +414,9 @@ export async function createEntity(
 
   // Additional foreign key reference items that must be saved _after_ a
   // successful save of the main item.
-  Logger.debug(`DynamoEntityRepository.createEntity Begin reference items for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.createEntity Begin reference items for ${documentInfo.naturalKey}`, lambdaRequestId);
 
-  const referenceItems = generateReferenceItems(putItem?.sk, entityInfo);
+  const referenceItems = generateReferenceItems(putItem?.sk, documentInfo);
   Logger.debug('DynamoEntityRepository.createEntity reference items', lambdaRequestId, null, referenceItems);
   const batches = R.splitEvery(25, referenceItems);
 
@@ -427,7 +427,7 @@ export async function createEntity(
 
     try {
       Logger.debug(
-        `DynamoEntityRepository.createEntity Writing reference items for ${entityInfo.naturalKey}`,
+        `DynamoEntityRepository.createEntity Writing reference items for ${documentInfo.naturalKey}`,
         lambdaRequestId,
       );
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
@@ -483,14 +483,18 @@ export async function deleteItems(items: { pk: string; sk: string }[], awsReques
 /**
  * Deletes the primary item from DynamoDB.
  */
-export async function deleteEntityById(id: string, entityInfo: EntityInfo, lambdaRequestId: string): Promise<DeleteResult> {
+export async function deleteEntityById(
+  id: string,
+  documentInfo: DocumentInfo,
+  lambdaRequestId: string,
+): Promise<DeleteResult> {
   Logger.debug(`DynamoEntityRepository.deleteEntityById`, lambdaRequestId);
 
   const deleteEntityItem: TransactWriteItem = {
     Delete: {
       TableName: tableOpts.tableName,
       Key: {
-        pk: entityTypeStringFrom(entityInfo),
+        pk: entityTypeStringFrom(documentInfo),
         sk: sortKeyFromId(id),
       },
       ConditionExpression: 'attribute_exists(sk)',
@@ -500,7 +504,7 @@ export async function deleteEntityById(id: string, entityInfo: EntityInfo, lambd
   const transactItems: TransactWriteItem[] = [deleteEntityItem];
 
   // if entity info is assignable, also delete the assignable item
-  const assignableItem: TransactWriteItem | null = constructAssignableDeleteItem(id, entityInfo);
+  const assignableItem: TransactWriteItem | null = constructAssignableDeleteItem(id, documentInfo);
   if (assignableItem != null) transactItems.push(assignableItem);
 
   try {
@@ -543,10 +547,10 @@ async function getPage<TReturn>(
  */
 export async function getReferencesToThisItem(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   lambdaRequestId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
-  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem for ${documentInfo.naturalKey}`, lambdaRequestId);
 
   const foreignKeys: ForeignKeyItem[] = [];
 
@@ -587,10 +591,10 @@ export async function getReferencesToThisItem(
  */
 export async function getForeignKeyReferences(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   lambdaRequestId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
-  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences for ${documentInfo.naturalKey}`, lambdaRequestId);
 
   const foreignKeys: ForeignKeyItem[] = [];
 
@@ -628,16 +632,16 @@ export async function getForeignKeyReferences(
  */
 export async function validateEntityOwnership(
   id: string,
-  entityInfo: EntityInfo,
+  documentInfo: DocumentInfo,
   clientName: string | null,
   lambdaRequestId: string,
 ): Promise<OwnershipResult> {
-  Logger.debug(`DynamoEntityRepository.validateEntityOwnership for ${entityInfo.naturalKey}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.validateEntityOwnership for ${documentInfo.naturalKey}`, lambdaRequestId);
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,
     Key: {
-      pk: entityTypeStringFrom(entityInfo),
+      pk: entityTypeStringFrom(documentInfo),
       sk: sortKeyFromId(id),
     },
   };

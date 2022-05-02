@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, Db, MongoClient, WithId } from 'mongodb';
-import { EntityInfo, Security, GetResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, Security, GetResult } from '@edfi/meadowlark-core';
 import { Entity } from '../model/Entity';
 
 async function naiveGetEntities(): Promise<Collection<Entity>> {
@@ -22,7 +22,7 @@ async function naiveGetEntities(): Promise<Collection<Entity>> {
 }
 
 export async function getEntityById(
-  _entityInfo: EntityInfo,
+  _documentInfo: DocumentInfo,
   id: string,
   _security: Security,
   _lambdaRequestId: string,

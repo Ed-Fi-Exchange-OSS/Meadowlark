@@ -10,7 +10,7 @@ import { DocumentReference } from './DocumentReference';
 /**
  * Type information for a MetaEd entity
  */
-export interface EntityTypeInfo {
+export interface DocumentTypeInfo {
   /**
    * The MetaEd project name the entity belongs to.
    */
@@ -35,7 +35,7 @@ export interface EntityTypeInfo {
 /**
  * Information to uniquely identify a MetaEd entity by natural key
  */
-export interface EntityIdentifyingInfo extends EntityTypeInfo {
+export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
   /**
    * The natural key of the entity extracted from the JSON body, in a bodyPathString=naturalKeyValue
    * form, hash-separated when their are multiple path/value pairs. The string is prefixed with "NK#".
@@ -46,7 +46,7 @@ export interface EntityIdentifyingInfo extends EntityTypeInfo {
 /**
  * Complete information on a validated MetaEd entity
  */
-export interface EntityInfo extends EntityIdentifyingInfo {
+export interface DocumentInfo extends DocumentIdentifyingInfo {
   /**
    * A list of the foreign keys of the entity extracted from the JSON body
    */
@@ -75,9 +75,9 @@ export interface EntityInfo extends EntityIdentifyingInfo {
 }
 
 /**
- * Creates a new empty EntityInfo object
+ * Creates a new empty DocumentInfo object
  */
-export function newEntityInfo(): EntityInfo {
+export function newEntityInfo(): DocumentInfo {
   return {
     entityName: '',
     isDescriptor: false,
@@ -93,7 +93,7 @@ export function newEntityInfo(): EntityInfo {
 }
 
 /**
- * The null object for EntityInfo
+ * The null object for DocumentInfo
  */
 export const NoEntityInfo = {
   ...newEntityInfo(),
@@ -112,9 +112,9 @@ export function entityTypeStringFromComponents(projectName: string, projectVersi
   return `TYPE#${projectName}#${projectVersion}#${entityName}`;
 }
 
-export function entityTypeStringFrom(entityInfo: EntityTypeInfo): string {
-  const adjustedEntityName = entityInfo.isDescriptor
-    ? normalizeDescriptorSuffix(entityInfo.entityName)
-    : entityInfo.entityName;
-  return entityTypeStringFromComponents(entityInfo.projectName, entityInfo.projectVersion, adjustedEntityName);
+export function entityTypeStringFrom(documentInfo: DocumentTypeInfo): string {
+  const adjustedEntityName = documentInfo.isDescriptor
+    ? normalizeDescriptorSuffix(documentInfo.entityName)
+    : documentInfo.entityName;
+  return entityTypeStringFromComponents(documentInfo.projectName, documentInfo.projectVersion, adjustedEntityName);
 }

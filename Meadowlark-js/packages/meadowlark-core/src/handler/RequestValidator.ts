@@ -9,7 +9,7 @@ import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../m
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
 import { extractNaturalKey, deriveAssignableFrom, NaturalKeyWithSecurity } from './NaturalKeyExtractor';
 import { decapitalize } from '../Utility';
-import { EntityInfo, NoEntityInfo } from '../model/EntityInfo';
+import { DocumentInfo, NoEntityInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { PathComponents } from '../model/PathComponents';
@@ -31,7 +31,7 @@ export type ResourceValidationResult = {
   /**
    * Information on the validated MetaEd entity matching the API request
    */
-  entityInfo: EntityInfo;
+  documentInfo: DocumentInfo;
 };
 
 /**
@@ -68,7 +68,7 @@ export async function validateResource(
     return {
       metaEdProjectHeaders,
       endpointName: pathComponents.endpointName,
-      entityInfo: NoEntityInfo,
+      documentInfo: NoEntityInfo,
       errorBody: JSON.stringify({
         message: invalidResourceMessage,
       }),
@@ -79,7 +79,7 @@ export async function validateResource(
     return {
       metaEdProjectHeaders,
       endpointName: pathComponents.endpointName,
-      entityInfo: NoEntityInfo,
+      documentInfo: NoEntityInfo,
       errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.endpointName}'.` }),
     };
   }
@@ -109,7 +109,7 @@ export async function validateResource(
   return {
     metaEdProjectHeaders,
     endpointName: pathComponents.endpointName,
-    entityInfo: {
+    documentInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,
       projectVersion: metaEdConfiguration.projects[0].projectVersion,
       entityName: matchingMetaEdModel.metaEdName,

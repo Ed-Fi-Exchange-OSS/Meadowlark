@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo } from '../../model/EntityInfo';
+import { DocumentInfo } from '../../model/DocumentInfo';
 import { ForeignKeyItem } from '../../model/ForeignKeyItem';
 import { Security } from '../../model/Security';
 import { ValidationOptions } from '../../model/ValidationOptions';
@@ -17,37 +17,42 @@ import { SearchResult } from './SearchResult';
 export interface MeadowlarkBackendPlugin {
   createEntity: (
     id: string,
-    entityInfo: EntityInfo,
+    documentInfo: DocumentInfo,
     info: object,
     validationOptions: ValidationOptions,
     security: Security,
     lambdaRequestId: string,
   ) => Promise<PutResult>;
 
-  getEntityById: (_entityInfo: EntityInfo, id: string, _security: Security, _lambdaRequestId: string) => Promise<GetResult>;
+  getEntityById: (
+    _documentInfo: DocumentInfo,
+    id: string,
+    _security: Security,
+    _lambdaRequestId: string,
+  ) => Promise<GetResult>;
 
-  getEntityList: (_entityInfo: EntityInfo, _lambdaRequestId: string) => Promise<GetResult>;
+  getEntityList: (_documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<GetResult>;
 
   updateEntityById: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
     _lambdaRequestId: string,
   ) => Promise<PutResult>;
 
-  deleteEntityById: (_id: string, _entityInfo: EntityInfo, _lambdaRequestId: string) => Promise<DeleteResult>;
+  deleteEntityById: (_id: string, _documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<DeleteResult>;
 
   getReferencesToThisItem: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _lambdaRequestId: string,
   ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
 
   getForeignKeyReferences: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _lambdaRequestId: string,
   ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
 
@@ -55,13 +60,13 @@ export interface MeadowlarkBackendPlugin {
 
   validateEntityOwnership: (
     _id: string,
-    _entityInfo: EntityInfo,
+    _documentInfo: DocumentInfo,
     _clientName: string | null,
     _lambdaRequestId: string,
   ) => Promise<OwnershipResult>;
 
   queryEntityList: (
-    entityInfo: EntityInfo,
+    documentInfo: DocumentInfo,
     queryStringParameters: object,
     paginationParameters: PaginationParameters,
     awsRequestId: string,

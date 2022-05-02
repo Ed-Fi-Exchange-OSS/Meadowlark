@@ -28,7 +28,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
-        entityInfo: {},
+        documentInfo: {},
         errorBody: validationError,
         metaEdProjectHeaders: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
@@ -66,7 +66,7 @@ describe('given an error on list fetch from persistence', () => {
 
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
-        entityInfo: {},
+        documentInfo: {},
         errorBody: null,
         metaEdProjectHeaders: {},
       } as unknown as RequestValidator.ResourceValidationResult),
@@ -115,7 +115,7 @@ describe('given successful fetch from persistence', () => {
 
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
-        entityInfo: {},
+        documentInfo: {},
         errorBody: null,
         metaEdProjectHeaders: {},
       } as unknown as RequestValidator.ResourceValidationResult),

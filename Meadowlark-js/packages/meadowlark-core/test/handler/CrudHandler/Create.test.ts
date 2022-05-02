@@ -79,7 +79,7 @@ describe('when posting a request to create a new resource', () => {
 
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
         Promise.resolve({
-          entityInfo: {},
+          documentInfo: {},
           errorBody: expectedError,
           metaEdProjectHeaders: expectedHeaders,
         } as unknown as RequestValidator.ResourceValidationResult),
@@ -123,7 +123,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
@@ -180,7 +180,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
@@ -237,7 +237,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
@@ -295,7 +295,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
@@ -353,7 +353,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },
@@ -416,7 +416,7 @@ describe('when posting a request to create a new resource', () => {
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
-            entityInfo: {
+            documentInfo: {
               foreignKeys: ['school'],
               naturalKey: 'NK#123',
             },

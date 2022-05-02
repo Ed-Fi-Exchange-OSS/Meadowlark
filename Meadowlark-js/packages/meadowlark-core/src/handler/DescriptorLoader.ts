@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { getBackendPlugin } from '../plugin/PluginLoader';
-import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
+import { buildNKString, DocumentInfo, newEntityInfo } from '../model/DocumentInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
 import { documentIdForEntityInfo } from '../helpers/DocumentId';
@@ -101,7 +101,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       }
 
       const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorValue) as DescriptorDocument;
-      const descriptorEntityInfo: EntityInfo = {
+      const descriptorEntityInfo: DocumentInfo = {
         ...newEntityInfo(),
         entityName: descriptorName,
         projectName: 'Ed-Fi',

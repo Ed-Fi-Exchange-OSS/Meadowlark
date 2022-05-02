@@ -10,7 +10,7 @@ import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { getById, query } from './GetResolvers';
 import { isDocumentIdValid, documentIdForEntityInfo } from '../helpers/DocumentId';
-import { NoEntityInfo } from '../model/EntityInfo';
+import { NoEntityInfo } from '../model/DocumentInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
 import { authorizationHeader } from '../helpers/AuthorizationHeader';
@@ -90,17 +90,17 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
-    const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
+    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
     if (errorBody != null) {
-      const statusCode = entityInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'create', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
     }
 
-    const resourceId = documentIdForEntityInfo(entityInfo);
+    const resourceId = documentIdForEntityInfo(documentInfo);
     const { result, failureMessage } = await getBackendPlugin().createEntity(
       resourceId,
-      entityInfo,
+      documentInfo,
       body,
       {
         referenceValidation: event.headers['reference-validation'] !== 'false',
@@ -243,14 +243,14 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
-    const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
+    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
     if (errorBody !== null) {
-      const statusCode = entityInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'update', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
     }
 
-    const resourceIdFromBody = documentIdForEntityInfo(entityInfo);
+    const resourceIdFromBody = documentIdForEntityInfo(documentInfo);
     if (resourceIdFromBody !== pathComponents.resourceId) {
       const failureMessage = 'The natural key of the resource does not match the natural key in the updated document.';
       writeDebugStatusToLog(context, 'update', 400, failureMessage);
@@ -263,7 +263,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
 
     const { result, failureMessage } = await getBackendPlugin().updateEntityById(
       pathComponents.resourceId,
-      entityInfo,
+      documentInfo,
       body,
       {
         referenceValidation: event.headers['reference-validation'] !== 'false',
@@ -334,9 +334,9 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body: '', statusCode: 404 };
     }
 
-    const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
     if (errorBody !== null) {
-      const statusCode = entityInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'deleteIt', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
     }
@@ -344,7 +344,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
     if (jwtStatus.isOwnershipEnabled) {
       const { isOwner, result: ownershipResult } = await getBackendPlugin().validateEntityOwnership(
         pathComponents.resourceId,
-        entityInfo,
+        documentInfo,
         jwtStatus.subject,
         awsRequestId,
       );
@@ -367,7 +367,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
 
     const foreignKeysLookup = await getBackendPlugin().getReferencesToThisItem(
       pathComponents.resourceId,
-      entityInfo,
+      documentInfo,
       awsRequestId,
     );
     if (!foreignKeysLookup.success || foreignKeysLookup.foreignKeys?.length > 0) {
@@ -381,7 +381,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body, statusCode: 409, headers: metaEdProjectHeaders };
     }
 
-    const { success } = await getBackendPlugin().deleteEntityById(pathComponents.resourceId, entityInfo, awsRequestId);
+    const { success } = await getBackendPlugin().deleteEntityById(pathComponents.resourceId, documentInfo, awsRequestId);
 
     if (!success) {
       writeDebugStatusToLog(context, 'deleteIt', 500);
@@ -397,7 +397,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
     );
     const { success: fkSuccess, foreignKeys } = await getBackendPlugin().getForeignKeyReferences(
       pathComponents.resourceId,
-      entityInfo,
+      documentInfo,
       awsRequestId,
     );
 

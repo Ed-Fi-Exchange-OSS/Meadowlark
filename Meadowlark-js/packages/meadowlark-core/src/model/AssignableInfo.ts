@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 /**
- * The optional assignability information for an EntityInfo. An assignable entity is one that is part of a
+ * The optional assignability information for an DocumentInfo. An assignable entity is one that is part of a
  * subclass/superclass relationship, meaning that a subclass can be "assigned to" a superclass reference.
  */
 export type AssignableInfo = {

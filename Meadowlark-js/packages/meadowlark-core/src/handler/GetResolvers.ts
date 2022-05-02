@@ -26,13 +26,13 @@ function writeDebugStatusToLog(context: Context, method: string, status: number,
  * Validates resource and forwards "get all" request to DynamoRepository
  */
 export async function list(pathComponents: PathComponents, context: Context): Promise<APIGatewayProxyResult> {
-  const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'list', 404, errorBody);
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
-  const { result, documents } = await getBackendPlugin().getEntityList(entityInfo, context.awsRequestId);
+  const { result, documents } = await getBackendPlugin().getEntityList(documentInfo, context.awsRequestId);
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(context, 'list', 500);
@@ -62,14 +62,14 @@ export async function getById(
     return { body: '', statusCode: 404 };
   }
 
-  const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'get', 404, errorBody);
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
   }
 
   const { result, documents, securityResolved } = await getBackendPlugin().getEntityById(
-    entityInfo,
+    documentInfo,
     pathComponents.resourceId,
     security,
     context.awsRequestId,
@@ -110,7 +110,7 @@ export async function query(
   queryStringParameters: object,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
-  const { entityInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'query', 404, errorBody);
     return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
@@ -120,7 +120,7 @@ export async function query(
   const paginationParameters: PaginationParameters = onlyPaginationParameters(queryStringParameters);
 
   const { success, results } = await getBackendPlugin().queryEntityList(
-    entityInfo,
+    documentInfo,
     cleanQueryParameters,
     paginationParameters,
     context.awsRequestId,

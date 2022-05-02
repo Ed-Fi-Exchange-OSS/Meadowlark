@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
 
 export async function updateEntityById(
   _id: string,
-  _entityInfo: EntityInfo,
+  _documentInfo: DocumentInfo,
   _info: object,
   _validationOptions: ValidationOptions,
   _security: Security,

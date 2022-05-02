@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo, DeleteResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, DeleteResult } from '@edfi/meadowlark-core';
 
 export async function deleteEntityById(
   _id: string,
-  _entityInfo: EntityInfo,
+  _documentInfo: DocumentInfo,
   _lambdaRequestId: string,
 ): Promise<DeleteResult> {
   return { success: false };
