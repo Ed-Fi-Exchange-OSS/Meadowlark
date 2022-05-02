@@ -9,7 +9,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import {
   ForeignKeyItem,
-  ReferentialConstraint,
+  DocumentReference,
   documentIdForEntityInfo,
   documentIdFromNaturalKeyString,
   EntityInfo,
@@ -84,7 +84,7 @@ export function conditionCheckFrom(entityIdentifyingInfo: EntityIdentifyingInfo)
   };
 }
 
-export function conditionCheckFromAssignable(assignableToTypeInfo: EntityTypeInfo, foreignKey: ReferentialConstraint) {
+export function conditionCheckFromAssignable(assignableToTypeInfo: EntityTypeInfo, foreignKey: DocumentReference) {
   invariant(
     foreignKey.constraintKey.startsWith('NK#'),
     `foreignKey.constraintKey "${foreignKey.constraintKey}" did not start with "NK#"`,
@@ -256,7 +256,7 @@ export function generateReferenceItems(naturalKeyHash: string, item: EntityInfo)
   const referenceType = entityTypeStringFromComponents(item.projectName, item.projectVersion, item.entityName);
   const { naturalKey } = item;
 
-  const extractReferences = R.forEach((reference: ReferentialConstraint) => {
+  const extractReferences = R.forEach((reference: DocumentReference) => {
     const referenceId = sortKeyFromId(documentIdFromNaturalKeyString(reference.constraintKey));
 
     const fk = new ForeignKeyItem({

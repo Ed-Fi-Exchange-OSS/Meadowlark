@@ -14,9 +14,10 @@ import {
   ReferenceComponent,
   ReferenceGroup,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { ReferentialConstraint } from '../model/ReferentialConstraint';
+import { DocumentReference } from '../model/DocumentReference';
 import { deriveAssignableFrom } from './NaturalKeyExtractor';
 import { AssignableInfo } from '../model/AssignableInfo';
+import { ExtractedValue, DocumentIdentity } from '../model/DocumentIdentity';
 
 // body paths shaped as an array for ramdajs 'path' function
 // return value is arrays of body paths, grouped (with arrays) by path endings to line up with namePath array
@@ -69,16 +70,11 @@ function extractBodyPaths(referenceGroup: ReferenceGroup, body: object): string[
 
 /**
  * Zip an arbitrary number of arrays.  Used to transpose arrays of extractions of the same path endpoint from
- * multiple locations (such as the repetition of values in a collection in an API body) into foreign key bundles.
+ * multiple document locations (such as the repetition of values in a collection in an API body) into document identities.
  */
 const multiZip = (...theArrays) => {
   const [firstArray, ...restArrays] = theArrays;
   return firstArray.map((value, index) => restArrays.reduce((acc, array) => [...acc, array[index]], [value]));
-};
-
-type ExtractedValue = {
-  namePath: string;
-  bodyValue: string;
 };
 
 /**
@@ -112,17 +108,17 @@ function extractDocumentBodyPaths(referenceComponents: ReferenceComponent[], ent
  * an API JSON body matching that entity, and returns an array of foreign key bundles
  * for all of the portions of the reference.
  *
- * Example of a foreign key bundle, representing a collection of two references to the same entity type
+ * Example of document identities, representing a collection of two references to the same entity type
  * [
  *   ['classPeriodName=z1', 'schoolId=24', 'studentId=333'],
  *   ['classPeriodName=z2', 'schoolId=25', 'studentId=444']
  * ]
  */
-function foreignKeyBundlesFromReferenceGroup(
+function documentIdentitiesFromReferenceGroup(
   referenceGroup: ReferenceGroup,
   body: object,
   entity: TopLevelEntity,
-): ExtractedValue[][] {
+): DocumentIdentity[] {
   // The body paths of the reference group, which matches the API document body paths to the
   // foreign key elements of the entity being referenced.
   const documentBodyPaths: string[] = extractDocumentBodyPaths(referenceGroup.referenceComponents, entity);
@@ -146,56 +142,56 @@ function foreignKeyBundlesFromReferenceGroup(
 
   if (orderedAndGroupedByEnding.length === 0) return [];
 
-  const foreignKeyBundles: ExtractedValue[][] = multiZip(...orderedAndGroupedByEnding);
-  // example result for foreignKeyBundles after multiZip():
+  const documentIdentities: DocumentIdentity[] = multiZip(...orderedAndGroupedByEnding);
+  // example result for documentIdentities after multiZip():
   // [
   //   [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}],
   //   [{namePath: 'classPeriodName', value: 'z2'}, {namePath: 'schoolId', value: '25'}, {namePath: 'studentId', value: '444'}],
   // ]
 
-  return foreignKeyBundles;
+  return documentIdentities;
 }
 
 /**
- * Converts bundle to string in natual key form
+ * Converts document identity to string in DynamoDB natual key form
  * For example, converts:
  * [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}]
  * to 'NK#classPeriodName=z1#schoolId=24#studentId=333'
  */
-function foreignKeyBundleToString(foreignKeyBundle: ExtractedValue[]): string {
-  const stringifiedValues: string[] = foreignKeyBundle.map((value) => `${value.namePath}=${value.bodyValue}`);
+function documentIdentityToString(documentIdentity: DocumentIdentity): string {
+  const stringifiedValues: string[] = documentIdentity.map((value) => `${value.namePath}=${value.bodyValue}`);
   return `NK#${stringifiedValues.join('#')}`;
 }
 
 /**
  * Takes a ReferenceGroup representing a reference on a MetaEd entity, along with
- * an API JSON body matching that entity, and returns an array of foreign key constraints
+ * an API JSON body matching that entity, and returns an array of DocumentReferences
  * for all of the portions of the reference.
  */
-function foreignKeysFromReferenceGroup(
+function documentReferencesFromReferenceGroup(
   referenceGroup: ReferenceGroup,
   body: object,
   entity: TopLevelEntity,
-): ReferentialConstraint[] {
-  const foreignKeyBundles: ExtractedValue[][] = foreignKeyBundlesFromReferenceGroup(referenceGroup, body, entity);
-  // Example of a foreign key bundle, representing a collection of two references to the same entity type
+): DocumentReference[] {
+  const documentIdentities: DocumentIdentity[] = documentIdentitiesFromReferenceGroup(referenceGroup, body, entity);
+  // Example of DocumentIdentities representing a collection of references to the same entity type
   // [
   //   [{namePath: 'classPeriodName', value: 'z1'}, {namePath: 'schoolId', value: '24'}, {namePath: 'studentId', value: '333'}],
   //   [{namePath: 'classPeriodName', value: 'z2'}, {namePath: 'schoolId', value: '25'}, {namePath: 'studentId', value: '444'}],
   // ]
 
-  const result: ReferentialConstraint[] = [];
+  const result: DocumentReference[] = [];
 
   const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
-  foreignKeyBundles.forEach((bundle) => {
-    const foreignKey: string = foreignKeyBundleToString(bundle);
-    // Check if this reference is to an assignable entity. If so, the foreign key string is in superclass form
-    const assignableInfo: AssignableInfo | null = deriveAssignableFrom(referencedEntity, foreignKey);
+  documentIdentities.forEach((bundle) => {
+    const identityString: string = documentIdentityToString(bundle);
+    // Check if this reference is to an assignable entity. If so, the identity string is in superclass form
+    const assignableInfo: AssignableInfo | null = deriveAssignableFrom(referencedEntity, identityString);
 
     result.push({
       metaEdType: referenceGroup.sourceProperty.type,
       metaEdName: referenceGroup.sourceProperty.metaEdName,
-      constraintKey: assignableInfo == null ? foreignKey : assignableInfo.assignableNaturalKey,
+      constraintKey: assignableInfo == null ? identityString : assignableInfo.assignableNaturalKey,
       isAssignableFrom: referencedEntity.subclassedBy.length > 0,
     });
   });
@@ -207,11 +203,11 @@ function foreignKeysFromReferenceGroup(
  * extracts the foreign key (reference) information from the JSON body, in the same form as a
  * natural key: NK#<path1>=<value1>#<path2>=<value2>#<path3>=<value3>#...
  */
-export function extractForeignKeys(entity: TopLevelEntity, body: object): ReferentialConstraint[] {
-  const result: ReferentialConstraint[] = [];
+export function extractDocumentReferences(entity: TopLevelEntity, body: object): DocumentReference[] {
+  const result: DocumentReference[] = [];
 
   (entity.data.meadowlark as EntityMeadowlarkData).apiMapping.referenceGroups.forEach((referenceGroup: ReferenceGroup) => {
-    result.push(...foreignKeysFromReferenceGroup(referenceGroup, body, entity));
+    result.push(...documentReferencesFromReferenceGroup(referenceGroup, body, entity));
   });
   return result;
 }

@@ -5,7 +5,7 @@
 
 import { PropertyType, ModelType } from '@edfi/metaed-core';
 
-export type ReferentialConstraint = {
+export type DocumentReference = {
   /**
    * The MetaEd entity type of the referenced entity.
    * Example: 'domainEntity'

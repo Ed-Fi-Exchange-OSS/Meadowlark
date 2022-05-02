@@ -6,11 +6,11 @@
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
-import { extractForeignKeys } from './ForeignKeyExtractor';
+import { extractDocumentReferences } from './DocumentReferenceExtractor';
 import { extractNaturalKey, deriveAssignableFrom, NaturalKeyWithSecurity } from './NaturalKeyExtractor';
 import { decapitalize } from '../Utility';
 import { EntityInfo, NoEntityInfo } from '../model/EntityInfo';
-import { ReferentialConstraint } from '../model/ReferentialConstraint';
+import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { PathComponents } from '../model/PathComponents';
 import { AssignableInfo } from '../model/AssignableInfo';
@@ -87,8 +87,8 @@ export async function validateResource(
   let errorBody: string | null = null;
   let naturalKeyWithSecurity: NaturalKeyWithSecurity = { naturalKey: '', studentId: null, edOrgId: null };
   let assignableInfo: AssignableInfo | null = null;
-  const foreignKeys: ReferentialConstraint[] = [];
-  const descriptorValues: ReferentialConstraint[] = [];
+  const foreignKeys: DocumentReference[] = [];
+  const descriptorValues: DocumentReference[] = [];
 
   if (!isDescriptor && body != null) {
     const bodyValidation: string[] = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
@@ -96,7 +96,7 @@ export async function validateResource(
       errorBody = JSON.stringify({ message: bodyValidation });
     } else {
       naturalKeyWithSecurity = extractNaturalKey(matchingMetaEdModel, body);
-      foreignKeys.push(...extractForeignKeys(matchingMetaEdModel, body));
+      foreignKeys.push(...extractDocumentReferences(matchingMetaEdModel, body));
       descriptorValues.push(...extractDescriptorValues(matchingMetaEdModel, body));
     }
   }

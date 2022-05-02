@@ -11,7 +11,7 @@ import {
   prefixedName,
   topLevelNameOnEntity,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { ReferentialConstraint } from '../model/ReferentialConstraint';
+import { DocumentReference } from '../model/DocumentReference';
 
 // TODO: The behavior of calculating the body names of descriptors for an entity can be pushed into a
 // new MetaEd enhancer, and entity.data.meadowlark.apiMapping.descriptorCollectedProperties
@@ -25,7 +25,7 @@ function extractForDescriptorCollection(
   collectedProperty: CollectedProperty,
   body: object,
   topLevelName: string,
-): ReferentialConstraint[] {
+): DocumentReference[] {
   const { apiMapping } = collectedProperty.property.data.meadowlark as EntityPropertyMeadowlarkData;
   const bodyDescriptorArray = body[prefixedName(topLevelName, collectedProperty.propertyModifier)];
 
@@ -45,7 +45,7 @@ function extractDescriptorValuesFromBody(
   collectedProperty: CollectedProperty,
   body: object,
   topLevelName: string,
-): ReferentialConstraint[] {
+): DocumentReference[] {
   const { apiMapping } = collectedProperty.property.data.meadowlark as EntityPropertyMeadowlarkData;
   if (apiMapping.isDescriptorCollection) return extractForDescriptorCollection(collectedProperty, body, topLevelName);
 
@@ -66,8 +66,8 @@ function extractDescriptorValuesFromBody(
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
  * extracts the descriptor URI for each descriptor value in the body
  */
-export function extractDescriptorValues(entity: TopLevelEntity, body: object): ReferentialConstraint[] {
-  const result: ReferentialConstraint[] = [];
+export function extractDescriptorValues(entity: TopLevelEntity, body: object): DocumentReference[] {
+  const result: DocumentReference[] = [];
   const { descriptorCollectedProperties } = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
 
   descriptorCollectedProperties.forEach((collectedProperty: CollectedProperty) => {

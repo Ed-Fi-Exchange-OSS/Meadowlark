@@ -19,13 +19,13 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractForeignKeys } from '../../src/handler/ForeignKeyExtractor';
-import { ReferentialConstraint } from '../../src/model/ReferentialConstraint';
+import { extractDocumentReferences } from '../../src/handler/DocumentReferenceExtractor';
+import { DocumentReference } from '../../src/model/DocumentReference';
 
 describe('when extracting foreign keys from domain entity referencing one as identity and another as collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     notImportant: false,
@@ -93,7 +93,7 @@ describe('when extracting foreign keys from domain entity referencing one as ide
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractForeignKeys(section, body);
+    result = extractDocumentReferences(section, body);
   });
 
   it('should have references', () => {
@@ -125,7 +125,7 @@ describe('when extracting foreign keys from domain entity referencing one as ide
 describe('when extracting with optional reference in body', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     sectionIdentifier: 'Bob',
@@ -163,7 +163,7 @@ describe('when extracting with optional reference in body', () => {
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractForeignKeys(section, body);
+    result = extractDocumentReferences(section, body);
   });
 
   it('should have references', () => {
@@ -183,7 +183,7 @@ describe('when extracting with optional reference in body', () => {
 describe('when extracting with optional reference not in body', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     sectionIdentifier: 'Bob',
@@ -218,7 +218,7 @@ describe('when extracting with optional reference not in body', () => {
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractForeignKeys(section, body);
+    result = extractDocumentReferences(section, body);
   });
 
   it('should have no references', () => {
@@ -229,7 +229,7 @@ describe('when extracting with optional reference not in body', () => {
 describe('when extracting optional collection in body', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     sectionIdentifier: 'Bob',
@@ -275,7 +275,7 @@ describe('when extracting optional collection in body', () => {
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractForeignKeys(section, body);
+    result = extractDocumentReferences(section, body);
   });
 
   it('should have references', () => {
@@ -301,7 +301,7 @@ Array [
 describe('when extracting optional collection not in body', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     sectionIdentifier: 'Bob',
@@ -335,7 +335,7 @@ describe('when extracting optional collection not in body', () => {
 
     namespace = metaEd.namespace.get('EdFi');
     const section = namespace.entity.domainEntity.get('Section');
-    result = extractForeignKeys(section, body);
+    result = extractDocumentReferences(section, body);
   });
 
   it('should have no references', () => {

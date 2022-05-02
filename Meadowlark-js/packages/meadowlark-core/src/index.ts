@@ -9,7 +9,7 @@ export { SearchResult } from './plugin/backend/SearchResult';
 export { ForeignKeyItem } from './model/ForeignKeyItem';
 export { Security, newSecurity } from './model/Security';
 export { ValidationOptions } from './model/ValidationOptions';
-export { ReferentialConstraint } from './model/ReferentialConstraint';
+export { DocumentReference } from './model/DocumentReference';
 export { documentIdForEntityInfo, documentIdFromNaturalKeyString } from './helpers/DocumentId';
 export {
   EntityInfo,

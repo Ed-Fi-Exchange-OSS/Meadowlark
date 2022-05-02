@@ -26,12 +26,12 @@ import {
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 
 import { extractDescriptorValues } from '../../src/handler/DescriptorValueExtractor';
-import { ReferentialConstraint } from '../../src/model/ReferentialConstraint';
+import { DocumentReference } from '../../src/model/DocumentReference';
 
 describe('when extracting single descriptor value from domain entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const descriptorValue = 'uri://ed-fi.org/grade';
 
@@ -88,7 +88,7 @@ describe('when extracting single descriptor value from domain entity', () => {
 describe('when extracting descriptor values from domain entity with the same names', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const gradingPeriod = 'GradingPeriod';
   const descriptorValue = 'uri://ed-fi.org/grade';
@@ -146,7 +146,7 @@ describe('when extracting descriptor values from domain entity with the same nam
 describe('when extracting array of descriptor values from domain entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const descriptorValue = 'uri://ed-fi.org/grade';
 
@@ -222,7 +222,7 @@ describe('when extracting array of descriptor values from domain entity', () => 
 describe('when extracting collection from domain entity subclass with naming collision issue', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     identity: 123,
@@ -303,7 +303,7 @@ Array [
 describe('when extracting collection from domain entity subclass with no naming collision issue due to one being a non-collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: ReferentialConstraint[] = [];
+  let result: DocumentReference[] = [];
 
   const body = {
     identity: 123,

@@ -5,7 +5,7 @@
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { AssignableInfo } from './AssignableInfo';
-import { ReferentialConstraint } from './ReferentialConstraint';
+import { DocumentReference } from './DocumentReference';
 
 /**
  * Type information for a MetaEd entity
@@ -50,12 +50,12 @@ export interface EntityInfo extends EntityIdentifyingInfo {
   /**
    * A list of the foreign keys of the entity extracted from the JSON body
    */
-  foreignKeys: ReferentialConstraint[];
+  foreignKeys: DocumentReference[];
 
   /**
    * A list of the non-reference (meaning top-level only) descriptor values of the entity extracted from the JSON body
    */
-  descriptorValues: ReferentialConstraint[];
+  descriptorValues: DocumentReference[];
 
   /**
    * If this entity is assignable to another entity (meaning it is part of a subclass/superclass relationship)
