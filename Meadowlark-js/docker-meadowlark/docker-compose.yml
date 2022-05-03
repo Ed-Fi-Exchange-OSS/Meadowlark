@@ -41,18 +41,77 @@ services:
       - opensearch-net
     restart: unless-stopped
 
-  mongodb-node1:
-    image : mongo:4.0.28
-    container_name: mongodb-node1
+  mongo-setup:
+    container_name: mongo-setup
+    image: mongo:4.0.28
+    restart: on-failure
+    networks:
+      - mongo-net
     volumes:
-      -  mongodb-data1:/data/db
+      - ./scripts:/scripts
+    entrypoint: [ "/scripts/mongo-setup.sh" ]
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo:4.0.28
+    expose:
+      - 27017
     ports:
       - 27017:27017
-    restart: unless-stopped
+    networks:
+      - mongo-net
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "false" ]
+    volumes:
+      - mongo-data1:/data/db
+      - mongo-datacfg1:/data/configdb
+
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo:4.0.28
+    expose:
+      - 27018
+    ports:
+      - 27018:27018
+    networks:
+      - mongo-net
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "false", "--port", "27018" ]
+    volumes:
+      - mongo-data2:/data/db
+      - mongo-datacfg2:/data/configdb
+
+  mongo3:
+    hostname: mongo3
+    container_name: mongo3
+    image: mongo:4.0.28
+    expose:
+      - 27019
+    ports:
+      - 27019:27019
+    networks:
+      - mongo-net
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "false", "--port", "27019" ]
+    volumes:
+      - mongo-data3:/data/db
+      - mongo-datacfg3:/data/configdb
 
 volumes:
   opensearch-data1:
-  mongodb-data1:
+  mongo-data1:
+  mongo-datacfg1:
+  mongo-data2:
+  mongo-datacfg2:
+  mongo-data3:
+  mongo-datacfg3:
 
 networks:
   opensearch-net:
+  mongo-net:
