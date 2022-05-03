@@ -15,7 +15,7 @@ import {
   ReferenceGroup,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { DocumentReference } from '../model/DocumentReference';
-import { deriveAssignableFrom } from './NaturalKeyExtractor';
+import { deriveAssignableFrom } from './DocumentIdentityExtractor';
 import { Assignable } from '../model/Assignable';
 import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DocumentElement } from '../model/DocumentElement';
@@ -120,7 +120,7 @@ function documentIdentitiesFromReferenceGroup(
   document: object,
   entity: TopLevelEntity,
 ): DocumentIdentity[] {
-  // The document paths of the reference group, which matches the API document body paths to the
+  // The document paths of the reference group, which matches the API document paths to the
   // foreign key elements of the entity being referenced.
   const documentPaths: string[] = documentPathsFromReferenceComponents(referenceGroup.referenceComponents, entity);
 
@@ -155,15 +155,15 @@ function documentIdentitiesFromReferenceGroup(
 
 /**
  * Takes a ReferenceGroup representing a reference on a MetaEd entity, along with
- * an API JSON body matching that entity, and returns an array of DocumentReferences
+ * an API document matching that entity, and returns an array of DocumentReferences
  * for all of the portions of the reference.
  */
 function documentReferencesFromReferenceGroup(
   referenceGroup: ReferenceGroup,
-  body: object,
+  document: object,
   entity: TopLevelEntity,
 ): DocumentReference[] {
-  const documentIdentities: DocumentIdentity[] = documentIdentitiesFromReferenceGroup(referenceGroup, body, entity);
+  const documentIdentities: DocumentIdentity[] = documentIdentitiesFromReferenceGroup(referenceGroup, document, entity);
   // Example of DocumentIdentities representing a collection of references to the same entity type
   // [
   //   [{name: 'classPeriodName', value: 'z1'}, {name: 'schoolId', value: '24'}, {name: 'studentId', value: '333'}],
@@ -188,15 +188,14 @@ function documentReferencesFromReferenceGroup(
 }
 
 /**
- * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
- * extracts the foreign key (reference) information from the JSON body, in the same form as a
- * natural key: NK#<path1>=<value1>#<path2>=<value2>#<path3>=<value3>#...
+ * Takes a MetaEd entity object and an API document for the resource mapped to that MetaEd entity and
+ * extracts the document reference information from the document.
  */
-export function extractDocumentReferences(entity: TopLevelEntity, body: object): DocumentReference[] {
+export function extractDocumentReferences(entity: TopLevelEntity, document: object): DocumentReference[] {
   const result: DocumentReference[] = [];
 
   (entity.data.meadowlark as EntityMeadowlarkData).apiMapping.referenceGroups.forEach((referenceGroup: ReferenceGroup) => {
-    result.push(...documentReferencesFromReferenceGroup(referenceGroup, body, entity));
+    result.push(...documentReferencesFromReferenceGroup(referenceGroup, document, entity));
   });
   return result;
 }

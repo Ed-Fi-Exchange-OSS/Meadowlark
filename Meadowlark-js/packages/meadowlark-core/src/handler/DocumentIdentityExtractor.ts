@@ -100,13 +100,13 @@ function documentIdentitiesFrom(
  * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
 export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentityWithSecurity {
-  const naturalKeysWithSecurity: DocumentIdentityWithSecurity[] = (
+  const documentIdentitiesWithSecurity: DocumentIdentityWithSecurity[] = (
     entity.data.meadowlark as EntityMeadowlarkData
   ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>
     documentIdentitiesFrom(identityReferenceComponent, body, entity, []),
   );
 
-  return naturalKeysWithSecurity.reduce(
+  return documentIdentitiesWithSecurity.reduce(
     (acc: DocumentIdentityWithSecurity, current: DocumentIdentityWithSecurity) => {
       acc.documentIdentity = [...acc.documentIdentity, ...current.documentIdentity];
       // Note that last non-null studentId/edOrgId wins

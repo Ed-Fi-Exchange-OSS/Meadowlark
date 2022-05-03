@@ -44,13 +44,13 @@ describe('when collecting foreign key references', () => {
     info.projectName = 'Ed-Fi';
     info.entityName = 'Parent';
     info.projectVersion = '3.3.1-b';
-    info.foreignKeys.push({
+    info.documentReferences.push({
       metaEdType: 'domainEntity',
       metaEdName: 'Person',
       documentIdentity: personNK,
       isAssignableFrom: false,
     });
-    info.foreignKeys.push({
+    info.documentReferences.push({
       metaEdType: 'domainEntity',
       metaEdName: 'EducationOrganization',
       documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],

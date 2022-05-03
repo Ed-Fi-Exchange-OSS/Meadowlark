@@ -124,7 +124,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -181,7 +181,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -238,7 +238,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -296,7 +296,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -354,7 +354,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -417,7 +417,7 @@ describe('when posting a request to create a new resource', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,

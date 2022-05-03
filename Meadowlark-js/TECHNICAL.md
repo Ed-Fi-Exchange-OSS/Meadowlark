@@ -6,7 +6,7 @@ Resource Ids are calculated from the fully qualified MetaEd entity type (project
 natural key string. They are a 224 bit hash using SHA-3's SHAKE-128 algorithm as implemented by the jsSHA library.
 
 The entity type string is of the form "TYPE#\<MetaEd project name>#$\<MetaEd project version>#\<MetaEd name>". The natural
-key string is of the form "NK#\<hash-separated key-value pairs>", where pairs are of the form "\<json document body
+key string is of the form "\<hash-separated key-value pairs>", where pairs are of the form "\<json document body
 location>=\<value>" and pairs are in alphabetical order.
 
 Document Ids are 56 character (224 bit) hex strings. For example: 6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7
@@ -49,7 +49,7 @@ MetaEd "role names" are expressed as prefixes on the property name.
 
 ### Name Overlap Collasping
 
-The ODS/API surface has naming rules that remove overlapping prefixes of properties that match the parent entity name in some cases. As a simple example, a MetaEd property "XyzAbcd" on an entity "Xyz" may be expressed in the API as "Abcd". However, the rules for name collasping can get quite involved in complex cases, and is beyond the scope of this document.
+The ODS/API surface has naming rules that remove overlapping prefixes of properties that match the parent entity name in some cases. As a simple example, a MetaEd property "XyzAbcd" on an entity "Xyz" may be expressed in the API as "Abcd". However, the rules for name collapsing can get quite involved in complex cases, and is beyond the scope of this document.
 
 ## References
 

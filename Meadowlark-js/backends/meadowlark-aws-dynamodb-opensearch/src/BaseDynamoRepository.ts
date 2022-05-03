@@ -112,7 +112,7 @@ export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeI
 }
 
 export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
-  return documentInfo.foreignKeys.map((documentReference) => {
+  return documentInfo.documentReferences.map((documentReference) => {
     const entityTypeInfo: DocumentTypeInfo = {
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
       projectName: documentInfo.projectName,
@@ -281,7 +281,7 @@ export function generateReferenceItems(naturalKeyHash: string, item: DocumentInf
     collection.push(generatePutEntityForUpsert(fk.generateToFromItem()));
   });
 
-  extractReferences(item.foreignKeys);
+  extractReferences(item.documentReferences);
 
   return collection;
 }

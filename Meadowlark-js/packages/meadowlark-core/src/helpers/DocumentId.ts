@@ -9,7 +9,7 @@ import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DocumentInfo } from '../model/DocumentInfo';
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given naturalKeyString for use as a document id.
+ * Returns a SHAKE128 hash of length 224 bits for the given document identity for use as a document id.
  */
 export function idFromDocumentElements(documentIdentity: DocumentIdentity): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
@@ -29,7 +29,7 @@ export function idFromDocumentElements(documentIdentity: DocumentIdentity): stri
  * If the given documentInfo is assignable, uses that information for the document id.
  */
 export function documentIdForEntityInfo(documentInfo: DocumentInfo): string {
-  // If this is an assignable entity, use the assignableNaturalKey for the id instead of the actual natural key
+  // If this is an assignable entity, use the assignableIdentity for the id instead of the actual document identity
   const documentIdentity: DocumentIdentity =
     documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 

@@ -34,12 +34,11 @@ export interface DocumentTypeInfo {
 }
 
 /**
- * Information to uniquely identify a MetaEd entity by natural key
+ * Information to uniquely identify an API document by the elements that make up its identity
  */
 export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
   /**
-   * The natural key of the entity extracted from the JSON body, in a documentPathString=naturalKeyValue
-   * form, hash-separated when their are multiple path/value pairs. The string is prefixed with "NK#".
+   * The identity elements extracted from an Ed-Fi document
    */
   documentIdentity: DocumentIdentity;
 }
@@ -49,9 +48,9 @@ export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
  */
 export interface DocumentInfo extends DocumentIdentifyingInfo {
   /**
-   * A list of the foreign keys of the entity extracted from the JSON body
+   * A list of the document references extracted from the API document
    */
-  foreignKeys: DocumentReference[];
+  documentReferences: DocumentReference[];
 
   /**
    * A list of the non-reference (meaning top-level only) descriptor values of the entity extracted from the JSON body
@@ -60,7 +59,7 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
 
   /**
    * If this entity is assignable to another entity (meaning it is part of a subclass/superclass relationship)
-   * this is the assignable natural key and superclass information.
+   * this is the assignable document identity and superclass information.
    */
   assignableInfo: Assignable | null;
 
@@ -86,7 +85,7 @@ export function newEntityInfo(): DocumentInfo {
     projectVersion: '',
     documentIdentity: NoDocumentIdentity,
     assignableInfo: null,
-    foreignKeys: [],
+    documentReferences: [],
     descriptorValues: [],
     studentId: null,
     edOrgId: null,

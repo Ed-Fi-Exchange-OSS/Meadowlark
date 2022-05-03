@@ -296,10 +296,10 @@ export async function updateEntityById(
         };
 
       if (error.CancellationReasons.length > 1) {
-        const submittedForeignKeysLength = referenceValidation ? documentInfo.foreignKeys.length : 0;
+        const submittedForeignKeysLength = referenceValidation ? documentInfo.documentReferences.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
-          const failureForeignKey = documentInfo.foreignKeys[failureIndex];
+          const failureForeignKey = documentInfo.documentReferences[failureIndex];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${
@@ -397,10 +397,10 @@ export async function createEntity(
 
       const hasForeignKeyOrDescriptorChecks: boolean = checkForeignKeys.length > 0 || checkDescriptorValues.length > 0;
       if (hasForeignKeyOrDescriptorChecks) {
-        const submittedForeignKeysLength = referenceValidation ? documentInfo.foreignKeys.length : 0;
+        const submittedForeignKeysLength = referenceValidation ? documentInfo.documentReferences.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
-          const failureForeignKey = documentInfo.foreignKeys[failureIndex];
+          const failureForeignKey = documentInfo.documentReferences[failureIndex];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${

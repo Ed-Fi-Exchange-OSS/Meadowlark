@@ -7,7 +7,7 @@ import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './NaturalKeyExtractor';
+import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './DocumentIdentityExtractor';
 import { decapitalize } from '../Utility';
 import { DocumentInfo, NoEntityInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
@@ -41,7 +41,7 @@ export type ResourceValidationResult = {
  * Starts by loading the MetaEd project specified in the endpoint path. Then uses the MetaEd internal
  * model, enriched by Meadowlark-specific enhancers, to validate the complete resource endpoint path.
  * If valid, continues by validating the request body (if any) for the resource. If valid, extracts
- * natural key and foreign key information from the request body.
+ * document identity and document reference information from the request body.
  */
 export async function validateResource(
   pathComponents: PathComponents,
@@ -92,7 +92,7 @@ export async function validateResource(
     edOrgId: null,
   };
   let assignableInfo: Assignable | null = null;
-  const foreignKeys: DocumentReference[] = [];
+  const documentReferences: DocumentReference[] = [];
   const descriptorValues: DocumentReference[] = [];
 
   if (!isDescriptor && body != null) {
@@ -101,7 +101,7 @@ export async function validateResource(
       errorBody = JSON.stringify({ message: bodyValidation });
     } else {
       documentIdentityWithSecurity = extractDocumentIdentity(matchingMetaEdModel, body);
-      foreignKeys.push(...extractDocumentReferences(matchingMetaEdModel, body));
+      documentReferences.push(...extractDocumentReferences(matchingMetaEdModel, body));
       descriptorValues.push(...extractDescriptorValues(matchingMetaEdModel, body));
     }
   }
@@ -119,7 +119,7 @@ export async function validateResource(
       projectVersion: metaEdConfiguration.projects[0].projectVersion,
       entityName: matchingMetaEdModel.metaEdName,
       isDescriptor,
-      foreignKeys,
+      documentReferences,
       descriptorValues,
       ...documentIdentityWithSecurity,
       assignableInfo,

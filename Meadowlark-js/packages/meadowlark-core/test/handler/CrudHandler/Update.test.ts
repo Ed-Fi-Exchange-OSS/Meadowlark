@@ -82,7 +82,7 @@ describe('given a completely missing resource path', () => {
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
       Promise.resolve({
         documentInfo: {
-          foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+          documentReferences: [[{ name: 'schoolId', value: '1' }]],
           documentIdentity: [{ name: 'x', value: '123' }],
         },
         errorBody: null,
@@ -127,7 +127,7 @@ describe('given a valid object', () => {
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
         Promise.resolve({
           documentInfo: {
-            foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+            documentReferences: [[{ name: 'schoolId', value: '1' }]],
             documentIdentity: [{ name: 'x', value: '123' }],
           },
           errorBody: null,
@@ -185,7 +185,7 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -242,7 +242,7 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
@@ -301,7 +301,7 @@ describe('given a valid object', () => {
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
           Promise.resolve({
             documentInfo: {
-              foreignKeys: [[{ name: 'schoolId', value: '1' }]],
+              documentReferences: [[{ name: 'schoolId', value: '1' }]],
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
