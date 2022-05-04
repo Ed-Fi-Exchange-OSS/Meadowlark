@@ -13,7 +13,7 @@ import { PaginationParameters } from './PaginationParameters';
 import { SearchResult } from './SearchResult';
 
 export interface MeadowlarkBackendPlugin {
-  createEntity: (
+  createDocument: (
     id: string,
     documentInfo: DocumentInfo,
     info: object,
@@ -22,16 +22,16 @@ export interface MeadowlarkBackendPlugin {
     lambdaRequestId: string,
   ) => Promise<PutResult>;
 
-  getEntityById: (
+  getDocumentById: (
     _documentInfo: DocumentInfo,
     id: string,
     _security: Security,
     _lambdaRequestId: string,
   ) => Promise<GetResult>;
 
-  getEntityList: (_documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<GetResult>;
+  getDocumentList: (_documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<GetResult>;
 
-  updateEntityById: (
+  updateDocumentById: (
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
@@ -40,7 +40,7 @@ export interface MeadowlarkBackendPlugin {
     _lambdaRequestId: string,
   ) => Promise<PutResult>;
 
-  deleteEntityById: (
+  deleteDocumentById: (
     _id: string,
     _documentInfo: DocumentInfo,
     _validationOptions: ValidationOptions,
@@ -48,7 +48,7 @@ export interface MeadowlarkBackendPlugin {
     _lambdaRequestId: string,
   ) => Promise<DeleteResult>;
 
-  queryEntityList: (
+  queryDocumentList: (
     documentInfo: DocumentInfo,
     queryStringParameters: object,
     paginationParameters: PaginationParameters,

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity, DocumentInfo, newEntityInfo } from '@edfi/meadowlark-core';
+import { DocumentIdentity, DocumentInfo, newDocumentInfo } from '@edfi/meadowlark-core';
 import { generateReferenceItems } from '../src/BaseDynamoRepository';
 import { TransactWriteItem } from '../src/types/AwsSdkLibDynamoDb';
 
@@ -11,7 +11,7 @@ describe('when collecting foreign key references', () => {
   describe('given a item with no references', () => {
     let result: TransactWriteItem[];
     const pkHash: string = 'ID#asdfqwer;lkj';
-    const info: DocumentInfo = newEntityInfo();
+    const info: DocumentInfo = newDocumentInfo();
 
     beforeAll(() => {
       result = generateReferenceItems(pkHash, info);
@@ -39,11 +39,11 @@ describe('when collecting foreign key references', () => {
     const parentKey: string = 'parentId=asdfasdf';
     const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
     const personNK: DocumentIdentity = [{ name: 'person.personId', value: 'b' }];
-    const info: DocumentInfo = newEntityInfo();
+    const info: DocumentInfo = newDocumentInfo();
 
     info.projectName = 'Ed-Fi';
-    info.entityName = 'Parent';
-    info.projectVersion = '3.3.1-b';
+    info.resourceName = 'Parent';
+    info.resourceVersion = '3.3.1-b';
     info.documentReferences.push({
       metaEdType: 'domainEntity',
       metaEdName: 'Person',
@@ -105,11 +105,11 @@ describe('when collecting foreign key references', () => {
     let result: TransactWriteItem[];
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
     const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
-    const info: DocumentInfo = newEntityInfo();
+    const info: DocumentInfo = newDocumentInfo();
 
     info.projectName = 'Ed-Fi';
-    info.entityName = 'Parent';
-    info.projectVersion = '3.3.1-b';
+    info.resourceName = 'Parent';
+    info.resourceVersion = '3.3.1-b';
     info.descriptorValues.push({
       metaEdType: 'domainEntity',
       metaEdName: 'Something',

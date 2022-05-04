@@ -7,7 +7,7 @@ import { newDomainEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { validateResource, ResourceValidationResult } from '../../src/validation/RequestValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
 import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';
-import { NoEntityInfo } from '../../src/model/DocumentInfo';
+import { NoDocumentInfo } from '../../src/model/DocumentInfo';
 
 describe('given an invalid resource name with a suggested matching name', () => {
   let result: ResourceValidationResult;
@@ -47,7 +47,7 @@ describe('given an invalid resource name with a suggested matching name', () => 
   });
 
   it('returns no entity info', () => {
-    expect(result.documentInfo).toBe(NoEntityInfo);
+    expect(result.documentInfo).toBe(NoDocumentInfo);
   });
 });
 
@@ -86,7 +86,7 @@ describe('given an invalid resource name with no suggested matching name', () =>
   });
 
   it('returns no entity info', () => {
-    expect(result.documentInfo).toBe(NoEntityInfo);
+    expect(result.documentInfo).toBe(NoDocumentInfo);
   });
 });
 

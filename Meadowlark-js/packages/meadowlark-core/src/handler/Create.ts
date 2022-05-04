@@ -8,8 +8,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { validateResource } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
-import { documentIdForEntityInfo } from '../helpers/DocumentId';
-import { NoEntityInfo } from '../model/DocumentInfo';
+import { documentIdForDocumentInfo } from '../helpers/DocumentId';
+import { NoDocumentInfo } from '../model/DocumentInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
 import { authorizationHeader } from '../helpers/AuthorizationHeader';
@@ -56,13 +56,13 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
 
     const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody != null) {
-      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoDocumentInfo ? 404 : 400;
       writeDebugStatusToLog(moduleName, context, 'create', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
-    const resourceId = documentIdForEntityInfo(documentInfo);
-    const { result, failureMessage } = await getBackendPlugin().createEntity(
+    const resourceId = documentIdForDocumentInfo(documentInfo);
+    const { result, failureMessage } = await getBackendPlugin().createDocument(
       resourceId,
       documentInfo,
       body,

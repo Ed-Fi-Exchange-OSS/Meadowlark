@@ -5,7 +5,7 @@
 
 import { DocumentInfo, GetResult, PaginationParameters, SearchResult } from '@edfi/meadowlark-core';
 
-export async function queryEntityList(
+export async function queryDocumentList(
   _documentInfo: DocumentInfo,
   _queryStringParameters: object,
   _paginationParameters: PaginationParameters,
@@ -14,6 +14,6 @@ export async function queryEntityList(
   return { success: false, results: [] };
 }
 
-export async function getEntityList(_documentInfo: DocumentInfo, _lambdaRequestId: string): Promise<GetResult> {
+export async function getDocumentList(_documentInfo: DocumentInfo, _lambdaRequestId: string): Promise<GetResult> {
   return { result: 'ERROR', documents: [] };
 }

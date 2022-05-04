@@ -10,15 +10,8 @@ export { ValidationOptions } from './model/ValidationOptions';
 export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';
 export { DocumentIdentity } from './model/DocumentIdentity';
-export { documentIdForEntityInfo, idFromDocumentIdentity as idFromDocumentElements } from './helpers/DocumentId';
-export {
-  DocumentInfo,
-  newEntityInfo,
-  DocumentIdentifyingInfo,
-  DocumentTypeInfo,
-  entityTypeStringFrom,
-  entityTypeStringFromComponents,
-} from './model/DocumentInfo';
+export { documentIdForDocumentInfo, idFromDocumentIdentity as idFromDocumentElements } from './helpers/DocumentId';
+export { DocumentInfo, newDocumentInfo, DocumentIdentifyingInfo, DocumentTypeInfo } from './model/DocumentInfo';
 export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 

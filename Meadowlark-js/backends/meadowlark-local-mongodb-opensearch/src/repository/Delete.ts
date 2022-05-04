@@ -5,7 +5,7 @@
 
 import { DocumentInfo, DeleteResult, Security, ValidationOptions } from '@edfi/meadowlark-core';
 
-export async function deleteEntityById(
+export async function deleteDocumentById(
   _id: string,
   _documentInfo: DocumentInfo,
   _validationOptions: ValidationOptions,

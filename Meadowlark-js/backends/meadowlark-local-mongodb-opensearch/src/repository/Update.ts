@@ -5,7 +5,7 @@
 
 import { DocumentInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
 
-export async function updateEntityById(
+export async function updateDocumentById(
   _id: string,
   _documentInfo: DocumentInfo,
   _info: object,

@@ -11,17 +11,16 @@ import {
   DocumentElement,
   DocumentReference,
   DocumentIdentity,
-  documentIdForEntityInfo,
+  documentIdForDocumentInfo,
   idFromDocumentElements,
   DocumentInfo,
   DocumentIdentifyingInfo,
   DocumentTypeInfo,
   Logger,
-  entityTypeStringFrom,
-  entityTypeStringFromComponents,
 } from '@edfi/meadowlark-core';
 import { PutItemInputAttributeMap, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
 import { ForeignKeyItem } from './model/ForeignKeyItem';
+import { entityTypeStringFrom, entityTypeStringFromComponents } from './Utility';
 
 // setup to switch between local and cloud dynamodb based on stage flag
 export const dynamoOpts: any = {};
@@ -82,7 +81,7 @@ export function assignableSortKeyFromId(id: string): string {
 }
 
 export function sortKeyFromEntityIdentity(documentInfo: DocumentInfo): string {
-  return sortKeyFromId(documentIdForEntityInfo(documentInfo));
+  return sortKeyFromId(documentIdForDocumentInfo(documentInfo));
 }
 
 export function conditionCheckFrom(entityIdentifyingInfo: DocumentIdentifyingInfo) {
@@ -116,8 +115,8 @@ export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteI
     const entityTypeInfo: DocumentTypeInfo = {
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
       projectName: documentInfo.projectName,
-      projectVersion: documentInfo.projectVersion,
-      entityName: documentReference.metaEdName,
+      resourceVersion: documentInfo.resourceVersion,
+      resourceName: documentReference.metaEdName,
       isDescriptor: false,
     };
 
@@ -137,8 +136,8 @@ export function descriptorValueConditions(documentInfo: DocumentInfo): TransactW
     conditionCheckFrom({
       // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
       projectName: documentInfo.projectName,
-      projectVersion: documentInfo.projectVersion,
-      entityName: descriptorValue.metaEdName,
+      resourceVersion: documentInfo.resourceVersion,
+      resourceName: descriptorValue.metaEdName,
       isDescriptor: true,
       documentIdentity: descriptorValue.documentIdentity,
     }),
@@ -172,11 +171,11 @@ export function constructPutEntityItem(
   if (documentInfo.edOrgId != null) putItem.edOrgId = documentInfo.edOrgId;
 
   // Security relationships for relevant associations
-  if (documentInfo.entityName === 'StudentEducationOrganizationAssociation') {
+  if (documentInfo.resourceName === 'StudentEducationOrganizationAssociation') {
     putItem.securityStudentId = `Student#${documentInfo.studentId}`;
     putItem.securityEdOrgId = `StudentEducationOrganizationAssociation#${documentInfo.edOrgId}`;
   }
-  if (documentInfo.entityName === 'StudentSchoolAssociation') {
+  if (documentInfo.resourceName === 'StudentSchoolAssociation') {
     putItem.securityStudentId = `Student#${documentInfo.studentId}`;
     putItem.securityEdOrgId = `StudentSchoolAssociation#${documentInfo.edOrgId}`;
   }
@@ -193,7 +192,7 @@ export function constructAssignablePutItem(documentInfo: DocumentInfo): Transact
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
     documentInfo.projectName,
-    documentInfo.projectVersion,
+    documentInfo.resourceVersion,
     documentInfo.assignableInfo.assignableToName,
   );
 
@@ -218,7 +217,7 @@ export function constructAssignableDeleteItem(id: string, documentInfo: Document
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
     documentInfo.projectName,
-    documentInfo.projectVersion,
+    documentInfo.resourceVersion,
     documentInfo.assignableInfo.assignableToName,
   );
 
@@ -263,7 +262,7 @@ export function generatePutEntityForUpsert(item: PutItemInputAttributeMap): Tran
  */
 export function generateReferenceItems(naturalKeyHash: string, item: DocumentInfo): TransactWriteItem[] {
   const collection: TransactWriteItem[] = [];
-  const referenceType = entityTypeStringFromComponents(item.projectName, item.projectVersion, item.entityName);
+  const referenceType = entityTypeStringFromComponents(item.projectName, item.resourceVersion, item.resourceName);
 
   const extractReferences = R.forEach((documentReference: DocumentReference) => {
     const referenceId = sortKeyFromId(idFromDocumentElements(documentReference.documentIdentity));

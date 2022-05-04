@@ -34,7 +34,7 @@ export async function getById(
     return { body: errorBody, statusCode: 404, headers: headerMetadata };
   }
 
-  const { result, documents, securityResolved } = await getBackendPlugin().getEntityById(
+  const { result, documents, securityResolved } = await getBackendPlugin().getDocumentById(
     documentInfo,
     pathComponents.resourceId,
     security,

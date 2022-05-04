@@ -136,7 +136,7 @@ describe('given a valid object', () => {
       );
 
       // Setup the update operation to fail
-      mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
+      mockDynamo = jest.spyOn(getBackendPlugin(), 'updateDocumentById').mockReturnValue(
         Promise.resolve({
           result: 'UPDATE_FAILURE_NOT_EXISTS',
           failureMessage: 'Does not exist',
@@ -194,7 +194,7 @@ describe('given a valid object', () => {
         );
 
         // Setup the update operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateDocumentById').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: expectedError,
@@ -254,7 +254,7 @@ describe('given a valid object', () => {
         jest.spyOn(GetById, 'getById').mockReturnValue(Promise.resolve({ body: '', statusCode: 200 }));
 
         // Setup the update operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateDocumentById').mockReturnValue(
           Promise.resolve({
             result: 'UNKNOWN_FAILURE',
             failureMessage: expectedError,
@@ -310,7 +310,7 @@ describe('given a valid object', () => {
         );
 
         // Setup the update operation to succeed
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'updateDocumentById').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,

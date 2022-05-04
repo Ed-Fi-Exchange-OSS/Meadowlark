@@ -211,14 +211,14 @@ describe('when demonstrating key unification via entity referencing two entities
 describe('when demonstrating descriptor collections and scalar descriptors on one entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespace = 'EdFi';
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const descriptorName = 'DescriptorName';
   const singlePrefix = 'Single';
 
   beforeAll(() => {
     MetaEdTextBuilder.build()
       .withBeginNamespace(namespace)
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withStringIdentity('SectionIdentifier', 'doc', '30')
       .withDescriptorProperty(descriptorName, 'doc', true, true)
@@ -244,14 +244,14 @@ describe('when demonstrating descriptor collections and scalar descriptors on on
   });
 
   it('should have two descriptor collected properties', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties).toHaveLength(2);
   });
 
   it('should have one collection collected property', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties[0].property.type).toBe('descriptor');
@@ -262,7 +262,7 @@ describe('when demonstrating descriptor collections and scalar descriptors on on
   });
 
   it('should have one scalar collected property', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties[1].property.type).toBe('descriptor');
@@ -276,14 +276,14 @@ describe('when demonstrating descriptor collections and scalar descriptors on on
 describe('when one entity has a descriptor on an inline common reference', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespace = 'EdFi';
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const inlineCommonName = 'InlineCommonName';
   const descriptorName = 'DescriptorName';
 
   beforeAll(() => {
     MetaEdTextBuilder.build()
       .withBeginNamespace(namespace)
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withStringIdentity('SectionIdentifier', 'doc', '30')
       .withInlineCommonProperty(inlineCommonName, 'doc', true, false)
@@ -315,14 +315,14 @@ describe('when one entity has a descriptor on an inline common reference', () =>
   });
 
   it('should have one descriptor collected property', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties).toHaveLength(1);
   });
 
   it('should have correct collected property values', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties[0].property.type).toBe('descriptor');
@@ -337,7 +337,7 @@ describe('when one entity has a descriptor on an inline common reference', () =>
 describe('when one entity has a descriptor on an inline common reference which is role named', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespace = 'EdFi';
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const inlineCommonName = 'InlineCommonName';
   const inlineCommonRoleName = 'Role';
   const descriptorName = 'DescriptorName';
@@ -345,7 +345,7 @@ describe('when one entity has a descriptor on an inline common reference which i
   beforeAll(() => {
     MetaEdTextBuilder.build()
       .withBeginNamespace(namespace)
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withStringIdentity('SectionIdentifier', 'doc', '30')
       .withInlineCommonProperty(inlineCommonName, 'doc', true, false, inlineCommonRoleName)
@@ -377,14 +377,14 @@ describe('when one entity has a descriptor on an inline common reference which i
   });
 
   it('should have one descriptor collected property', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties).toHaveLength(1);
   });
 
   it('should have correct descriptor name', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(entityName);
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get(resourceName);
     const collectedProperties = entity?.data.meadowlark.apiMapping.descriptorCollectedProperties;
 
     expect(collectedProperties[0].property.type).toBe('descriptor');

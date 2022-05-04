@@ -8,7 +8,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { validateResource } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
-import { NoEntityInfo } from '../model/DocumentInfo';
+import { NoDocumentInfo } from '../model/DocumentInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
 import { authorizationHeader } from '../helpers/AuthorizationHeader';
@@ -40,12 +40,12 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
 
     const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
     if (errorBody !== null) {
-      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoDocumentInfo ? 404 : 400;
       writeDebugStatusToLog(moduleName, context, 'deleteIt', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().deleteEntityById(
+    const { result, failureMessage } = await getBackendPlugin().deleteDocumentById(
       pathComponents.resourceId,
       documentInfo,
       {

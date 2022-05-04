@@ -4,19 +4,19 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
-import { createEntity } from './repository/Create';
-import { deleteEntityById } from './repository/Delete';
-import { getEntityById } from './repository/Read';
-import { getEntityList, queryEntityList } from './repository/Query';
-import { updateEntityById } from './repository/Update';
+import { createDocument } from './repository/Create';
+import { deleteDocumentById } from './repository/Delete';
+import { getDocumentById } from './repository/Read';
+import { getDocumentList, queryDocumentList } from './repository/Query';
+import { updateDocumentById } from './repository/Update';
 
 export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
   return {
-    createEntity,
-    getEntityById,
-    getEntityList,
-    updateEntityById,
-    deleteEntityById,
-    queryEntityList,
+    createDocument,
+    getDocumentById,
+    getDocumentList,
+    updateDocumentById,
+    deleteDocumentById,
+    queryDocumentList,
   };
 }

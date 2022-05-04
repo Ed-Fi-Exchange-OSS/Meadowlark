@@ -9,7 +9,7 @@ import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../m
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
 import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './DocumentIdentityExtractor';
 import { decapitalize } from '../Utility';
-import { DocumentInfo, NoEntityInfo } from '../model/DocumentInfo';
+import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { PathComponents } from '../model/PathComponents';
@@ -69,7 +69,7 @@ export async function validateResource(
     return {
       headerMetadata,
       endpointName: pathComponents.endpointName,
-      documentInfo: NoEntityInfo,
+      documentInfo: NoDocumentInfo,
       errorBody: JSON.stringify({
         message: invalidResourceMessage,
       }),
@@ -80,7 +80,7 @@ export async function validateResource(
     return {
       headerMetadata,
       endpointName: pathComponents.endpointName,
-      documentInfo: NoEntityInfo,
+      documentInfo: NoDocumentInfo,
       errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.endpointName}'.` }),
     };
   }
@@ -116,8 +116,8 @@ export async function validateResource(
     endpointName: pathComponents.endpointName,
     documentInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,
-      projectVersion: metaEdConfiguration.projects[0].projectVersion,
-      entityName: matchingMetaEdModel.metaEdName,
+      resourceVersion: metaEdConfiguration.projects[0].projectVersion,
+      resourceName: matchingMetaEdModel.metaEdName,
       isDescriptor,
       documentReferences,
       descriptorValues,

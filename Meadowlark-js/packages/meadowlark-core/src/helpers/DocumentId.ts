@@ -28,7 +28,7 @@ export function idFromDocumentIdentity(documentIdentity: DocumentIdentity): stri
  * Returns a SHAKE128 hash of length 224 bits for the given documentInfo for use as a document id.
  * If the given documentInfo is assignable, uses that information for the document id.
  */
-export function documentIdForEntityInfo(documentInfo: DocumentInfo): string {
+export function documentIdForDocumentInfo(documentInfo: DocumentInfo): string {
   // If this is an assignable entity, use the assignableIdentity for the id instead of the actual document identity
   const documentIdentity: DocumentIdentity =
     documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;

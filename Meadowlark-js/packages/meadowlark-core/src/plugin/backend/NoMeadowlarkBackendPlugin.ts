@@ -15,7 +15,7 @@ import { Logger } from '../../helpers/Logger';
 import { MeadowlarkBackendPlugin } from './MeadowlarkBackendPlugin';
 
 export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
-  createEntity: (
+  createDocument: (
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
@@ -23,26 +23,26 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _security: Security,
     lambdaRequestId: string,
   ): Promise<PutResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.createEntity(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.createDocument(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  getEntityById: (
+  getDocumentById: (
     _documentInfo: DocumentInfo,
     _id: string,
     _security: Security,
     lambdaRequestId: string,
   ): Promise<GetResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.getEntityById(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentById(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
-  getEntityList: (_documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.getEntityList(): No backend plugin has been configured', lambdaRequestId);
+  getDocumentList: (_documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> => {
+    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentList(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
-  updateEntityById: (
+  updateDocumentById: (
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
@@ -50,28 +50,28 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _security: Security,
     lambdaRequestId: string,
   ): Promise<PutResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.updateEntityById(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.updateDocumentById(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  deleteEntityById: (
+  deleteDocumentById: (
     _id: string,
     _documentInfo: DocumentInfo,
     _validationOptions: ValidationOptions,
     _security: Security,
     lambdaRequestId: string,
   ): Promise<DeleteResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.deleteEntityById(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.deleteDocumentById(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  queryEntityList: (
+  queryDocumentList: (
     _documentInfo: DocumentInfo,
     _queryStringParameters: object,
     _paginationParameters: PaginationParameters,
     lambdaRequestId: string,
   ): Promise<SearchResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.queryEntityList(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.queryDocumentList(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ success: false, results: [] });
   },
 };

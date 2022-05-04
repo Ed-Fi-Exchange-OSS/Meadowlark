@@ -8,8 +8,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import { validateResource } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
-import { documentIdForEntityInfo } from '../helpers/DocumentId';
-import { NoEntityInfo } from '../model/DocumentInfo';
+import { documentIdForDocumentInfo } from '../helpers/DocumentId';
+import { NoDocumentInfo } from '../model/DocumentInfo';
 import { validateJwt } from '../helpers/JwtValidator';
 import { newSecurity } from '../model/Security';
 import { authorizationHeader } from '../helpers/AuthorizationHeader';
@@ -55,19 +55,19 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
 
     const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody !== null) {
-      const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
+      const statusCode = documentInfo === NoDocumentInfo ? 404 : 400;
       writeDebugStatusToLog(moduleName, context, 'update', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
-    const resourceIdFromBody = documentIdForEntityInfo(documentInfo);
+    const resourceIdFromBody = documentIdForDocumentInfo(documentInfo);
     if (resourceIdFromBody !== pathComponents.resourceId) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(moduleName, context, 'update', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().updateEntityById(
+    const { result, failureMessage } = await getBackendPlugin().updateDocumentById(
       pathComponents.resourceId,
       documentInfo,
       body,

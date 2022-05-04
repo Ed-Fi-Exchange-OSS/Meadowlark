@@ -2154,6 +2154,7 @@ __metadata:
     "@aws-sdk/types": 3.40.0
     "@aws-sdk/util-dynamodb": 3.44.0
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/metaed-core": ^3.0.1
     "@elastic/elasticsearch": 7.13.0
     aws4: ^1.11.0
     copyfiles: ^2.4.1
@@ -2258,6 +2259,29 @@ __metadata:
     topo: 2.0.2
     winston: 3.7.2
   checksum: 6a385e967b3c060f78e731a538e18fd8b7c488c9fad3f275b9f119981f18863821ac9e9f86eb4c85b1059e3e4e6f3a2fc314bbb260e0e187ceeec3a04acc8380
+  languageName: node
+  linkType: hard
+
+"@edfi/metaed-core@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@edfi/metaed-core@npm:3.0.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.1.tgz"
+  dependencies:
+    ajv: ^6.12.6
+    antlr4: 4.6.1-patched.0
+    chalk: ^4.1.2
+    cosmiconfig: ^5.2.1
+    deep-freeze: ^0.0.1
+    deepmerge: ^2.2.1
+    final-fs: ^1.6.1
+    fs-extra: ^5.0.0
+    joi: 12.0.0
+    klaw-sync: ^3.0.2
+    ramda: ^0.28.0
+    semver: ^7.3.5
+    sugar: ^2.0.6
+    topo: 2.0.2
+    winston: 3.5.1
+  checksum: f93b68fc1dae9daeff49499e2233b556de0791d7b33440b7432bee6a841516f6cdff11d0295154b01607716c6a9bdc4b5f1b3d23e15e3d1888dfac93451ad9bc
   languageName: node
   linkType: hard
 
@@ -18332,7 +18356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-transport@npm:^4.5.0":
+"winston-transport@npm:^4.4.2, winston-transport@npm:^4.5.0":
   version: 4.5.0
   resolution: "winston-transport@npm:4.5.0"
   dependencies:
@@ -18357,6 +18381,24 @@ __metadata:
     triple-beam: ^1.3.0
     winston-transport: ^4.3.0
   checksum: 5265d0a1ed53bedc0e7bbcba17c33aefb2b5486cd37586a386eac1ac584380062f7120f298696aba3b9b4b2a1f4ee760128a8631bdf749c3253bb7b1aaeb587d
+  languageName: node
+  linkType: hard
+
+"winston@npm:3.5.1":
+  version: 3.5.1
+  resolution: "winston@npm:3.5.1"
+  dependencies:
+    "@dabh/diagnostics": ^2.0.2
+    async: ^3.2.3
+    is-stream: ^2.0.0
+    logform: ^2.3.2
+    one-time: ^1.0.0
+    readable-stream: ^3.4.0
+    safe-stable-stringify: ^2.3.1
+    stack-trace: 0.0.x
+    triple-beam: ^1.3.0
+    winston-transport: ^4.4.2
+  checksum: 12253f1644c46f90b36b8e675f397b29f862778c6a76cce11ad901c35d7a9b556fe371bfd0c22e180f6aa2e23d7a726a6f4ec1eec637dac3fe76390a0cd5ed09
   languageName: node
   linkType: hard
 

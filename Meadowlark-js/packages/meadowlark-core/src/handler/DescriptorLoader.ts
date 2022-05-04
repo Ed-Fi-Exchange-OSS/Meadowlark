@@ -10,10 +10,10 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { getBackendPlugin } from '../plugin/PluginLoader';
-import { DocumentInfo, newEntityInfo } from '../model/DocumentInfo';
+import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
-import { documentIdForEntityInfo } from '../helpers/DocumentId';
+import { documentIdForDocumentInfo } from '../helpers/DocumentId';
 import { newSecurity } from '../model/Security';
 import { PutResult } from '../plugin/backend/PutResult';
 
@@ -101,11 +101,11 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       }
 
       const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorValue) as DescriptorDocument;
-      const descriptorEntityInfo: DocumentInfo = {
-        ...newEntityInfo(),
-        entityName: descriptorName,
+      const descriptorDocumentInfo: DocumentInfo = {
+        ...newDocumentInfo(),
+        resourceName: descriptorName,
         projectName: 'Ed-Fi',
-        projectVersion: '3.3.1-b',
+        resourceVersion: '3.3.1-b',
         documentIdentity: [
           {
             name: 'descriptor',
@@ -114,16 +114,16 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         ],
       };
 
-      const putResult: PutResult = await getBackendPlugin().createEntity(
-        documentIdForEntityInfo(descriptorEntityInfo),
-        descriptorEntityInfo,
+      const putResult: PutResult = await getBackendPlugin().createDocument(
+        documentIdForDocumentInfo(descriptorDocumentInfo),
+        descriptorDocumentInfo,
         { ...descriptorDocument, _isDescriptor: true },
         { referenceValidation: false, descriptorValidation: false },
         { ...newSecurity(), isOwnershipEnabled: false },
         '-',
       );
       Logger.debug(
-        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorEntityInfo.documentIdentity)}: ${
+        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorDocumentInfo.documentIdentity)}: ${
           putResult.failureMessage
         }`,
         '-',
@@ -131,7 +131,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       if (!(putResult.result === 'INSERT_SUCCESS' || putResult.result === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
-            descriptorEntityInfo.documentIdentity,
+            descriptorDocumentInfo.documentIdentity,
           )} failed: ${putResult.failureMessage}`,
           'n/a',
         );

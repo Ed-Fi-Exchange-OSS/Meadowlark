@@ -22,7 +22,7 @@ import { isReferenceGroup, ReferenceGroup, isReferenceElement } from '../../src/
 
 describe('when building simple domain entity referencing another', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const referencedEntityName = 'ReferencedEntityName';
   const identityPropertyName = 'IdentityPropertyName';
 
@@ -31,7 +31,7 @@ describe('when building simple domain entity referencing another', () => {
 
     MetaEdTextBuilder.build()
       .withBeginNamespace('Namespace')
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withDomainEntityIdentity(referencedEntityName, 'doc')
       .withEndDomainEntity()
@@ -64,14 +64,14 @@ describe('when building simple domain entity referencing another', () => {
 
 describe('when building simple domain entity referencing a descriptor as part of identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const descriptorName = 'DescriptorName';
   const identityPropertyName = 'IdentityPropertyName';
 
   beforeAll(() => {
     MetaEdTextBuilder.build()
       .withBeginNamespace('Namespace')
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withIntegerIdentity(identityPropertyName, 'doc')
       .withDescriptorIdentity(descriptorName, 'doc')
@@ -101,7 +101,7 @@ describe('when building simple domain entity referencing a descriptor as part of
 
 describe('when building simple domain entity referencing another referencing another without identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const referencedEntityName = 'ReferencedEntityName';
   const subreferencedEntityName = 'SubreferencedEntityName';
   const integerIdentityPropertyName = 'IntegerIdentityPropertyName';
@@ -112,7 +112,7 @@ describe('when building simple domain entity referencing another referencing ano
 
     MetaEdTextBuilder.build()
       .withBeginNamespace('Namespace')
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withBooleanProperty('Distraction1', 'doc', true, false)
       .withBooleanIdentity('Pk', 'doc')
@@ -155,7 +155,7 @@ describe('when building simple domain entity referencing another referencing ano
 
 describe('when building simple domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const entityName = 'EntityName';
+  const resourceName = 'EntityName';
   const referencedEntityName = 'ReferencedEntityName';
   const subreferencedEntityName = 'SubreferencedEntityName';
   const integerIdentityPropertyName = 'IntegerIdentityPropertyName';
@@ -166,7 +166,7 @@ describe('when building simple domain entity referencing another referencing ano
 
     MetaEdTextBuilder.build()
       .withBeginNamespace('Namespace')
-      .withStartDomainEntity(entityName)
+      .withStartDomainEntity(resourceName)
       .withDocumentation('doc')
       .withBooleanProperty('Distraction1', 'doc', true, false)
       .withBooleanIdentity('Pk', 'doc')

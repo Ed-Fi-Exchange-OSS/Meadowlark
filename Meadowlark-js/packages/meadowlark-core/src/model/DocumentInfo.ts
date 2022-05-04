@@ -3,32 +3,30 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { Assignable } from './Assignable';
 import { DocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
 import { DocumentReference } from './DocumentReference';
 
 /**
- * Type information for a MetaEd entity
+ * Type information for an API document
  */
 export interface DocumentTypeInfo {
   /**
-   * The MetaEd project name the entity belongs to.
+   * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
   projectName: string;
 
   /**
    * The MetaEd project version the entity belongs to.
    */
-  projectVersion: string;
+  resourceVersion: string;
   /**
-   * The name of the entity. Typically, this is the same as the entity metaEdName. However,
-   * there are exceptions, for example descriptors have a "Descriptor" suffix to their name
-   * to avoid name collisions with entities of the same metaEdName.
+   * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
+   * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  entityName: string;
+  resourceName: string;
   /**
-   * Whether this entity is a descriptor. Descriptors are treated differently for other MetaEd model entities
+   * Whether this document is a descriptor. Descriptors are treated differently from other documents
    */
   isDescriptor: boolean;
 }
@@ -38,13 +36,13 @@ export interface DocumentTypeInfo {
  */
 export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
   /**
-   * The identity elements extracted from an Ed-Fi document
+   * The identity elements extracted from the API document
    */
   documentIdentity: DocumentIdentity;
 }
 
 /**
- * Complete information on a validated MetaEd entity
+ * Complete information on a validated API document
  */
 export interface DocumentInfo extends DocumentIdentifyingInfo {
   /**
@@ -53,23 +51,23 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
   documentReferences: DocumentReference[];
 
   /**
-   * A list of the non-reference (meaning top-level only) descriptor values of the entity extracted from the JSON body
+   * A list of the non-reference (meaning top-level only) descriptor values of the entity extracted from the API document
    */
   descriptorValues: DocumentReference[];
 
   /**
-   * If this entity is assignable to another entity (meaning it is part of a subclass/superclass relationship)
+   * If this resource is assignable to another resource (meaning it is part of a subclass/superclass relationship)
    * this is the assignable document identity and superclass information.
    */
   assignableInfo: Assignable | null;
 
   /**
-   * The student id extracted from the JSON body, if any (for security)
+   * The student id extracted from the API document, if any (for security)
    */
   studentId: string | null;
 
   /**
-   * The education organization id extracted from the JSON body, if any (for security)
+   * The education organization id extracted from the API document, if any (for security)
    */
   edOrgId: string | null;
 }
@@ -77,12 +75,12 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
 /**
  * Creates a new empty DocumentInfo object
  */
-export function newEntityInfo(): DocumentInfo {
+export function newDocumentInfo(): DocumentInfo {
   return {
-    entityName: '',
+    resourceName: '',
     isDescriptor: false,
     projectName: '',
-    projectVersion: '',
+    resourceVersion: '',
     documentIdentity: NoDocumentIdentity,
     assignableInfo: null,
     documentReferences: [],
@@ -95,20 +93,9 @@ export function newEntityInfo(): DocumentInfo {
 /**
  * The null object for DocumentInfo
  */
-export const NoEntityInfo = {
-  ...newEntityInfo(),
-  entityName: 'NoEntityName',
+export const NoDocumentInfo = {
+  ...newDocumentInfo(),
+  resourceName: 'NoEntityName',
   projectName: 'NoProjectName',
-  projectVersion: '0.0.0',
+  resourceVersion: '0.0.0',
 };
-
-export function entityTypeStringFromComponents(projectName: string, projectVersion: string, entityName: string): string {
-  return `TYPE#${projectName}#${projectVersion}#${entityName}`;
-}
-
-export function entityTypeStringFrom(documentInfo: DocumentTypeInfo): string {
-  const adjustedEntityName = documentInfo.isDescriptor
-    ? normalizeDescriptorSuffix(documentInfo.entityName)
-    : documentInfo.entityName;
-  return entityTypeStringFromComponents(documentInfo.projectName, documentInfo.projectVersion, adjustedEntityName);
-}

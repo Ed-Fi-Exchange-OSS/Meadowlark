@@ -16,15 +16,7 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
-import {
-  Logger,
-  ValidationOptions,
-  GetResult,
-  PutResult,
-  Security,
-  DocumentInfo,
-  entityTypeStringFrom,
-} from '@edfi/meadowlark-core';
+import { Logger, ValidationOptions, GetResult, PutResult, Security, DocumentInfo } from '@edfi/meadowlark-core';
 import {
   getDynamoDBDocumentClient,
   entityIdPrefixRemoved,
@@ -42,6 +34,7 @@ import {
 import { NoOutput, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
 import { ForeignKeyItem } from './model/ForeignKeyItem';
 import { OwnershipResult } from './model/OwnershipResult';
+import { entityTypeStringFrom } from './Utility';
 
 export type DynamoDeleteResult = { success: boolean };
 type NextToken = string;
@@ -50,7 +43,7 @@ type NextToken = string;
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
  */
 export async function getEntityList(documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.entityName}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.resourceName}`, lambdaRequestId);
 
   const queryParams: QueryCommandInput = {
     TableName: tableOpts.tableName,

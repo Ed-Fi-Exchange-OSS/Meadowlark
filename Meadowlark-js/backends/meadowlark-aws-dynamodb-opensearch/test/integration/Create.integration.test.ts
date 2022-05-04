@@ -10,16 +10,11 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb';
-import {
-  DocumentInfo,
-  entityTypeStringFrom,
-  newEntityInfo,
-  newSecurity,
-  documentIdForEntityInfo,
-} from '@edfi/meadowlark-core';
+import { DocumentInfo, newDocumentInfo, newSecurity, documentIdForDocumentInfo } from '@edfi/meadowlark-core';
 import * as DynamoRepository from '../../src/BaseDynamoRepository';
 import { createEntity } from '../../src/DynamoEntityRepository';
 import { sortKeyFromId } from '../../src/BaseDynamoRepository';
+import { entityTypeStringFrom } from '../../src/Utility';
 
 jest.setTimeout(120000);
 
@@ -48,17 +43,17 @@ async function createTable(tableDefinition: CreateTableInput): Promise<CreateTab
 
 describe('given the PUT run successfully in DynamoDb', () => {
   const documentInfo: DocumentInfo = {
-    ...newEntityInfo(),
+    ...newDocumentInfo(),
     edOrgId: 'edOrg id',
-    entityName: 'test name',
+    resourceName: 'test name',
     documentIdentity: [{ name: 'natural', value: 'key' }],
     projectName: 'a#project#name',
-    projectVersion: '1',
+    resourceVersion: '1',
     studentId: '1',
     descriptorValues: [],
   };
 
-  const id = documentIdForEntityInfo(documentInfo);
+  const id = documentIdForDocumentInfo(documentInfo);
   const bodyEntry = 'test';
 
   beforeAll(async () => {
