@@ -13,7 +13,7 @@ import { PaginationParameters } from './PaginationParameters';
 import { SearchResult } from './SearchResult';
 
 export interface MeadowlarkBackendPlugin {
-  createDocument: (
+  upsertDocument: (
     id: string,
     documentInfo: DocumentInfo,
     info: object,

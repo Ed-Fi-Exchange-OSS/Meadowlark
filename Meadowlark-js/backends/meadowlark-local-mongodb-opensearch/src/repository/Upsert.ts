@@ -3,12 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection } from 'mongodb';
+import { Collection, UpdateResult, Document } from 'mongodb';
 import { DocumentInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
-import { Document } from '../model/Document';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getMongoDocuments } from './Db';
 
-export async function createDocument(
+export async function upsertDocument(
   id: string,
   documentInfo: DocumentInfo,
   info: object,
@@ -16,9 +16,9 @@ export async function createDocument(
   _security: Security,
   _lambdaRequestId: string,
 ): Promise<PutResult> {
-  const mongoDocuments: Collection<Document> = getMongoDocuments();
+  const mongoDocuments: Collection<MeadowlarkDocument> = getMongoDocuments();
 
-  const document: Document = {
+  const document: MeadowlarkDocument = {
     id,
     projectName: documentInfo.projectName,
     resourceName: documentInfo.resourceName,
@@ -28,9 +28,10 @@ export async function createDocument(
   };
 
   try {
-    await mongoDocuments.insertOne(document);
+    const result: UpdateResult | Document = await mongoDocuments.replaceOne({ id }, document, { upsert: true });
+    if (result.upsertedCount === 0) return { result: 'INSERT_SUCCESS' };
+    return { result: 'UPDATE_SUCCESS' };
   } catch (e) {
     return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
-  return { result: 'INSERT_SUCCESS' };
 }

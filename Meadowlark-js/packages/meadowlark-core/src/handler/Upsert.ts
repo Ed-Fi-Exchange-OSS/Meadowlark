@@ -20,9 +20,9 @@ const moduleName = 'Create';
 /**
  * Entry point for API POST requests
  *
- * Validates resource and JSON document shape, extracts keys and forwards to DynamoRepository for creation
+ * Validates resource and JSON document shape, extracts keys and forwards to backend for creation/update
  */
-export async function create(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function upsert(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   try {
     writeRequestToLog(moduleName, event, context, 'create');
 
@@ -62,7 +62,7 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
     }
 
     const resourceId = documentIdForDocumentInfo(documentInfo);
-    const { result, failureMessage } = await getBackendPlugin().createDocument(
+    const { result, failureMessage } = await getBackendPlugin().upsertDocument(
       resourceId,
       documentInfo,
       body,

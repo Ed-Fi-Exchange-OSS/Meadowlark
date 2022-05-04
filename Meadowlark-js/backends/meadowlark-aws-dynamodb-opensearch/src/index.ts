@@ -5,7 +5,7 @@
 
 import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
 import {
-  createEntity as createDocument,
+  createEntity as upsertDocument,
   getEntityById as getDocumentById,
   getEntityList as getDocumentList,
   updateEntityById as updateDocumentById,
@@ -15,7 +15,7 @@ import { queryEntityList as queryDocumentList } from './ElasticsearchRepository'
 
 export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
   return {
-    createDocument,
+    upsertDocument,
     getDocumentById,
     getDocumentList,
     updateDocumentById,

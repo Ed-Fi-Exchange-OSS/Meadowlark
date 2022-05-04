@@ -12,8 +12,8 @@ import * as Meadowlark from '@edfi/meadowlark-core';
  *
  * Validates resource and JSON document shape, extracts keys and forwards to DynamoRepository for creation
  */
-export async function create(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return Meadowlark.create(event, context);
+export async function upsert(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+  return Meadowlark.upsert(event, context);
 }
 
 /**

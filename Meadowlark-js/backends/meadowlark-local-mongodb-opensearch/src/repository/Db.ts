@@ -5,11 +5,11 @@
 
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
-import { Document } from '../model/Document';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const MONGO_URL: string = process.env.MONGO_URL ?? 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
 
-const client = new MongoClient(MONGO_URL);
+const client = new MongoClient(MONGO_URL, { w: 'majority', readConcern: 'majority' });
 
 // IIFE for top-level await
 (async () => {
@@ -17,11 +17,11 @@ const client = new MongoClient(MONGO_URL);
     await client.connect();
 
     const db: Db = client.db('meadowlark');
-    const documents: Collection<Document> = db.collection('documents');
+    const documents: Collection<MeadowlarkDocument> = db.collection('meadowlarkDocuments');
 
     // Note this will trigger a time-consuming index build if the indexes do not already exist.
     documents.createIndex({ id: 1 }, { unique: true });
-    documents.createIndex({ out_refs: 1 });
+    documents.createIndex({ outRefs: 1 });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'unknown';
     Logger.error(`Error connecting MongoDb URL: "${MONGO_URL}". Error was ${message}`, null);
@@ -29,6 +29,6 @@ const client = new MongoClient(MONGO_URL);
   }
 })();
 
-export function getMongoDocuments(): Collection<Document> {
+export function getMongoDocuments(): Collection<MeadowlarkDocument> {
   return client.db('meadowlark').collection('documents');
 }

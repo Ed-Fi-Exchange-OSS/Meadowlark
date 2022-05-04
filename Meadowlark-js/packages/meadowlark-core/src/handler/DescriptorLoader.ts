@@ -114,7 +114,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         ],
       };
 
-      const putResult: PutResult = await getBackendPlugin().createDocument(
+      const putResult: PutResult = await getBackendPlugin().upsertDocument(
         documentIdForDocumentInfo(descriptorDocumentInfo),
         descriptorDocumentInfo,
         { ...descriptorDocument, _isDescriptor: true },

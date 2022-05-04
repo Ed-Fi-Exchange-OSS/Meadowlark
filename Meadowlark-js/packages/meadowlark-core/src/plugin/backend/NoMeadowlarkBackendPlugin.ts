@@ -15,7 +15,7 @@ import { Logger } from '../../helpers/Logger';
 import { MeadowlarkBackendPlugin } from './MeadowlarkBackendPlugin';
 
 export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
-  createDocument: (
+  upsertDocument: (
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
@@ -23,7 +23,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _security: Security,
     lambdaRequestId: string,
   ): Promise<PutResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.createDocument(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.upsertDocument(): No backend plugin has been configured', lambdaRequestId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 

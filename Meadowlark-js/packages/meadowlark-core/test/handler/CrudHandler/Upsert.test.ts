@@ -6,14 +6,14 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import { create } from '../../../src/handler/Create';
+import { upsert } from '../../../src/handler/Upsert';
 import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
-describe('when posting a request to create a new resource', () => {
+describe('when posting a request to upsert a new resource', () => {
   describe('given there is no request body', () => {
     let response: APIGatewayProxyResult;
 
@@ -26,7 +26,7 @@ describe('when posting a request to create a new resource', () => {
       } as any;
       const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
-      response = await create(event, context);
+      response = await upsert(event, context);
     }, 6000);
 
     it('returns status 400', () => {
@@ -50,7 +50,7 @@ describe('when posting a request to create a new resource', () => {
       } as any;
       const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
-      response = await create(event, context);
+      response = await upsert(event, context);
     });
 
     it('returns status 400', () => {
@@ -85,7 +85,7 @@ describe('when posting a request to create a new resource', () => {
         } as unknown as RequestValidator.ResourceValidationResult),
       );
 
-      response = await create(event, context);
+      response = await upsert(event, context);
     });
 
     afterAll(() => mockRequestValidator.mockRestore());
@@ -132,8 +132,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: expectedError,
@@ -141,7 +141,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -189,8 +189,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: 'Reference failure',
@@ -198,7 +198,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -246,8 +246,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_FAILURE_NOT_EXISTS',
             failureMessage: 'Does not exist',
@@ -255,7 +255,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -304,8 +304,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'UNKNOWN_FAILURE',
             failureMessage: expectedError,
@@ -313,7 +313,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -362,8 +362,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'INSERT_SUCCESS',
             failureMessage: null,
@@ -371,7 +371,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -425,8 +425,8 @@ describe('when posting a request to create a new resource', () => {
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
-        // Setup the create operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'createDocument').mockReturnValue(
+        // Setup the upsert operation to fail
+        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
@@ -434,7 +434,7 @@ describe('when posting a request to create a new resource', () => {
         );
 
         // Act
-        response = await create(event, context);
+        response = await upsert(event, context);
       });
 
       afterAll(() => {
@@ -475,10 +475,10 @@ describe('given requesting abstract classes', () => {
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Act
-    response[0] = await create(event, context);
+    response[0] = await upsert(event, context);
 
     event.path = 'local/v3.3b/ed-fi/GeneralStudentProgramAssociations';
-    response[1] = await create(event, context);
+    response[1] = await upsert(event, context);
   });
 
   it('returns status 404', () => {

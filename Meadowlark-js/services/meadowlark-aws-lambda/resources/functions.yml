@@ -1,5 +1,5 @@
-create:
-  handler: dist/handler/CrudHandler.create
+upsert:
+  handler: dist/handler/CrudHandler.upsert
   events:
     - http:
         method: post

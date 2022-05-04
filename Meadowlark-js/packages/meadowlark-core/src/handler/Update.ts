@@ -20,7 +20,7 @@ const moduleName = 'Update';
 /**
  * Entry point for all API PUT requests, which are "by id"
  *
- * Validates resource and JSON document shape, extracts keys and forwards to DynamoRepository for update
+ * Validates resource and JSON document shape, extracts keys and forwards to backend for update
  */
 export async function update(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   try {

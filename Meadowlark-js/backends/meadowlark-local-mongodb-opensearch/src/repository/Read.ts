@@ -5,7 +5,7 @@
 
 import { Collection, WithId } from 'mongodb';
 import { DocumentInfo, Security, GetResult } from '@edfi/meadowlark-core';
-import { Document } from '../model/Document';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getMongoDocuments } from './Db';
 
 export async function getDocumentById(
@@ -14,10 +14,10 @@ export async function getDocumentById(
   _security: Security,
   _lambdaRequestId: string,
 ): Promise<GetResult> {
-  const mongoDocuments: Collection<Document> = getMongoDocuments();
+  const mongoDocuments: Collection<MeadowlarkDocument> = getMongoDocuments();
 
   try {
-    const result: WithId<Document> | null = await mongoDocuments.findOne({ id });
+    const result: WithId<MeadowlarkDocument> | null = await mongoDocuments.findOne({ id });
     if (result === null) return { result: 'NOT_FOUND', documents: [] };
     return { result: 'SUCCESS', documents: [{ id: result.id, ...result.edfiDoc }] };
   } catch (e) {

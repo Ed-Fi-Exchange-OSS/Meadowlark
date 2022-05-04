@@ -16,7 +16,7 @@ export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 
 // Handlers
-export { create } from './handler/Create';
+export { upsert } from './handler/Upsert';
 export { deleteIt } from './handler/Delete';
 export { getResolver } from './handler/Get';
 export { update } from './handler/Update';
