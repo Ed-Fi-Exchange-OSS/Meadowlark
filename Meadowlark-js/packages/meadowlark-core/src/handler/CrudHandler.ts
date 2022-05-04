@@ -315,7 +315,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
 /**
  * Entry point for all API DELETE requests, which are "by id"
  *
- * Validates resource and forwards to DynamoRepository for deletion
+ * Validates resource and forwards to backend for deletion
  */
 export async function deleteIt(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   const { awsRequestId } = context;
@@ -341,85 +341,49 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
     }
 
-    if (jwtStatus.isOwnershipEnabled) {
-      const { isOwner, result: ownershipResult } = await getBackendPlugin().validateEntityOwnership(
-        pathComponents.resourceId,
-        documentInfo,
-        jwtStatus.subject,
-        awsRequestId,
-      );
-
-      if (ownershipResult === 'ERROR') {
-        writeDebugStatusToLog(context, 'deleteIt', 500);
-        return { body: '', statusCode: 500, headers: metaEdProjectHeaders };
-      }
-
-      if (ownershipResult === 'NOT_FOUND') {
-        writeDebugStatusToLog(context, 'deleteIt', 404);
-        return { body: '', statusCode: 404, headers: metaEdProjectHeaders };
-      }
-
-      if (!isOwner) {
-        writeDebugStatusToLog(context, 'deleteIt ownership not valid', 404);
-        return { body: '', statusCode: 404, headers: metaEdProjectHeaders };
-      }
-    }
-
-    const foreignKeysLookup = await getBackendPlugin().getReferencesToThisItem(
+    const { result, failureMessage } = await getBackendPlugin().deleteEntityById(
       pathComponents.resourceId,
       documentInfo,
-      awsRequestId,
-    );
-    if (!foreignKeysLookup.success || foreignKeysLookup.foreignKeys?.length > 0) {
-      const fks = foreignKeysLookup.foreignKeys.map((fk) => fk.Description);
-      const body = JSON.stringify({
-        error: 'Unable to delete this item because there are foreign keys pointing to it',
-        foreignKeys: fks,
-      });
-
-      writeDebugStatusToLog(context, 'deleteIt foreign keys exist', 409);
-      return { body, statusCode: 409, headers: metaEdProjectHeaders };
-    }
-
-    const { success } = await getBackendPlugin().deleteEntityById(pathComponents.resourceId, documentInfo, awsRequestId);
-
-    if (!success) {
-      writeDebugStatusToLog(context, 'deleteIt', 500);
-      return { body: '', statusCode: 500, headers: metaEdProjectHeaders };
-    }
-
-    // Now that the main object has been deleted, we need to delete the foreign key references
-    Logger.debug(
-      `CrudHandler.deleteIt deleting this item's foreign key references`,
-      context.awsRequestId,
-      null,
-      foreignKeysLookup.foreignKeys,
-    );
-    const { success: fkSuccess, foreignKeys } = await getBackendPlugin().getForeignKeyReferences(
-      pathComponents.resourceId,
-      documentInfo,
+      {
+        referenceValidation: event.headers['reference-validation'] !== 'false',
+        descriptorValidation: event.headers['descriptor-validation'] !== 'false',
+      },
+      {
+        ...newSecurity(),
+        isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
+        clientName: jwtStatus.subject,
+      },
       awsRequestId,
     );
 
-    if (fkSuccess) {
-      // Delete the (FREF, TREF) records
-      await getBackendPlugin().deleteItems(
-        foreignKeys.map((i) => ({ pk: i.From, sk: i.To })),
-        awsRequestId,
-      );
-      // And now reverse that, to delete the (TREF, FREF) records
-      await getBackendPlugin().deleteItems(
-        foreignKeys.map((i) => ({ pk: i.To, sk: i.From })),
-        awsRequestId,
-      );
-    } // Else: user can't resolve this error, and it should be logged already. Ignore.
-
-    // Currently we are returning 204 even if there was no record to delete, IF the resourceId looks like a real resourced
-    // id. Should we? Interestingly, a completely bogus resource Id like "i+am+not+an+id" gives a 404.
-    writeDebugStatusToLog(context, 'deleteIt', 204);
+    if (result === 'DELETE_SUCCESS') {
+      writeDebugStatusToLog(context, 'deleteIt', 204);
+      return {
+        body: '',
+        statusCode: 204,
+        headers: metaEdProjectHeaders,
+      };
+    }
+    if (result === 'DELETE_FAILURE_NOT_EXISTS') {
+      writeDebugStatusToLog(context, 'deleteIt', 404);
+      return {
+        body: '',
+        statusCode: 404,
+        headers: metaEdProjectHeaders,
+      };
+    }
+    if (result === 'DELETE_FAILURE_REFERENCE') {
+      writeDebugStatusToLog(context, 'deleteIt', 409, failureMessage);
+      return {
+        body: JSON.stringify({ message: failureMessage }),
+        statusCode: 409,
+        headers: metaEdProjectHeaders,
+      };
+    }
+    writeDebugStatusToLog(context, 'deleteIt', 500, failureMessage);
     return {
-      body: '',
-      statusCode: 204,
+      body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
+      statusCode: 500,
       headers: metaEdProjectHeaders,
     };
   } catch (e) {

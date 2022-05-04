@@ -4,11 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentInfo } from '../../model/DocumentInfo';
-import { ForeignKeyItem } from '../../model/ForeignKeyItem';
 import { Security } from '../../model/Security';
 import { ValidationOptions } from '../../model/ValidationOptions';
 import { GetResult } from './GetResult';
-import { OwnershipResult } from './OwnershipResult';
 import { PutResult } from './PutResult';
 import { DeleteResult } from './DeleteResult';
 import { PaginationParameters } from './PaginationParameters';
@@ -56,51 +54,15 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  deleteEntityById: (_id: string, _documentInfo: DocumentInfo, lambdaRequestId: string): Promise<DeleteResult> => {
+  deleteEntityById: (
+    _id: string,
+    _documentInfo: DocumentInfo,
+    _validationOptions: ValidationOptions,
+    _security: Security,
+    lambdaRequestId: string,
+  ): Promise<DeleteResult> => {
     Logger.warn('NoMeadowlarkBackendPlugin.deleteEntityById(): No backend plugin has been configured', lambdaRequestId);
-    return Promise.resolve({ success: false });
-  },
-
-  getReferencesToThisItem: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    lambdaRequestId: string,
-  ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> => {
-    Logger.warn(
-      'NoMeadowlarkBackendPlugin.getReferencesToThisItem(): No backend plugin has been configured',
-      lambdaRequestId,
-    );
-    return Promise.resolve({ success: false, foreignKeys: [] });
-  },
-
-  getForeignKeyReferences: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    lambdaRequestId: string,
-  ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> => {
-    Logger.warn(
-      'NoMeadowlarkBackendPlugin.getForeignKeyReferences(): No backend plugin has been configured',
-      lambdaRequestId,
-    );
-    return Promise.resolve({ success: false, foreignKeys: [] });
-  },
-
-  deleteItems: (_items: { pk: string; sk: string }[], lambdaRequestId: string): Promise<DeleteResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.deleteItems(): No backend plugin has been configured', lambdaRequestId);
-    return Promise.resolve({ success: false });
-  },
-
-  validateEntityOwnership: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    _clientName: string | null,
-    lambdaRequestId: string,
-  ): Promise<OwnershipResult> => {
-    Logger.warn(
-      'NoMeadowlarkBackendPlugin.validateEntityOwnership(): No backend plugin has been configured',
-      lambdaRequestId,
-    );
-    return Promise.resolve({ result: 'ERROR', isOwner: false });
+    return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
   queryEntityList: (

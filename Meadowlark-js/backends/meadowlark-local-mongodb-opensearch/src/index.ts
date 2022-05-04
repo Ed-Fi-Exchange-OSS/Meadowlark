@@ -5,11 +5,10 @@
 
 import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
 import { createEntity } from './repository/Create';
-import { deleteEntityById, deleteItems } from './repository/Delete';
+import { deleteEntityById } from './repository/Delete';
 import { getEntityById } from './repository/Read';
 import { getEntityList, queryEntityList } from './repository/Query';
 import { updateEntityById } from './repository/Update';
-import { getForeignKeyReferences, getReferencesToThisItem, validateEntityOwnership } from './repository/Unknown';
 
 export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
   return {
@@ -18,10 +17,6 @@ export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
     getEntityList,
     updateEntityById,
     deleteEntityById,
-    getReferencesToThisItem,
-    getForeignKeyReferences,
-    deleteItems,
-    validateEntityOwnership,
     queryEntityList,
   };
 }

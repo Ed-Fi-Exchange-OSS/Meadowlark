@@ -4,11 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentInfo } from '../../model/DocumentInfo';
-import { ForeignKeyItem } from '../../model/ForeignKeyItem';
 import { Security } from '../../model/Security';
 import { ValidationOptions } from '../../model/ValidationOptions';
 import { GetResult } from './GetResult';
-import { OwnershipResult } from './OwnershipResult';
 import { PutResult } from './PutResult';
 import { DeleteResult } from './DeleteResult';
 import { PaginationParameters } from './PaginationParameters';
@@ -42,28 +40,13 @@ export interface MeadowlarkBackendPlugin {
     _lambdaRequestId: string,
   ) => Promise<PutResult>;
 
-  deleteEntityById: (_id: string, _documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<DeleteResult>;
-
-  getReferencesToThisItem: (
+  deleteEntityById: (
     _id: string,
     _documentInfo: DocumentInfo,
+    _validationOptions: ValidationOptions,
+    _security: Security,
     _lambdaRequestId: string,
-  ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
-
-  getForeignKeyReferences: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    _lambdaRequestId: string,
-  ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
-
-  deleteItems: (_items: { pk: string; sk: string }[], _awsRequestId: string) => Promise<DeleteResult>;
-
-  validateEntityOwnership: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    _clientName: string | null,
-    _lambdaRequestId: string,
-  ) => Promise<OwnershipResult>;
+  ) => Promise<DeleteResult>;
 
   queryEntityList: (
     documentInfo: DocumentInfo,

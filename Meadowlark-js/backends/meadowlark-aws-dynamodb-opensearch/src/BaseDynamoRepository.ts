@@ -8,7 +8,6 @@ import { invariant } from 'ts-invariant';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import {
-  ForeignKeyItem,
   DocumentElement,
   DocumentReference,
   DocumentIdentity,
@@ -22,6 +21,7 @@ import {
   entityTypeStringFromComponents,
 } from '@edfi/meadowlark-core';
 import { PutItemInputAttributeMap, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
+import { ForeignKeyItem } from './model/ForeignKeyItem';
 
 // setup to switch between local and cloud dynamodb based on stage flag
 export const dynamoOpts: any = {};

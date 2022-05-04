@@ -19,11 +19,8 @@ import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
 import {
   Logger,
   ValidationOptions,
-  ForeignKeyItem,
-  DeleteResult,
   GetResult,
   PutResult,
-  OwnershipResult,
   Security,
   DocumentInfo,
   entityTypeStringFrom,
@@ -43,7 +40,10 @@ import {
   getDynamoDBClient,
 } from './BaseDynamoRepository';
 import { NoOutput, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
+import { ForeignKeyItem } from './model/ForeignKeyItem';
+import { OwnershipResult } from './model/OwnershipResult';
 
+export type DynamoDeleteResult = { success: boolean };
 type NextToken = string;
 
 /**
@@ -461,7 +461,7 @@ export async function createEntity(
 /*
  * Deletes any items by partition key and sort key, in batches of 25.
  */
-export async function deleteItems(items: { pk: string; sk: string }[], awsRequestId: string): Promise<DeleteResult> {
+export async function deleteItems(items: { pk: string; sk: string }[], awsRequestId: string): Promise<DynamoDeleteResult> {
   Logger.debug('DynamoEntityRepository.deleteItems', awsRequestId);
 
   const transactItems = items.map((item) => ({
@@ -499,12 +499,12 @@ export async function deleteItems(items: { pk: string; sk: string }[], awsReques
 /**
  * Deletes the primary item from DynamoDB.
  */
-export async function deleteEntityById(
+export async function deleteEntityByIdDynamo(
   id: string,
   documentInfo: DocumentInfo,
   lambdaRequestId: string,
-): Promise<DeleteResult> {
-  Logger.debug(`DynamoEntityRepository.deleteEntityById`, lambdaRequestId);
+): Promise<DynamoDeleteResult> {
+  Logger.debug(`DynamoEntityRepository.deleteEntityByIdDynamo`, lambdaRequestId);
 
   const deleteEntityItem: TransactWriteItem = {
     Delete: {
@@ -536,7 +536,7 @@ export async function deleteEntityById(
         return { success: true };
       }
     } else {
-      Logger.error(`DynamoEntityRepository.deleteEntityById`, lambdaRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, lambdaRequestId, '', error);
       return { success: false };
     }
   }

@@ -106,8 +106,8 @@ function documentPathsFromReferenceComponents(referenceComponents: ReferenceComp
 
 /**
  * Takes a ReferenceGroup representing a reference on a MetaEd entity, along with
- * an API JSON document matching that entity, and returns an array of foreign key bundles
- * for all of the portions of the reference.
+ * an API JSON document matching that entity, and returns a document identity
+ * for each reference.
  *
  * Example of document identities, representing a collection of two references to the same entity type
  * [
@@ -121,7 +121,7 @@ function documentIdentitiesFromReferenceGroup(
   entity: TopLevelEntity,
 ): DocumentIdentity[] {
   // The document paths of the reference group, which matches the API document paths to the
-  // foreign key elements of the entity being referenced.
+  // document identity elements of the entity being referenced.
   const documentPaths: string[] = documentPathsFromReferenceComponents(referenceGroup.referenceComponents, entity);
 
   const documentPathSets: string[][][] = extractRawDocumentPaths(referenceGroup, document);

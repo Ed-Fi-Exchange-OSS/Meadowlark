@@ -4,17 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
-import {
-  createEntity,
-  deleteEntityById,
-  deleteItems,
-  getEntityById,
-  getEntityList,
-  getForeignKeyReferences,
-  getReferencesToThisItem,
-  updateEntityById,
-  validateEntityOwnership,
-} from './DynamoEntityRepository';
+import { createEntity, getEntityById, getEntityList, updateEntityById } from './DynamoEntityRepository';
+import { deleteEntityById } from './DeleteOrchestrator';
 import { queryEntityList } from './ElasticsearchRepository';
 
 export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
@@ -24,10 +15,6 @@ export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
     getEntityList,
     updateEntityById,
     deleteEntityById,
-    getReferencesToThisItem,
-    getForeignKeyReferences,
-    deleteItems,
-    validateEntityOwnership,
     queryEntityList,
   };
 }

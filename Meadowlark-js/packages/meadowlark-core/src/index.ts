@@ -2,11 +2,9 @@ export { MeadowlarkBackendPlugin } from './plugin/backend/MeadowlarkBackendPlugi
 export { NoMeadowlarkBackendPlugin } from './plugin/backend/NoMeadowlarkBackendPlugin';
 export { GetResult } from './plugin/backend/GetResult';
 export { DeleteResult } from './plugin/backend/DeleteResult';
-export { OwnershipResult } from './plugin/backend/OwnershipResult';
 export { PaginationParameters } from './plugin/backend/PaginationParameters';
 export { PutResult } from './plugin/backend/PutResult';
 export { SearchResult } from './plugin/backend/SearchResult';
-export { ForeignKeyItem } from './model/ForeignKeyItem';
 export { Security, newSecurity } from './model/Security';
 export { ValidationOptions } from './model/ValidationOptions';
 export { DocumentElement } from './model/DocumentElement';

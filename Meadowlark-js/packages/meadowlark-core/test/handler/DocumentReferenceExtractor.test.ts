@@ -22,7 +22,7 @@ import {
 import { extractDocumentReferences } from '../../src/handler/DocumentReferenceExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
 
-describe('when extracting foreign keys from domain entity referencing one as identity and another as collection', () => {
+describe('when extracting document references from domain entity referencing one as identity and another as collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
   let result: DocumentReference[] = [];
