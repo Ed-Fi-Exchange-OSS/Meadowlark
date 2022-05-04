@@ -5,8 +5,9 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import * as GetResolvers from '../../../src/handler/GetResolvers';
-import { getResolver } from '../../../src/handler/CrudHandler';
+import * as GetById from '../../../src/handler/GetById';
+import * as Query from '../../../src/handler/Query';
+import { getResolver } from '../../../src/handler/Get';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -153,13 +154,11 @@ describe('given requesting abstract classes', () => {
 
 describe('given a valid get by id request', () => {
   let mockGetById;
-  let mockList;
   let mockQuery;
 
   beforeAll(async () => {
-    mockGetById = jest.spyOn(GetResolvers, 'getById').mockImplementation((() => null) as any);
-    mockList = jest.spyOn(GetResolvers, 'list').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(GetResolvers, 'query').mockImplementation((() => null) as any);
+    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation((() => null) as any);
+    mockQuery = jest.spyOn(Query, 'query').mockImplementation((() => null) as any);
 
     const event: APIGatewayProxyEvent = {
       body: '',
@@ -175,7 +174,6 @@ describe('given a valid get by id request', () => {
 
   afterAll(() => {
     mockGetById.mockRestore();
-    mockList.mockRestore();
     mockQuery.mockRestore();
   });
 
@@ -184,58 +182,17 @@ describe('given a valid get by id request', () => {
   });
 
   it('did not call list or query', () => {
-    expect(mockList).not.toHaveBeenCalled();
     expect(mockQuery).not.toHaveBeenCalled();
-  });
-});
-
-describe('given a valid list request', () => {
-  let mockGetById;
-  let mockList;
-  let mockQuery;
-
-  beforeAll(async () => {
-    mockGetById = jest.spyOn(GetResolvers, 'getById').mockImplementation((() => null) as any);
-    mockList = jest.spyOn(GetResolvers, 'list').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(GetResolvers, 'query').mockImplementation((() => null) as any);
-
-    const event: APIGatewayProxyEvent = {
-      body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
-      path: '/v3.3b/ed-fi/students',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
-
-    // Act
-    await getResolver(event, context);
-  });
-
-  afterAll(() => {
-    mockGetById.mockRestore();
-    mockList.mockRestore();
-    mockQuery.mockRestore();
-  });
-
-  it('called query', () => {
-    expect(mockQuery).toHaveBeenCalled();
-  });
-
-  it('did not call getById or list', () => {
-    expect(mockGetById).not.toHaveBeenCalled();
-    expect(mockList).not.toHaveBeenCalled();
   });
 });
 
 describe('given a valid query request', () => {
   let mockGetById;
-  let mockList;
   let mockQuery;
 
   beforeAll(async () => {
-    mockGetById = jest.spyOn(GetResolvers, 'getById').mockImplementation((() => null) as any);
-    mockList = jest.spyOn(GetResolvers, 'list').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(GetResolvers, 'query').mockImplementation((() => null) as any);
+    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation((() => null) as any);
+    mockQuery = jest.spyOn(Query, 'query').mockImplementation((() => null) as any);
 
     const event: APIGatewayProxyEvent = {
       body: '',
@@ -252,7 +209,6 @@ describe('given a valid query request', () => {
 
   afterAll(() => {
     mockGetById.mockRestore();
-    mockList.mockRestore();
     mockQuery.mockRestore();
   });
 
@@ -262,6 +218,5 @@ describe('given a valid query request', () => {
 
   it('did not call getById or list', () => {
     expect(mockGetById).not.toHaveBeenCalled();
-    expect(mockList).not.toHaveBeenCalled();
   });
 });

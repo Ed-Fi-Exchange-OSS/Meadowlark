@@ -7,7 +7,7 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../../src/validation/RequestValidator';
-import { query } from '../../../src/handler/GetResolvers';
+import { query } from '../../../src/handler/Query';
 import { SearchResult } from '../../../src/plugin/backend/SearchResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 

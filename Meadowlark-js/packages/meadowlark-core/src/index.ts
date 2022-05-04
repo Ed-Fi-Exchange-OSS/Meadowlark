@@ -23,7 +23,10 @@ export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 
 // Handlers
-export { create, deleteIt, getResolver, update } from './handler/CrudHandler';
+export { create } from './handler/Create';
+export { deleteIt } from './handler/Delete';
+export { getResolver } from './handler/Get';
+export { update } from './handler/Update';
 export { loadDescriptors } from './handler/DescriptorLoader';
 export {
   apiVersion,

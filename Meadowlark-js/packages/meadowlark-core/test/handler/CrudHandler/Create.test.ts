@@ -6,7 +6,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import { create } from '../../../src/handler/CrudHandler';
+import { create } from '../../../src/handler/Create';
 import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';

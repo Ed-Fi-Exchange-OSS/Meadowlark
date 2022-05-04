@@ -6,8 +6,8 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import * as Get from '../../../src/handler/GetResolvers';
-import { update } from '../../../src/handler/CrudHandler';
+import * as GetById from '../../../src/handler/GetById';
+import { update } from '../../../src/handler/Update';
 import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
@@ -251,7 +251,7 @@ describe('given a valid object', () => {
         );
 
         // Setup the GET request to succeed
-        jest.spyOn(Get, 'getById').mockReturnValue(Promise.resolve({ body: '', statusCode: 200 }));
+        jest.spyOn(GetById, 'getById').mockReturnValue(Promise.resolve({ body: '', statusCode: 200 }));
 
         // Setup the update operation to fail
         mockDynamo = jest.spyOn(getBackendPlugin(), 'updateEntityById').mockReturnValue(

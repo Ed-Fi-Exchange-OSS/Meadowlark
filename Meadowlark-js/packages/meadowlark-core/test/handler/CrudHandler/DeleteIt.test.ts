@@ -6,7 +6,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import { deleteIt } from '../../../src/handler/CrudHandler';
+import { deleteIt } from '../../../src/handler/Delete';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
