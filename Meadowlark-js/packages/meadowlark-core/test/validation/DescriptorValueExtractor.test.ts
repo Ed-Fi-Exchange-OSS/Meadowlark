@@ -25,7 +25,7 @@ import {
   subclassApiEntityMappingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 
-import { extractDescriptorValues } from '../../src/handler/DescriptorValueExtractor';
+import { extractDescriptorValues } from '../../src/validation/DescriptorValueExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
 
 describe('when extracting single descriptor value from domain entity', () => {

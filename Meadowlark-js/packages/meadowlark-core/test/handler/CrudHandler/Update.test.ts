@@ -8,7 +8,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 
 import * as Get from '../../../src/handler/GetResolvers';
 import { update } from '../../../src/handler/CrudHandler';
-import * as RequestValidator from '../../../src/handler/RequestValidator';
+import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
@@ -86,7 +86,7 @@ describe('given a completely missing resource path', () => {
           documentIdentity: [{ name: 'x', value: '123' }],
         },
         errorBody: null,
-        metaEdProjectHeaders: {},
+        headerMetadata: {},
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
@@ -131,7 +131,7 @@ describe('given a valid object', () => {
             documentIdentity: [{ name: 'x', value: '123' }],
           },
           errorBody: null,
-          metaEdProjectHeaders: metaEdHeaders,
+          headerMetadata: metaEdHeaders,
         } as unknown as RequestValidator.ResourceValidationResult),
       );
 
@@ -189,7 +189,7 @@ describe('given a valid object', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -246,7 +246,7 @@ describe('given a valid object', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -305,7 +305,7 @@ describe('given a valid object', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: metaEdHeaders,
+            headerMetadata: metaEdHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 

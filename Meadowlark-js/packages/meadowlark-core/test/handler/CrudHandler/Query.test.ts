@@ -6,7 +6,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import * as RequestValidator from '../../../src/handler/RequestValidator';
+import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { query } from '../../../src/handler/GetResolvers';
 import { SearchResult } from '../../../src/plugin/backend/SearchResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
@@ -31,7 +31,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: validationError,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
@@ -71,7 +71,7 @@ describe('given persistence fails', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: null,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
@@ -122,7 +122,7 @@ describe('given successful fetch from persistence', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: null,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 

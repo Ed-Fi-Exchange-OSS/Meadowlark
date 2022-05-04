@@ -24,7 +24,7 @@ export type ResourceValidationResult = {
   /**
    * Metadata for the MetaEd project loaded
    */
-  metaEdProjectHeaders?: any;
+  headerMetadata?: any;
   /**
    * Error messaging for validation failure
    */
@@ -57,7 +57,7 @@ export async function validateResource(
     metaEd,
     pathComponents.namespace,
   );
-  const metaEdProjectHeaders = {
+  const headerMetadata = {
     'X-MetaEd-Project-Name': metaEdConfiguration.projects[0].projectName,
     'X-MetaEd-Project-Version': metaEdConfiguration.projects[0].projectVersion,
     'X-MetaEd-Project-Package-Name': modelNpmPackage,
@@ -67,7 +67,7 @@ export async function validateResource(
     const invalidResourceMessage = `Invalid resource '${pathComponents.endpointName}'. The most similar resource is '${resourceName}'.`;
 
     return {
-      metaEdProjectHeaders,
+      headerMetadata,
       endpointName: pathComponents.endpointName,
       documentInfo: NoEntityInfo,
       errorBody: JSON.stringify({
@@ -78,7 +78,7 @@ export async function validateResource(
 
   if (exact === false && suggestion === false) {
     return {
-      metaEdProjectHeaders,
+      headerMetadata,
       endpointName: pathComponents.endpointName,
       documentInfo: NoEntityInfo,
       errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.endpointName}'.` }),
@@ -112,7 +112,7 @@ export async function validateResource(
   }
 
   return {
-    metaEdProjectHeaders,
+    headerMetadata,
     endpointName: pathComponents.endpointName,
     documentInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,

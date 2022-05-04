@@ -13,7 +13,7 @@ import { getBackendPlugin } from '../plugin/PluginLoader';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { Security } from '../model/Security';
-import { validateResource } from './RequestValidator';
+import { validateResource } from '../validation/RequestValidator';
 import { PaginationParameters } from '../plugin/backend/PaginationParameters';
 
 function writeDebugStatusToLog(context: Context, method: string, status: number, message: string = ''): void {
@@ -26,24 +26,24 @@ function writeDebugStatusToLog(context: Context, method: string, status: number,
  * Validates resource and forwards "get all" request to DynamoRepository
  */
 export async function list(pathComponents: PathComponents, context: Context): Promise<APIGatewayProxyResult> {
-  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'list', 404, errorBody);
-    return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
+    return { body: errorBody, statusCode: 404, headers: headerMetadata };
   }
 
   const { result, documents } = await getBackendPlugin().getEntityList(documentInfo, context.awsRequestId);
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(context, 'list', 500);
-    return { body: JSON.stringify({ message: 'Failure' }), statusCode: 500, headers: metaEdProjectHeaders };
+    return { body: JSON.stringify({ message: 'Failure' }), statusCode: 500, headers: headerMetadata };
   }
 
   writeDebugStatusToLog(context, 'list', 200);
   return {
     body: JSON.stringify(documents),
     statusCode: 200,
-    headers: metaEdProjectHeaders,
+    headers: headerMetadata,
   };
 }
 
@@ -62,10 +62,10 @@ export async function getById(
     return { body: '', statusCode: 404 };
   }
 
-  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'get', 404, errorBody);
-    return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
+    return { body: errorBody, statusCode: 404, headers: headerMetadata };
   }
 
   const { result, documents, securityResolved } = await getBackendPlugin().getEntityById(
@@ -77,7 +77,7 @@ export async function getById(
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(context, 'get', 500);
-    return { body: '', statusCode: 500, headers: metaEdProjectHeaders };
+    return { body: '', statusCode: 500, headers: headerMetadata };
   }
 
   if (documents.length < 1) {
@@ -85,7 +85,7 @@ export async function getById(
     return {
       body: '',
       statusCode: 404,
-      headers: { ...metaEdProjectHeaders, 'x-security-resolved': securityResolved?.join(',') },
+      headers: { ...headerMetadata, 'x-security-resolved': securityResolved?.join(',') },
     };
   }
 
@@ -93,7 +93,7 @@ export async function getById(
   return {
     body: JSON.stringify(documents[0]),
     statusCode: 200,
-    headers: { ...metaEdProjectHeaders, 'x-security-resolved': securityResolved?.join(',') },
+    headers: { ...headerMetadata, 'x-security-resolved': securityResolved?.join(',') },
   };
 }
 
@@ -110,10 +110,10 @@ export async function query(
   queryStringParameters: object,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
-  const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+  const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
   if (errorBody !== null) {
     writeDebugStatusToLog(context, 'query', 404, errorBody);
-    return { body: errorBody, statusCode: 404, headers: metaEdProjectHeaders };
+    return { body: errorBody, statusCode: 404, headers: headerMetadata };
   }
 
   const cleanQueryParameters: object = removeDisallowedQueryParameters(queryStringParameters);
@@ -128,10 +128,10 @@ export async function query(
 
   if (!success) {
     if (results?.length > 0) {
-      return { body: JSON.stringify(results), statusCode: 400, headers: metaEdProjectHeaders };
+      return { body: JSON.stringify(results), statusCode: 400, headers: headerMetadata };
     }
     writeDebugStatusToLog(context, 'query', 500);
-    return { body: '', statusCode: 500, headers: metaEdProjectHeaders };
+    return { body: '', statusCode: 500, headers: headerMetadata };
   }
 
   writeDebugStatusToLog(context, 'query', 200);
@@ -139,6 +139,6 @@ export async function query(
   return {
     body,
     statusCode: 200,
-    headers: metaEdProjectHeaders,
+    headers: headerMetadata,
   };
 }

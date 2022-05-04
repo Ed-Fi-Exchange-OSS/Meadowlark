@@ -7,7 +7,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { create } from '../../../src/handler/CrudHandler';
-import * as RequestValidator from '../../../src/handler/RequestValidator';
+import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { PutResult } from '../../../src/plugin/backend/PutResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
 
@@ -81,7 +81,7 @@ describe('when posting a request to create a new resource', () => {
         Promise.resolve({
           documentInfo: {},
           errorBody: expectedError,
-          metaEdProjectHeaders: expectedHeaders,
+          headerMetadata: expectedHeaders,
         } as unknown as RequestValidator.ResourceValidationResult),
       );
 
@@ -128,7 +128,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -185,7 +185,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -242,7 +242,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -300,7 +300,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: expectedHeaders,
+            headerMetadata: expectedHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -358,7 +358,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: metaEdHeaders,
+            headerMetadata: metaEdHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 
@@ -421,7 +421,7 @@ describe('when posting a request to create a new resource', () => {
               documentIdentity: [{ name: 'x', value: '123' }],
             },
             errorBody: null,
-            metaEdProjectHeaders: metaEdHeaders,
+            headerMetadata: metaEdHeaders,
           } as unknown as RequestValidator.ResourceValidationResult),
         );
 

@@ -5,7 +5,7 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { validateResource } from './RequestValidator';
+import { validateResource } from '../validation/RequestValidator';
 import { Logger } from '../helpers/Logger';
 import { PathComponents } from '../model/PathComponents';
 import { getById, query } from './GetResolvers';
@@ -90,11 +90,11 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
-    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
+    const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody != null) {
       const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'create', statusCode, errorBody);
-      return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
+      return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
     const resourceId = documentIdForEntityInfo(documentInfo);
@@ -115,47 +115,33 @@ export async function create(event: APIGatewayProxyEvent, context: Context): Pro
     );
     if (result === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(context, 'create', 201);
+      const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
       return {
         body: '',
         statusCode: 201,
-        headers: { ...metaEdProjectHeaders, Location: `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}` },
+        headers: { ...headerMetadata, Location: location },
       };
     }
     if (result === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(context, 'create', 200);
-      return {
-        body: '',
-        statusCode: 200,
-        headers: { ...metaEdProjectHeaders, Location: `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}` },
-      };
+      const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
+      return { body: '', statusCode: 200, headers: { ...headerMetadata, Location: location } };
     }
     if (result === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(context, 'create', 409);
-      return {
-        body: '',
-        statusCode: 409,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 409, headers: headerMetadata };
     }
     if (result === 'UPDATE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(context, 'create', 404);
-      return {
-        body: '',
-        statusCode: 404,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 404, headers: headerMetadata };
     }
     if (result === 'INSERT_FAILURE_REFERENCE' || result === 'INSERT_FAILURE_ASSIGNABLE_COLLISION') {
       writeDebugStatusToLog(context, 'create', 400, failureMessage);
-      return {
-        body: JSON.stringify({ message: failureMessage }),
-        statusCode: 400,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
     writeErrorToLog(context, event, 'create', 500, failureMessage);
-    return { body: '', statusCode: 500, headers: metaEdProjectHeaders };
+    return { body: '', statusCode: 500, headers: headerMetadata };
   } catch (e) {
     writeErrorToLog(context, event, 'create', 500, e);
     return { body: '', statusCode: 500 };
@@ -243,22 +229,18 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
-    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, body);
+    const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody !== null) {
       const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'update', statusCode, errorBody);
-      return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
+      return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
     const resourceIdFromBody = documentIdForEntityInfo(documentInfo);
     if (resourceIdFromBody !== pathComponents.resourceId) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(context, 'update', 400, failureMessage);
-      return {
-        body: JSON.stringify({ message: failureMessage }),
-        statusCode: 400,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
     const { result, failureMessage } = await getBackendPlugin().updateEntityById(
@@ -278,34 +260,18 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
     );
     if (result === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(context, 'update', 204);
-      return {
-        body: '',
-        statusCode: 204,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 204, headers: headerMetadata };
     }
     if (result === 'UPDATE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(context, 'update', 404);
-      return {
-        body: '',
-        statusCode: 404,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 404, headers: headerMetadata };
     }
     if (result === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(context, 'update', 400, failureMessage);
-      return {
-        body: JSON.stringify({ message: failureMessage }),
-        statusCode: 400,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
     writeDebugStatusToLog(context, 'update', 500, failureMessage);
-    return {
-      body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
-      statusCode: 500,
-      headers: metaEdProjectHeaders,
-    };
+    return { body: JSON.stringify({ message: failureMessage ?? 'Failure' }), statusCode: 500, headers: headerMetadata };
   } catch (e) {
     writeErrorToLog(context, event, 'update', 500, e);
     return { body: '', statusCode: 500 };
@@ -334,11 +300,11 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body: '', statusCode: 404 };
     }
 
-    const { documentInfo, errorBody, metaEdProjectHeaders } = await validateResource(pathComponents, null);
+    const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
     if (errorBody !== null) {
       const statusCode = documentInfo === NoEntityInfo ? 404 : 400;
       writeDebugStatusToLog(context, 'deleteIt', statusCode, errorBody);
-      return { body: errorBody, statusCode, headers: metaEdProjectHeaders };
+      return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
     const { result, failureMessage } = await getBackendPlugin().deleteEntityById(
@@ -358,34 +324,18 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
 
     if (result === 'DELETE_SUCCESS') {
       writeDebugStatusToLog(context, 'deleteIt', 204);
-      return {
-        body: '',
-        statusCode: 204,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 204, headers: headerMetadata };
     }
     if (result === 'DELETE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(context, 'deleteIt', 404);
-      return {
-        body: '',
-        statusCode: 404,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: '', statusCode: 404, headers: headerMetadata };
     }
     if (result === 'DELETE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(context, 'deleteIt', 409, failureMessage);
-      return {
-        body: JSON.stringify({ message: failureMessage }),
-        statusCode: 409,
-        headers: metaEdProjectHeaders,
-      };
+      return { body: JSON.stringify({ message: failureMessage }), statusCode: 409, headers: headerMetadata };
     }
     writeDebugStatusToLog(context, 'deleteIt', 500, failureMessage);
-    return {
-      body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
-      statusCode: 500,
-      headers: metaEdProjectHeaders,
-    };
+    return { body: JSON.stringify({ message: failureMessage ?? 'Failure' }), statusCode: 500, headers: headerMetadata };
   } catch (e) {
     writeErrorToLog(context, event, 'deleteIt', 500, e);
     return { body: '', statusCode: 500 };

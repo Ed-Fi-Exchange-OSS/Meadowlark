@@ -19,7 +19,7 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractDocumentReferences } from '../../src/handler/DocumentReferenceExtractor';
+import { extractDocumentReferences } from '../../src/validation/DocumentReferenceExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
 
 describe('when extracting document references from domain entity referencing one as identity and another as collection', () => {

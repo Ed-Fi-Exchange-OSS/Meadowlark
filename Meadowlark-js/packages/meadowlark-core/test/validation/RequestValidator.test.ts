@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { newDomainEntity, NoTopLevelEntity } from '@edfi/metaed-core';
-import { validateResource, ResourceValidationResult } from '../../src/handler/RequestValidator';
+import { validateResource, ResourceValidationResult } from '../../src/validation/RequestValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
 import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';
 import { NoEntityInfo } from '../../src/model/DocumentInfo';

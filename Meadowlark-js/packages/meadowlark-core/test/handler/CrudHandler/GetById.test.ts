@@ -7,7 +7,7 @@
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { getById } from '../../../src/handler/GetResolvers';
-import * as RequestValidator from '../../../src/handler/RequestValidator';
+import * as RequestValidator from '../../../src/validation/RequestValidator';
 import { Security } from '../../../src/model/Security';
 import { GetResult } from '../../../src/plugin/backend/GetResult';
 import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
@@ -32,7 +32,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: validationError,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
@@ -72,7 +72,7 @@ describe('given database lookup fails', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: null,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
@@ -123,7 +123,7 @@ describe('given a valid request', () => {
       Promise.resolve({
         documentInfo: {},
         errorBody: null,
-        metaEdProjectHeaders: metaEdHeaders,
+        headerMetadata: metaEdHeaders,
       } as RequestValidator.ResourceValidationResult),
     );
 
