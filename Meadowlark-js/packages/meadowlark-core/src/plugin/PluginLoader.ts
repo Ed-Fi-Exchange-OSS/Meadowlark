@@ -18,7 +18,7 @@ async function loadBackendPlugin(pluginNpmName: string) {
   return ((await import(pluginNpmName)) as any).initializeBackendPlugin();
 }
 
-// Workaround no top-level await with IIFE
+// IIFE for top-level await
 (async () => {
   if (process.env.BACKEND_PLUGIN_NAME) {
     try {
