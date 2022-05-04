@@ -11,7 +11,7 @@ import { DocumentInfo } from '../model/DocumentInfo';
 /**
  * Returns a SHAKE128 hash of length 224 bits for the given document identity for use as a document id.
  */
-export function idFromDocumentElements(documentIdentity: DocumentIdentity): string {
+export function idFromDocumentIdentity(documentIdentity: DocumentIdentity): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
   // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
 
@@ -33,7 +33,7 @@ export function documentIdForEntityInfo(documentInfo: DocumentInfo): string {
   const documentIdentity: DocumentIdentity =
     documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 
-  return idFromDocumentElements(documentIdentity);
+  return idFromDocumentIdentity(documentIdentity);
 }
 
 /**

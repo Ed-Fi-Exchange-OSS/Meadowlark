@@ -10,7 +10,7 @@ export { ValidationOptions } from './model/ValidationOptions';
 export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';
 export { DocumentIdentity } from './model/DocumentIdentity';
-export { documentIdForEntityInfo, idFromDocumentElements } from './helpers/DocumentId';
+export { documentIdForEntityInfo, idFromDocumentIdentity as idFromDocumentElements } from './helpers/DocumentId';
 export {
   DocumentInfo,
   newEntityInfo,
