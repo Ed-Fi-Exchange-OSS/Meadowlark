@@ -9,7 +9,7 @@ import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const MONGO_URL: string = process.env.MONGO_URL ?? 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
 
-const client = new MongoClient(MONGO_URL, { w: 'majority', readConcern: 'majority' });
+const client = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
 
 // IIFE for top-level await
 (async () => {
@@ -17,7 +17,7 @@ const client = new MongoClient(MONGO_URL, { w: 'majority', readConcern: 'majorit
     await client.connect();
 
     const db: Db = client.db('meadowlark');
-    const documents: Collection<MeadowlarkDocument> = db.collection('meadowlarkDocuments');
+    const documents: Collection<MeadowlarkDocument> = db.collection('documents');
 
     // Note this will trigger a time-consuming index build if the indexes do not already exist.
     documents.createIndex({ id: 1 }, { unique: true });
