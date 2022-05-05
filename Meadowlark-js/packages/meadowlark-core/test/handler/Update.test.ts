@@ -6,11 +6,11 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import * as GetById from '../../../src/handler/GetById';
-import { update } from '../../../src/handler/Update';
-import * as RequestValidator from '../../../src/validation/RequestValidator';
-import { PutResult } from '../../../src/plugin/backend/PutResult';
-import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
+import * as GetById from '../../src/handler/GetById';
+import { update } from '../../src/handler/Update';
+import * as RequestValidator from '../../src/validation/RequestValidator';
+import { PutResult } from '../../src/plugin/backend/PutResult';
+import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -112,7 +112,7 @@ describe('given a valid object', () => {
   describe('given the object does not exist', () => {
     let mockDynamo: any;
     const metaEdHeaders = { header: 'one' };
-    const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
+    const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
     beforeAll(async () => {
       const event: APIGatewayProxyEvent = {
@@ -170,7 +170,7 @@ describe('given a valid object', () => {
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
+      const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -227,7 +227,7 @@ describe('given a valid object', () => {
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
+      const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -286,7 +286,7 @@ describe('given a valid object', () => {
     describe('given persistence succeeds', () => {
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const path = '/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3';
+      const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {

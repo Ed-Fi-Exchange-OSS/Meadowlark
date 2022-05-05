@@ -111,8 +111,9 @@ describe('when extracting document references from domain entity referencing one
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "ClassPeriod",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -126,8 +127,9 @@ describe('when extracting document references from domain entity referencing one
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "ClassPeriod",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -141,8 +143,9 @@ describe('when extracting document references from domain entity referencing one
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "CourseOffering",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "CourseOffering",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -204,8 +207,9 @@ describe('when extracting with optional reference in body', () => {
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "CourseOffering",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "CourseOffering",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -321,8 +325,9 @@ describe('when extracting optional collection in body', () => {
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "ClassPeriod",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -332,8 +337,9 @@ describe('when extracting optional collection in body', () => {
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "ClassPeriod",
-          "metaEdType": "domainEntity",
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+          "resourceVersion": "",
         },
       ]
     `);

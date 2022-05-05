@@ -5,9 +5,9 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import * as GetById from '../../../src/handler/GetById';
-import * as Query from '../../../src/handler/Query';
-import { getResolver } from '../../../src/handler/Get';
+import * as GetById from '../../src/handler/GetById';
+import * as Query from '../../src/handler/Query';
+import { getResolver } from '../../src/handler/Get';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 

@@ -95,7 +95,7 @@ export function newDocumentInfo(): DocumentInfo {
  */
 export const NoDocumentInfo = {
   ...newDocumentInfo(),
-  resourceName: 'NoEntityName',
+  resourceName: 'NoResourceName',
   projectName: 'NoProjectName',
   resourceVersion: '0.0.0',
 };

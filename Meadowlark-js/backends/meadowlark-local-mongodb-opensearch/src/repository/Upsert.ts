@@ -4,7 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, UpdateResult, Document } from 'mongodb';
-import { DocumentInfo, Security, ValidationOptions, PutResult } from '@edfi/meadowlark-core';
+import {
+  DocumentInfo,
+  Security,
+  ValidationOptions,
+  PutResult,
+  documentIdForDocumentReference,
+  DocumentReference,
+} from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getMongoDocuments } from './Db';
 
@@ -20,11 +27,12 @@ export async function upsertDocument(
 
   const document: MeadowlarkDocument = {
     id,
+    documentIdentity: documentInfo.documentIdentity,
     projectName: documentInfo.projectName,
     resourceName: documentInfo.resourceName,
     resourceVersion: documentInfo.resourceVersion,
     edfiDoc: info,
-    outRefs: [], // TODO
+    outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
   };
 
   try {

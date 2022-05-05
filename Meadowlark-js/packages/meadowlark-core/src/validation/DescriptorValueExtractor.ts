@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { TopLevelEntity } from '@edfi/metaed-core';
+import { normalizeDescriptorSuffix, TopLevelEntity } from '@edfi/metaed-core';
 import {
   CollectedProperty,
   EntityMeadowlarkData,
@@ -58,8 +58,9 @@ function extractDescriptorValuesFromBody(
   if (body[bodyDescriptorName] == null) return [];
   return [
     {
-      metaEdType: apiMapping.metaEdType,
-      metaEdName: apiMapping.metaEdName,
+      projectName: collectedProperty.property.namespace.projectName,
+      resourceVersion: collectedProperty.property.namespace.projectVersion,
+      resourceName: normalizeDescriptorSuffix(apiMapping.metaEdName),
       isAssignableFrom: false,
       documentIdentity: [
         {

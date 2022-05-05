@@ -3,12 +3,19 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { DocumentIdentity } from '@edfi/meadowlark-core';
+
 export interface MeadowlarkDocument {
   /**
    * A string hash derived from the project name, resource name, resource version
    * and identity of the API document. This field will be a unique index on the collection.
    */
   id: string;
+
+  /**
+   * The identity elements extracted from the API document.
+   */
+  documentIdentity: DocumentIdentity;
 
   /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.

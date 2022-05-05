@@ -296,7 +296,7 @@ export async function updateEntityById(
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${
-              failureForeignKey.metaEdName
+              failureForeignKey.resourceName
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
@@ -307,7 +307,7 @@ export async function updateEntityById(
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
               failureDescriptorValue.documentIdentity,
-            )} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
+            )} is not a valid value for descriptor ${failureDescriptorValue.resourceName}.`,
           };
         }
       }
@@ -397,7 +397,7 @@ export async function createEntity(
           return {
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${
-              failureForeignKey.metaEdName
+              failureForeignKey.resourceName
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
@@ -408,7 +408,7 @@ export async function createEntity(
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
               failureDescriptorValue.documentIdentity,
-            )} is not a valid value for descriptor ${failureDescriptorValue.metaEdName}.`,
+            )} is not a valid value for descriptor ${failureDescriptorValue.resourceName}.`,
           };
         }
       }

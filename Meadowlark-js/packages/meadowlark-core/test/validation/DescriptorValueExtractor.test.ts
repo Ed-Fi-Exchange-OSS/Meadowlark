@@ -82,8 +82,9 @@ describe('when extracting single descriptor value from domain entity', () => {
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "GradingPeriod",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "GradingPeriodDescriptor",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -145,8 +146,9 @@ describe('when extracting descriptor values from domain entity with the same nam
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "GradingPeriod",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "GradingPeriodDescriptor",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -410,8 +412,9 @@ describe('when extracting collection from domain entity subclass with no naming 
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "SchoolCategory",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "SchoolCategoryDescriptor",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [

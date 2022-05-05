@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { TopLevelEntity, ReferentialProperty } from '@edfi/metaed-core';
+import { TopLevelEntity, ReferentialProperty, normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import {
   EntityMeadowlarkData,
   EntityPropertyMeadowlarkData,
@@ -177,9 +177,15 @@ function documentReferencesFromReferenceGroup(
     // Check if this reference is to an assignable entity. If so, the identity to a superclass
     const assignable: Assignable | null = deriveAssignableFrom(referencedEntity, documentIdentity);
 
+    let resourceName = referenceGroup.sourceProperty.metaEdName;
+    if (referenceGroup.sourceProperty.type === 'descriptor') {
+      resourceName = normalizeDescriptorSuffix(resourceName);
+    }
+
     result.push({
-      metaEdType: referenceGroup.sourceProperty.type,
-      metaEdName: referenceGroup.sourceProperty.metaEdName,
+      projectName: referenceGroup.sourceProperty.namespace.projectName,
+      resourceName,
+      resourceVersion: referenceGroup.sourceProperty.namespace.projectVersion,
       documentIdentity: assignable == null ? documentIdentity : assignable.assignableIdentity,
       isAssignableFrom: referencedEntity.subclassedBy.length > 0,
     });

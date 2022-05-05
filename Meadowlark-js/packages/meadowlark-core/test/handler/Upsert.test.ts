@@ -6,10 +6,10 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import { upsert } from '../../../src/handler/Upsert';
-import * as RequestValidator from '../../../src/validation/RequestValidator';
-import { PutResult } from '../../../src/plugin/backend/PutResult';
-import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
+import { upsert } from '../../src/handler/Upsert';
+import * as RequestValidator from '../../src/validation/RequestValidator';
+import { PutResult } from '../../src/plugin/backend/PutResult';
+import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -339,7 +339,7 @@ describe('when posting a request to upsert a new resource', () => {
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const location = `/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3`;
+      const location = `/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21`;
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {
@@ -402,7 +402,7 @@ describe('when posting a request to upsert a new resource', () => {
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
-      const location = `/v3.3b/ed-fi/academicWeeks/0e44c7538d2ada64aa2ab80a69994f18e05c9f101df8f6c57689c2d3`;
+      const location = `/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21`;
 
       beforeAll(async () => {
         const event: APIGatewayProxyEvent = {

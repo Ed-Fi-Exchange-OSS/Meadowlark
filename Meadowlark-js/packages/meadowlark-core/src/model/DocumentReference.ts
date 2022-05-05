@@ -3,21 +3,25 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { PropertyType, ModelType } from '@edfi/metaed-core';
 import { DocumentIdentity } from './DocumentIdentity';
 
 export type DocumentReference = {
   /**
-   * The MetaEd entity type of the referenced entity.
-   * Example: 'domainEntity'
+   * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  metaEdType: PropertyType | ModelType;
+  projectName: string;
 
   /**
-   * The MetaEd name of the referenced entity.
-   * Example: 'School'
+   * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
+   * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  metaEdName: string;
+  resourceName: string;
+
+  /**
+   * The resource version as a string. This is the same as the MetaEd project version
+   * the entity is defined in e.g. "3.3.1-b" for a 3.3b data standard entity.
+   */
+  resourceVersion: string;
 
   /**
    * True if the referenced entity is assignable from other entities (meaning it is a superclass),

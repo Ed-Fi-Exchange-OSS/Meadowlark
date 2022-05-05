@@ -6,10 +6,11 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
-import * as RequestValidator from '../../../src/validation/RequestValidator';
-import { query } from '../../../src/handler/Query';
-import { SearchResult } from '../../../src/plugin/backend/SearchResult';
-import { getBackendPlugin } from '../../../src/plugin/PluginLoader';
+import { getById } from '../../src/handler/GetById';
+import * as RequestValidator from '../../src/validation/RequestValidator';
+import { Security } from '../../src/model/Security';
+import { GetResult } from '../../src/plugin/backend/GetResult';
+import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -22,7 +23,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
       version: 'a',
       namespace: 'b',
       endpointName: 'c',
-      resourceId: null,
+      resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
@@ -36,7 +37,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await getById(pathComponents, context, {} as Security);
   });
 
   afterAll(() => {
@@ -51,10 +52,10 @@ describe('given the endpoint is not in the MetaEd model', () => {
   });
 });
 
-describe('given persistence fails', () => {
+describe('given database lookup fails', () => {
   let response: APIGatewayProxyResult;
   let mockRequestValidator: any;
-  let mockElasticsearch: any;
+  let mockDynamo: any;
   const metaEdHeaders = { header: 'one' };
 
   beforeAll(async () => {
@@ -62,7 +63,7 @@ describe('given persistence fails', () => {
       version: 'a',
       namespace: 'b',
       endpointName: 'c',
-      resourceId: null,
+      resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
@@ -75,21 +76,22 @@ describe('given persistence fails', () => {
       } as unknown as RequestValidator.ResourceValidationResult),
     );
 
-    // Setup the query operation to fail
-    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryDocumentList').mockReturnValue(
+    // Setup the get operation to fail
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getDocumentById').mockReturnValue(
       Promise.resolve({
-        success: false,
-        results: [],
-      } as unknown as SearchResult),
+        result: 'ERROR',
+        documents: [],
+        failureMessage: null,
+      } as GetResult),
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await getById(pathComponents, context, {} as Security);
   });
 
   afterAll(() => {
     mockRequestValidator.mockRestore();
-    mockElasticsearch.mockRestore();
+    mockDynamo.mockRestore();
   });
 
   it('returns status 500', () => {
@@ -101,19 +103,18 @@ describe('given persistence fails', () => {
   });
 });
 
-describe('given successful fetch from persistence', () => {
+describe('given a valid request', () => {
   let response: APIGatewayProxyResult;
   let mockRequestValidator: any;
-  let mockElasticsearch: any;
+  let mockDynamo: any;
   const metaEdHeaders = { header: 'one' };
-  const goodResult: object = { goodResult: 'result' };
 
   beforeAll(async () => {
     const pathComponents = {
       version: 'a',
       namespace: 'b',
       endpointName: 'c',
-      resourceId: null,
+      resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
     const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
@@ -123,24 +124,25 @@ describe('given successful fetch from persistence', () => {
         documentInfo: {},
         errorBody: null,
         headerMetadata: metaEdHeaders,
-      } as unknown as RequestValidator.ResourceValidationResult),
+      } as RequestValidator.ResourceValidationResult),
     );
 
-    // Setup the query operation to succeed
-    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryDocumentList').mockReturnValue(
+    // Setup the get operation to succeed
+    mockDynamo = jest.spyOn(getBackendPlugin(), 'getDocumentById').mockReturnValue(
       Promise.resolve({
-        success: true,
-        results: [goodResult],
-      } as unknown as SearchResult),
+        result: 'SUCCESS',
+        failureMessage: null,
+        documents: [{ a: 'result' }],
+      } as GetResult),
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await getById(pathComponents, context, {} as Security);
   });
 
   afterAll(() => {
     mockRequestValidator.mockRestore();
-    mockElasticsearch.mockRestore();
+    mockDynamo.mockRestore();
   });
 
   it('returns status 200', () => {
@@ -151,11 +153,7 @@ describe('given successful fetch from persistence', () => {
     expect(response.headers).toEqual(metaEdHeaders);
   });
 
-  it('returns 1 result', () => {
-    expect(JSON.parse(response.body)).toHaveLength(1);
-  });
-
-  it('returns good result', () => {
-    expect(JSON.parse(response.body)[0].goodResult).toEqual('result');
+  it('returns expected body', () => {
+    expect(response.body).toEqual('{"a":"result"}');
   });
 });

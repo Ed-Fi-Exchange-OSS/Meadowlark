@@ -45,14 +45,16 @@ describe('when collecting foreign key references', () => {
     info.resourceName = 'Parent';
     info.resourceVersion = '3.3.1-b';
     info.documentReferences.push({
-      metaEdType: 'domainEntity',
-      metaEdName: 'Person',
+      projectName: info.projectName,
+      resourceVersion: info.resourceVersion,
+      resourceName: 'Person',
       documentIdentity: personNK,
       isAssignableFrom: false,
     });
     info.documentReferences.push({
-      metaEdType: 'domainEntity',
-      metaEdName: 'EducationOrganization',
+      projectName: info.projectName,
+      resourceVersion: info.resourceVersion,
+      resourceName: 'EducationOrganization',
       documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],
       isAssignableFrom: false,
     });
@@ -111,8 +113,9 @@ describe('when collecting foreign key references', () => {
     info.resourceName = 'Parent';
     info.resourceVersion = '3.3.1-b';
     info.descriptorValues.push({
-      metaEdType: 'domainEntity',
-      metaEdName: 'Something',
+      projectName: info.projectName,
+      resourceVersion: info.resourceVersion,
+      resourceName: 'SomethingDescriptor',
       documentIdentity: [
         {
           name: 'descriptor',

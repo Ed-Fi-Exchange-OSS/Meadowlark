@@ -12,11 +12,12 @@ import {
   DocumentReference,
   DocumentIdentity,
   documentIdForDocumentInfo,
-  idFromDocumentElements,
+  documentIdForDocumentIdentifyingInfo,
   DocumentInfo,
   DocumentIdentifyingInfo,
   DocumentTypeInfo,
   Logger,
+  documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
 import { PutItemInputAttributeMap, TransactWriteItem } from './types/AwsSdkLibDynamoDb';
 import { ForeignKeyItem } from './model/ForeignKeyItem';
@@ -90,7 +91,7 @@ export function conditionCheckFrom(entityIdentifyingInfo: DocumentIdentifyingInf
       TableName: tableOpts.tableName,
       Key: {
         pk: entityTypeStringFrom(entityIdentifyingInfo),
-        sk: sortKeyFromId(idFromDocumentElements(entityIdentifyingInfo.documentIdentity)),
+        sk: sortKeyFromId(documentIdForDocumentIdentifyingInfo(entityIdentifyingInfo)),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
@@ -103,7 +104,7 @@ export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeI
       TableName: tableOpts.tableName,
       Key: {
         pk: entityTypeStringFrom(assignableToTypeInfo),
-        sk: assignableSortKeyFromId(idFromDocumentElements(documentIdentity)),
+        sk: assignableSortKeyFromId(documentIdForDocumentIdentifyingInfo({ ...assignableToTypeInfo, documentIdentity })),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
@@ -116,7 +117,7 @@ export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteI
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
       projectName: documentInfo.projectName,
       resourceVersion: documentInfo.resourceVersion,
-      resourceName: documentReference.metaEdName,
+      resourceName: documentReference.resourceName,
       isDescriptor: false,
     };
 
@@ -137,7 +138,7 @@ export function descriptorValueConditions(documentInfo: DocumentInfo): TransactW
       // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
       projectName: documentInfo.projectName,
       resourceVersion: documentInfo.resourceVersion,
-      resourceName: descriptorValue.metaEdName,
+      resourceName: descriptorValue.resourceName,
       isDescriptor: true,
       documentIdentity: descriptorValue.documentIdentity,
     }),
@@ -201,7 +202,15 @@ export function constructAssignablePutItem(documentInfo: DocumentInfo): Transact
       TableName: tableOpts.tableName,
       Item: {
         pk: assignableToType,
-        sk: assignableSortKeyFromId(idFromDocumentElements(documentInfo.assignableInfo.assignableIdentity)),
+        sk: assignableSortKeyFromId(
+          documentIdForDocumentIdentifyingInfo({
+            projectName: documentInfo.projectName,
+            resourceName: documentInfo.resourceName,
+            resourceVersion: documentInfo.resourceVersion,
+            isDescriptor: false,
+            documentIdentity: documentInfo.assignableInfo.assignableIdentity,
+          }),
+        ),
       },
       ConditionExpression: 'attribute_not_exists(sk)',
     },
@@ -265,7 +274,7 @@ export function generateReferenceItems(naturalKeyHash: string, item: DocumentInf
   const referenceType = entityTypeStringFromComponents(item.projectName, item.resourceVersion, item.resourceName);
 
   const extractReferences = R.forEach((documentReference: DocumentReference) => {
-    const referenceId = sortKeyFromId(idFromDocumentElements(documentReference.documentIdentity));
+    const referenceId = sortKeyFromId(documentIdForDocumentReference(documentReference));
 
     const fk = new ForeignKeyItem({
       From: naturalKeyHash,
