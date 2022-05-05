@@ -9,7 +9,7 @@ import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const MONGO_URL: string = process.env.MONGO_URL ?? 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
 
-const client = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
+const client: MongoClient = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
 
 // IIFE for top-level await
 (async () => {
@@ -31,4 +31,8 @@ const client = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'ma
 
 export function getMongoDocuments(): Collection<MeadowlarkDocument> {
   return client.db('meadowlark').collection('documents');
+}
+
+export function getClient(): MongoClient {
+  return client;
 }
