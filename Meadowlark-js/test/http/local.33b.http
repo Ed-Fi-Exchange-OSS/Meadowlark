@@ -1,7 +1,8 @@
-### Create with POST
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ###
 GET http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+{{auth_header}}
 
 ### Created an EducationContents record
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
@@ -38,6 +39,7 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/4a7d89fd5b4247a
 
 ### Strict validation is enabled, this will fail due to an invalid country
 POST http://localhost:3000/local/v3.3b/ed-fi/students
+{{auth_header}}
 reference-validation: true
 
 { 
@@ -168,6 +170,7 @@ reference-validation: false
 ### Create a location - school does not exist.
 ## This has an unusual error message - complains about educationOrganizationId not existing because it is renamed schoolId by School.
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
+{{auth_header}}
 reference-validation: true
 
 {
@@ -181,6 +184,7 @@ reference-validation: true
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
+{{auth_header}}
 descriptor-validation: false
 
 {

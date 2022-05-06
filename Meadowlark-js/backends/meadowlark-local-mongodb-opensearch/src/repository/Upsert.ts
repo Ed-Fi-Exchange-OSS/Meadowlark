@@ -57,15 +57,18 @@ export async function upsertDocument(
         const isInsert: boolean = (await mongoDocuments.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
 
         // TODO: provide message on which references are bad, by comparing outRefs to existingOutRefs
-        upsertResult = { result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE' };
+        upsertResult = {
+          result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: 'References not found',
+        };
         await session.abortTransaction();
+      } else {
+        // Perform the document upsert
+        Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, lambdaRequestId);
+
+        const { upsertedCount } = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
+        upsertResult.result = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
       }
-
-      // Perform the document upsert
-      const replacementResult = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
-
-      if (replacementResult.upsertedCount === 0) return { result: 'UPDATE_SUCCESS' };
-      return { result: 'INSERT_SUCCESS' };
     });
   } catch (e) {
     Logger.error('mongodb.repository.Upsert.upsertDocument', lambdaRequestId, e);
