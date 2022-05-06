@@ -20,11 +20,13 @@ export async function upsertDocument(
   id: string,
   documentInfo: DocumentInfo,
   info: object,
-  _validationOptions: ValidationOptions,
+  validationOptions: ValidationOptions,
   _security: Security,
   lambdaRequestId: string,
 ): Promise<PutResult> {
   const mongoDocuments: Collection<MeadowlarkDocument> = getMongoDocuments();
+
+  const { referenceValidation, descriptorValidation } = validationOptions;
 
   const document: MeadowlarkDocument = {
     id,
@@ -47,28 +49,32 @@ export async function upsertDocument(
   try {
     await session.withTransaction(async () => {
       // Validate reference document existence
-      const findDocumentsMatchingOutRefs = mongoDocuments.find({ id: { $in: document.outRefs } }, ONLY_ID_IN_RESULT);
-      const existingOutRefs: MeadowlarkDocumentId[] = await findDocumentsMatchingOutRefs.toArray();
+      if (referenceValidation) {
+        const findDocumentsMatchingOutRefs = mongoDocuments.find({ id: { $in: document.outRefs } }, ONLY_ID_IN_RESULT);
+        const existingOutRefs: MeadowlarkDocumentId[] = await findDocumentsMatchingOutRefs.toArray();
 
-      if (document.outRefs.length !== existingOutRefs.length) {
-        Logger.debug('mongodb.repository.Upsert.upsertDocument: references not found', lambdaRequestId);
+        // Check for missing references
+        if (document.outRefs.length !== existingOutRefs.length) {
+          Logger.debug('mongodb.repository.Upsert.upsertDocument: references not found', lambdaRequestId);
 
-        // DB read to check whether this was an update or insert attempt
-        const isInsert: boolean = (await mongoDocuments.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
+          // DB read to check whether this was an update or insert attempt
+          const isInsert: boolean = (await mongoDocuments.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
 
-        // TODO: provide message on which references are bad, by comparing outRefs to existingOutRefs
-        upsertResult = {
-          result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
-          failureMessage: 'References not found',
-        };
-        await session.abortTransaction();
-      } else {
-        // Perform the document upsert
-        Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, lambdaRequestId);
-
-        const { upsertedCount } = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
-        upsertResult.result = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+          // TODO: provide message on which references are bad, by comparing outRefs to existingOutRefs
+          upsertResult = {
+            result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
+            failureMessage: 'References not found',
+          };
+          await session.abortTransaction();
+          return;
+        }
       }
+
+      // Perform the document upsert
+      Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, lambdaRequestId);
+
+      const { upsertedCount } = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
+      upsertResult.result = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
     });
   } catch (e) {
     Logger.error('mongodb.repository.Upsert.upsertDocument', lambdaRequestId, e);
