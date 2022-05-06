@@ -112,7 +112,7 @@ describe('when collecting foreign key references', () => {
     info.projectName = 'Ed-Fi';
     info.resourceName = 'Parent';
     info.resourceVersion = '3.3.1-b';
-    info.descriptorValues.push({
+    info.descriptorReferences.push({
       projectName: info.projectName,
       resourceVersion: info.resourceVersion,
       resourceName: 'SomethingDescriptor',

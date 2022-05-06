@@ -42,8 +42,8 @@ type NextToken = string;
 /**
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
  */
-export async function getEntityList(documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.resourceName}`, lambdaRequestId);
+export async function getEntityList(documentInfo: DocumentInfo, traceId: string): Promise<GetResult> {
+  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.resourceName}`, traceId);
 
   const queryParams: QueryCommandInput = {
     TableName: tableOpts.tableName,
@@ -65,7 +65,7 @@ export async function getEntityList(documentInfo: DocumentInfo, lambdaRequestId:
       documents: Array.from(queryResult.Items ?? []).map((item) => ({ id: entityIdPrefixRemoved(item.sk), ...item.info })),
     };
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityList`, lambdaRequestId, '', error);
+    Logger.error(`DynamoEntityRepository.getEntityList`, traceId, '', error);
     return { result: 'ERROR', documents: [] };
   }
 }
@@ -78,7 +78,7 @@ async function edOrgsForStudent(
   throughAssociation: string,
   studentId: string,
   edOrgIds: string[],
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<string[]> {
   const securityEdOrgPrefix = `${throughAssociation}#`;
   const queryParams: QueryCommandInput = {
@@ -96,7 +96,7 @@ async function edOrgsForStudent(
   try {
     queryResult = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, lambdaRequestId, '', error);
+    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, '', error);
     return [];
   }
 
@@ -118,9 +118,9 @@ export async function getEntityById(
   documentInfo: DocumentInfo,
   id: string,
   security: Security,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.getEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,
@@ -135,7 +135,7 @@ export async function getEntityById(
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, lambdaRequestId, '', error);
+    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, traceId, '', error);
     return { result: 'ERROR', documents: [] };
   }
 
@@ -146,19 +146,19 @@ export async function getEntityById(
   // Ownership-based security takes precedence
   if (security.isOwnershipEnabled) {
     if (getResult.Item.ownerId == null) {
-      Logger.debug('DynamoEntityRepository.getEntityById: No ownership of item', lambdaRequestId);
+      Logger.debug('DynamoEntityRepository.getEntityById: No ownership of item', traceId);
       return { result: 'SUCCESS', documents, securityResolved: ['No ownership of item'] };
     }
 
     if (security.clientName !== getResult.Item.ownerId) {
       Logger.debug(
         `DynamoEntityRepository.getEntityById: Ownership match failure - client ${security.clientName} access item owned by ${getResult.Item.ownerId}`,
-        lambdaRequestId,
+        traceId,
       );
       return { result: 'AUTHORIZATION_FAILURE', documents: [], securityResolved: ['Ownership match failure'] };
     }
 
-    Logger.debug(`DynamoEntityRepository.getEntityById: Ownership match - client ${security.clientName}`, lambdaRequestId);
+    Logger.debug(`DynamoEntityRepository.getEntityById: Ownership match - client ${security.clientName}`, traceId);
     return { result: 'SUCCESS', documents, securityResolved: ['Ownership matches'] };
   }
 
@@ -198,7 +198,7 @@ export async function getEntityById(
       security.throughAssociation,
       getResult.Item.studentId,
       security.edOrgIds,
-      lambdaRequestId,
+      traceId,
     );
     if (edOrgsFound.length > 0) {
       securityResolved.push(
@@ -224,13 +224,10 @@ export async function updateEntityById(
   info: object,
   validationOptions: ValidationOptions,
   security: Security,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<PutResult> {
-  Logger.debug(
-    `DynamoEntityRepository.updateEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`,
-    lambdaRequestId,
-  );
-  const { referenceValidation, descriptorValidation } = validationOptions;
+  Logger.debug(`DynamoEntityRepository.updateEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
+  const { referenceValidation } = validationOptions;
 
   const infoWithMetadata = referenceValidation ? info : { ...info, _unvalidated: true };
 
@@ -267,7 +264,7 @@ export async function updateEntityById(
   // Construct foreign key condition checks if reference validation is on
   const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(documentInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = referenceValidation ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order, as a single transaction
   const transactParams: TransactWriteCommandInput = {
@@ -300,9 +297,9 @@ export async function updateEntityById(
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
-        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
+        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorReferences.length) {
           // failure was with one of the descriptor condition check actions
-          const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
+          const failureDescriptorValue = documentInfo.descriptorReferences[failureIndex - submittedForeignKeysLength];
           return {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
@@ -312,7 +309,7 @@ export async function updateEntityById(
         }
       }
     } else {
-      Logger.error(`DynamoEntityRepository.updateEntityById`, lambdaRequestId, error);
+      Logger.error(`DynamoEntityRepository.updateEntityById`, traceId, error);
       return { result: 'UNKNOWN_FAILURE' };
     }
   }
@@ -329,24 +326,18 @@ export async function createEntity(
   info: object,
   validationOptions: ValidationOptions,
   security: Security,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<PutResult> {
-  Logger.debug(`DynamoEntityRepository.createEntity for ${JSON.stringify(documentInfo.documentIdentity)}`, lambdaRequestId);
-  const { referenceValidation, descriptorValidation } = validationOptions;
+  Logger.debug(`DynamoEntityRepository.createEntity for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
+  const { referenceValidation } = validationOptions;
 
-  const putItem = constructPutEntityItem(
-    id,
-    documentInfo,
-    info,
-    security.clientName,
-    referenceValidation || descriptorValidation,
-  );
+  const putItem = constructPutEntityItem(id, documentInfo, info, security.clientName, referenceValidation);
   const tryPutEntity: TransactWriteItem = generatePutEntityThatFailsIfExists(putItem);
 
   // Construct foreign key condition checks if reference validation is on
   const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = descriptorValidation ? descriptorValueConditions(documentInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = referenceValidation ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order
   const transactItems: TransactWriteItem[] = [...checkForeignKeys, ...checkDescriptorValues, tryPutEntity];
@@ -356,7 +347,7 @@ export async function createEntity(
   if (assignableItem != null) transactItems.push(assignableItem);
 
   try {
-    Logger.debug(`DynamoEntityRepository.createEntity Transacting key checks and item put request`, lambdaRequestId);
+    Logger.debug(`DynamoEntityRepository.createEntity Transacting key checks and item put request`, traceId);
     await getDynamoDBDocumentClient().send(new TransactWriteCommand({ TransactItems: transactItems }));
   } catch (error) {
     if (error?.name === 'TransactionCanceledException') {
@@ -367,14 +358,7 @@ export async function createEntity(
         assignableItem == null ? error.CancellationReasons.length - 1 : error.CancellationReasons.length - 2;
       if (failureIndex === tryPutEntityIndex) {
         // Entity already exists, try as update
-        return updateEntityById(
-          id,
-          documentInfo,
-          info,
-          { referenceValidation, descriptorValidation },
-          security,
-          lambdaRequestId,
-        );
+        return updateEntityById(id, documentInfo, info, { referenceValidation }, security, traceId);
       }
 
       const assignableItemIndex = assignableItem == null ? -1 : error.CancellationReasons.length - 1;
@@ -401,9 +385,9 @@ export async function createEntity(
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
           };
         }
-        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorValues.length) {
+        if (failureIndex - submittedForeignKeysLength < documentInfo.descriptorReferences.length) {
           // failure was with one of the descriptor condition check actions
-          const failureDescriptorValue = documentInfo.descriptorValues[failureIndex - submittedForeignKeysLength];
+          const failureDescriptorValue = documentInfo.descriptorReferences[failureIndex - submittedForeignKeysLength];
           return {
             result: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
@@ -413,7 +397,7 @@ export async function createEntity(
         }
       }
     } else {
-      Logger.error(`DynamoEntityRepository.createEntity`, lambdaRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
       return { result: 'UNKNOWN_FAILURE' };
     }
   }
@@ -422,11 +406,11 @@ export async function createEntity(
   // successful save of the main item.
   Logger.debug(
     `DynamoEntityRepository.createEntity Begin reference items for ${JSON.stringify(documentInfo.documentIdentity)}`,
-    lambdaRequestId,
+    traceId,
   );
 
   const referenceItems = generateReferenceItems(putItem?.sk, documentInfo);
-  Logger.debug('DynamoEntityRepository.createEntity reference items', lambdaRequestId, null, referenceItems);
+  Logger.debug('DynamoEntityRepository.createEntity reference items', traceId, null, referenceItems);
   const batches = R.splitEvery(25, referenceItems);
 
   Object.values(batches).forEach(async (batch) => {
@@ -437,11 +421,11 @@ export async function createEntity(
     try {
       Logger.debug(
         `DynamoEntityRepository.createEntity Writing reference items for ${JSON.stringify(documentInfo.documentIdentity)}`,
-        lambdaRequestId,
+        traceId,
       );
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
     } catch (error) {
-      Logger.error(`DynamoEntityRepository.createEntity`, lambdaRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
       // TODO: decide if this should really be handled so silently, or if
       // something else should occur. Also consider checking for specific
       // situations - is there any unique behavior we want to take?
@@ -495,9 +479,9 @@ export async function deleteItems(items: { pk: string; sk: string }[], awsReques
 export async function deleteEntityByIdDynamo(
   id: string,
   documentInfo: DocumentInfo,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<DynamoDeleteResult> {
-  Logger.debug(`DynamoEntityRepository.deleteEntityByIdDynamo`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId);
 
   const deleteEntityItem: TransactWriteItem = {
     Delete: {
@@ -529,7 +513,7 @@ export async function deleteEntityByIdDynamo(
         return { success: true };
       }
     } else {
-      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, lambdaRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId, '', error);
       return { success: false };
     }
   }
@@ -557,11 +541,11 @@ async function getPage<TReturn>(
 export async function getReferencesToThisItem(
   id: string,
   documentInfo: DocumentInfo,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
   Logger.debug(
     `DynamoEntityRepository.getReferencesToThisItem for ${JSON.stringify(documentInfo.documentIdentity)}`,
-    lambdaRequestId,
+    traceId,
   );
 
   const foreignKeys: ForeignKeyItem[] = [];
@@ -592,7 +576,7 @@ export async function getReferencesToThisItem(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getReferencesToThisItem', lambdaRequestId, null, error);
+    Logger.error('DynamoEntityRepository.getReferencesToThisItem', traceId, null, error);
 
     return { success: false, foreignKeys };
   }
@@ -604,11 +588,11 @@ export async function getReferencesToThisItem(
 export async function getForeignKeyReferences(
   id: string,
   documentInfo: DocumentInfo,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }> {
   Logger.debug(
     `DynamoEntityRepository.getForeignKeyReferences for ${JSON.stringify(documentInfo.documentIdentity)}`,
-    lambdaRequestId,
+    traceId,
   );
 
   const foreignKeys: ForeignKeyItem[] = [];
@@ -636,7 +620,7 @@ export async function getForeignKeyReferences(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getForeignKeyReferences', lambdaRequestId, null, error);
+    Logger.error('DynamoEntityRepository.getForeignKeyReferences', traceId, null, error);
 
     return { success: false, foreignKeys };
   }
@@ -649,11 +633,11 @@ export async function validateEntityOwnership(
   id: string,
   documentInfo: DocumentInfo,
   clientName: string | null,
-  lambdaRequestId: string,
+  traceId: string,
 ): Promise<OwnershipResult> {
   Logger.debug(
     `DynamoEntityRepository.validateEntityOwnership for ${JSON.stringify(documentInfo.documentIdentity)}`,
-    lambdaRequestId,
+    traceId,
   );
 
   const getParams: GetCommandInput = {
@@ -669,28 +653,28 @@ export async function validateEntityOwnership(
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, lambdaRequestId, '', error);
+    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, traceId, '', error);
     return { result: 'ERROR', isOwner: false };
   }
 
   if (getResult.Item == null) {
-    Logger.debug('DynamoEntityRepository.validateEntityOwnership item not found', lambdaRequestId);
+    Logger.debug('DynamoEntityRepository.validateEntityOwnership item not found', traceId);
     return { result: 'NOT_FOUND', isOwner: false };
   }
 
   if (getResult.Item.ownerId == null) {
-    Logger.debug('DynamoEntityRepository.validateEntityOwnership: No ownership of item', lambdaRequestId);
+    Logger.debug('DynamoEntityRepository.validateEntityOwnership: No ownership of item', traceId);
     return { result: 'SUCCESS', isOwner: true };
   }
 
   if (clientName !== getResult.Item.ownerId) {
     Logger.debug(
       `DynamoEntityRepository.validateEntityOwnership: Ownership match failure - client ${clientName} access item owned by ${getResult.Item.ownerId}`,
-      lambdaRequestId,
+      traceId,
     );
     return { result: 'SUCCESS', isOwner: false };
   }
 
-  Logger.debug(`DynamoEntityRepository.validateEntityOwnership: Ownership match - client ${clientName}`, lambdaRequestId);
+  Logger.debug(`DynamoEntityRepository.validateEntityOwnership: Ownership match - client ${clientName}`, traceId);
   return { result: 'SUCCESS', isOwner: true };
 }

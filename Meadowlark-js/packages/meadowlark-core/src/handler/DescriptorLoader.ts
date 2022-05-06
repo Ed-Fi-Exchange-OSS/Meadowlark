@@ -77,30 +77,30 @@ async function readDescriptors(directoryPath: string): Promise<XmlDescriptorData
 
 async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise<void> {
   let loadCount = 0;
-  for (const [descriptorName, descriptorValues] of Object.entries(descriptorData)) {
+  for (const [descriptorName, descriptorReferences] of Object.entries(descriptorData)) {
     if (!descriptorName.endsWith('Descriptor')) {
       Logger.warn(`Descriptor name ${descriptorName} does not end in 'Descriptor'. Skipping.`, '-');
       continue;
     }
-    for (const descriptorValue of descriptorValues) {
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'Namespace')) {
+    for (const descriptorReference of descriptorReferences) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'Namespace')) {
         Logger.warn(`Descriptor ${descriptorName} has no Namespace. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'CodeValue')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'CodeValue')) {
         Logger.warn(`Descriptor ${descriptorName} has no CodeValue. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'ShortDescription')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'ShortDescription')) {
         Logger.warn(`Descriptor ${descriptorName} has no ShortDescription. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'Description')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'Description')) {
         Logger.warn(`Descriptor ${descriptorName} has no Description. Skipping.`, '-');
         continue;
       }
 
-      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorValue) as DescriptorDocument;
+      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
       const descriptorDocumentInfo: DocumentInfo = {
         ...newDocumentInfo(),
         resourceName: descriptorName,
@@ -118,7 +118,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         documentIdForDocumentInfo(descriptorDocumentInfo),
         descriptorDocumentInfo,
         descriptorDocument,
-        { referenceValidation: false, descriptorValidation: false },
+        { referenceValidation: true },
         { ...newSecurity(), isOwnershipEnabled: false },
         '-',
       );

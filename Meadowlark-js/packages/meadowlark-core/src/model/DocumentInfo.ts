@@ -53,7 +53,7 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
   /**
    * A list of the non-reference (meaning top-level only) descriptor values of the entity extracted from the API document
    */
-  descriptorValues: DocumentReference[];
+  descriptorReferences: DocumentReference[];
 
   /**
    * If this resource is assignable to another resource (meaning it is part of a subclass/superclass relationship)
@@ -84,7 +84,7 @@ export function newDocumentInfo(): DocumentInfo {
     documentIdentity: NoDocumentIdentity,
     assignableInfo: null,
     documentReferences: [],
-    descriptorValues: [],
+    descriptorReferences: [],
     studentId: null,
     edOrgId: null,
   };

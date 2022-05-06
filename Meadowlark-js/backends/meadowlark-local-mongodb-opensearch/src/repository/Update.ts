@@ -11,7 +11,7 @@ export async function updateDocumentById(
   _info: object,
   _validationOptions: ValidationOptions,
   _security: Security,
-  _lambdaRequestId: string,
+  _traceId: string,
 ): Promise<PutResult> {
   return { result: 'UNKNOWN_FAILURE', failureMessage: 'Not Implemented' };
 }

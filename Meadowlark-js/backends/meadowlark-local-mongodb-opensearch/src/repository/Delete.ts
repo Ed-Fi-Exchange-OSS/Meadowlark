@@ -10,7 +10,7 @@ export async function deleteDocumentById(
   _documentInfo: DocumentInfo,
   _validationOptions: ValidationOptions,
   _security: Security,
-  _lambdaRequestId: string,
+  _traceId: string,
 ): Promise<DeleteResult> {
   return { result: 'UNKNOWN_FAILURE' };
 }

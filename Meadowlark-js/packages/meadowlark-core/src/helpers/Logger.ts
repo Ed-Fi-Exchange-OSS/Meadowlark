@@ -36,7 +36,7 @@ const logger = winston.createLogger({
 });
 
 export const Logger = {
-  error: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null, err?: any | null) => {
+  error: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, err?: any | null) => {
     let error: object;
 
     // Preserve any dictionary, but otherwise convert to string
@@ -46,16 +46,16 @@ export const Logger = {
       error = err;
     }
 
-    logger.error({ message, error, lambdaRequestId, apiGatewayRequestId });
+    logger.error({ message, error, traceId, apiGatewayRequestId });
   },
-  warn: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null) => {
-    logger.warn({ message, lambdaRequestId, apiGatewayRequestId });
+  warn: (message: string, traceId: string | null, apiGatewayRequestId?: string | null) => {
+    logger.warn({ message, traceId, apiGatewayRequestId });
   },
-  info: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
-    logger.info({ message, lambdaRequestId, apiGatewayRequestId, extra });
+  info: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
+    logger.info({ message, traceId, apiGatewayRequestId, extra });
   },
-  debug: (message: string, lambdaRequestId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
-    logger.debug({ message, lambdaRequestId, apiGatewayRequestId, extra });
+  debug: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
+    logger.debug({ message, traceId, apiGatewayRequestId, extra });
   },
 };
 

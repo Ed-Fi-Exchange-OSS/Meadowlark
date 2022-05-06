@@ -4,6 +4,7 @@ export { GetResult } from './plugin/backend/GetResult';
 export { DeleteResult } from './plugin/backend/DeleteResult';
 export { PaginationParameters } from './plugin/backend/PaginationParameters';
 export { PutResult } from './plugin/backend/PutResult';
+export { UpsertResult } from './plugin/backend/UpsertResult';
 export { SearchResult } from './plugin/backend/SearchResult';
 export { Security, newSecurity } from './model/Security';
 export { ValidationOptions } from './model/ValidationOptions';

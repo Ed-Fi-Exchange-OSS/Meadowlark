@@ -21,24 +21,19 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
-    lambdaRequestId: string,
+    traceId: string,
   ): Promise<PutResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.upsertDocument(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.upsertDocument(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
-  getDocumentById: (
-    _documentInfo: DocumentInfo,
-    _id: string,
-    _security: Security,
-    lambdaRequestId: string,
-  ): Promise<GetResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentById(): No backend plugin has been configured', lambdaRequestId);
+  getDocumentById: (_documentInfo: DocumentInfo, _id: string, _security: Security, traceId: string): Promise<GetResult> => {
+    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
-  getDocumentList: (_documentInfo: DocumentInfo, lambdaRequestId: string): Promise<GetResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentList(): No backend plugin has been configured', lambdaRequestId);
+  getDocumentList: (_documentInfo: DocumentInfo, traceId: string): Promise<GetResult> => {
+    Logger.warn('NoMeadowlarkBackendPlugin.getDocumentList(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'ERROR', documents: [] });
   },
 
@@ -48,9 +43,9 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
-    lambdaRequestId: string,
+    traceId: string,
   ): Promise<PutResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.updateDocumentById(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.updateDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
@@ -59,9 +54,9 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _documentInfo: DocumentInfo,
     _validationOptions: ValidationOptions,
     _security: Security,
-    lambdaRequestId: string,
+    traceId: string,
   ): Promise<DeleteResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.deleteDocumentById(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.deleteDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
 
@@ -69,9 +64,9 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _documentInfo: DocumentInfo,
     _queryStringParameters: object,
     _paginationParameters: PaginationParameters,
-    lambdaRequestId: string,
+    traceId: string,
   ): Promise<SearchResult> => {
-    Logger.warn('NoMeadowlarkBackendPlugin.queryDocumentList(): No backend plugin has been configured', lambdaRequestId);
+    Logger.warn('NoMeadowlarkBackendPlugin.queryDocumentList(): No backend plugin has been configured', traceId);
     return Promise.resolve({ success: false, results: [] });
   },
 };

@@ -73,7 +73,6 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       body,
       {
         referenceValidation: event.headers['reference-validation'] !== 'false',
-        descriptorValidation: event.headers['descriptor-validation'] !== 'false',
       },
       {
         ...newSecurity(),

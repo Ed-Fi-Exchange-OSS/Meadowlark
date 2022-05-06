@@ -219,63 +219,6 @@ describe('when posting a request to upsert a new resource', () => {
       });
     });
 
-    describe('given persistence is going to throw an error not exists though existed on insert attempt', () => {
-      let response: APIGatewayProxyResult;
-      let mockRequestValidator: any;
-      let mockDynamo: any;
-      const expectedHeaders = { header: 'one' };
-
-      beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
-          body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
-          path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
-
-        // Setup the request validation to succeed
-        mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
-          Promise.resolve({
-            documentInfo: {
-              documentReferences: [[{ name: 'schoolId', value: '1' }]],
-              documentIdentity: [{ name: 'x', value: '123' }],
-            },
-            errorBody: null,
-            headerMetadata: expectedHeaders,
-          } as unknown as RequestValidator.ResourceValidationResult),
-        );
-
-        // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
-          Promise.resolve({
-            result: 'UPDATE_FAILURE_NOT_EXISTS',
-            failureMessage: 'Does not exist',
-          }),
-        );
-
-        // Act
-        response = await upsert(event, context);
-      });
-
-      afterAll(() => {
-        mockRequestValidator.mockRestore();
-        mockDynamo.mockRestore();
-      });
-
-      it('returns status 404', () => {
-        expect(response.statusCode).toEqual(404);
-      });
-
-      it('does not return a message body', () => {
-        expect(response.body).toEqual('');
-      });
-
-      it('it returns headers', () => {
-        expect(response.headers).toEqual(expectedHeaders);
-      });
-    });
-
     describe('given persistence is going to fail', () => {
       let response: APIGatewayProxyResult;
       let mockRequestValidator: any;

@@ -9,13 +9,22 @@ import {
   DocumentInfo,
   Security,
   ValidationOptions,
-  PutResult,
+  UpsertResult,
   documentIdForDocumentReference,
   DocumentReference,
   Logger,
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
-import { getMongoDocuments, getClient } from './Db';
+import { getDocumentCollection, getClient } from './Db';
+
+async function findReferencesById(
+  referenceIds: string[],
+  mongoDocuments: Collection<MeadowlarkDocument>,
+  findOptions: FindOptions,
+): Promise<MeadowlarkDocumentId[]> {
+  const findReferenceDocuments = mongoDocuments.find({ id: { $in: referenceIds } }, findOptions);
+  return (await findReferenceDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
+}
 
 /**
  * Returns an error message listing out the resource name and identity of any missing document references.
@@ -24,10 +33,10 @@ import { getMongoDocuments, getClient } from './Db';
  * @param documentOutRefs The document references extracted from the document, as id strings
  * @param documentInfo The DocumentInfo of the document
  */
-function missingOutRefMessage(
+function missingReferencesMessage(
   refsInDb: MeadowlarkDocumentId[],
   documentOutRefs: string[],
-  documentInfo: DocumentInfo,
+  documentReferences: DocumentReference[],
 ): string {
   const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef.id);
   const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, idsOfRefsInDb);
@@ -38,7 +47,7 @@ function missingOutRefMessage(
   // Pick out the DocumentReferences of the missing from the entire array of DocumentReferences,
   const pickedDocumentReferencesOfMissing: DocumentReference[] = R.props(
     arrayIndexesOfMissing as any[],
-    documentInfo.documentReferences as any[],
+    documentReferences as any[],
   );
 
   return pickedDocumentReferencesOfMissing
@@ -52,11 +61,11 @@ export async function upsertDocument(
   info: object,
   validationOptions: ValidationOptions,
   _security: Security,
-  lambdaRequestId: string,
-): Promise<PutResult> {
-  const mongoDocuments: Collection<MeadowlarkDocument> = getMongoDocuments();
+  traceId: string,
+): Promise<UpsertResult> {
+  const documentCollection: Collection<MeadowlarkDocument> = getDocumentCollection();
 
-  const { referenceValidation, descriptorValidation } = validationOptions;
+  const { referenceValidation } = validationOptions;
 
   const document: MeadowlarkDocument = {
     id,
@@ -66,7 +75,7 @@ export async function upsertDocument(
     resourceVersion: documentInfo.resourceVersion,
     edfiDoc: info,
     outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
-    validated: referenceValidation && descriptorValidation,
+    validated: referenceValidation,
     isDescriptor: documentInfo.isDescriptor,
   };
 
@@ -76,25 +85,40 @@ export async function upsertDocument(
   const ONLY_ID_IN_RESULT: FindOptions = { projection: { id: 1, _id: 0 }, session };
   const AS_UPSERT: ReplaceOptions = { upsert: true, session };
 
-  let upsertResult: PutResult = { result: 'UNKNOWN_FAILURE' };
+  let upsertResult: UpsertResult = { result: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
-      // Validate document references
       if (referenceValidation) {
-        const findDocumentsMatchingOutRefs = mongoDocuments.find({ id: { $in: document.outRefs } }, ONLY_ID_IN_RESULT);
-        const refsInDb: MeadowlarkDocumentId[] = await findDocumentsMatchingOutRefs.toArray();
+        const failureMessages: string[] = [];
 
-        // Check for missing references
-        if (document.outRefs.length !== refsInDb.length) {
-          Logger.debug('mongodb.repository.Upsert.upsertDocument: references not found', lambdaRequestId);
+        // Validate document references
+        const referencesInDb = await findReferencesById(document.outRefs, documentCollection, ONLY_ID_IN_RESULT);
+        if (document.outRefs.length !== referencesInDb.length) {
+          Logger.debug('mongodb.repository.Upsert.upsertDocument: documentReferences not found', traceId);
+          failureMessages.push(missingReferencesMessage(referencesInDb, document.outRefs, documentInfo.documentReferences));
+        }
 
-          // DB read to check whether this was an update or insert attempt
-          const isInsert: boolean = (await mongoDocuments.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
+        // Validate descriptor references
+        const descriptorReferenceIds: string[] = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+          documentIdForDocumentReference(dr),
+        );
+        const descriptorsInDb = await findReferencesById(descriptorReferenceIds, documentCollection, ONLY_ID_IN_RESULT);
+        if (descriptorReferenceIds.length !== descriptorsInDb.length) {
+          Logger.debug('mongodb.repository.Upsert.upsertDocument: descriptorReferences not found', traceId);
+          failureMessages.push(
+            missingReferencesMessage(descriptorsInDb, descriptorReferenceIds, documentInfo.descriptorReferences),
+          );
+        }
+
+        // Abort on validation failure
+        if (failureMessages.length > 0) {
+          // DB read to check whether this would have been an insert or update
+          const isInsert: boolean = (await documentCollection.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
 
           upsertResult = {
             result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: `Reference validation failed: ${missingOutRefMessage(refsInDb, document.outRefs, documentInfo)}`,
+            failureMessage: `Reference validation failed: ${failureMessages.join(',')}`,
           };
 
           await session.abortTransaction();
@@ -102,19 +126,14 @@ export async function upsertDocument(
         }
       }
 
-      // Validate descriptor references
-      if (descriptorValidation) {
-        return;
-      }
-
       // Perform the document upsert
-      Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, lambdaRequestId);
+      Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
 
-      const { upsertedCount } = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
+      const { upsertedCount } = await documentCollection.replaceOne({ id }, document, AS_UPSERT);
       upsertResult.result = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
     });
   } catch (e) {
-    Logger.error('mongodb.repository.Upsert.upsertDocument', lambdaRequestId, e);
+    Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, e);
 
     return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

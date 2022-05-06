@@ -133,14 +133,14 @@ export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteI
 }
 
 export function descriptorValueConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
-  return documentInfo.descriptorValues.map((descriptorValue) =>
+  return documentInfo.descriptorReferences.map((descriptorReference) =>
     conditionCheckFrom({
       // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
       projectName: documentInfo.projectName,
       resourceVersion: documentInfo.resourceVersion,
-      resourceName: descriptorValue.resourceName,
+      resourceName: descriptorReference.resourceName,
       isDescriptor: true,
-      documentIdentity: descriptorValue.documentIdentity,
+      documentIdentity: descriptorReference.documentIdentity,
     }),
   );
 }

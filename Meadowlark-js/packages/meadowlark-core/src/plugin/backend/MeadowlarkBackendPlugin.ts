@@ -19,17 +19,12 @@ export interface MeadowlarkBackendPlugin {
     info: object,
     validationOptions: ValidationOptions,
     security: Security,
-    lambdaRequestId: string,
+    traceId: string,
   ) => Promise<PutResult>;
 
-  getDocumentById: (
-    _documentInfo: DocumentInfo,
-    id: string,
-    _security: Security,
-    _lambdaRequestId: string,
-  ) => Promise<GetResult>;
+  getDocumentById: (_documentInfo: DocumentInfo, id: string, _security: Security, _traceId: string) => Promise<GetResult>;
 
-  getDocumentList: (_documentInfo: DocumentInfo, _lambdaRequestId: string) => Promise<GetResult>;
+  getDocumentList: (_documentInfo: DocumentInfo, _traceId: string) => Promise<GetResult>;
 
   updateDocumentById: (
     _id: string,
@@ -37,7 +32,7 @@ export interface MeadowlarkBackendPlugin {
     _info: object,
     _validationOptions: ValidationOptions,
     _security: Security,
-    _lambdaRequestId: string,
+    _traceId: string,
   ) => Promise<PutResult>;
 
   deleteDocumentById: (
@@ -45,7 +40,7 @@ export interface MeadowlarkBackendPlugin {
     _documentInfo: DocumentInfo,
     _validationOptions: ValidationOptions,
     _security: Security,
-    _lambdaRequestId: string,
+    _traceId: string,
   ) => Promise<DeleteResult>;
 
   queryDocumentList: (

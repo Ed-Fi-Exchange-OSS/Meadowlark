@@ -50,7 +50,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
     projectName: 'a#project#name',
     resourceVersion: '1',
     studentId: '1',
-    descriptorValues: [],
+    descriptorReferences: [],
   };
 
   const id = documentIdForDocumentInfo(documentInfo);
@@ -80,7 +80,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
       id,
       documentInfo,
       { bodyEntry },
-      { referenceValidation: false, descriptorValidation: false },
+      { referenceValidation: false },
       { ...newSecurity(), isOwnershipEnabled: false },
       'correlationId',
     );

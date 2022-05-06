@@ -68,7 +68,6 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       body,
       {
         referenceValidation: event.headers['reference-validation'] !== 'false',
-        descriptorValidation: event.headers['descriptor-validation'] !== 'false',
       },
       {
         ...newSecurity(),
@@ -95,15 +94,12 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       writeDebugStatusToLog(moduleName, context, 'create', 409);
       return { body: '', statusCode: 409, headers: headerMetadata };
     }
-    if (result === 'UPDATE_FAILURE_NOT_EXISTS') {
-      writeDebugStatusToLog(moduleName, context, 'create', 404);
-      return { body: '', statusCode: 404, headers: headerMetadata };
-    }
     if (result === 'INSERT_FAILURE_REFERENCE' || result === 'INSERT_FAILURE_ASSIGNABLE_COLLISION') {
       writeDebugStatusToLog(moduleName, context, 'create', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
+    // Otherwise, it's a 500 error
     writeErrorToLog(moduleName, context, event, 'create', 500, failureMessage);
     return { body: '', statusCode: 500, headers: headerMetadata };
   } catch (e) {

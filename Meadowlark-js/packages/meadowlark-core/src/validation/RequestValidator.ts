@@ -93,7 +93,7 @@ export async function validateResource(
   };
   let assignableInfo: Assignable | null = null;
   const documentReferences: DocumentReference[] = [];
-  const descriptorValues: DocumentReference[] = [];
+  const descriptorReferences: DocumentReference[] = [];
 
   if (!isDescriptor && body != null) {
     const bodyValidation: string[] = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
@@ -102,7 +102,7 @@ export async function validateResource(
     } else {
       documentIdentityWithSecurity = extractDocumentIdentity(matchingMetaEdModel, body);
       documentReferences.push(...extractDocumentReferences(matchingMetaEdModel, body));
-      descriptorValues.push(...extractDescriptorValues(matchingMetaEdModel, body));
+      descriptorReferences.push(...extractDescriptorValues(matchingMetaEdModel, body));
     }
   }
 
@@ -120,7 +120,7 @@ export async function validateResource(
       resourceName: matchingMetaEdModel.metaEdName,
       isDescriptor,
       documentReferences,
-      descriptorValues,
+      descriptorReferences,
       ...documentIdentityWithSecurity,
       assignableInfo,
     },

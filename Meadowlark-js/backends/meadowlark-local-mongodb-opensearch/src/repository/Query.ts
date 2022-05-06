@@ -14,6 +14,6 @@ export async function queryDocumentList(
   return { success: false, results: [] };
 }
 
-export async function getDocumentList(_documentInfo: DocumentInfo, _lambdaRequestId: string): Promise<GetResult> {
+export async function getDocumentList(_documentInfo: DocumentInfo, _traceId: string): Promise<GetResult> {
   return { result: 'ERROR', documents: [] };
 }

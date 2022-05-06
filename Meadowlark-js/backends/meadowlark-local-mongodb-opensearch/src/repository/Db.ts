@@ -29,7 +29,7 @@ const client: MongoClient = new MongoClient(MONGO_URL, { w: 'majority', readConc
   }
 })();
 
-export function getMongoDocuments(): Collection<MeadowlarkDocument> {
+export function getDocumentCollection(): Collection<MeadowlarkDocument> {
   return client.db('meadowlark').collection('documents');
 }
 

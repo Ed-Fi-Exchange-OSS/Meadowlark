@@ -50,7 +50,6 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       documentInfo,
       {
         referenceValidation: event.headers['reference-validation'] !== 'false',
-        descriptorValidation: event.headers['descriptor-validation'] !== 'false',
       },
       {
         ...newSecurity(),
