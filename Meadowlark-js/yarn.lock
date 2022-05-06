@@ -2234,6 +2234,7 @@ __metadata:
     "@edfi/meadowlark-core": 0.2.0-dev.0
     copyfiles: ^2.4.1
     mongodb: ^4.5.0
+    ramda: ^0.28.0
     rimraf: ^3.0.2
     ts-invariant: ^0.9.4
   languageName: unknown

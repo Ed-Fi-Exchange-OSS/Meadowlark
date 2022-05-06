@@ -109,7 +109,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         documentIdentity: [
           {
             name: 'descriptor',
-            value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
+            value: `${descriptorDocument.namespace}/${descriptorDocument.codeValue}`,
           },
         ],
       };
@@ -117,7 +117,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const putResult: PutResult = await getBackendPlugin().upsertDocument(
         documentIdForDocumentInfo(descriptorDocumentInfo),
         descriptorDocumentInfo,
-        { ...descriptorDocument, _isDescriptor: true },
+        descriptorDocument,
         { referenceValidation: false, descriptorValidation: false },
         { ...newSecurity(), isOwnershipEnabled: false },
         '-',

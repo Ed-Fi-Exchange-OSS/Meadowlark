@@ -44,6 +44,7 @@ type DynamoNewImage = {
   studentId?: string;
   securityEdOrgId?: string;
   securityStudentId?: string;
+  isDescriptor: boolean;
 };
 
 /**
@@ -185,7 +186,7 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
 
         // Ignore if a descriptor.
         // eslint-disable-next-line no-underscore-dangle
-        if (newImage.info._isDescriptor) {
+        if (newImage.isDescriptor) {
           Logger.debug(
             `DynamoDbStreamHandler.updateExternalStorage Skipping ${JSON.stringify(record)} since it is a descriptor entity`,
             context.awsRequestId,

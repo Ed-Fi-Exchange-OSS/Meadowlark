@@ -46,4 +46,14 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * referenced documents.
    */
   outRefs: string[];
+
+  /**
+   * True if this document has been reference and descriptor validated.
+   */
+  validated: boolean;
+
+  /**
+   * True if this document is a descriptor.
+   */
+  isDescriptor: boolean;
 }
