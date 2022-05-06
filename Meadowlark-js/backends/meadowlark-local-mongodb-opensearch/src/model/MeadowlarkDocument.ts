@@ -5,13 +5,15 @@
 
 import { DocumentIdentity } from '@edfi/meadowlark-core';
 
-export interface MeadowlarkDocument {
+export interface MeadowlarkDocumentId {
   /**
    * A string hash derived from the project name, resource name, resource version
    * and identity of the API document. This field will be a unique index on the collection.
    */
   id: string;
+}
 
+export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   /**
    * The identity elements extracted from the API document.
    */

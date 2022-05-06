@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, UpdateResult, ClientSession } from 'mongodb';
+import { Collection, ClientSession, FindOptions, ReplaceOptions } from 'mongodb';
 import {
   DocumentInfo,
   Security,
@@ -13,7 +13,7 @@ import {
   DocumentReference,
   Logger,
 } from '@edfi/meadowlark-core';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 import { getMongoDocuments, getClient } from './Db';
 
 export async function upsertDocument(
@@ -38,44 +38,42 @@ export async function upsertDocument(
 
   const session: ClientSession = getClient().startSession();
 
-  let result: any = null;
+  // Define Mongo options ahead of time for readability
+  const ONLY_ID_IN_RESULT: FindOptions = { projection: { id: 1, _id: 0 }, session };
+  const AS_UPSERT: ReplaceOptions = { upsert: true, session };
+
+  let upsertResult: PutResult = { result: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
-      result = await mongoDocuments.replaceOne({ id }, document, { upsert: true, session });
+      // Validate reference document existence
+      const findDocumentsMatchingOutRefs = mongoDocuments.find({ id: { $in: document.outRefs } }, ONLY_ID_IN_RESULT);
+      const existingOutRefs: MeadowlarkDocumentId[] = await findDocumentsMatchingOutRefs.toArray();
 
-      // const usersUpdateResults = await usersCollection.updateOne(
-      //   { email: userEmail },
-      //   { $addToSet: { reservations: reservation } },
-      //   { session },
-      // );
-      // console.log(
-      //   `${usersUpdateResults.matchedCount} document(s) found in the users collection with the email address ${userEmail}.`,
-      // );
-      // console.log(`${usersUpdateResults.modifiedCount} document(s) was/were updated to include the reservation.`);
+      if (document.outRefs.length !== existingOutRefs.length) {
+        Logger.debug('mongodb.repository.Upsert.upsertDocument: references not found', lambdaRequestId);
 
-      // const isListingReservedResults = await listingsAndReviewsCollection.findOne(
-      //   { name: nameOfListing, datesReserved: { $in: reservationDates } },
-      //   { session },
-      // );
-      // if (isListingReservedResults) {
-      //   await session.abortTransaction();
-      //   console.error(
-      //     'This listing is already reserved for at least one of the given dates. The reservation could not be created.',
-      //   );
-      //   console.error('Any operations that already occurred as part of this transaction will be rolled back.');
-      //   return;
-      // }
+        // DB read to check whether this was an update or insert attempt
+        const isInsert: boolean = (await mongoDocuments.findOne({ id }, ONLY_ID_IN_RESULT)) == null;
+
+        // TODO: provide message on which references are bad, by comparing outRefs to existingOutRefs
+        upsertResult = { result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE' };
+        await session.abortTransaction();
+      }
+
+      // Perform the document upsert
+      const replacementResult = await mongoDocuments.replaceOne({ id }, document, AS_UPSERT);
+
+      if (replacementResult.upsertedCount === 0) return { result: 'UPDATE_SUCCESS' };
+      return { result: 'INSERT_SUCCESS' };
     });
   } catch (e) {
-    Logger.error(`mongodb.repository.Upsert.upsertDocument`, lambdaRequestId, e);
+    Logger.error('mongodb.repository.Upsert.upsertDocument', lambdaRequestId, e);
+
     return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }
 
-  if (result == null) return { result: 'UNKNOWN_FAILURE' };
-
-  if ((result as UpdateResult).upsertedCount === 0) return { result: 'UPDATE_SUCCESS' };
-  return { result: 'INSERT_SUCCESS' };
+  return upsertResult;
 }
