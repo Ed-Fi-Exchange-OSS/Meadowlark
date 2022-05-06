@@ -3,11 +3,10 @@ export { NoMeadowlarkBackendPlugin } from './plugin/backend/NoMeadowlarkBackendP
 export { GetResult } from './plugin/backend/GetResult';
 export { DeleteResult } from './plugin/backend/DeleteResult';
 export { PaginationParameters } from './plugin/backend/PaginationParameters';
-export { PutResult } from './plugin/backend/PutResult';
+export { UpdateResult } from './plugin/backend/UpdateResult';
 export { UpsertResult } from './plugin/backend/UpsertResult';
 export { SearchResult } from './plugin/backend/SearchResult';
 export { Security, newSecurity } from './model/Security';
-export { ValidationOptions } from './model/ValidationOptions';
 export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';
 export { DocumentIdentity } from './model/DocumentIdentity';

@@ -66,9 +66,7 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       resourceId,
       documentInfo,
       body,
-      {
-        referenceValidation: event.headers['reference-validation'] !== 'false',
-      },
+      event.headers['reference-validation'] !== 'false',
       {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
@@ -94,7 +92,7 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       writeDebugStatusToLog(moduleName, context, 'create', 409);
       return { body: '', statusCode: 409, headers: headerMetadata };
     }
-    if (result === 'INSERT_FAILURE_REFERENCE' || result === 'INSERT_FAILURE_ASSIGNABLE_COLLISION') {
+    if (result === 'INSERT_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, context, 'create', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }

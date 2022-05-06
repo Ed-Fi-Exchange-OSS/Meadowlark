@@ -80,7 +80,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
       id,
       documentInfo,
       { bodyEntry },
-      { referenceValidation: false },
+      false,
       { ...newSecurity(), isOwnershipEnabled: false },
       'correlationId',
     );

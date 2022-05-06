@@ -5,42 +5,42 @@
 
 import { DocumentInfo } from '../../model/DocumentInfo';
 import { Security } from '../../model/Security';
-import { ValidationOptions } from '../../model/ValidationOptions';
 import { GetResult } from './GetResult';
-import { PutResult } from './PutResult';
 import { DeleteResult } from './DeleteResult';
 import { PaginationParameters } from './PaginationParameters';
 import { SearchResult } from './SearchResult';
+import { UpdateResult } from './UpdateResult';
+import { UpsertResult } from './UpsertResult';
 
 export interface MeadowlarkBackendPlugin {
   upsertDocument: (
     id: string,
     documentInfo: DocumentInfo,
     info: object,
-    validationOptions: ValidationOptions,
+    validate: boolean,
     security: Security,
     traceId: string,
-  ) => Promise<PutResult>;
+  ) => Promise<UpsertResult>;
 
-  getDocumentById: (_documentInfo: DocumentInfo, id: string, _security: Security, _traceId: string) => Promise<GetResult>;
+  getDocumentById: (documentInfo: DocumentInfo, id: string, security: Security, traceId: string) => Promise<GetResult>;
 
-  getDocumentList: (_documentInfo: DocumentInfo, _traceId: string) => Promise<GetResult>;
+  getDocumentList: (documentInfo: DocumentInfo, traceId: string) => Promise<GetResult>;
 
   updateDocumentById: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    _info: object,
-    _validationOptions: ValidationOptions,
-    _security: Security,
-    _traceId: string,
-  ) => Promise<PutResult>;
+    id: string,
+    documentInfo: DocumentInfo,
+    info: object,
+    validate: boolean,
+    security: Security,
+    traceId: string,
+  ) => Promise<UpdateResult>;
 
   deleteDocumentById: (
-    _id: string,
-    _documentInfo: DocumentInfo,
-    _validationOptions: ValidationOptions,
-    _security: Security,
-    _traceId: string,
+    id: string,
+    documentInfo: DocumentInfo,
+    validate: boolean,
+    security: Security,
+    traceId: string,
   ) => Promise<DeleteResult>;
 
   queryDocumentList: (

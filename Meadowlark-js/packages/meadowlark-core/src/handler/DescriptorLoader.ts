@@ -15,7 +15,7 @@ import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
 import { documentIdForDocumentInfo } from '../helpers/DocumentId';
 import { newSecurity } from '../model/Security';
-import { PutResult } from '../plugin/backend/PutResult';
+import { UpsertResult } from '../plugin/backend/UpsertResult';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -114,11 +114,11 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         ],
       };
 
-      const putResult: PutResult = await getBackendPlugin().upsertDocument(
+      const putResult: UpsertResult = await getBackendPlugin().upsertDocument(
         documentIdForDocumentInfo(descriptorDocumentInfo),
         descriptorDocumentInfo,
         descriptorDocument,
-        { referenceValidation: true },
+        true,
         { ...newSecurity(), isOwnershipEnabled: false },
         '-',
       );

@@ -48,9 +48,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
     const { result, failureMessage } = await getBackendPlugin().deleteDocumentById(
       pathComponents.resourceId,
       documentInfo,
-      {
-        referenceValidation: event.headers['reference-validation'] !== 'false',
-      },
+      event.headers['reference-validation'] !== 'false',
       {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,

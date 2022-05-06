@@ -71,9 +71,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       pathComponents.resourceId,
       documentInfo,
       body,
-      {
-        referenceValidation: event.headers['reference-validation'] !== 'false',
-      },
+      event.headers['reference-validation'] !== 'false',
       {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,

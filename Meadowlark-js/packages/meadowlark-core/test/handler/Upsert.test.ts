@@ -8,7 +8,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 
 import { upsert } from '../../src/handler/Upsert';
 import * as RequestValidator from '../../src/validation/RequestValidator';
-import { PutResult } from '../../src/plugin/backend/PutResult';
+import { UpsertResult } from '../../src/plugin/backend/UpsertResult';
 import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
@@ -310,7 +310,7 @@ describe('when posting a request to upsert a new resource', () => {
           Promise.resolve({
             result: 'INSERT_SUCCESS',
             failureMessage: null,
-          } as unknown as PutResult),
+          } as unknown as UpsertResult),
         );
 
         // Act
@@ -373,7 +373,7 @@ describe('when posting a request to upsert a new resource', () => {
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
-          } as unknown as PutResult),
+          } as unknown as UpsertResult),
         );
 
         // Act

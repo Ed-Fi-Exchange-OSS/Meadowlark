@@ -9,7 +9,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import * as GetById from '../../src/handler/GetById';
 import { update } from '../../src/handler/Update';
 import * as RequestValidator from '../../src/validation/RequestValidator';
-import { PutResult } from '../../src/plugin/backend/PutResult';
+import { UpdateResult } from '../../src/plugin/backend/UpdateResult';
 import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
@@ -314,7 +314,7 @@ describe('given a valid object', () => {
           Promise.resolve({
             result: 'UPDATE_SUCCESS',
             failureMessage: null,
-          } as unknown as PutResult),
+          } as unknown as UpdateResult),
         );
 
         // Act

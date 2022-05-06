@@ -5,24 +5,24 @@
 
 import { DocumentInfo } from '../../model/DocumentInfo';
 import { Security } from '../../model/Security';
-import { ValidationOptions } from '../../model/ValidationOptions';
-import { GetResult } from './GetResult';
-import { PutResult } from './PutResult';
 import { DeleteResult } from './DeleteResult';
 import { PaginationParameters } from './PaginationParameters';
 import { SearchResult } from './SearchResult';
 import { Logger } from '../../helpers/Logger';
 import { MeadowlarkBackendPlugin } from './MeadowlarkBackendPlugin';
+import { UpsertResult } from './UpsertResult';
+import { UpdateResult } from './UpdateResult';
+import { GetResult } from './GetResult';
 
 export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
   upsertDocument: (
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
-    _validationOptions: ValidationOptions,
+    _validate: boolean,
     _security: Security,
     traceId: string,
-  ): Promise<PutResult> => {
+  ): Promise<UpsertResult> => {
     Logger.warn('NoMeadowlarkBackendPlugin.upsertDocument(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
@@ -41,10 +41,10 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
     _id: string,
     _documentInfo: DocumentInfo,
     _info: object,
-    _validationOptions: ValidationOptions,
+    _validate: boolean,
     _security: Security,
     traceId: string,
-  ): Promise<PutResult> => {
+  ): Promise<UpdateResult> => {
     Logger.warn('NoMeadowlarkBackendPlugin.updateDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ result: 'UNKNOWN_FAILURE' });
   },
@@ -52,7 +52,7 @@ export const NoMeadowlarkBackendPlugin: MeadowlarkBackendPlugin = {
   deleteDocumentById: (
     _id: string,
     _documentInfo: DocumentInfo,
-    _validationOptions: ValidationOptions,
+    _validate: boolean,
     _security: Security,
     traceId: string,
   ): Promise<DeleteResult> => {

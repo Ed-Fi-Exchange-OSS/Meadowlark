@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DeleteResult, DocumentInfo, Security, ValidationOptions } from '@edfi/meadowlark-core';
+import { DeleteResult, DocumentInfo, Security } from '@edfi/meadowlark-core';
 import {
   deleteEntityByIdDynamo,
   deleteItems,
@@ -18,7 +18,7 @@ import {
 export async function deleteEntityById(
   id: string,
   documentInfo: DocumentInfo,
-  _validationOptions: ValidationOptions,
+  _validate: boolean,
   security: Security,
   awsRequestId: string,
 ): Promise<DeleteResult> {

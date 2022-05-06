@@ -6,7 +6,7 @@
 import { Collection, WithId } from 'mongodb';
 import { DocumentInfo, Security, GetResult } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getDocumentCollection } from './Db';
+import { getMongoCollection } from './Db';
 
 export async function getDocumentById(
   _documentInfo: DocumentInfo,
@@ -14,7 +14,7 @@ export async function getDocumentById(
   _security: Security,
   _traceId: string,
 ): Promise<GetResult> {
-  const mongoDocuments: Collection<MeadowlarkDocument> = getDocumentCollection();
+  const mongoDocuments: Collection<MeadowlarkDocument> = getMongoCollection();
 
   try {
     const result: WithId<MeadowlarkDocument> | null = await mongoDocuments.findOne({ id });

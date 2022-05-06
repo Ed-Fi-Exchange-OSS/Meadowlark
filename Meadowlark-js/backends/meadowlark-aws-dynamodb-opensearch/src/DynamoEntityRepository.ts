@@ -16,7 +16,7 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
-import { Logger, ValidationOptions, GetResult, PutResult, Security, DocumentInfo } from '@edfi/meadowlark-core';
+import { Logger, GetResult, UpdateResult, UpsertResult, Security, DocumentInfo } from '@edfi/meadowlark-core';
 import {
   getDynamoDBDocumentClient,
   entityIdPrefixRemoved,
@@ -222,14 +222,12 @@ export async function updateEntityById(
   id: string,
   documentInfo: DocumentInfo,
   info: object,
-  validationOptions: ValidationOptions,
+  validate: boolean,
   security: Security,
   traceId: string,
-): Promise<PutResult> {
+): Promise<UpdateResult> {
   Logger.debug(`DynamoEntityRepository.updateEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
-  const { referenceValidation } = validationOptions;
-
-  const infoWithMetadata = referenceValidation ? info : { ...info, _unvalidated: true };
+  const infoWithMetadata = validate ? info : { ...info, _unvalidated: true };
 
   // Construct the action to update the Entity item
   const ExpressionAttributeValues = { ':info': infoWithMetadata };
@@ -262,9 +260,9 @@ export async function updateEntityById(
   };
 
   // Construct foreign key condition checks if reference validation is on
-  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
+  const checkForeignKeys: TransactWriteItem[] = validate ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = referenceValidation ? descriptorValueConditions(documentInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = validate ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order, as a single transaction
   const transactParams: TransactWriteCommandInput = {
@@ -286,7 +284,7 @@ export async function updateEntityById(
         };
 
       if (error.CancellationReasons.length > 1) {
-        const submittedForeignKeysLength = referenceValidation ? documentInfo.documentReferences.length : 0;
+        const submittedForeignKeysLength = validate ? documentInfo.documentReferences.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
           const failureForeignKey = documentInfo.documentReferences[failureIndex];
@@ -324,20 +322,18 @@ export async function createEntity(
   id: string,
   documentInfo: DocumentInfo,
   info: object,
-  validationOptions: ValidationOptions,
+  validate: boolean,
   security: Security,
   traceId: string,
-): Promise<PutResult> {
+): Promise<UpsertResult> {
   Logger.debug(`DynamoEntityRepository.createEntity for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
-  const { referenceValidation } = validationOptions;
-
-  const putItem = constructPutEntityItem(id, documentInfo, info, security.clientName, referenceValidation);
+  const putItem = constructPutEntityItem(id, documentInfo, info, security.clientName, validate);
   const tryPutEntity: TransactWriteItem = generatePutEntityThatFailsIfExists(putItem);
 
   // Construct foreign key condition checks if reference validation is on
-  const checkForeignKeys: TransactWriteItem[] = referenceValidation ? foreignKeyConditions(documentInfo) : [];
+  const checkForeignKeys: TransactWriteItem[] = validate ? foreignKeyConditions(documentInfo) : [];
   // Construct descriptor value condition checks if descriptor validation is on
-  const checkDescriptorValues: TransactWriteItem[] = referenceValidation ? descriptorValueConditions(documentInfo) : [];
+  const checkDescriptorValues: TransactWriteItem[] = validate ? descriptorValueConditions(documentInfo) : [];
 
   // Put all the actions together in order
   const transactItems: TransactWriteItem[] = [...checkForeignKeys, ...checkDescriptorValues, tryPutEntity];
@@ -358,23 +354,12 @@ export async function createEntity(
         assignableItem == null ? error.CancellationReasons.length - 1 : error.CancellationReasons.length - 2;
       if (failureIndex === tryPutEntityIndex) {
         // Entity already exists, try as update
-        return updateEntityById(id, documentInfo, info, { referenceValidation }, security, traceId);
-      }
-
-      const assignableItemIndex = assignableItem == null ? -1 : error.CancellationReasons.length - 1;
-      if (failureIndex === assignableItemIndex) {
-        // Another assignable subclass is using this natural key
-        return {
-          result: 'INSERT_FAILURE_ASSIGNABLE_COLLISION',
-          failureMessage: `Another subclass of entity ${
-            documentInfo.assignableInfo?.assignableToName
-          } is already using the natural key ${JSON.stringify(documentInfo.assignableInfo?.assignableIdentity)}`,
-        };
+        return updateEntityById(id, documentInfo, info, validate, security, traceId) as unknown as UpsertResult;
       }
 
       const hasForeignKeyOrDescriptorChecks: boolean = checkForeignKeys.length > 0 || checkDescriptorValues.length > 0;
       if (hasForeignKeyOrDescriptorChecks) {
-        const submittedForeignKeysLength = referenceValidation ? documentInfo.documentReferences.length : 0;
+        const submittedForeignKeysLength = validate ? documentInfo.documentReferences.length : 0;
         if (failureIndex < submittedForeignKeysLength) {
           // failure was with one of the foreign key condition check actions
           const failureForeignKey = documentInfo.documentReferences[failureIndex];
