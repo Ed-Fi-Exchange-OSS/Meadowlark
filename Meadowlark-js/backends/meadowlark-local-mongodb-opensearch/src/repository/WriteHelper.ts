@@ -47,13 +47,11 @@ export function findMissingReferences(
   );
 }
 
-// Transactional MongoDB options defined for readability
-export function onlyId(session: ClientSession): FindOptions {
-  return { projection: { id: 1, _id: 0 }, session };
-}
-export function asUpsert(session: ClientSession): ReplaceOptions {
-  return { upsert: true, session };
-}
+// MongoDB FindOption to return only the indexed id field, making this a covered query (MongoDB will optimize)
+export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { id: 1, _id: 0 }, session });
+
+// MongoDB ReplaceOption that enables upsert (insert if not exists)
+export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });
 
 /**
  * Validate document and descriptor references
@@ -76,7 +74,7 @@ export async function validateReferences(
 ): Promise<string[]> {
   const failureMessages: string[] = [];
 
-  const referencesInDb = await findReferencesById(outRefs, documentCollection, onlyId(session));
+  const referencesInDb = await findReferencesById(outRefs, documentCollection, onlyReturnId(session));
   if (outRefs.length !== referencesInDb.length) {
     Logger.debug('mongodb.repository.Upsert.upsertDocument: documentReferences not found', traceId);
     failureMessages.push(...findMissingReferences(referencesInDb, outRefs, documentReferences));
@@ -86,7 +84,7 @@ export async function validateReferences(
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencesById(descriptorReferenceIds, documentCollection, onlyId(session));
+  const descriptorsInDb = await findReferencesById(descriptorReferenceIds, documentCollection, onlyReturnId(session));
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
     Logger.debug('mongodb.repository.Upsert.upsertDocument: descriptorReferences not found', traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));

@@ -42,14 +42,14 @@ type NextToken = string;
 /**
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
  */
-export async function getEntityList(documentInfo: DocumentInfo, traceId: string): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.resourceName}`, traceId);
+export async function getEntityList(documentTypeInfo: DocumentInfo, traceId: string): Promise<GetResult> {
+  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentTypeInfo.resourceName}`, traceId);
 
   const queryParams: QueryCommandInput = {
     TableName: tableOpts.tableName,
     KeyConditionExpression: 'pk = :pk',
     ExpressionAttributeValues: {
-      ':pk': entityTypeStringFrom(documentInfo),
+      ':pk': entityTypeStringFrom(documentTypeInfo),
     },
   };
 
@@ -120,7 +120,7 @@ export async function getEntityById(
   security: Security,
   traceId: string,
 ): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
+  Logger.debug(`DynamoEntityRepository.getEntityById for ${id}`, traceId);
 
   const getParams: GetCommandInput = {
     TableName: tableOpts.tableName,

@@ -38,6 +38,11 @@ export async function updateDocumentById(
 
         // Abort on validation failure
         if (failures.length > 0) {
+          Logger.debug(
+            `mongodb.repository.Upsert.updateDocumentById: Updating document id ${id} failed due to invalid references`,
+            traceId,
+          );
+
           updateResult = {
             result: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Reference validation failed: ${failures.join(',')}`,

@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, WithId } from 'mongodb';
-import { DocumentInfo, Security, GetResult } from '@edfi/meadowlark-core';
+import { Security, GetResult, DocumentInfo } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getMongoCollection } from './Db';
 
@@ -14,10 +14,10 @@ export async function getDocumentById(
   _security: Security,
   _traceId: string,
 ): Promise<GetResult> {
-  const mongoDocuments: Collection<MeadowlarkDocument> = getMongoCollection();
+  const mongoCollection: Collection<MeadowlarkDocument> = getMongoCollection();
 
   try {
-    const result: WithId<MeadowlarkDocument> | null = await mongoDocuments.findOne({ id });
+    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ id });
     if (result === null) return { result: 'NOT_FOUND', documents: [] };
     return { result: 'SUCCESS', documents: [{ id: result.id, ...result.edfiDoc }] };
   } catch (e) {

@@ -7,7 +7,7 @@ import { Collection, ClientSession } from 'mongodb';
 import { DocumentInfo, Security, UpsertResult, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getMongoCollection, getClient } from './Db';
-import { asUpsert, newMeadowlarkDocument, onlyId, validateReferences } from './WriteHelper';
+import { asUpsert, newMeadowlarkDocument, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
   id: string,
@@ -38,8 +38,13 @@ export async function upsertDocument(
 
         // Abort on validation failure
         if (failures.length > 0) {
+          Logger.debug(
+            `mongodb.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to invalid references`,
+            traceId,
+          );
+
           // Check whether this would have been an insert or update
-          const isInsert: boolean = (await mongoCollection.findOne({ id }, onlyId(session))) == null;
+          const isInsert: boolean = (await mongoCollection.findOne({ id }, onlyReturnId(session))) == null;
 
           upsertResult = {
             result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
