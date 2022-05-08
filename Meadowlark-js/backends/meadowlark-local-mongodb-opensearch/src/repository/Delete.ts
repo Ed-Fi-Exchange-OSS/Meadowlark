@@ -6,7 +6,7 @@
 import { DocumentInfo, DeleteResult, Security, Logger } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getClient, getMongoCollection } from './Db';
+import { getCollection, startSession } from './Db';
 import { onlyReturnId } from './WriteHelper';
 
 // MongoDB Filter on documents with the given id in their outRefs list
@@ -22,8 +22,8 @@ export async function deleteDocumentById(
   _security: Security,
   traceId: string,
 ): Promise<DeleteResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = getMongoCollection();
-  const session: ClientSession = getClient().startSession();
+  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
+  const session: ClientSession = await startSession();
 
   let deleteResult: DeleteResult = { result: 'UNKNOWN_FAILURE' };
 
@@ -47,7 +47,7 @@ export async function deleteDocumentById(
           const referringDocuments = await mongoCollection.find(onlyDocumentsReferencing(id), limitFive(session)).toArray();
 
           const failures: string[] = referringDocuments.map(
-            (document) => `Resource ${document.resourceName} with identity '${document.documentIdentity}'`,
+            (document) => `Resource ${document.resourceName} with identity '${JSON.stringify(document.documentIdentity)}'`,
           );
 
           deleteResult = {

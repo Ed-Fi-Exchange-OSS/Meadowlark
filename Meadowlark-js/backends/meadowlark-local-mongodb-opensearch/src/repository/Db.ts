@@ -3,36 +3,55 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, Db, MongoClient } from 'mongodb';
+import { ClientSession, Collection, Db, MongoClient } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
-const MONGO_URL: string = process.env.MONGO_URL ?? 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
+const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
+const DB_NAME_DEFAULT = 'meadowlark';
+const MONGO_COLLECTION_NAME_DEFAULT = 'documents';
 
-const client: MongoClient = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
+let client: MongoClient | null = null;
+let db: Db | null = null;
+let collection: Collection<MeadowlarkDocument> | null = null;
 
-// IIFE for top-level await
-(async () => {
-  try {
-    await client.connect();
+async function getClient(): Promise<MongoClient> {
+  if (client == null) {
+    const MONGO_URL: string = process.env.MONGO_URL ?? MONGO_URL_DEFAULT;
+    const DB_NAME: string = process.env.DB_NAME ?? DB_NAME_DEFAULT;
+    const MONGO_COLLECTION_NAME: string = process.env.MONGO_COLLECTION_NAME ?? MONGO_COLLECTION_NAME_DEFAULT;
 
-    const db: Db = client.db('meadowlark');
-    const documents: Collection<MeadowlarkDocument> = db.collection('documents');
+    try {
+      client = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
+      await client.connect();
 
-    // Note this will trigger a time-consuming index build if the indexes do not already exist.
-    documents.createIndex({ id: 1 }, { unique: true });
-    documents.createIndex({ outRefs: 1 });
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
-    Logger.error(`Error connecting MongoDb URL: "${MONGO_URL}". Error was ${message}`, null);
-    throw e;
+      db = client.db(DB_NAME);
+      collection = db.collection(MONGO_COLLECTION_NAME);
+
+      // Note this does nothing if the indexes already exist (triggers an index build otherwise)
+      collection.createIndex({ id: 1 }, { unique: true });
+      collection.createIndex({ outRefs: 1 });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'unknown';
+      Logger.error(`Error connecting MongoDb URL: "${MONGO_URL}". Error was ${message}`, null);
+      throw e;
+    }
   }
-})();
 
-export function getMongoCollection(): Collection<MeadowlarkDocument> {
-  return client.db('meadowlark').collection('documents');
+  return client;
 }
 
-export function getClient(): MongoClient {
-  return client;
+export async function getCollection(): Promise<Collection<MeadowlarkDocument>> {
+  if (collection == null) {
+    await getClient();
+    if (collection == null) {
+      Logger.error('Db: Database create failed', null);
+      throw new Error('Db: Database create failed');
+    }
+  }
+  return collection;
+}
+
+export async function startSession(): Promise<ClientSession> {
+  return (await getClient()).startSession();
 }

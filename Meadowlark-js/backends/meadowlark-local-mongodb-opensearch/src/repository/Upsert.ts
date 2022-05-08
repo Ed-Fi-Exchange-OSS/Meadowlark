@@ -6,8 +6,8 @@
 import { Collection, ClientSession } from 'mongodb';
 import { DocumentInfo, Security, UpsertResult, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getMongoCollection, getClient } from './Db';
-import { asUpsert, newMeadowlarkDocument, onlyReturnId, validateReferences } from './WriteHelper';
+import { getCollection, startSession } from './Db';
+import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
   id: string,
@@ -17,10 +17,10 @@ export async function upsertDocument(
   _security: Security,
   traceId: string,
 ): Promise<UpsertResult> {
-  const document: MeadowlarkDocument = newMeadowlarkDocument(documentInfo, id, edfiDoc, validate);
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
 
-  const mongoCollection: Collection<MeadowlarkDocument> = getMongoCollection();
-  const session: ClientSession = getClient().startSession();
+  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
+  const session: ClientSession = await startSession();
 
   let upsertResult: UpsertResult = { result: 'UNKNOWN_FAILURE' };
 

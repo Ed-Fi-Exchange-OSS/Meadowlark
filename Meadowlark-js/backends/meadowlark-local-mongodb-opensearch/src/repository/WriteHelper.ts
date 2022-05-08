@@ -93,7 +93,7 @@ export async function validateReferences(
   return failureMessages;
 }
 
-export function newMeadowlarkDocument(
+export function meadowlarkDocumentFrom(
   documentInfo: DocumentInfo,
   id: string,
   edfiDoc: object,
