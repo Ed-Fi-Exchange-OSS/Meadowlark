@@ -109,7 +109,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         documentIdentity: [
           {
             name: 'descriptor',
-            value: `${descriptorDocument.namespace}/${descriptorDocument.codeValue}`,
+            value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
           },
         ],
       };
