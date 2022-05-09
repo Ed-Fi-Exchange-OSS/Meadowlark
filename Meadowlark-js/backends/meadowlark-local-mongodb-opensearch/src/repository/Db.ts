@@ -15,17 +15,17 @@ let client: MongoClient | null = null;
 let db: Db | null = null;
 let collection: Collection<MeadowlarkDocument> | null = null;
 
-async function getClient(): Promise<MongoClient> {
+export async function getClient(): Promise<MongoClient> {
   if (client == null) {
     const MONGO_URL: string = process.env.MONGO_URL ?? MONGO_URL_DEFAULT;
-    const DB_NAME: string = process.env.DB_NAME ?? DB_NAME_DEFAULT;
+    const MONGO_DB_NAME: string = process.env.MONGO_DB_NAME ?? DB_NAME_DEFAULT;
     const MONGO_COLLECTION_NAME: string = process.env.MONGO_COLLECTION_NAME ?? MONGO_COLLECTION_NAME_DEFAULT;
 
     try {
       client = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
       await client.connect();
 
-      db = client.db(DB_NAME);
+      db = client.db(MONGO_DB_NAME);
       collection = db.collection(MONGO_COLLECTION_NAME);
 
       // Note this does nothing if the indexes already exist (triggers an index build otherwise)
@@ -39,6 +39,17 @@ async function getClient(): Promise<MongoClient> {
   }
 
   return client;
+}
+
+export async function getDb(): Promise<Db> {
+  if (db == null) {
+    await getClient();
+    if (db == null) {
+      Logger.error('Db: Database create failed', null);
+      throw new Error('Db: Database create failed');
+    }
+  }
+  return db;
 }
 
 export async function getCollection(): Promise<Collection<MeadowlarkDocument>> {
