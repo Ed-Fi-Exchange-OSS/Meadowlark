@@ -45,17 +45,17 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().deleteDocumentById(
-      pathComponents.resourceId,
+    const { result, failureMessage } = await getBackendPlugin().deleteDocumentById({
+      id: pathComponents.resourceId,
       documentInfo,
-      event.headers['reference-validation'] !== 'false',
-      {
+      validate: event.headers['reference-validation'] !== 'false',
+      security: {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
         clientName: jwtStatus.subject,
       },
-      awsRequestId,
-    );
+      traceId: awsRequestId,
+    });
 
     if (result === 'DELETE_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'deleteIt', 204);

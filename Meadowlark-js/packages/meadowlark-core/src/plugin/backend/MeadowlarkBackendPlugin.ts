@@ -3,50 +3,27 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo } from '../../model/DocumentInfo';
-import { Security } from '../../model/Security';
+import { GetRequest } from './GetRequest';
 import { GetResult } from './GetResult';
+import { DeleteRequest } from './DeleteRequest';
 import { DeleteResult } from './DeleteResult';
-import { PaginationParameters } from './PaginationParameters';
-import { SearchResult } from './SearchResult';
+import { UpdateRequest } from './UpdateRequest';
 import { UpdateResult } from './UpdateResult';
+import { UpsertRequest } from './UpsertRequest';
 import { UpsertResult } from './UpsertResult';
+import { QueryRequest } from './QueryRequest';
+import { QueryResult } from './QueryResult';
 
 export interface MeadowlarkBackendPlugin {
-  upsertDocument: (
-    id: string,
-    documentInfo: DocumentInfo,
-    info: object,
-    validate: boolean,
-    security: Security,
-    traceId: string,
-  ) => Promise<UpsertResult>;
+  upsertDocument: (request: UpsertRequest) => Promise<UpsertResult>;
 
-  getDocumentById: (documentInfo: DocumentInfo, id: string, security: Security, traceId: string) => Promise<GetResult>;
+  getDocumentById: (request: GetRequest) => Promise<GetResult>;
 
-  getDocumentList: (documentInfo: DocumentInfo, traceId: string) => Promise<GetResult>;
+  getDocumentList: (request: QueryRequest) => Promise<GetResult>;
 
-  updateDocumentById: (
-    id: string,
-    documentInfo: DocumentInfo,
-    info: object,
-    validate: boolean,
-    security: Security,
-    traceId: string,
-  ) => Promise<UpdateResult>;
+  updateDocumentById: (request: UpdateRequest) => Promise<UpdateResult>;
 
-  deleteDocumentById: (
-    id: string,
-    documentInfo: DocumentInfo,
-    validate: boolean,
-    security: Security,
-    traceId: string,
-  ) => Promise<DeleteResult>;
+  deleteDocumentById: (request: DeleteRequest) => Promise<DeleteResult>;
 
-  queryDocumentList: (
-    documentInfo: DocumentInfo,
-    queryStringParameters: object,
-    paginationParameters: PaginationParameters,
-    awsRequestId: string,
-  ) => Promise<SearchResult>;
+  queryDocumentList: (request: QueryRequest) => Promise<QueryResult>;
 }

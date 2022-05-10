@@ -4,17 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, MongoClient, WithId } from 'mongodb';
-import { Security, GetResult, DocumentInfo } from '@edfi/meadowlark-core';
+import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
 
-export async function getDocumentById(
-  _documentInfo: DocumentInfo,
-  id: string,
-  _security: Security,
-  _traceId: string,
-  client: MongoClient,
-): Promise<GetResult> {
+export async function getDocumentById({ id }: GetRequest, client: MongoClient): Promise<GetResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
 
   try {

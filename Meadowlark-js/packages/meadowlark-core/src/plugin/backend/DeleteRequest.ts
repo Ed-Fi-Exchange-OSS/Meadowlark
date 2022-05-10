@@ -3,8 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/** TODO: this needs to be unified with GetResult */
-export type SearchResult = {
-  success: boolean;
-  results: Array<object>;
+import { DocumentInfo } from '../../model/DocumentInfo';
+import { Security } from '../../model/Security';
+
+export type DeleteRequest = {
+  id: string;
+  documentInfo: DocumentInfo;
+  validate: boolean;
+  security: Security;
+  traceId: string;
 };

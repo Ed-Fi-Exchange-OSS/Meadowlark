@@ -67,18 +67,18 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().updateDocumentById(
-      pathComponents.resourceId,
+    const { result, failureMessage } = await getBackendPlugin().updateDocumentById({
+      id: pathComponents.resourceId,
       documentInfo,
-      body,
-      event.headers['reference-validation'] !== 'false',
-      {
+      edfiDoc: body,
+      validate: event.headers['reference-validation'] !== 'false',
+      security: {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
         clientName: jwtStatus.subject,
       },
-      context.awsRequestId,
-    );
+      traceId: context.awsRequestId,
+    });
     if (result === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'update', 204);
       return { body: '', statusCode: 204, headers: headerMetadata };

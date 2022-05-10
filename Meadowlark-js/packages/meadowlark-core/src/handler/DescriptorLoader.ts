@@ -114,14 +114,14 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         ],
       };
 
-      const putResult: UpsertResult = await getBackendPlugin().upsertDocument(
-        documentIdForDocumentInfo(descriptorDocumentInfo),
-        descriptorDocumentInfo,
-        descriptorDocument,
-        true,
-        { ...newSecurity(), isOwnershipEnabled: false },
-        '-',
-      );
+      const putResult: UpsertResult = await getBackendPlugin().upsertDocument({
+        id: documentIdForDocumentInfo(descriptorDocumentInfo),
+        documentInfo: descriptorDocumentInfo,
+        edfiDoc: descriptorDocument,
+        validate: true,
+        security: { ...newSecurity(), isOwnershipEnabled: false },
+        traceId: '-',
+      });
       Logger.debug(
         `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorDocumentInfo.documentIdentity)}: ${
           putResult.failureMessage

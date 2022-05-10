@@ -25,12 +25,14 @@ describe('given something', () => {
     client = (await getNewClient()) as MongoClient;
 
     await upsertDocument(
-      id,
-      documentInfo,
-      { natural: 'key' },
-      false,
-      { ...newSecurity(), isOwnershipEnabled: false },
-      'correlationId',
+      {
+        id,
+        documentInfo,
+        edfiDoc: { natural: 'key' },
+        validate: false,
+        security: { ...newSecurity(), isOwnershipEnabled: false },
+        traceId: 'traceId',
+      },
       client,
     );
   });

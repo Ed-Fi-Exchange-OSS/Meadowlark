@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo, DeleteResult, Security, Logger } from '@edfi/meadowlark-core';
+import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, Filter, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
@@ -16,11 +16,7 @@ const onlyDocumentsReferencing = (id: string): Filter<MeadowlarkDocument> => ({ 
 const limitFive = (session: ClientSession): FindOptions => ({ projection: { _id: 0 }, limit: 5, session });
 
 export async function deleteDocumentById(
-  id: string,
-  _documentInfo: DocumentInfo,
-  validate: boolean,
-  _security: Security,
-  traceId: string,
+  { id, validate, traceId }: DeleteRequest,
   client: MongoClient,
 ): Promise<DeleteResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);

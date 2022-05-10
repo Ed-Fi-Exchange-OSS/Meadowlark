@@ -16,7 +16,17 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
-import { Logger, GetResult, UpdateResult, UpsertResult, Security, DocumentInfo } from '@edfi/meadowlark-core';
+import {
+  Logger,
+  GetResult,
+  UpdateResult,
+  UpsertResult,
+  DocumentInfo,
+  UpsertRequest,
+  GetRequest,
+  UpdateRequest,
+  QueryRequest,
+} from '@edfi/meadowlark-core';
 import {
   getDynamoDBDocumentClient,
   entityIdPrefixRemoved,
@@ -42,14 +52,14 @@ type NextToken = string;
 /**
  * Entry point for "get all" style query in DynamoDB. Querys by the entity type.
  */
-export async function getEntityList(documentTypeInfo: DocumentInfo, traceId: string): Promise<GetResult> {
-  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentTypeInfo.resourceName}`, traceId);
+export async function getEntityList({ documentInfo, traceId }: QueryRequest): Promise<GetResult> {
+  Logger.debug(`DynamoEntityRepository.getEntityList for ${documentInfo.resourceName}`, traceId);
 
   const queryParams: QueryCommandInput = {
     TableName: tableOpts.tableName,
     KeyConditionExpression: 'pk = :pk',
     ExpressionAttributeValues: {
-      ':pk': entityTypeStringFrom(documentTypeInfo),
+      ':pk': entityTypeStringFrom(documentInfo),
     },
   };
 
@@ -114,12 +124,7 @@ async function edOrgsForStudent(
  * Student relationships.  If they exist, only return the result if it matches
  * the claims in the Security object.
  */
-export async function getEntityById(
-  documentInfo: DocumentInfo,
-  id: string,
-  security: Security,
-  traceId: string,
-): Promise<GetResult> {
+export async function getEntityById({ id, documentInfo, security, traceId }: GetRequest): Promise<GetResult> {
   Logger.debug(`DynamoEntityRepository.getEntityById for ${id}`, traceId);
 
   const getParams: GetCommandInput = {
@@ -218,16 +223,16 @@ export async function getEntityById(
  * Entry point for entity update in DynamoDB. Takes the entity id, JSON body and key information
  * extracted from the body, and attempts a DynamoDB update.
  */
-export async function updateEntityById(
-  id: string,
-  documentInfo: DocumentInfo,
-  info: object,
-  validate: boolean,
-  security: Security,
-  traceId: string,
-): Promise<UpdateResult> {
+export async function updateEntityById({
+  id,
+  documentInfo,
+  validate,
+  edfiDoc,
+  security,
+  traceId,
+}: UpdateRequest): Promise<UpdateResult> {
   Logger.debug(`DynamoEntityRepository.updateEntityById for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
-  const infoWithMetadata = validate ? info : { ...info, _unvalidated: true };
+  const infoWithMetadata = validate ? edfiDoc : { ...edfiDoc, _unvalidated: true };
 
   // Construct the action to update the Entity item
   const ExpressionAttributeValues = { ':info': infoWithMetadata };
@@ -318,16 +323,16 @@ export async function updateEntityById(
  * Entry point for entity creation in DynamoDB. Takes the entity id, JSON body and key information
  * extracted from the body, and attempts a DynamoDB insert. Falls back to DynamoDB update if ID exists.
  */
-export async function createEntity(
-  id: string,
-  documentInfo: DocumentInfo,
-  info: object,
-  validate: boolean,
-  security: Security,
-  traceId: string,
-): Promise<UpsertResult> {
+export async function createEntity({
+  id,
+  documentInfo,
+  validate,
+  security,
+  traceId,
+  edfiDoc,
+}: UpsertRequest): Promise<UpsertResult> {
   Logger.debug(`DynamoEntityRepository.createEntity for ${JSON.stringify(documentInfo.documentIdentity)}`, traceId);
-  const putItem = constructPutEntityItem(id, documentInfo, info, security.clientName, validate);
+  const putItem = constructPutEntityItem(id, documentInfo, edfiDoc, security.clientName, validate);
   const tryPutEntity: TransactWriteItem = generatePutEntityThatFailsIfExists(putItem);
 
   // Construct foreign key condition checks if reference validation is on
@@ -354,7 +359,7 @@ export async function createEntity(
         assignableItem == null ? error.CancellationReasons.length - 1 : error.CancellationReasons.length - 2;
       if (failureIndex === tryPutEntityIndex) {
         // Entity already exists, try as update
-        return updateEntityById(id, documentInfo, info, validate, security, traceId) as unknown as UpsertResult;
+        return updateEntityById({ id, documentInfo, edfiDoc, validate, security, traceId }) as unknown as UpsertResult;
       }
 
       const hasForeignKeyOrDescriptorChecks: boolean = checkForeignKeys.length > 0 || checkDescriptorValues.length > 0;

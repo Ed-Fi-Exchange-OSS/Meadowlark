@@ -8,7 +8,7 @@ import { APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { query } from '../../src/handler/Query';
-import { SearchResult } from '../../src/plugin/backend/SearchResult';
+import { QueryResult } from '../../src/plugin/backend/QueryResult';
 import { getBackendPlugin } from '../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
@@ -80,7 +80,7 @@ describe('given persistence fails', () => {
       Promise.resolve({
         success: false,
         results: [],
-      } as unknown as SearchResult),
+      } as unknown as QueryResult),
     );
 
     // Act
@@ -131,7 +131,7 @@ describe('given successful fetch from persistence', () => {
       Promise.resolve({
         success: true,
         results: [goodResult],
-      } as unknown as SearchResult),
+      } as unknown as QueryResult),
     );
 
     // Act

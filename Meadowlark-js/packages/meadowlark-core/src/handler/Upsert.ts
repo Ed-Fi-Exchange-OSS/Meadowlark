@@ -62,18 +62,18 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
     }
 
     const resourceId = documentIdForDocumentInfo(documentInfo);
-    const { result, failureMessage } = await getBackendPlugin().upsertDocument(
-      resourceId,
+    const { result, failureMessage } = await getBackendPlugin().upsertDocument({
+      id: resourceId,
       documentInfo,
-      body,
-      event.headers['reference-validation'] !== 'false',
-      {
+      edfiDoc: body,
+      validate: event.headers['reference-validation'] !== 'false',
+      security: {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
         clientName: jwtStatus.subject,
       },
-      context.awsRequestId,
-    );
+      traceId: context.awsRequestId,
+    });
     if (result === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'create', 201);
       const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;

@@ -76,14 +76,14 @@ describe('given the PUT run successfully in DynamoDb', () => {
     const result: CreateTableCommandOutput = await createTable(tableDefinition);
     expect(result.$metadata.httpStatusCode).toBe(200);
 
-    await createEntity(
+    await createEntity({
       id,
       documentInfo,
-      { bodyEntry },
-      false,
-      { ...newSecurity(), isOwnershipEnabled: false },
-      'correlationId',
-    );
+      edfiDoc: { bodyEntry },
+      validate: false,
+      security: { ...newSecurity(), isOwnershipEnabled: false },
+      traceId: 'traceId',
+    });
   });
 
   afterAll(async () => {

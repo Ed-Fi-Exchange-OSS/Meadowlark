@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DeleteResult, DocumentInfo, Security } from '@edfi/meadowlark-core';
+import { DeleteRequest, DeleteResult } from '@edfi/meadowlark-core';
 import {
   deleteEntityByIdDynamo,
   deleteItems,
@@ -15,20 +15,14 @@ import {
 /**
  * Deletes the primary item from DynamoDB.
  */
-export async function deleteEntityById(
-  id: string,
-  documentInfo: DocumentInfo,
-  _validate: boolean,
-  security: Security,
-  awsRequestId: string,
-): Promise<DeleteResult> {
+export async function deleteEntityById({ id, documentInfo, security, traceId }: DeleteRequest): Promise<DeleteResult> {
   try {
     if (security.isOwnershipEnabled) {
       const { isOwner, result: ownershipResult } = await validateEntityOwnership(
         id,
         documentInfo,
         security.clientName,
-        awsRequestId,
+        traceId,
       );
 
       if (ownershipResult === 'ERROR') {
@@ -44,7 +38,7 @@ export async function deleteEntityById(
       }
     }
 
-    const foreignKeysLookup = await getReferencesToThisItem(id, documentInfo, awsRequestId);
+    const foreignKeysLookup = await getReferencesToThisItem(id, documentInfo, traceId);
     if (!foreignKeysLookup.success || foreignKeysLookup.foreignKeys?.length > 0) {
       const fks = foreignKeysLookup.foreignKeys.map((fk) => fk.Description);
       const failureMessage = JSON.stringify({
@@ -55,25 +49,25 @@ export async function deleteEntityById(
       return { result: 'DELETE_FAILURE_REFERENCE', failureMessage };
     }
 
-    const { success } = await deleteEntityByIdDynamo(id, documentInfo, awsRequestId);
+    const { success } = await deleteEntityByIdDynamo(id, documentInfo, traceId);
 
     if (!success) {
       return { result: 'UNKNOWN_FAILURE' };
     }
 
     // Now that the main object has been deleted, we need to delete the foreign key references
-    const { success: fkSuccess, foreignKeys } = await getForeignKeyReferences(id, documentInfo, awsRequestId);
+    const { success: fkSuccess, foreignKeys } = await getForeignKeyReferences(id, documentInfo, traceId);
 
     if (fkSuccess) {
       // Delete the (FREF, TREF) records
       await deleteItems(
         foreignKeys.map((i) => ({ pk: i.From, sk: i.To })),
-        awsRequestId,
+        traceId,
       );
       // And now reverse that, to delete the (TREF, FREF) records
       await deleteItems(
         foreignKeys.map((i) => ({ pk: i.To, sk: i.From })),
-        awsRequestId,
+        traceId,
       );
     } // Else: user can't resolve this error, and it should be logged already. Ignore.
 

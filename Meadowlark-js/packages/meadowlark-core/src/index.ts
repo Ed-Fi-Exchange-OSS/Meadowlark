@@ -2,10 +2,15 @@ export { MeadowlarkBackendPlugin } from './plugin/backend/MeadowlarkBackendPlugi
 export { NoMeadowlarkBackendPlugin } from './plugin/backend/NoMeadowlarkBackendPlugin';
 export { GetResult } from './plugin/backend/GetResult';
 export { DeleteResult } from './plugin/backend/DeleteResult';
-export { PaginationParameters } from './plugin/backend/PaginationParameters';
 export { UpdateResult } from './plugin/backend/UpdateResult';
 export { UpsertResult } from './plugin/backend/UpsertResult';
-export { SearchResult } from './plugin/backend/SearchResult';
+export { QueryResult } from './plugin/backend/QueryResult';
+export { GetRequest } from './plugin/backend/GetRequest';
+export { DeleteRequest } from './plugin/backend/DeleteRequest';
+export { UpdateRequest } from './plugin/backend/UpdateRequest';
+export { UpsertRequest } from './plugin/backend/UpsertRequest';
+export { QueryRequest } from './plugin/backend/QueryRequest';
+export { PaginationParameters } from './plugin/backend/PaginationParameters';
 export { Security, newSecurity } from './model/Security';
 export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';

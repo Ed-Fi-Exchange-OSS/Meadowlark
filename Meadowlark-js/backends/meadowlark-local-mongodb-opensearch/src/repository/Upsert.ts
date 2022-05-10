@@ -4,18 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { DocumentInfo, Security, UpsertResult, Logger } from '@edfi/meadowlark-core';
+import { UpsertResult, Logger, UpsertRequest } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
 import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
-  id: string,
-  documentInfo: DocumentInfo,
-  edfiDoc: object,
-  validate: boolean,
-  _security: Security,
-  traceId: string,
+  { documentInfo, id, edfiDoc, validate, traceId }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);

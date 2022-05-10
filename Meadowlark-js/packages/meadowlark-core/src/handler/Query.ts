@@ -36,12 +36,12 @@ export async function query(
   const cleanQueryParameters: object = removeDisallowedQueryParameters(queryStringParameters);
   const paginationParameters: PaginationParameters = onlyPaginationParameters(queryStringParameters);
 
-  const { success, results } = await getBackendPlugin().queryDocumentList(
+  const { success, results } = await getBackendPlugin().queryDocumentList({
     documentInfo,
-    cleanQueryParameters,
+    queryStringParameters: cleanQueryParameters,
     paginationParameters,
-    context.awsRequestId,
-  );
+    traceId: context.awsRequestId,
+  });
 
   if (!success) {
     if (results?.length > 0) {

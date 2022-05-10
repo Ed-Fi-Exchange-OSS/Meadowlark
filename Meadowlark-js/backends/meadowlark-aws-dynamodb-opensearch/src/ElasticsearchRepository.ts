@@ -9,7 +9,7 @@ import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
-import { DocumentInfo, Logger, PaginationParameters, SearchResult } from '@edfi/meadowlark-core';
+import { DocumentInfo, Logger, QueryRequest, QueryResult } from '@edfi/meadowlark-core';
 import { entityTypeStringFrom } from './Utility';
 
 /**
@@ -93,15 +93,15 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
  * Entry point for querying with Elasticsearch, given entity info, the original http
  * request query parameters, and a Security object for possible filtering
  */
-export async function queryEntityList(
-  documentInfo: DocumentInfo,
-  queryStringParameters: object,
-  paginationParameters: PaginationParameters,
-  awsRequestId: string,
-): Promise<SearchResult> {
-  const client = await getElasticsearchClient(awsRequestId);
+export async function queryEntityList({
+  documentInfo,
+  queryStringParameters,
+  paginationParameters,
+  traceId,
+}: QueryRequest): Promise<QueryResult> {
+  const client = await getElasticsearchClient(traceId);
 
-  Logger.debug(`Building query`, awsRequestId);
+  Logger.debug(`Building query`, traceId);
 
   let results: any = {};
   try {
@@ -112,11 +112,11 @@ export async function queryEntityList(
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 
-    Logger.debug(`ElasticsearchRepository.queryEntityList executing query: ${query}`, awsRequestId);
+    Logger.debug(`ElasticsearchRepository.queryEntityList executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
 
-    Logger.debug(`Result: ${JSON.stringify(body)}`, awsRequestId);
+    Logger.debug(`Result: ${JSON.stringify(body)}`, traceId);
     results = body.datarows.map((datarow) => JSON.parse(datarow));
   } catch (e) {
     const body = JSON.parse(e.meta.body);
@@ -127,10 +127,10 @@ export async function queryEntityList(
         return { success: true, results: [] };
       case 'SemanticAnalysisException':
         // The query term is invalid, respond with a validation message
-        Logger.debug('ElasticsearchRepository.queryEntityList', awsRequestId, 'n/a', e.meta.body);
+        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, 'n/a', e.meta.body);
         return { success: false, results: [{ error: body.error.details }] };
       default:
-        Logger.error('ElasticsearchRepository.queryEntityList', awsRequestId, 'n/a', body ?? e);
+        Logger.error('ElasticsearchRepository.queryEntityList', traceId, 'n/a', body ?? e);
         return { success: false, results: [] };
     }
   }

@@ -34,12 +34,12 @@ export async function getById(
     return { body: errorBody, statusCode: 404, headers: headerMetadata };
   }
 
-  const { result, documents, securityResolved } = await getBackendPlugin().getDocumentById(
+  const { result, documents, securityResolved } = await getBackendPlugin().getDocumentById({
+    id: pathComponents.resourceId,
     documentInfo,
-    pathComponents.resourceId,
     security,
-    context.awsRequestId,
-  );
+    traceId: context.awsRequestId,
+  });
 
   if (result === 'ERROR') {
     writeDebugStatusToLog(moduleName, context, 'getById', 500);

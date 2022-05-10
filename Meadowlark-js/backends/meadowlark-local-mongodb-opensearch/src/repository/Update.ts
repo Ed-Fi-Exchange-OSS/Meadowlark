@@ -3,19 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo, Security, UpdateResult, Logger } from '@edfi/meadowlark-core';
+import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
 import { meadowlarkDocumentFrom, validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
-  id: string,
-  documentInfo: DocumentInfo,
-  edfiDoc: object,
-  validate: boolean,
-  _security: Security,
-  traceId: string,
+  { id, documentInfo, edfiDoc, validate, traceId }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
