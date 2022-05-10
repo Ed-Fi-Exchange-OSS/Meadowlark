@@ -4,9 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentInfo, DeleteResult, Security, Logger } from '@edfi/meadowlark-core';
-import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
+import { ClientSession, Collection, Filter, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getCollection, startSession } from './Db';
+import { getCollection } from './Db';
 import { onlyReturnId } from './WriteHelper';
 
 // MongoDB Filter on documents with the given id in their outRefs list
@@ -21,9 +21,10 @@ export async function deleteDocumentById(
   validate: boolean,
   _security: Security,
   traceId: string,
+  client: MongoClient,
 ): Promise<DeleteResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
-  const session: ClientSession = await startSession();
+  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const session: ClientSession = client.startSession();
 
   let deleteResult: DeleteResult = { result: 'UNKNOWN_FAILURE' };
 

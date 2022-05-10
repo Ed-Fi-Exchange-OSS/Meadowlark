@@ -6,38 +6,24 @@
 import { DocumentInfo, newDocumentInfo, newSecurity, documentIdForDocumentInfo } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
-import { getCollection, getClient } from '../../src/repository/Db';
+import { getCollection, getNewClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 
-jest.setTimeout(40000);
-
-const TEST_DB_NAME = 'meadowlark-integration-tests';
-process.env.MONGO_DB_NAME = TEST_DB_NAME;
-
-async function resetDb(): Promise<void> {
-  const client = new MongoClient('mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0', {
-    w: 'majority',
-    readConcernLevel: 'majority',
-  });
-  try {
-    await client.connect();
-    const db = client.db(TEST_DB_NAME);
-    await db.dropDatabase();
-  } finally {
-    await client.close();
-  }
-}
+jest.setTimeout(400000);
 
 describe('given something', () => {
+  let client;
+
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'key' }],
   };
-
   const id = documentIdForDocumentInfo(documentInfo);
+
   beforeAll(async () => {
-    await resetDb();
+    client = (await getNewClient()) as MongoClient;
+
     await upsertDocument(
       id,
       documentInfo,
@@ -45,16 +31,18 @@ describe('given something', () => {
       false,
       { ...newSecurity(), isOwnershipEnabled: false },
       'correlationId',
+      client,
     );
   });
 
   afterAll(async () => {
-    (await getClient()).close();
+    await getCollection(client).deleteMany({});
+    await client.close();
   });
 
   it('exists in db', async () => {
-    const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
-    const result: any = await mongoCollection.findOne({ id });
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ id });
     expect(result).not.toBeNull();
     expect(result.resourceName).toBe('School');
   });

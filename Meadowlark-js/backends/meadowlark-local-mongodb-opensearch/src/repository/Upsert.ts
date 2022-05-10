@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, ClientSession } from 'mongodb';
+import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { DocumentInfo, Security, UpsertResult, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getCollection, startSession } from './Db';
+import { getCollection } from './Db';
 import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
@@ -16,11 +16,12 @@ export async function upsertDocument(
   validate: boolean,
   _security: Security,
   traceId: string,
+  client: MongoClient,
 ): Promise<UpsertResult> {
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
 
-  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
-  const session: ClientSession = await startSession();
+  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const session: ClientSession = client.startSession();
 
   let upsertResult: UpsertResult = { result: 'UNKNOWN_FAILURE' };
 

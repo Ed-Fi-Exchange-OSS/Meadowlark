@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, WithId } from 'mongodb';
+import { Collection, MongoClient, WithId } from 'mongodb';
 import { Security, GetResult, DocumentInfo } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
@@ -13,8 +13,9 @@ export async function getDocumentById(
   id: string,
   _security: Security,
   _traceId: string,
+  client: MongoClient,
 ): Promise<GetResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
+  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
 
   try {
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ id });

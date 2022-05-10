@@ -4,9 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentInfo, Security, UpdateResult, Logger } from '@edfi/meadowlark-core';
-import { Collection, ClientSession } from 'mongodb';
+import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getCollection, startSession } from './Db';
+import { getCollection } from './Db';
 import { meadowlarkDocumentFrom, validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
@@ -16,11 +16,12 @@ export async function updateDocumentById(
   validate: boolean,
   _security: Security,
   traceId: string,
+  client: MongoClient,
 ): Promise<UpdateResult> {
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
 
-  const mongoCollection: Collection<MeadowlarkDocument> = await getCollection();
-  const session: ClientSession = await startSession();
+  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const session: ClientSession = client.startSession();
 
   let updateResult: UpdateResult = { result: 'UNKNOWN_FAILURE' };
 

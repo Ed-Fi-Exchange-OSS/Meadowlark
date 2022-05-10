@@ -1,6 +1,9 @@
+const { defaults: tsjPreset } = require('ts-jest/presets');
+
 module.exports = {
+  transform: tsjPreset.transform,
   testEnvironment: 'node',
-  preset: 'ts-jest',
+  preset: '@shelf/jest-mongodb',
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   collectCoverageFrom: ['packages/**/src/**/*.ts'],
@@ -13,4 +16,5 @@ module.exports = {
     },
   },
   modulePathIgnorePatterns: ['dist*', 'docs*'],
+  watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
 };
