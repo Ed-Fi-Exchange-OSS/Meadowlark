@@ -20,7 +20,13 @@ export {
   documentIdForDocumentReference,
   documentIdForDocumentIdentifyingInfo,
 } from './helpers/DocumentId';
-export { DocumentInfo, newDocumentInfo, DocumentIdentifyingInfo, DocumentTypeInfo } from './model/DocumentInfo';
+export {
+  DocumentInfo,
+  newDocumentInfo,
+  NoDocumentInfo,
+  DocumentIdentifyingInfo,
+  DocumentTypeInfo,
+} from './model/DocumentInfo';
 export { Logger } from './helpers/Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 
