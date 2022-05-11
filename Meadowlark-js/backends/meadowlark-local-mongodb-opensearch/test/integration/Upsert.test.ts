@@ -398,7 +398,7 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
 
     // The original document with no reference
-    upsertResult = await upsertDocument(
+    await upsertDocument(
       { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
       client,
     );
@@ -473,7 +473,7 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
 
     // The original document with no references
-    upsertResult = await upsertDocument(
+    await upsertDocument(
       { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
       client,
     );
