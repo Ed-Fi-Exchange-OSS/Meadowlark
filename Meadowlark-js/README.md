@@ -7,10 +7,28 @@ deployment. For remote deployment instructions, please see
 
 ## Getting Started
 
+### Repo structure
+
+Meadowlark-js is structured as a monorepo managed by Yarn and Lerna. There are three
+directories that contain npm packages:
+
+* `services`: The Meadowlark custom frontend runners, e.g. AWS API Gateway + Lambda,
+   Ngnix + Fastify
+* `backends`: The Meadowlark custom backend plugins providing primary data storage and
+  reference validation e.g. MongoDB, PostgreSQL
+* `packages`: The Meadowlark packages providing core functionality and libraries
+  for the frontend and backend packages
+
+The `docker` directory contains Docker Compose files supporting the frontends and backends.
+The `test` directory contains test scripts to exercise the API. Similar to Postman,
+these scripts are .http files that use the Visual Studio Code [REST
+Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+extension.
+
 ### Local Installation
 
-* Install [Node.js 14.x or higher](https://nodejs.org/en/download/releases/)
-* Install [Yarn 1.x or higher](https://classic.yarnpkg.com/lang/en/)
+* Install [Node.js 16.x or higher](https://nodejs.org/en/download/releases/)
+* Enable [Yarn](https://yarnpkg.com/getting-started/install) as the package manager
 * (recommended editor) Install [Visual Studio Code](https://code.visualstudio.com/)
 * Install Java JRE version 11 or higher to run DynamoDB Local (Downloadable
   Version).
@@ -33,7 +51,7 @@ Meadowlark uses environment variables from a `.env` file for API security and
 local DynamoDB and OpenSearch configuration. You will also need to set dummy
 AWS credentials if you do not intend to deploy Meadowlark to an AWS account.
 
-* In the `packages/meadowlark` directory, Copy the `.env.example` file to
+* In the `services/meadowlark-aws-lambda` directory, Copy the `.env.example` file to
   `.env`.
 * Decide on a directory location for the DynamoDB Local data to be stored, and
   create that directory.
@@ -51,56 +69,35 @@ already have the AWS CLI configured, uncomment the `AWS_ACCESS_KEY_ID` and
 
 ### DynamoDB Local Installation
 
-* Change directories to `packages/meadowlark`.
+* On the command line, enusure you are in the `services/meadowlark-aws-lambda` directory.
 * Run `yarn init:local-dynamodb`.
 
-### OpenSearch Installation
+### MongoDB and OpenSearch Installation
 
 The quickest way to get OpenSearch running locally is with Docker. See the
-[docker-local README.md](docker-local/readme.md) in the docker-local directory
+[docker README.md](docker/readme.md) in the docker directory
 for instructions.
 
 ### Test a local deploy
 
-Meadowlark is bundled with test scripts to exercise the API. Similar to Postman,
-these scripts are .http files that use the Visual Studio Code [REST
-Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
-extension.
+Meadowlark is bundled with test scripts to exercise the API.
 
-* Run `yarn start:local`
+* Run `yarn start:local` from the root `Meadowlark-js` directory.
 * Use a test/http/local.*.http file to make API calls.
   * Reference validation can be disabled by adding the header
     `reference-validation: false`.
-  * Descriptor validation can be disabled by adding the header
-    `descriptor-validation: false`.
 
 ### Load Ed-Fi Descriptors
 
 Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not
-required, must be loaded in order to use descriptor validation.
+required, must be loaded in order for descriptors to validate successfully.
 
 * Run `yarn start:local` in one shell.
-* In a second shell, run `yarn load:descriptors:local` from
-  `packages/meadowlark` to invoke the Meadowlark Lambda function that loads
-  descriptors into the "dev" stage.
+* In a second shell, run `yarn load:descriptors:local` to invoke the Meadowlark
+* Lambda function that loads descriptors into the "dev" stage.
 
 ### Other Build Scripts
 
 For other build / operation scripts, please review the [general
-package.json](package.json) (repository-wide commands) file or the
-[meadowlark-specific package.json](packages/meadowlark/package.json) (package
-commands)
-
-## Resources for Learning about DynamoDB
-
-* Alex DeBrie's [DynamodDB Guide](https://www.dynamodbguide.com/) and [The
-  DynamoDB Book](https://www.dynamodbbook.com/)
-* [Single table design with
-  DynamoDB](https://www.youtube.com/watch?v=BnDKD_Zv0og). "Covers a fair amount
-  of his book content".
-* [re:Invent 2019 - DynamoDB Deep
-  Dive](https://www.youtube.com/watch?v=6yqfmXiZTlM)
-* [re:Invent 2020 - DynamoDB Advanced Design Patterns, part
-  1](https://www.youtube.com/watch?v=MF9a1UNOAQo)
-* [re:Invent 2020 - DynamoDB Advanced Design Patterns, part
-  2](https://www.youtube.com/watch?v=_KNrRdWD25M)
+package.json](package.json) (repository-wide commands) file or the individual
+package.json files in each package.

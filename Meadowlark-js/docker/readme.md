@@ -3,8 +3,8 @@
 (!) This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-This compose file requires [Docker Compose v2](https://github.com/docker/compose)
-(which comes with Docker Desktop for Windows users). It provisions:
+These compose file requires [Docker Compose v2](https://github.com/docker/compose)
+(which comes with Docker Desktop for Windows users). Together, they provision:
 
 * OpenSearch
 * OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
@@ -53,6 +53,11 @@ At a command prompt, running in this directory:
 | view OpenSearch Dashboard logs | `docker logs opensearch-dashboards` |
 | view MongoDB logs | `docker logs mongodb-node1` |
 
+## VSCode Docker Plugin
+
+The Docker for VSCode plugin is an easy way to manage Docker Containers, providing right-click
+`compose up` and `compose down` as well as container monitoring.
+
 ## Visualizations in OpenSearch Dashboards
 
 Once data starts flowing into OpenSearch, you can setup some basic
@@ -80,6 +85,7 @@ hosts file:
 `127.0.0.1 mongo1 mongo2 mongo3`
 
 ## Browsing MongoDB
+
 [MongoDB Compass](https://www.mongodb.com/docs/compass/current/) is a freely available UI tool
 for browsing and importing data into MongoDB. `mongodb://mongo1:27017,mongo2:27018,mongo3:27019` is the connection
 string to use for this MongoDB replica set. Login/password security is disabled in the default
