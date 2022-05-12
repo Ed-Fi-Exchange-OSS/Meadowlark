@@ -4,6 +4,7 @@
       "esbenp.prettier-vscode",
       "dbaeumer.vscode-eslint",
       "ms-vscode-remote.remote-containers",
-      "humao.rest-client"
+      "humao.rest-client",
+      "EditorConfig.EditorConfig"
     ]
 }
