@@ -82,6 +82,7 @@ for instructions.
 
 Meadowlark is bundled with test scripts to exercise the API.
 
+* Run `yarn build` from the root `Meadowlark-js` directory.
 * Run `yarn start:local` from the root `Meadowlark-js` directory.
 * Use a test/http/local.*.http file to make API calls.
   * Reference validation can be disabled by adding the header
