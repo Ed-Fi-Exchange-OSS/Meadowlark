@@ -78,43 +78,6 @@ export async function getEntityList({ documentInfo, traceId }: QueryRequest): Pr
 }
 
 /**
- * Queries the SecurityStudentEdOrgGSI for all education organization ids associated with a student through
- * a given Association entity in the Ed-Fi model e.g. StudentSchoolAssociation
- */
-async function edOrgsForStudent(
-  throughAssociation: string,
-  studentId: string,
-  edOrgIds: string[],
-  traceId: string,
-): Promise<string[]> {
-  const securityEdOrgPrefix = `${throughAssociation}#`;
-  const queryParams: QueryCommandInput = {
-    TableName: tableOpts.tableName,
-    IndexName: 'SecurityStudentEdOrgGSI',
-    KeyConditionExpression: 'securityStudentId = :securityStudentId and begins_with(securityEdOrgId, :securityEdOrgId)',
-    ExpressionAttributeValues: {
-      ':securityStudentId': `Student#${studentId}`,
-      ':securityEdOrgId': securityEdOrgPrefix,
-    },
-  };
-
-  let queryResult: QueryCommandOutput = NoOutput;
-
-  try {
-    queryResult = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
-  } catch (error) {
-    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, error);
-    return [];
-  }
-
-  const edOrgIdHits: string[] = Array.from(queryResult.Items ?? []).map((item) =>
-    (item.securityEdOrgId as string).replace(securityEdOrgPrefix, ''),
-  );
-
-  return R.intersection(edOrgIdHits, edOrgIds);
-}
-
-/**
  * Entry point for "get bv id" style query in DynamoDB. Querys by the entity type and id.
  *
  * If security is enabled, check the Entity item returned by DynamoDB for EdOrg and/or
@@ -145,8 +108,7 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
 
   const document = { id: entityIdPrefixRemoved(getResult.Item.sk), ...getResult.Item.info };
 
-  // Ownership-based security takes precedence
-  if (security.isOwnershipEnabled) {
+  if (security.authorizationStrategy === 'OWNERSHIP_BASED') {
     if (getResult.Item.ownerId == null) {
       Logger.debug('DynamoEntityRepository.getEntityById: No ownership of item', traceId);
       return { response: 'GET_SUCCESS', document, securityResolved: ['No ownership of item'] };
@@ -164,56 +126,7 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
     return { response: 'GET_SUCCESS', document, securityResolved: ['Ownership matches'] };
   }
 
-  // no security if no legacy claims (for demo/testing reasons)
-  if (security.edOrgIds.length === 0 && security.studentIds.length === 0)
-    return { response: 'GET_SUCCESS', document, securityResolved: ['Security inactive without claims'] };
-
-  const securityResolved: string[] = [];
-
-  // unsecured by edorg/student security
-  if (getResult.Item.edOrgId == null && getResult.Item.studentId == null) {
-    return { response: 'GET_SUCCESS', document, securityResolved: ['Entity not secured by EdOrgId or StudentId'] };
-  }
-
-  // ed org direct security
-  if (getResult.Item.edOrgId != null && getResult.Item.studentId == null) {
-    if (security.edOrgIds.includes(getResult.Item.edOrgId)) {
-      return { response: 'GET_SUCCESS', document, securityResolved: [`Direct via EdOrgId ${getResult.Item.edOrgId}`] };
-    }
-    return {
-      response: 'GET_FAILURE_AUTHORIZATION',
-      document: {},
-      securityResolved: [`No access via EdOrgId ${getResult.Item.edOrgId}`],
-    };
-  }
-
-  // student direct security
-  if (security.studentIds.includes(getResult.Item.studentId)) {
-    securityResolved.push(`Direct via StudentId ${getResult.Item.studentId}`);
-    return { response: 'GET_SUCCESS', document, securityResolved };
-  }
-  securityResolved.push(`No access via StudentId ${getResult.Item.studentId}`);
-
-  // student indirect security
-  if (security.throughAssociation != null) {
-    const edOrgsFound: string[] = await edOrgsForStudent(
-      security.throughAssociation,
-      getResult.Item.studentId,
-      security.edOrgIds,
-      traceId,
-    );
-    if (edOrgsFound.length > 0) {
-      securityResolved.push(
-        `StudentId ${getResult.Item.studentId} relationship with EdOrgId ${edOrgsFound.join(',')} through ${
-          security.throughAssociation
-        } `,
-      );
-      return { response: 'GET_SUCCESS', document, securityResolved };
-    }
-    securityResolved.push(`No relationship through ${security.throughAssociation}`);
-  }
-
-  return { response: 'GET_FAILURE_AUTHORIZATION', document: {}, securityResolved };
+  return { response: 'GET_FAILURE_AUTHORIZATION', document: {}, securityResolved: [] };
 }
 
 /**
@@ -241,7 +154,7 @@ export async function updateEntityById({
   let ExpressionAttributeNames;
 
   // Additional conditions if ownership-based security is enabled
-  if (security.isOwnershipEnabled) {
+  if (security.authorizationStrategy === 'OWNERSHIP_BASED') {
     ExpressionAttributeNames = { '#ownerId': 'ownerId' };
     ExpressionAttributeValues[':ownerId'] = security.clientName;
     ConditionExpression += ' AND (attribute_not_exists(ownerId) OR #ownerId = :ownerId)';

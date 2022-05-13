@@ -5,10 +5,12 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import type { FrontendRequest, FrontendResponse } from '@edfi/meadowlark-core';
+import { FrontendRequest, FrontendResponse, newFrontendRequest, HttpMethod } from '@edfi/meadowlark-core';
 
-export function fromRequest(event: APIGatewayProxyEvent, context: Context): FrontendRequest {
+export function fromRequest(event: APIGatewayProxyEvent, context: Context, method: HttpMethod): FrontendRequest {
   return {
+    ...newFrontendRequest(),
+    method,
     path: event.path ?? '',
     traceId: context.awsRequestId ?? '',
     body: event.body,

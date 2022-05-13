@@ -10,10 +10,10 @@ import { getCollection } from './Db';
 import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
-  { documentInfo, id, edfiDoc, validate, traceId }: UpsertRequest,
+  { documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate, security.clientName);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();

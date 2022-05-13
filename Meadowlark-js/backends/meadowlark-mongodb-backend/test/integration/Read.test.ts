@@ -23,7 +23,7 @@ jest.setTimeout(40000);
 const newGetRequest = (): GetRequest => ({
   id: '',
   documentInfo: NoDocumentInfo,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
@@ -32,7 +32,7 @@ const newUpsertRequest = (): UpsertRequest => ({
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 

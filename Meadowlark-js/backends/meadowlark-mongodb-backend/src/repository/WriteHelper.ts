@@ -98,6 +98,7 @@ export function meadowlarkDocumentFrom(
   id: string,
   edfiDoc: object,
   validate: boolean,
+  createdBy: string,
 ): MeadowlarkDocument {
   return {
     documentIdentity: documentInfo.documentIdentity,
@@ -109,5 +110,6 @@ export function meadowlarkDocumentFrom(
     edfiDoc,
     outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
     validated: validate,
+    createdBy,
   };
 }

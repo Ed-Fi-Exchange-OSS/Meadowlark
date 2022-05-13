@@ -17,26 +17,26 @@ import { respondWith, fromRequest } from './MeadowlarkConverter';
  * Entry point for API POST requests
  */
 export async function upsert(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await meadowlarkUpsert(fromRequest(event, context)));
+  return respondWith(await meadowlarkUpsert(fromRequest(event, context, 'POST')));
 }
 
 /**
  * Entry point for all API GET requests
  */
 export async function getResolver(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await meadowlarkGet(fromRequest(event, context)));
+  return respondWith(await meadowlarkGet(fromRequest(event, context, 'GET')));
 }
 
 /**
  * Entry point for all API PUT requests, which are "by id"
  */
 export async function update(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await meadowlarkUpdate(fromRequest(event, context)));
+  return respondWith(await meadowlarkUpdate(fromRequest(event, context, 'PUT')));
 }
 
 /**
  * Entry point for all API DELETE requests, which are "by id"
  */
 export async function deleteIt(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await meadowlarkDelete(fromRequest(event, context)));
+  return respondWith(await meadowlarkDelete(fromRequest(event, context, 'DELETE')));
 }

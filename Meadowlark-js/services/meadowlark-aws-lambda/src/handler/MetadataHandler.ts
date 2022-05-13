@@ -6,6 +6,7 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as Meadowlark from '@edfi/meadowlark-core';
+import { HttpMethod } from '@edfi/meadowlark-core';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
 
 /**
@@ -13,28 +14,32 @@ import { respondWith, fromRequest } from './MeadowlarkConverter';
  * project and returns MetaEd project metadata in the response header.
  */
 export async function metaed(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await Meadowlark.metaed(fromRequest(event, context)));
+  return respondWith(await Meadowlark.metaed(fromRequest(event, context, event.httpMethod.toUpperCase() as HttpMethod)));
 }
 
 /**
  * Base endpoint that returns the DS version and supported extensions
  */
 export async function apiVersion(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await Meadowlark.apiVersion(fromRequest(event, context)));
+  return respondWith(await Meadowlark.apiVersion(fromRequest(event, context, event.httpMethod.toUpperCase() as HttpMethod)));
 }
 
 /**
  * Endpoint for accessing Resources API swagger metadata
  */
 export async function swaggerForResourcesAPI(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await Meadowlark.swaggerForResourcesAPI(fromRequest(event, context)));
+  return respondWith(
+    await Meadowlark.swaggerForResourcesAPI(fromRequest(event, context, event.httpMethod.toUpperCase() as HttpMethod)),
+  );
 }
 
 /*
  * Endpoint for listing available Open API metadata descriptions
  */
 export async function openApiUrlList(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return respondWith(await Meadowlark.openApiUrlList(fromRequest(event, context)));
+  return respondWith(
+    await Meadowlark.openApiUrlList(fromRequest(event, context, event.httpMethod.toUpperCase() as HttpMethod)),
+  );
 }
 
 /**
@@ -44,5 +49,7 @@ export async function swaggerForDescriptorsAPI(
   event: APIGatewayProxyEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
-  return respondWith(await Meadowlark.swaggerForDescriptorsAPI(fromRequest(event, context)));
+  return respondWith(
+    await Meadowlark.swaggerForDescriptorsAPI(fromRequest(event, context, event.httpMethod.toUpperCase() as HttpMethod)),
+  );
 }

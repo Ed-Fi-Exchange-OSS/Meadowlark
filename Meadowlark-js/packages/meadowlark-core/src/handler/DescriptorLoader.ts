@@ -13,7 +13,7 @@ import { getDocumentStore } from '../plugin/PluginLoader';
 import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
 import { Logger } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentId';
-import { newSecurity } from '../model/Security';
+import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
 
@@ -135,7 +135,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         documentInfo: descriptorDocumentInfo,
         edfiDoc: descriptorDocument,
         validate: true,
-        security: { ...newSecurity(), isOwnershipEnabled: false },
+        security: { ...newSecurity(), authorizationStrategy: 'FULL_ACCESS' },
         traceId: '-',
       });
       Logger.debug(

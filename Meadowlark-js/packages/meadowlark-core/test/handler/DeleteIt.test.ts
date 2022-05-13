@@ -4,39 +4,163 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { deleteIt } from '../../src/handler/Delete';
-import { FrontendRequest } from '../../src/handler/FrontendRequest';
+import { getDocumentStore } from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
+import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 
-process.env.ACCESS_TOKEN_REQUIRED = 'false';
+const frontendRequest: FrontendRequest = {
+  ...newFrontendRequest(),
+  middleware: {
+    ...newFrontendRequestMiddleware(),
+    pathComponents: {
+      endpointName: 'academicWeeks',
+      namespace: 'ed-fi',
+      version: 'v3.3b',
+      resourceId: 'TBD',
+    },
+  },
+};
 
-describe('given requesting abstract classes', () => {
-  const response: FrontendResponse[] = [];
+describe('given there is no resourceId', () => {
+  let response: FrontendResponse;
+  let mockDocumentStore: any;
 
   beforeAll(async () => {
-    const event: FrontendRequest = {
-      headers: { 'reference-validation': false },
-      requestContext: { requestId: 'ApiGatewayRequestId' },
-      path: '/v3.3b/ed-fi/educationOrganizations/a0df76bba8212ea9b1a20c29591e940045dec9d65ee89603c31f0830',
-    } as any;
+    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById');
 
     // Act
-    response[0] = await deleteIt(event);
+    response = await deleteIt(newFrontendRequest());
+  });
 
-    event.path = '/v3.3b/ed-fi/GeneralStudentProgramAssociations/a0df76bba8212ea9b1a20c29591e940045dec9d65ee89603c31f0830';
-    response[1] = await deleteIt(event);
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
   });
 
   it('returns status 404', () => {
-    expect(response[0].statusCode).toEqual(404);
-    expect(response[1].statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(404);
   });
 
-  it('returns the expected message body', () => {
-    expect(response[0].body).toEqual(
-      '{"message":"Invalid resource \'educationOrganizations\'. The most similar resource is \'educationOrganizationNetworks\'."}',
+  it('has an empty body', () => {
+    expect(response.body).toEqual('');
+  });
+
+  it('never calls deleteDocumentById', () => {
+    expect(mockDocumentStore).not.toHaveBeenCalled();
+  });
+});
+
+describe('given delete has unknown failure', () => {
+  let response: FrontendResponse;
+  const expectedError = 'Error';
+  let mockDocumentStore: any;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
+      Promise.resolve({
+        response: 'UNKNOWN_FAILURE',
+        failureMessage: expectedError,
+      }),
     );
-    expect(response[1].body).toEqual(
-      '{"message":"Invalid resource \'GeneralStudentProgramAssociations\'. The most similar resource is \'studentProgramAssociations\'."}',
+
+    // Act
+    response = await deleteIt(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 500', () => {
+    expect(response.statusCode).toEqual(500);
+  });
+
+  it('has a failure message', () => {
+    expect(JSON.parse(response.body).message).toEqual(expectedError);
+  });
+});
+
+describe('given id does not exist', () => {
+  let response: FrontendResponse;
+  let mockDocumentStore: any;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
+      Promise.resolve({
+        response: 'DELETE_FAILURE_NOT_EXISTS',
+      }),
     );
+
+    // Act
+    response = await deleteIt(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 404', () => {
+    expect(response.statusCode).toEqual(404);
+  });
+
+  it('has an empty body', () => {
+    expect(response.body).toEqual('');
+  });
+});
+
+describe('given the document to be deleted is referenced by other documents ', () => {
+  let mockDocumentStore: any;
+  const expectedError = 'Error';
+  let response: FrontendResponse;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
+      Promise.resolve({
+        response: 'DELETE_FAILURE_REFERENCE',
+        failureMessage: expectedError,
+      }),
+    );
+
+    // Act
+    response = await deleteIt(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
+  });
+
+  it('returns the error message', () => {
+    expect(JSON.parse(response.body).message).toEqual(expectedError);
+  });
+});
+
+describe('given a valid request', () => {
+  let response: FrontendResponse;
+  let mockDocumentStore: any;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
+      Promise.resolve({
+        response: 'DELETE_SUCCESS',
+      }),
+    );
+
+    // Act
+    response = await deleteIt(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 204', () => {
+    expect(response.statusCode).toEqual(204);
+  });
+
+  it('has an empty body', () => {
+    expect(response.body).toEqual('');
   });
 });

@@ -20,19 +20,14 @@ export function validateJwt(authorizationHeader: string | undefined): JwtValidat
   }
 
   if (jwtStatus.isMissing) {
-    if (jwtStatus.isOwnershipEnabled) {
-      return {
-        jwtStatus,
-        errorResponse: {
-          statusCode: 401,
-          body: '{ "error": "invalid_client", "error_description": "Authorization token not provided" }',
-          headers: { 'WWW-Authenticate': 'Bearer' },
-        },
-      };
-    }
-
-    // Ownership security is off
-    return { jwtStatus };
+    return {
+      jwtStatus,
+      errorResponse: {
+        statusCode: 401,
+        body: '{ "error": "invalid_client", "error_description": "Authorization token not provided" }',
+        headers: { 'WWW-Authenticate': 'Bearer' },
+      },
+    };
   }
 
   if (jwtStatus.isExpired) {

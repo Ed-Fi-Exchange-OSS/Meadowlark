@@ -17,7 +17,7 @@ import {
  */
 export async function deleteEntityById({ id, documentInfo, security, traceId }: DeleteRequest): Promise<DeleteResult> {
   try {
-    if (security.isOwnershipEnabled) {
+    if (security.authorizationStrategy === 'OWNERSHIP_BASED') {
       const { isOwner, result: ownershipResult } = await validateEntityOwnership(
         id,
         documentInfo,

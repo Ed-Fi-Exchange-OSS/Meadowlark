@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentInfo } from '../model/DocumentInfo';
-import { Security } from '../model/Security';
+import { Security } from '../security/Security';
 
 export type UpdateRequest = {
   id: string;

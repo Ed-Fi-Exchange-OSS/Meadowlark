@@ -5,9 +5,6 @@
 
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { writeDebugStatusToLog } from '../Logger';
-import { PathComponents } from '../model/PathComponents';
-import { Security } from '../model/Security';
-import { validateResource } from '../validation/RequestValidator';
 import { GetRequest } from '../message/GetRequest';
 import { afterGetDocumentById, beforeGetDocumentById } from '../plugin/listener/Publish';
 import { GetResult } from '../message/GetResult';
@@ -19,28 +16,17 @@ const moduleName = 'GetById';
 /**
  * Handler for API "get by id" requests
  *
- * Validates resource and forwards "get by id" request to backend
+ * Forwards "get by id" request to datastore backend
  */
-export async function getById(
-  pathComponents: PathComponents,
-  frontendRequest: FrontendRequest,
-  security: Security,
-): Promise<FrontendResponse> {
-  if (pathComponents.resourceId == null) {
+export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  if (frontendRequest.middleware.pathComponents.resourceId == null) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
     return { body: '', statusCode: 404 };
   }
-
-  const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
-  if (errorBody !== null) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404, errorBody);
-    return { body: errorBody, statusCode: 404, headers: headerMetadata };
-  }
-
   const request: GetRequest = {
-    id: pathComponents.resourceId,
-    documentInfo,
-    security,
+    id: frontendRequest.middleware.pathComponents.resourceId,
+    documentInfo: frontendRequest.middleware.documentInfo,
+    security: frontendRequest.middleware.security,
     traceId: frontendRequest.traceId,
   };
 
@@ -48,11 +34,11 @@ export async function getById(
   const result: GetResult = await getDocumentStore().getDocumentById(request);
   afterGetDocumentById(request, result);
 
-  const { response, document, securityResolved } = result;
+  const { response, document } = result;
 
   if (response === 'UNKNOWN_FAILURE') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 500);
-    return { body: '', statusCode: 500, headers: headerMetadata };
+    return { body: '', statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
   if (response === 'GET_FAILURE_NOT_EXISTS') {
@@ -60,7 +46,7 @@ export async function getById(
     return {
       body: '',
       statusCode: 404,
-      headers: { ...headerMetadata, 'x-security-resolved': securityResolved?.join(',') },
+      headers: frontendRequest.middleware.headerMetadata,
     };
   }
 
@@ -68,6 +54,6 @@ export async function getById(
   return {
     body: JSON.stringify(document),
     statusCode: 200,
-    headers: { ...headerMetadata, 'x-security-resolved': securityResolved?.join(',') },
+    headers: frontendRequest.middleware.headerMetadata,
   };
 }

@@ -6,8 +6,6 @@
 import R from 'ramda';
 import { getQueryHandler } from '../plugin/PluginLoader';
 import { writeDebugStatusToLog } from '../Logger';
-import { PathComponents } from '../model/PathComponents';
-import { validateResource } from '../validation/RequestValidator';
 import { PaginationParameters } from '../message/PaginationParameters';
 import { QueryRequest } from '../message/QueryRequest';
 import { afterQueryDocuments, beforeQueryDocuments } from '../plugin/listener/Publish';
@@ -23,20 +21,14 @@ const onlyPaginationParameters = R.pick(['offset', 'limit']);
 /**
  * Handler for API query requests
  *
- * Validates resource and forwards query request to backend
+ * Forwards query request to datastore backend
  */
-export async function query(pathComponents: PathComponents, frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, null);
-  if (errorBody !== null) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 404, errorBody);
-    return { body: errorBody, statusCode: 404, headers: headerMetadata };
-  }
-
+export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   const cleanQueryParameters: object = removeDisallowedQueryParameters(frontendRequest.queryStringParameters);
   const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryStringParameters);
 
   const request: QueryRequest = {
-    documentInfo,
+    documentInfo: frontendRequest.middleware.documentInfo,
     queryStringParameters: cleanQueryParameters,
     paginationParameters,
     traceId: frontendRequest.traceId,
@@ -51,12 +43,12 @@ export async function query(pathComponents: PathComponents, frontendRequest: Fro
   if (response === 'QUERY_FAILURE_AUTHORIZATION') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 400);
 
-    return { body: JSON.stringify(documents), statusCode: 400, headers: headerMetadata };
+    return { body: JSON.stringify(documents), statusCode: 400, headers: frontendRequest.middleware.headerMetadata };
   }
 
   if (response === 'UNKNOWN_FAILURE') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 500);
-    return { body: '', statusCode: 500, headers: headerMetadata };
+    return { body: '', statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
@@ -64,6 +56,6 @@ export async function query(pathComponents: PathComponents, frontendRequest: Fro
   return {
     body,
     statusCode: 200,
-    headers: headerMetadata,
+    headers: frontendRequest.middleware.headerMetadata,
   };
 }

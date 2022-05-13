@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { newDomainEntity, NoTopLevelEntity } from '@edfi/metaed-core';
-import { validateResource, ResourceValidationResult } from '../../src/validation/RequestValidator';
+import { validateRequest, ResourceValidationResult } from '../../src/validation/RequestValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
 import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';
 import { NoDocumentInfo } from '../../src/model/DocumentInfo';
@@ -32,7 +32,7 @@ describe('given an invalid resource name with a suggested matching name', () => 
     } as any);
 
     // Act
-    result = await validateResource({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null }, {});
+    result = await validateRequest({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null }, {});
   });
 
   afterAll(() => {
@@ -73,7 +73,7 @@ describe('given an invalid resource name with no suggested matching name', () =>
     } as any);
 
     // Act
-    result = await validateResource({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null }, {});
+    result = await validateRequest({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null }, {});
   });
 
   afterAll(() => {
@@ -121,7 +121,7 @@ describe('given a valid resource name but body fails schema validation', () => {
     } as any);
 
     // Act
-    result = await validateResource({ version: 'a', namespace: 'b', endpointName: 'match', resourceId: null }, {});
+    result = await validateRequest({ version: 'a', namespace: 'b', endpointName: 'match', resourceId: null }, {});
   });
 
   afterAll(() => {

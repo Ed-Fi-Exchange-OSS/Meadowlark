@@ -43,7 +43,7 @@ export type ResourceValidationResult = {
  * If valid, continues by validating the request body (if any) for the resource. If valid, extracts
  * document identity and document reference information from the request body.
  */
-export async function validateResource(
+export async function validateRequest(
   pathComponents: PathComponents,
   body: object | null,
 ): Promise<ResourceValidationResult> {
@@ -57,7 +57,7 @@ export async function validateResource(
     metaEd,
     pathComponents.namespace,
   );
-  const headerMetadata = {
+  const headerMetadata: object = {
     'X-MetaEd-Project-Name': metaEdConfiguration.projects[0].projectName,
     'X-MetaEd-Project-Version': metaEdConfiguration.projects[0].projectVersion,
     'X-MetaEd-Project-Package-Name': modelNpmPackage,

@@ -10,8 +10,6 @@ import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
 
-const accessTokenRequired = memoize(() => getValueFromEnvironment('ACCESS_TOKEN_REQUIRED').toLowerCase() === 'true');
-
 function signingKey(): Buffer {
   const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
   if (signingKeyEncoded == null) {
@@ -40,12 +38,11 @@ export function createToken(vendor: string): Jwt {
 function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
   Logger.debug('JwtStatus.toJwtStatus', null, jwt);
 
-  if (jwt == null) return { ...newJwtStatus(), isValid: false, isOwnershipEnabled: accessTokenRequired() };
+  if (jwt == null) return { ...newJwtStatus(), isValid: false };
 
   const failureMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
 
   return {
-    isOwnershipEnabled: accessTokenRequired(),
     isMissing: false,
     isValid: jwt != null && !failureMessages.includes(jwt.message),
     isExpired: jwt.message === 'Jwt is expired',
@@ -63,7 +60,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 export function verifyJwt(authorization?: string): JwtStatus {
   Logger.debug('JwtStatus.verifyJwt authorization header', null, authorization ?? '*None Supplied*');
   if (authorization == null || !authorization.startsWith('bearer ')) {
-    return { ...newJwtStatus(), isMissing: true, isValid: false, isOwnershipEnabled: accessTokenRequired() };
+    return { ...newJwtStatus(), isMissing: true, isValid: false };
   }
 
   const token = authorization.split(' ')[1];

@@ -81,7 +81,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
       documentInfo,
       edfiDoc: { bodyEntry },
       validate: false,
-      security: { ...newSecurity(), isOwnershipEnabled: false },
+      security: { ...newSecurity() },
       traceId: 'traceId',
     });
   });

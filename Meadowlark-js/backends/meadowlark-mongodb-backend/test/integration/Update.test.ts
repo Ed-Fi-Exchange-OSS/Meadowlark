@@ -25,7 +25,7 @@ const newUpdateRequest = (): UpdateRequest => ({
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
