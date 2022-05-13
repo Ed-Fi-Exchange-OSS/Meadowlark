@@ -3,23 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MeadowlarkBackendPlugin } from '@edfi/meadowlark-core';
-import {
-  upsertDocument,
-  deleteDocumentById,
-  getDocumentById,
-  getDocumentList,
-  queryDocumentList,
-  updateDocumentById,
-} from './BackendFacade';
+import { DocumentStorePlugin } from '@edfi/meadowlark-core';
+import { upsertDocument, deleteDocumentById, getDocumentById, updateDocumentById } from './BackendFacade';
 
-export function initializeBackendPlugin(): MeadowlarkBackendPlugin {
+export function initialize(): DocumentStorePlugin {
   return {
     upsertDocument,
     getDocumentById,
-    getDocumentList,
     updateDocumentById,
     deleteDocumentById,
-    queryDocumentList,
   };
 }

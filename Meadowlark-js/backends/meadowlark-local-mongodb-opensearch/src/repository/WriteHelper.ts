@@ -23,7 +23,7 @@ export async function findReferencesById(
  * @param refsInDb The document references that were actually found in the db (id property only)
  * @param documentOutRefs The document references extracted from the document, as id strings
  * @param documentInfo The DocumentInfo of the document
- * @returns Failure messages listing out the resource name and identity of missing document references.
+ * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
   refsInDb: MeadowlarkDocumentId[],
@@ -62,7 +62,7 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
  * @param documentCollection The MongoDb collection the documents are in
  * @param session A MongoDb session with a transaction in progress
  * @param traceId The trace id from a service call
- * @returns A array of validation failure messages, if any
+ * @returns A array of validation failure message, if any
  */
 export async function validateReferences(
   documentReferences: DocumentReference[],

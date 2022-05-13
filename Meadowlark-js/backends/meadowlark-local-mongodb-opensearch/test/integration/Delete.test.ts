@@ -61,7 +61,7 @@ describe('given the delete of a non-existent document', () => {
   });
 
   it('should return delete failure', async () => {
-    expect(deleteResult.result).toBe('DELETE_FAILURE_NOT_EXISTS');
+    expect(deleteResult.response).toBe('DELETE_FAILURE_NOT_EXISTS');
   });
 });
 
@@ -92,7 +92,7 @@ describe('given the delete of an existing document', () => {
   });
 
   it('should return delete success', async () => {
-    expect(deleteResult.result).toBe('DELETE_SUCCESS');
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
   });
 
   it('should have deleted the document in the db', async () => {
@@ -153,7 +153,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should have returned delete failure due to existing reference', async () => {
-    expect(deleteResult.result).toBe('DELETE_FAILURE_REFERENCE');
+    expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
   });
 
   it('should still have the referenced document in the db', async () => {
@@ -214,7 +214,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should have returned delete success', async () => {
-    expect(deleteResult.result).toBe('DELETE_SUCCESS');
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
   });
 
   it('should not have the referenced document in the db', async () => {

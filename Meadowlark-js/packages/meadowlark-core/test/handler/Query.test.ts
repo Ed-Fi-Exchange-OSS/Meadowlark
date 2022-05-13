@@ -5,11 +5,10 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyResult, Context } from 'aws-lambda';
-
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { query } from '../../src/handler/Query';
-import { QueryResult } from '../../src/plugin/backend/QueryResult';
-import { getBackendPlugin } from '../../src/plugin/PluginLoader';
+import { QueryResult } from '../../src/message/QueryResult';
+import { getQueryHandler } from '../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -76,10 +75,10 @@ describe('given persistence fails', () => {
     );
 
     // Setup the query operation to fail
-    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryDocumentList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
       Promise.resolve({
-        success: false,
-        results: [],
+        response: 'UNKNOWN_FAILURE',
+        documents: [],
       } as unknown as QueryResult),
     );
 
@@ -127,10 +126,10 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the query operation to succeed
-    mockElasticsearch = jest.spyOn(getBackendPlugin(), 'queryDocumentList').mockReturnValue(
+    mockElasticsearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
       Promise.resolve({
-        success: true,
-        results: [goodResult],
+        response: 'QUERY_SUCCESS',
+        documents: [goodResult],
       } as unknown as QueryResult),
     );
 

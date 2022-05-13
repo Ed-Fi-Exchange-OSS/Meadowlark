@@ -5,11 +5,10 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-
 import { upsert } from '../../src/handler/Upsert';
 import * as RequestValidator from '../../src/validation/RequestValidator';
-import { UpsertResult } from '../../src/plugin/backend/UpsertResult';
-import { getBackendPlugin } from '../../src/plugin/PluginLoader';
+import { UpsertResult } from '../../src/message/UpsertResult';
+import { getDocumentStore } from '../../src/plugin/PluginLoader';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -133,9 +132,9 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
+        mockDynamo = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
-            result: 'INSERT_FAILURE_REFERENCE',
+            response: 'INSERT_FAILURE_REFERENCE',
             failureMessage: expectedError,
           }),
         );
@@ -190,9 +189,9 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
+        mockDynamo = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
-            result: 'UPDATE_FAILURE_REFERENCE',
+            response: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: 'Reference failure',
           }),
         );
@@ -248,9 +247,9 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
+        mockDynamo = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
-            result: 'UNKNOWN_FAILURE',
+            response: 'UNKNOWN_FAILURE',
             failureMessage: expectedError,
           }),
         );
@@ -306,9 +305,9 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
+        mockDynamo = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
-            result: 'INSERT_SUCCESS',
+            response: 'INSERT_SUCCESS',
             failureMessage: null,
           } as unknown as UpsertResult),
         );
@@ -369,9 +368,9 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Setup the upsert operation to fail
-        mockDynamo = jest.spyOn(getBackendPlugin(), 'upsertDocument').mockReturnValue(
+        mockDynamo = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
           Promise.resolve({
-            result: 'UPDATE_SUCCESS',
+            response: 'UPDATE_SUCCESS',
             failureMessage: null,
           } as unknown as UpsertResult),
         );

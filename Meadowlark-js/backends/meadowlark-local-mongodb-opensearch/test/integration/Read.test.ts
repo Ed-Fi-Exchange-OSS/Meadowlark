@@ -65,7 +65,7 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should return get failure', async () => {
-    expect(getResult.result).toBe('NOT_FOUND');
+    expect(getResult.response).toBe('GET_FAILURE_NOT_EXISTS');
   });
 });
 
@@ -96,8 +96,7 @@ describe('given the get of an existing document', () => {
   });
 
   it('should return the document', async () => {
-    expect(getResult.result).toBe('SUCCESS');
-    expect(getResult.documents).toHaveLength(1);
-    expect(getResult.documents[0].inserted).toBe('yes');
+    expect(getResult.response).toBe('GET_SUCCESS');
+    expect(getResult.document.inserted).toBe('yes');
   });
 });

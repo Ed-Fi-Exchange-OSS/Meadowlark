@@ -61,7 +61,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should return insert success', async () => {
-    expect(upsertResult.result).toBe('INSERT_SUCCESS');
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
   });
 });
 
@@ -93,15 +93,15 @@ describe('given the upsert of an existing document twice', () => {
   });
 
   it('should return insert success on 1st upsert', async () => {
-    expect(upsertResult1.result).toBe('INSERT_SUCCESS');
+    expect(upsertResult1.response).toBe('INSERT_SUCCESS');
   });
 
   it('should return update success on 2nd upsert', async () => {
-    expect(upsertResult2.result).toBe('UPDATE_SUCCESS');
+    expect(upsertResult2.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should return update success on 3rd upsert', async () => {
-    expect(upsertResult3.result).toBe('UPDATE_SUCCESS');
+    expect(upsertResult3.response).toBe('UPDATE_SUCCESS');
   });
 });
 
@@ -172,7 +172,7 @@ describe('given an upsert of a new document that references a non-existent docum
   });
 
   it('should have returned insert success for the document with invalid reference but validation off', async () => {
-    expect(upsertResult.result).toBe('INSERT_SUCCESS');
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
   });
 
   it('should have inserted the document with an invalid reference in the db', async () => {
@@ -228,7 +228,7 @@ describe('given an upsert of a new document that references an existing document
   });
 
   it('should have returned insert success for the document with a valid reference', async () => {
-    expect(upsertResult.result).toBe('INSERT_SUCCESS');
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
   });
 
   it('should have inserted the document with a valid reference in the db', async () => {
@@ -292,7 +292,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   });
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
-    expect(upsertResult.result).toBe('INSERT_FAILURE_REFERENCE');
+    expect(upsertResult.response).toBe('INSERT_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
       `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
     );
@@ -350,7 +350,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have returned update success for the document with invalid reference but validation off', async () => {
-    expect(upsertResult.result).toBe('UPDATE_SUCCESS');
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
@@ -417,7 +417,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have returned update success for the document with a valid reference', async () => {
-    expect(upsertResult.result).toBe('UPDATE_SUCCESS');
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
@@ -492,7 +492,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
-    expect(upsertResult.result).toBe('UPDATE_FAILURE_REFERENCE');
+    expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
       `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
     );

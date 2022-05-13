@@ -4,10 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import JsSha from 'jssha';
-import { DocumentElement } from '../model/DocumentElement';
-import { DocumentIdentity } from '../model/DocumentIdentity';
-import { DocumentIdentifyingInfo, DocumentInfo } from '../model/DocumentInfo';
-import { DocumentReference } from '../model/DocumentReference';
+import { DocumentElement } from './DocumentElement';
+import { DocumentIdentity } from './DocumentIdentity';
+import { DocumentIdentifyingInfo, DocumentInfo } from './DocumentInfo';
+import { DocumentReference } from './DocumentReference';
 
 /**
  * Returns a SHAKE128 hash of length 224 bits for the given document info (and possibly assignable-adjusted

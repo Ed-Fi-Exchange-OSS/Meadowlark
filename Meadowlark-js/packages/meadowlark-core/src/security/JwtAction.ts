@@ -8,7 +8,7 @@ import memoize from 'fast-memoize';
 import { getValueFromEnvironment } from '../Environment';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 
 const accessTokenRequired = memoize(() => getValueFromEnvironment('ACCESS_TOKEN_REQUIRED').toLowerCase() === 'true');
 

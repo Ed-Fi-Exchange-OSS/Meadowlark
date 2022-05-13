@@ -3,12 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo } from '../../model/DocumentInfo';
-import { Security } from '../../model/Security';
-
-export type GetRequest = {
-  id: string;
-  documentInfo: DocumentInfo;
-  security: Security;
-  traceId: string;
+export type UpdateResult = {
+  response:
+    | 'UPDATE_SUCCESS'
+    | 'UPDATE_FAILURE_REFERENCE'
+    | 'UPDATE_FAILURE_NOT_EXISTS'
+    | 'UPDATE_FAILURE_AUTHORIZATION'
+    | 'UNKNOWN_FAILURE';
+  failureMessage?: string;
 };

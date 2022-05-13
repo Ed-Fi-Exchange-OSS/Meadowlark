@@ -6,13 +6,16 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from '../validation/RequestValidator';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
 import { NoDocumentInfo } from '../model/DocumentInfo';
-import { validateJwt } from '../helpers/JwtValidator';
+import { validateJwt } from '../security/JwtValidator';
 import { newSecurity } from '../model/Security';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
-import { getBackendPlugin } from '../plugin/PluginLoader';
+import { authorizationHeader } from '../security/AuthorizationHeader';
+import { getDocumentStore } from '../plugin/PluginLoader';
+import { beforeDeleteDocumentById, afterDeleteDocumentById } from '../plugin/listener/Publish';
+import { DeleteRequest } from '../message/DeleteRequest';
+import { DeleteResult } from '../message/DeleteResult';
 
 const moduleName = 'Delete';
 
@@ -45,7 +48,7 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().deleteDocumentById({
+    const request: DeleteRequest = {
       id: pathComponents.resourceId,
       documentInfo,
       validate: event.headers['reference-validation'] !== 'false',
@@ -55,17 +58,23 @@ export async function deleteIt(event: APIGatewayProxyEvent, context: Context): P
         clientName: jwtStatus.subject,
       },
       traceId: awsRequestId,
-    });
+    };
 
-    if (result === 'DELETE_SUCCESS') {
+    beforeDeleteDocumentById(request);
+    const result: DeleteResult = await getDocumentStore().deleteDocumentById(request);
+    afterDeleteDocumentById(request, result);
+
+    const { response, failureMessage } = result;
+
+    if (response === 'DELETE_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'deleteIt', 204);
       return { body: '', statusCode: 204, headers: headerMetadata };
     }
-    if (result === 'DELETE_FAILURE_NOT_EXISTS') {
+    if (response === 'DELETE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, context, 'deleteIt', 404);
       return { body: '', statusCode: 404, headers: headerMetadata };
     }
-    if (result === 'DELETE_FAILURE_REFERENCE') {
+    if (response === 'DELETE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, context, 'deleteIt', 409, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 409, headers: headerMetadata };
     }

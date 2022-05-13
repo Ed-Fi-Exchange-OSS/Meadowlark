@@ -9,13 +9,13 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { getBackendPlugin } from '../plugin/PluginLoader';
+import { getDocumentStore } from '../plugin/PluginLoader';
 import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
-import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
-import { Logger } from '../helpers/Logger';
-import { documentIdForDocumentInfo } from '../helpers/DocumentId';
+import { Logger } from '../Logger';
+import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { newSecurity } from '../model/Security';
-import { UpsertResult } from '../plugin/backend/UpsertResult';
+import { UpsertResult } from '../message/UpsertResult';
+import { decapitalize } from '../Utility';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -34,6 +34,21 @@ type DescriptorDocument = {
   shortDescription: string;
   description: string;
 };
+
+/** Returns a new object */
+export function decapitalizeKeys(obj: object): object {
+  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [decapitalize(key), value]));
+}
+
+/** Convert any non-array object value into an array of length 1. Mutates object */
+export function arrayifyScalarObjectValues(obj: object): object {
+  Object.keys(obj).forEach((key) => {
+    if (!Array.isArray(obj[key])) {
+      obj[key] = [obj[key]];
+    }
+  });
+  return obj;
+}
 
 /**
  * Reads Ed-Fi Data Standard XML descriptor files and combines into a single object
@@ -114,7 +129,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         ],
       };
 
-      const putResult: UpsertResult = await getBackendPlugin().upsertDocument({
+      const putResult: UpsertResult = await getDocumentStore().upsertDocument({
         id: documentIdForDocumentInfo(descriptorDocumentInfo),
         documentInfo: descriptorDocumentInfo,
         edfiDoc: descriptorDocument,
@@ -128,7 +143,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         }`,
         '-',
       );
-      if (!(putResult.result === 'INSERT_SUCCESS' || putResult.result === 'UPDATE_SUCCESS')) {
+      if (!(putResult.response === 'INSERT_SUCCESS' || putResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
             descriptorDocumentInfo.documentIdentity,

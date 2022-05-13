@@ -3,8 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/** TODO: this needs to be unified with GetResult */
-export type QueryResult = {
-  success: boolean;
-  results: Array<object>;
+export type GetResult = {
+  response: 'GET_SUCCESS' | 'GET_FAILURE_NOT_EXISTS' | 'GET_FAILURE_AUTHORIZATION' | 'UNKNOWN_FAILURE';
+  document: object;
+  securityResolved?: string[];
+  failureMessage?: string;
 };

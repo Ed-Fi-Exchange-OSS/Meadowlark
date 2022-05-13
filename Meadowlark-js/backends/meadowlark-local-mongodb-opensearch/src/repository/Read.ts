@@ -13,9 +13,9 @@ export async function getDocumentById({ id }: GetRequest, client: MongoClient): 
 
   try {
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ id });
-    if (result === null) return { result: 'NOT_FOUND', documents: [] };
-    return { result: 'SUCCESS', documents: [{ id: result.id, ...result.edfiDoc }] };
+    if (result === null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+    return { response: 'GET_SUCCESS', document: { id: result.id, ...result.edfiDoc } };
   } catch (e) {
-    return { result: 'ERROR', documents: [] };
+    return { response: 'UNKNOWN_FAILURE', document: {} };
   }
 }

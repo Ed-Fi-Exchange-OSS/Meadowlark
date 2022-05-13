@@ -9,8 +9,8 @@ import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import { getById } from '../../src/handler/GetById';
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { Security } from '../../src/model/Security';
-import { GetResult } from '../../src/plugin/backend/GetResult';
-import { getBackendPlugin } from '../../src/plugin/PluginLoader';
+import { GetResult } from '../../src/message/GetResult';
+import { getDocumentStore } from '../../src/plugin/PluginLoader';
 
 describe('given the endpoint is not in the MetaEd model', () => {
   let response: APIGatewayProxyResult;
@@ -77,11 +77,10 @@ describe('given database lookup fails', () => {
     );
 
     // Setup the get operation to fail
-    mockDynamo = jest.spyOn(getBackendPlugin(), 'getDocumentById').mockReturnValue(
+    mockDynamo = jest.spyOn(getDocumentStore(), 'getDocumentById').mockReturnValue(
       Promise.resolve({
-        result: 'ERROR',
-        documents: [],
-        failureMessage: null,
+        response: 'UNKNOWN_FAILURE',
+        document: {},
       } as GetResult),
     );
 
@@ -128,11 +127,10 @@ describe('given a valid request', () => {
     );
 
     // Setup the get operation to succeed
-    mockDynamo = jest.spyOn(getBackendPlugin(), 'getDocumentById').mockReturnValue(
+    mockDynamo = jest.spyOn(getDocumentStore(), 'getDocumentById').mockReturnValue(
       Promise.resolve({
-        result: 'SUCCESS',
-        failureMessage: null,
-        documents: [{ a: 'result' }],
+        response: 'GET_SUCCESS',
+        document: { a: 'result' },
       } as GetResult),
     );
 

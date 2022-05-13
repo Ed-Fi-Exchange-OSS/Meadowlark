@@ -1,16 +1,19 @@
-export { MeadowlarkBackendPlugin } from './plugin/backend/MeadowlarkBackendPlugin';
-export { NoMeadowlarkBackendPlugin } from './plugin/backend/NoMeadowlarkBackendPlugin';
-export { GetResult } from './plugin/backend/GetResult';
-export { DeleteResult } from './plugin/backend/DeleteResult';
-export { UpdateResult } from './plugin/backend/UpdateResult';
-export { UpsertResult } from './plugin/backend/UpsertResult';
-export { QueryResult } from './plugin/backend/QueryResult';
-export { GetRequest } from './plugin/backend/GetRequest';
-export { DeleteRequest } from './plugin/backend/DeleteRequest';
-export { UpdateRequest } from './plugin/backend/UpdateRequest';
-export { UpsertRequest } from './plugin/backend/UpsertRequest';
-export { QueryRequest } from './plugin/backend/QueryRequest';
-export { PaginationParameters } from './plugin/backend/PaginationParameters';
+export { DocumentStorePlugin } from './plugin/backend/DocumentStorePlugin';
+export { NoDocumentStorePlugin } from './plugin/backend/NoDocumentStorePlugin';
+export { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';
+export { NoQueryHandlerPlugin } from './plugin/backend/NoQueryHandlerPlugin';
+export { Subscribe } from './plugin/listener/Subscribe';
+export { GetResult } from './message/GetResult';
+export { DeleteResult } from './message/DeleteResult';
+export { UpdateResult } from './message/UpdateResult';
+export { UpsertResult } from './message/UpsertResult';
+export { QueryResult } from './message/QueryResult';
+export { GetRequest } from './message/GetRequest';
+export { DeleteRequest } from './message/DeleteRequest';
+export { UpdateRequest } from './message/UpdateRequest';
+export { UpsertRequest } from './message/UpsertRequest';
+export { QueryRequest } from './message/QueryRequest';
+export { PaginationParameters } from './message/PaginationParameters';
 export { Security, newSecurity } from './model/Security';
 export { DocumentElement } from './model/DocumentElement';
 export { DocumentReference } from './model/DocumentReference';
@@ -19,7 +22,7 @@ export {
   documentIdForDocumentInfo,
   documentIdForDocumentReference,
   documentIdForDocumentIdentifyingInfo,
-} from './helpers/DocumentId';
+} from './model/DocumentId';
 export {
   DocumentInfo,
   newDocumentInfo,
@@ -27,7 +30,7 @@ export {
   DocumentIdentifyingInfo,
   DocumentTypeInfo,
 } from './model/DocumentInfo';
-export { Logger } from './helpers/Logger';
+export { Logger } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 
 // Handlers

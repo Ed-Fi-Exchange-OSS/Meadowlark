@@ -3,12 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentInfo } from '../../model/DocumentInfo';
-import { PaginationParameters } from './PaginationParameters';
+import { DocumentInfo } from '../model/DocumentInfo';
+import { Security } from '../model/Security';
 
-export type QueryRequest = {
+export type DeleteRequest = {
+  id: string;
   documentInfo: DocumentInfo;
-  queryStringParameters: object;
-  paginationParameters: PaginationParameters;
+  validate: boolean;
+  security: Security;
   traceId: string;
 };

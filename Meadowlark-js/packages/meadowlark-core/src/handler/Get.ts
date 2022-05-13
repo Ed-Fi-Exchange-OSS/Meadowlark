@@ -5,12 +5,12 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
 import { getById } from './GetById';
 import { query } from './Query';
-import { validateJwt } from '../helpers/JwtValidator';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
+import { validateJwt } from '../security/JwtValidator';
+import { authorizationHeader } from '../security/AuthorizationHeader';
 
 const moduleName = 'Get';
 

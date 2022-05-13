@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type DeleteResult = {
-  result: 'DELETE_SUCCESS' | 'DELETE_FAILURE_REFERENCE' | 'DELETE_FAILURE_NOT_EXISTS' | 'UNKNOWN_FAILURE';
+export type QueryResult = {
+  response: 'QUERY_SUCCESS' | 'QUERY_FAILURE_INVALID_QUERY' | 'QUERY_FAILURE_AUTHORIZATION' | 'UNKNOWN_FAILURE';
+  documents: Array<object>;
   failureMessage?: string;
 };

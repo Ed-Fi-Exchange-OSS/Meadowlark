@@ -8,13 +8,13 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
 
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
 import { getValueFromEnvironment } from '../Environment';
-import { buildBaseUrlFromRequest } from '../helpers/UrlBuilder';
+import { buildBaseUrlFromRequest } from './UrlBuilder';
 
 interface ExternalResource {
   body: string;

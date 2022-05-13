@@ -38,10 +38,6 @@ export async function updateDocumentById(request: UpdateRequest): Promise<Update
   return Update.updateDocumentById(request, await getSharedClient());
 }
 
-export async function queryDocumentList(request: QueryRequest): Promise<QueryResult> {
-  return Query.queryDocumentList(request, await getSharedClient());
-}
-
-export async function getDocumentList(request: QueryRequest): Promise<GetResult> {
-  return Query.getDocumentList(request, await getSharedClient());
+export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {
+  return Query.queryDocuments(request, await getSharedClient());
 }

@@ -61,7 +61,7 @@ describe('given the update of a non-existent document', () => {
   });
 
   it('should return update failure', async () => {
-    expect(updateResult.result).toBe('UPDATE_FAILURE_NOT_EXISTS');
+    expect(updateResult.response).toBe('UPDATE_FAILURE_NOT_EXISTS');
   });
 });
 
@@ -92,7 +92,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should return update success', async () => {
-    expect(updateResult.result).toBe('UPDATE_SUCCESS');
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should have updated the document in the db', async () => {
@@ -146,7 +146,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have returned update success for the document with invalid reference but validation off', async () => {
-    expect(updateResult.result).toBe('UPDATE_SUCCESS');
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
@@ -213,7 +213,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have returned update success for the document with a valid reference', async () => {
-    expect(updateResult.result).toBe('UPDATE_SUCCESS');
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
@@ -288,7 +288,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
-    expect(updateResult.result).toBe('UPDATE_FAILURE_REFERENCE');
+    expect(updateResult.response).toBe('UPDATE_FAILURE_REFERENCE');
     expect(updateResult.failureMessage).toMatchInlineSnapshot(
       `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
     );

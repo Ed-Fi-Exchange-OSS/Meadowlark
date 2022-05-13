@@ -18,7 +18,7 @@ export async function updateDocumentById(
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
-  let updateResult: UpdateResult = { result: 'UNKNOWN_FAILURE' };
+  let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
@@ -40,7 +40,7 @@ export async function updateDocumentById(
           );
 
           updateResult = {
-            result: 'UPDATE_FAILURE_REFERENCE',
+            response: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Reference validation failed: ${failures.join(',')}`,
           };
 
@@ -53,12 +53,12 @@ export async function updateDocumentById(
       Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
       const { matchedCount } = await mongoCollection.replaceOne({ id }, document, { session });
-      updateResult.result = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
     });
   } catch (e) {
     Logger.error('mongodb.repository.Upsert.updateDocumentById', traceId, e);
 
-    return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }

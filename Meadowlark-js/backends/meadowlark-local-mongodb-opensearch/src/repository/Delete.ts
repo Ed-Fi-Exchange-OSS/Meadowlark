@@ -22,7 +22,7 @@ export async function deleteDocumentById(
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
-  let deleteResult: DeleteResult = { result: 'UNKNOWN_FAILURE' };
+  let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
@@ -48,7 +48,7 @@ export async function deleteDocumentById(
           );
 
           deleteResult = {
-            result: 'DELETE_FAILURE_REFERENCE',
+            response: 'DELETE_FAILURE_REFERENCE',
             failureMessage: `Delete failed due to existing references to document: ${failures.join(',')}`,
           };
 
@@ -61,12 +61,12 @@ export async function deleteDocumentById(
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
       const { deletedCount } = await mongoCollection.deleteOne({ id }, { session });
-      deleteResult.result = deletedCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
+      deleteResult.response = deletedCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
     });
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, e);
 
-    return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }

@@ -18,7 +18,7 @@ export async function upsertDocument(
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
-  let upsertResult: UpsertResult = { result: 'UNKNOWN_FAILURE' };
+  let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
@@ -43,7 +43,7 @@ export async function upsertDocument(
           const isInsert: boolean = (await mongoCollection.findOne({ id }, onlyReturnId(session))) == null;
 
           upsertResult = {
-            result: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
+            response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Reference validation failed: ${failures.join(',')}`,
           };
 
@@ -56,12 +56,12 @@ export async function upsertDocument(
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
 
       const { upsertedCount } = await mongoCollection.replaceOne({ id }, document, asUpsert(session));
-      upsertResult.result = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+      upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
     });
   } catch (e) {
     Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, e);
 
-    return { result: 'UNKNOWN_FAILURE', failureMessage: e.message };
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }

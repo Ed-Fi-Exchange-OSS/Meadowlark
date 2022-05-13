@@ -3,7 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type UpdateResult = {
-  result: 'UPDATE_SUCCESS' | 'UPDATE_FAILURE_REFERENCE' | 'UPDATE_FAILURE_NOT_EXISTS' | 'UNKNOWN_FAILURE';
-  failureMessage?: string;
-};
+import { QueryRequest } from '../../message/QueryRequest';
+import { QueryResult } from '../../message/QueryResult';
+
+export interface QueryHandlerPlugin {
+  queryDocuments: (request: QueryRequest) => Promise<QueryResult>;
+}

@@ -7,12 +7,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import querystring from 'querystring';
 import secureRandom from 'secure-random';
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 import { client1, client2 } from '../security/HardcodedCredential';
 import { createToken } from '../security/JwtAction';
 import { Jwt } from '../security/Jwt';
-import { validateJwt } from '../helpers/JwtValidator';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
+import { validateJwt } from '../security/JwtValidator';
+import { authorizationHeader } from '../security/AuthorizationHeader';
 
 function createTokenResponse(token: Jwt): string {
   return JSON.stringify({

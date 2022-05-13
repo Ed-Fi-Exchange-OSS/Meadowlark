@@ -6,19 +6,22 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from '../validation/RequestValidator';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
-import { documentIdForDocumentInfo } from '../helpers/DocumentId';
+import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { NoDocumentInfo } from '../model/DocumentInfo';
-import { validateJwt } from '../helpers/JwtValidator';
+import { validateJwt } from '../security/JwtValidator';
 import { newSecurity } from '../model/Security';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
-import { getBackendPlugin } from '../plugin/PluginLoader';
+import { authorizationHeader } from '../security/AuthorizationHeader';
+import { getDocumentStore } from '../plugin/PluginLoader';
+import { afterUpdateDocumentById, beforeUpdateDocumentById } from '../plugin/listener/Publish';
+import { UpdateRequest } from '../message/UpdateRequest';
+import { UpdateResult } from '../message/UpdateResult';
 
 const moduleName = 'Update';
 
 /**
- * Entry point for all API PUT requests, which are "by id"
+ * Entry point for API update requests, which are "by id"
  *
  * Validates resource and JSON document shape, extracts keys and forwards to backend for update
  */
@@ -67,7 +70,7 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
-    const { result, failureMessage } = await getBackendPlugin().updateDocumentById({
+    const request: UpdateRequest = {
       id: pathComponents.resourceId,
       documentInfo,
       edfiDoc: body,
@@ -78,16 +81,23 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
         clientName: jwtStatus.subject,
       },
       traceId: context.awsRequestId,
-    });
-    if (result === 'UPDATE_SUCCESS') {
+    };
+
+    beforeUpdateDocumentById(request);
+    const result: UpdateResult = await getDocumentStore().updateDocumentById(request);
+    afterUpdateDocumentById(request, result);
+
+    const { response, failureMessage } = result;
+
+    if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'update', 204);
       return { body: '', statusCode: 204, headers: headerMetadata };
     }
-    if (result === 'UPDATE_FAILURE_NOT_EXISTS') {
+    if (response === 'UPDATE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, context, 'update', 404);
       return { body: '', statusCode: 404, headers: headerMetadata };
     }
-    if (result === 'UPDATE_FAILURE_REFERENCE') {
+    if (response === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, context, 'update', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }

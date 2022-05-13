@@ -6,19 +6,22 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from '../validation/RequestValidator';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
-import { documentIdForDocumentInfo } from '../helpers/DocumentId';
+import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { NoDocumentInfo } from '../model/DocumentInfo';
-import { validateJwt } from '../helpers/JwtValidator';
+import { validateJwt } from '../security/JwtValidator';
 import { newSecurity } from '../model/Security';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
-import { getBackendPlugin } from '../plugin/PluginLoader';
+import { authorizationHeader } from '../security/AuthorizationHeader';
+import { getDocumentStore } from '../plugin/PluginLoader';
+import { UpsertRequest } from '../message/UpsertRequest';
+import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
+import { UpsertResult } from '../message/UpsertResult';
 
 const moduleName = 'Create';
 
 /**
- * Entry point for API POST requests
+ * Entry point for API upsert requests
  *
  * Validates resource and JSON document shape, extracts keys and forwards to backend for creation/update
  */
@@ -62,7 +65,7 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
     }
 
     const resourceId = documentIdForDocumentInfo(documentInfo);
-    const { result, failureMessage } = await getBackendPlugin().upsertDocument({
+    const request: UpsertRequest = {
       id: resourceId,
       documentInfo,
       edfiDoc: body,
@@ -73,8 +76,15 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
         clientName: jwtStatus.subject,
       },
       traceId: context.awsRequestId,
-    });
-    if (result === 'INSERT_SUCCESS') {
+    };
+
+    beforeUpsertDocument(request);
+    const result: UpsertResult = await getDocumentStore().upsertDocument(request);
+    afterUpsertDocument(request, result);
+
+    const { response, failureMessage } = result;
+
+    if (response === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'create', 201);
       const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
       return {
@@ -83,16 +93,16 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
         headers: { ...headerMetadata, Location: location },
       };
     }
-    if (result === 'UPDATE_SUCCESS') {
+    if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, context, 'create', 200);
       const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
       return { body: '', statusCode: 200, headers: { ...headerMetadata, Location: location } };
     }
-    if (result === 'UPDATE_FAILURE_REFERENCE') {
+    if (response === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, context, 'create', 409);
       return { body: '', statusCode: 409, headers: headerMetadata };
     }
-    if (result === 'INSERT_FAILURE_REFERENCE') {
+    if (response === 'INSERT_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, context, 'create', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }

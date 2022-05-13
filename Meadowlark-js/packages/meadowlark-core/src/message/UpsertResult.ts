@@ -4,6 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export type UpsertResult = {
-  result: 'INSERT_SUCCESS' | 'INSERT_FAILURE_REFERENCE' | 'UPDATE_SUCCESS' | 'UPDATE_FAILURE_REFERENCE' | 'UNKNOWN_FAILURE';
+  response:
+    | 'INSERT_SUCCESS'
+    | 'INSERT_FAILURE_REFERENCE'
+    | 'UPDATE_SUCCESS'
+    | 'UPDATE_FAILURE_REFERENCE'
+    | 'UPSERT_FAILURE_AUTHORIZATION'
+    | 'UNKNOWN_FAILURE';
   failureMessage?: string;
 };
