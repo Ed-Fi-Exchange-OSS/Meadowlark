@@ -1,0 +1,83 @@
+service: edfi-meadowlark
+
+useDotenv: true
+variablesResolutionMode: 20210326
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-plugin-offline-dynamodb-stream
+  - serverless-offline
+
+package:
+  patterns:
+    - '!**'
+    - 'dist/**'
+    - 'node_modules/**'
+    - 'edfi-descriptors/**'
+    - 'package.json'
+
+custom:
+  serverless-offline:
+    host: 0.0.0.0
+    port: 4000
+
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: false
+      dbPath: ${env:DYNAMODB_DATA_DIR}
+      migrate: true
+
+  dynamodbStream:
+      region: ${aws:region}
+      host: localhost
+      port: 8000
+      pollForever: true
+      streams:
+        - table: ${self:service}-${self:provider.stage}
+          functions:
+            - updateExternalStorage
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: ${opt:stage, 'local'}
+  timeout: 10
+
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1 # Reuse TCP connections - important for DynamoDB performance
+    REGION: ${aws:region}
+    STAGE: ${self:provider.stage}
+    DOMAIN_TABLE_NAME: ${self:service}-${self:provider.stage}
+    DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
+    ES_LOCAL_ENDPOINT: 'http://localhost:9200'
+    TOKEN_URL: 'http://localhost:3000/${self:provider.stage}/api/oauth/token'
+    IS_LOCAL: ${env:IS_LOCAL, 'false'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    ACCESS_TOKEN_REQUIRED: ${env:ACCESS_TOKEN_REQUIRED, 'true'}
+    SIGNING_KEY: ${env:SIGNING_KEY}
+
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - dynamodb:*
+        - lambda:*
+        - s3:*
+        - es:*
+      Resource:
+        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:*
+        - arn:aws:lambda:${aws:region}:${aws:accountId}:*
+        - arn:aws:es:${aws:region}:${aws:accountId}:domain/${self:service}-${self:provider.stage}/*
+
+  lambdaHashingVersion: 20201221
+
+functions:
+ - ${file(resources/functions.yml)}
+
+resources:
+ - ${file(resources/resources.yml)}

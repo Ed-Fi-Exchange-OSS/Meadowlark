@@ -3,67 +3,27 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { EntityInfo } from '../../model/EntityInfo';
-import { ForeignKeyItem } from '../../model/ForeignKeyItem';
-import { Security } from '../../model/Security';
-import { ValidationOptions } from '../../model/ValidationOptions';
+import { GetRequest } from './GetRequest';
 import { GetResult } from './GetResult';
-import { OwnershipResult } from './OwnershipResult';
-import { PutResult } from './PutResult';
+import { DeleteRequest } from './DeleteRequest';
 import { DeleteResult } from './DeleteResult';
-import { PaginationParameters } from './PaginationParameters';
-import { SearchResult } from './SearchResult';
+import { UpdateRequest } from './UpdateRequest';
+import { UpdateResult } from './UpdateResult';
+import { UpsertRequest } from './UpsertRequest';
+import { UpsertResult } from './UpsertResult';
+import { QueryRequest } from './QueryRequest';
+import { QueryResult } from './QueryResult';
 
 export interface MeadowlarkBackendPlugin {
-  createEntity: (
-    id: string,
-    entityInfo: EntityInfo,
-    info: object,
-    validationOptions: ValidationOptions,
-    security: Security,
-    lambdaRequestId: string,
-  ) => Promise<PutResult>;
+  upsertDocument: (request: UpsertRequest) => Promise<UpsertResult>;
 
-  getEntityById: (_entityInfo: EntityInfo, id: string, _security: Security, _lambdaRequestId: string) => Promise<GetResult>;
+  getDocumentById: (request: GetRequest) => Promise<GetResult>;
 
-  getEntityList: (_entityInfo: EntityInfo, _lambdaRequestId: string) => Promise<GetResult>;
+  getDocumentList: (request: QueryRequest) => Promise<GetResult>;
 
-  updateEntityById: (
-    _id: string,
-    _entityInfo: EntityInfo,
-    _info: object,
-    _validationOptions: ValidationOptions,
-    _security: Security,
-    _lambdaRequestId: string,
-  ) => Promise<PutResult>;
+  updateDocumentById: (request: UpdateRequest) => Promise<UpdateResult>;
 
-  deleteEntityById: (_id: string, _entityInfo: EntityInfo, _lambdaRequestId: string) => Promise<DeleteResult>;
+  deleteDocumentById: (request: DeleteRequest) => Promise<DeleteResult>;
 
-  getReferencesToThisItem: (
-    _id: string,
-    _entityInfo: EntityInfo,
-    _lambdaRequestId: string,
-  ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
-
-  getForeignKeyReferences: (
-    _id: string,
-    _entityInfo: EntityInfo,
-    _lambdaRequestId: string,
-  ) => Promise<{ success: Boolean; foreignKeys: ForeignKeyItem[] }>;
-
-  deleteItems: (_items: { pk: string; sk: string }[], _awsRequestId: string) => Promise<DeleteResult>;
-
-  validateEntityOwnership: (
-    _id: string,
-    _entityInfo: EntityInfo,
-    _clientName: string | null,
-    _lambdaRequestId: string,
-  ) => Promise<OwnershipResult>;
-
-  queryEntityList: (
-    entityInfo: EntityInfo,
-    queryStringParameters: object,
-    paginationParameters: PaginationParameters,
-    awsRequestId: string,
-  ) => Promise<SearchResult>;
+  queryDocumentList: (request: QueryRequest) => Promise<QueryResult>;
 }

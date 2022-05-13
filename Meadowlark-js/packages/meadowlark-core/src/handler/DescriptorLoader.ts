@@ -10,12 +10,12 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { getBackendPlugin } from '../plugin/PluginLoader';
-import { buildNKString, EntityInfo, newEntityInfo } from '../model/EntityInfo';
+import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
 import { arrayifyScalarObjectValues, decapitalizeKeys } from '../Utility';
 import { Logger } from '../helpers/Logger';
-import { documentIdForEntityInfo } from '../helpers/DocumentId';
+import { documentIdForDocumentInfo } from '../helpers/DocumentId';
 import { newSecurity } from '../model/Security';
-import { PutResult } from '../plugin/backend/PutResult';
+import { UpsertResult } from '../plugin/backend/UpsertResult';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -77,53 +77,62 @@ async function readDescriptors(directoryPath: string): Promise<XmlDescriptorData
 
 async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise<void> {
   let loadCount = 0;
-  for (const [descriptorName, descriptorValues] of Object.entries(descriptorData)) {
+  for (const [descriptorName, descriptorReferences] of Object.entries(descriptorData)) {
     if (!descriptorName.endsWith('Descriptor')) {
       Logger.warn(`Descriptor name ${descriptorName} does not end in 'Descriptor'. Skipping.`, '-');
       continue;
     }
-    for (const descriptorValue of descriptorValues) {
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'Namespace')) {
+    for (const descriptorReference of descriptorReferences) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'Namespace')) {
         Logger.warn(`Descriptor ${descriptorName} has no Namespace. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'CodeValue')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'CodeValue')) {
         Logger.warn(`Descriptor ${descriptorName} has no CodeValue. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'ShortDescription')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'ShortDescription')) {
         Logger.warn(`Descriptor ${descriptorName} has no ShortDescription. Skipping.`, '-');
         continue;
       }
-      if (!Object.prototype.hasOwnProperty.call(descriptorValue, 'Description')) {
+      if (!Object.prototype.hasOwnProperty.call(descriptorReference, 'Description')) {
         Logger.warn(`Descriptor ${descriptorName} has no Description. Skipping.`, '-');
         continue;
       }
 
-      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorValue) as DescriptorDocument;
-      const descriptorEntityInfo: EntityInfo = {
-        ...newEntityInfo(),
-        entityName: descriptorName,
+      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
+      const descriptorDocumentInfo: DocumentInfo = {
+        ...newDocumentInfo(),
+        resourceName: descriptorName,
         projectName: 'Ed-Fi',
-        projectVersion: '3.3.1-b',
-        naturalKey: buildNKString(`${descriptorDocument.namespace}#${descriptorDocument.codeValue}`),
+        resourceVersion: '3.3.1-b',
+        documentIdentity: [
+          {
+            name: 'descriptor',
+            value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
+          },
+        ],
       };
 
-      const putResult: PutResult = await getBackendPlugin().createEntity(
-        documentIdForEntityInfo(descriptorEntityInfo),
-        descriptorEntityInfo,
-        { ...descriptorDocument, _isDescriptor: true },
-        { referenceValidation: false, descriptorValidation: false },
-        { ...newSecurity(), isOwnershipEnabled: false },
-        '-',
-      );
+      const putResult: UpsertResult = await getBackendPlugin().upsertDocument({
+        id: documentIdForDocumentInfo(descriptorDocumentInfo),
+        documentInfo: descriptorDocumentInfo,
+        edfiDoc: descriptorDocument,
+        validate: true,
+        security: { ...newSecurity(), isOwnershipEnabled: false },
+        traceId: '-',
+      });
       Logger.debug(
-        `Loading descriptor ${descriptorName} with natural key ${descriptorEntityInfo.naturalKey}: ${putResult.failureMessage}`,
+        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorDocumentInfo.documentIdentity)}: ${
+          putResult.failureMessage
+        }`,
         '-',
       );
       if (!(putResult.result === 'INSERT_SUCCESS' || putResult.result === 'UPDATE_SUCCESS')) {
         Logger.error(
-          `Attempt to load descriptor ${descriptorName} with natural key ${descriptorEntityInfo.naturalKey} failed: ${putResult.failureMessage}`,
+          `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
+            descriptorDocumentInfo.documentIdentity,
+          )} failed: ${putResult.failureMessage}`,
           'n/a',
         );
       } else {

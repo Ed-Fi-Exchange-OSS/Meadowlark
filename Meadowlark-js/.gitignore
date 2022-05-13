@@ -26,3 +26,6 @@ dynamodb_local_data/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# jest-mongodb
+globalConfig.json

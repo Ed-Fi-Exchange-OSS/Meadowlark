@@ -5,5 +5,4 @@
 
 export type ValidationOptions = {
   referenceValidation: boolean;
-  descriptorValidation: boolean;
 };

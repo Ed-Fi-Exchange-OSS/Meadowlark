@@ -4,5 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export type DeleteResult = {
-  success: boolean;
+  result: 'DELETE_SUCCESS' | 'DELETE_FAILURE_REFERENCE' | 'DELETE_FAILURE_NOT_EXISTS' | 'UNKNOWN_FAILURE';
+  failureMessage?: string;
 };

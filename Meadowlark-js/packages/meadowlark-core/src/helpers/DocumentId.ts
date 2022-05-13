@@ -4,33 +4,70 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import JsSha from 'jssha';
-import invariant from 'invariant';
-import { EntityInfo } from '../model/EntityInfo';
+import { DocumentElement } from '../model/DocumentElement';
+import { DocumentIdentity } from '../model/DocumentIdentity';
+import { DocumentIdentifyingInfo, DocumentInfo } from '../model/DocumentInfo';
+import { DocumentReference } from '../model/DocumentReference';
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given naturalKeyString for use as a document id.
- * naturalKeyString must be of the form "NK#<hash-separated key-value pairs>"
+ * Returns a SHAKE128 hash of length 224 bits for the given document info (and possibly assignable-adjusted
+ * document identity) for use as a document id.
  */
-export function documentIdFromNaturalKeyString(naturalKeyString: string): string {
-  invariant(naturalKeyString.startsWith('NK#'), `naturalKeyString "${naturalKeyString}" did not start with "NK#"`);
-  // Hack that might be better addressed elsewhere
-  const nks = naturalKeyString.replace(/\.school=/g, '.schoolId=');
+function constructId(
+  projectName: string,
+  resourceName: string,
+  resourceVersion: string,
+  documentIdentity: DocumentIdentity,
+): string {
+  // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
+  // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
+
+  const stringifiedIdentity: string = `${projectName}#${resourceName}#${resourceVersion}#${documentIdentity
+    .map((element: DocumentElement) => `${element.name}=${element.value}`)
+    .join('#')}`;
 
   const shaObj = new JsSha('CSHAKE128', 'TEXT');
-  shaObj.update(nks);
+  shaObj.update(stringifiedIdentity);
   return shaObj.getHash('HEX', { outputLen: 224 });
 }
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given entityInfo for use as a document id.
- * If the given entityInfo is assignable, uses that information for the document id.
+ * Returns the id of the given DocumentIdentifyingInfo, using the project name, resource name, resource version
+ * and identity of the API document.
+ * If the given documentInfo is assignable, uses that information for the document id.
  */
-export function documentIdForEntityInfo(entityInfo: EntityInfo): string {
-  // If this is an assignable entity, use the assignableNaturalKey for the id instead of the actual natural key
-  const naturalKey =
-    entityInfo.assignableInfo == null ? entityInfo.naturalKey : entityInfo.assignableInfo.assignableNaturalKey;
+export function documentIdForDocumentInfo(documentInfo: DocumentInfo): string {
+  // If this is an assignable entity, use the assignableIdentity for the id instead of the actual document identity
+  const documentIdentity: DocumentIdentity =
+    documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 
-  return documentIdFromNaturalKeyString(naturalKey);
+  return constructId(documentInfo.projectName, documentInfo.resourceName, documentInfo.resourceVersion, documentIdentity);
+}
+
+/**
+ * Returns the id of the given DocumentIdentifyingInfo, using the project name, resource name, resource version
+ * and identity of the API document.
+ */
+export function documentIdForDocumentIdentifyingInfo(documentIdentifyingInfo: DocumentIdentifyingInfo): string {
+  return constructId(
+    documentIdentifyingInfo.projectName,
+    documentIdentifyingInfo.resourceName,
+    documentIdentifyingInfo.resourceVersion,
+    documentIdentifyingInfo.documentIdentity,
+  );
+}
+
+/**
+ * Returns the id of the given DocumentReference, using the project name, resource name, resource version
+ * and identity of the API document.
+ */
+export function documentIdForDocumentReference(documentReference: DocumentReference): string {
+  return constructId(
+    documentReference.projectName,
+    documentReference.resourceName,
+    documentReference.resourceVersion,
+    documentReference.documentIdentity,
+  );
 }
 
 /**
