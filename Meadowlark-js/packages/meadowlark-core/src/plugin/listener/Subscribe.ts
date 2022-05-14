@@ -2,94 +2,95 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import PubSub from 'pubsub-js';
+import type { DeleteRequest } from '../../message/DeleteRequest';
+import type { DeleteResult } from '../../message/DeleteResult';
+import type { GetRequest } from '../../message/GetRequest';
+import type { GetResult } from '../../message/GetResult';
+import type { QueryRequest } from '../../message/QueryRequest';
+import type { QueryResult } from '../../message/QueryResult';
+import type { UpdateRequest } from '../../message/UpdateRequest';
+import type { UpdateResult } from '../../message/UpdateResult';
+import type { UpsertRequest } from '../../message/UpsertRequest';
+import type { UpsertResult } from '../../message/UpsertResult';
 
-import { DeleteRequest } from '../../message/DeleteRequest';
-import { DeleteResult } from '../../message/DeleteResult';
-import { GetRequest } from '../../message/GetRequest';
-import { GetResult } from '../../message/GetResult';
-import { QueryRequest } from '../../message/QueryRequest';
-import { QueryResult } from '../../message/QueryResult';
-import { UpdateRequest } from '../../message/UpdateRequest';
-import { UpdateResult } from '../../message/UpdateResult';
-import { UpsertRequest } from '../../message/UpsertRequest';
-import { UpsertResult } from '../../message/UpsertResult';
+import {
+  emitter,
+  BEFORE_UPSERT_DOCUMENT,
+  AFTER_UPSERT_DOCUMENT,
+  BEFORE_GET_DOCUMENT_BY_ID,
+  AFTER_GET_DOCUMENT_BY_ID,
+  BEFORE_UPDATE_DOCUMENT_BY_ID,
+  AFTER_UPDATE_DOCUMENT_BY_ID,
+  BEFORE_DELETE_DOCUMENT_BY_ID,
+  AFTER_DELETE_DOCUMENT_BY_ID,
+  BEFORE_QUERY_DOCUMENTS,
+  AFTER_QUERY_DOCUMENTS,
+} from './Publish';
 
-type AfterUpsert = { request: UpsertRequest; result: UpsertResult };
-type AfterGet = { request: GetRequest; result: GetResult };
-type AfterUpdate = { request: UpdateRequest; result: UpdateResult };
-type AfterDelete = { request: DeleteRequest; result: DeleteResult };
-type AfterQuery = { request: QueryRequest; result: QueryResult };
+export type AfterUpsert = [request: UpsertRequest, result: UpsertResult];
+export type AfterGet = [request: GetRequest, result: GetResult];
+export type AfterUpdate = [request: UpdateRequest, result: UpdateResult];
+export type AfterDelete = [request: DeleteRequest, result: DeleteResult];
+export type AfterQuery = [request: QueryRequest, result: QueryResult];
 
-export const BEFORE_UPSERT_DOCUMENT: string = 'BEFORE_UPSERT_DOCUMENT';
-export const AFTER_UPSERT_DOCUMENT: string = 'AFTER_UPSERT_DOCUMENT';
-export const BEFORE_GET_DOCUMENT_BY_ID: string = 'BEFORE_GET_DOCUMENT_BY_ID';
-export const AFTER_GET_DOCUMENT_BY_ID: string = 'AFTER_GET_DOCUMENT_BY_ID';
-export const BEFORE_UPDATE_DOCUMENT_BY_ID: string = 'BEFORE_UPDATE_DOCUMENT_BY_ID';
-export const AFTER_UPDATE_DOCUMENT_BY_ID: string = 'AFTER_UPDATE_DOCUMENT_BY_ID';
-export const BEFORE_DELETE_DOCUMENT_BY_ID: string = 'BEFORE_DELETE_DOCUMENT_BY_ID';
-export const AFTER_DELETE_DOCUMENT_BY_ID: string = 'AFTER_DELETE_DOCUMENT_BY_ID';
-export const BEFORE_QUERY_DOCUMENTS: string = 'BEFORE_QUERY_DOCUMENTS';
-export const AFTER_QUERY_DOCUMENTS: string = 'AFTER_QUERY_DOCUMENTS';
-
-export class Subscribe {
-  static beforeUpsertDocument(hook: (request: UpsertRequest) => void) {
-    PubSub.subscribe(BEFORE_UPSERT_DOCUMENT, (_, data: UpsertRequest) => {
-      hook(data);
+export const Subscribe = {
+  beforeUpsertDocument: (hook: (request: UpsertRequest) => void) => {
+    emitter.on(BEFORE_UPSERT_DOCUMENT, (request: UpsertRequest) => {
+      hook(request);
     });
-  }
+  },
 
-  static afterUpsertDocument(hook: (request: UpsertRequest, result: UpsertResult) => void) {
-    PubSub.subscribe(AFTER_UPSERT_DOCUMENT, (_, data: AfterUpsert) => {
-      hook(data.request, data.result);
+  afterUpsertDocument: (hook: (request: UpsertRequest, result: UpsertResult) => void) => {
+    emitter.on(AFTER_UPSERT_DOCUMENT, ([request, result]: AfterUpsert) => {
+      hook(request, result);
     });
-  }
+  },
 
-  static beforeGetDocumentById(hook: (request: GetRequest) => void) {
-    PubSub.subscribe(BEFORE_GET_DOCUMENT_BY_ID, (_, data: GetRequest) => {
-      hook(data);
+  beforeGetDocumentById: (hook: (rrequest: GetRequest) => void) => {
+    emitter.on(BEFORE_GET_DOCUMENT_BY_ID, (request: GetRequest) => {
+      hook(request);
     });
-  }
+  },
 
-  static afterGetDocumentById(hook: (request: GetRequest, result: GetResult) => void) {
-    PubSub.subscribe(AFTER_GET_DOCUMENT_BY_ID, (_, data: AfterGet) => {
-      hook(data.request, data.result);
+  afterGetDocumentById: (hook: (request: GetRequest, result: GetResult) => void) => {
+    emitter.on(AFTER_GET_DOCUMENT_BY_ID, ([request, result]: AfterGet) => {
+      hook(request, result);
     });
-  }
+  },
 
-  static beforeUpdateDocumentById(hook: (request: UpdateRequest) => void) {
-    PubSub.subscribe(BEFORE_UPDATE_DOCUMENT_BY_ID, (_, data: UpdateRequest) => {
-      hook(data);
+  beforeUpdateDocumentById: (hook: (request: UpdateRequest) => void) => {
+    emitter.on(BEFORE_UPDATE_DOCUMENT_BY_ID, (request: UpdateRequest) => {
+      hook(request);
     });
-  }
+  },
 
-  static afterUpdateDocumentById(hook: (request: UpdateRequest, result: UpdateResult) => void) {
-    PubSub.subscribe(AFTER_UPDATE_DOCUMENT_BY_ID, (_, data: AfterUpdate) => {
-      hook(data.request, data.result);
+  afterUpdateDocumentById: (hook: (request: UpdateRequest, result: UpdateResult) => void) => {
+    emitter.on(AFTER_UPDATE_DOCUMENT_BY_ID, ([request, result]: AfterUpdate) => {
+      hook(request, result);
     });
-  }
+  },
 
-  static beforeDeleteDocumentById(hook: (request: DeleteRequest) => void) {
-    PubSub.subscribe(BEFORE_DELETE_DOCUMENT_BY_ID, (_, data: DeleteRequest) => {
-      hook(data);
+  beforeDeleteDocumentById: (hook: (request: DeleteRequest) => void) => {
+    emitter.on(BEFORE_DELETE_DOCUMENT_BY_ID, (request: DeleteRequest) => {
+      hook(request);
     });
-  }
+  },
 
-  static afterDeleteDocumentById(hook: (request: DeleteRequest, result: DeleteResult) => void) {
-    PubSub.subscribe(AFTER_DELETE_DOCUMENT_BY_ID, (_, data: AfterDelete) => {
-      hook(data.request, data.result);
+  afterDeleteDocumentById: (hook: (request: DeleteRequest, result: DeleteResult) => void) => {
+    emitter.on(AFTER_DELETE_DOCUMENT_BY_ID, ([request, result]: AfterDelete) => {
+      hook(request, result);
     });
-  }
+  },
 
-  static beforeQueryDocuments(hook: (request: QueryRequest) => void) {
-    PubSub.subscribe(BEFORE_QUERY_DOCUMENTS, (_, data: QueryRequest) => {
-      hook(data);
+  beforeQueryDocuments: (hook: (request: QueryRequest) => void) => {
+    emitter.on(BEFORE_QUERY_DOCUMENTS, (request: QueryRequest) => {
+      hook(request);
     });
-  }
+  },
 
-  static afterQueryDocuments(hook: (request: QueryRequest, result: QueryResult) => void) {
-    PubSub.subscribe(AFTER_QUERY_DOCUMENTS, (_, data: AfterQuery) => {
-      hook(data.request, data.result);
+  afterQueryDocuments: (hook: (request: QueryRequest, result: QueryResult) => void) => {
+    emitter.on(AFTER_QUERY_DOCUMENTS, ([request, result]: AfterQuery) => {
+      hook(request, result);
     });
-  }
-}
+  },
+};

@@ -2,7 +2,7 @@ export { DocumentStorePlugin } from './plugin/backend/DocumentStorePlugin';
 export { NoDocumentStorePlugin } from './plugin/backend/NoDocumentStorePlugin';
 export { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';
 export { NoQueryHandlerPlugin } from './plugin/backend/NoQueryHandlerPlugin';
-export { Subscribe } from './plugin/listener/Subscribe';
+export type { Subscribe } from './plugin/listener/Subscribe';
 export { GetResult } from './message/GetResult';
 export { DeleteResult } from './message/DeleteResult';
 export { UpdateResult } from './message/UpdateResult';

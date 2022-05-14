@@ -6,7 +6,7 @@
 import { DocumentStorePlugin } from '@edfi/meadowlark-core';
 import { upsertDocument, deleteDocumentById, getDocumentById, updateDocumentById } from './BackendFacade';
 
-export function initialize(): DocumentStorePlugin {
+export function initializeDocumentStore(): DocumentStorePlugin {
   return {
     upsertDocument,
     getDocumentById,

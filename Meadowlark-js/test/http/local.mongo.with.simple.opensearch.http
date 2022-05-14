@@ -83,8 +83,26 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/academicWeeks/20325050be22032deae
 
 
 
+######################### Query
 
 
 
+### Get all schools records
+GET http://localhost:3000/local/v3.3b/ed-fi/schools
+{{auth_header}}
 
+
+### Get all academicWeeks records
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks
+{{auth_header}}
+
+
+### Query schools
+GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
+{{auth_header}}
+
+
+### Query academicWeeks
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?schoolReference.schoolId=123
+{{auth_header}}
 

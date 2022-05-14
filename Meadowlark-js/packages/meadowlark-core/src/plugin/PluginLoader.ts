@@ -12,6 +12,7 @@ import { NoDocumentStorePlugin } from './backend/NoDocumentStorePlugin';
 import { NoQueryHandlerPlugin } from './backend/NoQueryHandlerPlugin';
 import { QueryHandlerInitializer } from './backend/QueryHandlerInitializer';
 import { QueryHandlerPlugin } from './backend/QueryHandlerPlugin';
+import { Subscribe } from './listener/Subscribe';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ async function loadQueryHandler(pluginNpmName: string) {
 }
 
 async function loadListener(pluginNpmName: string) {
-  return ((await import(pluginNpmName)) as ListenerInitializer).initializeListener();
+  return ((await import(pluginNpmName)) as ListenerInitializer).initializeListener(Subscribe);
 }
 
 // IIFE for top-level await

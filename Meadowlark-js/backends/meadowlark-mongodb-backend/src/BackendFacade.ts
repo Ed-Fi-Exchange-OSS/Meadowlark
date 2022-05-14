@@ -8,8 +8,6 @@ import {
   DeleteResult,
   GetRequest,
   GetResult,
-  QueryRequest,
-  QueryResult,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
@@ -18,7 +16,6 @@ import {
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Read from './repository/Read';
-import * as Query from './repository/Query';
 import * as Update from './repository/Update';
 import { getSharedClient } from './repository/Db';
 
@@ -36,8 +33,4 @@ export async function upsertDocument(request: UpsertRequest): Promise<UpsertResu
 
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
   return Update.updateDocumentById(request, await getSharedClient());
-}
-
-export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {
-  return Query.queryDocuments(request, await getSharedClient());
 }

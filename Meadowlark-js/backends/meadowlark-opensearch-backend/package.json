@@ -1,8 +1,8 @@
 {
-  "name": "@edfi/meadowlark-local-mongodb-opensearch",
+  "name": "@edfi/meadowlark-opensearch-backend",
   "main": "dist/index.js",
   "version": "0.2.0-dev.0",
-  "description": "Meadowlark backend plugin for local MongoDB and OpenSearch",
+  "description": "Meadowlark backend plugin for OpenSearch",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://www.myget.org/F/ed-fi/npm/"
@@ -20,9 +20,8 @@
   },
   "dependencies": {
     "@edfi/meadowlark-core": "0.2.0-dev.0",
-    "mongodb": "^4.5.0",
-    "ramda": "^0.28.0",
-    "ts-invariant": "^0.9.4"
+    "@edfi/metaed-core": "3.0.2-dev.1",
+    "@elastic/elasticsearch": "7.13.0"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",

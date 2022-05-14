@@ -2202,7 +2202,6 @@ __metadata:
     "@types/js-yaml": ^4.0.5
     "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
-    "@types/pubsub-js": ^1.8.3
     "@types/ramda": 0.27.64
     "@types/semver": ^7.3.9
     "@types/xml2js": ^0.4.9
@@ -2211,13 +2210,13 @@ __metadata:
     copyfiles: ^2.4.1
     didyoumean2: ^5.0.0
     dotenv: ^16.0.0
+    emittery: ^0.11.0
     fast-memoize: ^2.5.2
     fs-extra: ^10.0.0
     inquirer: ^8.2.0
     jsinspect: ^0.12.7
     jssha: ^3.2.0
     njwt: ^1.2.0
-    pubsub-js: ^1.9.4
     ramda: ^0.27.2
     regenerator-runtime: ^0.13.9
     rimraf: ^3.0.2
@@ -2229,9 +2228,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/meadowlark-local-mongodb-opensearch@workspace:backends/meadowlark-local-mongodb-opensearch":
+"@edfi/meadowlark-mongodb-backend@workspace:backends/meadowlark-mongodb-backend":
   version: 0.0.0-use.local
-  resolution: "@edfi/meadowlark-local-mongodb-opensearch@workspace:backends/meadowlark-local-mongodb-opensearch"
+  resolution: "@edfi/meadowlark-mongodb-backend@workspace:backends/meadowlark-mongodb-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
     copyfiles: ^2.4.1
@@ -2239,6 +2238,18 @@ __metadata:
     ramda: ^0.28.0
     rimraf: ^3.0.2
     ts-invariant: ^0.9.4
+  languageName: unknown
+  linkType: soft
+
+"@edfi/meadowlark-opensearch-backend@workspace:backends/meadowlark-opensearch-backend":
+  version: 0.0.0-use.local
+  resolution: "@edfi/meadowlark-opensearch-backend@workspace:backends/meadowlark-opensearch-backend"
+  dependencies:
+    "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/metaed-core": 3.0.2-dev.1
+    "@elastic/elasticsearch": 7.13.0
+    copyfiles: ^2.4.1
+    rimraf: ^3.0.2
   languageName: unknown
   linkType: soft
 
@@ -4866,13 +4877,6 @@ __metadata:
   version: 2.4.2
   resolution: "@types/prettier@npm:2.4.2::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fprettier%2F-%2F%40types%2Fprettier-2.4.2.tgz"
   checksum: 76e230b2d11028af11fe12e09b2d5b10b03738e9abf819ae6ebb0f78cac13d39f860755ce05ac3855b608222518d956628f5d00322dc206cc6d1f2d8d1519f1e
-  languageName: node
-  linkType: hard
-
-"@types/pubsub-js@npm:^1.8.3":
-  version: 1.8.3
-  resolution: "@types/pubsub-js@npm:1.8.3::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fpubsub-js%2F-%2F%40types%2Fpubsub-js-1.8.3.tgz"
-  checksum: 10161a266ad6e35f059e0d8aca2612530ea1c747812b813ecc7934cd0aec5f7ca1d6f8fdea91d79ffaea698cde2e873f0c8a402210bc32861a16e88661d1c797
   languageName: node
   linkType: hard
 
@@ -8042,6 +8046,13 @@ __metadata:
   version: 1.4.18
   resolution: "electron-to-chromium@npm:1.4.18"
   checksum: 59d8da47d997b35fca63286cc486e84b0b84587e62c632dd22f9c2b98b5c2116fa8ff0ca3b64518f0957a7f3d6812b42459a7301f5e81607b600526e1bb55227
+  languageName: node
+  linkType: hard
+
+"emittery@npm:^0.11.0":
+  version: 0.11.0
+  resolution: "emittery@npm:0.11.0"
+  checksum: fba43607e6184a9e318541c1613b742e4d4753bab4fd27f17b93127172f62aa34da8096c78c290dd1a65f12a63abe5ae6765a1d555194d60e5f42eed8548c23d
   languageName: node
   linkType: hard
 
@@ -15198,13 +15209,6 @@ __metadata:
   version: 1.8.0
   resolution: "psl@npm:1.8.0"
   checksum: 6150048ed2da3f919478bee8a82f3828303bc0fc730fb015a48f83c9977682c7b28c60ab01425a72d82a2891a1681627aa530a991d50c086b48a3be27744bde7
-  languageName: node
-  linkType: hard
-
-"pubsub-js@npm:^1.9.4":
-  version: 1.9.4
-  resolution: "pubsub-js@npm:1.9.4"
-  checksum: 4644a74d0731786bc10b5b01418ee8221f1dcd3ce6b6b011cf383059f625d6ce658e83c234c67dcdd3058023867bdcf128c1edff6cc05d09a3206d2276e14d36
   languageName: node
   linkType: hard
 
