@@ -5,40 +5,38 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import * as Meadowlark from '@edfi/meadowlark-core';
+import {
+  update as meadowlarkUpdate,
+  upsert as meadowlarkUpsert,
+  getResolver as meadowlarkGet,
+  deleteIt as meadowlarkDelete,
+} from '@edfi/meadowlark-core';
+import { respondWith, fromRequest } from './MeadowlarkConverter';
 
 /**
  * Entry point for API POST requests
- *
- * Validates resource and JSON document shape, extracts keys and forwards to DynamoRepository for creation
  */
 export async function upsert(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return Meadowlark.upsert(event, context);
+  return respondWith(await meadowlarkUpsert(fromRequest(event, context)));
 }
 
 /**
  * Entry point for all API GET requests
- *
- * Determines whether request is "get all", "get by id", or a query, and forwards to the appropriate handler
  */
 export async function getResolver(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return Meadowlark.getResolver(event, context);
+  return respondWith(await meadowlarkGet(fromRequest(event, context)));
 }
 
 /**
  * Entry point for all API PUT requests, which are "by id"
- *
- * Validates resource and JSON document shape, extracts keys and forwards to DynamoRepository for update
  */
 export async function update(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return Meadowlark.update(event, context);
+  return respondWith(await meadowlarkUpdate(fromRequest(event, context)));
 }
 
 /**
  * Entry point for all API DELETE requests, which are "by id"
- *
- * Validates resource and forwards to DynamoRepository for deletion
  */
 export async function deleteIt(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  return Meadowlark.deleteIt(event, context);
+  return respondWith(await meadowlarkDelete(fromRequest(event, context)));
 }

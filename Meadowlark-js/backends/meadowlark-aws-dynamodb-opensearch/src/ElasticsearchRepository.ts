@@ -127,10 +127,10 @@ export async function queryEntityList({
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
       case 'SemanticAnalysisException':
         // The query term is invalid
-        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, 'n/a', e.meta.body);
+        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, e.meta.body);
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
       default:
-        Logger.error('ElasticsearchRepository.queryEntityList', traceId, 'n/a', body ?? e);
+        Logger.error('ElasticsearchRepository.queryEntityList', traceId, body ?? e);
         return { response: 'UNKNOWN_FAILURE', documents: [] };
     }
   }

@@ -76,10 +76,10 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
       case 'SemanticAnalysisException':
         // The query term is invalid
-        Logger.debug('meadowlark-opensearch: queryDocuments', traceId, 'n/a', e.meta.body);
+        Logger.debug('meadowlark-opensearch: queryDocuments', traceId, e.meta.body);
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
       default:
-        Logger.error('meadowlark-opensearch: queryDocuments', traceId, 'n/a', body ?? e);
+        Logger.error('meadowlark-opensearch: queryDocuments', traceId, body ?? e);
         return { response: 'UNKNOWN_FAILURE', documents: [] };
     }
   }

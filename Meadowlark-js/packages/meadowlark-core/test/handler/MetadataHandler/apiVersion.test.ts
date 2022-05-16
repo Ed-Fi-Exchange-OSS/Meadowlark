@@ -3,14 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
+import { FrontendResponse } from '../../../src/handler/FrontendResponse';
 import { apiVersion } from '../../../src/handler/MetadataHandler';
 
 describe('when getting API version information', () => {
   describe('given a valid request not running in localhost', () => {
     process.env.TOKEN_URL = 'mock_oauth';
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
     const EXPECTED_OUTPUT_HTTPS = `{
     "version": "5.3",
     "informationalVersion": "5.3",
@@ -33,20 +33,17 @@ describe('when getting API version information', () => {
   }`;
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
         headers: {
           Host: 'test_url',
         },
-        requestContext: {
-          stage: 'outside',
-        },
-      } as any;
-      const context = {
-        awsRequestId: 'aaaa',
-      } as any;
+
+        stage: 'outside',
+      };
 
       // Act
-      response = await apiVersion(event, context);
+      response = await apiVersion(event);
     });
 
     it('returns status 200', () => {
@@ -58,7 +55,7 @@ describe('when getting API version information', () => {
   });
   describe('given a valid request not running in localhost', () => {
     process.env.TOKEN_URL = 'mock_oauth';
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
 
     const EXPECTED_OUTPUT_HTTP = `{
     "version": "5.3",
@@ -82,20 +79,17 @@ describe('when getting API version information', () => {
   }`;
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
         headers: {
           Host: 'localhost:3000',
         },
-        requestContext: {
-          stage: 'local',
-        },
-      } as any;
-      const context = {
-        awsRequestId: 'aaaa',
-      } as any;
+
+        stage: 'local',
+      };
 
       // Act
-      response = await apiVersion(event, context);
+      response = await apiVersion(event);
     });
 
     it('returns status 200', () => {

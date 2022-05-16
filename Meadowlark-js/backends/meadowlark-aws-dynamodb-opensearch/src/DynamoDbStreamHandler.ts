@@ -67,7 +67,7 @@ async function removeFromElasticsearchIfExists(client: EsClient, requestParams: 
       await client.delete({ ...requestParams, refresh: true });
     }
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.removeFromElasticsearchIfExists`, awsRequestId, 'n/a', err);
+    Logger.error(`DynamoDbStreamHandler.removeFromElasticsearchIfExists`, awsRequestId, err);
   }
 }
 
@@ -100,7 +100,7 @@ async function insertIntoElasticsearch(
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.insertIntoElasticsearch`, awsRequestId, 'n/a', err);
+    Logger.error(`DynamoDbStreamHandler.insertIntoElasticsearch`, awsRequestId, err);
   }
 }
 

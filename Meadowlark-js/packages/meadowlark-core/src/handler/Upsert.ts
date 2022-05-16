@@ -3,8 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
@@ -17,6 +15,8 @@ import { getDocumentStore } from '../plugin/PluginLoader';
 import { UpsertRequest } from '../message/UpsertRequest';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
 import { UpsertResult } from '../message/UpsertResult';
+import { FrontendRequest } from './FrontendRequest';
+import { FrontendResponse } from './FrontendResponse';
 
 const moduleName = 'Create';
 
@@ -25,42 +25,42 @@ const moduleName = 'Create';
  *
  * Validates resource and JSON document shape, extracts keys and forwards to backend for creation/update
  */
-export async function upsert(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function upsert(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    writeRequestToLog(moduleName, event, context, 'create');
+    writeRequestToLog(moduleName, frontendRequest, 'create');
 
-    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
     if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, context, 'create', errorResponse.statusCode, JSON.stringify(jwtStatus));
-      return errorResponse as APIGatewayProxyResult;
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', errorResponse.statusCode, JSON.stringify(jwtStatus));
+      return errorResponse as FrontendResponse;
     }
 
-    const pathComponents: PathComponents | null = pathComponentsFrom(event.path);
+    const pathComponents: PathComponents | null = pathComponentsFrom(frontendRequest.path);
 
     if (pathComponents === null) {
-      writeDebugStatusToLog(moduleName, context, 'create', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 404);
       return { body: '', statusCode: 404 };
     }
 
-    if (event.body == null) {
+    if (frontendRequest.body == null) {
       const message = 'Missing body';
-      writeDebugStatusToLog(moduleName, context, 'create', 400, message);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 400, message);
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
     let body: object = {};
     try {
-      body = JSON.parse(event.body);
+      body = JSON.parse(frontendRequest.body);
     } catch (error) {
       const message = 'Malformed body';
-      writeDebugStatusToLog(moduleName, context, 'create', 400, message);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 400, message);
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
     const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody != null) {
       const statusCode = documentInfo === NoDocumentInfo ? 404 : 400;
-      writeDebugStatusToLog(moduleName, context, 'create', statusCode, errorBody);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
@@ -69,13 +69,13 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       id: resourceId,
       documentInfo,
       edfiDoc: body,
-      validate: event.headers['reference-validation'] !== 'false',
+      validate: frontendRequest.headers['reference-validation'] !== 'false',
       security: {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
         clientName: jwtStatus.subject,
       },
-      traceId: context.awsRequestId,
+      traceId: frontendRequest.traceId,
     };
 
     beforeUpsertDocument(request);
@@ -85,8 +85,8 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
     const { response, failureMessage } = result;
 
     if (response === 'INSERT_SUCCESS') {
-      writeDebugStatusToLog(moduleName, context, 'create', 201);
-      const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 201);
+      const location = `${frontendRequest.path}${frontendRequest.path.endsWith('/') ? '' : '/'}${resourceId}`;
       return {
         body: '',
         statusCode: 201,
@@ -94,24 +94,24 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
       };
     }
     if (response === 'UPDATE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, context, 'create', 200);
-      const location = `${event.path}${event.path.endsWith('/') ? '' : '/'}${resourceId}`;
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 200);
+      const location = `${frontendRequest.path}${frontendRequest.path.endsWith('/') ? '' : '/'}${resourceId}`;
       return { body: '', statusCode: 200, headers: { ...headerMetadata, Location: location } };
     }
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, context, 'create', 409);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 409);
       return { body: '', statusCode: 409, headers: headerMetadata };
     }
     if (response === 'INSERT_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, context, 'create', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'create', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
     // Otherwise, it's a 500 error
-    writeErrorToLog(moduleName, context, event, 'create', 500, failureMessage);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'create', 500, failureMessage);
     return { body: '', statusCode: 500, headers: headerMetadata };
   } catch (e) {
-    writeErrorToLog(moduleName, context, event, 'create', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'create', 500, e);
     return { body: '', statusCode: 500 };
   }
 }

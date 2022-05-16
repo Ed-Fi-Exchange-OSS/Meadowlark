@@ -3,17 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyResult, Context } from 'aws-lambda';
-
 import { getById } from '../../src/handler/GetById';
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { Security } from '../../src/model/Security';
 import { GetResult } from '../../src/message/GetResult';
 import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import { FrontendResponse } from '../../src/handler/FrontendResponse';
+import { newFrontendRequest } from '../../src/handler/FrontendRequest';
 
 describe('given the endpoint is not in the MetaEd model', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   const metaEdHeaders = { header: 'one' };
   const validationError = { 'this is': 'an error' };
@@ -25,7 +24,6 @@ describe('given the endpoint is not in the MetaEd model', () => {
       endpointName: 'c',
       resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -37,7 +35,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
     );
 
     // Act
-    response = await getById(pathComponents, context, {} as Security);
+    response = await getById(pathComponents, newFrontendRequest(), {} as Security);
   });
 
   afterAll(() => {
@@ -53,7 +51,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
 });
 
 describe('given database lookup fails', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   let mockDynamo: any;
   const metaEdHeaders = { header: 'one' };
@@ -65,7 +63,6 @@ describe('given database lookup fails', () => {
       endpointName: 'c',
       resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -85,7 +82,7 @@ describe('given database lookup fails', () => {
     );
 
     // Act
-    response = await getById(pathComponents, context, {} as Security);
+    response = await getById(pathComponents, newFrontendRequest(), {} as Security);
   });
 
   afterAll(() => {
@@ -103,7 +100,7 @@ describe('given database lookup fails', () => {
 });
 
 describe('given a valid request', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   let mockDynamo: any;
   const metaEdHeaders = { header: 'one' };
@@ -115,7 +112,6 @@ describe('given a valid request', () => {
       endpointName: 'c',
       resourceId: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -135,7 +131,7 @@ describe('given a valid request', () => {
     );
 
     // Act
-    response = await getById(pathComponents, context, {} as Security);
+    response = await getById(pathComponents, newFrontendRequest(), {} as Security);
   });
 
   afterAll(() => {

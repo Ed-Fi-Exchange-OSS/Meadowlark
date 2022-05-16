@@ -46,9 +46,9 @@ At a command prompt, running in this directory:
 
 | Operation | Command |
 | -- | -- |
-| start containers | `docker compose up -d` |
+| start containers | `docker compose -f <yml filename> up -d` |
 | view running containers | `docker ps` |
-| stop containers | `docker compose down` |
+| stop containers | `docker compose -f <yml filename> down` |
 | view OpenSearch logs | `docker logs opensearch-node1` |
 | view OpenSearch Dashboard logs | `docker logs opensearch-dashboards` |
 | view MongoDB logs | `docker logs mongodb-node1` |

@@ -3,8 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { validateResource } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
@@ -17,6 +15,8 @@ import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpdateDocumentById, beforeUpdateDocumentById } from '../plugin/listener/Publish';
 import { UpdateRequest } from '../message/UpdateRequest';
 import { UpdateResult } from '../message/UpdateResult';
+import { FrontendRequest } from './FrontendRequest';
+import { FrontendResponse } from './FrontendResponse';
 
 const moduleName = 'Update';
 
@@ -25,48 +25,48 @@ const moduleName = 'Update';
  *
  * Validates resource and JSON document shape, extracts keys and forwards to backend for update
  */
-export async function update(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function update(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    writeRequestToLog(moduleName, event, context, 'update');
+    writeRequestToLog(moduleName, frontendRequest, 'update');
 
-    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
     if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, context, 'update', errorResponse.statusCode, JSON.stringify(jwtStatus));
-      return errorResponse as APIGatewayProxyResult;
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', errorResponse.statusCode, JSON.stringify(jwtStatus));
+      return errorResponse as FrontendResponse;
     }
 
-    const pathComponents: PathComponents | null = pathComponentsFrom(event.path);
+    const pathComponents: PathComponents | null = pathComponentsFrom(frontendRequest.path);
     if (pathComponents === null || pathComponents.resourceId == null) {
-      writeDebugStatusToLog(moduleName, context, 'update', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 404);
       return { body: '', statusCode: 404 };
     }
 
-    if (event.body == null) {
+    if (frontendRequest.body == null) {
       const message = 'Missing body';
-      writeDebugStatusToLog(moduleName, context, 'update', 400, message);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, message);
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
     let body: any = {};
     try {
-      body = JSON.parse(event.body);
+      body = JSON.parse(frontendRequest.body);
     } catch (error) {
       const message = 'Malformed body';
-      writeDebugStatusToLog(moduleName, context, 'update', 400, message);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, message);
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
     const { documentInfo, errorBody, headerMetadata } = await validateResource(pathComponents, body);
     if (errorBody !== null) {
       const statusCode = documentInfo === NoDocumentInfo ? 404 : 400;
-      writeDebugStatusToLog(moduleName, context, 'update', statusCode, errorBody);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', statusCode, errorBody);
       return { body: errorBody, statusCode, headers: headerMetadata };
     }
 
     const resourceIdFromBody = documentIdForDocumentInfo(documentInfo);
     if (resourceIdFromBody !== pathComponents.resourceId) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
-      writeDebugStatusToLog(moduleName, context, 'update', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
 
@@ -74,13 +74,13 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
       id: pathComponents.resourceId,
       documentInfo,
       edfiDoc: body,
-      validate: event.headers['reference-validation'] !== 'false',
+      validate: frontendRequest.headers['reference-validation'] !== 'false',
       security: {
         ...newSecurity(),
         isOwnershipEnabled: jwtStatus.isOwnershipEnabled,
         clientName: jwtStatus.subject,
       },
-      traceId: context.awsRequestId,
+      traceId: frontendRequest.traceId,
     };
 
     beforeUpdateDocumentById(request);
@@ -90,21 +90,21 @@ export async function update(event: APIGatewayProxyEvent, context: Context): Pro
     const { response, failureMessage } = result;
 
     if (response === 'UPDATE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, context, 'update', 204);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 204);
       return { body: '', statusCode: 204, headers: headerMetadata };
     }
     if (response === 'UPDATE_FAILURE_NOT_EXISTS') {
-      writeDebugStatusToLog(moduleName, context, 'update', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 404);
       return { body: '', statusCode: 404, headers: headerMetadata };
     }
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, context, 'update', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
       return { body: JSON.stringify({ message: failureMessage }), statusCode: 400, headers: headerMetadata };
     }
-    writeDebugStatusToLog(moduleName, context, 'update', 500, failureMessage);
+    writeDebugStatusToLog(moduleName, frontendRequest, 'update', 500, failureMessage);
     return { body: JSON.stringify({ message: failureMessage ?? 'Failure' }), statusCode: 500, headers: headerMetadata };
   } catch (e) {
-    writeErrorToLog(moduleName, context, event, 'update', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);
     return { body: '', statusCode: 500 };
   }
 }

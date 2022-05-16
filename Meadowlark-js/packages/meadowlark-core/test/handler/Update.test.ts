@@ -3,30 +3,29 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as GetById from '../../src/handler/GetById';
 import { update } from '../../src/handler/Update';
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { UpdateResult } from '../../src/message/UpdateResult';
 import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import { FrontendResponse } from '../../src/handler/FrontendResponse';
+import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 describe('given there is no request body', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       body: null,
       headers: {},
-      requestContext: { requestId: 'ApiGatewayRequestId' },
       path,
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
-    response = await update(event, context);
+    response = await update(event);
   });
 
   it('returns status 400', () => {
@@ -39,19 +38,17 @@ describe('given there is no request body', () => {
 });
 
 describe('given there is a malformed request body', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   const path = '/v3.3b/ed-fi/academicWeeks/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       body: 'this is not a JSON object',
-      headers: {},
-      requestContext: { requestId: 'ApiGatewayRequestId' },
       path,
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
-    response = await update(event, context);
+    response = await update(event);
   });
 
   it('returns status 400', () => {
@@ -64,18 +61,16 @@ describe('given there is a malformed request body', () => {
 });
 
 describe('given a completely missing resource path', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   const path = '/whatever';
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       body: '{"id": "string", "weekIdentifier": "string"}',
-      headers: {},
-      requestContext: { requestId: 'ApiGatewayRequestId' },
       path,
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -90,7 +85,7 @@ describe('given a completely missing resource path', () => {
     );
 
     // Act
-    response = await update(event, context);
+    response = await update(event);
   });
 
   afterAll(() => mockRequestValidator.mockRestore());
@@ -105,7 +100,7 @@ describe('given a completely missing resource path', () => {
 });
 
 describe('given a valid object', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
 
   describe('given the object does not exist', () => {
@@ -114,13 +109,12 @@ describe('given a valid object', () => {
     const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
         body: '{"id": "string", "weekIdentifier": "string"}',
-        headers: { 'reference-validation': false },
+        headers: { 'reference-validation': 'false' },
         path,
-        requestContext: { requestId: 'ApiGatewayRequestId' },
-      } as any;
-      const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      };
 
       // Setup the request validation to succeed
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -143,7 +137,7 @@ describe('given a valid object', () => {
       );
 
       // Act
-      response = await update(event, context);
+      response = await update(event);
     });
 
     afterAll(() => {
@@ -172,13 +166,13 @@ describe('given a valid object', () => {
       const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
+
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
+          headers: { 'reference-validation': 'false' },
           path,
-          requestContext: { requestId: 'ApiGatewayRequestId' },
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -201,7 +195,7 @@ describe('given a valid object', () => {
         );
 
         // Act
-        response = await update(event, context);
+        response = await update(event);
       });
 
       afterAll(() => {
@@ -229,13 +223,12 @@ describe('given a valid object', () => {
       const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
+          headers: { 'reference-validation': 'false' },
           path,
-          requestContext: { requestId: 'ApiGatewayRequestId' },
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -261,7 +254,7 @@ describe('given a valid object', () => {
         );
 
         // Act
-        response = await update(event, context);
+        response = await update(event);
       });
 
       afterAll(() => {
@@ -288,13 +281,12 @@ describe('given a valid object', () => {
       const path = '/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
+          headers: { 'reference-validation': 'false' },
           path,
-          requestContext: { requestId: 'ApiGatewayRequestId' },
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -317,7 +309,7 @@ describe('given a valid object', () => {
         );
 
         // Act
-        response = await update(event, context);
+        response = await update(event);
       });
 
       afterAll(() => {
@@ -341,22 +333,22 @@ describe('given a valid object', () => {
 });
 
 describe('given requesting abstract classes', () => {
-  const response: APIGatewayProxyResult[] = [];
+  const response: FrontendResponse[] = [];
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
+
       body: '{"id": "0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb", "body": "a body"}',
-      headers: { 'reference-validation': false },
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: { 'reference-validation': 'false' },
       path: '/v3.3b/ed-fi/educationOrganizations/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response[0] = await update(event, context);
+    response[0] = await update(event);
 
     event.path = '/v3.3b/ed-fi/generalStudentProgramAssociations/0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb';
-    response[1] = await update(event, context);
+    response[1] = await update(event);
   });
 
   it('returns status 404', () => {

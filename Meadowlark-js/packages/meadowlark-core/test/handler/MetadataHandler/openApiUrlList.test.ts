@@ -3,24 +3,20 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
+import { FrontendResponse } from '../../../src/handler/FrontendResponse';
 import { openApiUrlList } from '../../../src/handler/MetadataHandler';
 
 describe('when getting the Open API metadata list', () => {
   describe('given stage is local', () => {
-    let response: APIGatewayProxyResult;
-    const event: APIGatewayProxyEvent = {
+    let response: FrontendResponse;
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       headers: {
         Host: 'l:1',
       },
-      requestContext: {
-        path: '/local/metadata/',
-        stage: 'local',
-      },
-    } as any;
-    const context = {
-      awsRequestId: 'aaaa',
+      path: '/local/metadata/',
+      stage: 'local',
     };
 
     // In this expected output, note that `http` is used instead of `https`
@@ -39,7 +35,7 @@ describe('when getting the Open API metadata list', () => {
 
     // eslint-disable-next-line no-return-assign
     beforeAll(async () => {
-      response = await openApiUrlList(event, context as Context);
+      response = await openApiUrlList(event);
     });
 
     it('returns status 200', () => {
@@ -51,18 +47,14 @@ describe('when getting the Open API metadata list', () => {
   });
 
   describe('given stage is NOT local', () => {
-    let response: APIGatewayProxyResult;
-    const event: APIGatewayProxyEvent = {
+    let response: FrontendResponse;
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       headers: {
         Host: 'l:1',
       },
-      requestContext: {
-        path: '/!@#/metadata/',
-        stage: '!@#',
-      },
-    } as any;
-    const context = {
-      awsRequestId: 'aaaa',
+      path: '/!@#/metadata/',
+      stage: '!@#',
     };
 
     // In this expected output, note that `https` is used instead of `http`
@@ -81,7 +73,7 @@ describe('when getting the Open API metadata list', () => {
 
     // eslint-disable-next-line no-return-assign
     beforeAll(async () => {
-      response = await openApiUrlList(event, context as Context);
+      response = await openApiUrlList(event);
     });
 
     it('returns status 200', () => {

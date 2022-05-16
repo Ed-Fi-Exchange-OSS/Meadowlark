@@ -7,13 +7,11 @@ import { Client } from '@elastic/elasticsearch';
 import {
   DeleteRequest,
   DeleteResult,
-  DocumentInfo,
   Logger,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
   UpsertResult,
-  documentIdForDocumentInfo,
 } from '@edfi/meadowlark-core';
 import { indexFromDocumentInfo } from './QueryOpensearch';
 
@@ -23,32 +21,22 @@ import { indexFromDocumentInfo } from './QueryOpensearch';
 type OpensearchRequest = { index: string; id: string };
 
 /**
- * Build the Elasticsearch request parameters.
- */
-function buildOpensearchRequest(documentInfo: DocumentInfo): OpensearchRequest {
-  return {
-    index: indexFromDocumentInfo(documentInfo),
-    id: documentIdForDocumentInfo(documentInfo),
-  };
-}
-
-/**
  * Listener for afterDeleteDocumentById events
  */
 export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult, client: Client) {
   Logger.info('UpdateOpenSearch.afterDeleteDocumentById', request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const requestParams = buildOpensearchRequest(request.documentInfo);
+  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromDocumentInfo(request.documentInfo) };
 
   try {
-    Logger.debug(`Checking if ${requestParams.index} exists in ElasticSearch`, request.traceId);
-    if ((await client.exists({ ...requestParams, refresh: true })).body) {
-      Logger.debug(`UpdateOpensearch.afterDeleteDocumentById removing ${requestParams.index}`, request.traceId);
-      await client.delete({ ...requestParams, refresh: true });
-    }
+    Logger.debug(
+      `UpdateOpensearch.afterDeleteDocumentById removing ${opensearchRequest.id} from index ${opensearchRequest.index}`,
+      request.traceId,
+    );
+    await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    Logger.error(`UpdateOpensearch.afterDeleteDocumentById`, request.traceId, 'n/a', err);
+    Logger.error(`UpdateOpensearch.afterDeleteDocumentById`, request.traceId, err);
   }
 }
 
@@ -56,30 +44,33 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  * Shared opensearch upsert logic
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
-  const requestParams = buildOpensearchRequest(request.documentInfo);
+  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromDocumentInfo(request.documentInfo) };
 
   // Ignore if a descriptor.
   if (request.documentInfo.isDescriptor) {
     Logger.debug(
-      `UpdateOpensearch.upsertToOpensearch Skipping ${JSON.stringify(requestParams)} since it is a descriptor entity`,
+      `UpdateOpensearch.upsertToOpensearch Skipping ${JSON.stringify(opensearchRequest)} since it is a descriptor entity`,
       request.traceId,
     );
     return;
   }
 
-  Logger.debug(`UpdateOpensearch.upsertToOpensearch Insert ${requestParams.index} into ElasticSearch`, request.traceId);
+  Logger.debug(
+    `UpdateOpensearch.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
+    request.traceId,
+  );
   try {
     await client.index({
-      ...requestParams,
+      ...opensearchRequest,
       body: {
-        id: requestParams.id,
-        info: JSON.stringify({ id: requestParams.id, ...request.edfiDoc }),
+        id: opensearchRequest.id,
+        info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
       },
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.upsertToOpensearch`, request.traceId, 'n/a', err);
+    Logger.error(`DynamoDbStreamHandler.upsertToOpensearch`, request.traceId, err);
   }
 }
 

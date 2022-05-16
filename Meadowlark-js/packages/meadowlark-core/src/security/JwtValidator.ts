@@ -3,22 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { FrontendResponse } from '../handler/FrontendResponse';
 import { verifyJwt } from './JwtAction';
 import { JwtStatus } from './JwtStatus';
 
-type ErrorResponse = {
-  statusCode: number;
-  body: string;
-  headers?:
-    | {
-        [header: string]: boolean | number | string;
-      }
-    | undefined;
-};
-
 export type JwtValidation = {
   jwtStatus: JwtStatus;
-  errorResponse?: ErrorResponse;
+  errorResponse?: FrontendResponse;
 };
 
 export function validateJwt(authorizationHeader: string | undefined): JwtValidation {

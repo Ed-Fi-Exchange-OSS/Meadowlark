@@ -76,7 +76,7 @@ export async function getEntityList({ documentInfo, traceId }: QueryRequest): Pr
         Array.from(queryResult.Items ?? []).map((item) => ({ id: entityIdPrefixRemoved(item.sk), ...item.info }))[0] ?? {},
     };
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityList`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.getEntityList`, traceId, error);
     return { response: 'UNKNOWN_FAILURE', document: {} };
   }
 }
@@ -107,7 +107,7 @@ async function edOrgsForStudent(
   try {
     queryResult = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, error);
     return [];
   }
 
@@ -141,7 +141,7 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, traceId, error);
     return { response: 'UNKNOWN_FAILURE', document: {} };
   }
 
@@ -388,7 +388,7 @@ export async function createEntity({
         }
       }
     } else {
-      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, error);
       return { response: 'UNKNOWN_FAILURE' };
     }
   }
@@ -401,7 +401,7 @@ export async function createEntity({
   );
 
   const referenceItems = generateReferenceItems(putItem?.sk, documentInfo);
-  Logger.debug('DynamoEntityRepository.createEntity reference items', traceId, null, referenceItems);
+  Logger.debug('DynamoEntityRepository.createEntity reference items', traceId, referenceItems);
   const batches = R.splitEvery(25, referenceItems);
 
   Object.values(batches).forEach(async (batch) => {
@@ -416,7 +416,7 @@ export async function createEntity({
       );
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
     } catch (error) {
-      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, error);
       // TODO: decide if this should really be handled so silently, or if
       // something else should occur. Also consider checking for specific
       // situations - is there any unique behavior we want to take?
@@ -454,7 +454,7 @@ export async function deleteItems(items: { pk: string; sk: string }[], awsReques
       Logger.debug(`DynamoEntityRepository.deleteItems deleting batch`, awsRequestId);
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
     } catch (error) {
-      Logger.error(`DynamoEntityRepository.deleteItems`, awsRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteItems`, awsRequestId, error);
       // TODO: decide if this should really be handled so silently, or if
       // something else should occur. Also consider checking for specific
       // situations - is there any unique behavior we want to take?
@@ -504,7 +504,7 @@ export async function deleteEntityByIdDynamo(
         return { success: true };
       }
     } else {
-      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId, error);
       return { success: false };
     }
   }
@@ -543,7 +543,7 @@ export async function getReferencesToThisItem(
 
   const trefKey = ForeignKeyItem.buildToReferenceKey(sortKeyFromId(id));
   const statement = `select * from "${tableOpts.tableName}" where pk = '${trefKey}'`;
-  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem`, null, null, { statement });
+  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem`, null, { statement });
 
   const mapper = (item: any) => {
     const i = unmarshall(item);
@@ -567,7 +567,7 @@ export async function getReferencesToThisItem(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getReferencesToThisItem', traceId, null, error);
+    Logger.error('DynamoEntityRepository.getReferencesToThisItem', traceId, error);
 
     return { success: false, foreignKeys };
   }
@@ -590,7 +590,7 @@ export async function getForeignKeyReferences(
 
   const frefKey = ForeignKeyItem.buildFromReferenceKey(sortKeyFromId(id));
   const statement = `select * from "${tableOpts.tableName}" where pk = '${frefKey}'`;
-  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences`, null, null, { statement });
+  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences`, null, { statement });
 
   const mapper = (item: any) => {
     // Without the unmarshall, the object structure will include a letter for the data type
@@ -611,7 +611,7 @@ export async function getForeignKeyReferences(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getForeignKeyReferences', traceId, null, error);
+    Logger.error('DynamoEntityRepository.getForeignKeyReferences', traceId, error);
 
     return { success: false, foreignKeys };
   }
@@ -644,7 +644,7 @@ export async function validateEntityOwnership(
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, traceId, error);
     return { result: 'ERROR', isOwner: false };
   }
 

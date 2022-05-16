@@ -3,9 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import winston from 'winston';
+import { FrontendRequest } from './handler/FrontendRequest';
 
 const offline = process.env.IS_LOCAL === 'true';
 
@@ -20,7 +19,7 @@ const format = winston.format.combine(
 );
 
 const offlineFormat = winston.format.combine(
-  format,
+  winston.format.cli(),
   winston.format.colorize({
     all: true,
   }),
@@ -36,7 +35,7 @@ const logger = winston.createLogger({
 });
 
 export const Logger = {
-  error: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, err?: any | null) => {
+  error: (message: string, traceId: string | null, err?: any | null) => {
     let error: object;
 
     // Preserve any dictionary, but otherwise convert to string
@@ -46,40 +45,33 @@ export const Logger = {
       error = err;
     }
 
-    logger.error({ message, error, traceId, apiGatewayRequestId });
+    logger.error({ message, error, traceId });
   },
-  warn: (message: string, traceId: string | null, apiGatewayRequestId?: string | null) => {
-    logger.warn({ message, traceId, apiGatewayRequestId });
+  warn: (message: string, traceId: string | null) => {
+    logger.warn({ message, traceId });
   },
-  info: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
-    logger.info({ message, traceId, apiGatewayRequestId, extra });
+  info: (message: string, traceId: string | null, extra?: any | null) => {
+    logger.info({ message, traceId, extra });
   },
-  debug: (message: string, traceId: string | null, apiGatewayRequestId?: string | null, extra?: any | null) => {
-    logger.debug({ message, traceId, apiGatewayRequestId, extra });
+  debug: (message: string, traceId: string | null, extra?: any | null) => {
+    logger.debug({ message, traceId, extra });
   },
 };
 
-export function writeRequestToLog(moduleName: string, event: APIGatewayProxyEvent, context: Context, method: string): void {
-  Logger.info(`${moduleName}.${method} ${event.path}`, context.awsRequestId, event.requestContext.requestId, event.headers);
+export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
+  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, request);
 }
 
 export function writeDebugStatusToLog(
   moduleName: string,
-  context: Context,
+  request: FrontendRequest,
   method: string,
   status: number,
   message: string = '',
 ): void {
-  Logger.debug(`${moduleName}.${method} ${status} ${message || ''}`.trimEnd(), context.awsRequestId);
+  Logger.debug(`${moduleName}.${method} ${status} ${message || ''}`.trimEnd(), request.traceId);
 }
 
-export function writeErrorToLog(
-  moduleName: string,
-  context: Context,
-  event: APIGatewayProxyEvent,
-  method: string,
-  status: number,
-  error?: any,
-): void {
-  Logger.error(`${moduleName}.${method} ${status}`, context.awsRequestId, event.requestContext.requestId, error);
+export function writeErrorToLog(moduleName: string, traceId: string, method: string, status: number, error?: any): void {
+  Logger.error(`${moduleName}.${method} ${status}`, traceId, error);
 }

@@ -3,29 +3,27 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { upsert } from '../../src/handler/Upsert';
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
+import { FrontendResponse } from '../../src/handler/FrontendResponse';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 describe('when posting a request to upsert a new resource', () => {
   describe('given there is no request body', () => {
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
-        body: null,
-        headers: {},
-        requestContext: { requestId: 'ApiGatewayRequestId' },
-        path: '/v3.3b/ed-fi/academicWeeks',
-      } as any;
-      const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
 
-      response = await upsert(event, context);
+        path: '/v3.3b/ed-fi/academicWeeks',
+      };
+
+      response = await upsert(event);
     }, 6000);
 
     it('returns status 400', () => {
@@ -38,18 +36,18 @@ describe('when posting a request to upsert a new resource', () => {
   });
 
   describe('given there is a malformed request body', () => {
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
-        body: 'this is not a JSON object',
-        headers: {},
-        requestContext: { requestId: 'ApiGatewayRequestId' },
-        path: '/v3.3b/ed-fi/academicWeeks',
-      } as any;
-      const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
 
-      response = await upsert(event, context);
+        body: 'this is not a JSON object',
+
+        path: '/v3.3b/ed-fi/academicWeeks',
+      };
+
+      response = await upsert(event);
     });
 
     it('returns status 400', () => {
@@ -62,19 +60,19 @@ describe('when posting a request to upsert a new resource', () => {
   });
 
   describe('given an invalid object', () => {
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
     let mockRequestValidator: any;
     const expectedError = { a: 'b' };
     const expectedHeaders = { header: 'one' };
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
+
         body: '{"id": "string", "weekIdentifier": "string"}',
-        headers: {},
-        requestContext: { requestId: 'ApiGatewayRequestId' },
+
         path: '/v3.3b/ed-fi/academicWeeks',
-      } as any;
-      const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      };
 
       mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
         Promise.resolve({
@@ -84,7 +82,7 @@ describe('when posting a request to upsert a new resource', () => {
         } as unknown as RequestValidator.ResourceValidationResult),
       );
 
-      response = await upsert(event, context);
+      response = await upsert(event);
     });
 
     afterAll(() => mockRequestValidator.mockRestore());
@@ -104,20 +102,20 @@ describe('when posting a request to upsert a new resource', () => {
 
   describe('given a valid object', () => {
     describe('given persistence is going to throw a reference error on insert', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
       let mockRequestValidator: any;
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
+          headers: { 'reference-validation': 'false' },
+
           path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -140,7 +138,7 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Act
-        response = await upsert(event, context);
+        response = await upsert(event);
       });
 
       afterAll(() => {
@@ -162,19 +160,19 @@ describe('when posting a request to upsert a new resource', () => {
     });
 
     describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
       let mockRequestValidator: any;
       let mockDynamo: any;
       const expectedHeaders = { header: 'one' };
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
+          headers: { 'reference-validation': 'false' },
+
           path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -197,7 +195,7 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Act
-        response = await upsert(event, context);
+        response = await upsert(event);
       });
 
       afterAll(() => {
@@ -219,20 +217,20 @@ describe('when posting a request to upsert a new resource', () => {
     });
 
     describe('given persistence is going to fail', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
       let mockRequestValidator: any;
       let mockDynamo: any;
       const expectedError = 'Dynamo did not like me';
       const expectedHeaders = { header: 'one' };
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
+          headers: { 'reference-validation': 'false' },
+
           path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -255,7 +253,7 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Act
-        response = await upsert(event, context);
+        response = await upsert(event);
       });
 
       afterAll(() => {
@@ -277,20 +275,20 @@ describe('when posting a request to upsert a new resource', () => {
     });
 
     describe('given persistence succeeds as insert', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
       const location = `/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21`;
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
+          headers: { 'reference-validation': 'false' },
+
           path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -313,7 +311,7 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Act
-        response = await upsert(event, context);
+        response = await upsert(event);
       });
 
       afterAll(() => {
@@ -340,20 +338,20 @@ describe('when posting a request to upsert a new resource', () => {
     });
 
     describe('given persistence succeeds as update', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
       let mockRequestValidator: any;
       let mockDynamo: any;
       const metaEdHeaders = { header: 'one' };
       const location = `/v3.3b/ed-fi/academicWeeks/02a9c5eddbd4bad9b107410254ef41af66cbe230107df7d640ad9a21`;
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           body: '{"id": "string", "weekIdentifier": "string"}',
-          headers: { 'reference-validation': false },
-          requestContext: { requestId: 'ApiGatewayRequestId' },
+          headers: { 'reference-validation': 'false' },
+
           path: '/v3.3b/ed-fi/academicWeeks',
-        } as any;
-        const context = { awsRequestId: 'LambdaRequestId' } as Context;
+        };
 
         // Setup the request validation to succeed
         mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -376,7 +374,7 @@ describe('when posting a request to upsert a new resource', () => {
         );
 
         // Act
-        response = await upsert(event, context);
+        response = await upsert(event);
       });
 
       afterAll(() => {
@@ -405,22 +403,22 @@ describe('when posting a request to upsert a new resource', () => {
 });
 
 describe('given requesting abstract classes', () => {
-  const response: APIGatewayProxyResult[] = [];
+  const response: FrontendResponse[] = [];
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
+      ...newFrontendRequest(),
       body: '{"id": "string", "weekIdentifier": "string"}',
-      headers: { 'reference-validation': false },
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: { 'reference-validation': 'false' },
+
       path: 'local/v3.3b/ed-fi/educationOrganizations',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response[0] = await upsert(event, context);
+    response[0] = await upsert(event);
 
     event.path = 'local/v3.3b/ed-fi/GeneralStudentProgramAssociations';
-    response[1] = await upsert(event, context);
+    response[1] = await upsert(event);
   });
 
   it('returns status 404', () => {

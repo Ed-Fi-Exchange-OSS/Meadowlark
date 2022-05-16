@@ -3,15 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as RequestValidator from '../../src/validation/RequestValidator';
 import { query } from '../../src/handler/Query';
 import { QueryResult } from '../../src/message/QueryResult';
 import { getQueryHandler } from '../../src/plugin/PluginLoader';
+import { FrontendResponse } from '../../src/handler/FrontendResponse';
+import { newFrontendRequest } from '../../src/handler/FrontendRequest';
 
 describe('given the endpoint is not in the MetaEd model', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   const metaEdHeaders = { header: 'one' };
   const validationError = { 'this is': 'an error' };
@@ -23,7 +23,6 @@ describe('given the endpoint is not in the MetaEd model', () => {
       endpointName: 'c',
       resourceId: null,
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to fail
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -35,7 +34,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await query(pathComponents, newFrontendRequest());
   });
 
   afterAll(() => {
@@ -51,7 +50,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
 });
 
 describe('given persistence fails', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   let mockElasticsearch: any;
   const metaEdHeaders = { header: 'one' };
@@ -63,7 +62,6 @@ describe('given persistence fails', () => {
       endpointName: 'c',
       resourceId: null,
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -83,7 +81,7 @@ describe('given persistence fails', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await query(pathComponents, newFrontendRequest());
   });
 
   afterAll(() => {
@@ -101,7 +99,7 @@ describe('given persistence fails', () => {
 });
 
 describe('given successful fetch from persistence', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
   let mockRequestValidator: any;
   let mockElasticsearch: any;
   const metaEdHeaders = { header: 'one' };
@@ -114,7 +112,6 @@ describe('given successful fetch from persistence', () => {
       endpointName: 'c',
       resourceId: null,
     };
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
 
     // Setup the request validation to succeed
     mockRequestValidator = jest.spyOn(RequestValidator, 'validateResource').mockReturnValue(
@@ -134,7 +131,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Act
-    response = await query(pathComponents, {}, context);
+    response = await query(pathComponents, newFrontendRequest());
   });
 
   afterAll(() => {

@@ -3,8 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-// eslint-disable-next-line import/no-unresolved
-import { APIGatewayProxyEvent } from 'aws-lambda';
+import { FrontendRequest } from './FrontendRequest';
 
 const getHttpProtocol = (stage: string): string => (stage === 'local' ? 'http' : 'https');
 
@@ -12,8 +11,7 @@ const getHttpProtocol = (stage: string): string => (stage === 'local' ? 'http' :
  * Rebuilds the base URL for the request. Assumes that everything running in the
  * "local" stage is using HTTP, and anything else is using HTTPS.
  */
-export const buildBaseUrlFromRequest = (event: APIGatewayProxyEvent): string => {
-  const { stage } = event.requestContext;
-  const protocol = getHttpProtocol(stage);
-  return `${protocol}://${event.headers.Host}/${stage}`;
+export const buildBaseUrlFromRequest = (frontendRequest: FrontendRequest): string => {
+  const protocol = getHttpProtocol(frontendRequest.stage);
+  return `${protocol}://${frontendRequest.headers.Host}/${frontendRequest.stage}`;
 };
