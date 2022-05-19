@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import JsSha from 'jssha';
 import { DocumentElement } from './DocumentElement';
 import { DocumentIdentity } from './DocumentIdentity';
@@ -13,16 +14,18 @@ import { DocumentReference } from './DocumentReference';
  * Returns a SHAKE128 hash of length 224 bits for the given document info (and possibly assignable-adjusted
  * document identity) for use as a document id.
  */
-function constructId(
-  projectName: string,
-  resourceName: string,
-  resourceVersion: string,
-  documentIdentity: DocumentIdentity,
-): string {
+function constructId({
+  projectName,
+  resourceName,
+  resourceVersion,
+  documentIdentity,
+  isDescriptor,
+}: DocumentIdentifyingInfo): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
   // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
 
-  const stringifiedIdentity: string = `${projectName}#${resourceName}#${resourceVersion}#${documentIdentity
+  const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
+  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${resourceVersion}#${documentIdentity
     .map((element: DocumentElement) => `${element.name}=${element.value}`)
     .join('#')}`;
 
@@ -41,7 +44,13 @@ export function documentIdForDocumentInfo(documentInfo: DocumentInfo): string {
   const documentIdentity: DocumentIdentity =
     documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 
-  return constructId(documentInfo.projectName, documentInfo.resourceName, documentInfo.resourceVersion, documentIdentity);
+  return constructId({
+    projectName: documentInfo.projectName,
+    resourceName: documentInfo.resourceName,
+    resourceVersion: documentInfo.resourceVersion,
+    documentIdentity,
+    isDescriptor: documentInfo.isDescriptor,
+  });
 }
 
 /**
@@ -49,12 +58,7 @@ export function documentIdForDocumentInfo(documentInfo: DocumentInfo): string {
  * and identity of the API document.
  */
 export function documentIdForDocumentIdentifyingInfo(documentIdentifyingInfo: DocumentIdentifyingInfo): string {
-  return constructId(
-    documentIdentifyingInfo.projectName,
-    documentIdentifyingInfo.resourceName,
-    documentIdentifyingInfo.resourceVersion,
-    documentIdentifyingInfo.documentIdentity,
-  );
+  return constructId(documentIdentifyingInfo);
 }
 
 /**
@@ -62,12 +66,13 @@ export function documentIdForDocumentIdentifyingInfo(documentIdentifyingInfo: Do
  * and identity of the API document.
  */
 export function documentIdForDocumentReference(documentReference: DocumentReference): string {
-  return constructId(
-    documentReference.projectName,
-    documentReference.resourceName,
-    documentReference.resourceVersion,
-    documentReference.documentIdentity,
-  );
+  return constructId({
+    projectName: documentReference.projectName,
+    resourceName: documentReference.resourceName,
+    resourceVersion: documentReference.resourceVersion,
+    documentIdentity: documentReference.documentIdentity,
+    isDescriptor: documentReference.isDescriptor,
+  });
 }
 
 /**

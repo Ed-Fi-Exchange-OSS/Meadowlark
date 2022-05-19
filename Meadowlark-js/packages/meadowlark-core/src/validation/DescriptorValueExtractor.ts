@@ -46,6 +46,7 @@ function extractForDescriptorCollection(
               bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
           },
         ],
+        isDescriptor: true,
       } as DocumentReference),
   );
 }
@@ -73,6 +74,7 @@ function extractDescriptorValuesFromBody(
           value: body[bodyDescriptorName],
         },
       ],
+      isDescriptor: true,
     },
   ];
 }

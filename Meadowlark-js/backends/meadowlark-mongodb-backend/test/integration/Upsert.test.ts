@@ -153,6 +153,7 @@ describe('given an upsert of a new document that references a non-existent docum
     resourceVersion: documentWithReferencesInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
   documentWithReferencesInfo.documentReferences = [invalidReference];
 
@@ -199,6 +200,7 @@ describe('given an upsert of a new document that references an existing document
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {
@@ -255,6 +257,7 @@ describe('given an upsert of a new document with one existing and one non-existe
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
@@ -263,6 +266,7 @@ describe('given an upsert of a new document with one existing and one non-existe
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {
@@ -325,6 +329,7 @@ describe('given an update of a document that references a non-existent document 
     resourceVersion: documentWithReferencesInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
 
   beforeAll(async () => {
@@ -382,6 +387,7 @@ describe('given an update of a document that references an existing document wit
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {
@@ -449,6 +455,7 @@ describe('given an update of a document with one existing and one non-existent r
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
@@ -457,6 +464,7 @@ describe('given an update of a document with one existing and one non-existent r
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {

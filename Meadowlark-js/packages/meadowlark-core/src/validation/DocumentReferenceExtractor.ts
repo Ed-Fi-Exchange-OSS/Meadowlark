@@ -188,6 +188,7 @@ function documentReferencesFromReferenceGroup(
       resourceVersion: referenceGroup.sourceProperty.namespace.projectVersion,
       documentIdentity: assignable == null ? documentIdentity : assignable.assignableIdentity,
       isAssignableFrom: referencedEntity.subclassedBy.length > 0,
+      isDescriptor: false,
     });
   });
   return result;

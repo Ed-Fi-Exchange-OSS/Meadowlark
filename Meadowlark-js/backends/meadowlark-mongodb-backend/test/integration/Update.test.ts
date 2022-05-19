@@ -121,6 +121,7 @@ describe('given an update of a document that references a non-existent document 
     resourceVersion: documentWithReferencesInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
 
   beforeAll(async () => {
@@ -178,6 +179,7 @@ describe('given an update of a document that references an existing document wit
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {
@@ -245,6 +247,7 @@ describe('given an update of a document with one existing and one non-existent r
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
@@ -253,6 +256,7 @@ describe('given an update of a document with one existing and one non-existent r
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {

@@ -119,6 +119,7 @@ describe('given an delete of a document referenced by an existing document with 
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {
@@ -180,6 +181,7 @@ describe('given an delete of a document referenced by an existing document with 
     resourceVersion: referencedDocumentInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
   };
 
   const documentWithReferencesInfo: DocumentInfo = {

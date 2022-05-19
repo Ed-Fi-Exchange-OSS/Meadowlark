@@ -127,6 +127,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
             value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
           },
         ],
+        isDescriptor: true,
       };
 
       const putResult: UpsertResult = await getDocumentStore().upsertDocument({

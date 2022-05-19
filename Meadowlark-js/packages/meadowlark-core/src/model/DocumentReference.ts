@@ -24,6 +24,11 @@ export type DocumentReference = {
   resourceVersion: string;
 
   /**
+   * Whether this document is a descriptor. Descriptors are treated differently from other documents
+   */
+  isDescriptor: boolean;
+
+  /**
    * True if the referenced entity is assignable from other entities (meaning it is a superclass),
    *
    * Example 1: School is not a superclass. isAssignableFrom would be false if the reference
