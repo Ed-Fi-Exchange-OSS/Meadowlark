@@ -139,7 +139,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       });
       Logger.debug(
         `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorDocumentInfo.documentIdentity)}: ${
-          putResult.failureMessage
+          putResult.failureMessage ?? 'OK'
         }`,
         '-',
       );

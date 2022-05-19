@@ -219,8 +219,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "GradingPeriod",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "GradingPeriod",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -230,8 +231,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "GradingPeriod",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "GradingPeriod",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -241,8 +243,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "GradingPeriod",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "GradingPeriod",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -323,8 +326,9 @@ describe('when extracting collection from domain entity subclass with naming col
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "SchoolCategory",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "SchoolCategory",
+          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -334,8 +338,9 @@ describe('when extracting collection from domain entity subclass with naming col
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "EducationOrganizationCategory",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "EducationOrganizationCategory",
+          "resourceVersion": "",
         },
       ]
     `);
@@ -424,8 +429,9 @@ describe('when extracting collection from domain entity subclass with no naming 
             },
           ],
           "isAssignableFrom": false,
-          "metaEdName": "EducationOrganizationCategory",
-          "metaEdType": "descriptor",
+          "projectName": "EdFi",
+          "resourceName": "EducationOrganizationCategory",
+          "resourceVersion": "",
         },
       ]
     `);
