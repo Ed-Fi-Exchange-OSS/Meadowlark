@@ -26,15 +26,15 @@ export async function deleteEntityById({ id, documentInfo, security, traceId }: 
       );
 
       if (ownershipResult === 'ERROR') {
-        return { result: 'UNKNOWN_FAILURE' };
+        return { response: 'UNKNOWN_FAILURE' };
       }
 
       if (ownershipResult === 'NOT_FOUND') {
-        return { result: 'DELETE_FAILURE_NOT_EXISTS' };
+        return { response: 'DELETE_FAILURE_NOT_EXISTS' };
       }
 
       if (!isOwner) {
-        return { result: 'DELETE_FAILURE_NOT_EXISTS' };
+        return { response: 'DELETE_FAILURE_NOT_EXISTS' };
       }
     }
 
@@ -46,13 +46,13 @@ export async function deleteEntityById({ id, documentInfo, security, traceId }: 
         foreignKeys: fks,
       });
 
-      return { result: 'DELETE_FAILURE_REFERENCE', failureMessage };
+      return { response: 'DELETE_FAILURE_REFERENCE', failureMessage };
     }
 
     const { success } = await deleteEntityByIdDynamo(id, documentInfo, traceId);
 
     if (!success) {
-      return { result: 'UNKNOWN_FAILURE' };
+      return { response: 'UNKNOWN_FAILURE' };
     }
 
     // Now that the main object has been deleted, we need to delete the foreign key references
@@ -71,8 +71,8 @@ export async function deleteEntityById({ id, documentInfo, security, traceId }: 
       );
     } // Else: user can't resolve this error, and it should be logged already. Ignore.
 
-    return { result: 'DELETE_SUCCESS' };
+    return { response: 'DELETE_SUCCESS' };
   } catch (e) {
-    return { result: 'UNKNOWN_FAILURE' };
+    return { response: 'UNKNOWN_FAILURE' };
   }
 }

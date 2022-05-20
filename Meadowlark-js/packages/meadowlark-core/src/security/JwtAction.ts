@@ -8,7 +8,7 @@ import memoize from 'fast-memoize';
 import { getValueFromEnvironment } from '../Environment';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 
 const accessTokenRequired = memoize(() => getValueFromEnvironment('ACCESS_TOKEN_REQUIRED').toLowerCase() === 'true');
 
@@ -38,7 +38,7 @@ export function createToken(vendor: string): Jwt {
  * Converts a Jwt object to a Meadowlark JwtStatus
  */
 function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
-  Logger.debug('JwtStatus.toJwtStatus', null, null, jwt);
+  Logger.debug('JwtStatus.toJwtStatus', null, jwt);
 
   if (jwt == null) return { ...newJwtStatus(), isValid: false, isOwnershipEnabled: accessTokenRequired() };
 
@@ -61,7 +61,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
  * Verifies that a JWT is valid, not expired, and returns parsed claim data.
  */
 export function verifyJwt(authorization?: string): JwtStatus {
-  Logger.debug('JwtStatus.verifyJwt authorization header', null, null, authorization ?? '*None Supplied*');
+  Logger.debug('JwtStatus.verifyJwt authorization header', null, authorization ?? '*None Supplied*');
   if (authorization == null || !authorization.startsWith('bearer ')) {
     return { ...newJwtStatus(), isMissing: true, isValid: false, isOwnershipEnabled: accessTokenRequired() };
   }
@@ -72,7 +72,7 @@ export function verifyJwt(authorization?: string): JwtStatus {
     const verified: nJwt | undefined = verify(token, cachedSigningKey());
     return toJwtStatus(verified as Jwt);
   } catch (err) {
-    Logger.debug('Jwt.verifyPromise user-submitted token error', null, null, err);
+    Logger.debug('Jwt.verifyPromise user-submitted token error', null, err);
     return toJwtStatus(err);
   }
 }

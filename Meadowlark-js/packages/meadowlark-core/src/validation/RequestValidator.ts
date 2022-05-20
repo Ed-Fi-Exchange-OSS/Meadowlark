@@ -26,7 +26,7 @@ export type ResourceValidationResult = {
    */
   headerMetadata?: any;
   /**
-   * Error messaging for validation failure
+   * Error message for validation failure
    */
   errorBody: string | null;
   /**

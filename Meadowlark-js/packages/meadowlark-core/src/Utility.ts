@@ -8,18 +8,3 @@ export function decapitalize(str: string): string {
   if (str.length === 1) return str.toLowerCase();
   return str[0].toLowerCase() + str.slice(1);
 }
-
-/** Returns a new object */
-export function decapitalizeKeys(obj: object): object {
-  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [decapitalize(key), value]));
-}
-
-/** Convert any non-array object value into an array of length 1. Mutates object */
-export function arrayifyScalarObjectValues(obj: object): object {
-  Object.keys(obj).forEach((key) => {
-    if (!Array.isArray(obj[key])) {
-      obj[key] = [obj[key]];
-    }
-  });
-  return obj;
-}

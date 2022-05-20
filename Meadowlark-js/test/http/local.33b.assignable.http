@@ -1,3 +1,5 @@
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
 ###
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 reference-validation: true
@@ -20,8 +22,8 @@ GET http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescrip
 
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
+{{auth_header}}
 reference-validation: true
-descriptor-validation: false
 
 {
     "schoolId": 122,
@@ -40,12 +42,12 @@ descriptor-validation: false
 }
 
 ### 
-GET http://localhost:3000/local/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+GET http://localhost:3000/local/v3.3b/ed-fi/schools/267c1bc87ead4ceb952db39440cfa77f8e6a498bb7c667ee3f752d6d
+{{auth_header}}
 
 ### 
-PUT http://localhost:3000/local/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
-reference-validation: true
-descriptor-validation: false
+PUT http://localhost:3000/local/v3.3b/ed-fi/schools/267c1bc87ead4ceb952db39440cfa77f8e6a498bb7c667ee3f752d6d
+{{auth_header}}
 
 {
     "schoolId": 122,

@@ -55,9 +55,9 @@ function metaEdConfigurationFrom(metaEdProjectMetadata: MetaEdProjectMetadata[])
   return metaEdConfiguration;
 }
 
-// TODO: should probably include project version in key
+// TODO in RND-260: should probably include project version in key
 /**
- * This is a simple Lambda cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
+ * This is a simple cache implementation that works in Lambdas, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
  */
 const stateCache = {};
 

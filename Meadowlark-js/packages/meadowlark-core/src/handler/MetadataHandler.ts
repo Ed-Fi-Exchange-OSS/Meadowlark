@@ -3,18 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
 
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
 import { getValueFromEnvironment } from '../Environment';
-import { buildBaseUrlFromRequest } from '../helpers/UrlBuilder';
+import { buildBaseUrlFromRequest } from './UrlBuilder';
+import { FrontendRequest } from './FrontendRequest';
+import { FrontendResponse } from './FrontendResponse';
 
 interface ExternalResource {
   body: string;
@@ -22,25 +22,25 @@ interface ExternalResource {
 }
 export const resourceCache: { [key: string]: ExternalResource } = {};
 
-function writeRequestToLog(event: APIGatewayProxyEvent, context: Context, method: string): void {
-  Logger.info(`MetadataHandler.${method} ${event.path}`, context.awsRequestId, event.requestContext.requestId);
+function writeRequestToLog(frontendRequest: FrontendRequest, method: string): void {
+  Logger.info(`MetadataHandler.${method} ${frontendRequest.path}`, frontendRequest.traceId);
 }
 
-function writeDebugStatusToLog(context: Context, method: string, message?: string, status?: number): void {
-  Logger.debug(`MetadataHandler.${method} ${status} ${message || ''}`.trimEnd(), context.awsRequestId);
+function writeDebugStatusToLog(frontendRequest: FrontendRequest, method: string, message?: string, status?: number): void {
+  Logger.debug(`MetadataHandler.${method} ${status} ${message || ''}`.trimEnd(), frontendRequest.traceId);
 }
 
-function writeErrorToLog(context: Context, event: APIGatewayProxyEvent, method: string, status: number, error?: any): void {
-  Logger.error(`MetadataHandler.${method} ${status}`, context.awsRequestId, event.requestContext.requestId, error);
+function writeErrorToLog(frontendRequest: FrontendRequest, method: string, status: number, error?: any): void {
+  Logger.error(`MetadataHandler.${method} ${status}`, frontendRequest.traceId, error);
 }
 
 /**
  * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd
  * project and returns MetaEd project metadata in the response header.
  */
-export async function metaed(event: APIGatewayProxyEvent, _context: Context): Promise<APIGatewayProxyResult> {
-  if (event.pathParameters?.projectAbbreviation == null) return { body: '', statusCode: 400 };
-  const modelNpmPackage = modelPackageFor(event.pathParameters.projectAbbreviation);
+export async function metaed(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  if (frontendRequest.pathParameters?.projectAbbreviation == null) return { body: '', statusCode: 400 };
+  const modelNpmPackage = modelPackageFor(frontendRequest.pathParameters.projectAbbreviation);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 
   const { entity, projectName, projectVersion } = metaEd.namespace.get('EdFi') as Namespace;
@@ -62,8 +62,8 @@ export async function metaed(event: APIGatewayProxyEvent, _context: Context): Pr
 /**
  * Base endpoint that returns the DS version and supported extensions
  */
-export async function apiVersion(event: APIGatewayProxyEvent, _context: Context): Promise<APIGatewayProxyResult> {
-  const baseUrl = buildBaseUrlFromRequest(event);
+export async function apiVersion(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  const baseUrl = buildBaseUrlFromRequest(frontendRequest);
   return {
     body: CreateApiVersionObject(baseUrl),
     statusCode: 200,
@@ -102,15 +102,11 @@ function useTemplate(data: string, host: string, stage: string): string {
 /*
  * Retrieves and caches a swagger specification from an external URL.
  */
-async function getSwaggerSpecification(
-  url: string,
-  event: APIGatewayProxyEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
+async function getSwaggerSpecification(url: string, frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   const resource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
-    writeDebugStatusToLog(context, 'getSwaggerSpecification', `getting ${url}`);
+    writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', `getting ${url}`);
     const response = await axios.get(url, {
       headers: { 'If-None-Match': resource.etag },
       validateStatus(status) {
@@ -119,13 +115,13 @@ async function getSwaggerSpecification(
     });
 
     if (response.status === 200) {
-      writeDebugStatusToLog(context, 'getSwaggerSpecification', '200 from AWS');
+      writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', '200 from AWS');
       resource.etag = response.headers.etag;
-      resource.body = useTemplate(response.data, event.headers?.Host || '', event.requestContext.stage);
+      resource.body = useTemplate(response.data, frontendRequest.headers?.Host || '', frontendRequest.stage);
 
       resourceCache[url] = resource;
     } else {
-      writeDebugStatusToLog(context, 'getSwaggerSpecification', '304 from AWS');
+      writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', '304 from AWS');
     }
 
     return {
@@ -136,7 +132,7 @@ async function getSwaggerSpecification(
       },
     };
   } catch (error) {
-    writeErrorToLog(context, event, 'getSwaggerSpecification', 404, error);
+    writeErrorToLog(frontendRequest, 'getSwaggerSpecification', 404, error);
     return {
       body: '',
       statusCode: 404,
@@ -147,21 +143,21 @@ async function getSwaggerSpecification(
 /**
  * Endpoint for accessing Resources API swagger metadata
  */
-export async function swaggerForResourcesAPI(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  writeRequestToLog(event, context, 'swaggerForResourcesAPI');
+export async function swaggerForResourcesAPI(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeRequestToLog(frontendRequest, 'swaggerForResourcesAPI');
   // For now, we are serving a (nearly) static JSON file extracted from the real
   // ODS/API 5.3. This file is > 2 MB even when minified. Instead of keeping it
   // in the source code repository, it is being stored in S3.
-  return getSwaggerSpecification(Constants.swaggerResourceUrl, event, context);
+  return getSwaggerSpecification(Constants.swaggerResourceUrl, frontendRequest);
 }
 
 /*
  * Endpoint for listing available Open API metadata descriptions
  */
-export async function openApiUrlList(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  writeRequestToLog(event, context, 'openApiUrlList');
+export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeRequestToLog(frontendRequest, 'openApiUrlList');
 
-  const baseUrl = buildBaseUrlFromRequest(event);
+  const baseUrl = buildBaseUrlFromRequest(frontendRequest);
   const baseUrlToken = /{{ baseUrl }}/g;
 
   return {
@@ -173,10 +169,7 @@ export async function openApiUrlList(event: APIGatewayProxyEvent, context: Conte
 /**
  * Endpoint for accessing Descriptors API swagger metadata
  */
-export async function swaggerForDescriptorsAPI(
-  event: APIGatewayProxyEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
-  writeRequestToLog(event, context, 'swaggerForDescriptorsAPI');
-  return getSwaggerSpecification(Constants.swaggerDescriptorUrl, event, context);
+export async function swaggerForDescriptorsAPI(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeRequestToLog(frontendRequest, 'swaggerForDescriptorsAPI');
+  return getSwaggerSpecification(Constants.swaggerDescriptorUrl, frontendRequest);
 }

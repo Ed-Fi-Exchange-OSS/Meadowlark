@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import axios from 'axios';
 import { swaggerForResourcesAPI, resourceCache } from '../../../src/handler/MetadataHandler';
 import { Constants } from '../../../src/Constants';
+import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
+import { FrontendResponse } from '../../../src/handler/FrontendResponse';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -23,25 +23,21 @@ describe('when getting Swagger resources', () => {
   });
 
   describe('given the swagger resource does not exist upstream', () => {
-    let response: APIGatewayProxyResult;
+    let response: FrontendResponse;
 
     beforeAll(async () => {
-      const event: APIGatewayProxyEvent = {
+      const event: FrontendRequest = {
+        ...newFrontendRequest(),
         headers: {
           Host: 'localhost:3000',
         },
-        requestContext: {
-          stage: 'outside',
-        },
-      } as any;
-      const context = {
-        awsRequestId: 'aaaa',
+        stage: 'outside',
       };
 
       mockedAxios.get.mockRejectedValue({ data: 'whatever' });
 
       // Act
-      response = await swaggerForResourcesAPI(event, context as Context);
+      response = await swaggerForResourcesAPI(event);
     });
 
     it('returns status 404', () => {
@@ -57,22 +53,18 @@ describe('when getting Swagger resources', () => {
 
   describe('given the swagger resource exists', () => {
     describe('and given the current version has been retrieved before', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
 
       const ETAG = 'metaed';
       const EXPECTED_OUTPUT = '{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/c", "host": "localhost:3000" }';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           headers: {
             Host: 'localhost:3000',
           },
-          requestContext: {
-            stage: 'outside',
-          },
-        } as any;
-        const context = {
-          awsRequestId: 'aaaa',
+          stage: 'outside',
         };
 
         const resp = { status: 304, headers: { etag: ETAG } };
@@ -82,7 +74,7 @@ describe('when getting Swagger resources', () => {
         resourceCache[Constants.swaggerResourceUrl] = { body: EXPECTED_OUTPUT, etag: ETAG };
 
         // Act
-        response = await swaggerForResourcesAPI(event, context as Context);
+        response = await swaggerForResourcesAPI(event);
       });
 
       it('returns status 200', () => {
@@ -97,7 +89,7 @@ describe('when getting Swagger resources', () => {
     });
 
     describe('and given an older version has been retrieved before', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
 
       const OLD_ETAG = 'meat-ed';
       const NEW_ETAG = 'metaed';
@@ -106,16 +98,12 @@ describe('when getting Swagger resources', () => {
       const EXPECTED_OUTPUT = '{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/c", "host": "localhost:3000" }';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           headers: {
             Host: 'localhost:3000',
           },
-          requestContext: {
-            stage: 'outside',
-          },
-        } as any;
-        const context = {
-          awsRequestId: 'aaaa',
+          stage: 'outside',
         };
 
         const resp = { data: RAW_FILE, status: 200, headers: { etag: NEW_ETAG } };
@@ -125,7 +113,7 @@ describe('when getting Swagger resources', () => {
         resourceCache[Constants.swaggerResourceUrl] = { body: CACHED_OUTPUT, etag: OLD_ETAG };
 
         // Act
-        response = await swaggerForResourcesAPI(event, context as Context);
+        response = await swaggerForResourcesAPI(event);
       });
 
       it('returns status 200', () => {
@@ -144,30 +132,26 @@ describe('when getting Swagger resources', () => {
     });
 
     describe('and given it has not been retrieved before', () => {
-      let response: APIGatewayProxyResult;
+      let response: FrontendResponse;
 
       const ETAG = 'metaed';
       const RAW_FILE = '{ "basePath": "{{ basePath }}", "tokenUrl": "{{ tokenUrl }}", "host": "{{ host }}" }';
       const EXPECTED_OUTPUT = '{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/c", "host": "localhost:3000" }';
 
       beforeAll(async () => {
-        const event: APIGatewayProxyEvent = {
+        const event: FrontendRequest = {
+          ...newFrontendRequest(),
           headers: {
             Host: 'localhost:3000',
           },
-          requestContext: {
-            stage: 'outside',
-          },
-        } as any;
-        const context = {
-          awsRequestId: 'aaaa',
+          stage: 'outside',
         };
 
         const resp = { data: RAW_FILE, status: 200, headers: { etag: ETAG } };
         mockedAxios.get.mockResolvedValue(resp);
 
         // Act
-        response = await swaggerForResourcesAPI(event, context as Context);
+        response = await swaggerForResourcesAPI(event);
       });
 
       it('returns status 200', () => {

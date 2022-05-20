@@ -3,8 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as Meadowlark from '@edfi/meadowlark-core';
+import { loadDescriptors as meadowlarkLoadDescriptors } from '@edfi/meadowlark-core';
 
 export async function loadDescriptors(): Promise<void> {
-  return Meadowlark.loadDescriptors();
+  return meadowlarkLoadDescriptors();
 }

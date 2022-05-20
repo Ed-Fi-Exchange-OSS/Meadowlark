@@ -3,16 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import querystring from 'querystring';
 import secureRandom from 'secure-random';
-import { Logger } from '../helpers/Logger';
+import { Logger } from '../Logger';
 import { client1, client2 } from '../security/HardcodedCredential';
 import { createToken } from '../security/JwtAction';
 import { Jwt } from '../security/Jwt';
-import { validateJwt } from '../helpers/JwtValidator';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
+import { validateJwt } from '../security/JwtValidator';
+import { authorizationHeader } from '../security/AuthorizationHeader';
+import { FrontendRequest } from './FrontendRequest';
+import { FrontendResponse } from './FrontendResponse';
 
 function createTokenResponse(token: Jwt): string {
   return JSON.stringify({
@@ -27,11 +27,11 @@ function createTokenResponse(token: Jwt): string {
  * OAuth2.0 style authentication endpoint. Currently backed by a hard-coded "in-memory" database of two sets of credentials.
  * Generates a JSON Web Token.
  */
-export async function postToken(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  Logger.info('OAuthHandler.postToken', context.awsRequestId, event.requestContext.requestId);
-  Logger.info(event.body?.toString() || '', context.awsRequestId, 'n/a');
+export async function postToken(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  Logger.info('OAuthHandler.postToken', frontendRequest.traceId);
+  Logger.info(frontendRequest.body?.toString() || '', frontendRequest.traceId, 'n/a');
 
-  if (event.body == null) {
+  if (frontendRequest.body == null) {
     return {
       body: 'Try submitting an OAuth2.0 Client Credential form',
       statusCode: 400,
@@ -40,10 +40,10 @@ export async function postToken(event: APIGatewayProxyEvent, context: Context): 
 
   // eslint-disable-next-line camelcase
   let body: { grant_type?: string; client_id?: string; client_secret?: string };
-  if (event.headers['content-type'] === 'application/x-www-form-urlencoded') {
-    body = querystring.parse(event.body);
+  if (frontendRequest.headers['content-type'] === 'application/x-www-form-urlencoded') {
+    body = querystring.parse(frontendRequest.body);
   } else {
-    body = JSON.parse(event.body);
+    body = JSON.parse(frontendRequest.body);
   }
 
   if (body.grant_type === 'client_credentials') {
@@ -72,17 +72,17 @@ export async function postToken(event: APIGatewayProxyEvent, context: Context): 
 /*
  * Creates an encoded 256 bit key appropriate for signing JWTs.
  */
-export async function createRandomSigningKey(): Promise<APIGatewayProxyResult> {
+export async function createRandomSigningKey(): Promise<FrontendResponse> {
   return {
     body: JSON.stringify({ key: secureRandom(256, { type: 'Buffer' }).toString('base64') }),
     statusCode: 201,
   };
 }
 
-export async function verify(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  Logger.debug(JSON.stringify(event.headers), context.awsRequestId, 'n/a');
+export async function verify(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  Logger.debug(JSON.stringify(frontendRequest.headers), frontendRequest.traceId);
 
-  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
+  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
 
   if (errorResponse == null) {
     return {
@@ -97,8 +97,8 @@ export async function verify(event: APIGatewayProxyEvent, context: Context): Pro
 /*
  * Single point of entry for both functions.
  */
-export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
-  if (event.path.endsWith('createKey')) return createRandomSigningKey();
-  if (event.path.endsWith('verify')) return verify(event, context);
-  return postToken(event, context);
+export async function handler(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  if (frontendRequest.path.endsWith('createKey')) return createRandomSigningKey();
+  if (frontendRequest.path.endsWith('verify')) return verify(frontendRequest);
+  return postToken(frontendRequest);
 }

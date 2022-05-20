@@ -3,14 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../helpers/Logger';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { PathComponents, pathComponentsFrom } from '../model/PathComponents';
 import { getById } from './GetById';
 import { query } from './Query';
-import { validateJwt } from '../helpers/JwtValidator';
-import { authorizationHeader } from '../helpers/AuthorizationHeader';
+import { validateJwt } from '../security/JwtValidator';
+import { authorizationHeader } from '../security/AuthorizationHeader';
+import { FrontendRequest } from './FrontendRequest';
+import { FrontendResponse } from './FrontendResponse';
 
 const moduleName = 'Get';
 
@@ -19,32 +19,33 @@ const moduleName = 'Get';
  *
  * Determines whether request is "get all", "get by id", or a query, and forwards to the appropriate handler
  */
-export async function getResolver(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function getResolver(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    writeRequestToLog(moduleName, event, context, 'getResolver');
+    writeRequestToLog(moduleName, frontendRequest, 'getResolver');
 
-    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(event));
+    const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
     if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, context, 'getResolver', errorResponse.statusCode, JSON.stringify(jwtStatus));
-      return errorResponse as APIGatewayProxyResult;
+      writeDebugStatusToLog(moduleName, frontendRequest, 'getResolver', errorResponse.statusCode, JSON.stringify(jwtStatus));
+      return errorResponse as FrontendResponse;
     }
 
-    const pathComponents: PathComponents | null = pathComponentsFrom(event.path);
+    const pathComponents: PathComponents | null = pathComponentsFrom(frontendRequest.path);
     if (pathComponents === null) {
-      writeDebugStatusToLog(moduleName, context, 'getResolver', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'getResolver', 404);
       return { body: '', statusCode: 404 };
     }
 
     let edOrgIds: string[] = [];
-    if (event.headers['x-security-edorgid'] != null) edOrgIds = (event.headers['x-security-edorgid'] as string).split(',');
+    if (frontendRequest.headers['x-security-edorgid'] != null)
+      edOrgIds = (frontendRequest.headers['x-security-edorgid'] as string).split(',');
 
     let studentIds: string[] = [];
-    if (event.headers['x-security-studentid'] != null)
-      studentIds = (event.headers['x-security-studentid'] as string).split(',');
+    if (frontendRequest.headers['x-security-studentid'] != null)
+      studentIds = (frontendRequest.headers['x-security-studentid'] as string).split(',');
 
-    const throughAssociation = event.headers['x-security-through'];
+    const throughAssociation = frontendRequest.headers['x-security-through'];
     if (pathComponents.resourceId != null)
-      return await getById(pathComponents, context, {
+      return await getById(pathComponents, frontendRequest, {
         edOrgIds,
         studentIds,
         throughAssociation,
@@ -52,9 +53,9 @@ export async function getResolver(event: APIGatewayProxyEvent, context: Context)
         clientName: jwtStatus.subject,
       });
 
-    return await query(pathComponents, event.queryStringParameters ?? {}, context);
+    return await query(pathComponents, frontendRequest);
   } catch (e) {
-    writeErrorToLog(moduleName, context, event, 'getResolver', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'getResolver', 500, e);
     return { body: '', statusCode: 500 };
   }
 }

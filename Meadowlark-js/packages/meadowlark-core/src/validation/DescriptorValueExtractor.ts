@@ -32,17 +32,23 @@ function extractForDescriptorCollection(
   // Handle optional case
   if (bodyDescriptorArray == null) return [];
 
-  return bodyDescriptorArray.map((bodyDescriptorObject) => ({
-    metaEdType: apiMapping.metaEdType,
-    metaEdName: apiMapping.metaEdName,
-    isAssignableFrom: false,
-    documentIdentity: [
-      {
-        name: 'descriptor',
-        value: bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
-      },
-    ],
-  }));
+  return bodyDescriptorArray.map(
+    (bodyDescriptorObject) =>
+      ({
+        projectName: collectedProperty.property.namespace.projectName,
+        resourceVersion: collectedProperty.property.namespace.projectVersion,
+        resourceName: apiMapping.metaEdName,
+        isAssignableFrom: false,
+        documentIdentity: [
+          {
+            name: 'descriptor',
+            value:
+              bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
+          },
+        ],
+        isDescriptor: true,
+      } as DocumentReference),
+  );
 }
 
 function extractDescriptorValuesFromBody(
@@ -68,6 +74,7 @@ function extractDescriptorValuesFromBody(
           value: body[bodyDescriptorName],
         },
       ],
+      isDescriptor: true,
     },
   ];
 }

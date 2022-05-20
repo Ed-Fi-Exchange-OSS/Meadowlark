@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { loadDescriptors, MeadowlarkBackendPlugin, PluginLoader } from '@edfi/meadowlark-core';
+import { loadDescriptors, DocumentStorePlugin, PluginLoader } from '@edfi/meadowlark-core';
 import * as DynamoRepository from '../../src/BaseDynamoRepository';
 
 jest.setTimeout(120000);
@@ -43,8 +43,8 @@ describe('given the set of descriptors to load into DynamoDB', () => {
   beforeAll(async () => {
     // Set the getBackendPlugin to DynamoDB
     // eslint-disable-next-line global-require
-    const dynamoBackendPlugin: MeadowlarkBackendPlugin = require(`../../src/index`).initializeBackendPlugin();
-    mockBackendPlugin = jest.spyOn(PluginLoader, 'getBackendPlugin').mockReturnValue(dynamoBackendPlugin);
+    const dynamoPlugin: DocumentStorePlugin = require(`../../src/index`).initialize();
+    mockBackendPlugin = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(dynamoPlugin);
 
     // Overwrite the dynamodb configuration with testing config
     Object.assign(DynamoRepository.dynamoOpts, {

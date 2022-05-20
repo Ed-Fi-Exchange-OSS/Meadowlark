@@ -66,17 +66,18 @@ export async function getEntityList({ documentInfo, traceId }: QueryRequest): Pr
   try {
     const queryResult: QueryCommandOutput = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
 
-    // TODO: there is a bug here because it doesn't deal with paging. If the results are > 1 MB then there will be another
+    // TODO: there is a bug here because it doesn't deal with paging. If the responses are > 1 MB then there will be another
     // page and another Query Command needs to be executed. If we change to ElasticSearch then this is not a big deal. But if
     // we leave this in Dynamo then we need to fix the bug. RND-183.
 
     return {
-      result: 'SUCCESS',
-      documents: Array.from(queryResult.Items ?? []).map((item) => ({ id: entityIdPrefixRemoved(item.sk), ...item.info })),
+      response: 'GET_SUCCESS',
+      document:
+        Array.from(queryResult.Items ?? []).map((item) => ({ id: entityIdPrefixRemoved(item.sk), ...item.info }))[0] ?? {},
     };
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityList`, traceId, '', error);
-    return { result: 'ERROR', documents: [] };
+    Logger.error(`DynamoEntityRepository.getEntityList`, traceId, error);
+    return { response: 'UNKNOWN_FAILURE', document: {} };
   }
 }
 
@@ -106,7 +107,7 @@ async function edOrgsForStudent(
   try {
     queryResult = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.edOrgsForStudent`, traceId, error);
     return [];
   }
 
@@ -140,19 +141,19 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, traceId, '', error);
-    return { result: 'ERROR', documents: [] };
+    Logger.error(`DynamoEntityRepository.getEntityById ${error}`, traceId, error);
+    return { response: 'UNKNOWN_FAILURE', document: {} };
   }
 
-  if (getResult.Item == null) return { result: 'NOT_FOUND', documents: [] };
+  if (getResult.Item == null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 
-  const documents = [{ id: entityIdPrefixRemoved(getResult.Item.sk), ...getResult.Item.info }];
+  const document = { id: entityIdPrefixRemoved(getResult.Item.sk), ...getResult.Item.info };
 
   // Ownership-based security takes precedence
   if (security.isOwnershipEnabled) {
     if (getResult.Item.ownerId == null) {
       Logger.debug('DynamoEntityRepository.getEntityById: No ownership of item', traceId);
-      return { result: 'SUCCESS', documents, securityResolved: ['No ownership of item'] };
+      return { response: 'GET_SUCCESS', document, securityResolved: ['No ownership of item'] };
     }
 
     if (security.clientName !== getResult.Item.ownerId) {
@@ -160,32 +161,32 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
         `DynamoEntityRepository.getEntityById: Ownership match failure - client ${security.clientName} access item owned by ${getResult.Item.ownerId}`,
         traceId,
       );
-      return { result: 'AUTHORIZATION_FAILURE', documents: [], securityResolved: ['Ownership match failure'] };
+      return { response: 'GET_FAILURE_AUTHORIZATION', document: {}, securityResolved: ['Ownership match failure'] };
     }
 
     Logger.debug(`DynamoEntityRepository.getEntityById: Ownership match - client ${security.clientName}`, traceId);
-    return { result: 'SUCCESS', documents, securityResolved: ['Ownership matches'] };
+    return { response: 'GET_SUCCESS', document, securityResolved: ['Ownership matches'] };
   }
 
   // no security if no legacy claims (for demo/testing reasons)
   if (security.edOrgIds.length === 0 && security.studentIds.length === 0)
-    return { result: 'SUCCESS', documents, securityResolved: ['Security inactive without claims'] };
+    return { response: 'GET_SUCCESS', document, securityResolved: ['Security inactive without claims'] };
 
   const securityResolved: string[] = [];
 
   // unsecured by edorg/student security
   if (getResult.Item.edOrgId == null && getResult.Item.studentId == null) {
-    return { result: 'SUCCESS', documents, securityResolved: ['Entity not secured by EdOrgId or StudentId'] };
+    return { response: 'GET_SUCCESS', document, securityResolved: ['Entity not secured by EdOrgId or StudentId'] };
   }
 
   // ed org direct security
   if (getResult.Item.edOrgId != null && getResult.Item.studentId == null) {
     if (security.edOrgIds.includes(getResult.Item.edOrgId)) {
-      return { result: 'SUCCESS', documents, securityResolved: [`Direct via EdOrgId ${getResult.Item.edOrgId}`] };
+      return { response: 'GET_SUCCESS', document, securityResolved: [`Direct via EdOrgId ${getResult.Item.edOrgId}`] };
     }
     return {
-      result: 'LEGACY_AUTHORIZATION_FAILURE',
-      documents: [],
+      response: 'GET_FAILURE_AUTHORIZATION',
+      document: {},
       securityResolved: [`No access via EdOrgId ${getResult.Item.edOrgId}`],
     };
   }
@@ -193,7 +194,7 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
   // student direct security
   if (security.studentIds.includes(getResult.Item.studentId)) {
     securityResolved.push(`Direct via StudentId ${getResult.Item.studentId}`);
-    return { result: 'SUCCESS', documents, securityResolved };
+    return { response: 'GET_SUCCESS', document, securityResolved };
   }
   securityResolved.push(`No access via StudentId ${getResult.Item.studentId}`);
 
@@ -211,12 +212,12 @@ export async function getEntityById({ id, documentInfo, security, traceId }: Get
           security.throughAssociation
         } `,
       );
-      return { result: 'SUCCESS', documents, securityResolved };
+      return { response: 'GET_SUCCESS', document, securityResolved };
     }
     securityResolved.push(`No relationship through ${security.throughAssociation}`);
   }
 
-  return { result: 'LEGACY_AUTHORIZATION_FAILURE', documents: [], securityResolved };
+  return { response: 'GET_FAILURE_AUTHORIZATION', document: {}, securityResolved };
 }
 
 /**
@@ -284,7 +285,7 @@ export async function updateEntityById({
       if (failureIndex === error.CancellationReasons.length - 1)
         // failure was with the update itself - not exists or denied by security rules
         return {
-          result: 'UPDATE_FAILURE_NOT_EXISTS',
+          response: 'UPDATE_FAILURE_NOT_EXISTS',
           failureMessage: `The resource with id ${id} does not exist.`,
         };
 
@@ -294,7 +295,7 @@ export async function updateEntityById({
           // failure was with one of the foreign key condition check actions
           const failureForeignKey = documentInfo.documentReferences[failureIndex];
           return {
-            result: 'UPDATE_FAILURE_REFERENCE',
+            response: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${
               failureForeignKey.resourceName
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
@@ -304,7 +305,7 @@ export async function updateEntityById({
           // failure was with one of the descriptor condition check actions
           const failureDescriptorValue = documentInfo.descriptorReferences[failureIndex - submittedForeignKeysLength];
           return {
-            result: 'UPDATE_FAILURE_REFERENCE',
+            response: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
               failureDescriptorValue.documentIdentity,
             )} is not a valid value for descriptor ${failureDescriptorValue.resourceName}.`,
@@ -313,10 +314,10 @@ export async function updateEntityById({
       }
     } else {
       Logger.error(`DynamoEntityRepository.updateEntityById`, traceId, error);
-      return { result: 'UNKNOWN_FAILURE' };
+      return { response: 'UNKNOWN_FAILURE' };
     }
   }
-  return { result: 'UPDATE_SUCCESS' };
+  return { response: 'UPDATE_SUCCESS' };
 }
 
 /**
@@ -369,7 +370,7 @@ export async function createEntity({
           // failure was with one of the foreign key condition check actions
           const failureForeignKey = documentInfo.documentReferences[failureIndex];
           return {
-            result: 'INSERT_FAILURE_REFERENCE',
+            response: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `Foreign key constraint failure for entity ${
               failureForeignKey.resourceName
             }. Expected natural key was ${JSON.stringify(failureForeignKey.documentIdentity)}`,
@@ -379,7 +380,7 @@ export async function createEntity({
           // failure was with one of the descriptor condition check actions
           const failureDescriptorValue = documentInfo.descriptorReferences[failureIndex - submittedForeignKeysLength];
           return {
-            result: 'INSERT_FAILURE_REFERENCE',
+            response: 'INSERT_FAILURE_REFERENCE',
             failureMessage: `${JSON.stringify(
               failureDescriptorValue.documentIdentity,
             )} is not a valid value for descriptor ${failureDescriptorValue.resourceName}.`,
@@ -387,8 +388,8 @@ export async function createEntity({
         }
       }
     } else {
-      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
-      return { result: 'UNKNOWN_FAILURE' };
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, error);
+      return { response: 'UNKNOWN_FAILURE' };
     }
   }
 
@@ -400,7 +401,7 @@ export async function createEntity({
   );
 
   const referenceItems = generateReferenceItems(putItem?.sk, documentInfo);
-  Logger.debug('DynamoEntityRepository.createEntity reference items', traceId, null, referenceItems);
+  Logger.debug('DynamoEntityRepository.createEntity reference items', traceId, referenceItems);
   const batches = R.splitEvery(25, referenceItems);
 
   Object.values(batches).forEach(async (batch) => {
@@ -415,14 +416,14 @@ export async function createEntity({
       );
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
     } catch (error) {
-      Logger.error(`DynamoEntityRepository.createEntity`, traceId, '', error);
+      Logger.error(`DynamoEntityRepository.createEntity`, traceId, error);
       // TODO: decide if this should really be handled so silently, or if
       // something else should occur. Also consider checking for specific
       // situations - is there any unique behavior we want to take?
     }
   });
 
-  return { result: 'INSERT_SUCCESS' };
+  return { response: 'INSERT_SUCCESS' };
 }
 
 /*
@@ -453,7 +454,7 @@ export async function deleteItems(items: { pk: string; sk: string }[], awsReques
       Logger.debug(`DynamoEntityRepository.deleteItems deleting batch`, awsRequestId);
       await getDynamoDBDocumentClient().send(new TransactWriteCommand(params));
     } catch (error) {
-      Logger.error(`DynamoEntityRepository.deleteItems`, awsRequestId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteItems`, awsRequestId, error);
       // TODO: decide if this should really be handled so silently, or if
       // something else should occur. Also consider checking for specific
       // situations - is there any unique behavior we want to take?
@@ -503,7 +504,7 @@ export async function deleteEntityByIdDynamo(
         return { success: true };
       }
     } else {
-      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId, '', error);
+      Logger.error(`DynamoEntityRepository.deleteEntityByIdDynamo`, traceId, error);
       return { success: false };
     }
   }
@@ -542,7 +543,7 @@ export async function getReferencesToThisItem(
 
   const trefKey = ForeignKeyItem.buildToReferenceKey(sortKeyFromId(id));
   const statement = `select * from "${tableOpts.tableName}" where pk = '${trefKey}'`;
-  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem`, null, null, { statement });
+  Logger.debug(`DynamoEntityRepository.getReferencesToThisItem`, null, { statement });
 
   const mapper = (item: any) => {
     const i = unmarshall(item);
@@ -566,7 +567,7 @@ export async function getReferencesToThisItem(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getReferencesToThisItem', traceId, null, error);
+    Logger.error('DynamoEntityRepository.getReferencesToThisItem', traceId, error);
 
     return { success: false, foreignKeys };
   }
@@ -589,7 +590,7 @@ export async function getForeignKeyReferences(
 
   const frefKey = ForeignKeyItem.buildFromReferenceKey(sortKeyFromId(id));
   const statement = `select * from "${tableOpts.tableName}" where pk = '${frefKey}'`;
-  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences`, null, null, { statement });
+  Logger.debug(`DynamoEntityRepository.getForeignKeyReferences`, null, { statement });
 
   const mapper = (item: any) => {
     // Without the unmarshall, the object structure will include a letter for the data type
@@ -610,7 +611,7 @@ export async function getForeignKeyReferences(
 
     return { success: true, foreignKeys };
   } catch (error) {
-    Logger.error('DynamoEntityRepository.getForeignKeyReferences', traceId, null, error);
+    Logger.error('DynamoEntityRepository.getForeignKeyReferences', traceId, error);
 
     return { success: false, foreignKeys };
   }
@@ -643,7 +644,7 @@ export async function validateEntityOwnership(
   try {
     getResult = await getDynamoDBDocumentClient().send(new GetCommand(getParams));
   } catch (error) {
-    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, traceId, '', error);
+    Logger.error(`DynamoEntityRepository.validateEntityOwnership ${error}`, traceId, error);
     return { result: 'ERROR', isOwner: false };
   }
 

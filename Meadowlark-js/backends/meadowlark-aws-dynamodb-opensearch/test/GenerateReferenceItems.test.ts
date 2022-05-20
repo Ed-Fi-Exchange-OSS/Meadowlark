@@ -50,6 +50,7 @@ describe('when collecting foreign key references', () => {
       resourceName: 'Person',
       documentIdentity: personNK,
       isAssignableFrom: false,
+      isDescriptor: false,
     });
     info.documentReferences.push({
       projectName: info.projectName,
@@ -57,6 +58,7 @@ describe('when collecting foreign key references', () => {
       resourceName: 'EducationOrganization',
       documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],
       isAssignableFrom: false,
+      isDescriptor: false,
     });
     info.documentIdentity = parentIdentity;
 
@@ -123,6 +125,7 @@ describe('when collecting foreign key references', () => {
         },
       ],
       isAssignableFrom: false,
+      isDescriptor: true,
     });
     info.documentIdentity = parentIdentity;
 

@@ -103,7 +103,7 @@ export async function queryEntityList({
 
   Logger.debug(`Building query`, traceId);
 
-  let results: any = {};
+  let documents: any = [];
   try {
     let query = `SELECT info FROM ${indexFromEntityInfo(documentInfo)}`;
     if (Object.entries(queryStringParameters).length > 0) {
@@ -117,23 +117,23 @@ export async function queryEntityList({
     const { body } = await performSqlQuery(client, query);
 
     Logger.debug(`Result: ${JSON.stringify(body)}`, traceId);
-    results = body.datarows.map((datarow) => JSON.parse(datarow));
+    documents = body.datarows.map((datarow) => JSON.parse(datarow));
   } catch (e) {
     const body = JSON.parse(e.meta.body);
 
     switch (body?.error?.type) {
       case 'IndexNotFoundException':
         // No object has been uploaded for the requested type
-        return { success: true, results: [] };
+        return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
       case 'SemanticAnalysisException':
-        // The query term is invalid, respond with a validation message
-        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, 'n/a', e.meta.body);
-        return { success: false, results: [{ error: body.error.details }] };
+        // The query term is invalid
+        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, e.meta.body);
+        return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
       default:
-        Logger.error('ElasticsearchRepository.queryEntityList', traceId, 'n/a', body ?? e);
-        return { success: false, results: [] };
+        Logger.error('ElasticsearchRepository.queryEntityList', traceId, body ?? e);
+        return { response: 'UNKNOWN_FAILURE', documents: [] };
     }
   }
 
-  return { success: true, results };
+  return { response: 'QUERY_SUCCESS', documents };
 }

@@ -32,7 +32,7 @@ export const validate = (schema, _prefs, _tests?) => {
     for (const test of tests) {
       const [input, pass, expected] = test;
       if (!pass) {
-        expect(expected, 'Failing tests messages must be tested').to.exist();
+        expect(expected, 'Failing tests message must be tested').to.exist();
       }
 
       const { error: errord, value: valued } = schema.validate(input, { debug: true, ...prefs });

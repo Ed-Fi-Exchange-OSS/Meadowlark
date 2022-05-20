@@ -3,27 +3,30 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable-next-line import/no-unresolved */
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as GetById from '../../src/handler/GetById';
 import * as Query from '../../src/handler/Query';
 import { getResolver } from '../../src/handler/Get';
+import { FrontendRequest } from '../../src/handler/FrontendRequest';
+import { FrontendResponse } from '../../src/handler/FrontendResponse';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 describe('given a missing resource path', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
       body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      headers: {},
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
+      path: '',
+    };
 
     // Act
-    response = await getResolver(event, context);
+    response = await getResolver(event);
   }, 6000);
 
   it('returns status 404', () => {
@@ -36,19 +39,21 @@ describe('given a missing resource path', () => {
 });
 
 describe('given a path with only a version', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
       body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: {},
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
       path: '/v3.3b',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response = await getResolver(event, context);
+    response = await getResolver(event);
   });
 
   it('returns status 404', () => {
@@ -61,19 +66,21 @@ describe('given a path with only a version', () => {
 });
 
 describe('given a path with version and namespace', () => {
-  let response: APIGatewayProxyResult;
+  let response: FrontendResponse;
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
       body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: {},
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
       path: '/v3.3b/ed-fi',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response = await getResolver(event, context);
+    response = await getResolver(event);
   });
 
   it('returns status 404', () => {
@@ -86,22 +93,25 @@ describe('given a path with version and namespace', () => {
 });
 
 describe('given requesting abstract classes by id', () => {
-  const response: APIGatewayProxyResult[] = [];
+  const response: FrontendResponse[] = [];
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
-      headers: { 'reference-validation': false },
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+    const event: FrontendRequest = {
+      body: '',
+      headers: { 'reference-validation': 'false' },
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
       path: 'local/v3.3b/ed-fi/educationOrganizations/a0df76bba8212ea9b1a20c29591e940045dec9d65ee89603c31f0830',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response[0] = await getResolver(event, context);
+    response[0] = await getResolver(event);
 
     event.path =
       'local/v3.3b/ed-fi/GeneralStudentProgramAssociations/a0df76bba8212ea9b1a20c29591e940045dec9d65ee89603c31f0830';
-    response[1] = await getResolver(event, context);
+    response[1] = await getResolver(event);
   });
 
   it('returns status 404', () => {
@@ -120,21 +130,24 @@ describe('given requesting abstract classes by id', () => {
 });
 
 describe('given requesting abstract classes', () => {
-  const response: APIGatewayProxyResult[] = [];
+  const response: FrontendResponse[] = [];
 
   beforeAll(async () => {
-    const event: APIGatewayProxyEvent = {
-      headers: { 'reference-validation': false },
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+    const event: FrontendRequest = {
+      body: '',
+      headers: { 'reference-validation': 'false' },
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
       path: 'local/v3.3b/ed-fi/educationOrganizations',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    response[0] = await getResolver(event, context);
+    response[0] = await getResolver(event);
 
     event.path = 'local/v3.3b/ed-fi/GeneralStudentProgramAssociations';
-    response[1] = await getResolver(event, context);
+    response[1] = await getResolver(event);
   });
 
   it('returns status 404', () => {
@@ -157,19 +170,21 @@ describe('given a valid get by id request', () => {
   let mockQuery;
 
   beforeAll(async () => {
-    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(Query, 'query').mockImplementation((() => null) as any);
+    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation(() => null as any);
+    mockQuery = jest.spyOn(Query, 'query').mockImplementation(() => null as any);
 
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
       body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: {},
+      traceId: 'ApiGatewayRequestId',
+      pathParameters: {},
+      queryStringParameters: {},
+      stage: '',
       path: '/v3.3b/ed-fi/students/a0df76bba8212ea9b1a20c29591e940045dec9d65ee89603c31f0830',
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+    };
 
     // Act
-    await getResolver(event, context);
+    await getResolver(event);
   });
 
   afterAll(() => {
@@ -191,20 +206,21 @@ describe('given a valid query request', () => {
   let mockQuery;
 
   beforeAll(async () => {
-    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation((() => null) as any);
-    mockQuery = jest.spyOn(Query, 'query').mockImplementation((() => null) as any);
+    mockGetById = jest.spyOn(GetById, 'getById').mockImplementation(() => null as any);
+    mockQuery = jest.spyOn(Query, 'query').mockImplementation(() => null as any);
 
-    const event: APIGatewayProxyEvent = {
+    const event: FrontendRequest = {
       body: '',
-      headers: '',
-      requestContext: { requestId: 'ApiGatewayRequestId' },
+      headers: {},
+      traceId: 'ApiGatewayRequestId',
       path: '/v3.3b/ed-fi/students/',
       queryStringParameters: { lastSurname: 'World' },
-    } as any;
-    const context = { awsRequestId: 'LambdaRequestId' } as Context;
+      pathParameters: {},
+      stage: '',
+    };
 
     // Act
-    await getResolver(event, context);
+    await getResolver(event);
   });
 
   afterAll(() => {
