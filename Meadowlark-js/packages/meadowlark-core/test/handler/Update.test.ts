@@ -26,7 +26,7 @@ describe('given there is no request body', () => {
     };
 
     response = await update(event);
-  });
+  }, 5100);
 
   it('returns status 400', () => {
     expect(response.statusCode).toEqual(400);

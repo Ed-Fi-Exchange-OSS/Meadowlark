@@ -419,7 +419,7 @@ describe('given requesting abstract classes', () => {
 
     event.path = 'local/v3.3b/ed-fi/GeneralStudentProgramAssociations';
     response[1] = await upsert(event);
-  });
+  }, 6000);
 
   it('returns status 404', () => {
     expect(response[0].statusCode).toEqual(404);
