@@ -3,14 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@elastic/elasticsearch';
+import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, Logger, DocumentInfo } from '@edfi/meadowlark-core';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 
 /**
- * Returns Elasticsearch index name from the given DocumentInfo.
+ * Returns OpenSearch index name from the given DocumentInfo.
  *
- * Elasticsearch indexes are required to be lowercase only, with no pound signs or periods.
+ * OpenSearch indexes are required to be lowercase only, with no pound signs or periods.
  */
 export function indexFromDocumentInfo(documentInfo: DocumentInfo): string {
   const adjustedResourceName = documentInfo.isDescriptor
@@ -24,7 +24,7 @@ export function indexFromDocumentInfo(documentInfo: DocumentInfo): string {
 
 // TODO: RND-203 unsafe for SQL injection
 /**
- * Convert query string parameters from http request to Elasticsearch
+ * Convert query string parameters from http request to OpenSearch
  * SQL WHERE conditions.
  */
 function whereConditionsFrom(queryStringParameters: object): string {
@@ -34,7 +34,7 @@ function whereConditionsFrom(queryStringParameters: object): string {
 }
 
 /**
- * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
+ * This mechanism of SQL querying is specific to OpenSearch (vs OpenSearch)
  */
 async function performSqlQuery(client: Client, query: string): Promise<any> {
   return client.transport.request({
@@ -45,7 +45,7 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
 }
 
 /**
- * Entry point for querying with Elasticsearch
+ * Entry point for querying with OpenSearch
  */
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
   const { documentInfo, queryStringParameters, paginationParameters, traceId } = request;

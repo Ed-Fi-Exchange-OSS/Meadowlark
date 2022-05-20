@@ -4,8 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { ClientRequestArgs, request } from 'http';
-import { Client, Connection } from '@elastic/elasticsearch';
-import { ConnectionOptions } from '@elastic/elasticsearch/lib/Connection';
+import { Client, Connection } from '@opensearch-project/opensearch';
+import { ConnectionOptions } from '@opensearch-project/opensearch/lib/Connection';
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
@@ -16,7 +16,7 @@ import { entityTypeStringFrom } from './Utility';
  * A replacement for @acuris/aws-es-connection's "createAWSConnection", using aws4.
  * Allows us to use @aws-sdk/credential-provider-node instead of aws-sdk v2 dependency.
  */
-function createESConnection(credentials: Credentials) {
+function createOpenSearchConnection(credentials: Credentials) {
   return class extends Connection {
     public constructor(opts: ConnectionOptions) {
       super(opts);
@@ -26,10 +26,10 @@ function createESConnection(credentials: Credentials) {
 }
 
 /**
- * Returns Elasticsearch index name for a given entity type, as defined by a
+ * Returns OpenSearch index name for a given entity type, as defined by a
  * DynamoDB partition key
  *
- * Elasticsearch indexes are required to be lowercase only, with no pound signs,
+ * OpenSearch indexes are required to be lowercase only, with no pound signs,
  * whereas pound signs separators are commonly used in DynamoDB
  */
 export function indexFromEntityTypeString(pk: string): string {
@@ -37,9 +37,9 @@ export function indexFromEntityTypeString(pk: string): string {
 }
 
 /**
- * Returns Elasticsearch index name for an entity type, from the given DocumentInfo.
+ * Returns OpenSearch index name for an entity type, from the given DocumentInfo.
  *
- * Elasticsearch indexes are required to be lowercase only, with no pound signs,
+ * OpenSearch indexes are required to be lowercase only, with no pound signs,
  * wheras pound signs separators are commonly used in DynamoDB
  */
 export function indexFromEntityInfo(documentInfo: DocumentInfo): string {
@@ -48,7 +48,7 @@ export function indexFromEntityInfo(documentInfo: DocumentInfo): string {
 
 // TODO: RND-203 unsafe for SQL injection
 /**
- * Convert query string parameters from http request to Elasticsearch
+ * Convert query string parameters from http request to OpenSearch
  * SQL WHERE conditions.
  */
 function whereConditionsFrom(queryStringParameters: object): string {
@@ -58,28 +58,29 @@ function whereConditionsFrom(queryStringParameters: object): string {
 }
 
 /**
- * Create and return an Elasticsearch connection object
+ * Create and return an OpenSearch connection object
  */
-export async function getElasticsearchClient(awsRequestId: string): Promise<Client> {
+export async function getOpenSearchClient(awsRequestId: string): Promise<Client> {
   if (process.env.STAGE === 'local') {
-    Logger.debug('ElasticsearchRepository.getElasticsearchClient creating Elasticsearch local client', awsRequestId);
+    Logger.debug('OpenSearchRepository.getOpenSearchClient creating OpenSearch local client', awsRequestId);
     return new Client({
-      node: process.env.ES_LOCAL_ENDPOINT,
-      auth: { username: process.env.ES_USERNAME ?? 'x', password: process.env.ES_PASSWORD ?? 'y' },
+      node: process.env.OPENSEARCH_ENDPOINT,
+      auth: { username: process.env.OPENSEARCH_USERNAME ?? 'x', password: process.env.OPENSEARCH_PASSWORD ?? 'y' },
     });
   }
 
-  Logger.debug('ElasticsearchRepository.getElasticsearchClient creating Elasticsearch client', awsRequestId);
+  Logger.debug('OpenSearchRepository.getOpenSearchClient creating OpenSearch client', awsRequestId);
 
   return new Client({
-    Connection: createESConnection(await AWSCredentialProvider()()),
+    Connection: createOpenSearchConnection(await AWSCredentialProvider()()),
+    // ES_ENDPOINT seems to be correct even for OpenSearch
     node: `https://${process.env.ES_ENDPOINT}`,
   });
 }
 
 /**
- * This mechanism of SQL querying is specific to Amazon's open source version of Elasticsearch,
- * as SQL queries are only otherwise available in the Elasticsearch paid edition.
+ * This mechanism of SQL querying is specific to Amazon's open source version of OpenSearch,
+ * as SQL queries are only otherwise available in the OpenSearch paid edition.
  */
 async function performSqlQuery(client: Client, query: string): Promise<any> {
   return client.transport.request({
@@ -90,7 +91,7 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
 }
 
 /**
- * Entry point for querying with Elasticsearch, given entity info, the original http
+ * Entry point for querying with OpenSearch, given entity info, the original http
  * request query parameters, and a Security object for possible filtering
  */
 export async function queryEntityList({
@@ -99,7 +100,7 @@ export async function queryEntityList({
   paginationParameters,
   traceId,
 }: QueryRequest): Promise<QueryResult> {
-  const client = await getElasticsearchClient(traceId);
+  const client = await getOpenSearchClient(traceId);
 
   Logger.debug(`Building query`, traceId);
 
@@ -112,7 +113,7 @@ export async function queryEntityList({
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 
-    Logger.debug(`ElasticsearchRepository.queryEntityList executing query: ${query}`, traceId);
+    Logger.debug(`OpenSearchRepository.queryEntityList executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
 
@@ -127,10 +128,10 @@ export async function queryEntityList({
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
       case 'SemanticAnalysisException':
         // The query term is invalid
-        Logger.debug('ElasticsearchRepository.queryEntityList', traceId, e.meta.body);
+        Logger.debug('OpenSearchRepository.queryEntityList', traceId, e.meta.body);
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
       default:
-        Logger.error('ElasticsearchRepository.queryEntityList', traceId, body ?? e);
+        Logger.error('OpenSearchRepository.queryEntityList', traceId, body ?? e);
         return { response: 'UNKNOWN_FAILURE', documents: [] };
     }
   }

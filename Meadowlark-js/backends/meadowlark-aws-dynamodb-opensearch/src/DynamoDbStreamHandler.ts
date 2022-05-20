@@ -8,9 +8,9 @@
 import { Context } from 'aws-lambda';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
-import { Client as EsClient } from '@elastic/elasticsearch';
+import { Client as EsClient } from '@opensearch-project/opensearch';
 import { Logger } from '@edfi/meadowlark-core';
-import { indexFromEntityTypeString, getElasticsearchClient } from './ElasticsearchRepository';
+import { indexFromEntityTypeString, getOpenSearchClient } from './OpenSearchRepository';
 import { entityIdPrefixRemoved } from './BaseDynamoRepository';
 
 /** A locally-defined slice of a DynamoDBRecord's StreamRecord */
@@ -31,7 +31,7 @@ interface DynamoDBStreamEvent {
 }
 
 /**
- * Parameters for an Elasticsearch request
+ * Parameters for an OpenSearch request
  */
 type RequestParamsType = { index: string; id: string };
 
@@ -56,35 +56,32 @@ type DynamoKeys = {
 };
 
 /**
- * Given Elasticsearch request parameters for a DynamoDB Entity item, remove the item
- * from Elasticsearch if it exists.
+ * Given OpenSearch request parameters for a DynamoDB Entity item, remove the item
+ * from OpenSearch if it exists.
  */
-async function removeFromElasticsearchIfExists(client: EsClient, requestParams: RequestParamsType, awsRequestId: string) {
+async function removeFromOpenSearchIfExists(client: EsClient, requestParams: RequestParamsType, awsRequestId: string) {
   try {
-    Logger.debug(`Checking if ${requestParams.index} exists in ElasticSearch`, awsRequestId);
+    Logger.debug(`Checking if ${requestParams.index} exists in OpenSearch`, awsRequestId);
     if ((await client.exists({ ...requestParams, refresh: true })).body) {
-      Logger.debug(`DynamoDbStreamHandler.removeFromElasticsearchIfExists removing ${requestParams.index}`, awsRequestId);
+      Logger.debug(`DynamoDbStreamHandler.removeFromOpenSearchIfExists removing ${requestParams.index}`, awsRequestId);
       await client.delete({ ...requestParams, refresh: true });
     }
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.removeFromElasticsearchIfExists`, awsRequestId, err);
+    Logger.error(`DynamoDbStreamHandler.removeFromOpenSearchIfExists`, awsRequestId, err);
   }
 }
 
 /**
- * Given a DynamoDB Entity item and Elasticsearch request parameters, upsert the
- * Entity item into Elasticsearch.
+ * Given a DynamoDB Entity item and OpenSearch request parameters, upsert the
+ * Entity item into OpenSearch.
  */
-async function insertIntoElasticsearch(
+async function insertIntoOpenSearch(
   client: EsClient,
   newImage: DynamoNewImage,
   requestParams: RequestParamsType,
   awsRequestId: string,
 ) {
-  Logger.debug(
-    `DynamoDbStreamHandler.insertIntoElasticsearch Insert ${requestParams.index} into ElasticSearch`,
-    awsRequestId,
-  );
+  Logger.debug(`DynamoDbStreamHandler.insertIntoOpenSearch Insert ${requestParams.index} into OpenSearch`, awsRequestId);
   try {
     await client.index({
       ...requestParams,
@@ -100,15 +97,15 @@ async function insertIntoElasticsearch(
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.insertIntoElasticsearch`, awsRequestId, err);
+    Logger.error(`DynamoDbStreamHandler.insertIntoOpenSearch`, awsRequestId, err);
   }
 }
 
 /**
  * Given the partition and sort keys from the DynamoDb Stream event,
- * build the Elasticsearch request parameters.
+ * build the OpenSearch request parameters.
  */
-function buildElasticSearchRequestParameters(keys: DynamoKeys): RequestParamsType {
+function buildOpenSearchRequestParameters(keys: DynamoKeys): RequestParamsType {
   const id = entityIdPrefixRemoved(keys.sk as string);
   const requestParams = {
     index: indexFromEntityTypeString(keys.pk),
@@ -121,13 +118,13 @@ function buildElasticSearchRequestParameters(keys: DynamoKeys): RequestParamsTyp
 /**
  * Entry point for DynamoDB Stream events
  *
- * Looks for change events for Entity items. Triggers removal from Elasticsearch for
- * deleted Entity items, and upsert into Elasticsearch for new or modified
+ * Looks for change events for Entity items. Triggers removal from OpenSearch for
+ * deleted Entity items, and upsert into OpenSearch for new or modified
  * Entity items.
  */
 export async function updateExternalStorage(event: DynamoDBStreamEvent, context: Context) {
   Logger.info('DynamoDbStreamHandler.updateExternalStorage', context.awsRequestId);
-  const client = await getElasticsearchClient(context.awsRequestId);
+  const client = await getOpenSearchClient(context.awsRequestId);
 
   // eslint-disable-next-line no-restricted-syntax
   for (const record of event.Records) {
@@ -162,16 +159,16 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
       continue;
     }
 
-    const requestParams = buildElasticSearchRequestParameters(keys);
+    const requestParams = buildOpenSearchRequestParameters(keys);
 
     switch (record.eventName) {
       case 'REMOVE': {
-        await removeFromElasticsearchIfExists(client, requestParams, context.awsRequestId);
+        await removeFromOpenSearchIfExists(client, requestParams, context.awsRequestId);
 
         break;
       }
       case 'MODIFY': {
-        // TODO: update elasticsearch RND-181
+        // TODO: update OpenSearch RND-181
 
         Logger.debug(
           `DynamoDbStreamHandler.updateExternalStorage ${record.eventName} was detected but no specific action is taken for now`,
@@ -181,7 +178,7 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
       }
       case 'INSERT': {
         if (record.dynamodb?.NewImage == null) continue;
-        Logger.debug(`DynamoDbStreamHandler.updateExternalStorage prepare insert to Elasticsearch`, context.awsRequestId);
+        Logger.debug(`DynamoDbStreamHandler.updateExternalStorage prepare insert to OpenSearch`, context.awsRequestId);
         const newImage = unmarshall(record.dynamodb.NewImage) as DynamoNewImage;
 
         // Ignore if a descriptor.
@@ -194,7 +191,7 @@ export async function updateExternalStorage(event: DynamoDBStreamEvent, context:
           continue;
         }
 
-        await insertIntoElasticsearch(client, newImage, requestParams, context.awsRequestId);
+        await insertIntoOpenSearch(client, newImage, requestParams, context.awsRequestId);
 
         break;
       }

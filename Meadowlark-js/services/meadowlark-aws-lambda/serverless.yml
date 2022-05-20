@@ -55,8 +55,8 @@ provider:
     STAGE: ${self:provider.stage}
     DOMAIN_TABLE_NAME: ${self:service}-${self:provider.stage}
     DYNAMODB_LOCAL_ENDPOINT: 'http://localhost:8000'
-    ES_LOCAL_ENDPOINT: 'http://localhost:9200'
-    TOKEN_URL: 'http://localhost:3000/${self:provider.stage}/api/oauth/token'
+    OPENSEARCH_ENDPOINT: ${env:OPENSEARCH_ENDPOINT, 'http://localhost:9200'}
+    TOKEN_URL: ${env:TOKEN_URL, 'http://localhost:3000/${self:provider.stage}/api/oauth/token'}
     IS_LOCAL: ${env:IS_LOCAL, 'false'}
     LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
     ACCESS_TOKEN_REQUIRED: ${env:ACCESS_TOKEN_REQUIRED, 'true'}
@@ -70,9 +70,9 @@ provider:
         - s3:*
         - es:*
       Resource:
-        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:*
-        - arn:aws:lambda:${aws:region}:${aws:accountId}:*
-        - arn:aws:es:${aws:region}:${aws:accountId}:domain/${self:service}-${self:provider.stage}/*
+        - arn:aws:dynamodb:${aws:region, 'unused'}:${aws:accountId, 'unused'}:*
+        - arn:aws:lambda:${aws:region, 'unused'}:${aws:accountId, 'unused'}:*
+        - arn:aws:es:${aws:region, 'unused'}:${aws:accountId, 'unused'}:domain/${self:service}-${self:provider.stage}/*
 
   lambdaHashingVersion: 20201221
 

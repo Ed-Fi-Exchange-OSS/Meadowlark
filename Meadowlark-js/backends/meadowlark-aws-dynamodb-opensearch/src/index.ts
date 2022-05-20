@@ -9,7 +9,7 @@ import {
   getEntityById as getDocumentById,
   updateEntityById as updateDocumentById,
 } from './DynamoEntityRepository';
-import { queryEntityList as queryDocuments } from './ElasticsearchRepository';
+import { queryEntityList as queryDocuments } from './OpenSearchRepository';
 import { deleteEntityById as deleteDocumentById } from './DeleteOrchestrator';
 
 export function initializeDocumentStore(): DocumentStorePlugin {

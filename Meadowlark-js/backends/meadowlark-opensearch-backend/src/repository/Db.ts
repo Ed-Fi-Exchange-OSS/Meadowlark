@@ -3,20 +3,21 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client, ClientOptions } from '@elastic/elasticsearch';
+import { Client, ClientOptions } from '@opensearch-project/opensearch';
 import { Logger } from '@edfi//meadowlark-core';
 
 let singletonClient: Client | null = null;
 
 /**
- * Create and return an Elasticsearch connection object
+ * Create and return an OpenSearch connection object
  */
 export async function getNewClient(): Promise<Client> {
   Logger.debug('meadowlark-opensearch: creating local client', null);
 
   const clientOpts: ClientOptions = {
-    node: process.env.ES_LOCAL_ENDPOINT,
-    auth: { username: process.env.ES_USERNAME ?? 'x', password: process.env.ES_PASSWORD ?? 'y' },
+    node: process.env.OPENSEARCH_ENDPOINT,
+    auth: { username: process.env.OPENSEARCH_USERNAME ?? 'x', password: process.env.OPENSEARCH_PASSWORD ?? 'y' },
+    /* Might need to setup SSL here in the future */
   };
 
   try {
