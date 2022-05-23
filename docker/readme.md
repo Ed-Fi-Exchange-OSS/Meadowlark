@@ -1,15 +1,26 @@
 # Docker Localhost for Meadowlark
 
-(!) This solution should only be used on localhost with proper firewalls around
+:exclamation: This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-These compose file requires [Docker Compose v2](https://github.com/docker/compose)
-(which comes with Docker Desktop for Windows users). Together, they provision:
+These compose files require [Docker Compose v2](https://github.com/docker/compose)
+(which comes with Docker Desktop for Windows users). They provision the following
+services, all using local volumes to for permanent data storage:
 
-* OpenSearch
-* OpenSearch Dashboard at [http://localhost:5601/](http://localhost:5601/)
-* MongoDB 3-node replica set on ports 27017, 27018, 27019 
-* External storage volumes
+* [MongoDB](mongo/): starts a 3-node replica set of MongoDB 4.0 instances on ports 27017, 27018, and 27019.
+* [OpenSearch](opensearch/): single node cluster of OpenSearch database and [OpenSearch
+  Dashboard](http://localhost:5601/) (latest versions).
+* [PostgreSQL](postgres/): single instance of PostgreSQL 14.
+
+This repository does not have a compose file for DynamoDB, because the
+configuration is not well documented. For DynamoDB startup, run the `yarn
+init:local-dynamodb` command in the
+[meadowlark-aws-lambda](../Meadowlark-js/services/meadowlark-aws-lambda/)
+directory.
+
+## Preparatory Steps
+
+### Docker
 
 Ensure that you have sufficient resources allocated to Docker:
 
@@ -17,8 +28,8 @@ Ensure that you have sufficient resources allocated to Docker:
 * macOS: set RAM to at least 4 GB [user manual](https://docs.docker.com/desktop/mac/).
 * Linux, including Windows Subsystem for Linux (WSL/WSL2): Ensure vm.max_map_count is set to at least 262144 as [per the
   documentation](https://opensearch.org/docs/opensearch/install/important-settings/).
-  * On Linux: ```sudo sysctl -w vm.max_map_count=262144```
-  * Permanently setting this on WSL is more challenging than expected. Recipe:
+  * On real Linux: ```sudo sysctl -w vm.max_map_count=262144```
+  * On Windows Subsystem for Linux:
 
     ```powershell
     # Setup a .wslconfig file with the proper setting
@@ -40,25 +51,42 @@ Ensure that you have sufficient resources allocated to Docker:
     Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
     ```
 
+### MongoDB Hosts
+
+MongoDB replica sets require the hostname in the connection string to match the hostname of each node.
+Because the container hostnames are mongo1, mongo2 and mongo3, add the following line to your
+hosts file:
+
+`127.0.0.1 mongo1 mongo2 mongo3`
+
 ## Operations
 
-At a command prompt, running in this directory:
+To startup just one of the three sets of services, open a command prompt, change
+to that directory, and run `docker compose up -d`. You can customize the PostgreSQL
+startup with three environment variables, which can also be placed into a `.env` file:
 
-| Operation | Command |
-| -- | -- |
-| start containers | `docker compose -f <yml filename> up -d` |
-| view running containers | `docker ps` |
-| stop containers | `docker compose -f <yml filename> down` |
-| view OpenSearch logs | `docker logs opensearch-node1` |
+* `POSTGRES_USER` (default value: "postgres")
+* `POSTGRES_PASSWORD` (default value: "abcdefgh1!")
+* `POSTGRES_PORT` (default value: 5432)
+
+Summary of some commonly useful [docker CLI
+commands](https://docs.docker.com/engine/reference/commandline/cli/):
+
+| Operation                      | Command                             |
+| ------------------------------ | ----------------------------------- |
+| start containers               | `docker compose up -d`              |
+| stop containers                | `docker compose down`               |
+| view running containers        | `docker ps`                         |
+| view OpenSearch logs           | `docker logs opensearch-node1`      |
 | view OpenSearch Dashboard logs | `docker logs opensearch-dashboards` |
-| view MongoDB logs | `docker logs mongodb-node1` |
+| view MongoDB logs              | `docker logs mongodb-node1`         |
 
-## VSCode Docker Plugin
+### VSCode Docker Plugin
 
 The Docker for VSCode plugin is an easy way to manage Docker Containers, providing right-click
 `compose up` and `compose down` as well as container monitoring.
 
-## Visualizations in OpenSearch Dashboards
+### Visualizations in OpenSearch Dashboards
 
 Once data starts flowing into OpenSearch, you can setup some basic
 visualizations with the OpenSearch Dashboards. Basic steps:
@@ -76,15 +104,7 @@ visualizations with the OpenSearch Dashboards. Basic steps:
      want to filter on a particular entity type, such as `studentUniqueId:
      exists`.
 
-## MongoDB network setup
-
-MongoDB replica sets require the hostname in the connection string to match the hostname of each node.
-Because the container hostnames are mongo1, mongo2 and mongo3, add the following line to your
-hosts file:
-
-`127.0.0.1 mongo1 mongo2 mongo3`
-
-## Browsing MongoDB
+### Browsing MongoDB
 
 [MongoDB Compass](https://www.mongodb.com/docs/compass/current/) is a freely available UI tool
 for browsing and importing data into MongoDB. `mongodb://mongo1:27017,mongo2:27018,mongo3:27019` is the connection
