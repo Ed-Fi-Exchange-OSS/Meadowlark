@@ -1,6 +1,6 @@
 # Ed-Fi-Meadowlark
 
-<img alt="Meadowlark (c) naturenerd_joel"
+<img alt="Meadowlark photo (c) Joel Chamberlain"
  src="images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png" align="right"
  width="300">
 
@@ -15,10 +15,10 @@ production-like settings.
 
 ## Getting Started
 
-See [Meadowlark-js/README.md](Meadowlark-js/README.md) for developer notes.
-
-See [Meadowlark-js/DEPLOYMENT.md](Meadowlark-js/DEPLOYMENT.md) for instructions
-on deployment to AWS.
+* [Deployment on AWS](docs/DEPLOYMENT.md)
+* [Running on Localhost](docs/LOCALHOST.md)
+* [Developer getting started notes](docs/)
+  * [Additional technical details](docs/TECHNICAL.md)
 
 ## Legal Information
 
@@ -33,6 +33,6 @@ specific language governing permissions and limitations under the License.
 
 See [NOTICES](NOTICES.md) for additional copyright and license notifications.
 
-Meadowlark image: Copyright &copy; naturenerd_joel, [some rights
-reserved](http://creativecommons.org/licenses/by-nc/4.0/)
-[source](https://www.inaturalist.org/observations/38032376)
+Meadowlark image: Copyright &copy; Joel Chamberlain, [some rights
+reserved](http://creativecommons.org/licenses/by-nc/4.0/).
+[Original source](https://www.inaturalist.org/observations/38032376).
