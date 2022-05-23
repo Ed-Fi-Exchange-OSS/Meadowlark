@@ -66,10 +66,6 @@ export async function getEntityList({ documentInfo, traceId }: QueryRequest): Pr
   try {
     const queryResult: QueryCommandOutput = await getDynamoDBDocumentClient().send(new QueryCommand(queryParams));
 
-    // TODO: there is a bug here because it doesn't deal with paging. If the responses are > 1 MB then there will be another
-    // page and another Query Command needs to be executed. If we change to ElasticSearch then this is not a big deal. But if
-    // we leave this in Dynamo then we need to fix the bug. RND-183.
-
     return {
       response: 'GET_SUCCESS',
       document:

@@ -52,7 +52,7 @@ describe('given the endpoint is not in the MetaEd model', () => {
 describe('given persistence fails', () => {
   let response: FrontendResponse;
   let mockRequestValidator: any;
-  let mockElasticsearch: any;
+  let mockOpenSearch: any;
   const metaEdHeaders = { header: 'one' };
 
   beforeAll(async () => {
@@ -73,7 +73,7 @@ describe('given persistence fails', () => {
     );
 
     // Setup the query operation to fail
-    mockElasticsearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
+    mockOpenSearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
       Promise.resolve({
         response: 'UNKNOWN_FAILURE',
         documents: [],
@@ -86,7 +86,7 @@ describe('given persistence fails', () => {
 
   afterAll(() => {
     mockRequestValidator.mockRestore();
-    mockElasticsearch.mockRestore();
+    mockOpenSearch.mockRestore();
   });
 
   it('returns status 500', () => {
@@ -101,7 +101,7 @@ describe('given persistence fails', () => {
 describe('given successful fetch from persistence', () => {
   let response: FrontendResponse;
   let mockRequestValidator: any;
-  let mockElasticsearch: any;
+  let mockOpenSearch: any;
   const metaEdHeaders = { header: 'one' };
   const goodResult: object = { goodResult: 'result' };
 
@@ -123,7 +123,7 @@ describe('given successful fetch from persistence', () => {
     );
 
     // Setup the query operation to succeed
-    mockElasticsearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
+    mockOpenSearch = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
       Promise.resolve({
         response: 'QUERY_SUCCESS',
         documents: [goodResult],
@@ -136,7 +136,7 @@ describe('given successful fetch from persistence', () => {
 
   afterAll(() => {
     mockRequestValidator.mockRestore();
-    mockElasticsearch.mockRestore();
+    mockOpenSearch.mockRestore();
   });
 
   it('returns status 200', () => {

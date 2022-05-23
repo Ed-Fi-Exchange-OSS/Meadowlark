@@ -27,7 +27,7 @@
     "@aws-sdk/util-dynamodb": "3.44.0",
     "@edfi/meadowlark-core": "0.2.0-dev.0",
     "@edfi/metaed-core": "^3.0.1",
-    "@elastic/elasticsearch": "7.13.0",
+    "@opensearch-project/opensearch": "^1.1.0",
     "aws4": "^1.11.0",
     "ramda": "^0.28.0",
     "ts-invariant": "^0.9.4"

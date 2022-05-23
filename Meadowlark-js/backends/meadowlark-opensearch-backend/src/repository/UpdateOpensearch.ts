@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@elastic/elasticsearch';
+import { Client } from '@opensearch-project/opensearch';
 import {
   DeleteRequest,
   DeleteResult,
@@ -16,7 +16,7 @@ import {
 import { indexFromDocumentInfo } from './QueryOpensearch';
 
 /**
- * Parameters for an Elasticsearch request
+ * Parameters for an OpenSearch request
  */
 type OpensearchRequest = { index: string; id: string };
 
