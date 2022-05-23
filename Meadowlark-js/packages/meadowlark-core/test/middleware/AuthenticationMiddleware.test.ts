@@ -8,13 +8,13 @@ import { authenticate } from '../../src/middleware/AuthenticationMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { JwtStatus, newJwtStatus } from '../../src/security/JwtStatus';
-import { MiddlewareChain } from '../../src/middleware/MiddlewareChain';
+import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { JwtValidation } from '../../src/security/JwtValidator';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {
@@ -45,7 +45,7 @@ describe('given an error response from authenticate', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const errorResponse: FrontendResponse = newFrontendResponse();
   const jwtStatus: JwtStatus = newJwtStatus();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {
@@ -73,7 +73,7 @@ describe('given a valid response from authenticate', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const subject = 'Subject';
   const jwtStatus: JwtStatus = { ...newJwtStatus(), subject };
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {

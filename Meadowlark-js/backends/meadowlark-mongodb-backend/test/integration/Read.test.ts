@@ -15,7 +15,7 @@ import {
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getCollection, getNewClient } from '../../src/repository/Db';
-import { getDocumentById } from '../../src/repository/Read';
+import { getDocumentById } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);

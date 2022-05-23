@@ -6,12 +6,12 @@
 import { noBody } from '../../src/middleware/NoBodyMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
-import { MiddlewareChain } from '../../src/middleware/MiddlewareChain';
+import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     // Act
@@ -29,7 +29,7 @@ describe('given a previous middleware has created a response', () => {
 
 describe('given no previous middleware response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     // Act

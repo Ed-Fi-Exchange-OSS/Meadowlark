@@ -6,7 +6,7 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { isDocumentIdValid } from '../model/DocumentId';
 import type { PathComponents } from '../model/PathComponents';
-import type { MiddlewareChain } from './MiddlewareChain';
+import type { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'ParsePathMiddleware';
 
@@ -38,7 +38,7 @@ function pathComponentsFrom(path: string): PathComponents | null {
 /**
  * Handles path parsing
  */
-export async function parsePath({ frontendRequest, frontendResponse }: MiddlewareChain): Promise<MiddlewareChain> {
+export async function parsePath({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'parsePath');

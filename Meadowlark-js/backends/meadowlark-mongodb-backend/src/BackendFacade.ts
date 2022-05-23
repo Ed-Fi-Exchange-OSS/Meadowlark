@@ -8,6 +8,7 @@ import {
   DeleteResult,
   GetRequest,
   GetResult,
+  MiddlewareModel,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
@@ -15,8 +16,9 @@ import {
 } from '@edfi/meadowlark-core';
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
-import * as Read from './repository/Read';
+import * as Get from './repository/Get';
 import * as Update from './repository/Update';
+import * as SecurityMiddleware from './security/SecurityMiddleware';
 import { getSharedClient } from './repository/Db';
 
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
@@ -24,7 +26,7 @@ export async function deleteDocumentById(request: DeleteRequest): Promise<Delete
 }
 
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
-  return Read.getDocumentById(request, await getSharedClient());
+  return Get.getDocumentById(request, await getSharedClient());
 }
 
 export async function upsertDocument(request: UpsertRequest): Promise<UpsertResult> {
@@ -33,4 +35,8 @@ export async function upsertDocument(request: UpsertRequest): Promise<UpsertResu
 
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
   return Update.updateDocumentById(request, await getSharedClient());
+}
+
+export async function securityMiddleware(middlewareModel: MiddlewareModel): Promise<MiddlewareModel> {
+  return SecurityMiddleware.securityMiddleware(middlewareModel, await getSharedClient());
 }

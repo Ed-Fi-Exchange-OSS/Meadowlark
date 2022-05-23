@@ -4,14 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeRequestToLog } from '../Logger';
-import { MiddlewareChain } from './MiddlewareChain';
+import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'NoBodyMiddleware';
 
 /**
  * Creates empty body. For methods that don't expect one.
  */
-export async function noBody({ frontendRequest, frontendResponse }: MiddlewareChain): Promise<MiddlewareChain> {
+export async function noBody({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'noBody');

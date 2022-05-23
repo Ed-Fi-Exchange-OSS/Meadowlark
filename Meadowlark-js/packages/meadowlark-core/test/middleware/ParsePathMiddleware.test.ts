@@ -6,12 +6,12 @@
 import { parsePath } from '../../src/middleware/ParsePathMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
-import { MiddlewareChain } from '../../src/middleware/MiddlewareChain';
+import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     // Act
@@ -29,7 +29,7 @@ describe('given a previous middleware has created a response', () => {
 
 describe('given an empty path', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.path = '';
@@ -49,7 +49,7 @@ describe('given an empty path', () => {
 
 describe('given an invalid path', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.path = 'badpath';
@@ -69,7 +69,7 @@ describe('given an invalid path', () => {
 
 describe('given a valid path without resourceId', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.path = '/1/2/3';
@@ -100,7 +100,7 @@ describe('given a valid path without resourceId', () => {
 
 describe('given a valid path with resourceId', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.path = '/1/2/3/6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7';
@@ -131,7 +131,7 @@ describe('given a valid path with resourceId', () => {
 
 describe('given a path with invalid resourceId', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.path = '/1/2/3/x';

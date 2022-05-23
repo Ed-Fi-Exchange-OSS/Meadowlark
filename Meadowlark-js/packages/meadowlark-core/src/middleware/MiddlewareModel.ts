@@ -9,7 +9,7 @@ import { FrontendResponse } from '../handler/FrontendResponse';
 /**
  * Processing ends once there is a response.
  */
-export type MiddlewareChain = {
+export type MiddlewareModel = {
   frontendRequest: FrontendRequest;
   frontendResponse: FrontendResponse | null;
 };

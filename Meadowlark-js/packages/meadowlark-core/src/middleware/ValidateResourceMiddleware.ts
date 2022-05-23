@@ -5,7 +5,7 @@
 
 import { validateRequest } from '../validation/RequestValidator';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { MiddlewareChain } from './MiddlewareChain';
+import { MiddlewareModel } from './MiddlewareModel';
 import { NoDocumentInfo } from '../model/DocumentInfo';
 
 const moduleName = 'ValidateResourceMiddleware';
@@ -13,7 +13,7 @@ const moduleName = 'ValidateResourceMiddleware';
 /**
  * Validates resource, JSON document shape, and extracts identity information
  */
-export async function validateResource({ frontendRequest, frontendResponse }: MiddlewareChain): Promise<MiddlewareChain> {
+export async function validateResource({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'validateResource');

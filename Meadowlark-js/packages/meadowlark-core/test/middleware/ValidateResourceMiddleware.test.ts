@@ -8,12 +8,12 @@ import { validateResource } from '../../src/middleware/ValidateResourceMiddlewar
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
-import { MiddlewareChain } from '../../src/middleware/MiddlewareChain';
+import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {
@@ -42,7 +42,7 @@ describe('given a previous middleware has created a response', () => {
 
 describe('given an error response and no document info from validateResource', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   const errorBody = 'An error occurred';
   let mockRequestValidator: any;
 
@@ -80,7 +80,7 @@ describe('given an error response and no document info from validateResource', (
 describe('given an error response and document info from validateResource', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const errorBody = 'An error occurred';
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {
@@ -118,7 +118,7 @@ describe('given a valid response from validateResource', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const documentInfo = newDocumentInfo();
   const headerMetadata = {};
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
   beforeAll(async () => {
@@ -158,7 +158,7 @@ describe('given a valid response from validateResource', () => {
 });
 
 describe('given requesting abstract domain entity', () => {
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {
@@ -192,7 +192,7 @@ describe('given requesting abstract domain entity', () => {
 });
 
 describe('given requesting abstract association', () => {
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {

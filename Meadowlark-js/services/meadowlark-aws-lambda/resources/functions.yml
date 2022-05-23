@@ -6,8 +6,8 @@ upsert:
         path: /{proxy+}
         cors: true
 
-getResolver:
-  handler: dist/handler/CrudHandler.getResolver
+get:
+  handler: dist/handler/CrudHandler.get
   environment:
     ES_ENDPOINT:
       Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]

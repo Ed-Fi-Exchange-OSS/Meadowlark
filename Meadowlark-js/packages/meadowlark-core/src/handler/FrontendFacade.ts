@@ -5,7 +5,7 @@
 import R from 'ramda';
 import { writeErrorToLog } from '../Logger';
 import { authenticate } from '../middleware/AuthenticationMiddleware';
-import { MiddlewareChain } from '../middleware/MiddlewareChain';
+import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
 import { validateResource } from '../middleware/ValidateResourceMiddleware';
@@ -15,60 +15,112 @@ import { FrontendResponse } from './FrontendResponse';
 import * as Upsert from './Upsert';
 import * as Update from './Update';
 import * as Delete from './Delete';
-import * as Get from './Get';
+import * as Query from './Query';
+import * as GetById from './GetById';
+import { getDocumentStore } from '../plugin/PluginLoader';
 
 // Middleware stack for methods with a body in the request (POST, PUT)
-const methodWithBodyStack: (chain: MiddlewareChain) => Promise<MiddlewareChain> = R.pipe(
+const methodWithBodyStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
   authenticate,
   R.andThen(parsePath),
   R.andThen(parseBody),
   R.andThen(validateResource),
+  R.andThen(getDocumentStore().securityMiddleware),
 );
 
-// Middleware stack for methods without a body in the request (GET, DELETE)
-const methodWithoutBodyStack: (chain: MiddlewareChain) => Promise<MiddlewareChain> = R.pipe(
+// Middleware stack for deletes - no body
+const deleteStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
   authenticate,
   R.andThen(parsePath),
+  R.andThen(noBody),
+  R.andThen(validateResource),
+  R.andThen(getDocumentStore().securityMiddleware),
+);
+
+// Middleware stack for GetById - parsePath gets run earlier, no body - document store security
+const getByIdStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
+  authenticate,
+  R.andThen(noBody),
+  R.andThen(validateResource),
+  R.andThen(getDocumentStore().securityMiddleware),
+);
+
+// Middleware stack for Query - parsePath gets run earlier, no body
+const queryStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
+  authenticate,
   R.andThen(noBody),
   R.andThen(validateResource),
 );
 
 /**
- * Entry point for all API GET requests, both "by id" and query
+ * Handles query action
  */
-export async function getResolver(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const chain: MiddlewareChain = await methodWithoutBodyStack({ frontendRequest, frontendResponse: null });
-    if (chain.frontendResponse != null) return chain.frontendResponse;
-    return await Get.getResolver(chain.frontendRequest);
+    const model: MiddlewareModel = await queryStack({ frontendRequest, frontendResponse: null });
+    if (model.frontendResponse != null) return model.frontendResponse;
+    return await Query.query(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.deleteIt', frontendRequest.traceId, 'deleteIt', 500, e);
+    writeErrorToLog('FrontendFacade.query', frontendRequest.traceId, 'create', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
 
 /**
- * Entry point for API update requests, which are "by id"
+ * Handles getById action
+ */
+export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  try {
+    const model: MiddlewareModel = await getByIdStack({ frontendRequest, frontendResponse: null });
+    if (model.frontendResponse != null) return model.frontendResponse;
+    return await GetById.getById(model.frontendRequest);
+  } catch (e) {
+    writeErrorToLog('FrontendFacade.getById', frontendRequest.traceId, 'create', 500, e);
+    return { body: '', statusCode: 500 };
+  }
+}
+
+/**
+ * Entry point for all API GET requests, which determines the action type - get by id, or query
+ */
+export async function get(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  try {
+    // determine query or "by id"
+    const afterParsePath: MiddlewareModel = await parsePath({ frontendRequest, frontendResponse: null });
+    if (afterParsePath.frontendRequest.middleware.pathComponents.resourceId == null) {
+      frontendRequest.action = 'query';
+      return await query(frontendRequest);
+    }
+    frontendRequest.action = 'getById';
+    return await getById(frontendRequest);
+  } catch (e) {
+    writeErrorToLog('FrontendFacade.get', frontendRequest.traceId, 'deleteIt', 500, e);
+    return { body: '', statusCode: 500 };
+  }
+}
+
+/**
+ * Entry point for API update actions, which are "by id"
  */
 export async function update(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const chain: MiddlewareChain = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
-    if (chain.frontendResponse != null) return chain.frontendResponse;
-    return await Update.update(chain.frontendRequest);
+    const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
+    if (model.frontendResponse != null) return model.frontendResponse;
+    return await Update.update(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.upsert', frontendRequest.traceId, 'create', 500, e);
+    writeErrorToLog('FrontendFacade.update', frontendRequest.traceId, 'create', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
 
 /**
- * Entry point for API upsert requests
+ * Entry point for API upsert actions
  */
 export async function upsert(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const chain: MiddlewareChain = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
-    if (chain.frontendResponse != null) return chain.frontendResponse;
-    return await Upsert.upsert(chain.frontendRequest);
+    const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
+    if (model.frontendResponse != null) return model.frontendResponse;
+    return await Upsert.upsert(model.frontendRequest);
   } catch (e) {
     writeErrorToLog('FrontendFacade.upsert', frontendRequest.traceId, 'create', 500, e);
     return { body: '', statusCode: 500 };
@@ -76,13 +128,13 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 }
 
 /**
- * Entry point for all API DELETE requests, which are "by id"
+ * Entry point for all delete actions, which are "by id"
  */
 export async function deleteIt(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const chain: MiddlewareChain = await methodWithoutBodyStack({ frontendRequest, frontendResponse: null });
-    if (chain.frontendResponse != null) return chain.frontendResponse;
-    return await Delete.deleteIt(chain.frontendRequest);
+    const model: MiddlewareModel = await deleteStack({ frontendRequest, frontendResponse: null });
+    if (model.frontendResponse != null) return model.frontendResponse;
+    return await Delete.deleteIt(model.frontendRequest);
   } catch (e) {
     writeErrorToLog('FrontendFacade.deleteIt', frontendRequest.traceId, 'deleteIt', 500, e);
     return { body: '', statusCode: 500 };

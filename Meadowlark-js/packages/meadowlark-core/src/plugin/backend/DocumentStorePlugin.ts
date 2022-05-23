@@ -11,6 +11,7 @@ import { UpdateRequest } from '../../message/UpdateRequest';
 import { UpdateResult } from '../../message/UpdateResult';
 import { UpsertRequest } from '../../message/UpsertRequest';
 import { UpsertResult } from '../../message/UpsertResult';
+import { MiddlewareModel } from '../../middleware/MiddlewareModel';
 
 export interface DocumentStorePlugin {
   upsertDocument: (request: UpsertRequest) => Promise<UpsertResult>;
@@ -20,4 +21,6 @@ export interface DocumentStorePlugin {
   updateDocumentById: (request: UpdateRequest) => Promise<UpdateResult>;
 
   deleteDocumentById: (request: DeleteRequest) => Promise<DeleteResult>;
+
+  securityMiddleware: (middlewareModel: MiddlewareModel) => Promise<MiddlewareModel>;
 }

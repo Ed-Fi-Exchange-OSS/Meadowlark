@@ -6,12 +6,12 @@
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
-import { MiddlewareChain } from '../../src/middleware/MiddlewareChain';
+import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     // Act
@@ -29,7 +29,7 @@ describe('given a previous middleware has created a response', () => {
 
 describe('given a missing body', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.body = null;
@@ -53,7 +53,7 @@ describe('given a missing body', () => {
 
 describe('given a malformed body', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
     frontendRequest.body = 'Not JSON';
@@ -77,7 +77,7 @@ describe('given a malformed body', () => {
 
 describe('given a valid body', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  let resultChain: MiddlewareChain;
+  let resultChain: MiddlewareModel;
   const validBody = '{}';
 
   beforeAll(async () => {

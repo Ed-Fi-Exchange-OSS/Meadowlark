@@ -24,7 +24,6 @@ export { newSecurity } from './security/Security';
 export type { DocumentElement } from './model/DocumentElement';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
-export { HttpMethod } from './handler/HttpMethod';
 export type { FrontendRequest } from './handler/FrontendRequest';
 export { newFrontendRequest } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
@@ -38,9 +37,11 @@ export type { DocumentInfo, DocumentIdentifyingInfo, DocumentTypeInfo } from './
 export { newDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
 export { Logger } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
+export type { MiddlewareModel } from './middleware/MiddlewareModel';
+export { doNothingMiddleware } from './middleware/DoNothingMiddleware';
 
 // Handlers
-export { upsert, deleteIt, getResolver, update } from './handler/FrontendFacade';
+export { upsert, deleteIt, get, update } from './handler/FrontendFacade';
 export { loadDescriptors } from './handler/DescriptorLoader';
 export {
   apiVersion,

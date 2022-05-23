@@ -6,7 +6,7 @@
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { PathComponents, NoPathComponents } from '../model/PathComponents';
 import { Security, UndefinedSecurity } from '../security/Security';
-import type { HttpMethod } from './HttpMethod';
+import type { Action } from './Action';
 
 export interface FrontendHeaders {
   [header: string]: string | undefined;
@@ -29,7 +29,7 @@ export interface FrontendRequestMiddleware {
 }
 
 export interface FrontendRequest {
-  method: HttpMethod;
+  action: Action;
   path: string;
   traceId: string;
   body: string | null;
@@ -52,7 +52,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
 
 export function newFrontendRequest(): FrontendRequest {
   return {
-    method: 'GET',
+    action: 'UNKNOWN',
     path: '',
     traceId: '',
     body: null,

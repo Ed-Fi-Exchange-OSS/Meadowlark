@@ -4,14 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { MiddlewareChain } from './MiddlewareChain';
+import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'ParseBodyMiddleware';
 
 /**
  * Handles initial body validation and parsing
  */
-export async function parseBody({ frontendRequest, frontendResponse }: MiddlewareChain): Promise<MiddlewareChain> {
+export async function parseBody({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'parseBody');

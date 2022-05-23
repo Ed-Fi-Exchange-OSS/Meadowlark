@@ -13,6 +13,7 @@ import { UpsertRequest } from '../../message/UpsertRequest';
 import { UpsertResult } from '../../message/UpsertResult';
 import { Logger } from '../../Logger';
 import { DocumentStorePlugin } from './DocumentStorePlugin';
+import { MiddlewareModel } from '../../middleware/MiddlewareModel';
 
 export const NoDocumentStorePlugin: DocumentStorePlugin = {
   upsertDocument: ({ traceId }: UpsertRequest): Promise<UpsertResult> => {
@@ -33,5 +34,13 @@ export const NoDocumentStorePlugin: DocumentStorePlugin = {
   deleteDocumentById: ({ traceId }: DeleteRequest): Promise<DeleteResult> => {
     Logger.warn('NoDocumentStorePlugin.deleteDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+  },
+
+  securityMiddleware: (middlewareModel: MiddlewareModel): Promise<MiddlewareModel> => {
+    Logger.warn(
+      'NoDocumentStorePlugin.securityMiddleware(): No backend plugin has been configured',
+      middlewareModel.frontendRequest.traceId,
+    );
+    return Promise.resolve(middlewareModel);
   },
 };

@@ -6,14 +6,14 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { validateJwt } from '../security/JwtValidator';
 import { authorizationHeader } from '../security/AuthorizationHeader';
-import { MiddlewareChain } from './MiddlewareChain';
+import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'AuthenticationMiddleware';
 
 /**
  * Handles authentication
  */
-export async function authenticate({ frontendRequest, frontendResponse }: MiddlewareChain): Promise<MiddlewareChain> {
+export async function authenticate({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'authenticate');
