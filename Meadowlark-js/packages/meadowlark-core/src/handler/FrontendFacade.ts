@@ -59,6 +59,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
   try {
     const model: MiddlewareModel = await queryStack({ frontendRequest, frontendResponse: null });
 
+    // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
     return await Query.query(model.frontendRequest);
@@ -75,6 +76,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   try {
     const model: MiddlewareModel = await getByIdStack({ frontendRequest, frontendResponse: null });
 
+    // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
     return await GetById.getById(model.frontendRequest);
@@ -91,8 +93,10 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
   try {
     // determine query or "by id"
     const afterParsePath: MiddlewareModel = await parsePath({ frontendRequest, frontendResponse: null });
+    const { resourceId } = afterParsePath.frontendRequest.middleware.pathComponents;
 
-    if (afterParsePath.frontendRequest.middleware.pathComponents.resourceId == null) {
+    // No resourceId in path means this is a query
+    if (resourceId == null) {
       frontendRequest.action = 'query';
       return await query(frontendRequest);
     }
@@ -112,6 +116,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
   try {
     const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
 
+    // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
     return await Update.update(model.frontendRequest);
@@ -128,6 +133,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
   try {
     const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
 
+    // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
     return await Upsert.upsert(model.frontendRequest);
@@ -144,6 +150,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
   try {
     const model: MiddlewareModel = await deleteStack({ frontendRequest, frontendResponse: null });
 
+    // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
     return await Delete.deleteIt(model.frontendRequest);
