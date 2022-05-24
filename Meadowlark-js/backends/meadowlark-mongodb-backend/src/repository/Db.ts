@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, Logger as MongoLogger, LoggerLevel } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
@@ -11,6 +11,9 @@ const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/mead
 export const COLLECTION_NAME = 'documents';
 
 let singletonClient: MongoClient | null = null;
+
+const MONGO_LOG_LEVEL: string = process.env.MONGO_LOG_LEVEL != null ? process.env.MONGO_LOG_LEVEL.toLowerCase() : 'error';
+MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
 /**
  * Return a brand new client - which is a connection pool. Only use for testing purposes.
