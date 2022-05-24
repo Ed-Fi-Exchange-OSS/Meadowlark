@@ -22,14 +22,16 @@ const moduleName = 'Upsert';
 export async function upsert(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
     writeRequestToLog(moduleName, frontendRequest, 'upsert');
+    const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const resourceId = documentIdForDocumentInfo(frontendRequest.middleware.documentInfo);
+    const resourceId = documentIdForDocumentInfo(resourceInfo, documentInfo);
     const request: UpsertRequest = {
       id: resourceId,
-      documentInfo: frontendRequest.middleware.documentInfo,
-      edfiDoc: frontendRequest.middleware.parsedBody,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: parsedBody,
       validate: frontendRequest.headers['reference-validation'] !== 'false',
-      security: frontendRequest.middleware.security,
+      security,
       traceId: frontendRequest.traceId,
     };
 
@@ -41,36 +43,37 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
-      const { pathComponents } = frontendRequest.middleware;
       const location = `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
       return {
         body: '',
         statusCode: 201,
-        headers: { ...frontendRequest.middleware.headerMetadata, Location: location },
+        headers: { ...headerMetadata, Location: location },
       };
     }
+
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
-      const { pathComponents } = frontendRequest.middleware;
       const location = `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
-      return { body: '', statusCode: 200, headers: { ...frontendRequest.middleware.headerMetadata, Location: location } };
+      return { body: '', statusCode: 200, headers: { ...headerMetadata, Location: location } };
     }
+
     if (response === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409);
-      return { body: '', statusCode: 409, headers: frontendRequest.middleware.headerMetadata };
+      return { body: '', statusCode: 409, headers: headerMetadata };
     }
+
     if (response === 'INSERT_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, failureMessage);
       return {
         body: JSON.stringify({ message: failureMessage }),
         statusCode: 400,
-        headers: frontendRequest.middleware.headerMetadata,
+        headers: headerMetadata,
       };
     }
 
     // Otherwise, it's a 500 error
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, failureMessage);
-    return { body: '', statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
+    return { body: '', statusCode: 500, headers: headerMetadata };
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, e);
     return { body: '', statusCode: 500 };

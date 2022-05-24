@@ -5,6 +5,7 @@
 
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { PathComponents, NoPathComponents } from '../model/PathComponents';
+import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 import { Security, UndefinedSecurity } from '../security/Security';
 import type { Action } from './Action';
 
@@ -24,6 +25,7 @@ export interface FrontendRequestMiddleware {
   security: Security;
   pathComponents: PathComponents;
   parsedBody: object;
+  resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   headerMetadata: { [header: string]: string };
 }
@@ -45,6 +47,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     security: UndefinedSecurity,
     pathComponents: NoPathComponents,
     parsedBody: {},
+    resourceInfo: NoResourceInfo,
     documentInfo: NoDocumentInfo,
     headerMetadata: {},
   };

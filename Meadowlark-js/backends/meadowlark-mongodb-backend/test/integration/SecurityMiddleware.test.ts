@@ -9,6 +9,8 @@ import {
   FrontendRequest,
   newDocumentInfo,
   newFrontendRequest,
+  newResourceInfo,
+  ResourceInfo,
   Security,
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
@@ -87,15 +89,19 @@ describe('given the getById of a document owned by the requestor', () => {
   const authorizationStrategy = 'OWNERSHIP_BASED';
   const clientName = 'ThisClient';
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'get2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
     id,
+    resourceInfo,
     documentInfo,
     edfiDoc: {},
     validate: false,
@@ -139,15 +145,19 @@ describe('given the getById of a document not owned by the requestor', () => {
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'get2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
     id,
+    resourceInfo,
     documentInfo,
     edfiDoc: {},
     validate: false,

@@ -7,20 +7,18 @@ import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import JsSha from 'jssha';
 import { DocumentElement } from './DocumentElement';
 import { DocumentIdentity } from './DocumentIdentity';
-import { DocumentIdentifyingInfo, DocumentInfo } from './DocumentInfo';
+import { DocumentInfo } from './DocumentInfo';
 import { DocumentReference } from './DocumentReference';
+import { ResourceInfo } from './ResourceInfo';
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given document info (and possibly assignable-adjusted
- * document identity) for use as a document id.
+ * Returns a SHAKE128 hash of length 224 bits for the given document identity (possibly assignable-adjusted)
+ * for use as a document id.
  */
-function constructId({
-  projectName,
-  resourceName,
-  resourceVersion,
-  documentIdentity,
-  isDescriptor,
-}: DocumentIdentifyingInfo): string {
+export function documentIdForDocumentIdentity(
+  { projectName, resourceName, resourceVersion, isDescriptor }: ResourceInfo,
+  documentIdentity: DocumentIdentity,
+): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
   // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
 
@@ -35,30 +33,16 @@ function constructId({
 }
 
 /**
- * Returns the id of the given DocumentIdentifyingInfo, using the project name, resource name, resource version
+ * Returns the id of the given DocumentInfo, using the project name, resource name, resource version
  * and identity of the API document.
  * If the given documentInfo is assignable, uses that information for the document id.
  */
-export function documentIdForDocumentInfo(documentInfo: DocumentInfo): string {
+export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
   // If this is an assignable entity, use the assignableIdentity for the id instead of the actual document identity
   const documentIdentity: DocumentIdentity =
     documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
 
-  return constructId({
-    projectName: documentInfo.projectName,
-    resourceName: documentInfo.resourceName,
-    resourceVersion: documentInfo.resourceVersion,
-    documentIdentity,
-    isDescriptor: documentInfo.isDescriptor,
-  });
-}
-
-/**
- * Returns the id of the given DocumentIdentifyingInfo, using the project name, resource name, resource version
- * and identity of the API document.
- */
-export function documentIdForDocumentIdentifyingInfo(documentIdentifyingInfo: DocumentIdentifyingInfo): string {
-  return constructId(documentIdentifyingInfo);
+  return documentIdForDocumentIdentity(resourceInfo, documentIdentity);
 }
 
 /**
@@ -66,13 +50,15 @@ export function documentIdForDocumentIdentifyingInfo(documentIdentifyingInfo: Do
  * and identity of the API document.
  */
 export function documentIdForDocumentReference(documentReference: DocumentReference): string {
-  return constructId({
-    projectName: documentReference.projectName,
-    resourceName: documentReference.resourceName,
-    resourceVersion: documentReference.resourceVersion,
-    documentIdentity: documentReference.documentIdentity,
-    isDescriptor: documentReference.isDescriptor,
-  });
+  return documentIdForDocumentIdentity(
+    {
+      projectName: documentReference.projectName,
+      resourceName: documentReference.resourceName,
+      resourceVersion: documentReference.resourceVersion,
+      isDescriptor: documentReference.isDescriptor,
+    },
+    documentReference.documentIdentity,
+  );
 }
 
 /**

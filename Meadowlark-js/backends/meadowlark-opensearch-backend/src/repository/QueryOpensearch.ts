@@ -4,20 +4,20 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from '@opensearch-project/opensearch';
-import { QueryRequest, QueryResult, Logger, DocumentInfo } from '@edfi/meadowlark-core';
+import { QueryRequest, QueryResult, Logger, ResourceInfo } from '@edfi/meadowlark-core';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 
 /**
- * Returns OpenSearch index name from the given DocumentInfo.
+ * Returns OpenSearch index name from the given ResourceInfo.
  *
  * OpenSearch indexes are required to be lowercase only, with no pound signs or periods.
  */
-export function indexFromDocumentInfo(documentInfo: DocumentInfo): string {
-  const adjustedResourceName = documentInfo.isDescriptor
-    ? normalizeDescriptorSuffix(documentInfo.resourceName)
-    : documentInfo.resourceName;
+export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
+  const adjustedResourceName = resourceInfo.isDescriptor
+    ? normalizeDescriptorSuffix(resourceInfo.resourceName)
+    : resourceInfo.resourceName;
 
-  return `${documentInfo.projectName}$${documentInfo.resourceVersion}$${adjustedResourceName}`
+  return `${resourceInfo.projectName}$${resourceInfo.resourceVersion}$${adjustedResourceName}`
     .toLowerCase()
     .replace(/\./g, '-');
 }
@@ -48,13 +48,13 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
  * Entry point for querying with OpenSearch
  */
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
-  const { documentInfo, queryStringParameters, paginationParameters, traceId } = request;
+  const { resourceInfo, queryStringParameters, paginationParameters, traceId } = request;
 
   Logger.debug(`Building query`, traceId);
 
   let documents: any = [];
   try {
-    let query = `SELECT info FROM ${indexFromDocumentInfo(documentInfo)}`;
+    let query = `SELECT info FROM ${indexFromResourceInfo(resourceInfo)}`;
     if (Object.entries(queryStringParameters).length > 0) {
       query += ` WHERE ${whereConditionsFrom(queryStringParameters)} ORDER BY _doc`;
     }

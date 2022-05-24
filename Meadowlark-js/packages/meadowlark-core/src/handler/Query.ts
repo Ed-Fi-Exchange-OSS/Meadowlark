@@ -28,7 +28,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
   const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryStringParameters);
 
   const request: QueryRequest = {
-    documentInfo: frontendRequest.middleware.documentInfo,
+    resourceInfo: frontendRequest.middleware.resourceInfo,
     queryStringParameters: cleanQueryParameters,
     paginationParameters,
     traceId: frontendRequest.traceId,

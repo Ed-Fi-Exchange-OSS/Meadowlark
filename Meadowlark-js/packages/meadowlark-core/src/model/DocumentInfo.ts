@@ -3,48 +3,20 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Assignable } from './Assignable';
-import { DocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
-import { DocumentReference } from './DocumentReference';
-
-/**
- * Type information for an API document
- */
-export interface DocumentTypeInfo {
-  /**
-   * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
-   */
-  projectName: string;
-
-  /**
-   * The MetaEd project version the entity belongs to.
-   */
-  resourceVersion: string;
-  /**
-   * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
-   * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
-   */
-  resourceName: string;
-  /**
-   * Whether this document is a descriptor. Descriptors are treated differently from other documents
-   */
-  isDescriptor: boolean;
-}
-
-/**
- * Information to uniquely identify an API document by the elements that make up its identity
- */
-export interface DocumentIdentifyingInfo extends DocumentTypeInfo {
-  /**
-   * The identity elements extracted from the API document
-   */
-  documentIdentity: DocumentIdentity;
-}
+import type { Assignable } from './Assignable';
+import type { DocumentIdentity } from './DocumentIdentity';
+import type { DocumentReference } from './DocumentReference';
+import { NoDocumentIdentity } from './DocumentIdentity';
 
 /**
  * Complete information on a validated API document
  */
-export interface DocumentInfo extends DocumentIdentifyingInfo {
+export interface DocumentInfo {
+  /**
+   * The identity elements extracted from the API document
+   */
+  documentIdentity: DocumentIdentity;
+
   /**
    * A list of the document references extracted from the API document
    */
@@ -77,10 +49,6 @@ export interface DocumentInfo extends DocumentIdentifyingInfo {
  */
 export function newDocumentInfo(): DocumentInfo {
   return {
-    resourceName: '',
-    isDescriptor: false,
-    projectName: '',
-    resourceVersion: '',
     documentIdentity: NoDocumentIdentity,
     assignableInfo: null,
     documentReferences: [],
@@ -93,9 +61,6 @@ export function newDocumentInfo(): DocumentInfo {
 /**
  * The null object for DocumentInfo
  */
-export const NoDocumentInfo = {
+export const NoDocumentInfo = Object.freeze({
   ...newDocumentInfo(),
-  resourceName: 'NoResourceName',
-  projectName: 'NoProjectName',
-  resourceVersion: '0.0.0',
-};
+});

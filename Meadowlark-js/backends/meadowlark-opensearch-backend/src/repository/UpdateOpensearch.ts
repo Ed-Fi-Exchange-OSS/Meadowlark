@@ -13,7 +13,7 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { indexFromDocumentInfo } from './QueryOpensearch';
+import { indexFromResourceInfo } from './QueryOpensearch';
 
 /**
  * Parameters for an OpenSearch request
@@ -27,7 +27,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   Logger.info('UpdateOpenSearch.afterDeleteDocumentById', request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromDocumentInfo(request.documentInfo) };
+  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
 
   try {
     Logger.debug(
@@ -44,10 +44,10 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  * Shared opensearch upsert logic
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromDocumentInfo(request.documentInfo) };
+  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
 
   // Ignore if a descriptor.
-  if (request.documentInfo.isDescriptor) {
+  if (request.resourceInfo.isDescriptor) {
     Logger.debug(
       `UpdateOpensearch.upsertToOpensearch Skipping ${JSON.stringify(opensearchRequest)} since it is a descriptor entity`,
       request.traceId,

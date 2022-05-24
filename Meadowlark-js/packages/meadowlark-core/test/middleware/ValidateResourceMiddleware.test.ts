@@ -3,28 +3,28 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as RequestValidator from '../../src/validation/RequestValidator';
-import { validateResource } from '../../src/middleware/ValidateResourceMiddleware';
+import * as ResourceValidator from '../../src/validation/ResourceValidator';
+import { resourceValidation } from '../../src/middleware/ValidateResourceMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
-import { newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
+import { newResourceInfo, NoResourceInfo } from '../../src/model/ResourceInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
   let resultChain: MiddlewareModel;
-  let mockRequestValidator: any;
+  let mockResourceValidator: any;
 
   beforeAll(async () => {
-    mockRequestValidator = jest.spyOn(RequestValidator, 'validateRequest');
+    mockResourceValidator = jest.spyOn(ResourceValidator, 'validateResource');
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
-    mockRequestValidator.mockRestore();
+    mockResourceValidator.mockRestore();
   });
 
   it('returns the given request', () => {
@@ -35,33 +35,34 @@ describe('given a previous middleware has created a response', () => {
     expect(resultChain.frontendResponse).toBe(frontendResponse);
   });
 
-  it('never calls validateResource', () => {
-    expect(mockRequestValidator).not.toHaveBeenCalled();
+  it('never calls resourceValidation', () => {
+    expect(mockResourceValidator).not.toHaveBeenCalled();
   });
 });
 
-describe('given an error response and no document info from validateResource', () => {
+describe('given an error response and no document info from resourceValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   let resultChain: MiddlewareModel;
   const errorBody = 'An error occurred';
-  let mockRequestValidator: any;
+  let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: RequestValidator.ResourceValidationResult = {
-      documentInfo: NoDocumentInfo,
+    const validationResult: ResourceValidator.ResourceValidationResult = {
+      resourceInfo: NoResourceInfo,
       errorBody,
+      endpointName: '',
     };
 
-    mockRequestValidator = jest
-      .spyOn(RequestValidator, 'validateRequest')
+    mockResourceValidator = jest
+      .spyOn(ResourceValidator, 'validateResource')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse: null });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockRequestValidator.mockRestore();
+    mockResourceValidator.mockRestore();
   });
 
   it('returns the given request', () => {
@@ -77,28 +78,29 @@ describe('given an error response and no document info from validateResource', (
   });
 });
 
-describe('given an error response and document info from validateResource', () => {
+describe('given an error response and document info from resourceValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const errorBody = 'An error occurred';
   let resultChain: MiddlewareModel;
-  let mockRequestValidator: any;
+  let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: RequestValidator.ResourceValidationResult = {
-      documentInfo: newDocumentInfo(),
+    const validationResult: ResourceValidator.ResourceValidationResult = {
+      resourceInfo: newResourceInfo(),
       errorBody,
+      endpointName: '',
     };
 
-    mockRequestValidator = jest
-      .spyOn(RequestValidator, 'validateRequest')
+    mockResourceValidator = jest
+      .spyOn(ResourceValidator, 'validateResource')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse: null });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockRequestValidator.mockRestore();
+    mockResourceValidator.mockRestore();
   });
 
   it('returns the given request', () => {
@@ -114,38 +116,38 @@ describe('given an error response and document info from validateResource', () =
   });
 });
 
-describe('given a valid response from validateResource', () => {
+describe('given a valid response from resourceValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  const documentInfo = newDocumentInfo();
+  const resourceInfo = newResourceInfo();
   const headerMetadata = {};
   let resultChain: MiddlewareModel;
-  let mockRequestValidator: any;
+  let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: RequestValidator.ResourceValidationResult = {
-      documentInfo,
-      errorBody: null,
+    const validationResult: ResourceValidator.ResourceValidationResult = {
+      resourceInfo,
+      endpointName: '',
       headerMetadata,
     };
 
-    mockRequestValidator = jest
-      .spyOn(RequestValidator, 'validateRequest')
+    mockResourceValidator = jest
+      .spyOn(ResourceValidator, 'validateResource')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse: null });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockRequestValidator.mockRestore();
+    mockResourceValidator.mockRestore();
   });
 
   it('returns the given request', () => {
     expect(resultChain.frontendRequest).toBe(frontendRequest);
   });
 
-  it('adds documentInfo to frontendRequest', () => {
-    expect(resultChain.frontendRequest.middleware.documentInfo).toBe(documentInfo);
+  it('adds resourceInfo to frontendRequest', () => {
+    expect(resultChain.frontendRequest.middleware.resourceInfo).toBe(resourceInfo);
   });
 
   it('adds headerMetadata to frontendRequest', () => {
@@ -177,7 +179,7 @@ describe('given requesting abstract domain entity', () => {
     };
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse: null });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
   });
 
   it('returns status 404', () => {
@@ -211,7 +213,7 @@ describe('given requesting abstract association', () => {
     };
 
     // Act
-    resultChain = await validateResource({ frontendRequest, frontendResponse: null });
+    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
   });
 
   it('returns status 404', () => {

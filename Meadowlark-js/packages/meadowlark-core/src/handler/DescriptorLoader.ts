@@ -16,6 +16,7 @@ import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
+import { ResourceInfo } from '../model/ResourceInfo';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -116,30 +117,34 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       }
 
       const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
-      const descriptorDocumentInfo: DocumentInfo = {
-        ...newDocumentInfo(),
+      const resourceInfo: ResourceInfo = {
         resourceName: descriptorName,
         projectName: 'Ed-Fi',
         resourceVersion: '3.3.1-b',
+        isDescriptor: true,
+      };
+
+      const documentInfo: DocumentInfo = {
+        ...newDocumentInfo(),
         documentIdentity: [
           {
             name: 'descriptor',
             value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
           },
         ],
-        isDescriptor: true,
       };
 
       const putResult: UpsertResult = await getDocumentStore().upsertDocument({
-        id: documentIdForDocumentInfo(descriptorDocumentInfo),
-        documentInfo: descriptorDocumentInfo,
+        id: documentIdForDocumentInfo(resourceInfo, documentInfo),
+        resourceInfo,
+        documentInfo,
         edfiDoc: descriptorDocument,
         validate: true,
         security: { ...newSecurity(), authorizationStrategy: 'FULL_ACCESS' },
         traceId: '-',
       });
       Logger.debug(
-        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(descriptorDocumentInfo.documentIdentity)}: ${
+        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
           putResult.failureMessage ?? 'OK'
         }`,
         '-',
@@ -147,7 +152,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       if (!(putResult.response === 'INSERT_SUCCESS' || putResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
-            descriptorDocumentInfo.documentIdentity,
+            documentInfo.documentIdentity,
           )} failed: ${putResult.failureMessage}`,
           'n/a',
         );

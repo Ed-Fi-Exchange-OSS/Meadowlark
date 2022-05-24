@@ -25,7 +25,10 @@ const frontendRequest: FrontendRequest = {
   },
 };
 // resourceId must match id of document body
-frontendRequest.middleware.pathComponents.resourceId = documentIdForDocumentInfo(frontendRequest.middleware.documentInfo);
+frontendRequest.middleware.pathComponents.resourceId = documentIdForDocumentInfo(
+  frontendRequest.middleware.resourceInfo,
+  frontendRequest.middleware.documentInfo,
+);
 
 describe('given the requested document does not exist', () => {
   let response: FrontendResponse;

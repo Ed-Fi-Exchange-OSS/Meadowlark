@@ -5,22 +5,16 @@
 
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
-import { matchResourceNameToMetaEd, validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
-import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './DocumentIdentityExtractor';
+import { matchResourceNameToMetaEd } from '../metaed/MetaEdValidation';
 import { decapitalize } from '../Utility';
-import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
-import { DocumentReference } from '../model/DocumentReference';
-import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { PathComponents } from '../model/PathComponents';
-import { Assignable } from '../model/Assignable';
-import { NoDocumentIdentity } from '../model/DocumentIdentity';
+import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 
 export type ResourceValidationResult = {
   /**
    * The name of the validated endpoint, corresponding to the name of the resource requested
    */
-  endpointName?: string;
+  endpointName: string;
   /**
    * Metadata for the MetaEd project loaded
    */
@@ -28,11 +22,11 @@ export type ResourceValidationResult = {
   /**
    * Error message for validation failure
    */
-  errorBody: string | null;
+  errorBody?: string;
   /**
    * Information on the validated MetaEd entity matching the API request
    */
-  documentInfo: DocumentInfo;
+  resourceInfo: ResourceInfo;
 };
 
 /**
@@ -40,13 +34,8 @@ export type ResourceValidationResult = {
  *
  * Starts by loading the MetaEd project specified in the endpoint path. Then uses the MetaEd internal
  * model, enriched by Meadowlark-specific enhancers, to validate the complete resource endpoint path.
- * If valid, continues by validating the request body (if any) for the resource. If valid, extracts
- * document identity and document reference information from the request body.
  */
-export async function validateRequest(
-  pathComponents: PathComponents,
-  body: object | null,
-): Promise<ResourceValidationResult> {
+export async function validateResource(pathComponents: PathComponents): Promise<ResourceValidationResult> {
   // Equally supporting resources with either upper or lower case names
   const lowerResourceName = decapitalize(pathComponents.endpointName);
   const modelNpmPackage = modelPackageFor(pathComponents.version);
@@ -69,7 +58,7 @@ export async function validateRequest(
     return {
       headerMetadata,
       endpointName: pathComponents.endpointName,
-      documentInfo: NoDocumentInfo,
+      resourceInfo: NoResourceInfo,
       errorBody: JSON.stringify({
         message: invalidResourceMessage,
       }),
@@ -80,50 +69,19 @@ export async function validateRequest(
     return {
       headerMetadata,
       endpointName: pathComponents.endpointName,
-      documentInfo: NoDocumentInfo,
+      resourceInfo: NoResourceInfo,
       errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.endpointName}'.` }),
     };
-  }
-
-  let errorBody: string | null = null;
-  let documentIdentityWithSecurity: DocumentIdentityWithSecurity = {
-    documentIdentity: NoDocumentIdentity,
-    studentId: null,
-    edOrgId: null,
-  };
-  let assignableInfo: Assignable | null = null;
-  const documentReferences: DocumentReference[] = [];
-  const descriptorReferences: DocumentReference[] = [];
-
-  if (!isDescriptor && body != null) {
-    const bodyValidation: string[] = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
-    if (bodyValidation.length > 0) {
-      errorBody = JSON.stringify({ message: bodyValidation });
-    } else {
-      documentIdentityWithSecurity = extractDocumentIdentity(matchingMetaEdModel, body);
-      documentReferences.push(...extractDocumentReferences(matchingMetaEdModel, body));
-      descriptorReferences.push(...extractDescriptorValues(matchingMetaEdModel, body));
-    }
-  }
-
-  if (!isDescriptor) {
-    // We need to do this even if no body for deletes
-    assignableInfo = deriveAssignableFrom(matchingMetaEdModel, documentIdentityWithSecurity.documentIdentity);
   }
 
   return {
     headerMetadata,
     endpointName: pathComponents.endpointName,
-    documentInfo: {
+    resourceInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,
       resourceVersion: metaEdConfiguration.projects[0].projectVersion,
       resourceName: matchingMetaEdModel.metaEdName,
       isDescriptor,
-      documentReferences,
-      descriptorReferences,
-      ...documentIdentityWithSecurity,
-      assignableInfo,
     },
-    errorBody,
   };
 }

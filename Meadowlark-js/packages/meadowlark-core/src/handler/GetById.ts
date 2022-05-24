@@ -25,7 +25,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   }
   const request: GetRequest = {
     id: frontendRequest.middleware.pathComponents.resourceId,
-    documentInfo: frontendRequest.middleware.documentInfo,
+    resourceInfo: frontendRequest.middleware.resourceInfo,
     security: frontendRequest.middleware.security,
     traceId: frontendRequest.traceId,
   };

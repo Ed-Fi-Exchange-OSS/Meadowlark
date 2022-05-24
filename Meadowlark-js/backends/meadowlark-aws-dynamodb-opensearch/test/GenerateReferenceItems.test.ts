@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity, DocumentInfo, newDocumentInfo } from '@edfi/meadowlark-core';
+import { DocumentIdentity, DocumentInfo, newDocumentInfo, newResourceInfo, ResourceInfo } from '@edfi/meadowlark-core';
 import { generateReferenceItems } from '../src/BaseDynamoRepository';
 import { TransactWriteItem } from '../src/types/AwsSdkLibDynamoDb';
 
@@ -11,10 +11,11 @@ describe('when collecting foreign key references', () => {
   describe('given a item with no references', () => {
     let result: TransactWriteItem[];
     const pkHash: string = 'ID#asdfqwer;lkj';
-    const info: DocumentInfo = newDocumentInfo();
+    const resourceInfo: ResourceInfo = newResourceInfo();
+    const documentInfo: DocumentInfo = newDocumentInfo();
 
     beforeAll(() => {
-      result = generateReferenceItems(pkHash, info);
+      result = generateReferenceItems(pkHash, resourceInfo, documentInfo);
     });
 
     it('returns an empty array', () => {
@@ -39,28 +40,29 @@ describe('when collecting foreign key references', () => {
     const parentKey: string = 'parentId=asdfasdf';
     const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
     const personNK: DocumentIdentity = [{ name: 'person.personId', value: 'b' }];
-    const info: DocumentInfo = newDocumentInfo();
+    const resourceInfo: ResourceInfo = newResourceInfo();
+    const documentInfo: DocumentInfo = newDocumentInfo();
 
-    info.projectName = 'Ed-Fi';
-    info.resourceName = 'Parent';
-    info.resourceVersion = '3.3.1-b';
-    info.documentReferences.push({
-      projectName: info.projectName,
-      resourceVersion: info.resourceVersion,
+    resourceInfo.projectName = 'Ed-Fi';
+    resourceInfo.resourceName = 'Parent';
+    resourceInfo.resourceVersion = '3.3.1-b';
+    documentInfo.documentReferences.push({
+      projectName: resourceInfo.projectName,
+      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'Person',
       documentIdentity: personNK,
       isAssignableFrom: false,
       isDescriptor: false,
     });
-    info.documentReferences.push({
-      projectName: info.projectName,
-      resourceVersion: info.resourceVersion,
+    documentInfo.documentReferences.push({
+      projectName: resourceInfo.projectName,
+      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'EducationOrganization',
       documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],
       isAssignableFrom: false,
       isDescriptor: false,
     });
-    info.documentIdentity = parentIdentity;
+    documentInfo.documentIdentity = parentIdentity;
 
     const fromParent = 'FREF#ID#09876554tuiolkjasdfasdfwe2w33afss';
     const toPerson = 'TREF#ID#884650ad435c14971851aeeac416cb961c3931b3c982b7113a91187e';
@@ -71,7 +73,7 @@ describe('when collecting foreign key references', () => {
     };
 
     beforeAll(() => {
-      result = generateReferenceItems(parentHash, info);
+      result = generateReferenceItems(parentHash, resourceInfo, documentInfo);
     });
 
     it('returns two items', () => {
@@ -109,14 +111,15 @@ describe('when collecting foreign key references', () => {
     let result: TransactWriteItem[];
     const parentHash: string = 'ID#09876554tuiolkjasdfasdfwe2w33afss';
     const parentIdentity = [{ name: 'parentId', value: 'asdfasdf' }];
-    const info: DocumentInfo = newDocumentInfo();
+    const resourceInfo: ResourceInfo = newResourceInfo();
+    const documentInfo: DocumentInfo = newDocumentInfo();
 
-    info.projectName = 'Ed-Fi';
-    info.resourceName = 'Parent';
-    info.resourceVersion = '3.3.1-b';
-    info.descriptorReferences.push({
-      projectName: info.projectName,
-      resourceVersion: info.resourceVersion,
+    resourceInfo.projectName = 'Ed-Fi';
+    resourceInfo.resourceName = 'Parent';
+    resourceInfo.resourceVersion = '3.3.1-b';
+    documentInfo.descriptorReferences.push({
+      projectName: resourceInfo.projectName,
+      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'SomethingDescriptor',
       documentIdentity: [
         {
@@ -127,10 +130,10 @@ describe('when collecting foreign key references', () => {
       isAssignableFrom: false,
       isDescriptor: true,
     });
-    info.documentIdentity = parentIdentity;
+    documentInfo.documentIdentity = parentIdentity;
 
     beforeAll(() => {
-      result = generateReferenceItems(parentHash, info);
+      result = generateReferenceItems(parentHash, resourceInfo, documentInfo);
     });
 
     it('returns zero items because descriptors are ignored', () => {

@@ -11,6 +11,9 @@ import {
   documentIdForDocumentInfo,
   UpsertRequest,
   DocumentReference,
+  NoResourceInfo,
+  ResourceInfo,
+  newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -21,6 +24,7 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   id: '',
+  resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
@@ -32,18 +36,21 @@ describe('given the upsert of a new document', () => {
   let client;
   let upsertResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert1' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      { ...newUpsertRequest(), id, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
       client,
     );
   });
@@ -71,16 +78,25 @@ describe('given the upsert of an existing document twice', () => {
   let upsertResult2;
   let upsertResult3;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { natural: 'key' } };
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      id,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
 
     upsertResult1 = await upsertDocument(upsertRequest, client);
     upsertResult2 = await upsertDocument(upsertRequest, client);
@@ -108,16 +124,19 @@ describe('given the upsert of an existing document twice', () => {
 describe('given an upsert of an existing document that changes the edfiDoc', () => {
   let client;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert3' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo };
+    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, resourceInfo, documentInfo };
 
     await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one' } }, client);
     await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two' } }, client);
@@ -139,18 +158,21 @@ describe('given an upsert of a new document that references a non-existent docum
   let client;
   let upsertResult;
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert4' }],
   };
 
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   const invalidReference: DocumentReference = {
-    projectName: documentWithReferencesInfo.projectName,
-    resourceName: documentWithReferencesInfo.resourceName,
-    resourceVersion: documentWithReferencesInfo.resourceVersion,
+    projectName: documentWithReferencesResourceInfo.projectName,
+    resourceName: documentWithReferencesResourceInfo.resourceName,
+    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
@@ -162,7 +184,13 @@ describe('given an upsert of a new document that references a non-existent docum
 
     // The new document with an invalid reference
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: false },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
       client,
     );
   });
@@ -187,39 +215,59 @@ describe('given an upsert of a new document that references an existing document
   let client;
   let upsertResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert5' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert6' }],
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The new document with a valid reference
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });
@@ -244,48 +292,68 @@ describe('given an upsert of a new document with one existing and one non-existe
   let client;
   let upsertResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert7' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert8' }],
     documentReferences: [validReference, invalidReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The new document with both valid and invalid references
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });
@@ -315,18 +383,21 @@ describe('given an update of a document that references a non-existent document 
   let client;
   let upsertResult;
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert4' }],
   };
 
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   const invalidReference: DocumentReference = {
-    projectName: documentWithReferencesInfo.projectName,
-    resourceName: documentWithReferencesInfo.resourceName,
-    resourceVersion: documentWithReferencesInfo.resourceVersion,
+    projectName: documentWithReferencesResourceInfo.projectName,
+    resourceName: documentWithReferencesResourceInfo.resourceName,
+    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
@@ -337,14 +408,26 @@ describe('given an update of a document that references a non-existent document 
 
     // Insert the original document with no reference
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: false },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
       client,
     );
 
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: false },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
       client,
     );
   });
@@ -374,45 +457,71 @@ describe('given an update of a document that references an existing document wit
   let client;
   let upsertResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert5' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert6' }],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The original document with no reference
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
 
     // The updated document with a valid reference
     documentWithReferencesInfo.documentReferences = [validReference];
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });
@@ -442,54 +551,80 @@ describe('given an update of a document with one existing and one non-existent r
   let client;
   let upsertResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'upsert7' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'upsert8' }],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The original document with no references
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
 
     // The updated document with both valid and invalid references
     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });

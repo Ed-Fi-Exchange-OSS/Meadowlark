@@ -22,24 +22,27 @@ const moduleName = 'Update';
 export async function update(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
     writeRequestToLog(moduleName, frontendRequest, 'update');
+    const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const resourceIdFromBody = documentIdForDocumentInfo(frontendRequest.middleware.documentInfo);
-    if (resourceIdFromBody !== frontendRequest.middleware.pathComponents.resourceId) {
+    const resourceIdFromBody = documentIdForDocumentInfo(resourceInfo, documentInfo);
+    if (resourceIdFromBody !== pathComponents.resourceId) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
+
       return {
         body: JSON.stringify({ message: failureMessage }),
         statusCode: 400,
-        headers: frontendRequest.middleware.headerMetadata,
+        headers: headerMetadata,
       };
     }
 
     const request: UpdateRequest = {
-      id: frontendRequest.middleware.pathComponents.resourceId,
-      documentInfo: frontendRequest.middleware.documentInfo,
-      edfiDoc: frontendRequest.middleware.parsedBody,
+      id: pathComponents.resourceId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: parsedBody,
       validate: frontendRequest.headers['reference-validation'] !== 'false',
-      security: frontendRequest.middleware.security,
+      security,
       traceId: frontendRequest.traceId,
     };
 
@@ -51,25 +54,29 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 204);
-      return { body: '', statusCode: 204, headers: frontendRequest.middleware.headerMetadata };
+      return { body: '', statusCode: 204, headers: headerMetadata };
     }
+
     if (response === 'UPDATE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 404);
-      return { body: '', statusCode: 404, headers: frontendRequest.middleware.headerMetadata };
+      return { body: '', statusCode: 404, headers: headerMetadata };
     }
+
     if (response === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
       return {
         body: JSON.stringify({ message: failureMessage }),
         statusCode: 400,
-        headers: frontendRequest.middleware.headerMetadata,
+        headers: headerMetadata,
       };
     }
+
     writeDebugStatusToLog(moduleName, frontendRequest, 'update', 500, failureMessage);
+
     return {
       body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
       statusCode: 500,
-      headers: frontendRequest.middleware.headerMetadata,
+      headers: headerMetadata,
     };
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);

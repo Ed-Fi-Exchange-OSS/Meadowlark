@@ -8,8 +8,8 @@ import { authorize } from '../middleware/AuthorizationMiddleware';
 import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
-import { validateResource } from '../middleware/ValidateResourceMiddleware';
-import { noBody } from '../middleware/NoBodyMiddleware';
+import { resourceValidation } from '../middleware/ValidateResourceMiddleware';
+import { documentValidation } from '../middleware/ValidateDocumentMiddleware';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import * as Upsert from './Upsert';
@@ -24,7 +24,8 @@ const methodWithBodyStack: (model: MiddlewareModel) => Promise<MiddlewareModel> 
   authorize,
   R.andThen(parsePath),
   R.andThen(parseBody),
-  R.andThen(validateResource),
+  R.andThen(resourceValidation),
+  R.andThen(documentValidation),
   R.andThen(getDocumentStore().securityMiddleware),
 );
 
@@ -32,25 +33,19 @@ const methodWithBodyStack: (model: MiddlewareModel) => Promise<MiddlewareModel> 
 const deleteStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
   authorize,
   R.andThen(parsePath),
-  R.andThen(noBody),
-  R.andThen(validateResource),
+  R.andThen(resourceValidation),
   R.andThen(getDocumentStore().securityMiddleware),
 );
 
 // Middleware stack for GetById - parsePath gets run earlier, no body - document store security
 const getByIdStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
   authorize,
-  R.andThen(noBody),
-  R.andThen(validateResource),
+  R.andThen(resourceValidation),
   R.andThen(getDocumentStore().securityMiddleware),
 );
 
 // Middleware stack for Query - parsePath gets run earlier, no body
-const queryStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
-  authorize,
-  R.andThen(noBody),
-  R.andThen(validateResource),
-);
+const queryStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(authorize, R.andThen(resourceValidation));
 
 /**
  * Handles query action
