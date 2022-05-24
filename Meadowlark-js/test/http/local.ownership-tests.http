@@ -2,19 +2,6 @@
 # Be sure to load all descriptors into the database first.
 
 ##
-## Try creating a new resource without authorization header - expect failure.
-###
-POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
-
-{
-    "contentIdentifier": "first",
-    "namespace": "4321",
-    "shortDescription": "abc",
-    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
-}
-
-##
 ## Create WITH authorization header
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
@@ -28,16 +15,6 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
     "learningResourceMetadataURI": "2143"
 }
 
-## NOTE: next one assumes you already created the EducationContents resource
-## from local.33b.http before turning on ACCESS_TOKEN_REQUIRED.
-
-### Try getting an existing resource without authorization header - expect failure.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/4a7d89fd5b4247a526bee49d28b97c7eead5f2d73b5982e23fb518a8
-
-### Try getting that resource with authorization header - expect success, even though the 
-# client doesn't actually own the record (no one owns it).
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/4a7d89fd5b4247a526bee49d28b97c7eead5f2d73b5982e23fb518a8
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
@@ -58,7 +35,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fb
 GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
-### Try getting that resource with a different authorization header - expect 404, because it "doesn't exist" for this client.
+### Try getting that resource with a different authorization header - expect 403
 GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
@@ -74,21 +51,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
     "learningResourceMetadataURI": "2143"
 }
 
-### Try getting the modified resource using no authorization header - expect 401.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
-
-### Try updating the resource without authorization header - expect 401.
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
-
-{
-    "contentIdentifier": "different",
-    "namespace": "4321",
-    "shortDescription": "abc",
-    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
-}
-
-### Try updating the resource with wrong authorization header - expect 404.
+### Try updating the resource with wrong authorization header - expect 403
 PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
@@ -100,10 +63,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
     "learningResourceMetadataURI": "2143"
 }
 
-### Try deleting the resource without authorization header - expect 401 or 404.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
-
-### Try deleting that resource using the wrong authorization header - expect 404
+### Try deleting that resource using the wrong authorization header - expect 403
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 

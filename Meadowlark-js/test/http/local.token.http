@@ -116,9 +116,6 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 # GET by id (Requires ACCESS_TOKEN_REQUIRED=true environment variable)
 #
 
-### GET of Student owned by Vendor 1 without Authorization header - should fail - expect 400
-GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
-
 ### Vendor 1 GET of Student owned by Vendor 1
 GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I

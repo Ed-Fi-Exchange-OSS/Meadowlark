@@ -8,19 +8,19 @@ import { validateJwt } from '../security/JwtValidator';
 import { authorizationHeader } from '../security/AuthorizationHeader';
 import { MiddlewareModel } from './MiddlewareModel';
 
-const moduleName = 'AuthenticationMiddleware';
+const moduleName = 'AuthorizationMiddleware';
 
 /**
- * Handles authentication
+ * Handles authorization
  */
-export async function authenticate({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
+export async function authorize({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
-  writeRequestToLog(moduleName, frontendRequest, 'authenticate');
+  writeRequestToLog(moduleName, frontendRequest, 'authorize');
 
   const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
   if (errorResponse != null) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'authenticate', errorResponse.statusCode, JSON.stringify(jwtStatus));
+    writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', errorResponse.statusCode, JSON.stringify(jwtStatus));
     return { frontendRequest, frontendResponse: errorResponse };
   }
 

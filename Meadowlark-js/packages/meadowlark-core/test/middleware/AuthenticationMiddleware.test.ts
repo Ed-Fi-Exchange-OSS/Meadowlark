@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import * as JwtValidator from '../../src/security/JwtValidator';
-import { authenticate } from '../../src/middleware/AuthenticationMiddleware';
+import { authorize } from '../../src/middleware/AuthorizationMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { JwtStatus, newJwtStatus } from '../../src/security/JwtStatus';
@@ -21,7 +21,7 @@ describe('given a previous middleware has created a response', () => {
     mockRequestValidator = jest.spyOn(JwtValidator, 'validateJwt');
 
     // Act
-    resultChain = await authenticate({ frontendRequest, frontendResponse });
+    resultChain = await authorize({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -36,12 +36,12 @@ describe('given a previous middleware has created a response', () => {
     expect(resultChain.frontendResponse).toBe(frontendResponse);
   });
 
-  it('never calls authenticate', () => {
+  it('never calls authorize', () => {
     expect(mockRequestValidator).not.toHaveBeenCalled();
   });
 });
 
-describe('given an error response from authenticate', () => {
+describe('given an error response from authorize', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const errorResponse: FrontendResponse = newFrontendResponse();
   const jwtStatus: JwtStatus = newJwtStatus();
@@ -53,7 +53,7 @@ describe('given an error response from authenticate', () => {
     mockRequestValidator = jest.spyOn(JwtValidator, 'validateJwt').mockReturnValue(jwtValidation);
 
     // Act
-    resultChain = await authenticate({ frontendRequest, frontendResponse: null });
+    resultChain = await authorize({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -69,7 +69,7 @@ describe('given an error response from authenticate', () => {
   });
 });
 
-describe('given a valid response from authenticate', () => {
+describe('given a valid response from authorize', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const subject = 'Subject';
   const jwtStatus: JwtStatus = { ...newJwtStatus(), subject };
@@ -81,7 +81,7 @@ describe('given a valid response from authenticate', () => {
     mockRequestValidator = jest.spyOn(JwtValidator, 'validateJwt').mockReturnValue(jwtValidation);
 
     // Act
-    resultChain = await authenticate({ frontendRequest, frontendResponse: null });
+    resultChain = await authorize({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
