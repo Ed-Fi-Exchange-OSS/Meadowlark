@@ -14,6 +14,7 @@
         "esbenp.prettier-vscode",
         "humao.rest-client",
         "davidanson.vscode-markdownlint",
-        "stkb.rewrap"
+        "stkb.rewrap",
+        "bierner.markdown-emoji"
     ]
 }
