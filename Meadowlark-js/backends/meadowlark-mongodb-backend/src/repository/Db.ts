@@ -13,7 +13,6 @@ export const COLLECTION_NAME = 'documents';
 let singletonClient: MongoClient | null = null;
 
 const MONGO_LOG_LEVEL: string = process.env.MONGO_LOG_LEVEL != null ? process.env.MONGO_LOG_LEVEL.toLowerCase() : 'error';
-MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
 /**
  * Return a brand new client - which is a connection pool. Only use for testing purposes.
@@ -25,6 +24,8 @@ export async function getNewClient(): Promise<MongoClient> {
   try {
     const newClient = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
     await newClient.connect();
+
+    MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
     const collection = newClient.db().collection(COLLECTION_NAME);
 

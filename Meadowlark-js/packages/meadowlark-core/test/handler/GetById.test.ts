@@ -5,10 +5,11 @@
 
 import { getById } from '../../src/handler/GetById';
 import { GetResult } from '../../src/message/GetResult';
-import { getDocumentStore } from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { PathComponents } from '../../src/model/PathComponents';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 const validPathComponents: PathComponents = {
   endpointName: '1',
@@ -25,7 +26,7 @@ describe('given there is no resourceId', () => {
 
   beforeAll(async () => {
     request.middleware.headerMetadata = metaEdHeaders;
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'getDocumentById');
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(NoDocumentStorePlugin);
 
     // Act
     response = await getById(request);
@@ -53,12 +54,14 @@ describe('given database lookup has unknown failure', () => {
 
   beforeAll(async () => {
     request.middleware.headerMetadata = metaEdHeaders;
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'getDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UNKNOWN_FAILURE',
-        document: {},
-      } as GetResult),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      getDocumentById: () =>
+        Promise.resolve({
+          response: 'UNKNOWN_FAILURE',
+          document: {},
+        } as GetResult),
+    });
 
     // Act
     response = await getById(request);
@@ -86,12 +89,14 @@ describe('given id does not exist', () => {
 
   beforeAll(async () => {
     request.middleware.headerMetadata = metaEdHeaders;
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'getDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'GET_FAILURE_NOT_EXISTS',
-        document: {},
-      } as GetResult),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      getDocumentById: () =>
+        Promise.resolve({
+          response: 'GET_FAILURE_NOT_EXISTS',
+          document: {},
+        } as GetResult),
+    });
 
     // Act
     response = await getById(request);
@@ -120,12 +125,14 @@ describe('given a valid request', () => {
 
   beforeAll(async () => {
     request.middleware.headerMetadata = metaEdHeaders;
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'getDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'GET_SUCCESS',
-        document,
-      } as GetResult),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      getDocumentById: () =>
+        Promise.resolve({
+          response: 'GET_SUCCESS',
+          document,
+        } as GetResult),
+    });
 
     // Act
     response = await getById(request);

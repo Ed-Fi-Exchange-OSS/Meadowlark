@@ -4,10 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { update } from '../../src/handler/Update';
-import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { documentIdForDocumentInfo } from '../../src/model/DocumentId';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -35,12 +36,14 @@ describe('given the requested document does not exist', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'updateDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_FAILURE_NOT_EXISTS',
-        failureMessage: 'Does not exist',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      updateDocumentById: () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILURE_NOT_EXISTS',
+          failureMessage: 'Does not exist',
+        }),
+    });
 
     // Act
     response = await update(frontendRequest);
@@ -65,12 +68,14 @@ describe('given the new document has an invalid reference ', () => {
   let response: FrontendResponse;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'updateDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_FAILURE_REFERENCE',
-        failureMessage: expectedError,
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      updateDocumentById: () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await update(frontendRequest);
@@ -94,11 +99,13 @@ describe('given the update succeeds', () => {
   let response: FrontendResponse;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'updateDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_SUCCESS',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      updateDocumentById: () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        }),
+    });
 
     // Act
     response = await update(frontendRequest);
@@ -136,11 +143,13 @@ describe('given the resourceId of the update does not match the id derived from 
   };
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'updateDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_SUCCESS',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      updateDocumentById: () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        }),
+    });
 
     // Act
     response = await update(badFrontendRequest);

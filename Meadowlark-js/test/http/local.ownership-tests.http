@@ -1,9 +1,7 @@
 ### Set `ACCESS_TOKEN_REQUIRED=true` environment variable before `yarn start:local`
 # Be sure to load all descriptors into the database first.
 
-##
-## Create WITH authorization header
-###
+### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
@@ -15,13 +13,12 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
     "learningResourceMetadataURI": "2143"
 }
 
-
-### Try creating a new resource with authorization header - expect success.
+### Re-POST with different authorization header - expect 403.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
 {
-    "contentIdentifier": "different",
+    "contentIdentifier": "first",
     "namespace": "4321",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
@@ -29,34 +26,34 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 }
 
 ### Try getting that resource without authorization header - expect 401.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ### Try getting that resource with a different authorization header - expect 403
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
 ### Try updating that resource using the same authorization header that created the record - expect success.
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 {
-    "contentIdentifier": "different",
+    "contentIdentifier": "first",
     "namespace": "4321",
-    "shortDescription": "abcdefeg",
+    "shortDescription": "abcdefghijklmnopqrstuvwxyz",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
     "learningResourceMetadataURI": "2143"
 }
 
 ### Try updating the resource with wrong authorization header - expect 403
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
 {
-    "contentIdentifier": "different",
+    "contentIdentifier": "first",
     "namespace": "4321",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
@@ -64,9 +61,9 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 }
 
 ### Try deleting that resource using the wrong authorization header - expect 403
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
 
 ### Try deleting that resource using the same authorization header that created the record - expect success.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I

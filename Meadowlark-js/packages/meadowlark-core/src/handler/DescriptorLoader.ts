@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { getDocumentStore } from '../plugin/PluginLoader';
+import { getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
 import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
 import { Logger } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentId';
@@ -166,6 +166,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
 
 export async function loadDescriptors(): Promise<void> {
   Logger.info('Loading descriptors', 'n/a');
+  await loadDocumentStore();
   const data: XmlDescriptorData = await readDescriptors(descriptorPath);
   await loadParsedDescriptors(data);
 }

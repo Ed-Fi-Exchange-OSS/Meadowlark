@@ -5,9 +5,10 @@
 
 import { upsert } from '../../src/handler/Upsert';
 import { UpsertResult } from '../../src/message/UpsertResult';
-import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -31,12 +32,14 @@ describe('given persistence is going to throw a reference error on insert', () =
   const expectedError = 'Error';
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
-      Promise.resolve({
-        response: 'INSERT_FAILURE_REFERENCE',
-        failureMessage: expectedError,
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: () =>
+        Promise.resolve({
+          response: 'INSERT_FAILURE_REFERENCE',
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await upsert(frontendRequest);
@@ -60,12 +63,14 @@ describe('given persistence is going to throw a reference error on update though
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_FAILURE_REFERENCE',
-        failureMessage: 'Reference failure',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: 'Reference failure',
+        }),
+    });
 
     // Act
     response = await upsert(frontendRequest);
@@ -90,12 +95,14 @@ describe('given persistence is going to fail', () => {
   const expectedError = 'Error';
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
-      Promise.resolve({
-        response: 'UNKNOWN_FAILURE',
-        failureMessage: expectedError,
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: () =>
+        Promise.resolve({
+          response: 'UNKNOWN_FAILURE',
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await upsert(frontendRequest);
@@ -119,12 +126,14 @@ describe('given persistence succeeds as insert', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
-      Promise.resolve({
-        response: 'INSERT_SUCCESS',
-        failureMessage: null,
-      } as unknown as UpsertResult),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: () =>
+        Promise.resolve({
+          response: 'INSERT_SUCCESS',
+          failureMessage: null,
+        } as unknown as UpsertResult),
+    });
 
     // Act
     response = await upsert(frontendRequest);
@@ -153,12 +162,14 @@ describe('given persistence succeeds as update', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'upsertDocument').mockReturnValue(
-      Promise.resolve({
-        response: 'UPDATE_SUCCESS',
-        failureMessage: null,
-      } as unknown as UpsertResult),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+          failureMessage: null,
+        } as unknown as UpsertResult),
+    });
 
     // Act
     response = await upsert(frontendRequest);

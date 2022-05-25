@@ -17,42 +17,51 @@ import * as Update from './Update';
 import * as Delete from './Delete';
 import * as Query from './Query';
 import * as GetById from './GetById';
-import { getDocumentStore } from '../plugin/PluginLoader';
+import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 
-// Middleware stack for methods with a body in the request (POST, PUT)
-const methodWithBodyStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
-  authorize,
-  R.andThen(parsePath),
-  R.andThen(parseBody),
-  R.andThen(resourceValidation),
-  R.andThen(documentValidation),
-  R.andThen(getDocumentStore().securityMiddleware),
-);
+type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
-// Middleware stack for deletes - no body
-const deleteStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
-  authorize,
-  R.andThen(parsePath),
-  R.andThen(resourceValidation),
-  R.andThen(getDocumentStore().securityMiddleware),
-);
+// Middleware stack builder for methods with a body in the request (POST, PUT)
+function methodWithBodyStack(): MiddlewareStack {
+  return R.once(
+    R.pipe(
+      authorize,
+      R.andThen(parsePath),
+      R.andThen(parseBody),
+      R.andThen(resourceValidation),
+      R.andThen(documentValidation),
+      R.andThen(getDocumentStore().securityMiddleware),
+    ),
+  );
+}
 
-// Middleware stack for GetById - parsePath gets run earlier, no body - document store security
-const getByIdStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(
-  authorize,
-  R.andThen(resourceValidation),
-  R.andThen(getDocumentStore().securityMiddleware),
-);
+// Middleware stack builder for deletes - no body
+function deleteStack(): MiddlewareStack {
+  return R.once(
+    R.pipe(authorize, R.andThen(parsePath), R.andThen(resourceValidation), R.andThen(getDocumentStore().securityMiddleware)),
+  );
+}
 
-// Middleware stack for Query - parsePath gets run earlier, no body
-const queryStack: (model: MiddlewareModel) => Promise<MiddlewareModel> = R.pipe(authorize, R.andThen(resourceValidation));
+// Middleware stack builder for GetById - parsePath gets run earlier, no body - document store security
+function getByIdStack(): MiddlewareStack {
+  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(getDocumentStore().securityMiddleware)));
+}
+
+// Middleware stack builder for Query - parsePath gets run earlier, no body
+function queryStack(): MiddlewareStack {
+  return R.once(R.pipe(authorize, R.andThen(resourceValidation)));
+}
 
 /**
  * Handles query action
  */
 export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const model: MiddlewareModel = await queryStack({ frontendRequest, frontendResponse: null });
+    frontendRequest.action = 'query';
+
+    await ensurePluginsLoaded();
+    const stack: MiddlewareStack = queryStack();
+    const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
@@ -69,7 +78,11 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
  */
 export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const model: MiddlewareModel = await getByIdStack({ frontendRequest, frontendResponse: null });
+    frontendRequest.action = 'getById';
+
+    await ensurePluginsLoaded();
+    const stack: MiddlewareStack = getByIdStack();
+    const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
@@ -92,11 +105,9 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
 
     // No resourceId in path means this is a query
     if (resourceId == null) {
-      frontendRequest.action = 'query';
       return await query(frontendRequest);
     }
 
-    frontendRequest.action = 'getById';
     return await getById(frontendRequest);
   } catch (e) {
     writeErrorToLog('FrontendFacade.get', frontendRequest.traceId, 'deleteIt', 500, e);
@@ -109,7 +120,11 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
  */
 export async function update(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
+    frontendRequest.action = 'updateById';
+
+    await ensurePluginsLoaded();
+    const stack: MiddlewareStack = methodWithBodyStack();
+    const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
@@ -126,7 +141,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
  */
 export async function upsert(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const model: MiddlewareModel = await methodWithBodyStack({ frontendRequest, frontendResponse: null });
+    frontendRequest.action = 'upsert';
+
+    await ensurePluginsLoaded();
+    const stack: MiddlewareStack = methodWithBodyStack();
+    const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
@@ -143,7 +162,11 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
  */
 export async function deleteIt(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
-    const model: MiddlewareModel = await deleteStack({ frontendRequest, frontendResponse: null });
+    frontendRequest.action = 'deleteById';
+
+    await ensurePluginsLoaded();
+    const stack: MiddlewareStack = deleteStack();
+    const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;

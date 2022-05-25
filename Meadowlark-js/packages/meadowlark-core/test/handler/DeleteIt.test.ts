@@ -4,9 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { deleteIt } from '../../src/handler/Delete';
-import { getDocumentStore } from '../../src/plugin/PluginLoader';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -26,7 +27,7 @@ describe('given there is no resourceId', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById');
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(NoDocumentStorePlugin);
 
     // Act
     response = await deleteIt(newFrontendRequest());
@@ -55,12 +56,14 @@ describe('given delete has unknown failure', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'UNKNOWN_FAILURE',
-        failureMessage: expectedError,
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      deleteDocumentById: () =>
+        Promise.resolve({
+          response: 'UNKNOWN_FAILURE',
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await deleteIt(frontendRequest);
@@ -84,11 +87,13 @@ describe('given id does not exist', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'DELETE_FAILURE_NOT_EXISTS',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      deleteDocumentById: () =>
+        Promise.resolve({
+          response: 'DELETE_FAILURE_NOT_EXISTS',
+        }),
+    });
 
     // Act
     response = await deleteIt(frontendRequest);
@@ -113,12 +118,14 @@ describe('given the document to be deleted is referenced by other documents ', (
   let response: FrontendResponse;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'DELETE_FAILURE_REFERENCE',
-        failureMessage: expectedError,
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      deleteDocumentById: () =>
+        Promise.resolve({
+          response: 'DELETE_FAILURE_REFERENCE',
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await deleteIt(frontendRequest);
@@ -142,11 +149,13 @@ describe('given a valid request', () => {
   let mockDocumentStore: any;
 
   beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(getDocumentStore(), 'deleteDocumentById').mockReturnValue(
-      Promise.resolve({
-        response: 'DELETE_SUCCESS',
-      }),
-    );
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      deleteDocumentById: () =>
+        Promise.resolve({
+          response: 'DELETE_SUCCESS',
+        }),
+    });
 
     // Act
     response = await deleteIt(frontendRequest);

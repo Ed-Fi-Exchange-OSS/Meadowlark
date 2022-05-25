@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import dotenv from 'dotenv';
-import { Logger } from '../Logger';
+import R from 'ramda';
+import { Logger, writeErrorToLog } from '../Logger';
 import { DocumentStoreInitializer } from './backend/DocumentStoreInitializer';
 import { DocumentStorePlugin } from './backend/DocumentStorePlugin';
 import { ListenerInitializer } from './backend/ListenerInitializer';
@@ -16,46 +17,56 @@ import { Subscribe } from './listener/Subscribe';
 
 dotenv.config();
 
-// Default to "no" plugin
 let loadedDocumentStore: DocumentStorePlugin = NoDocumentStorePlugin;
 let loadedQueryHandler: QueryHandlerPlugin = NoQueryHandlerPlugin;
+let listenersLoadAttempted: boolean = false;
 
-async function loadDocumentStore(pluginNpmName: string) {
-  return ((await import(pluginNpmName)) as DocumentStoreInitializer).initializeDocumentStore();
+export async function loadDocumentStore() {
+  if (loadedDocumentStore !== NoDocumentStorePlugin) return;
+
+  if (process.env.DOCUMENT_STORE_PLUGIN == null) return;
+
+  Logger.debug(`PluginLoader.loadDocumentStore - loading plugin ${process.env.DOCUMENT_STORE_PLUGIN}`, '');
+
+  try {
+    loadedDocumentStore = (
+      (await import(process.env.DOCUMENT_STORE_PLUGIN)) as DocumentStoreInitializer
+    ).initializeDocumentStore();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'unknown';
+    Logger.error(`Unable to load document store plugin "${process.env.DOCUMENT_STORE_PLUGIN}". Error was ${message}`, null);
+    throw e;
+  }
 }
 
-async function loadQueryHandler(pluginNpmName: string) {
-  return ((await import(pluginNpmName)) as QueryHandlerInitializer).initializeQueryHandler();
+export async function loadQueryHandler() {
+  if (loadedQueryHandler !== NoQueryHandlerPlugin) return;
+
+  if (process.env.QUERY_HANDLER_PLUGIN == null) return;
+
+  Logger.debug(`PluginLoader.loadQueryHandler - loading plugin ${process.env.QUERY_HANDLER_PLUGIN}`, '');
+
+  try {
+    loadedQueryHandler = (
+      (await import(process.env.QUERY_HANDLER_PLUGIN)) as QueryHandlerInitializer
+    ).initializeQueryHandler();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'unknown';
+    Logger.error(`Unable to load query handler plugin "${process.env.QUERY_HANDLER_PLUGIN}". Error was ${message}`, null);
+    throw e;
+  }
 }
 
 async function loadListener(pluginNpmName: string) {
+  Logger.debug(`PluginLoader.loadListener - loading plugin ${pluginNpmName}`, '');
+
   return ((await import(pluginNpmName)) as ListenerInitializer).initializeListener(Subscribe);
 }
 
-// IIFE for top-level await
-(async () => {
-  if (process.env.DOCUMENT_STORE_PLUGIN != null) {
-    try {
-      loadedDocumentStore = await loadDocumentStore(process.env.DOCUMENT_STORE_PLUGIN);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'unknown';
-      Logger.error(
-        `Unable to load document store plugin "${process.env.DOCUMENT_STORE_PLUGIN}". Error was ${message}`,
-        null,
-      );
-      throw e;
-    }
-  }
+export async function loadListeners() {
+  if (listenersLoadAttempted) return;
 
-  if (process.env.QUERY_HANDLER_PLUGIN != null) {
-    try {
-      loadedQueryHandler = await loadQueryHandler(process.env.QUERY_HANDLER_PLUGIN);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'unknown';
-      Logger.error(`Unable to load query handler plugin "${process.env.QUERY_HANDLER_PLUGIN}". Error was ${message}`, null);
-      throw e;
-    }
-  }
+  listenersLoadAttempted = true;
 
   // If this works out, we'll discover listeners dynamically - no need to specify
   if (process.env.LISTENER1_PLUGIN != null) {
@@ -77,7 +88,7 @@ async function loadListener(pluginNpmName: string) {
       throw e;
     }
   }
-})();
+}
 
 export function getDocumentStore(): DocumentStorePlugin {
   return loadedDocumentStore;
@@ -86,3 +97,19 @@ export function getDocumentStore(): DocumentStorePlugin {
 export function getQueryHandler(): QueryHandlerPlugin {
   return loadedQueryHandler;
 }
+
+async function loadAllPlugins(): Promise<void> {
+  Logger.debug('PluginLoader.loadAllPlugins', '');
+  try {
+    await loadDocumentStore();
+    await loadQueryHandler();
+    await loadListeners();
+  } catch (e) {
+    writeErrorToLog('PluginLoader', '', 'ensurePluginsLoaded', 500, e);
+  }
+}
+
+/**
+ * Ensures all plugins are loaded
+ */
+export const ensurePluginsLoaded = R.once(loadAllPlugins);

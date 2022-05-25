@@ -5,9 +5,10 @@
 
 import { query } from '../../src/handler/Query';
 import { QueryResult } from '../../src/message/QueryResult';
-import { getQueryHandler } from '../../src/plugin/PluginLoader';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -29,13 +30,15 @@ describe('given persistence is going to fail', () => {
   const expectedError = 'Error';
 
   beforeAll(async () => {
-    mockQueryHandler = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
-      Promise.resolve({
-        response: 'UNKNOWN_FAILURE',
-        documents: [],
-        failureMessage: expectedError,
-      }),
-    );
+    mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      queryDocuments: () =>
+        Promise.resolve({
+          response: 'UNKNOWN_FAILURE',
+          documents: [],
+          failureMessage: expectedError,
+        }),
+    });
 
     // Act
     response = await query(frontendRequest);
@@ -60,12 +63,14 @@ describe('given successful query result', () => {
   const goodResult: object = { goodResult: 'result' };
 
   beforeAll(async () => {
-    mockQueryHandler = jest.spyOn(getQueryHandler(), 'queryDocuments').mockReturnValue(
-      Promise.resolve({
-        response: 'QUERY_SUCCESS',
-        documents: [goodResult],
-      } as unknown as QueryResult),
-    );
+    mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      queryDocuments: () =>
+        Promise.resolve({
+          response: 'QUERY_SUCCESS',
+          documents: [goodResult],
+        } as unknown as QueryResult),
+    });
 
     // Act
     response = await query(frontendRequest);
