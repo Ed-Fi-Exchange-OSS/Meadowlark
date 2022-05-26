@@ -20,6 +20,10 @@ reference-validation: true
 GET http://localhost:3000/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
 {{auth_header}}
 
+### Query the created record
+GET http://localhost:3000/local/v3.3b/ed-fi/schools/?nameOfInstitution=abc
+{{auth_header}}
+
 
 ### Update the created record
 PUT http://localhost:3000/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
@@ -98,7 +102,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks
 
 
 ### Query schools
-GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
+GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=12
 {{auth_header}}
 
 
