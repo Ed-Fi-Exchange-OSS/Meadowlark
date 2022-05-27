@@ -1,6 +1,18 @@
 {
   "configurations": [
     {
+      "name": "Load Local Descriptors",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--inspect", "--debug-port=9230"],
+      "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
+      "args": ["invoke", "local", "-f", "loadDescriptors"],
+      "port": 9230,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/services/meadowlark-aws-lambda",
+      "justMyCode": false
+    },
+    {
       "name": "Serverless Offline",
       "type": "node",
       "request": "launch",

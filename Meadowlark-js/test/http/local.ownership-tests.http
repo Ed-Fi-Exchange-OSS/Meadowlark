@@ -1,9 +1,14 @@
 ### Set `ACCESS_TOKEN_REQUIRED=true` environment variable before `yarn start:local`
 # Be sure to load all descriptors into the database first.
 
+
+@auth_header_1=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+@auth_header_2=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+
+
 ### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+{{auth_header_1}}
 
 {
     "contentIdentifier": "first",
@@ -15,7 +20,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 
 ### Re-POST with different authorization header - expect 403.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+{{auth_header_2}}
 
 {
     "contentIdentifier": "first",
@@ -30,15 +35,15 @@ GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
 GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+{{auth_header_1}}
 
 ### Try getting that resource with a different authorization header - expect 403
 GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+{{auth_header_2}}
 
 ### Try updating that resource using the same authorization header that created the record - expect success.
 PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+{{auth_header_1}}
 
 {
     "contentIdentifier": "first",
@@ -50,7 +55,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 
 ### Try updating the resource with wrong authorization header - expect 403
 PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+{{auth_header_2}}
 
 {
     "contentIdentifier": "first",
@@ -62,8 +67,8 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 
 ### Try deleting that resource using the wrong authorization header - expect 403
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+{{auth_header_2}}
 
 ### Try deleting that resource using the same authorization header that created the record - expect success.
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+{{auth_header_1}}
