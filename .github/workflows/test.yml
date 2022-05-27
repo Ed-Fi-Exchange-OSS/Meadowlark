@@ -57,12 +57,8 @@ jobs:
       run: yarn test:lint
       working-directory: Meadowlark-js
 
-    - name: Build
-      run: yarn build
-      working-directory: Meadowlark-js
-
     - name: Unit tests with code coverage
-      run: yarn test:coverage --ci
+      run: yarn test:unit:coverage --ci
       working-directory: Meadowlark-js
       env:
         AWS_ACCESS_KEY_ID: abc
@@ -75,4 +71,10 @@ jobs:
         name: code-coverage-report
         path: Meadowlark-js/coverage/lcov-report
 
-    # TODO: add integration testing RND-199
+    - name: Integration tests
+      run: yarn test:integration
+      working-directory: Meadowlark-js
+
+    - name: System tests
+      run: yarn test:system
+      working-directory: Meadowlark-js
