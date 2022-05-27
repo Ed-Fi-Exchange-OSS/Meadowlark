@@ -42,6 +42,16 @@ export async function getNewClient(): Promise<MongoClient> {
 }
 
 /**
+ * Close and discard the current shared client. Only use for testing purposes.
+ */
+export async function resetSharedClient(): Promise<void> {
+  if (singletonClient != null) {
+    await singletonClient.close();
+  }
+  singletonClient = null;
+}
+
+/**
  * Return the shared client
  */
 export async function getSharedClient(): Promise<MongoClient> {
