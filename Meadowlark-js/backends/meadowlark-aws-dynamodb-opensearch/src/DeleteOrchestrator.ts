@@ -15,12 +15,12 @@ import {
 /**
  * Deletes the primary item from DynamoDB.
  */
-export async function deleteEntityById({ id, documentInfo, security, traceId }: DeleteRequest): Promise<DeleteResult> {
+export async function deleteEntityById({ id, resourceInfo, security, traceId }: DeleteRequest): Promise<DeleteResult> {
   try {
-    if (security.isOwnershipEnabled) {
+    if (security.authorizationStrategy === 'OWNERSHIP_BASED') {
       const { isOwner, result: ownershipResult } = await validateEntityOwnership(
         id,
-        documentInfo,
+        resourceInfo,
         security.clientName,
         traceId,
       );
@@ -38,7 +38,7 @@ export async function deleteEntityById({ id, documentInfo, security, traceId }: 
       }
     }
 
-    const foreignKeysLookup = await getReferencesToThisItem(id, documentInfo, traceId);
+    const foreignKeysLookup = await getReferencesToThisItem(id, traceId);
     if (!foreignKeysLookup.success || foreignKeysLookup.foreignKeys?.length > 0) {
       const fks = foreignKeysLookup.foreignKeys.map((fk) => fk.Description);
       const failureMessage = JSON.stringify({
@@ -49,14 +49,14 @@ export async function deleteEntityById({ id, documentInfo, security, traceId }: 
       return { response: 'DELETE_FAILURE_REFERENCE', failureMessage };
     }
 
-    const { success } = await deleteEntityByIdDynamo(id, documentInfo, traceId);
+    const { success } = await deleteEntityByIdDynamo(id, resourceInfo, traceId);
 
     if (!success) {
       return { response: 'UNKNOWN_FAILURE' };
     }
 
     // Now that the main object has been deleted, we need to delete the foreign key references
-    const { success: fkSuccess, foreignKeys } = await getForeignKeyReferences(id, documentInfo, traceId);
+    const { success: fkSuccess, foreignKeys } = await getForeignKeyReferences(id, traceId);
 
     if (fkSuccess) {
       // Delete the (FREF, TREF) records

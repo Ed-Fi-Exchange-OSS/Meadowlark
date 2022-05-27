@@ -46,18 +46,6 @@ Authorization: bearer {{token}}
 }
 
 
-### Try creating a new resource without authorization header - expect 401 Unauthorized.
-POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents
-
-{
-    "contentIdentifier": "different2",
-    "namespace": "4321",
-    "shortDescription": "abc",
-    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
-}
-
-
 ### Try getting that resource using the same authorization header that created the record - expect success.
 ### (Cold start for GET means this may take up to 5 seconds.)
 GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
@@ -162,100 +150,4 @@ Authorization: bearer {{token}}
 ### View all schools - should be none. If still there, try again - maybe went too fast
 # and DynamoDB eventual consistency is not yet consistent.
 GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
-Authorization: bearer {{token}}
-
-
-
-# -----------------------------------------------------------------------------
-# Students and EdOrgs - Create (with reference validation), Delete (with reference integrity)
-# -----------------------------------------------------------------------------
-
-
-
-### Create a Student
-POST  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/
-Authorization: bearer {{token}}
-
-{ 
-    "studentUniqueId": "abc",
-    "firstName": "Hello",
-    "lastSurname": "World",
-    "birthDate": "2001-01-01",
-    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
-}
-
-
-### Create a local education agency
-POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/localEducationAgencies
-Authorization: bearer {{token}}
-
-{
-    "localEducationAgencyId": 123,
-    "nameOfInstitution": "A LEA",
-    "categories" : [
-        {
-            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency"
-        }
-    ],
-    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
-}
-
-
-#### Create a Student EdOrg Association with an invalid educationOrganizationReference - should fail
-POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
-Authorization: bearer {{token}}
-
-{ 
-    "studentReference": {
-        "studentUniqueId": "abc"
-    },
-    "educationOrganizationReference": {
-        "educationOrganizationId": 1
-    },
-    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
-}
-
-
-#### Create a Student EdOrg Association with valid references - should succeed
-POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
-Authorization: bearer {{token}}
-
-{ 
-    "studentReference": {
-        "studentUniqueId": "abc"
-    },
-    "educationOrganizationReference": {
-        "educationOrganizationId": 123
-    },
-    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
-}
-
-
-### View all Students - should be one with id 60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
-GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students
-Authorization: bearer {{token}}
-
-
-### Attempt to delete the Student - should fail due to the Student EdOrg Association reference to this Student
-DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
-Authorization: bearer {{token}}
-
-
-### View all Student EdOrg Associations - should be one with id 3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
-GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations
-Authorization: bearer {{token}}
-
-
-### Attempt to delete the Student EdOrg Association - should succeed
-DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/studentEducationOrganizationAssociations/3c8001ce0963fd2967843c0b72c3afdcf1d4c159e3264816c52a6fcb
-Authorization: bearer {{token}}
-
-
-### Attempt to delete the Student now that the Student EdOrg Association is gone - should succeed
-DELETE  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students/60a600cdab21192ccb4757c3e4c501f83ae92545792467eb12ed6853
-Authorization: bearer {{token}}
-
-
-### View all Students - should be none
-GET  https://{{hostname}}/{{stage}}/v3.3b/ed-fi/students
 Authorization: bearer {{token}}

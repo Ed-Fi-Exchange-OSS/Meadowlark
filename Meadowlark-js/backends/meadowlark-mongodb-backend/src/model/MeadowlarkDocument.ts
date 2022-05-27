@@ -56,4 +56,9 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * True if this document is a descriptor.
    */
   isDescriptor: boolean;
+
+  /**
+   * Creator of this document
+   */
+  createdBy: string;
 }

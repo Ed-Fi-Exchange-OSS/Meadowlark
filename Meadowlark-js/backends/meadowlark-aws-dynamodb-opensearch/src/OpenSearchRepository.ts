@@ -9,7 +9,7 @@ import { ConnectionOptions } from '@opensearch-project/opensearch/lib/Connection
 import { defaultProvider as AWSCredentialProvider } from '@aws-sdk/credential-provider-node';
 import type { Credentials } from '@aws-sdk/types';
 import { sign } from 'aws4';
-import { DocumentInfo, Logger, QueryRequest, QueryResult } from '@edfi/meadowlark-core';
+import { Logger, QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { entityTypeStringFrom } from './Utility';
 
 /**
@@ -42,8 +42,8 @@ export function indexFromEntityTypeString(pk: string): string {
  * OpenSearch indexes are required to be lowercase only, with no pound signs,
  * wheras pound signs separators are commonly used in DynamoDB
  */
-export function indexFromEntityInfo(documentInfo: DocumentInfo): string {
-  return indexFromEntityTypeString(entityTypeStringFrom(documentInfo));
+export function indexFromEntityInfo(resourceInfo: ResourceInfo): string {
+  return indexFromEntityTypeString(entityTypeStringFrom(resourceInfo));
 }
 
 // TODO: RND-203 unsafe for SQL injection
@@ -95,7 +95,7 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
  * request query parameters, and a Security object for possible filtering
  */
 export async function queryEntityList({
-  documentInfo,
+  resourceInfo,
   queryStringParameters,
   paginationParameters,
   traceId,
@@ -106,7 +106,7 @@ export async function queryEntityList({
 
   let documents: any = [];
   try {
-    let query = `SELECT info FROM ${indexFromEntityInfo(documentInfo)}`;
+    let query = `SELECT info FROM ${indexFromEntityInfo(resourceInfo)}`;
     if (Object.entries(queryStringParameters).length > 0) {
       query += ` WHERE ${whereConditionsFrom(queryStringParameters)} ORDER BY _doc`;
     }

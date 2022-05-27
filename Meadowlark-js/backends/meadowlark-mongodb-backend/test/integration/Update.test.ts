@@ -11,6 +11,9 @@ import {
   documentIdForDocumentInfo,
   UpdateRequest,
   DocumentReference,
+  NoResourceInfo,
+  ResourceInfo,
+  newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -22,10 +25,11 @@ jest.setTimeout(40000);
 
 const newUpdateRequest = (): UpdateRequest => ({
   id: '',
+  resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
@@ -33,18 +37,21 @@ describe('given the update of a non-existent document', () => {
   let client;
   let updateResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'update1' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), id, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      { ...newUpdateRequest(), id, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
       client,
     );
   });
@@ -69,16 +76,25 @@ describe('given the update of an existing document', () => {
   let client;
   let updateResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'update2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
-    const updateRequest: UpdateRequest = { ...newUpdateRequest(), id, documentInfo, edfiDoc: { natural: 'key' } };
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      id,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
 
     // insert the initial version
     await upsertDocument(updateRequest, client);
@@ -107,18 +123,21 @@ describe('given an update of a document that references a non-existent document 
   let client;
   let updateResult;
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'update4' }],
   };
 
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   const invalidReference: DocumentReference = {
-    projectName: documentWithReferencesInfo.projectName,
-    resourceName: documentWithReferencesInfo.resourceName,
-    resourceVersion: documentWithReferencesInfo.resourceVersion,
+    projectName: documentWithReferencesResourceInfo.projectName,
+    resourceName: documentWithReferencesResourceInfo.resourceName,
+    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
@@ -129,14 +148,26 @@ describe('given an update of a document that references a non-existent document 
 
     // Insert the original document with no reference
     await upsertDocument(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: false },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
       client,
     );
 
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: false },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
       client,
     );
   });
@@ -166,45 +197,71 @@ describe('given an update of a document that references an existing document wit
   let client;
   let updateResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'update5' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'update6' }],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpdateRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpdateRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The original document with no reference
     await upsertDocument(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
 
     // The updated document with a valid reference
     documentWithReferencesInfo.documentReferences = [validReference];
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });
@@ -234,54 +291,80 @@ describe('given an update of a document with one existing and one non-existent r
   let client;
   let updateResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'update7' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
   const invalidReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'update8' }],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced
-    await upsertDocument({ ...newUpdateRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    await upsertDocument(
+      {
+        ...newUpdateRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The original document with no references
     await upsertDocument(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
 
     // The updated document with both valid and invalid references
     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpdateRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
       client,
     );
   });

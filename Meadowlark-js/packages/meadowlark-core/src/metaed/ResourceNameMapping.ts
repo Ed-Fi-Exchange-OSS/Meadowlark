@@ -84,7 +84,7 @@ function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<str
 }
 
 /**
- * Returns true if a top-level MetaEd entity matching the given resourceName exists
+ * Returns top-level MetaEd entity matching the given resourceName, if it exists
  */
 export function getMatchingMetaEdModelFrom(
   resourceName: string,

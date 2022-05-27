@@ -12,6 +12,9 @@ import {
   DeleteRequest,
   DocumentReference,
   UpsertRequest,
+  NoResourceInfo,
+  ResourceInfo,
+  newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -23,18 +26,19 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   id: '',
+  resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
 const newDeleteRequest = (): DeleteRequest => ({
   id: '',
-  documentInfo: NoDocumentInfo,
+  resourceInfo: NoResourceInfo,
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
@@ -42,17 +46,20 @@ describe('given the delete of a non-existent document', () => {
   let client;
   let deleteResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'delete1' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, documentInfo, validate: false }, client);
+    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, resourceInfo, validate: false }, client);
   });
 
   afterAll(async () => {
@@ -69,12 +76,15 @@ describe('given the delete of an existing document', () => {
   let client;
   let deleteResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'delete2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
@@ -83,7 +93,7 @@ describe('given the delete of an existing document', () => {
     // insert the initial version
     await upsertDocument(upsertRequest, client);
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, documentInfo }, client);
+    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, resourceInfo }, client);
   });
 
   afterAll(async () => {
@@ -106,29 +116,36 @@ describe('given an delete of a document referenced by an existing document with 
   let client;
   let deleteResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'delete5' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'delete6' }],
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
@@ -143,7 +160,7 @@ describe('given an delete of a document referenced by an existing document with 
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo, validate: true },
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
       client,
     );
   });
@@ -168,29 +185,35 @@ describe('given an delete of a document referenced by an existing document with 
   let client;
   let deleteResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'delete5' }],
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedDocumentInfo);
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
   const validReference: DocumentReference = {
-    projectName: referencedDocumentInfo.projectName,
-    resourceName: referencedDocumentInfo.resourceName,
-    resourceVersion: referencedDocumentInfo.resourceVersion,
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
     isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
 
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'AcademicWeek',
     documentIdentity: [{ name: 'natural', value: 'delete6' }],
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
@@ -205,7 +228,7 @@ describe('given an delete of a document referenced by an existing document with 
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo, validate: false },
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: false },
       client,
     );
   });

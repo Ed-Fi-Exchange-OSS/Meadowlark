@@ -4,7 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentStorePlugin } from '@edfi/meadowlark-core';
-import { upsertDocument, deleteDocumentById, getDocumentById, updateDocumentById } from './BackendFacade';
+import {
+  upsertDocument,
+  deleteDocumentById,
+  getDocumentById,
+  updateDocumentById,
+  securityMiddleware,
+} from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
   return {
@@ -12,5 +18,6 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     getDocumentById,
     updateDocumentById,
     deleteDocumentById,
+    securityMiddleware,
   };
 }

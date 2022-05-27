@@ -7,7 +7,6 @@
  * Information extracted from a JWT token
  */
 export interface JwtStatus {
-  isOwnershipEnabled: boolean;
   isMissing: boolean;
   isValid: boolean;
   isExpired: boolean;
@@ -20,7 +19,6 @@ export interface JwtStatus {
 
 export function newJwtStatus() {
   return {
-    isOwnershipEnabled: false,
     isMissing: false,
     isValid: false,
     isExpired: false,
@@ -31,3 +29,5 @@ export function newJwtStatus() {
     expiresAt: 0,
   };
 }
+
+export const NoJwtStatus = Object.freeze(newJwtStatus());

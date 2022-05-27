@@ -11,28 +11,32 @@ import {
   documentIdForDocumentInfo,
   GetRequest,
   UpsertRequest,
+  NoResourceInfo,
+  ResourceInfo,
+  newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getCollection, getNewClient } from '../../src/repository/Db';
-import { getDocumentById } from '../../src/repository/Read';
+import { getDocumentById } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);
 
 const newGetRequest = (): GetRequest => ({
   id: '',
-  documentInfo: NoDocumentInfo,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  resourceInfo: NoResourceInfo,
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
   id: '',
+  resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity(), isOwnershipEnabled: false },
+  security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
@@ -40,17 +44,20 @@ describe('given the get of a non-existent document', () => {
   let client;
   let getResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'get1' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, documentInfo }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
   });
 
   afterAll(async () => {
@@ -73,12 +80,15 @@ describe('given the get of an existing document', () => {
   let client;
   let getResult;
 
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    resourceName: 'School',
     documentIdentity: [{ name: 'natural', value: 'get2' }],
   };
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
@@ -87,7 +97,7 @@ describe('given the get of an existing document', () => {
     // insert the initial version
     await upsertDocument(upsertRequest, client);
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, documentInfo }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
   });
 
   afterAll(async () => {

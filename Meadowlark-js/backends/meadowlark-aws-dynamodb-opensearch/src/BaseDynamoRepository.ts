@@ -12,10 +12,9 @@ import {
   DocumentReference,
   DocumentIdentity,
   documentIdForDocumentInfo,
-  documentIdForDocumentIdentifyingInfo,
+  documentIdForDocumentIdentity,
   DocumentInfo,
-  DocumentIdentifyingInfo,
-  DocumentTypeInfo,
+  ResourceInfo,
   Logger,
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
@@ -81,42 +80,42 @@ export function assignableSortKeyFromId(id: string): string {
   return `ASSIGN#ID#${id}`;
 }
 
-export function sortKeyFromEntityIdentity(documentInfo: DocumentInfo): string {
-  return sortKeyFromId(documentIdForDocumentInfo(documentInfo));
+export function sortKeyFromEntityIdentity(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
+  return sortKeyFromId(documentIdForDocumentInfo(resourceInfo, documentInfo));
 }
 
-export function conditionCheckFrom(entityIdentifyingInfo: DocumentIdentifyingInfo) {
+export function conditionCheckFrom(resourceInfo: ResourceInfo, documentIdentity: DocumentIdentity) {
   return {
     ConditionCheck: {
       TableName: tableOpts.tableName,
       Key: {
-        pk: entityTypeStringFrom(entityIdentifyingInfo),
-        sk: sortKeyFromId(documentIdForDocumentIdentifyingInfo(entityIdentifyingInfo)),
+        pk: entityTypeStringFrom(resourceInfo),
+        sk: sortKeyFromId(documentIdForDocumentIdentity(resourceInfo, documentIdentity)),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
   };
 }
 
-export function conditionCheckFromAssignable(assignableToTypeInfo: DocumentTypeInfo, documentIdentity: DocumentIdentity) {
+export function conditionCheckFromAssignable(assignableToTypeInfo: ResourceInfo, documentIdentity: DocumentIdentity) {
   return {
     ConditionCheck: {
       TableName: tableOpts.tableName,
       Key: {
         pk: entityTypeStringFrom(assignableToTypeInfo),
-        sk: assignableSortKeyFromId(documentIdForDocumentIdentifyingInfo({ ...assignableToTypeInfo, documentIdentity })),
+        sk: assignableSortKeyFromId(documentIdForDocumentIdentity(assignableToTypeInfo, documentIdentity)),
       },
       ConditionExpression: 'attribute_exists(sk)',
     },
   };
 }
 
-export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
+export function foreignKeyConditions(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): TransactWriteItem[] {
   return documentInfo.documentReferences.map((documentReference) => {
-    const entityTypeInfo: DocumentTypeInfo = {
+    const entityTypeInfo: ResourceInfo = {
       // TODO: Note for the future, this assumes the referenced entity is in the same project/namespace as the referring one
-      projectName: documentInfo.projectName,
-      resourceVersion: documentInfo.resourceVersion,
+      projectName: resourceInfo.projectName,
+      resourceVersion: resourceInfo.resourceVersion,
       resourceName: documentReference.resourceName,
       isDescriptor: false,
     };
@@ -125,23 +124,22 @@ export function foreignKeyConditions(documentInfo: DocumentInfo): TransactWriteI
       return conditionCheckFromAssignable(entityTypeInfo, documentReference.documentIdentity);
     }
 
-    return conditionCheckFrom({
-      ...entityTypeInfo,
-      documentIdentity: documentReference.documentIdentity,
-    });
+    return conditionCheckFrom(entityTypeInfo, documentReference.documentIdentity);
   });
 }
 
-export function descriptorValueConditions(documentInfo: DocumentInfo): TransactWriteItem[] {
+export function descriptorValueConditions(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): TransactWriteItem[] {
   return documentInfo.descriptorReferences.map((descriptorReference) =>
-    conditionCheckFrom({
-      // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
-      projectName: documentInfo.projectName,
-      resourceVersion: documentInfo.resourceVersion,
-      resourceName: descriptorReference.resourceName,
-      isDescriptor: true,
-      documentIdentity: descriptorReference.documentIdentity,
-    }),
+    conditionCheckFrom(
+      {
+        // TODO: Note for the future, this assumes the referenced descriptor is in the same project/namespace as the referring entity
+        projectName: resourceInfo.projectName,
+        resourceVersion: resourceInfo.resourceVersion,
+        resourceName: descriptorReference.resourceName,
+        isDescriptor: true,
+      },
+      descriptorReference.documentIdentity,
+    ),
   );
 }
 
@@ -150,6 +148,7 @@ export function descriptorValueConditions(documentInfo: DocumentInfo): TransactW
  */
 export function constructPutEntityItem(
   id: string,
+  resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
   info: object,
   ownerId: string | null,
@@ -159,7 +158,7 @@ export function constructPutEntityItem(
 
   // Start constructing the Entity item
   const putItem: PutItemInputAttributeMap = {
-    pk: entityTypeStringFrom(documentInfo),
+    pk: entityTypeStringFrom(resourceInfo),
     sk: sortKeyFromId(id),
     naturalKey: dynamoIdentityToString(documentInfo.documentIdentity),
     info: infoWithMetadata,
@@ -172,11 +171,11 @@ export function constructPutEntityItem(
   if (documentInfo.edOrgId != null) putItem.edOrgId = documentInfo.edOrgId;
 
   // Security relationships for relevant associations
-  if (documentInfo.resourceName === 'StudentEducationOrganizationAssociation') {
+  if (resourceInfo.resourceName === 'StudentEducationOrganizationAssociation') {
     putItem.securityStudentId = `Student#${documentInfo.studentId}`;
     putItem.securityEdOrgId = `StudentEducationOrganizationAssociation#${documentInfo.edOrgId}`;
   }
-  if (documentInfo.resourceName === 'StudentSchoolAssociation') {
+  if (resourceInfo.resourceName === 'StudentSchoolAssociation') {
     putItem.securityStudentId = `Student#${documentInfo.studentId}`;
     putItem.securityEdOrgId = `StudentSchoolAssociation#${documentInfo.edOrgId}`;
   }
@@ -187,13 +186,16 @@ export function constructPutEntityItem(
 /*
  * Returns the attribute map to PUT an assignable item if applicable, null otherwise
  */
-export function constructAssignablePutItem(documentInfo: DocumentInfo): TransactWriteItem | null {
+export function constructAssignablePutItem(
+  resourceInfo: ResourceInfo,
+  documentInfo: DocumentInfo,
+): TransactWriteItem | null {
   if (documentInfo.assignableInfo == null) return null;
 
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
-    documentInfo.projectName,
-    documentInfo.resourceVersion,
+    resourceInfo.projectName,
+    resourceInfo.resourceVersion,
     documentInfo.assignableInfo.assignableToName,
   );
 
@@ -203,13 +205,15 @@ export function constructAssignablePutItem(documentInfo: DocumentInfo): Transact
       Item: {
         pk: assignableToType,
         sk: assignableSortKeyFromId(
-          documentIdForDocumentIdentifyingInfo({
-            projectName: documentInfo.projectName,
-            resourceName: documentInfo.resourceName,
-            resourceVersion: documentInfo.resourceVersion,
-            isDescriptor: false,
-            documentIdentity: documentInfo.assignableInfo.assignableIdentity,
-          }),
+          documentIdForDocumentIdentity(
+            {
+              projectName: resourceInfo.projectName,
+              resourceName: resourceInfo.resourceName,
+              resourceVersion: resourceInfo.resourceVersion,
+              isDescriptor: false,
+            },
+            documentInfo.assignableInfo.assignableIdentity,
+          ),
         ),
       },
       ConditionExpression: 'attribute_not_exists(sk)',
@@ -220,13 +224,17 @@ export function constructAssignablePutItem(documentInfo: DocumentInfo): Transact
 /*
  * Returns the attribute map to DELETE an assignable item if applicable, null otherwise
  */
-export function constructAssignableDeleteItem(id: string, documentInfo: DocumentInfo): TransactWriteItem | null {
+export function constructAssignableDeleteItem(
+  id: string,
+  resourceInfo: ResourceInfo,
+  documentInfo: DocumentInfo,
+): TransactWriteItem | null {
   if (documentInfo.assignableInfo == null) return null;
 
   // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
-    documentInfo.projectName,
-    documentInfo.resourceVersion,
+    resourceInfo.projectName,
+    resourceInfo.resourceVersion,
     documentInfo.assignableInfo.assignableToName,
   );
 
@@ -269,9 +277,17 @@ export function generatePutEntityForUpsert(item: PutItemInputAttributeMap): Tran
 /*
  * Creates an array of reference information for use in creating foreign key reference items in Dynamo.
  */
-export function generateReferenceItems(naturalKeyHash: string, item: DocumentInfo): TransactWriteItem[] {
+export function generateReferenceItems(
+  naturalKeyHash: string,
+  resourceInfo: ResourceInfo,
+  documentInfo: DocumentInfo,
+): TransactWriteItem[] {
   const collection: TransactWriteItem[] = [];
-  const referenceType = entityTypeStringFromComponents(item.projectName, item.resourceVersion, item.resourceName);
+  const referenceType = entityTypeStringFromComponents(
+    resourceInfo.projectName,
+    resourceInfo.resourceVersion,
+    resourceInfo.resourceName,
+  );
 
   const extractReferences = R.forEach((documentReference: DocumentReference) => {
     const referenceId = sortKeyFromId(documentIdForDocumentReference(documentReference));
@@ -281,7 +297,7 @@ export function generateReferenceItems(naturalKeyHash: string, item: DocumentInf
       To: referenceId,
       Description: {
         Type: referenceType,
-        NaturalKey: dynamoIdentityToString(item.documentIdentity),
+        NaturalKey: dynamoIdentityToString(documentInfo.documentIdentity),
       },
     });
 
@@ -289,7 +305,7 @@ export function generateReferenceItems(naturalKeyHash: string, item: DocumentInf
     collection.push(generatePutEntityForUpsert(fk.generateToFromItem()));
   });
 
-  extractReferences(item.documentReferences);
+  extractReferences(documentInfo.documentReferences);
 
   return collection;
 }

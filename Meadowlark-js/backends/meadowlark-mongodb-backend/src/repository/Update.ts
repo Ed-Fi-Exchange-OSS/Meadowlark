@@ -10,10 +10,17 @@ import { getCollection } from './Db';
 import { meadowlarkDocumentFrom, validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
-  { id, documentInfo, edfiDoc, validate, traceId }: UpdateRequest,
+  { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(documentInfo, id, edfiDoc, validate);
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+    resourceInfo,
+    documentInfo,
+    id,
+    edfiDoc,
+    validate,
+    security.clientName,
+  );
 
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();

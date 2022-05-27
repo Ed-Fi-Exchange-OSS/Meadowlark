@@ -8,3 +8,11 @@ export interface FrontendResponse {
   headers?: { [header: string]: string } | undefined;
   body: string;
 }
+
+export function newFrontendResponse(): FrontendResponse {
+  return {
+    statusCode: 0,
+    headers: {},
+    body: '',
+  };
+}

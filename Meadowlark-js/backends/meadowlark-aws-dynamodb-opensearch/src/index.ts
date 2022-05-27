@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentStorePlugin, QueryHandlerPlugin } from '@edfi/meadowlark-core';
+import { DocumentStorePlugin, doNothingMiddleware, QueryHandlerPlugin } from '@edfi/meadowlark-core';
 import {
   createEntity as upsertDocument,
   getEntityById as getDocumentById,
@@ -18,6 +18,7 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     getDocumentById,
     updateDocumentById,
     deleteDocumentById,
+    securityMiddleware: doNothingMiddleware,
   };
 }
 

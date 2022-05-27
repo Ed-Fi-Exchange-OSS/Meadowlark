@@ -5,7 +5,13 @@
 
 import R from 'ramda';
 import { ClientSession, Collection, FindOptions, ReplaceOptions } from 'mongodb';
-import { documentIdForDocumentReference, DocumentInfo, DocumentReference, Logger } from '@edfi/meadowlark-core';
+import {
+  documentIdForDocumentReference,
+  DocumentInfo,
+  DocumentReference,
+  Logger,
+  ResourceInfo,
+} from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
 export async function findReferencesById(
@@ -94,20 +100,23 @@ export async function validateReferences(
 }
 
 export function meadowlarkDocumentFrom(
+  resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
   id: string,
   edfiDoc: object,
   validate: boolean,
+  createdBy: string,
 ): MeadowlarkDocument {
   return {
     documentIdentity: documentInfo.documentIdentity,
-    projectName: documentInfo.projectName,
-    resourceName: documentInfo.resourceName,
-    resourceVersion: documentInfo.resourceVersion,
-    isDescriptor: documentInfo.isDescriptor,
+    projectName: resourceInfo.projectName,
+    resourceName: resourceInfo.resourceName,
+    resourceVersion: resourceInfo.resourceVersion,
+    isDescriptor: resourceInfo.isDescriptor,
     id,
     edfiDoc,
     outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
     validated: validate,
+    createdBy,
   };
 }

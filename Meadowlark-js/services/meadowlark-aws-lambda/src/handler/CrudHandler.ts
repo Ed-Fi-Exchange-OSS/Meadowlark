@@ -8,7 +8,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda
 import {
   update as meadowlarkUpdate,
   upsert as meadowlarkUpsert,
-  getResolver as meadowlarkGet,
+  get as meadowlarkGet,
   deleteIt as meadowlarkDelete,
 } from '@edfi/meadowlark-core';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
@@ -23,7 +23,7 @@ export async function upsert(event: APIGatewayProxyEvent, context: Context): Pro
 /**
  * Entry point for all API GET requests
  */
-export async function getResolver(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+export async function get(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   return respondWith(await meadowlarkGet(fromRequest(event, context)));
 }
 

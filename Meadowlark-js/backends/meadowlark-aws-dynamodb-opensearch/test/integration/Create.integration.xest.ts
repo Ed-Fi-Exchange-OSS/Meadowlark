@@ -10,7 +10,14 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateTableInput, CreateTableCommand, CreateTableCommandOutput } from '@aws-sdk/client-dynamodb';
 import { GetCommand, GetCommandOutput } from '@aws-sdk/lib-dynamodb';
-import { DocumentInfo, newDocumentInfo, newSecurity, documentIdForDocumentInfo } from '@edfi/meadowlark-core';
+import {
+  DocumentInfo,
+  newDocumentInfo,
+  newSecurity,
+  documentIdForDocumentInfo,
+  ResourceInfo,
+  newResourceInfo,
+} from '@edfi/meadowlark-core';
 import * as DynamoRepository from '../../src/BaseDynamoRepository';
 import { createEntity } from '../../src/DynamoEntityRepository';
 import { sortKeyFromId } from '../../src/BaseDynamoRepository';
@@ -42,18 +49,20 @@ async function createTable(tableDefinition: CreateTableInput): Promise<CreateTab
 }
 
 describe('given the PUT run successfully in DynamoDb', () => {
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'test name',
+    projectName: 'a#project#name',
+    resourceVersion: '1',
+  };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     edOrgId: 'edOrg id',
-    resourceName: 'test name',
     documentIdentity: [{ name: 'natural', value: 'key' }],
-    projectName: 'a#project#name',
-    resourceVersion: '1',
     studentId: '1',
     descriptorReferences: [],
   };
-
-  const id = documentIdForDocumentInfo(documentInfo);
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
   const bodyEntry = 'test';
 
   beforeAll(async () => {
@@ -78,10 +87,11 @@ describe('given the PUT run successfully in DynamoDb', () => {
 
     await createEntity({
       id,
+      resourceInfo,
       documentInfo,
       edfiDoc: { bodyEntry },
       validate: false,
-      security: { ...newSecurity(), isOwnershipEnabled: false },
+      security: { ...newSecurity() },
       traceId: 'traceId',
     });
   });
@@ -96,7 +106,7 @@ describe('given the PUT run successfully in DynamoDb', () => {
       new GetCommand({
         TableName: tableName,
         Key: {
-          pk: entityTypeStringFrom(documentInfo),
+          pk: entityTypeStringFrom(resourceInfo),
           sk: sortKeyFromId(id),
         },
       }),

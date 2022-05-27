@@ -7,7 +7,7 @@ export type { DocumentStorePlugin } from './plugin/backend/DocumentStorePlugin';
 export { NoDocumentStorePlugin } from './plugin/backend/NoDocumentStorePlugin';
 export type { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';
 export { NoQueryHandlerPlugin } from './plugin/backend/NoQueryHandlerPlugin';
-export type { Subscribe } from './plugin/listener/Subscribe';
+export { Subscribe } from './plugin/listener/Subscribe';
 export type { GetResult } from './message/GetResult';
 export type { DeleteResult } from './message/DeleteResult';
 export type { UpdateResult } from './message/UpdateResult';
@@ -19,28 +19,31 @@ export type { UpdateRequest } from './message/UpdateRequest';
 export type { UpsertRequest } from './message/UpsertRequest';
 export type { QueryRequest } from './message/QueryRequest';
 export type { PaginationParameters } from './message/PaginationParameters';
-export type { Security } from './model/Security';
-export { newSecurity } from './model/Security';
+export type { Security } from './security/Security';
+export { newSecurity } from './security/Security';
 export type { DocumentElement } from './model/DocumentElement';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
 export type { FrontendRequest } from './handler/FrontendRequest';
+export { newFrontendRequest } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
+export { newFrontendResponse } from './handler/FrontendResponse';
 export {
   documentIdForDocumentInfo,
   documentIdForDocumentReference,
-  documentIdForDocumentIdentifyingInfo,
+  documentIdForDocumentIdentity,
 } from './model/DocumentId';
-export type { DocumentInfo, DocumentIdentifyingInfo, DocumentTypeInfo } from './model/DocumentInfo';
+export type { DocumentInfo } from './model/DocumentInfo';
 export { newDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
+export type { ResourceInfo } from './model/ResourceInfo';
+export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
 export { Logger } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
+export type { MiddlewareModel } from './middleware/MiddlewareModel';
+export { doNothingMiddleware } from './middleware/DoNothingMiddleware';
 
 // Handlers
-export { upsert } from './handler/Upsert';
-export { deleteIt } from './handler/Delete';
-export { getResolver } from './handler/Get';
-export { update } from './handler/Update';
+export { upsert, deleteIt, get, update } from './handler/FrontendFacade';
 export { loadDescriptors } from './handler/DescriptorLoader';
 export {
   apiVersion,
