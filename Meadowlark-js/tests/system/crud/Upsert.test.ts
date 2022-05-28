@@ -3,56 +3,34 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, FrontendResponse, get, newFrontendRequest, upsert, update } from '@edfi/meadowlark-core';
+import { FrontendRequest, FrontendResponse, get, upsert } from '@edfi/meadowlark-core';
 import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark-mongodb-backend';
 import { MongoClient } from 'mongodb';
+import {
+  CLIENT1_HEADERS,
+  schoolBodyClient1,
+  MONGO_DOCUMENT_STORE_PLUGIN,
+  newFrontendRequestTemplate,
+  TEST_SIGNING_KEY,
+  schoolGetClient1,
+  academicWeekBodyClient1,
+  schoolBodyClient2,
+} from './SystemTestSetup.ts';
 
 jest.setTimeout(40000);
-process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
-process.env.SIGNING_KEY =
-  'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
+process.env.SIGNING_KEY = TEST_SIGNING_KEY;
 
-const headers = {
-  Authorization:
-    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I',
-};
-
-export function newFrontendRequestTemplate(): FrontendRequest {
-  return {
-    ...newFrontendRequest(),
-    headers,
-    stage: 'local',
-  };
-}
-
-describe('given a POST of a school followed by the GET of the created school', () => {
+describe('given a POST of a school', () => {
   let client: MongoClient;
   let upsertResult: FrontendResponse;
-  let getResult: FrontendResponse;
-
-  const postSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools',
-    body: `{
-      "schoolId": 123,
-      "gradeLevels": [],
-      "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
-    }`,
-  };
-
-  const getSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
-  };
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
     await getCollection(client).deleteMany({});
 
     // Act
-    upsertResult = await upsert(postSchool);
-    getResult = await get(getSchool);
+    upsertResult = await upsert(schoolBodyClient1());
   });
 
   afterAll(async () => {
@@ -67,10 +45,44 @@ describe('given a POST of a school followed by the GET of the created school', (
   });
 
   it('should return get success', async () => {
+    const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
       `"{\\"id\\":\\"8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given a POST of a school with an empty body', () => {
+  let client: MongoClient;
+  let upsertResult: FrontendResponse;
+
+  const schoolEmptyBody: FrontendRequest = {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/schools',
+    headers: CLIENT1_HEADERS,
+    body: '{}',
+  };
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+    await getCollection(client).deleteMany({});
+
+    // Act
+    upsertResult = await upsert(schoolEmptyBody);
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+    await resetSharedClient();
+  });
+
+  it('should return insert failure', async () => {
+    expect(upsertResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":[\\"schoolId is required\\",\\"gradeLevels is required\\",\\"nameOfInstitution is required\\",\\"educationOrganizationCategories is required\\"]}"`,
+    );
+    expect(upsertResult.statusCode).toBe(400);
   });
 });
 
@@ -79,20 +91,10 @@ describe('given a POST of a school followed by a second POST of the school with 
   let firstUpsertResult: FrontendResponse;
   let secondUpsertResult: FrontendResponse;
 
-  const postSchool: FrontendRequest = {
+  const schoolChangeNameOfInstitutionClient1: FrontendRequest = {
     ...newFrontendRequestTemplate(),
     path: '/v3.3b/ed-fi/schools',
-    body: `{
-        "schoolId": 123,
-        "gradeLevels": [],
-        "nameOfInstitution": "abc",
-        "educationOrganizationCategories": []
-      }`,
-  };
-
-  const postSchoolChangeNameOfInstitution: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    headers: CLIENT1_HEADERS,
     body: `{
         "schoolId": 123,
         "gradeLevels": [],
@@ -106,8 +108,8 @@ describe('given a POST of a school followed by a second POST of the school with 
     await getCollection(client).deleteMany({});
 
     // Act
-    firstUpsertResult = await upsert(postSchool);
-    secondUpsertResult = await upsert(postSchoolChangeNameOfInstitution);
+    firstUpsertResult = await upsert(schoolBodyClient1());
+    secondUpsertResult = await upsert(schoolChangeNameOfInstitutionClient1);
   });
 
   afterAll(async () => {
@@ -125,100 +127,139 @@ describe('given a POST of a school followed by a second POST of the school with 
     expect(secondUpsertResult.body).toEqual('');
     expect(secondUpsertResult.statusCode).toBe(200);
   });
-});
 
-describe('given a POST of a school followed by the PUT of the school with a changed field', () => {
-  let client: MongoClient;
-  let putResult: FrontendResponse;
-
-  const postSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools',
-    body: `{
-      "schoolId": 123,
-      "gradeLevels": [],
-      "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
-    }`,
-  };
-
-  const putSchoolChangeNameOfInstitution: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
-    body: `{
-      "schoolId": 123,
-      "gradeLevels": [],
-      "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
-      "educationOrganizationCategories": []
-    }`,
-  };
-
-  beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
-
-    await upsert(postSchool);
-    // Act
-    putResult = await update(putSchoolChangeNameOfInstitution);
-  });
-
-  afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
-  });
-
-  it('should return put success', async () => {
-    expect(putResult.body).toEqual('');
-    expect(putResult.statusCode).toBe(204);
-  });
-});
-
-describe('given a POST of a school followed by the PUT of the school with a different identity', () => {
-  let client: MongoClient;
-  let putResult: FrontendResponse;
-
-  const postSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools',
-    body: `{
-      "schoolId": 123,
-      "gradeLevels": [],
-      "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
-    }`,
-  };
-
-  const putSchoolWrongIdentity: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
-    body: `{
-      "schoolId": 789,
-      "gradeLevels": [],
-      "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
-    }`,
-  };
-
-  beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
-
-    await upsert(postSchool);
-    // Act
-    putResult = await update(putSchoolWrongIdentity);
-  });
-
-  afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
-  });
-
-  it('should return put failure', async () => {
-    expect(putResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"The identity of the resource does not match the identity in the updated document.\\"}"`,
+  it('should return get with updated nameOfInstitution', async () => {
+    const getResult: FrontendResponse = await get(schoolGetClient1());
+    expect(getResult.body).toMatchInlineSnapshot(
+      `"{\\"id\\":\\"8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
     );
-    expect(putResult.statusCode).toBe(400);
+    expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given a POST of an academic week referencing a school that does not exist', () => {
+  let client: MongoClient;
+  let upsertResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+    await getCollection(client).deleteMany({});
+
+    // Act
+    upsertResult = await upsert(academicWeekBodyClient1());
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+    await resetSharedClient();
+  });
+
+  it('should return failure due to missing reference', async () => {
+    expect(upsertResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"educationOrganizationId\\\\\\",\\\\\\"value\\\\\\":123}]\\"}"`,
+    );
+    expect(upsertResult.statusCode).toBe(400);
+  });
+});
+
+describe('given a POST of an academic week referencing a school that exists', () => {
+  let client: MongoClient;
+  let upsertResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+    await getCollection(client).deleteMany({});
+
+    await upsert(schoolBodyClient1());
+
+    // Act
+    upsertResult = await upsert(academicWeekBodyClient1());
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+    await resetSharedClient();
+  });
+
+  it('should return success', async () => {
+    expect(upsertResult.body).toEqual('');
+    expect(upsertResult.statusCode).toBe(201);
+  });
+});
+
+describe('given a POST of an academic week referencing a school that exists followed by a second POST changing to reference a missing school', () => {
+  let client: MongoClient;
+  let upsertResult: FrontendResponse;
+
+  const academicWeekWithMissingSchool: FrontendRequest = {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/academicWeeks',
+    headers: CLIENT1_HEADERS,
+    body: `{
+      "schoolReference": {
+          "schoolId": 999
+      },
+      "weekIdentifier": "1st",
+      "beginDate": "2022-12-01",
+      "endDate": "2022-12-31",
+      "totalInstructionalDays": 30
+    }`,
+  };
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+    await getCollection(client).deleteMany({});
+
+    await upsert(schoolBodyClient1());
+    await upsert(academicWeekBodyClient1());
+
+    // Act
+    upsertResult = await upsert(academicWeekWithMissingSchool);
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+    await resetSharedClient();
+  });
+
+  it('should return failure due to missing reference', async () => {
+    expect(upsertResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"educationOrganizationId\\\\\\",\\\\\\"value\\\\\\":999}]\\"}"`,
+    );
+    expect(upsertResult.statusCode).toBe(400);
+  });
+});
+
+describe('given a POST of a school by one client followed by a second POST of the school by a second client', () => {
+  let client: MongoClient;
+  let firstUpsertResult: FrontendResponse;
+  let secondUpsertResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+    await getCollection(client).deleteMany({});
+
+    // Act
+    firstUpsertResult = await upsert(schoolBodyClient1());
+    secondUpsertResult = await upsert(schoolBodyClient2());
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+    await resetSharedClient();
+  });
+
+  it('should return 1st post 201 as an insert', async () => {
+    expect(firstUpsertResult.body).toEqual('');
+    expect(firstUpsertResult.statusCode).toBe(201);
+  });
+
+  it('should return 2nd post as a 403 forbidden', async () => {
+    expect(secondUpsertResult.body).toEqual('');
+    expect(secondUpsertResult.statusCode).toBe(403);
   });
 });
