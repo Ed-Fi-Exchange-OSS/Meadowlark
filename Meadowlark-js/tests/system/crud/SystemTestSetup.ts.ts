@@ -70,6 +70,9 @@ export function schoolGetClient2(): FrontendRequest {
   };
 }
 
+export const schoolDeleteClient1 = schoolGetClient1;
+export const schoolDeleteClient2 = schoolGetClient2;
+
 export function academicWeekBodyClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
