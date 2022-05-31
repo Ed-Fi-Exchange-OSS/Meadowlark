@@ -10729,7 +10729,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-environment-node@npm:^27.5.1":
+"jest-environment-node@npm:^27.0.0, jest-environment-node@npm:^27.5.1":
   version: 27.5.1
   resolution: "jest-environment-node@npm:27.5.1"
   dependencies:
@@ -12240,7 +12240,9 @@ __metadata:
     eslint-plugin-prettier: 4.0.0
     husky: ^7.0.4
     jest: 27.5.1
+    jest-environment-node: ^27.0.0
     lerna: ^3.22.1
+    mongodb: ^4.5.0
     prettier: 2.6.2
     rimraf: ^3.0.2
     ts-jest: ^27.1.4

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, MongoClient, Logger as MongoLogger, LoggerLevel } from 'mongodb';
+import { Collection, MongoClient, Logger as MongoLogger, LoggerLevel, ReadConcernLevel, W } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
@@ -13,6 +13,8 @@ export const COLLECTION_NAME = 'documents';
 let singletonClient: MongoClient | null = null;
 
 const MONGO_LOG_LEVEL: string = process.env.MONGO_LOG_LEVEL != null ? process.env.MONGO_LOG_LEVEL.toLowerCase() : 'error';
+const MONGO_WRITE_CONCERN: W = (process.env.MONGO_WRITE_CONCERN as W) ?? 'majority';
+const MONGO_READ_CONCERN: ReadConcernLevel = (process.env.MONGO_READ_CONCERN as ReadConcernLevel) ?? 'majority';
 
 /**
  * Return a brand new client - which is a connection pool. Only use for testing purposes.
@@ -22,7 +24,7 @@ export async function getNewClient(): Promise<MongoClient> {
   const MONGO_URL: string = process.env.MONGO_URL ?? (global as any).__MONGO_URI__ ?? MONGO_URL_DEFAULT;
 
   try {
-    const newClient = new MongoClient(MONGO_URL, { w: 'majority', readConcernLevel: 'majority' });
+    const newClient = new MongoClient(MONGO_URL, { w: MONGO_WRITE_CONCERN, readConcernLevel: MONGO_READ_CONCERN });
     await newClient.connect();
 
     MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
@@ -39,6 +41,16 @@ export async function getNewClient(): Promise<MongoClient> {
     Logger.error(`Error connecting MongoDb URL: "${MONGO_URL}". Error was ${message}`, null);
     throw e;
   }
+}
+
+/**
+ * Close and discard the current shared client. Only use for testing purposes.
+ */
+export async function resetSharedClient(): Promise<void> {
+  if (singletonClient != null) {
+    await singletonClient.close();
+  }
+  singletonClient = null;
 }
 
 /**

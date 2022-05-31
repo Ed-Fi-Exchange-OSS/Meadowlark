@@ -20,7 +20,9 @@
     "eslint-plugin-prettier": "4.0.0",
     "husky": "^7.0.4",
     "jest": "27.5.1",
+    "jest-environment-node": "^27.0.0",
     "lerna": "^3.22.1",
+    "mongodb": "^4.5.0",
     "prettier": "2.6.2",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.1.4",
@@ -30,19 +32,21 @@
   "workspaces": [
     "backends/*",
     "packages/*",
-    "services/*"
+    "services/*",
+    "tests/*"
   ],
   "scripts": {
     "build": "lerna run build --stream",
     "build:clean": "lerna run build:clean --stream",
     "test:all": "yarn test && yarn test:integration",
-    "test": "yarn test:lint && yarn test:unit",
+    "test": "yarn test:lint && yarn test:unit && yarn test:integration && yarn test:system",
     "test:lint": "yarn test:lint:ts && yarn test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",
-    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest  --testPathIgnorePatterns \"integration\"",
-    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest \"integration\"",
-    "test:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
+    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest  --testPathIgnorePatterns=\"system|integration\"",
+    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration --runInBand",
+    "test:system": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest system --runInBand",
+    "test:unit:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
     "prepare": "cd .. && husky install"
   },
   "husky": {
