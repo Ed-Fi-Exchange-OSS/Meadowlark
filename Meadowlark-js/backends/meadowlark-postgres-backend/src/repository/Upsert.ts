@@ -22,7 +22,12 @@ export async function upsertDocument(
 ): Promise<UpsertResult> {
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
-  const recordExistsResult = client.query('SELECT _pk FROM meadowlark.documents WHERE id = $1)', [id]);
+  let recordExistsResult;
+  try {
+    recordExistsResult = await client.query('SELECT _pk FROM meadowlark.documents WHERE id = $1);', [id]);
+  } catch (e) {
+    Logger.error(e, traceId);
+  }
 
   // eslint-disable-next-line no-underscore-dangle
   if (recordExistsResult.rows[0]._pk) {
