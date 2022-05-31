@@ -44,8 +44,8 @@
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",
     "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest  --testPathIgnorePatterns=\"system|integration\"",
-    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration",
-    "test:system": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest system",
+    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration --runInBand",
+    "test:system": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest system --runInBand",
     "test:unit:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
     "prepare": "cd .. && husky install"
   },
