@@ -5,6 +5,7 @@
 
 import { Pool, Client } from 'pg';
 import { Logger } from '@edfi//meadowlark-core';
+import format from 'pg-format';
 
 let dbPool: Pool | null = null;
 
@@ -44,7 +45,7 @@ export async function checkExistsAndCreateTables(client: Client) {
 
     await client.release();
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
+    const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
     throw e;
   }
@@ -60,11 +61,14 @@ export async function createConnectionPool(): Promise<Pool> {
     // and we can return
     dbPool = new Pool(dbConfiguration);
     await dbPool.connect();
+
     Logger.info(`Connected to ${dbConfiguration.database} successfully`, null);
+
     return dbPool;
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
+    const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
+
     // if this anything other than a DB doesn't exist error, there's a bigger problem and we don't want to continue
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
       throw e;
@@ -75,14 +79,18 @@ export async function createConnectionPool(): Promise<Pool> {
   // meadowlark DB, then reconnect the pool to the meadowlark DB and return
   let client;
   try {
+    const meadowlarkDbName = dbConfiguration.database;
     dbConfiguration.database = 'postgres';
+
     client = new Client(dbConfiguration);
     client.connect();
-    await client.query('CREATE DATABASE $1', [dbConfiguration.database]);
-    Logger.info(`Database ${dbConfiguration.database} created successfully`, null);
+    await client.query(format('CREATE DATABASE %I', meadowlarkDbName));
+
+    Logger.info(`Database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
+    const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
+
     throw e;
   } finally {
     await client.end();
