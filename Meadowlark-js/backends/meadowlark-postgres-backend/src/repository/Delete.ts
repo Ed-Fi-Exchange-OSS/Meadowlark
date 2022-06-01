@@ -3,8 +3,9 @@
 // // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // // See the LICENSE and NOTICES files in the project root for more information.
 
-// import { DeleteResult, DeleteRequest } from '@edfi/meadowlark-core';
-// import { Client } from 'pg';
+import { DeleteResult, Logger } from '@edfi/meadowlark-core';
+import { Client } from 'pg';
+
 // // import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 // // import { getCollection } from './Db';
 // // import { onlyReturnId } from './WriteHelper';
@@ -14,6 +15,26 @@
 
 // // MongoDB FindOption to return at most 5 documents
 // // const limitFive = (session: ClientSession): FindOptions => ({ projection: { _id: 0 }, limit: 5, session });
+
+export async function deleteAll(client: Client): Promise<DeleteResult> {
+  const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
+
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM meadowlark.documents;');
+    await client.query('DELETE FROM meadowlark.references;');
+    await client.query('COMMIT');
+    deleteResult.response = 'DELETE_SUCCESS';
+  } catch (e) {
+    Logger.error('postgres.repository.Upsert.upsertDocument', 'DELETE_ALL', e);
+    await client.query('ROLLBACK');
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
+  } finally {
+    client.release();
+  }
+
+  return deleteResult;
+}
 
 // export async function deleteDocumentById({}: DeleteRequest, client: Client): Promise<DeleteResult> {
 // //   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
