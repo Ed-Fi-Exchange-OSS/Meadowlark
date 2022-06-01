@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+name: CodeQL Security Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Meadowlark-js/**'
+  push:
+    branches:
+      - main
+
+jobs:
+  analyze:
+    name: Analyze Code
+    runs-on: ubuntu-latest
+    env:
+        SRC_DIR: Meadowlark-js
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b  # v3.0.2
+
+      - name: NPM caching
+        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        with:
+            node-version: '16'
+            cache: 'yarn'
+            cache-dependency-path: '**/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: Meadowlark-js
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@1fae5bf71b0ecdc7d0a2ef0d0c28409d99693966  # v2.9.2
+        with:
+          languages: "typescript"
+          setup-python-dependencies: false
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@1fae5bf71b0ecdc7d0a2ef0d0c28409d99693966  # v2.9.2
