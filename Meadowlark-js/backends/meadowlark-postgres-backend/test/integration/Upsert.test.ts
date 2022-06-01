@@ -17,9 +17,9 @@ import {
   GetResult,
   GetRequest,
 } from '@edfi/meadowlark-core';
-// import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Read';
 
 jest.setTimeout(40000);
@@ -66,7 +66,7 @@ describe('given the upsert of a new document', () => {
 
   afterAll(async () => {
     // @TODO:SAA update when delete exists
-    // await getCollection(client).deleteMany({});
+    await deleteAll(await getSharedClient());
     await client.end();
   });
 
