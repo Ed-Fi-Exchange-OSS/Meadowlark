@@ -10,15 +10,19 @@ import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 export async function getDocumentById({ id }: GetRequest, client: Client): Promise<GetResult> {
   const getByIdSQL =
     'SELECT _pk, id, document_identity, project_name, resource_name, resource_version,' +
-    'is_descriptor, validated. edfi_doc' +
-    'FROM meadowlark.documents' +
-    `WHERE id = ${id}`;
+    ' is_descriptor, validated, edfi_doc' +
+    ' FROM meadowlark.documents' +
+    ` WHERE id = '${id}';`;
 
   try {
-    const queryResult: Result = client.query(getByIdSQL);
+    const queryResult: Result = await client.query(getByIdSQL);
 
     if (queryResult.rows.count === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: [] };
-    return { response: 'GET_SUCCESS', document: [{ id: queryResult.rows[0].id, ...queryResult.rows[0].edfi_doc }] };
+    const response: GetResult = {
+      response: 'GET_SUCCESS',
+      document: { id: queryResult.rows[0].id, ...queryResult.rows[0].edfi_doc },
+    };
+    return response;
   } catch (e) {
     return { response: 'UNKNOWN_FAILURE', document: [] };
   } finally {

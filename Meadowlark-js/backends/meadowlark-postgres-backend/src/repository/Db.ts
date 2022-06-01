@@ -25,7 +25,7 @@ export async function checkExistsAndCreateTables(client: Client) {
       'CREATE TABLE IF NOT EXISTS meadowlark.documents(' +
       '_pk bigserial PRIMARY KEY,' +
       'id character varying NOT NULL,' +
-      'document_identity character varying NOT NULL,' +
+      'document_identity JSONB NOT NULL,' +
       'project_name character varying NOT NULL,' +
       'resource_name character varying NOT NULL,' +
       'resource_version character varying NOT NULL,' +

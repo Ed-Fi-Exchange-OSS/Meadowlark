@@ -15,6 +15,7 @@ import {
   ResourceInfo,
   newResourceInfo,
   GetResult,
+  GetRequest,
 } from '@edfi/meadowlark-core';
 // import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getSharedClient } from '../../src/repository/Db';
@@ -29,6 +30,13 @@ const newUpsertRequest = (): UpsertRequest => ({
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId',
+});
+
+const newGetRequest = (): GetRequest => ({
+  id: '',
+  resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId',
 });
@@ -59,13 +67,13 @@ describe('given the upsert of a new document', () => {
   afterAll(async () => {
     // @TODO:SAA update when delete exists
     // await getCollection(client).deleteMany({});
-    await client.close();
+    await client.end();
   });
 
   it('should exist in the db', async () => {
-    client = getSharedClient();
+    client = await getSharedClient();
 
-    const result: GetResult = await getDocumentById(client, id);
+    const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
     // const result: any = await collection.findOne({ id });
     expect(result.response === 'GET_SUCCESS');
     // @ts-ignore
