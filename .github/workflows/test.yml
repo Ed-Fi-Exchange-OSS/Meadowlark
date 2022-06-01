@@ -26,28 +26,14 @@ jobs:
 
     steps:
     - name: Checkout repository
-      # Commit hash is for https://github.com/actions/checkout/releases/tag/v2.4.0
-      uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
     - name: NPM caching
-      # Commit hash is for https://github.com/actions/setup-node/releases/tag/v2.5.0
-      uses: actions/setup-node@04c56d2f954f1e4c69436aa54cfef261a018f458
+      uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
       with:
-        node-version: '14'
+        node-version: '16'
         cache: 'yarn'
         cache-dependency-path: '**/yarn.lock'
-
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-
-    # Note: we want this to occur _before_ the build so that it doesn't
-    # have to wade through the generated *.js output
-    - name: Perform CodeQL Analysis
-      # Commit hash is for https://github.com/github/codeql-action/releases/tag/v1.0.26
-      uses: github/codeql-action/analyze@5f532563584d71fdef14ee64d17bafb34f751ce5
 
     - name: Install dependencies
       run: yarn install
@@ -60,13 +46,9 @@ jobs:
     - name: Unit tests with code coverage
       run: yarn test:unit:coverage --ci
       working-directory: Meadowlark-js
-      env:
-        AWS_ACCESS_KEY_ID: abc
-        AWS_SECRET_ACCESS_KEY: 123
 
     - name: Archive coverage results
-      # Commit hash is for https://github.com/actions/upload-artifact/releases/tag/v2.3.0
-      uses: actions/upload-artifact@da838ae9595ac94171fa2d4de5a2f117b3e7ac32
+      uses: actions/upload-artifact@da838ae9595ac94171fa2d4de5a2f117b3e7ac32 # v2.3.0
       with:
         name: code-coverage-report
         path: Meadowlark-js/coverage/lcov-report
