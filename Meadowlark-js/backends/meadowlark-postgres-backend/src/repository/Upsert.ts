@@ -4,6 +4,7 @@
 // // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from 'pg';
+import format from 'pg-format';
 import {
   UpsertResult,
   UpsertRequest,
@@ -24,45 +25,36 @@ export async function upsertDocument(
 
   let recordExistsResult;
   try {
-    recordExistsResult = await client.query('SELECT _pk FROM meadowlark.documents WHERE id = $1);', [id]);
+    const recordExistsSql = format('SELECT _pk FROM meadowlark.documents WHERE id = %L;', [id]);
+    recordExistsResult = await client.query(recordExistsSql);
   } catch (e) {
     Logger.error(e, traceId);
   }
 
   // eslint-disable-next-line no-underscore-dangle
-  if (recordExistsResult.rows[0]._pk) {
+  if (recordExistsResult.rowCount > 0) {
     // This is an update
     // TODO@SAA Add update functionality
   } else {
     // This is an insert
-    const insertDocumentSQL =
+    const insertDocumentValues = [
+      id,
+      documentInfo.documentIdentity,
+      resourceInfo.projectName,
+      resourceInfo.resourceName,
+      resourceInfo.resourceVersion,
+      resourceInfo.isDescriptor,
+      validate,
+      edfiDoc,
+    ];
+
+    const insertDocumentSQL = format(
       'INSERT INTO meadowlark.documents' +
-      ' COLUMNS(id, document_identity, project_name, resource_name, resource_version, is_descriptor, validated, edfi_doc)' +
-      ' VALUES ($1, $2, $3, $4, $5, $6, $7, $8)' +
-      ' RETURNING _pk';
-
-    const insertDocumentQuery = {
-      text: insertDocumentSQL,
-      values: [
-        id,
-        documentInfo.documentIdentity,
-        resourceInfo.projectName,
-        resourceInfo.resourceName,
-        resourceInfo.resourceVersion,
-        resourceInfo.isDescriptor,
-        validate,
-        edfiDoc,
-      ],
-      rowMode: 'array',
-    };
-
-    const insertReferencesSQL = 'INSERT INTO meadowlark.references COLUMNS (_pk, reference_from) VALUES($1, $2);';
-
-    const insertReferencesQuery = {
-      text: insertReferencesSQL,
-      values: ['', ''],
-      RowMode: 'array',
-    };
+        ' (id, document_identity, project_name, resource_name, resource_version, is_descriptor, validated, edfi_doc)' +
+        ' VALUES (%L)' +
+        ' RETURNING _pk;',
+      insertDocumentValues,
+    );
 
     try {
       await client.query('BEGIN');
@@ -87,23 +79,31 @@ export async function upsertDocument(
           return upsertResult;
         }
       }
-      const pkValueResult = await client.query(insertDocumentQuery);
+      // Perform the document upsert
+      Logger.debug(`postgres.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
+      const pkValueResult = await client.query(insertDocumentSQL);
 
       // eslint-disable-next-line no-underscore-dangle
       const newlyCreatedDocumentId = pkValueResult.rows[0]._pk;
       outRefs.forEach((ref: string) => {
-        insertReferencesQuery.values[0] = newlyCreatedDocumentId;
-        insertReferencesQuery.values[1] = ref;
-        client.query(insertReferencesQuery);
+        const referenceValues = [newlyCreatedDocumentId, ref];
+        const insertReferencesSql = format(
+          'INSERT INTO meadowlark.references COLUMNS (_pk, reference_from) VALUES(%L, L%);',
+          referenceValues,
+        );
+        client.query(insertReferencesSql);
       });
 
       await client.query('COMMIT');
+      upsertResult.response = 'INSERT_SUCCESS';
     } catch (e) {
+      Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
       await client.query('ROLLBACK');
+      return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
     } finally {
       client.release();
     }
   }
 
-  return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
+  return upsertResult;
 }
