@@ -13,10 +13,6 @@ export interface FrontendHeaders {
   [header: string]: string | undefined;
 }
 
-export interface FrontendPathParameters {
-  [name: string]: string | undefined;
-}
-
 export interface FrontendQueryStringParameters {
   [name: string]: string | undefined;
 }
@@ -32,11 +28,22 @@ export interface FrontendRequestMiddleware {
 
 export interface FrontendRequest {
   action: Action;
+  /**
+   * The URL path in the form /version/namespace/resource and optionally /resourceId
+   * The path should not include query parameters
+   */
   path: string;
+
+  /**
+   * A request identifier provided by the frontend service, used for log tracing
+   */
   traceId: string;
+
+  /**
+   * Unparsed request body provided by the frontend service as a string, or null if the is no body
+   */
   body: string | null;
   headers: FrontendHeaders;
-  pathParameters: FrontendPathParameters;
   queryStringParameters: FrontendQueryStringParameters;
   stage: string; // For example, "local"
   middleware: FrontendRequestMiddleware;
@@ -60,7 +67,6 @@ export function newFrontendRequest(): FrontendRequest {
     traceId: '',
     body: null,
     headers: {},
-    pathParameters: {},
     queryStringParameters: {},
     stage: '',
     middleware: newFrontendRequestMiddleware(),

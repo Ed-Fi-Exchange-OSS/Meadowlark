@@ -38,9 +38,8 @@ function writeErrorToLog(frontendRequest: FrontendRequest, method: string, statu
  * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd
  * project and returns MetaEd project metadata in the response header.
  */
-export async function metaed(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  if (frontendRequest.pathParameters?.projectAbbreviation == null) return { body: '', statusCode: 400 };
-  const modelNpmPackage = modelPackageFor(frontendRequest.pathParameters.projectAbbreviation);
+export async function metaed(_frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  const modelNpmPackage = modelPackageFor(Constants.version33b);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 
   const { entity, projectName, projectVersion } = metaEd.namespace.get('EdFi') as Namespace;

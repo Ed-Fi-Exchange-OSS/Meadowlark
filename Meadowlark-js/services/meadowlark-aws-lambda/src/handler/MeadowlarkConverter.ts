@@ -14,7 +14,6 @@ export function fromRequest(event: APIGatewayProxyEvent, context: Context): Fron
     traceId: context.awsRequestId ?? '',
     body: event.body,
     headers: event.headers ?? {},
-    pathParameters: event.pathParameters ?? {},
     queryStringParameters: event.queryStringParameters ?? {},
     stage: event.requestContext.stage,
   };

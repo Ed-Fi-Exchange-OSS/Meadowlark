@@ -12,7 +12,7 @@ import {
   TEST_SIGNING_KEY,
   schoolGetClient2,
   schoolGetClient1,
-} from './SystemTestSetup.ts';
+} from './SystemTestSetup';
 
 jest.setTimeout(40000);
 process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;

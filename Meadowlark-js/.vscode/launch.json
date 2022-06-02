@@ -25,6 +25,17 @@
       "justMyCode": false
     },
     {
+      "name": "meadowlark-fastify",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--inspect", "--debug-port=9229"],
+      "program": "${workspaceFolder}/services/meadowlark-fastify/dist/index.js",
+      "port": 9229,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/services/meadowlark-fastify",
+      "justMyCode": false
+    },
+    {
       "name": "Jest :: File Linux",
       "type": "node",
       "request": "launch",

@@ -1,0 +1,34 @@
+{
+  "name": "@edfi/meadowlark-fastify",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark service using Fastify",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "dependencies": {
+    "@edfi/meadowlark-core": "0.2.0-dev.0",
+    "fastify": "^3.29.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn test:lint"
+    }
+  },
+  "packageManager": "yarn@3.1.1"
+}
