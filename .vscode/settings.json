@@ -58,6 +58,10 @@
             "mapTo": "python"
         },
         {
+            "language": "yaml",
+            "mapTo": "python"
+        },
+        {
             "_": "Apply double dash-based comments",
             "language": "sql",
             "begin": "",
