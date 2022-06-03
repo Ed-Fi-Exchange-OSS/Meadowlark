@@ -12,7 +12,7 @@ import {
   DocumentReference,
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
-import { validateReferenceEntitiesExist } from './WriteHelper';
+import { validateReferenceEntitiesExist, getDocumentSql } from './WriteHelper';
 // import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 // import { getCollection } from './Db';
 // import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
@@ -24,85 +24,73 @@ export async function upsertDocument(
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
   let recordExistsResult;
+  let outRefs;
+  let documentSql;
+  let isInsert: boolean;
+
   try {
     const recordExistsSql = format('SELECT _pk FROM meadowlark.documents WHERE id = %L;', [id]);
     recordExistsResult = await client.query(recordExistsSql);
+
+    isInsert = recordExistsResult.rowCount === 0;
+
+    documentSql = await getDocumentSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, isInsert);
   } catch (e) {
     Logger.error(e, traceId);
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
 
-  // eslint-disable-next-line no-underscore-dangle
-  if (recordExistsResult.rowCount > 0) {
-    // This is an update
-    // TODO@SAA Add update functionality
-  } else {
-    // This is an insert
-    const insertDocumentValues = [
-      id,
-      documentInfo.documentIdentity,
-      resourceInfo.projectName,
-      resourceInfo.resourceName,
-      resourceInfo.resourceVersion,
-      resourceInfo.isDescriptor,
-      validate,
-      edfiDoc,
-    ];
+  try {
+    await client.query('BEGIN');
 
-    const insertDocumentSQL = format(
-      'INSERT INTO meadowlark.documents' +
-        ' (id, document_identity, project_name, resource_name, resource_version, is_descriptor, validated, edfi_doc)' +
-        ' VALUES (%L)' +
-        ' RETURNING _pk;',
-      insertDocumentValues,
-    );
+    if (validate) {
+      outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
+      const failures = await validateReferenceEntitiesExist(outRefs, client, traceId);
 
-    try {
-      await client.query('BEGIN');
-
-      const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-      if (validate) {
-        const failures = await validateReferenceEntitiesExist(outRefs, client, traceId);
-
-        // Abort on validation failure
-        if (failures.length > 0) {
-          Logger.debug(
-            `Postgres.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
-            traceId,
-          );
-
-          upsertResult = {
-            response: 'INSERT_FAILURE_REFERENCE',
-            failureMessage: `Reference validation failed: ${failures.join(',')}`,
-          };
-
-          await client.query('ROLLBACK');
-          return upsertResult;
-        }
-      }
-      // Perform the document upsert
-      Logger.debug(`postgres.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
-      const pkValueResult = await client.query(insertDocumentSQL);
-
-      // eslint-disable-next-line no-underscore-dangle
-      const newlyCreatedDocumentId = pkValueResult.rows[0]._pk;
-      outRefs.forEach((ref: string) => {
-        const referenceValues = [newlyCreatedDocumentId, ref];
-        const insertReferencesSql = format(
-          'INSERT INTO meadowlark.references COLUMNS (_pk, reference_from) VALUES(%L, L%);',
-          referenceValues,
+      // Abort on validation failure
+      if (failures.length > 0) {
+        Logger.debug(
+          `Postgres.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
+          traceId,
         );
-        client.query(insertReferencesSql);
-      });
 
-      await client.query('COMMIT');
-      upsertResult.response = 'INSERT_SUCCESS';
-    } catch (e) {
-      Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
-      await client.query('ROLLBACK');
-      return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-    } finally {
-      client.release();
+        upsertResult = {
+          response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: `Reference validation failed: ${failures.join(',')}`,
+        };
+
+        await client.query('ROLLBACK');
+        return upsertResult;
+      }
     }
+    // Perform the document upsert
+    Logger.debug(`postgres.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
+    const pkValueResult = await client.query(documentSql);
+
+    // Perform references insert, if reference validation is turned on
+    if (validate) {
+      // eslint-disable-next-line no-underscore-dangle
+      // const newlyCreatedDocumentId = pkValueResult.rows[0]._pk;
+      outRefs.forEach((ref: string) => {
+        Logger.debug('postgres.repository.Upsert.upsertDocument', pkValueResult, ref);
+        //   const referenceValues = [newlyCreatedDocumentId, ref];
+        //   const insertReferencesSql = format(
+        //     'INSERT INTO meadowlark.references COLUMNS (_pk, reference_from) VALUES(%L, L%);',
+        //     referenceValues,
+      });
+      //   client.query(insertReferencesSql);
+      // });
+    }
+
+    await client.query('COMMIT');
+    upsertResult.response = isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS';
+  } catch (e) {
+    Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
+    await client.query('ROLLBACK');
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
+  } finally {
+    // Planning on letting the caller release the client
+    // client.release();
   }
 
   return upsertResult;

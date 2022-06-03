@@ -114,3 +114,17 @@ export async function getSharedClient(): Promise<Client> {
   // Returns new Postgres Client
   return dbPool.connect();
 }
+/**
+ * Because of the creation/tear down process in integration tests, the pool was still ending when we were
+ * trying to start it for the next set of tests, nulling the pool allows to be created in time for tests
+ * @param nullPool
+ * @returns
+ */
+export async function closeDB(nullPool: boolean = true) {
+  if (dbPool == null) {
+    return;
+  }
+
+  dbPool.end();
+  dbPool = nullPool ? null : dbPool;
+}
