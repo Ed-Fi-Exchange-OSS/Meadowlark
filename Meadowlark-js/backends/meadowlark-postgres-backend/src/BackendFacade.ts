@@ -29,11 +29,21 @@ export async function deleteDocumentById(request: DeleteRequest): Promise<Delete
 }
 
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
-  return Read.getDocumentById(request, await getSharedClient());
+  const client = await getSharedClient();
+  try {
+    return Read.getDocumentById(request, client);
+  } finally {
+    client.release();
+  }
 }
 
 export async function upsertDocument(request: UpsertRequest): Promise<UpsertResult> {
-  return Upsert.upsertDocument(request, await getSharedClient());
+  const client = await getSharedClient();
+  try {
+    return Upsert.upsertDocument(request, client);
+  } finally {
+    client.release();
+  }
 }
 
 // @ts-ignore

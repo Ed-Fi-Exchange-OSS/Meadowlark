@@ -4,7 +4,7 @@
 // // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client, Result } from 'pg';
-import { GetResult, GetRequest } from '@edfi/meadowlark-core';
+import { GetResult, GetRequest, DocumentIdentity } from '@edfi/meadowlark-core';
 
 // @ts-ignore
 export async function getDocumentById({ id }: GetRequest, client: Client): Promise<GetResult> {
@@ -17,15 +17,27 @@ export async function getDocumentById({ id }: GetRequest, client: Client): Promi
   try {
     const queryResult: Result = await client.query(getByIdSQL);
 
-    if (queryResult.rows.count === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: [] };
+    if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: [] };
+    const test = queryResult.rows[0].document_identity;
+    const docObj: DocumentIdentity[] = test;
     const response: GetResult = {
       response: 'GET_SUCCESS',
-      document: { id: queryResult.rows[0].id, ...queryResult.rows[0].edfi_doc },
+      document: {
+        id: queryResult.rows[0].id,
+        documentIdentity: docObj,
+        projectName: queryResult.rows[0].project_name,
+        resourceName: queryResult.rows[0].resource_name,
+        resourceVersion: queryResult.rows[0].resource_version,
+        validated: queryResult.rows[0].validated,
+        isDescriptor: queryResult.rows[0].is_descriptor,
+        edfiDoc: queryResult.rows[0].edfi_doc,
+      },
     };
     return response;
   } catch (e) {
     return { response: 'UNKNOWN_FAILURE', document: [] };
   } finally {
-    client.release();
+    // Planning on letting the caller release the client
+    // client.release();
   }
 }
