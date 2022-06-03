@@ -10,14 +10,14 @@ import {
   newSecurity,
   documentIdForDocumentInfo,
   UpsertRequest,
-  // DocumentReference,
+  DocumentReference,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
   GetResult,
   GetRequest,
 } from '@edfi/meadowlark-core';
-import { getSharedClient } from '../../src/repository/Db';
+import { getSharedClient, closeDB } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Read';
@@ -65,13 +65,12 @@ describe('given the upsert of a new document', () => {
   });
 
   afterAll(async () => {
-    // @TODO:SAA update when delete exists
-    await deleteAll(await getSharedClient());
-    await client.end();
+    await deleteAll(client);
+    await closeDB();
   });
 
   it('should exist in the db', async () => {
-    client = await getSharedClient();
+    // client = await getSharedClient();
 
     const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
     // const result: any = await collection.findOne({ id });
@@ -85,144 +84,146 @@ describe('given the upsert of a new document', () => {
   });
 });
 
-// describe('given the upsert of an existing document twice', () => {
-//   let client;
-//   let upsertResult1;
-//   let upsertResult2;
-//   let upsertResult3;
+describe('given the upsert of an existing document twice', () => {
+  let client;
+  let upsertResult1;
+  let upsertResult2;
+  let upsertResult3;
 
-//   const resourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
-//   const documentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert2' }],
-//   };
-//   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert2' }],
+  };
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
-//     const upsertRequest: UpsertRequest = {
-//       ...newUpsertRequest(),
-//       id,
-//       resourceInfo,
-//       documentInfo,
-//       edfiDoc: { natural: 'key' },
-//     };
+  beforeAll(async () => {
+    client = await getSharedClient();
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      id,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
 
-//     upsertResult1 = await upsertDocument(upsertRequest, client);
-//     upsertResult2 = await upsertDocument(upsertRequest, client);
-//     upsertResult3 = await upsertDocument(upsertRequest, client);
-//   });
+    upsertResult1 = await upsertDocument(upsertRequest, client);
+    upsertResult2 = await upsertDocument(upsertRequest, client);
+    upsertResult3 = await upsertDocument(upsertRequest, client);
+  });
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await closeDB();
+    // await client.end();
+  });
 
-//   it('should return insert success on 1st upsert', async () => {
-//     expect(upsertResult1.response).toBe('INSERT_SUCCESS');
-//   });
+  it('should return insert success on 1st upsert', async () => {
+    expect(upsertResult1.response).toBe('INSERT_SUCCESS');
+  });
 
-//   it('should return update success on 2nd upsert', async () => {
-//     expect(upsertResult2.response).toBe('UPDATE_SUCCESS');
-//   });
+  it('should return update success on 2nd upsert', async () => {
+    expect(upsertResult2.response).toBe('UPDATE_SUCCESS');
+  });
 
-//   it('should return update success on 3rd upsert', async () => {
-//     expect(upsertResult3.response).toBe('UPDATE_SUCCESS');
-//   });
-// });
+  it('should return update success on 3rd upsert', async () => {
+    expect(upsertResult3.response).toBe('UPDATE_SUCCESS');
+  });
+});
 
-// describe('given an upsert of an existing document that changes the edfiDoc', () => {
-//   let client;
+describe('given an upsert of an existing document that changes the edfiDoc', () => {
+  let client;
 
-//   const resourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
-//   const documentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert3' }],
-//   };
-//   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert3' }],
+  };
+  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
-//     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, resourceInfo, documentInfo };
+  beforeAll(async () => {
+    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, resourceInfo, documentInfo };
 
-//     await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one' } }, client);
-//     await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two' } }, client);
-//   });
+    client = await getSharedClient();
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one' } }, client);
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two' } }, client);
+  });
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    // End the connection with the database
+    await closeDB();
+  });
 
-//   it('should have the change in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id });
-//     expect(result.edfiDoc.call).toBe('two');
-//   });
-// });
+  it('should have the change in the db', async () => {
+    const result = await getDocumentById({ ...newGetRequest(), id }, client);
 
-// describe('given an upsert of a new document that references a non-existent document with validation off', () => {
-//   let client;
-//   let upsertResult;
+    expect((result.document as any).edfiDoc.call).toBe('two');
+  });
+});
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert4' }],
-//   };
+describe('given an upsert of a new document that references a non-existent document with validation off', () => {
+  let client;
+  let upsertResult;
 
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert4' }],
+  };
 
-//   const invalidReference: DocumentReference = {
-//     projectName: documentWithReferencesResourceInfo.projectName,
-//     resourceName: documentWithReferencesResourceInfo.resourceName,
-//     resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
-//     isDescriptor: false,
-//   };
-//   documentWithReferencesInfo.documentReferences = [invalidReference];
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  const invalidReference: DocumentReference = {
+    projectName: documentWithReferencesResourceInfo.projectName,
+    resourceName: documentWithReferencesResourceInfo.resourceName,
+    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
+  };
+  documentWithReferencesInfo.documentReferences = [invalidReference];
 
-//     // The new document with an invalid reference
-//     upsertResult = await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: false,
-//       },
-//       client,
-//     );
-//   });
+  beforeAll(async () => {
+    client = await getSharedClient();
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+    // The new document with an invalid reference
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
+      client,
+    );
+  });
 
-//   it('should have returned insert success for the document with invalid reference but validation off', async () => {
-//     expect(upsertResult.response).toBe('INSERT_SUCCESS');
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await closeDB();
+  });
 
-//   it('should have inserted the document with an invalid reference in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: documentWithReferencesId });
-//     expect(result.documentIdentity[0].value).toBe('upsert4');
-//   });
-// });
+  it('should have returned insert success for the document with invalid reference but validation off', async () => {
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should have inserted the document with an invalid reference in the db', async () => {
+    const result: GetResult = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
+    const val = (result.document as any).documentIdentity[0].value;
+    expect(val).toBe('upsert4');
+  });
+});
 
 // describe('given an upsert of a new document that references an existing document with validation on', () => {
 //   let client;
