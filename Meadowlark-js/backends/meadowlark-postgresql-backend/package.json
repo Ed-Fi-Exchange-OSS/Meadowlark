@@ -1,5 +1,5 @@
 {
-  "name": "@edfi/meadowlark-postgres-backend",
+  "name": "@edfi/meadowlark-postgresql-backend",
   "main": "dist/index.js",
   "version": "0.2.0-dev.0",
   "description": "Meadowlark backend plugin for PostgreSQL",

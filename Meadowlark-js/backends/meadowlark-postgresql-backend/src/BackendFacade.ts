@@ -16,22 +16,25 @@ import {
 } from '@edfi/meadowlark-core';
 
 import * as Upsert from './repository/Upsert';
-// import * as Delete from './repository/Delete';
-import * as Read from './repository/Read';
-// import * as Update from './repository/Update';
+import * as Delete from './repository/Delete';
+import * as Get from './repository/Get';
+import * as Update from './repository/Update';
 import { getSharedClient } from './repository/Db';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 
-// @ts-ignore
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
-  return { response: 'UNKNOWN_FAILURE' };
-  // return Delete.deleteDocumentById(request, await getSharedClient());
+  const client = await getSharedClient();
+  try {
+    return Delete.deleteDocumentById(request, client);
+  } finally {
+    client.release();
+  }
 }
 
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
   const client = await getSharedClient();
   try {
-    return Read.getDocumentById(request, client);
+    return Get.getDocumentById(request, client);
   } finally {
     client.release();
   }
@@ -46,10 +49,13 @@ export async function upsertDocument(request: UpsertRequest): Promise<UpsertResu
   }
 }
 
-// @ts-ignore
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
-  return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
-  // return Update.updateDocumentById(request, await getSharedClient());
+  const client = await getSharedClient();
+  try {
+    return Update.updateDocumentById(request, client);
+  } finally {
+    client.release();
+  }
 }
 
 export async function securityMiddleware(middlewareModel: MiddlewareModel): Promise<MiddlewareModel> {

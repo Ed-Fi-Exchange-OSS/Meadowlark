@@ -1564,9 +1564,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/meadowlark-postgres-backend@workspace:backends/meadowlark-postgres-backend":
+"@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend":
   version: 0.0.0-use.local
-  resolution: "@edfi/meadowlark-postgres-backend@workspace:backends/meadowlark-postgres-backend"
+  resolution: "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
     copyfiles: ^2.4.1

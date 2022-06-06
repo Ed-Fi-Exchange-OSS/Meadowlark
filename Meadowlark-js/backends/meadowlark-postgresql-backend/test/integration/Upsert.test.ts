@@ -70,8 +70,6 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    // client = await getSharedClient();
-
     const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
     // const result: any = await collection.findOne({ id });
     expect(result.response === 'GET_SUCCESS');
@@ -118,7 +116,6 @@ describe('given the upsert of an existing document twice', () => {
   afterAll(async () => {
     await deleteAll(client);
     await closeDB();
-    // await client.end();
   });
 
   it('should return insert success on 1st upsert', async () => {
