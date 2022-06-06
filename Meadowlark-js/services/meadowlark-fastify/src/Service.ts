@@ -5,6 +5,7 @@
 
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
+import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance } from 'fastify';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
 import { metaed, apiVersion, swaggerForResourcesAPI, swaggerForDescriptorsAPI } from './handler/MetadataHandler';
@@ -15,6 +16,12 @@ export function buildService(): FastifyInstance {
     logger: true,
     genReqId: () => randomUUID(),
   });
+
+  if (process.env.FASTIFY_RATE_LIMIT != null && process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
+    // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
+    // effectiveness requires configuring for redis or an alternative store
+    service.register(FastifyRateLimit);
+  }
 
   // override json parser to leave body as string
   service.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {

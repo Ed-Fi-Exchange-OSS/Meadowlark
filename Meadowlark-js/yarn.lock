@@ -1522,6 +1522,7 @@ __metadata:
   resolution: "@edfi/meadowlark-fastify@workspace:services/meadowlark-fastify"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@fastify/rate-limit": ^6.0.1
     copyfiles: ^2.4.1
     fastify: ^3.29.0
     rimraf: ^3.0.2
@@ -1737,6 +1738,17 @@ __metadata:
   version: 2.0.0
   resolution: "@fastify/error@npm:2.0.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40fastify%2Ferror%2F-%2F%40fastify%2Ferror-2.0.0.tgz"
   checksum: ecf0834966b2bfb33ff834e3d55fe4dc04cbe9f822fda6c937b12cce4f162be4f8b0577ee665bc856d7012b1640c12472a1829a22ae38d287342c90b0f33a595
+  languageName: node
+  linkType: hard
+
+"@fastify/rate-limit@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "@fastify/rate-limit@npm:6.0.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40fastify%2Frate-limit%2F-%2F%40fastify%2Frate-limit-6.0.1.tgz"
+  dependencies:
+    fastify-plugin: ^3.0.1
+    ms: ^2.1.3
+    tiny-lru: ^8.0.1
+  checksum: 3186b5d98f9c37629b4ba080cf452bb4658b10257684a3bcaa65603cf53637064c7bc0bc0baaffa0e79a5ae332ace0b3d002e1c3589befcd273e26d4dcef9a19
   languageName: node
   linkType: hard
 
@@ -8385,6 +8397,13 @@ __metadata:
   version: 1.0.12
   resolution: "fastest-levenshtein@npm:1.0.12"
   checksum: e1a013698dd1d302c7a78150130c7d50bb678c2c2f8839842a796d66cc7cdf50ea6b3d7ca930b0c8e7e8c2cd84fea8ab831023b382f7aab6922c318c1451beab
+  languageName: node
+  linkType: hard
+
+"fastify-plugin@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "fastify-plugin@npm:3.0.1"
+  checksum: 131ba0a388f777829c3fb0fd5b75cf057688ce6d0ca354fb1ebf829767a8c853b0825762b9185b5200097454df0ede2f3095da2efe1aa1b3736d07f194e6d374
   languageName: node
   linkType: hard
 
