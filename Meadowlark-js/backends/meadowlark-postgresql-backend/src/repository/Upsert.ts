@@ -88,9 +88,6 @@ export async function upsertDocument(
     Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
     await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-  } finally {
-    // Planning on letting the caller release the client
-    // client.release();
   }
 
   return upsertResult;
