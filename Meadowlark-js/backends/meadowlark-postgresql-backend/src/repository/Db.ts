@@ -23,12 +23,12 @@ export async function checkExistsAndCreateTables(client: Client) {
 
     const documentsTableSql =
       'CREATE TABLE IF NOT EXISTS meadowlark.documents(' +
-      '_pk bigserial PRIMARY KEY,' +
-      'id character varying NOT NULL,' +
+      'id bigserial PRIMARY KEY,' +
+      'document_id VARCHAR(56) NOT NULL,' +
       'document_identity JSONB NOT NULL,' +
-      'project_name character varying NOT NULL,' +
-      'resource_name character varying NOT NULL,' +
-      'resource_version character varying NOT NULL,' +
+      'project_name VARCHAR NOT NULL,' +
+      'resource_name VARCHAR NOT NULL,' +
+      'resource_version VARCHAR NOT NULL,' +
       'is_descriptor boolean NOT NULL,' +
       'validated boolean NOT NULL,' +
       'edfi_doc JSONB NOT NULL);';
@@ -37,9 +37,9 @@ export async function checkExistsAndCreateTables(client: Client) {
 
     const referencesTableSql =
       'CREATE TABLE IF NOT EXISTS meadowlark.references(' +
-      '_pk bigserial PRIMARY KEY,' +
-      'references_to character varying NOT NULL,' +
-      'references_from character varying NOT NULL);';
+      'id bigserial PRIMARY KEY,' +
+      'parent_document_id VARCHAR NOT NULL,' +
+      'referenced_document_id VARCHAR NOT NULL);';
 
     await client.query(referencesTableSql);
 
