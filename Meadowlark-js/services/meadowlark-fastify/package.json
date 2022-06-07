@@ -24,7 +24,8 @@
     "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
-    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
+    "start:local": "yarn node dist/index.js"
   },
   "husky": {
     "hooks": {
