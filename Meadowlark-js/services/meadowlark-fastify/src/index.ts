@@ -9,7 +9,14 @@ import { buildService } from './Service';
 const start = async () => {
   const service: FastifyInstance = buildService();
   try {
-    await service.listen(3000);
+    let port: number = 3000;
+    if (process.env.FASTIFY_PORT != null) {
+      const possiblePort: number = parseInt(process.env.FASTIFY_PORT, 10);
+
+      if (!Number.isNaN(possiblePort)) port = possiblePort;
+    }
+
+    await service.listen(port);
   } catch (err) {
     service.log.error(err);
     process.exit(1);

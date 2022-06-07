@@ -17,7 +17,7 @@ export function buildService(): FastifyInstance {
     genReqId: () => randomUUID(),
   });
 
-  if (process.env.FASTIFY_RATE_LIMIT != null && process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
+  if (process.env.FASTIFY_RATE_LIMIT == null || process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
     // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
     // effectiveness requires configuring for redis or an alternative store
     service.register(FastifyRateLimit);
