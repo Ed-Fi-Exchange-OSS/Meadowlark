@@ -37,6 +37,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
     Logger.error(`UpdateOpensearch.afterDeleteDocumentById`, request.traceId, err);
+    throw err;
   }
 }
 
@@ -70,7 +71,8 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`DynamoDbStreamHandler.upsertToOpensearch`, request.traceId, err);
+    Logger.error(`UpdateOpensearch.upsertToOpensearch`, request.traceId, err);
+    throw err;
   }
 }
 

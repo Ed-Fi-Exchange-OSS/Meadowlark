@@ -1,0 +1,120 @@
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+### API Version
+GET http://localhost:3000/metaed
+{{auth_header}}
+
+
+#################### School
+
+### Create a School record
+POST http://localhost:3000/v3.3b/ed-fi/schools
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "schoolId": 123,
+    "gradeLevels": [],
+    "nameOfInstitution": "abc",
+    "educationOrganizationCategories": []
+}
+
+
+### Get the created record
+GET http://localhost:3000/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
+{{auth_header}}
+
+### Query the created record
+GET http://localhost:3000/v3.3b/ed-fi/schools/?nameOfInstitution=abc
+{{auth_header}}
+
+
+### Update the created record
+PUT http://localhost:3000/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "schoolId": 123,
+    "gradeLevels": [],
+    "nameOfInstitution": "abc*****",
+    "educationOrganizationCategories": []
+}
+
+### Delete the created record
+DELETE http://localhost:3000/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
+{{auth_header}}
+
+
+######################## Academic Week
+
+
+### Create an AcademicWeek record
+POST http://localhost:3000/v3.3b/ed-fi/academicWeeks
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "schoolReference": {
+        "schoolId": 123
+    },
+    "weekIdentifier": "1st",
+    "beginDate": "2022-12-01",
+    "endDate": "2022-12-31",
+    "totalInstructionalDays": 30
+}
+
+
+### Get the created record
+GET http://localhost:3000/v3.3b/ed-fi/academicWeeks/20325050be22032deaeaddeb6a82cc160ce85911c9ad5ca8de5482e2
+{{auth_header}}
+
+
+### Update the created record
+PUT http://localhost:3000/v3.3b/ed-fi/academicWeeks/20325050be22032deaeaddeb6a82cc160ce85911c9ad5ca8de5482e2
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "schoolReference": {
+        "schoolId": 123
+    },
+    "weekIdentifier": "1st",
+    "beginDate": "2022-12-01",
+    "endDate": "2022-12-31",
+    "totalInstructionalDays": 300
+}
+
+### Delete the created record
+DELETE http://localhost:3000/v3.3b/ed-fi/academicWeeks/20325050be22032deaeaddeb6a82cc160ce85911c9ad5ca8de5482e2
+{{auth_header}}
+
+
+
+######################### Query
+
+
+
+### Get all schools records
+GET http://localhost:3000/v3.3b/ed-fi/schools
+{{auth_header}}
+
+
+### Get all academicWeeks records
+GET http://localhost:3000/v3.3b/ed-fi/academicWeeks
+{{auth_header}}
+
+
+### Query schools
+GET http://localhost:3000/v3.3b/ed-fi/schools?schoolId=12
+{{auth_header}}
+
+
+### Query academicWeeks
+GET http://localhost:3000/v3.3b/ed-fi/academicWeeks?schoolReference.schoolId=123
+{{auth_header}}
+

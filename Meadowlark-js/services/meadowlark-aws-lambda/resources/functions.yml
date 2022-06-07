@@ -38,7 +38,7 @@ metaed:
   events:
     - http:
         method: get
-        path: /metaed/{projectAbbreviation}
+        path: /metaed
         cors: true
 
 apiVersion:
