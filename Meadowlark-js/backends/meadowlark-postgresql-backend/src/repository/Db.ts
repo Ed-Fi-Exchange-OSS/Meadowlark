@@ -5,7 +5,7 @@
 
 import { Pool, Client } from 'pg';
 import { Logger } from '@edfi//meadowlark-core';
-import format from 'pg-format';
+import { createDocumentTableSql, createReferencesTableSql, createSchemaSql, GetCreateDatabaseSql } from './QueryHelper';
 
 let dbPool: Pool | null = null;
 
@@ -19,29 +19,11 @@ const dbConfiguration = {
 
 export async function checkExistsAndCreateTables(client: Client) {
   try {
-    await client.query(`CREATE SCHEMA IF NOT EXISTS meadowlark`);
+    await client.query(createSchemaSql);
 
-    const documentsTableSql =
-      'CREATE TABLE IF NOT EXISTS meadowlark.documents(' +
-      'id bigserial PRIMARY KEY,' +
-      'document_id VARCHAR(56) NOT NULL,' +
-      'document_identity JSONB NOT NULL,' +
-      'project_name VARCHAR NOT NULL,' +
-      'resource_name VARCHAR NOT NULL,' +
-      'resource_version VARCHAR NOT NULL,' +
-      'is_descriptor boolean NOT NULL,' +
-      'validated boolean NOT NULL,' +
-      'edfi_doc JSONB NOT NULL);';
+    await client.query(createDocumentTableSql);
 
-    await client.query(documentsTableSql);
-
-    const referencesTableSql =
-      'CREATE TABLE IF NOT EXISTS meadowlark.references(' +
-      'id bigserial PRIMARY KEY,' +
-      'parent_document_id VARCHAR NOT NULL,' +
-      'referenced_document_id VARCHAR NOT NULL);';
-
-    await client.query(referencesTableSql);
+    await client.query(createReferencesTableSql);
 
     await client.release();
   } catch (e) {
@@ -84,7 +66,7 @@ export async function createConnectionPool(): Promise<Pool> {
 
     client = new Client(dbConfiguration);
     client.connect();
-    await client.query(format('CREATE DATABASE %I', meadowlarkDbName));
+    await client.query(GetCreateDatabaseSql(meadowlarkDbName));
 
     Logger.info(`Database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {

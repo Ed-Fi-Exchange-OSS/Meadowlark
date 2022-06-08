@@ -5,9 +5,8 @@
 
 import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-// import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import format from 'pg-format';
 import { SecurityResult } from '../security/SecurityResponse';
-// import { getSharedClient } from './Db';
 
 function extractIdFromUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
@@ -31,12 +30,12 @@ export async function rejectByOwnershipSecurity(frontendRequest: FrontendRequest
 
   try {
     // TODO@SAA - Not Complete
-    const result = await client.query(`SELECT * FROM meadowlark.documents WHERE id=${id}`);
+    const result = await client.query(format('SELECT * FROM meadowlark.documents WHERE id=%L', [id]));
     // const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
     //   { id },
     //   { projection: { createdBy: 1, _id: 0 } },
     // );
-    if (result === null) {
+    if (result.rowCount === null) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }

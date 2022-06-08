@@ -5,7 +5,7 @@
 
 import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import { getDocumentSql } from './WriteHelper';
+import { getDocumentInsertOrUpdateSql } from './QueryHelper';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId }: UpdateRequest,
@@ -38,7 +38,7 @@ export async function updateDocumentById(
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-    const documentSql = await getDocumentSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, false);
+    const documentSql = await getDocumentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, false);
     const result = await client.query(documentSql);
     await client.query('COMMIT');
 

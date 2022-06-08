@@ -20,7 +20,7 @@ import {
 import { getSharedClient, closeDB } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
-import { getDocumentById } from '../../src/repository/Read';
+import { getDocumentById } from '../../src/repository/Get';
 
 jest.setTimeout(40000);
 
@@ -74,7 +74,7 @@ describe('given the upsert of a new document', () => {
     // const result: any = await collection.findOne({ id });
     expect(result.response === 'GET_SUCCESS');
     // @ts-ignore
-    expect(await result.document.id).toBe(`${id}`);
+    expect(await result.document.document_id).toBe(`${id}`);
   });
 
   it('should return insert success', async () => {
