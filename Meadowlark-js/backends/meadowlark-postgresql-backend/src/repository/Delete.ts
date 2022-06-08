@@ -39,8 +39,20 @@ export async function deleteAll(client: Client): Promise<DeleteResult> {
 
 export async function deleteDocumentById({ id, validate, traceId }: DeleteRequest, client: Client): Promise<DeleteResult> {
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
+
   try {
+    // Determine if the record exists
+    // const existsQuery = client.query(await getRecordExistsSql(id));
+
+    // const recordExists = existsQuery.rowCount && existsQuery.rowCount > 0;
+
+    // if (recordExists) {
+    //   deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
+    //   return deleteResult;
+    // }
+
     client.query('BEGIN');
+
     if (validate) {
       //         // Check for any references to the document to be deleted
       //         const anyReferences: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
@@ -69,12 +81,12 @@ export async function deleteDocumentById({ id, validate, traceId }: DeleteReques
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
     const deleteQueryResult = await client.query(await deleteDocumentByIdSql(id));
-    deleteResult.response = deleteQueryResult.rowCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
+    deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
+    client.query('COMMIT');
   } catch (e) {
     Logger.error('postgresql.repository.Delete.deleteDocumentById', traceId, e);
-    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-  } finally {
     await client.query('ROLLBACK');
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
   return deleteResult;
 }
