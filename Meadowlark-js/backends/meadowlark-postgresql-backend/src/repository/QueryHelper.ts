@@ -1,4 +1,3 @@
-import { DocumentReference, documentIdForDocumentReference } from '@edfi/meadowlark-core';
 import format from 'pg-format';
 
 export async function getDocumentByIdSql(documentId: string) {
@@ -16,7 +15,11 @@ export async function getRecordExistsSql(documentId: string) {
 }
 
 export async function deleteDocumentByIdSql(documentId: string) {
-  const sql = format('DELETE FROM meadowlark.documents WHERE document_id = %L', [documentId]);
+  const sql = format(
+    'with del as (delete from meadowlark.documents WHERE document_id = %L returning id) select count (*) from del;',
+    [documentId],
+  );
+  // const sql = format('DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING *;', [documentId]);
   return sql;
 }
 
@@ -24,8 +27,6 @@ export async function getDocumentInsertOrUpdateSql(
   { id, resourceInfo, documentInfo, edfiDoc, validate },
   isInsert: boolean,
 ): Promise<string> {
-  const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-
   const documentValues = [
     id,
     JSON.stringify(documentInfo.documentIdentity),
@@ -35,7 +36,6 @@ export async function getDocumentInsertOrUpdateSql(
     resourceInfo.isDescriptor,
     validate,
     edfiDoc,
-    outRefs,
   ];
 
   let documentSql;

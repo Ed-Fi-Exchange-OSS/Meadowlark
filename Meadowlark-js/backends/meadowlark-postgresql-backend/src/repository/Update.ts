@@ -46,7 +46,6 @@ export async function updateDocumentById(
   } catch (e) {
     await client.query('ROLLBACK');
     Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
-    await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
 

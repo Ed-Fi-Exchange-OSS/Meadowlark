@@ -115,7 +115,7 @@ describe('given the delete of an existing document', () => {
 
   it('should have deleted the document in the db', async () => {
     const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
-    expect(result.response).toBe('GET_SUCCESS');
+    expect(result.response).toBe('GET_FAILURE_NOT_EXISTS');
   });
 });
 
