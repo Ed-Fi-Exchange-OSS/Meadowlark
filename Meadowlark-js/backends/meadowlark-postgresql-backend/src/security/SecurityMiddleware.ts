@@ -15,7 +15,7 @@ export async function securityMiddleware(
   { frontendRequest, frontendResponse }: MiddlewareModel,
   client: Client,
 ): Promise<MiddlewareModel> {
-  const functionName = 'PostgresBackend.SecurityMiddleware.securityMiddleware';
+  const functionName = 'PostgresSqlBackend.SecurityMiddleware.securityMiddleware';
 
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };

@@ -5,7 +5,7 @@
 
 import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import format from 'pg-format';
+import { deleteDocumentByIdSql } from './QueryHelper';
 
 // // import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 // // import { getCollection } from './Db';
@@ -68,7 +68,7 @@ export async function deleteDocumentById({ id, validate, traceId }: DeleteReques
     }
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
-    const deleteQueryResult = await client.query(format('DELETE FROM meadowlark.documents WHERE id = %L', [id]));
+    const deleteQueryResult = await client.query(await deleteDocumentByIdSql(id));
     deleteResult.response = deleteQueryResult.rowCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
   } catch (e) {
     Logger.error('postgresql.repository.Delete.deleteDocumentById', traceId, e);

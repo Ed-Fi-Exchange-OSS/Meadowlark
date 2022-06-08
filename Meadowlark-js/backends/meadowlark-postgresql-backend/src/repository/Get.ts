@@ -5,19 +5,11 @@
 
 import { Client, Result } from 'pg';
 import { GetResult, GetRequest, DocumentIdentity } from '@edfi/meadowlark-core';
-import format from 'pg-format';
+import { getDocumentByIdSql } from './QueryHelper';
 
 export async function getDocumentById({ id }: GetRequest, client: Client): Promise<GetResult> {
   try {
-    const getByIdSQL = format(
-      'SELECT _pk, id, document_identity, project_name, resource_name, resource_version,' +
-        ' is_descriptor, validated, edfi_doc' +
-        ' FROM meadowlark.documents' +
-        ' WHERE id = %L;',
-      [id],
-    );
-
-    const queryResult: Result = await client.query(getByIdSQL);
+    const queryResult: Result = await client.query(await getDocumentByIdSql(id));
 
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: [] };
     const test = queryResult.rows[0].document_identity;
@@ -25,7 +17,7 @@ export async function getDocumentById({ id }: GetRequest, client: Client): Promi
     const response: GetResult = {
       response: 'GET_SUCCESS',
       document: {
-        id: queryResult.rows[0].id,
+        document_id: queryResult.rows[0].document_id,
         documentIdentity: docObj,
         projectName: queryResult.rows[0].project_name,
         resourceName: queryResult.rows[0].resource_name,

@@ -4,7 +4,6 @@
 // // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from 'pg';
-import format from 'pg-format';
 import {
   UpsertResult,
   UpsertRequest,
@@ -12,10 +11,10 @@ import {
   DocumentReference,
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
-import { validateReferenceEntitiesExist, getDocumentSql } from './WriteHelper';
+import { validateReferenceEntitiesExist } from './WriteHelper';
+import { getDocumentInsertOrUpdateSql, getRecordExistsSql } from './QueryHelper';
 // import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 // import { getCollection } from './Db';
-// import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId }: UpsertRequest,
@@ -29,12 +28,11 @@ export async function upsertDocument(
   let isInsert: boolean;
 
   try {
-    const recordExistsSql = format('SELECT _pk FROM meadowlark.documents WHERE id = %L;', [id]);
-    recordExistsResult = await client.query(recordExistsSql);
+    recordExistsResult = await client.query(await getRecordExistsSql(id));
 
-    isInsert = recordExistsResult.rowCount === 0;
+    isInsert = !recordExistsResult.rowCount || recordExistsResult.rowCount === 0;
 
-    documentSql = await getDocumentSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, isInsert);
+    documentSql = await getDocumentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, isInsert);
   } catch (e) {
     Logger.error(e, traceId);
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };

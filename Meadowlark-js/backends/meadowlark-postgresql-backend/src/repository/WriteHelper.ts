@@ -4,7 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from 'pg';
-import format from 'pg-format';
 import R from 'ramda';
 import { DocumentReference, Logger } from '@edfi/meadowlark-core';
 
@@ -73,54 +72,3 @@ export async function validateReferenceEntitiesExist(
 //   }
 //   return upsertResult;
 // }
-
-export async function getDocumentSql(
-  { id, resourceInfo, documentInfo, edfiDoc, validate },
-  isInsert: boolean,
-): Promise<string> {
-  const documentValues = [
-    id,
-    JSON.stringify(documentInfo.documentIdentity),
-    resourceInfo.projectName,
-    resourceInfo.resourceName,
-    resourceInfo.resourceVersion,
-    resourceInfo.isDescriptor,
-    validate,
-    edfiDoc,
-  ];
-
-  let documentSql;
-
-  if (isInsert) {
-    documentSql = format(
-      'INSERT INTO meadowlark.documents' +
-        ' (id, document_identity, project_name, resource_name, resource_version, is_descriptor, validated, edfi_doc)' +
-        ' VALUES (%L)' +
-        ' RETURNING _pk;',
-      documentValues,
-    );
-  } else {
-    documentSql = format(
-      'UPDATE meadowlark.documents' +
-        ' SET' +
-        ' id = %L,' +
-        ' document_identity = %L,' +
-        ' project_name = %L,' +
-        ' resource_name = %L,' +
-        ' resource_version = %L,' +
-        ' is_descriptor = %L,' +
-        ' validated = %L,' +
-        ' edfi_doc = %L' +
-        ' WHERE meadowlark.documents.id = %1$L;',
-      documentValues[0],
-      documentValues[1],
-      documentValues[2],
-      documentValues[3],
-      documentValues[4],
-      documentValues[5],
-      documentValues[6],
-      documentValues[7],
-    );
-  }
-  return documentSql;
-}
