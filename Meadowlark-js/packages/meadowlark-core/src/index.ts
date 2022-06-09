@@ -24,7 +24,7 @@ export { newSecurity } from './security/Security';
 export type { DocumentElement } from './model/DocumentElement';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
-export type { FrontendRequest } from './handler/FrontendRequest';
+export type { FrontendRequest, FrontendHeaders } from './handler/FrontendRequest';
 export { newFrontendRequest } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
 export { newFrontendResponse } from './handler/FrontendResponse';
