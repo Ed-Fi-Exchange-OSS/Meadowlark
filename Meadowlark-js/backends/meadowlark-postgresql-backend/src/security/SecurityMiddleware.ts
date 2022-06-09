@@ -18,7 +18,10 @@ export async function securityMiddleware(
   const functionName = 'PostgresSqlBackend.SecurityMiddleware.securityMiddleware';
 
   // if there is a response already posted, we are done
-  if (frontendResponse != null) return { frontendRequest, frontendResponse };
+  if (frontendResponse != null) {
+    return { frontendRequest, frontendResponse };
+  }
+
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
   // Ownership-based is the only one for now. When others are implemented, do as
@@ -29,11 +32,14 @@ export async function securityMiddleware(
   }
 
   const securityResult: SecurityResult = await rejectByOwnershipSecurity(frontendRequest, client);
-  if (securityResult === 'ACCESS_APPROVED' || securityResult === 'NOT_APPLICABLE')
-    return { frontendRequest, frontendResponse };
 
-  if (securityResult === 'UNKNOWN_FAILURE')
+  if (securityResult === 'ACCESS_APPROVED' || securityResult === 'NOT_APPLICABLE') {
+    return { frontendRequest, frontendResponse };
+  }
+
+  if (securityResult === 'UNKNOWN_FAILURE') {
     return { frontendRequest, frontendResponse: { statusCode: 500, headers: {}, body: '' } };
+  }
 
   return { frontendRequest, frontendResponse: { statusCode: 403, headers: {}, body: '' } };
 }

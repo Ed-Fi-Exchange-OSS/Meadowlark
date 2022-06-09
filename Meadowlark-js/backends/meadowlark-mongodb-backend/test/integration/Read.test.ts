@@ -57,7 +57,7 @@ describe('given the get of a non-existent document', () => {
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), id }, client);
   });
 
   afterAll(async () => {
