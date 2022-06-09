@@ -8,7 +8,13 @@ import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance } from 'fastify';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
-import { metaed, apiVersion, swaggerForResourcesAPI, swaggerForDescriptorsAPI } from './handler/MetadataHandler';
+import {
+  metaed,
+  apiVersion,
+  swaggerForResourcesAPI,
+  swaggerForDescriptorsAPI,
+  openApiUrlList,
+} from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
 
 export function buildService(): FastifyInstance {
@@ -41,8 +47,11 @@ export function buildService(): FastifyInstance {
 
   // API version handler
   service.get(`/${stage}`, apiVersion);
+  service.get(`/${stage}/`, apiVersion);
 
   // Swagger handlers
+  service.get(`/${stage}/metadata`, openApiUrlList);
+  service.get(`/${stage}/metadata/`, openApiUrlList);
   service.get(`/${stage}/metadata/resources/swagger.json`, swaggerForResourcesAPI);
   service.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
 
