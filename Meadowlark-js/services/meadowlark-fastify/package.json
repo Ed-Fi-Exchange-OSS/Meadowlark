@@ -18,14 +18,16 @@
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.8.1"
   },
   "scripts": {
     "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
-    "start:local": "yarn node dist/index.js"
+    "start:local": "yarn node dist/index.js",
+    "start:local-ts": "yarn ts-node src/index.ts"
   },
   "husky": {
     "hooks": {
