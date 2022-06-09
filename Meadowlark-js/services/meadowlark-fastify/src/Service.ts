@@ -28,26 +28,28 @@ export function buildService(): FastifyInstance {
     done(null, body);
   });
 
+  const stage: string = process.env.MEADOWLARK_STAGE || 'local';
+
   // Matching crud operations handlers
-  service.get('/*', get);
-  service.post('/*', upsert);
-  service.put('/*', update);
-  service.delete('/*', deleteIt);
+  service.get(`/${stage}/*`, get);
+  service.post(`/${stage}/*`, upsert);
+  service.put(`/${stage}/*`, update);
+  service.delete(`/${stage}/*`, deleteIt);
 
   // MetaEd metadata handler
-  service.get('/metaed', metaed);
+  service.get(`/${stage}/metaed`, metaed);
 
   // API version handler
-  service.get('/', apiVersion);
+  service.get(`/${stage}`, apiVersion);
 
   // Swagger handlers
-  service.get('/metadata/resources/swagger.json', swaggerForResourcesAPI);
-  service.get('/metadata/descriptors/swagger.json', swaggerForDescriptorsAPI);
+  service.get(`/${stage}/metadata/resources/swagger.json`, swaggerForResourcesAPI);
+  service.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
 
   // OAuth handlers
-  service.post('/api/oauth/token', oauthHandler);
-  service.get('/createKey', oauthHandler);
-  service.get('/verify', oauthHandler);
+  service.post(`/${stage}/api/oauth/token`, oauthHandler);
+  service.get(`/${stage}/createKey`, oauthHandler);
+  service.get(`/${stage}/verify`, oauthHandler);
 
   return service;
 }
