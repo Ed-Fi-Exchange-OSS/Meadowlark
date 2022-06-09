@@ -119,6 +119,7 @@ describe('given the delete of an existing document', () => {
   });
 });
 
+// TODO - Reference validation to be added with RND-243
 // describe('given an delete of a document referenced by an existing document with validation on', () => {
 //   let client;
 //   let deleteResult;

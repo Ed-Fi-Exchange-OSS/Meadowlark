@@ -14,12 +14,12 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
-  GetResult,
 } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
 import { closeDB, getSharedClient } from '../../src/repository/Db';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
+import { getRecordExistsSql } from '../../src/repository/QueryHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);
@@ -67,10 +67,9 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
+    const result = await client.query(await getRecordExistsSql(id));
 
-    // @ts-ignore
-    expect(result.document.length).toBe(0);
+    expect(result.rowCount).toBe(0);
   });
 
   it('should return get failure', async () => {

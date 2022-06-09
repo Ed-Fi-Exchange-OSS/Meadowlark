@@ -21,6 +21,7 @@ import { getSharedClient, closeDB } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
+import { getRecordExistsSql } from '../../src/repository/QueryHelper';
 
 jest.setTimeout(40000);
 
@@ -70,11 +71,9 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
-    // const result: any = await collection.findOne({ id });
-    expect(result.response === 'GET_SUCCESS');
-    // @ts-ignore
-    expect(await result.document.document_id).toBe(`${id}`);
+    const result = await client.query(await getRecordExistsSql(id));
+
+    expect(result.rowCount).toBe(1);
   });
 
   it('should return insert success', async () => {
@@ -221,7 +220,7 @@ describe('given an upsert of a new document that references a non-existent docum
     expect(val).toBe('upsert4');
   });
 });
-
+// TODO - Reference validation to be added with RND-243
 // describe('given an upsert of a new document that references an existing document with validation on', () => {
 //   let client;
 //   let upsertResult;

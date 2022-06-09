@@ -5,8 +5,8 @@
 
 import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import format from 'pg-format';
 import { SecurityResult } from '../security/SecurityResponse';
+import { getDocumentOwnershipByIdSql } from './QueryHelper';
 
 function extractIdFromUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
@@ -29,18 +29,15 @@ export async function rejectByOwnershipSecurity(frontendRequest: FrontendRequest
   }
 
   try {
-    // TODO@SAA - Not Complete
-    const result = await client.query(format('SELECT * FROM meadowlark.documents WHERE id=%L', [id]));
-    // const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-    //   { id },
-    //   { projection: { createdBy: 1, _id: 0 } },
-    // );
-    if (result.rowCount === null) {
+    const result = await client.query(await getDocumentOwnershipByIdSql(id));
+
+    if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
     const { clientName } = frontendRequest.middleware.security;
-    if (result.createdBy === clientName) {
+
+    if (result.rows[0].created_by === clientName) {
       Logger.debug(`${functionName} - access approved: id ${id}, clientName ${clientName}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }

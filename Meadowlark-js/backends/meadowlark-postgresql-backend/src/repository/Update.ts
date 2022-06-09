@@ -8,7 +8,7 @@ import { Client } from 'pg';
 import { getDocumentInsertOrUpdateSql } from './QueryHelper';
 
 export async function updateDocumentById(
-  { id, resourceInfo, documentInfo, edfiDoc, validate, traceId }: UpdateRequest,
+  { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: Client,
 ): Promise<UpdateResult> {
   const updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
@@ -17,6 +17,7 @@ export async function updateDocumentById(
 
   try {
     await client.query('BEGIN');
+    // TODO - Reference validation to be added with RND-243
     // if (validate) {
     // outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
     //   const failures = await validateReferenceEntitiesExist(outRefs, client, traceId);
@@ -38,7 +39,10 @@ export async function updateDocumentById(
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-    const documentSql = await getDocumentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate }, false);
+    const documentSql = await getDocumentInsertOrUpdateSql(
+      { id, resourceInfo, documentInfo, edfiDoc, validate, security },
+      false,
+    );
     const result = await client.query(documentSql);
     await client.query('COMMIT');
 

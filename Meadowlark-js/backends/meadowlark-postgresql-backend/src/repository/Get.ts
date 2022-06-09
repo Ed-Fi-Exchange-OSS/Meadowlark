@@ -11,7 +11,7 @@ export async function getDocumentById({ id }: GetRequest, client: Client): Promi
   try {
     const queryResult: Result = await client.query(await getDocumentByIdSql(id));
 
-    if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: [] };
+    if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
     const test = queryResult.rows[0].document_identity;
     const docObj: DocumentIdentity[] = test;
     const response: GetResult = {
@@ -24,6 +24,7 @@ export async function getDocumentById({ id }: GetRequest, client: Client): Promi
         resourceVersion: queryResult.rows[0].resource_version,
         validated: queryResult.rows[0].validated,
         isDescriptor: queryResult.rows[0].is_descriptor,
+        createdBy: queryResult.rows[0].created_by,
         edfiDoc: queryResult.rows[0].edfi_doc,
       },
     };
