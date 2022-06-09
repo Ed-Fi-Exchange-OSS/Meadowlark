@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { FastifyInstance } from 'fastify';
+import { Logger } from '@edfi/meadowlark-core';
 import { buildService } from './Service';
 
 const start = async () => {
@@ -16,7 +17,9 @@ const start = async () => {
       if (!Number.isNaN(possiblePort)) port = possiblePort;
     }
 
-    await service.listen(port);
+    const stage = process.env.MEADOWLARK_STAGE || 'local';
+
+    await service.listen(port).then((address) => Logger.info(`Starting Meadowlark API at ${address}/${stage}`, null));
   } catch (err) {
     service.log.error(err);
     process.exit(1);
