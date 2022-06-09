@@ -122,10 +122,10 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
-    // @ts-ignore
+    const result: any = await getDocumentById({ ...newGetRequest(), id }, client);
+
     expect(result.document.documentIdentity[0].value).toBe('update2');
-    // @ts-ignore
+
     expect(result.document.edfiDoc.changeToDoc).toBe(true);
   });
 });
@@ -193,10 +193,10 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
-    // @ts-ignore
+    const result: any = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
+
     expect(result.document.documentIdentity[0].value).toBe('update4');
-    // TODO@SAA - Fix when reference validation is added
+    // TODO - Fix when reference validation is added with RND-243
     // expect(result.document.outRefs).toMatchInlineSnapshot(`
     //   Array [
     //     "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
@@ -204,7 +204,7 @@ describe('given an update of a document that references a non-existent document 
     // `);
   });
 });
-
+// TODO - Reference validation to be added with RND-243
 // describe('given an update of a document that references an existing document with validation on', () => {
 //   let client;
 //   let updateResult;

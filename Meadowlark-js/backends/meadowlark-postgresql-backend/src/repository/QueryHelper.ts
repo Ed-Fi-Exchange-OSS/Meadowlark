@@ -3,11 +3,15 @@ import format from 'pg-format';
 export async function getDocumentByIdSql(documentId: string) {
   return format(
     'SELECT document_id, document_identity, project_name, resource_name, resource_version,' +
-      ' is_descriptor, validated, edfi_doc' +
+      ' is_descriptor, validated, created_by, edfi_doc' +
       ' FROM meadowlark.documents' +
       ' WHERE document_id = %L;',
     [documentId],
   );
+}
+
+export async function getDocumentOwnershipByIdSql(documentId: string) {
+  return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
 export async function getRecordExistsSql(documentId: string) {
@@ -24,7 +28,7 @@ export async function deleteDocumentByIdSql(documentId: string) {
 }
 
 export async function getDocumentInsertOrUpdateSql(
-  { id, resourceInfo, documentInfo, edfiDoc, validate },
+  { id, resourceInfo, documentInfo, edfiDoc, validate, security },
   isInsert: boolean,
 ): Promise<string> {
   const documentValues = [
@@ -35,6 +39,7 @@ export async function getDocumentInsertOrUpdateSql(
     resourceInfo.resourceVersion,
     resourceInfo.isDescriptor,
     validate,
+    security.clientName,
     edfiDoc,
   ];
 
@@ -43,7 +48,8 @@ export async function getDocumentInsertOrUpdateSql(
   if (isInsert) {
     documentSql = format(
       'INSERT INTO meadowlark.documents' +
-        ' (document_id, document_identity, project_name, resource_name, resource_version, is_descriptor, validated, edfi_doc)' +
+        ' (document_id, document_identity, project_name, resource_name, resource_version, is_descriptor,' +
+        ' validated, created_by, edfi_doc)' +
         ' VALUES (%L)' +
         ' RETURNING document_id;',
       documentValues,
@@ -59,6 +65,7 @@ export async function getDocumentInsertOrUpdateSql(
         ' resource_version = %L,' +
         ' is_descriptor = %L,' +
         ' validated = %L,' +
+        ' created_by = %L,' +
         ' edfi_doc = %L' +
         ' WHERE meadowlark.documents.document_id = %1$L;',
       documentValues[0],
@@ -69,6 +76,7 @@ export async function getDocumentInsertOrUpdateSql(
       documentValues[5],
       documentValues[6],
       documentValues[7],
+      documentValues[8],
     );
   }
   return documentSql;
@@ -90,6 +98,7 @@ export const createDocumentTableSql =
   'resource_version VARCHAR NOT NULL,' +
   'is_descriptor boolean NOT NULL,' +
   'validated boolean NOT NULL,' +
+  'created_by VARCHAR(100) NULL,' +
   'edfi_doc JSONB NOT NULL);';
 
 export const createReferencesTableSql =
