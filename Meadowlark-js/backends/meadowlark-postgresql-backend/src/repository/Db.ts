@@ -53,10 +53,10 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
     return client;
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-    Logger.error(`Error connecting Postgres. Error was ${message}`, null);
 
     // if this anything other than a DB doesn't exist error, there's a bigger problem and we don't want to continue
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
+      Logger.error(`Error connecting Postgres. Error was ${message}`, null);
       throw e;
     }
     dbPool.end();
@@ -93,7 +93,17 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
 export async function getSharedClient(): Promise<Client> {
   if (dbPool == null) {
     const client = await createConnectionPoolAndReturnClient();
-    checkExistsAndCreateTables(client);
+    // checkExistsAndCreateTables(client);
+    try {
+      const result1 = await client.query(createSchemaSql);
+      const result2 = await client.query(createDocumentTableSql);
+      const result3 = await client.query(createReferencesTableSql);
+      Logger.debug(`${result1}:${result2}:${result3}`, '');
+    } catch (e) {
+      const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
+      Logger.error(`Error connecting PostgreSql. Error was ${message}`, null);
+      throw e;
+    }
     return client;
   }
 
