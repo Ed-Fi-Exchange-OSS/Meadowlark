@@ -17,7 +17,7 @@ import {
   GetResult,
   GetRequest,
 } from '@edfi/meadowlark-core';
-import { getSharedClient, closeDB } from '../../src/repository/Db';
+import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
@@ -67,7 +67,7 @@ describe('given the upsert of a new document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should exist in the db', async () => {
@@ -114,7 +114,7 @@ describe('given the upsert of an existing document twice', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should return insert success on 1st upsert', async () => {
@@ -154,7 +154,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   afterAll(async () => {
     await deleteAll(client);
     // End the connection with the database
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should have the change in the db', async () => {
@@ -207,7 +207,7 @@ describe('given an upsert of a new document that references a non-existent docum
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should have returned insert success for the document with invalid reference but validation off', async () => {

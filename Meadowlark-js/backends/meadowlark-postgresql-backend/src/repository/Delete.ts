@@ -7,16 +7,7 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
 import { deleteDocumentByIdSql } from './QueryHelper';
 
-// // import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-// // import { getCollection } from './Db';
-// // import { onlyReturnId } from './WriteHelper';
-
-// // MongoDB Filter on documents with the given id in their outRefs list
-// // const onlyDocumentsReferencing = (id: string): Filter<MeadowlarkDocument> => ({ outRefs: id });
-
-// // MongoDB FindOption to return at most 5 documents
-// // const limitFive = (session: ClientSession): FindOptions => ({ projection: { _id: 0 }, limit: 5, session });
-
+// This function should only be used for testing, it will clear out all data from both documents and references tables
 export async function deleteAll(client: Client): Promise<DeleteResult> {
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 

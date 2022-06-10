@@ -16,7 +16,7 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { Client } from 'pg';
-import { getSharedClient, closeDB } from '../../src/repository/Db';
+import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll } from '../../src/repository/Delete';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -45,7 +45,7 @@ describe('given the upsert where no document id is specified', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not apply security when no document id is specified', async () => {
@@ -75,7 +75,7 @@ describe('given the getById of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not apply security for non-existent document', async () => {
@@ -132,7 +132,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should approve access for owned document', async () => {
@@ -188,7 +188,7 @@ describe('given the getById of a document not owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should approve access for owned document', async () => {

@@ -18,7 +18,7 @@ import {
   GetRequest,
 } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import { closeDB, getSharedClient } from '../../src/repository/Db';
+import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
@@ -68,7 +68,7 @@ describe('given the update of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not exist in the db', async () => {
@@ -114,7 +114,7 @@ describe('given the update of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should return update success', async () => {
@@ -185,7 +185,7 @@ describe('given an update of a document that references a non-existent document 
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should have returned update success for the document with invalid reference but validation off', async () => {
@@ -280,7 +280,7 @@ describe('given an update of a document that references a non-existent document 
 
 //   afterAll(async () => {
 //     await deleteAll(client);
-//     await closeDB();
+//     await resetSharedClient();
 //   });
 
 //   it('should have returned update success for the document with a valid reference', async () => {
@@ -383,7 +383,7 @@ describe('given an update of a document that references a non-existent document 
 
 //   afterAll(async () => {
 //     await deleteAll(client);
-//     await closeDB();
+//     await resetSharedClient();
 //   });
 
 //   it('should have returned a failure to insert the document with an invalid reference', async () => {

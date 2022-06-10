@@ -3,7 +3,7 @@
 // // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // // See the LICENSE and NOTICES files in the project root for more information.
 
-import { closeDB, getSharedClient } from '../../src/repository/Db';
+import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 
 jest.setTimeout(40000);
 
@@ -42,6 +42,7 @@ describe('Test Connection to Postgres Successful', () => {
   });
 
   afterAll(async () => {
-    closeDB();
+    client.release();
+    resetSharedClient();
   });
 });
