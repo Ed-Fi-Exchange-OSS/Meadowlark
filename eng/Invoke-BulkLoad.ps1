@@ -8,12 +8,12 @@ $ErrorActionPreference = "Stop"
 
 Import-Module ./Package-Management.psm1 -force
 
-$apiUrl = "http://localhost:3000/local"
+$baseUrl = "http://localhost:3000/local"
 $key = "meadowlark_key_1"
 $secret = "meadowlark_secret_1"
 $sampleDataVersion = "3.3.1-b"
 $bulkLoadVersion = "5.3"
-$xsdDirectory = "$($PSScriptRoot)/.packages/XSD"
+$xsdDirectory = (Resolve-Path "$($PSScriptRoot)/.packages/XSD")
 
 $sampleDataDir = (Get-SampleData $sampleDataVersion).Trim()
 
@@ -29,8 +29,8 @@ Get-EdFiXsd -XsdDirectory $xsdDirectory
 
 # Load Descriptors
 $options = @(
-    "-b", $apiUrl,
-    "-d", "$($sampleDataDir)/Bootstrap",
+    "-b", $baseUrl,
+    "-d", (Resolve-Path "$($sampleDataDir)/Bootstrap"),
     "-w", $working,
     "-k", $key,
     "-s", $secret,

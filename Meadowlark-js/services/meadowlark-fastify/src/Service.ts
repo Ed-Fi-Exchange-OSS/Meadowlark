@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable no-use-before-define */
+
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
@@ -19,24 +21,14 @@ import {
 } from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
 
-function logWrapper(): FastifyLoggerInstance {
-  return {
-    // Fastify logging is too chatty for Meadowlark info, so redefine as debug
-    info: (msg: string) => Logger.debug(msg, null),
-    warn: (msg: string) => Logger.warn(msg, null),
-    error: (msg: string) => Logger.error(msg, null),
-    fatal: (msg: string) => Logger.error(msg, null),
-    trace: (msg: string) => Logger.debug(msg, null),
-    debug: (msg: string) => Logger.debug(msg, null),
-    child: (_) => logWrapper(),
-  };
-}
-
 export function buildService(): FastifyInstance {
   const service = Fastify({
     logger: logWrapper(),
+    disableRequestLogging: true,
     genReqId: () => randomUUID(),
   });
+
+  customizeRequestLogging();
 
   if (process.env.FASTIFY_RATE_LIMIT == null || process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
     // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
@@ -77,4 +69,40 @@ export function buildService(): FastifyInstance {
   service.get(`/${stage}/verify`, oauthHandler);
 
   return service;
+
+  function logWrapper(): FastifyLoggerInstance {
+    return {
+      info: (msg: string) => Logger.info(msg, null),
+      warn: (msg: string) => Logger.warn(msg, null),
+      error: (msg: string) => Logger.error(msg, null),
+      fatal: (msg: string) => Logger.error(msg, null),
+      trace: (msg: string) => Logger.debug(msg, null),
+      debug: (msg: string) => Logger.debug(msg, null),
+      child: (_) => logWrapper(),
+    };
+  }
+
+  function customizeRequestLogging() {
+    // Customize the request logging so that request Id and extra info can be passed into the Meadowlark logger.
+    function now() {
+      return Date.now();
+    }
+
+    service.addHook('onRequest', (req, reply, done) => {
+      // eslint-disable-next-line dot-notation
+      reply.headers['startTime'] = now();
+      Logger.info('Request', req.id, { url: req.raw.url, contentType: req.headers['content-type'] });
+      done();
+    });
+
+    service.addHook('onResponse', (req, reply, done) => {
+      Logger.info('Response', req.id, {
+        url: req.raw.url,
+        statusCode: reply.raw.statusCode,
+        // eslint-disable-next-line dot-notation
+        durationMs: now() - Number(reply.headers['startTime']),
+      });
+      done();
+    });
+  }
 }
