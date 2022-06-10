@@ -16,7 +16,7 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { Client } from 'pg';
-import { closeDB, getSharedClient } from '../../src/repository/Db';
+import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
@@ -45,7 +45,7 @@ describe('given the upsert where no document id is specified', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not respond when no document id is specified', async () => {
@@ -75,7 +75,7 @@ describe('given the getById of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not respond for non-existent document', async () => {
@@ -132,7 +132,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not respond for approved access for owned document', async () => {
@@ -188,7 +188,7 @@ describe('given the getById of a document not owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should respond 403 for access denied', async () => {

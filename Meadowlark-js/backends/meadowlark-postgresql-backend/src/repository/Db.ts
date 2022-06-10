@@ -17,18 +17,19 @@ const dbConfiguration = {
   database: 'meadowlark',
 };
 
+/**
+ * Checks that the meadowlark schema, document and references tables exist in the database, if not will create them
+ * @param client The Postgres client for querying
+ */
 export async function checkExistsAndCreateTables(client: Client) {
   try {
-    await client.query(createSchemaSql);
-
-    await client.query(createDocumentTableSql);
-
-    await client.query(createReferencesTableSql);
-
-    await client.release();
+    const result1 = await client.query(createSchemaSql);
+    const result2 = await client.query(createDocumentTableSql);
+    const result3 = await client.query(createReferencesTableSql);
+    Logger.debug(`${result1}:${result2}:${result3}`, '');
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-    Logger.error(`Error connecting Postgres. Error was ${message}`, null);
+    Logger.error(`Error connecting PostgreSql. Error was ${message}`, null);
     throw e;
   }
 }
@@ -37,16 +38,19 @@ export async function checkExistsAndCreateTables(client: Client) {
  * Create a connection pool, check that the database and table structure is in place
  * or create it if not and then return the pool
  */
-export async function createConnectionPool(): Promise<Pool> {
+export async function createConnectionPoolAndReturnClient(): Promise<Client> {
+  let client: Client;
   try {
-    // Attempt to connect to the meadowlark DB, if this is successful, the DB has already been created
-    // and we can return
+    // Attempt to connect to the meadowlark DB. If the meadowlark database doesn't exist, the connection will fail and throw
+    // an error. If this happens, we will create a client connection to the postgres database, create the meadowlark
+    // database, and disconnect. From there reconnect the pool to the meadowlark database and continue
+
     dbPool = new Pool(dbConfiguration);
-    await dbPool.connect();
+    client = await dbPool.connect();
 
     Logger.info(`Connected to ${dbConfiguration.database} successfully`, null);
 
-    return dbPool;
+    return client;
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
@@ -57,9 +61,9 @@ export async function createConnectionPool(): Promise<Pool> {
     }
     dbPool.end();
   }
+
   // The meadowlark DB doesn't exist, create a separate client that connects to the postgres(default) DB to create
   // meadowlark DB, then reconnect the pool to the meadowlark DB and return
-  let client;
   try {
     const meadowlarkDbName = dbConfiguration.database;
     dbConfiguration.database = 'postgres';
@@ -72,7 +76,6 @@ export async function createConnectionPool(): Promise<Pool> {
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
-
     throw e;
   } finally {
     await client.end();
@@ -81,7 +84,7 @@ export async function createConnectionPool(): Promise<Pool> {
   dbConfiguration.database = 'meadowlark';
   dbPool = new Pool(dbConfiguration);
 
-  return dbPool;
+  return dbPool.connect();
 }
 
 /**
@@ -89,24 +92,21 @@ export async function createConnectionPool(): Promise<Pool> {
  */
 export async function getSharedClient(): Promise<Client> {
   if (dbPool == null) {
-    dbPool = await createConnectionPool();
-    checkExistsAndCreateTables(await dbPool.connect());
+    const client = await createConnectionPoolAndReturnClient();
+    checkExistsAndCreateTables(client);
+    return client;
   }
 
   // Returns new Postgres Client
   return dbPool.connect();
 }
 /**
- * Because of the creation/tear down process in integration tests, the pool was still ending when we were
+ * Due to the creation/tear down process in integration tests, the pool was still ending when we were
  * trying to start it for the next set of tests, nulling the pool allows to be created in time for tests
- * @param nullPool
- * @returns
  */
-export async function closeDB(nullPool: boolean = true) {
-  if (dbPool == null) {
-    return;
+export async function resetSharedClient() {
+  if (dbPool != null) {
+    await dbPool.end();
   }
-
-  dbPool.end();
-  dbPool = nullPool ? null : dbPool;
+  dbPool = null;
 }
