@@ -51,5 +51,6 @@ export {
   openApiUrlList,
   swaggerForDescriptorsAPI,
   swaggerForResourcesAPI,
+  dependencies
 } from './handler/MetadataHandler';
 export { handler as oauthHandler } from './handler/OAuthHandler';

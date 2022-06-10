@@ -46,3 +46,10 @@ export async function swaggerForDescriptorsAPI(
 ): Promise<APIGatewayProxyResult> {
   return respondWith(await Meadowlark.swaggerForDescriptorsAPI(fromRequest(event, context)));
 }
+
+/**
+ * Endpoint for accessing Dependencies JSON file
+ */
+export async function dependencies(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+  return respondWith(await Meadowlark.dependencies(fromRequest(event, context)));
+}

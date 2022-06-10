@@ -101,11 +101,17 @@ function useTemplate(data: string, host: string, stage: string): string {
 /*
  * Retrieves and caches a swagger specification from an external URL.
  */
-async function getSwaggerSpecification(url: string, frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+type Transformer = (data: any) => string;
+
+async function getFileFromBlobStorage(
+  url: string,
+  frontendRequest: FrontendRequest,
+  transformer: Transformer,
+): Promise<FrontendResponse> {
   const resource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
-    writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', `getting ${url}`);
+    writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', `getting ${url}`);
     const response = await axios.get(url, {
       headers: { 'If-None-Match': resource.etag },
       validateStatus(status) {
@@ -114,13 +120,13 @@ async function getSwaggerSpecification(url: string, frontendRequest: FrontendReq
     });
 
     if (response.status === 200) {
-      writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', '200 from AWS');
+      writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', '200 from AWS');
       resource.etag = response.headers.etag;
-      resource.body = useTemplate(response.data, frontendRequest.headers?.Host || '', frontendRequest.stage);
+      resource.body = transformer(response.data);
 
       resourceCache[url] = resource;
     } else {
-      writeDebugStatusToLog(frontendRequest, 'getSwaggerSpecification', '304 from AWS');
+      writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', '304 from AWS');
     }
 
     return {
@@ -131,12 +137,20 @@ async function getSwaggerSpecification(url: string, frontendRequest: FrontendReq
       },
     };
   } catch (error) {
-    writeErrorToLog(frontendRequest, 'getSwaggerSpecification', 404, error);
+    writeErrorToLog(frontendRequest, 'getFileFromBlobStorage', 404, error);
     return {
       body: '',
       statusCode: 404,
     };
   }
+}
+/*
+ * Retrieves and caches a swagger specification from an external URL.
+ */
+async function getSwaggerSpecification(url: string, frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  return getFileFromBlobStorage(url, frontendRequest, (data: any) =>
+    useTemplate(data, frontendRequest.headers?.Host || '', frontendRequest.stage),
+  );
 }
 
 /**
@@ -171,4 +185,12 @@ export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<
 export async function swaggerForDescriptorsAPI(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   writeRequestToLog(frontendRequest, 'swaggerForDescriptorsAPI');
   return getSwaggerSpecification(Constants.swaggerDescriptorUrl, frontendRequest);
+}
+
+/**
+ * Endpoint for accessing the dependencies JSON file
+ */
+export async function dependencies(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeRequestToLog(frontendRequest, 'dependencies');
+  return getFileFromBlobStorage(Constants.dependenciesUrl, frontendRequest, (data: any) => data);
 }

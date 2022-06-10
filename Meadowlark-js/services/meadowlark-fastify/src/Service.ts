@@ -6,7 +6,8 @@
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
+import { Logger } from '@edfi/meadowlark-core';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
 import {
   metaed,
@@ -14,12 +15,26 @@ import {
   swaggerForResourcesAPI,
   swaggerForDescriptorsAPI,
   openApiUrlList,
+  dependencies,
 } from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
 
+function logWrapper(): FastifyLoggerInstance {
+  return {
+    // Fastify logging is too chatty for Meadowlark info, so redefine as debug
+    info: (msg: string) => Logger.debug(msg, null),
+    warn: (msg: string) => Logger.warn(msg, null),
+    error: (msg: string) => Logger.error(msg, null),
+    fatal: (msg: string) => Logger.error(msg, null),
+    trace: (msg: string) => Logger.debug(msg, null),
+    debug: (msg: string) => Logger.debug(msg, null),
+    child: (_) => logWrapper(),
+  };
+}
+
 export function buildService(): FastifyInstance {
   const service = Fastify({
-    logger: true,
+    logger: logWrapper(),
     genReqId: () => randomUUID(),
   });
 
@@ -54,6 +69,7 @@ export function buildService(): FastifyInstance {
   service.get(`/${stage}/metadata/`, openApiUrlList);
   service.get(`/${stage}/metadata/resources/swagger.json`, swaggerForResourcesAPI);
   service.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
+  service.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
 
   // OAuth handlers
   service.post(`/${stage}/api/oauth/token`, oauthHandler);

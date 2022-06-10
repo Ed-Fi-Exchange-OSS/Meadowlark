@@ -42,3 +42,10 @@ export async function openApiUrlList(request: FastifyRequest, reply: FastifyRepl
 export async function swaggerForDescriptorsAPI(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   return respondWith(await Meadowlark.swaggerForDescriptorsAPI(fromRequest(request)), reply);
 }
+
+/**
+ * Endpoint for accessing Dependencies JSON file
+ */
+export async function dependencies(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  return respondWith(await Meadowlark.dependencies(fromRequest(request)), reply);
+}
