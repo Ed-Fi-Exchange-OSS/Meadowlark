@@ -54,7 +54,9 @@ jobs:
         path: Meadowlark-js/coverage/lcov-report
 
     - name: Integration tests
-      run: yarn test:integration
+      run: |
+        sudo systemctl start postgresql.service
+        yarn test:integration
       working-directory: Meadowlark-js
 
     - name: System tests
