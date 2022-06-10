@@ -16,7 +16,7 @@ import {
   newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import { closeDB, getSharedClient } from '../../src/repository/Db';
+import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
 import { getRecordExistsSql } from '../../src/repository/QueryHelper';
@@ -63,7 +63,7 @@ describe('given the get of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should not exist in the db', async () => {
@@ -103,7 +103,7 @@ describe('given the get of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should return the document', async () => {

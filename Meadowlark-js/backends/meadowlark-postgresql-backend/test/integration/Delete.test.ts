@@ -18,7 +18,7 @@ import {
   newResourceInfo,
 } from '@edfi/meadowlark-core';
 import { Client } from 'pg';
-import { getSharedClient, closeDB } from '../../src/repository/Db';
+import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
@@ -72,7 +72,7 @@ describe('given the delete of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should return delete failure', async () => {
@@ -106,7 +106,7 @@ describe('given the delete of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await closeDB();
+    await resetSharedClient();
   });
 
   it('should return delete success', async () => {
