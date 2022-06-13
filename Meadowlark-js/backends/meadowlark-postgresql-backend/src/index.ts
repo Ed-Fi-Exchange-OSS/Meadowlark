@@ -12,7 +12,7 @@ import {
   securityMiddleware,
 } from './BackendFacade';
 
-export function initializeBackendPlugin(): DocumentStorePlugin {
+export function initializeDocumentStore(): DocumentStorePlugin {
   return {
     upsertDocument,
     getDocumentById,
