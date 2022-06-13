@@ -16,8 +16,9 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  DeleteResult,
 } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -51,8 +52,8 @@ const newGetRequest = (): GetRequest => ({
 });
 
 describe('given the delete of a non-existent document', () => {
-  let client;
-  let deleteResult;
+  let client: PoolClient;
+  let deleteResult: DeleteResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -65,7 +66,7 @@ describe('given the delete of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, resourceInfo, validate: false }, client);
   });
@@ -81,8 +82,8 @@ describe('given the delete of a non-existent document', () => {
 });
 
 describe('given the delete of an existing document', () => {
-  let client;
-  let deleteResult;
+  let client: PoolClient;
+  let deleteResult: DeleteResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -95,7 +96,7 @@ describe('given the delete of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { natural: 'key' } };
 
     // insert the initial version

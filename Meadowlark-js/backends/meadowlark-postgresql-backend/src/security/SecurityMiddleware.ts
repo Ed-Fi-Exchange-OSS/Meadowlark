@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger, MiddlewareModel } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { rejectByOwnershipSecurity } from '../repository/OwnershipSecurity';
 import { SecurityResult } from './SecurityResponse';
 
@@ -13,7 +13,7 @@ import { SecurityResult } from './SecurityResponse';
  */
 export async function securityMiddleware(
   { frontendRequest, frontendResponse }: MiddlewareModel,
-  client: Client,
+  client: PoolClient,
 ): Promise<MiddlewareModel> {
   const functionName = 'PostgresSqlBackend.SecurityMiddleware.securityMiddleware';
 

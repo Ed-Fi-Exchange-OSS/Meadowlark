@@ -4,11 +4,11 @@
 // // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient, QueryResult } from 'pg';
 import { deleteDocumentByIdSql } from './QueryHelper';
 
 // This function should only be used for testing, it will clear out all data from both documents and references tables
-export async function deleteAll(client: Client): Promise<DeleteResult> {
+export async function deleteAll(client: PoolClient): Promise<DeleteResult> {
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
@@ -28,7 +28,10 @@ export async function deleteAll(client: Client): Promise<DeleteResult> {
   return deleteResult;
 }
 
-export async function deleteDocumentById({ id, validate, traceId }: DeleteRequest, client: Client): Promise<DeleteResult> {
+export async function deleteDocumentById(
+  { id, validate, traceId }: DeleteRequest,
+  client: PoolClient,
+): Promise<DeleteResult> {
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
@@ -62,7 +65,7 @@ export async function deleteDocumentById({ id, validate, traceId }: DeleteReques
     }
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
-    const deleteQueryResult = await client.query(await deleteDocumentByIdSql(id));
+    const deleteQueryResult: QueryResult = await client.query(await deleteDocumentByIdSql(id));
     deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
     client.query('COMMIT');
   } catch (e) {
