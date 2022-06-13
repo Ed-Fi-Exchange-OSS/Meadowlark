@@ -36,10 +36,13 @@ export function buildService(): FastifyInstance {
     service.register(FastifyRateLimit);
   }
 
-  // override json parser to leave body as string
-  service.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
-    done(null, body);
-  });
+  service.addContentTypeParser(
+    ['application/json', 'application/x-www-form-urlencoded'],
+    { parseAs: 'string' },
+    async (_req, payload, done) => {
+      done(null, payload);
+    },
+  );
 
   const stage: string = process.env.MEADOWLARK_STAGE || 'local';
 
