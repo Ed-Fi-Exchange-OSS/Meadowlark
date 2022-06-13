@@ -40,7 +40,7 @@ export interface FrontendRequest {
   traceId: string;
 
   /**
-   * Unparsed request body provided by the frontend service as a string, or null if the is no body
+   * Unparsed request body provided by the frontend service as a string, or null if there is no body
    */
   body: string | null;
   headers: FrontendHeaders;
