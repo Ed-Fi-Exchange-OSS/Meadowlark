@@ -7,6 +7,7 @@
 $ErrorActionPreference = "Stop"
 
 Import-Module ./Package-Management.psm1 -force
+Import-Module ./Get-XSD.psm1 -force
 
 $baseUrl = "http://localhost:3000/local"
 $key = "meadowlark_key_1"
