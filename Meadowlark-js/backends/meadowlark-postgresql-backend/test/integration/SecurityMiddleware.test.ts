@@ -7,6 +7,7 @@ import {
   documentIdForDocumentInfo,
   DocumentInfo,
   FrontendRequest,
+  MiddlewareModel,
   newDocumentInfo,
   newFrontendRequest,
   newResourceInfo,
@@ -15,7 +16,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
-import { Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -24,8 +25,8 @@ import { deleteAll } from '../../src/repository/Delete';
 jest.setTimeout(40000);
 
 describe('given the upsert where no document id is specified', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: MiddlewareModel;
 
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
@@ -37,7 +38,7 @@ describe('given the upsert where no document id is specified', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);
@@ -54,8 +55,8 @@ describe('given the upsert where no document id is specified', () => {
 });
 
 describe('given the getById of a non-existent document', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: MiddlewareModel;
 
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
@@ -67,7 +68,7 @@ describe('given the getById of a non-existent document', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);
@@ -84,8 +85,8 @@ describe('given the getById of a non-existent document', () => {
 });
 
 describe('given the getById of a document owned by the requestor', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: MiddlewareModel;
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
   const clientName = 'ThisClient';
@@ -121,7 +122,7 @@ describe('given the getById of a document owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Insert owned document
     await upsertDocument(upsertRequest, client);
@@ -141,8 +142,8 @@ describe('given the getById of a document owned by the requestor', () => {
 });
 
 describe('given the getById of a document not owned by the requestor', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: MiddlewareModel;
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
 
@@ -177,7 +178,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Insert non-owned document
     await upsertDocument(upsertRequest, client);
@@ -192,6 +193,6 @@ describe('given the getById of a document not owned by the requestor', () => {
   });
 
   it('should respond 403 for access denied', async () => {
-    expect(result.frontendResponse.statusCode).toBe(403);
+    expect(result.frontendResponse?.statusCode).toBe(403);
   });
 });

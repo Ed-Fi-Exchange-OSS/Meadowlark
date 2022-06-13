@@ -15,17 +15,18 @@ import {
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
-import { Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll } from '../../src/repository/Delete';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { SecurityResult } from '../../src/security/SecurityResponse';
 
 jest.setTimeout(40000);
 
 describe('given the upsert where no document id is specified', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: SecurityResult;
 
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
@@ -37,7 +38,7 @@ describe('given the upsert where no document id is specified', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Act
     result = await rejectByOwnershipSecurity(frontendRequest, client);
@@ -54,8 +55,8 @@ describe('given the upsert where no document id is specified', () => {
 });
 
 describe('given the getById of a non-existent document', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: SecurityResult;
 
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
@@ -67,7 +68,7 @@ describe('given the getById of a non-existent document', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Act
     result = await rejectByOwnershipSecurity(frontendRequest, client);
@@ -84,8 +85,8 @@ describe('given the getById of a non-existent document', () => {
 });
 
 describe('given the getById of a document owned by the requestor', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: SecurityResult;
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
   const clientName = 'ThisClient';
@@ -121,7 +122,7 @@ describe('given the getById of a document owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Insert owned document
     await upsertDocument(upsertRequest, client);
@@ -141,8 +142,8 @@ describe('given the getById of a document owned by the requestor', () => {
 });
 
 describe('given the getById of a document not owned by the requestor', () => {
-  let client;
-  let result;
+  let client: PoolClient;
+  let result: SecurityResult;
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
 
@@ -177,7 +178,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Insert non-owned document
     await upsertDocument(upsertRequest, client);

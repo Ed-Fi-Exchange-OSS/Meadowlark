@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Pool, Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { Logger } from '@edfi//meadowlark-core';
 import { createDocumentTableSql, createReferencesTableSql, createSchemaSql, GetCreateDatabaseSql } from './QueryHelper';
 
@@ -21,7 +22,7 @@ const dbConfiguration = {
  * Checks that the meadowlark schema, document and references tables exist in the database, if not will create them
  * @param client The Postgres client for querying
  */
-export async function checkExistsAndCreateTables(client: Client) {
+export async function checkExistsAndCreateTables(client: PoolClient) {
   try {
     await client.query(createSchemaSql);
     await client.query(createDocumentTableSql);
@@ -37,19 +38,18 @@ export async function checkExistsAndCreateTables(client: Client) {
  * Create a connection pool, check that the database and table structure is in place
  * or create it if not and then return the pool
  */
-export async function createConnectionPoolAndReturnClient(): Promise<Client> {
-  let client: Client;
+export async function createConnectionPoolAndReturnClient(): Promise<PoolClient> {
   try {
     // Attempt to connect to the meadowlark DB. If the meadowlark database doesn't exist, the connection will fail and throw
     // an error. If this happens, we will create a client connection to the postgres database, create the meadowlark
     // database, and disconnect. From there reconnect the pool to the meadowlark database and continue
 
     dbPool = new Pool(dbConfiguration);
-    client = await dbPool.connect();
+    const poolClient: PoolClient = await dbPool.connect();
 
     Logger.info(`Connected to ${dbConfiguration.database} successfully`, null);
 
-    return client;
+    return poolClient;
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
 
@@ -58,16 +58,16 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
       Logger.error(`Error connecting Postgres. Error was ${message}`, null);
       throw e;
     }
-    dbPool.end();
+    if (dbPool != null) dbPool.end();
   }
 
   // The meadowlark DB doesn't exist, create a separate client that connects to the postgres(default) DB to create
   // meadowlark DB, then reconnect the pool to the meadowlark DB and return
+  const client: Client = new Client(dbConfiguration);
   try {
     const meadowlarkDbName = dbConfiguration.database;
     dbConfiguration.database = 'postgres';
 
-    client = new Client(dbConfiguration);
     client.connect();
     await client.query(await GetCreateDatabaseSql(meadowlarkDbName));
 
@@ -77,7 +77,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
     Logger.error(`Error connecting Postgres. Error was ${message}`, null);
     throw e;
   } finally {
-    await client.end();
+    if (client != null) await client.end();
   }
 
   dbConfiguration.database = 'meadowlark';
@@ -89,9 +89,9 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
 /**
  * Return the shared client
  */
-export async function getSharedClient(): Promise<Client> {
+export async function getSharedClient(): Promise<PoolClient> {
   if (dbPool == null) {
-    const client = await createConnectionPoolAndReturnClient();
+    const client: PoolClient = await createConnectionPoolAndReturnClient();
     await checkExistsAndCreateTables(client);
     return client;
   }
