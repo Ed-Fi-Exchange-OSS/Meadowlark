@@ -59,5 +59,10 @@ export async function updateDocumentById(request: UpdateRequest): Promise<Update
 }
 
 export async function securityMiddleware(middlewareModel: MiddlewareModel): Promise<MiddlewareModel> {
-  return SecurityMiddleware.securityMiddleware(middlewareModel, await getSharedClient());
+  const client = await getSharedClient();
+  try {
+    return SecurityMiddleware.securityMiddleware(middlewareModel, client);
+  } finally {
+    client.release();
+  }
 }

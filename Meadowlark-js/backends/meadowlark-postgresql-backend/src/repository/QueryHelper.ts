@@ -23,7 +23,6 @@ export async function deleteDocumentByIdSql(documentId: string) {
     'with del as (delete from meadowlark.documents WHERE document_id = %L returning id) select count (*) from del;',
     [documentId],
   );
-  // const sql = format('DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING *;', [documentId]);
   return sql;
 }
 

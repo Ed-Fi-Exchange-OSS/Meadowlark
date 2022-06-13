@@ -18,7 +18,6 @@ export async function rejectByOwnershipSecurity(frontendRequest: FrontendRequest
   const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
-  // const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
   if (id == null) id = extractIdFromUpsert(frontendRequest);

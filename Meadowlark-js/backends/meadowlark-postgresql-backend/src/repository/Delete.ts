@@ -32,18 +32,9 @@ export async function deleteDocumentById({ id, validate, traceId }: DeleteReques
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    // Determine if the record exists
-    // const existsQuery = client.query(await getRecordExistsSql(id));
-
-    // const recordExists = existsQuery.rowCount && existsQuery.rowCount > 0;
-
-    // if (recordExists) {
-    //   deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
-    //   return deleteResult;
-    // }
-
     client.query('BEGIN');
 
+    // TODO - Reference validation to be added with RND-243
     if (validate) {
       //         // Check for any references to the document to be deleted
       //         const anyReferences: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
