@@ -10,6 +10,7 @@ import {
   newSecurity,
   documentIdForDocumentInfo,
   UpsertRequest,
+  UpsertResult,
   DocumentReference,
   NoResourceInfo,
   ResourceInfo,
@@ -17,6 +18,7 @@ import {
   GetResult,
   GetRequest,
 } from '@edfi/meadowlark-core';
+import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
@@ -43,8 +45,8 @@ const newGetRequest = (): GetRequest => ({
 });
 
 describe('given the upsert of a new document', () => {
-  let client;
-  let upsertResult;
+  let client: PoolClient;
+  let upsertResult: UpsertResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -82,10 +84,10 @@ describe('given the upsert of a new document', () => {
 });
 
 describe('given the upsert of an existing document twice', () => {
-  let client;
-  let upsertResult1;
-  let upsertResult2;
-  let upsertResult3;
+  let client: PoolClient;
+  let upsertResult1: UpsertResult;
+  let upsertResult2: UpsertResult;
+  let upsertResult3: UpsertResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -131,7 +133,7 @@ describe('given the upsert of an existing document twice', () => {
 });
 
 describe('given an upsert of an existing document that changes the edfiDoc', () => {
-  let client;
+  let client: PoolClient;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -165,8 +167,8 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
 });
 
 describe('given an upsert of a new document that references a non-existent document with validation off', () => {
-  let client;
-  let upsertResult;
+  let client: PoolClient;
+  let upsertResult: UpsertResult;
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),

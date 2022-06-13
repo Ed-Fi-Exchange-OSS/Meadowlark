@@ -1,6 +1,6 @@
 import format from 'pg-format';
 
-export async function getDocumentByIdSql(documentId: string) {
+export async function getDocumentByIdSql(documentId: string): Promise<string> {
   return format(
     'SELECT document_id, document_identity, project_name, resource_name, resource_version,' +
       ' is_descriptor, validated, created_by, edfi_doc' +
@@ -10,15 +10,15 @@ export async function getDocumentByIdSql(documentId: string) {
   );
 }
 
-export async function getDocumentOwnershipByIdSql(documentId: string) {
+export async function getDocumentOwnershipByIdSql(documentId: string): Promise<string> {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export async function getRecordExistsSql(documentId: string) {
+export async function getRecordExistsSql(documentId: string): Promise<string> {
   return format('SELECT document_id FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export async function deleteDocumentByIdSql(documentId: string) {
+export async function deleteDocumentByIdSql(documentId: string): Promise<string> {
   const sql = format(
     'with del as (delete from meadowlark.documents WHERE document_id = %L returning id) select count (*) from del;',
     [documentId],
@@ -42,7 +42,7 @@ export async function getDocumentInsertOrUpdateSql(
     edfiDoc,
   ];
 
-  let documentSql;
+  let documentSql: string;
 
   if (isInsert) {
     documentSql = format(
@@ -81,7 +81,7 @@ export async function getDocumentInsertOrUpdateSql(
   return documentSql;
 }
 
-export async function GetCreateDatabaseSql(meadowlarkDbName: string) {
+export function GetCreateDatabaseSql(meadowlarkDbName: string): string {
   return format('CREATE DATABASE %I', meadowlarkDbName);
 }
 

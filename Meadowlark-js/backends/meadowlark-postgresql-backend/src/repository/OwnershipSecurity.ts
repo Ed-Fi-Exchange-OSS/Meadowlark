@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
 import { getDocumentOwnershipByIdSql } from './QueryHelper';
 
@@ -14,7 +14,10 @@ function extractIdFromUpsert(frontendRequest: FrontendRequest): string | null {
   return documentIdForDocumentInfo(frontendRequest.middleware.resourceInfo, frontendRequest.middleware.documentInfo);
 }
 
-export async function rejectByOwnershipSecurity(frontendRequest: FrontendRequest, client: Client): Promise<SecurityResult> {
+export async function rejectByOwnershipSecurity(
+  frontendRequest: FrontendRequest,
+  client: PoolClient,
+): Promise<SecurityResult> {
   const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
@@ -28,7 +31,7 @@ export async function rejectByOwnershipSecurity(frontendRequest: FrontendRequest
   }
 
   try {
-    const result = await client.query(await getDocumentOwnershipByIdSql(id));
+    const result: QueryResult = await client.query(await getDocumentOwnershipByIdSql(id));
 
     if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);

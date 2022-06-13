@@ -3,13 +3,13 @@
 // // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client, Result } from 'pg';
+import type { PoolClient, QueryResult } from 'pg';
 import { GetResult, GetRequest, DocumentIdentity } from '@edfi/meadowlark-core';
 import { getDocumentByIdSql } from './QueryHelper';
 
-export async function getDocumentById({ id }: GetRequest, client: Client): Promise<GetResult> {
+export async function getDocumentById({ id }: GetRequest, client: PoolClient): Promise<GetResult> {
   try {
-    const queryResult: Result = await client.query(await getDocumentByIdSql(id));
+    const queryResult: QueryResult = await client.query(await getDocumentByIdSql(id));
 
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
     const test = queryResult.rows[0].document_identity;

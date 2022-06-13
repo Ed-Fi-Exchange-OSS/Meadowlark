@@ -16,8 +16,9 @@ import {
   newResourceInfo,
   GetResult,
   GetRequest,
+  UpdateResult,
 } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -44,8 +45,8 @@ const newGetRequest = (): GetRequest => ({
 });
 
 describe('given the update of a non-existent document', () => {
-  let client;
-  let updateResult;
+  let client: PoolClient;
+  let updateResult: UpdateResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -58,7 +59,7 @@ describe('given the update of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     updateResult = await updateDocumentById(
       { ...newUpdateRequest(), id, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
@@ -83,8 +84,8 @@ describe('given the update of a non-existent document', () => {
 });
 
 describe('given the update of an existing document', () => {
-  let client;
-  let updateResult;
+  let client: PoolClient;
+  let updateResult: UpdateResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -97,7 +98,7 @@ describe('given the update of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
     const updateRequest: UpdateRequest = {
       ...newUpdateRequest(),
       id,
@@ -131,8 +132,8 @@ describe('given the update of an existing document', () => {
 });
 
 describe('given an update of a document that references a non-existent document with validation off', () => {
-  let client;
-  let updateResult;
+  let client: PoolClient;
+  let updateResult: UpdateResult;
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -155,7 +156,7 @@ describe('given an update of a document that references a non-existent document 
   };
 
   beforeAll(async () => {
-    client = (await getSharedClient()) as Client;
+    client = await getSharedClient();
 
     // Insert the original document with no reference
     await upsertDocument(

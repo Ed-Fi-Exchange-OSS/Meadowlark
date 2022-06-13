@@ -3,19 +3,19 @@
 // // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from 'pg';
+import type { PoolClient, QueryResult } from 'pg';
 import { UpsertResult, UpsertRequest, Logger } from '@edfi/meadowlark-core';
 import { getDocumentInsertOrUpdateSql, getRecordExistsSql } from './QueryHelper';
 
 export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
-  client: Client,
+  client: PoolClient,
 ): Promise<UpsertResult> {
   const upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
-  let recordExistsResult;
+  let recordExistsResult: QueryResult;
   // let outRefs;
-  let documentSql;
+  let documentSql: string;
   let isInsert: boolean;
 
   try {

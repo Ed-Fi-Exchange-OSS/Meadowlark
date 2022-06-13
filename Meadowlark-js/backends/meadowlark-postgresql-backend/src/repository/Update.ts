@@ -4,12 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
-import { Client } from 'pg';
+import type { PoolClient, QueryResult } from 'pg';
 import { getDocumentInsertOrUpdateSql } from './QueryHelper';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
-  client: Client,
+  client: PoolClient,
 ): Promise<UpdateResult> {
   const updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -39,11 +39,11 @@ export async function updateDocumentById(
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-    const documentSql = await getDocumentInsertOrUpdateSql(
+    const documentSql: string = await getDocumentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
       false,
     );
-    const result = await client.query(documentSql);
+    const result: QueryResult = await client.query(documentSql);
     await client.query('COMMIT');
 
     updateResult.response = result.rowCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';

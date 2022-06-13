@@ -14,6 +14,7 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import type { PoolClient } from 'pg';
 
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
@@ -23,38 +24,38 @@ import { getSharedClient } from './repository/Db';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
-  const client = await getSharedClient();
+  const poolClient: PoolClient = await getSharedClient();
   try {
-    return Delete.deleteDocumentById(request, client);
+    return Delete.deleteDocumentById(request, poolClient);
   } finally {
-    client.release();
+    poolClient.release();
   }
 }
 
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
-  const client = await getSharedClient();
+  const poolClient: PoolClient = await getSharedClient();
   try {
-    return Get.getDocumentById(request, client);
+    return Get.getDocumentById(request, poolClient);
   } finally {
-    client.release();
+    poolClient.release();
   }
 }
 
 export async function upsertDocument(request: UpsertRequest): Promise<UpsertResult> {
-  const client = await getSharedClient();
+  const poolClient: PoolClient = await getSharedClient();
   try {
-    return Upsert.upsertDocument(request, client);
+    return Upsert.upsertDocument(request, poolClient);
   } finally {
-    client.release();
+    poolClient.release();
   }
 }
 
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
-  const client = await getSharedClient();
+  const poolClient: PoolClient = await getSharedClient();
   try {
-    return Update.updateDocumentById(request, client);
+    return Update.updateDocumentById(request, poolClient);
   } finally {
-    client.release();
+    poolClient.release();
   }
 }
 
