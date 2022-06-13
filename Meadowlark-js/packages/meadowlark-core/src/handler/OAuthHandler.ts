@@ -14,6 +14,8 @@ import { authorizationHeader } from '../security/AuthorizationHeader';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
+type OAuthRequest = { grant_type?: string; client_id?: string; client_secret?: string };
+
 function createTokenResponse(token: Jwt): string {
   return JSON.stringify({
     access_token: token.compact(),
@@ -23,13 +25,18 @@ function createTokenResponse(token: Jwt): string {
   });
 }
 
+function maskClientSecret(body: OAuthRequest): string {
+  const masked = body.client_secret != null ? `${body.client_secret.slice(body.client_secret.length - 4)}` : '';
+
+  return `grant_type: ${body.grant_type || ''}, client_id: ${body.client_id || ''}, client_secret: ****${masked}`;
+}
+
 /*
  * OAuth2.0 style authentication endpoint. Currently backed by a hard-coded "in-memory" database of two sets of credentials.
  * Generates a JSON Web Token.
  */
 export async function postToken(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   Logger.info('OAuthHandler.postToken', frontendRequest.traceId);
-  Logger.info(frontendRequest.body?.toString() || '', frontendRequest.traceId, 'n/a');
 
   if (frontendRequest.body == null) {
     return {
@@ -39,12 +46,13 @@ export async function postToken(frontendRequest: FrontendRequest): Promise<Front
   }
 
   // eslint-disable-next-line camelcase
-  let body: { grant_type?: string; client_id?: string; client_secret?: string };
+  let body: OAuthRequest;
   if (frontendRequest.headers['content-type'] === 'application/x-www-form-urlencoded') {
     body = querystring.parse(frontendRequest.body);
   } else {
     body = JSON.parse(frontendRequest.body);
   }
+  Logger.debug(maskClientSecret(body), frontendRequest.traceId);
 
   if (body.grant_type === 'client_credentials') {
     const { client_id: clientId, client_secret: clientSecret } = body;
