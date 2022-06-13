@@ -23,10 +23,9 @@ const dbConfiguration = {
  */
 export async function checkExistsAndCreateTables(client: Client) {
   try {
-    const result1 = await client.query(createSchemaSql);
-    const result2 = await client.query(createDocumentTableSql);
-    const result3 = await client.query(createReferencesTableSql);
-    Logger.debug(`${result1}:${result2}:${result3}`, '');
+    await client.query(createSchemaSql);
+    await client.query(createDocumentTableSql);
+    await client.query(createReferencesTableSql);
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting PostgreSql. Error was ${message}`, null);
@@ -70,7 +69,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
 
     client = new Client(dbConfiguration);
     client.connect();
-    await client.query(GetCreateDatabaseSql(meadowlarkDbName));
+    await client.query(await GetCreateDatabaseSql(meadowlarkDbName));
 
     Logger.info(`Database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {
@@ -93,17 +92,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<Client> {
 export async function getSharedClient(): Promise<Client> {
   if (dbPool == null) {
     const client = await createConnectionPoolAndReturnClient();
-    // checkExistsAndCreateTables(client);
-    try {
-      const result1 = await client.query(createSchemaSql);
-      const result2 = await client.query(createDocumentTableSql);
-      const result3 = await client.query(createReferencesTableSql);
-      Logger.debug(`${result1}:${result2}:${result3}`, '');
-    } catch (e) {
-      const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-      Logger.error(`Error connecting PostgreSql. Error was ${message}`, null);
-      throw e;
-    }
+    await checkExistsAndCreateTables(client);
     return client;
   }
 

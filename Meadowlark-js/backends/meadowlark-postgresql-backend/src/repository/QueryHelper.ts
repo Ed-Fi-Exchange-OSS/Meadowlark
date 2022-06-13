@@ -82,7 +82,7 @@ export async function getDocumentInsertOrUpdateSql(
   return documentSql;
 }
 
-export function GetCreateDatabaseSql(meadowlarkDbName: string) {
+export async function GetCreateDatabaseSql(meadowlarkDbName: string) {
   return format('CREATE DATABASE %I', meadowlarkDbName);
 }
 
