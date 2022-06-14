@@ -52,10 +52,9 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     return poolClient;
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-
+    Logger.error(`Error connecting Postgres. Error was ${message}`, null);
     // if this anything other than a DB doesn't exist error, there's a bigger problem and we don't want to continue
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
-      Logger.error(`Error connecting Postgres. Error was ${message}`, null);
       throw e;
     }
     if (dbPool != null) dbPool.end();
