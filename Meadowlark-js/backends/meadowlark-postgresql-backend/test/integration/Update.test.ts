@@ -24,6 +24,7 @@ import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
+import { getDocumentByIdSql } from '../../src/repository/QueryHelper';
 
 jest.setTimeout(40000);
 
@@ -123,11 +124,12 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await getDocumentById({ ...newGetRequest(), id }, client);
+    const result: any = await client.query(await getDocumentByIdSql(id));
+    // await getDocumentById({ ...newGetRequest(), id }, client);
 
-    expect(result.document.documentIdentity[0].value).toBe('update2');
+    expect(result.rows[0].document_identity[0].value).toBe('update2');
 
-    expect(result.document.edfiDoc.changeToDoc).toBe(true);
+    expect(result.rows[0].edfi_doc.changeToDoc).toBe(true);
   });
 });
 
@@ -194,9 +196,10 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const result: any = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
+    const result: any = await client.query(await getDocumentByIdSql(documentWithReferencesId));
+    // getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
 
-    expect(result.document.documentIdentity[0].value).toBe('update4');
+    expect(result.rows[0].document_identity[0].value).toBe('update4');
     // TODO - Fix when reference validation is added with RND-243
     // expect(result.document.outRefs).toMatchInlineSnapshot(`
     //   Array [

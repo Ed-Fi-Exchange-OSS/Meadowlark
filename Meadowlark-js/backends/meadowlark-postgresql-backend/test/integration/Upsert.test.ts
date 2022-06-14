@@ -15,7 +15,6 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
-  GetResult,
   GetRequest,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
@@ -23,7 +22,7 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
-import { getRecordExistsSql } from '../../src/repository/QueryHelper';
+import { getDocumentByIdSql, getRecordExistsSql } from '../../src/repository/QueryHelper';
 
 jest.setTimeout(40000);
 
@@ -160,9 +159,9 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   });
 
   it('should have the change in the db', async () => {
-    const result = await getDocumentById({ ...newGetRequest(), id }, client);
+    const result: any = await getDocumentById({ ...newGetRequest(), id }, client);
 
-    expect((result.document as any).edfiDoc.call).toBe('two');
+    expect(result.document.call).toBe('two');
   });
 });
 
@@ -217,8 +216,8 @@ describe('given an upsert of a new document that references a non-existent docum
   });
 
   it('should have inserted the document with an invalid reference in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
-    const val = (result.document as any).documentIdentity[0].value;
+    const result: any = await client.query(await getDocumentByIdSql(documentWithReferencesId));
+    const val = result.rows[0].document_identity[0].value;
     expect(val).toBe('upsert4');
   });
 });
