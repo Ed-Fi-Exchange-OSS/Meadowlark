@@ -39,29 +39,26 @@ jobs:
       run: yarn install
       working-directory: Meadowlark-js
 
-    # - name: Linter
-    #   run: yarn test:lint
-    #   working-directory: Meadowlark-js
+    - name: Linter
+      run: yarn test:lint
+      working-directory: Meadowlark-js
 
-    # - name: Unit tests with code coverage
-    #   run: yarn test:unit:coverage --ci
-    #   working-directory: Meadowlark-js
+    - name: Unit tests with code coverage
+      run: yarn test:unit:coverage --ci
+      working-directory: Meadowlark-js
 
-    # - name: Archive coverage results
-    #   uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-    #   with:
-    #     name: code-coverage-report
-    #     path: Meadowlark-js/coverage/lcov-report
+    - name: Archive coverage results
+      uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+      with:
+        name: code-coverage-report
+        path: Meadowlark-js/coverage/lcov-report
 
     - name: Integration tests
       run: |
         sudo systemctl start postgresql.service
-        sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1';"
+        sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
         yarn test:integration
       working-directory: Meadowlark-js
-      env:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: 'abcdefgh1'
 
     - name: System tests
       run: yarn test:system
