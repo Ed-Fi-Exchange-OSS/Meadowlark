@@ -62,11 +62,10 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
 
   // The meadowlark DB doesn't exist, create a separate client that connects to the postgres(default) DB to create
   // meadowlark DB, then reconnect the pool to the meadowlark DB and return
+  const meadowlarkDbName = dbConfiguration.database;
+  dbConfiguration.database = 'postgres';
   const client: Client = new Client(dbConfiguration);
   try {
-    const meadowlarkDbName = dbConfiguration.database;
-    dbConfiguration.database = 'postgres';
-
     client.connect();
     await client.query(await GetCreateDatabaseSql(meadowlarkDbName));
 
