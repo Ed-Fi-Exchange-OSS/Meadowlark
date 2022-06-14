@@ -7,7 +7,8 @@ import { Collection, MongoClient, Logger as MongoLogger, LoggerLevel, ReadConcer
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
-const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/meadowlark?replicaSet=rs0';
+const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
+export const DATABASE_NAME = 'meadowlark';
 export const COLLECTION_NAME = 'documents';
 
 let singletonClient: MongoClient | null = null;
@@ -17,19 +18,18 @@ const MONGO_WRITE_CONCERN: W = (process.env.MONGO_WRITE_CONCERN as W) ?? 'majori
 const MONGO_READ_CONCERN: ReadConcernLevel = (process.env.MONGO_READ_CONCERN as ReadConcernLevel) ?? 'majority';
 
 /**
- * Return a brand new client - which is a connection pool. Only use for testing purposes.
+ * Return a brand new client - which is a connection pool.
  */
 export async function getNewClient(): Promise<MongoClient> {
-  // eslint-disable-next-line no-underscore-dangle
-  const MONGO_URL: string = process.env.MONGO_URL ?? (global as any).__MONGO_URI__ ?? MONGO_URL_DEFAULT;
+  const mongoUrl = process.env.MONGO_URL ?? MONGO_URL_DEFAULT;
 
   try {
-    const newClient = new MongoClient(MONGO_URL, { w: MONGO_WRITE_CONCERN, readConcernLevel: MONGO_READ_CONCERN });
+    const newClient = new MongoClient(mongoUrl, { w: MONGO_WRITE_CONCERN, readConcernLevel: MONGO_READ_CONCERN });
     await newClient.connect();
 
     MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
-    const collection = newClient.db().collection(COLLECTION_NAME);
+    const collection = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
 
     // Note this does nothing if the indexes already exist (triggers an index build otherwise)
     await collection.createIndex({ id: 1 }, { unique: true });
@@ -38,7 +38,7 @@ export async function getNewClient(): Promise<MongoClient> {
     return newClient;
   } catch (e) {
     const message = e instanceof Error ? e.message : 'unknown';
-    Logger.error(`Error connecting MongoDb URL: "${MONGO_URL}". Error was ${message}`, null);
+    Logger.error(`Error connecting MongoDb URL: "${mongoUrl}". Error was ${message}`, null);
     throw e;
   }
 }
@@ -65,5 +65,5 @@ export async function getSharedClient(): Promise<MongoClient> {
 }
 
 export function getCollection(client: MongoClient): Collection<MeadowlarkDocument> {
-  return client.db().collection(COLLECTION_NAME);
+  return client.db(DATABASE_NAME).collection(COLLECTION_NAME);
 }

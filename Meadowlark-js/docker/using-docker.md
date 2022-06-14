@@ -7,10 +7,6 @@ These compose files require [Docker Compose v2](https://github.com/docker/compos
 (which comes with Docker Desktop for Windows users). They provision the following
 services, all using local volumes to for permanent data storage:
 
-* [PostgreSQL](postgres/): single instance of PostgreSQL 14.
-
-## Preparatory Steps
-
 ### Docker
 
 Ensure that you have sufficient resources allocated to Docker:
@@ -44,13 +40,6 @@ Ensure that you have sufficient resources allocated to Docker:
 
 
 ## Operations
-
-You can customize the PostgreSQL startup with three environment variables, which can also
-be placed into a `.env` file:
-
-* `POSTGRES_USER` (default value: "postgres")
-* `POSTGRES_PASSWORD` (default value: "abcdefgh1!")
-* `POSTGRES_PORT` (default value: 5432)
 
 Summary of some commonly useful [docker CLI
 commands](https://docs.docker.com/engine/reference/commandline/cli/):

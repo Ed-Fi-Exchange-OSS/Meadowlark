@@ -1,0 +1,131 @@
+version: '3'
+services:
+
+  # Primary MongoDB node
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo:4.0.28
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    networks:
+      - mongo-net
+    restart: always
+    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--keyFile", "/auth/file.key" ]
+    volumes:
+      - mongo-data1:/data/db
+      - mongo-log1:/var/log/mongodb
+      - mongo-auth:/auth
+      - ./scripts:/scripts
+
+  # Secondary MongoDB node
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo:4.0.28
+    expose:
+      - 27018
+    ports:
+      - 27018:27018
+    networks:
+      - mongo-net
+    restart: always
+    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--port", "27018", "--keyFile", "/auth/file.key" ]
+    volumes:
+      - mongo-data2:/data/db
+      - mongo-log2:/var/log/mongodb
+      - mongo-auth:/auth
+
+  # Secondary MongoDB node
+  mongo3:
+    hostname: mongo3
+    container_name: mongo3
+    image: mongo:4.0.28
+    expose:
+      - 27019
+    ports:
+      - 27019:27019
+    networks:
+      - mongo-net
+    restart: always
+    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--port", "27019", "--keyFile", "/auth/file.key" ]
+    volumes:
+      - mongo-data3:/data/db
+      - mongo-log3:/var/log/mongodb
+      - mongo-auth:/auth
+
+  # Zookeeper image from Debezium
+  zookeeper:
+    hostname: zookeeper1
+    container_name: zookeeper1
+    image: debezium/zookeeper:1.9
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    networks:
+      - mongo-net
+
+  # Kafka image from Debezium
+  kafka:
+    hostname: kafka1
+    container_name: kafka1
+    image: debezium/kafka:1.9
+    ports:
+     - 9092:9092
+    networks:
+     - mongo-net
+    links:
+     - zookeeper
+    environment:
+     - ZOOKEEPER_CONNECT=zookeeper:2181
+
+  # Kafka Connect from Debezium, includes Debezium connectors
+  connect:
+    hostname: kafka-connect
+    container_name: kafka-connect
+    image: debezium/connect:1.9
+    ports:
+     - 8083:8083
+    networks:
+      - mongo-net
+    links:
+     - kafka
+     - mongo1
+     - mongo2
+     - mongo3
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=debezium_config
+     - OFFSET_STORAGE_TOPIC=debezium_offset
+     - STATUS_STORAGE_TOPIC=debezium_status
+
+  # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
+  kafdrop:
+    hostname: kafdrop
+    container_name: kafdrop
+    image: obsidiandynamics/kafdrop:3.30.0
+    ports:
+     - 9000:9000
+    networks:
+      - mongo-net
+    environment:
+      KAFKA_BROKERCONNECT: kafka1:9092
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+
+volumes:
+  mongo-data1:
+  mongo-log1:
+  mongo-data2:
+  mongo-log2:
+  mongo-data3:
+  mongo-log3:
+  mongo-auth:
+    external: true
+
+networks:
+  mongo-net:
