@@ -5,6 +5,7 @@
 
 ### Create a School record
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 
@@ -18,6 +19,7 @@ reference-validation: true
 
 ### Get the created record
 GET http://localhost:3000/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
+content-type: application/json
 {{auth_header}}
 
 ### Query the created record
@@ -27,6 +29,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools/?nameOfInstitution=abc
 
 ### Update the created record
 PUT http://localhost:3000/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 
@@ -47,6 +50,7 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e77
 
 ### Create an AcademicWeek record
 POST http://localhost:3000/local/v3.3b/ed-fi/academicWeeks
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 
@@ -68,6 +72,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks/20325050be22032deaeadd
 
 ### Update the created record
 PUT http://localhost:3000/local/v3.3b/ed-fi/academicWeeks/20325050be22032deaeaddeb6a82cc160ce85911c9ad5ca8de5482e2
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 

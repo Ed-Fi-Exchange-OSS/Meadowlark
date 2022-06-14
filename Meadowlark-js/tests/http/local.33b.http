@@ -6,6 +6,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
 
 ### Created an EducationContents record
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+content-type: application/json
 {{auth_header}}
 
 {
@@ -26,6 +27,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d116
 
 ### Update the created record
 PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d11697ee199c159d12c63b2c3af6ddeb7686f79546
+content-type: application/json
 {{auth_header}}
 
 {
@@ -42,6 +44,7 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d
 
 ### Strict validation is enabled, this will fail due to an invalid country
 POST http://localhost:3000/local/v3.3b/ed-fi/students
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 
@@ -55,6 +58,7 @@ reference-validation: true
 
 ### Strict validation is disabled
 POST http://localhost:3000/local/v3.3b/ed-fi/students
+content-type: application/json
 reference-validation: false
 {{auth_header}}
 
@@ -68,6 +72,7 @@ reference-validation: false
 
 ### Now it contains a valid country
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+content-type: application/json
 reference-validation: true
 {{auth_header}}
 
@@ -89,6 +94,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurname=World
 
 ### Update this student
 PUT http://localhost:3000/local/v3.3b/ed-fi/students/f28bc6a66993194981effdc24b2d7d3a33714ee9b41ea49731b03773
+content-type: application/json
 reference-validation: false
 {{auth_header}}
 
@@ -102,6 +108,7 @@ reference-validation: false
 
 ### Fails with 404 - can't post an abstract entity
 POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizations
+content-type: application/json
 {{auth_header}}
 
 {
@@ -112,6 +119,7 @@ POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizations
 
 ### Fails - note reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
+content-type: application/json
 reference-validation: true
 {{auth_header}}
 
@@ -127,6 +135,7 @@ reference-validation: true
 
 ### Succeeds despite intervention code not existing - note reference-validation: false
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
+content-type: application/json
 reference-validation: false
 {{auth_header}}
 
@@ -143,6 +152,7 @@ reference-validation: false
 
 #### Strict validation is off
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
 reference-validation: false
 {{auth_header}}
 
@@ -181,6 +191,7 @@ reference-validation: false
 ### Create a location - school does not exist.
 ## This has an unusual error message - complains about "educationOrganizationId" not existing rather than "schoolId"
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
 {{auth_header}}
 reference-validation: true
 
@@ -195,6 +206,7 @@ reference-validation: true
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
+content-type: application/json
 {{auth_header}}
 descriptor-validation: false
 
@@ -212,6 +224,7 @@ descriptor-validation: false
 
 ### Create a location
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
 reference-validation: true
 {{auth_header}}
 
@@ -226,6 +239,7 @@ reference-validation: true
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
 {{auth_header}}
 
 { 
@@ -273,6 +287,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/BehaviorDescriptors/41e20a8e3e29596a
 
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencies
+content-type: application/json
 {{auth_header}}
 
 {
@@ -284,6 +299,7 @@ POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencies
 
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/Courses
+content-type: application/json
 {{auth_header}}
 
 {
@@ -299,6 +315,7 @@ POST http://localhost:3000/local/v3.3b/ed-fi/Courses
 
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentEducationOrganizationAssociations
+content-type: application/json
 {{auth_header}}
 
 { 
@@ -314,6 +331,7 @@ POST http://localhost:3000/local/v3.3b/ed-fi/StudentEducationOrganizationAssocia
 
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
+content-type: application/json
 descriptor-validation: false
 {{auth_header}}
 
@@ -353,6 +371,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/GeneralStudentProgramAssociations
 
 ### RND-149: Account/AccountCode shape is wrong
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
+content-type: application/json
 reference-validation: false
 {{auth_header}}
 

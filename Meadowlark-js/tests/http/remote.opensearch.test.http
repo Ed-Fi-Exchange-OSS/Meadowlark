@@ -9,6 +9,7 @@
 
 ### Create School 1
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -20,6 +21,7 @@ descriptor-validation: false
 
 ### Create School 2
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -31,6 +33,7 @@ descriptor-validation: false
 
 ### Create School 3
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -42,6 +45,7 @@ descriptor-validation: false
 
 ### Create School 4
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -53,6 +57,7 @@ descriptor-validation: false
 
 ### Create School 5
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -64,6 +69,7 @@ descriptor-validation: false
 
 ### Create School 6
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -75,6 +81,7 @@ descriptor-validation: false
 
 ### Create School 7
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -86,6 +93,7 @@ descriptor-validation: false
 
 ### Create School 8
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -97,6 +105,7 @@ descriptor-validation: false
 
 ### Create School 9
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 
@@ -108,6 +117,7 @@ descriptor-validation: false
 
 ### Create School 10
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 descriptor-validation: false
 

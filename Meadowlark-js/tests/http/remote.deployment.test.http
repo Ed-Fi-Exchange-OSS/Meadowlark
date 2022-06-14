@@ -35,6 +35,7 @@ GET https://{{hostname}}/{{stage}}/
 ### (Cold start for POST means this may take up to 5 seconds. If you get a 400 error with invalid descriptor, see above
 ### on loading descriptors.)
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents
+content-type: application/json
 Authorization: bearer {{token}}
 
 {
@@ -64,6 +65,7 @@ GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df
 
 ### Create a School
 POST https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
+content-type: application/json
 Authorization: bearer {{token}}
 
 {
@@ -101,6 +103,7 @@ Authorization: bearer {{token}}
 ### Attempt to update the school with an invalid educationOrganizationCategoryDescriptor - should fail
 ### (Cold start for PUT means this may take up to 5 seconds.)
 PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+content-type: application/json
 Authorization: bearer {{token}}
 
 {
@@ -122,6 +125,7 @@ Authorization: bearer {{token}}
 
 ### Attempt to update the school with a valid educationOrganizationCategoryDescriptor - should succeed
 PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+content-type: application/json
 Authorization: bearer {{token}}
 
 {
