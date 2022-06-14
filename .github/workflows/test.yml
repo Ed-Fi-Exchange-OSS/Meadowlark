@@ -59,6 +59,9 @@ jobs:
         sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
         yarn test:integration
       working-directory: Meadowlark-js
+      env:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 'abcdefgh1!'
 
     - name: System tests
       run: yarn test:system
