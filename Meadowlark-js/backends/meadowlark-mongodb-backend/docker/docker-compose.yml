@@ -17,7 +17,7 @@ services:
     volumes:
       - mongo-data1:/data/db
       - mongo-log1:/var/log/mongodb
-      - ./file.key:/auth/file.key
+      - mongo-auth:/auth
       - ./scripts:/scripts
 
   # Secondary MongoDB node
@@ -36,7 +36,7 @@ services:
     volumes:
       - mongo-data2:/data/db
       - mongo-log2:/var/log/mongodb
-      - ./file.key:/auth/file.key
+      - mongo-auth:/auth
 
   # Secondary MongoDB node
   mongo3:
@@ -54,7 +54,7 @@ services:
     volumes:
       - mongo-data3:/data/db
       - mongo-log3:/var/log/mongodb
-      - ./file.key:/auth/file.key
+      - mongo-auth:/auth
 
   # Zookeeper image from Debezium
   zookeeper:
@@ -124,6 +124,8 @@ volumes:
   mongo-log2:
   mongo-data3:
   mongo-log3:
+  mongo-auth:
+    external: true
 
 networks:
-  mongo-net: 
+  mongo-net:
