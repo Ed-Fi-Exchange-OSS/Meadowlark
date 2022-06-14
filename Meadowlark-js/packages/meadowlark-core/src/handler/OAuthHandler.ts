@@ -45,7 +45,6 @@ export async function postToken(frontendRequest: FrontendRequest): Promise<Front
     };
   }
 
-  // eslint-disable-next-line camelcase
   let body: OAuthRequest;
   if (frontendRequest.headers['content-type'] === 'application/x-www-form-urlencoded') {
     body = querystring.parse(frontendRequest.body);
