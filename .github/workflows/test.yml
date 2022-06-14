@@ -53,9 +53,6 @@ jobs:
     #     name: code-coverage-report
     #     path: Meadowlark-js/coverage/lcov-report
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@8b4e4ac71822ed7e0ad5fb3d1c33483e9e8fb270 # v3.1.1
-
     - name: Integration tests
       run: |
         sudo systemctl start postgresql.service
@@ -64,7 +61,7 @@ jobs:
       working-directory: Meadowlark-js
       env:
         POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: 'abcdefgh1!'
+        POSTGRES_PASSWORD: 'abcdefgh1'
 
     - name: System tests
       run: yarn test:system
