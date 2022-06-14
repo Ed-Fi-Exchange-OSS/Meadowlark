@@ -80,7 +80,7 @@ describe('given the get of a non-existent document', () => {
 
 describe('given the get of an existing document', () => {
   let client: PoolClient;
-  let getResult: GetResult;
+  let getResult: any;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -109,6 +109,6 @@ describe('given the get of an existing document', () => {
 
   it('should return the document', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document.edfiDoc.inserted).toBe('yes');
+    expect(getResult.document.inserted).toBe('yes');
   });
 });
