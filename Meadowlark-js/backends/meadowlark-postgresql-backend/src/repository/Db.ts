@@ -12,9 +12,9 @@ let dbPool: Pool | null = null;
 
 const dbConfiguration = {
   host: process.env.POSTGRES_HOST ?? 'localhost',
-  port: Number(process.env.POSTGRES_PORT ?? 5432),
+  port: Number(process.env.POSTGRES_PORT ?? 5555),
   user: process.env.POSTGRES_USER ?? 'postgres',
-  password: process.env.POSTGRES_PASSWORD ?? 'abcdefgh1!',
+  password: process.env.POSTGRES_PASSWORD ?? 'abcdefgh1',
   database: 'meadowlark',
 };
 
