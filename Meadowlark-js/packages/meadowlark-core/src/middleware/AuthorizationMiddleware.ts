@@ -16,6 +16,9 @@ const moduleName = 'AuthorizationMiddleware';
 export async function authorize({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
+
+  // TODO: This is logging the request body. Useful for prototype debugging but not good
+  // for a real application. RND-286.
   writeRequestToLog(moduleName, frontendRequest, 'authorize');
 
   const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
