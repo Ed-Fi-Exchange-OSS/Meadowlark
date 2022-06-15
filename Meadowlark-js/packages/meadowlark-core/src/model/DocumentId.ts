@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import JsSha from 'jssha';
+import { createHash } from 'node:crypto';
+import type { Hash } from 'node:crypto';
 import { DocumentElement } from './DocumentElement';
 import { DocumentIdentity } from './DocumentIdentity';
 import { DocumentInfo } from './DocumentInfo';
@@ -12,24 +13,33 @@ import { DocumentReference } from './DocumentReference';
 import { ResourceInfo } from './ResourceInfo';
 
 /**
- * Returns a SHAKE128 hash of length 224 bits for the given document identity (possibly assignable-adjusted)
+ * Converts Base64 to Base64Url by character replacement and truncation of padding.
+ * '+' becomes '-', '/' becomes '_', and any trailing '=' are removed.
+ * See https://datatracker.ietf.org/doc/html/rfc4648#section-5
+ */
+function toBase64Url(base64: string): string {
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * Returns a SHA-224 hash for the given document identity (possibly assignable-adjusted)
  * for use as a document id.
  */
 export function documentIdForDocumentIdentity(
-  { projectName, resourceName, resourceVersion, isDescriptor }: ResourceInfo,
+  { projectName, resourceName, isDescriptor }: ResourceInfo,
   documentIdentity: DocumentIdentity,
 ): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
   // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
 
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
-  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${resourceVersion}#${documentIdentity
+  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${documentIdentity
     .map((element: DocumentElement) => `${element.name}=${element.value}`)
     .join('#')}`;
 
-  const shaObj = new JsSha('CSHAKE128', 'TEXT');
+  const shaObj: Hash = createHash('sha3-224');
   shaObj.update(stringifiedIdentity);
-  return shaObj.getHash('HEX', { outputLen: 224 });
+  return toBase64Url(shaObj.digest('base64'));
 }
 
 /**
@@ -62,10 +72,9 @@ export function documentIdForDocumentReference(documentReference: DocumentRefere
 }
 
 /**
- * Document Ids are 56 character (224 bit) hex strings.
- * Example valid id: 6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7
+ * Document Ids are 38 character base64url strings. No whitespace, plus or slash allowed
+ * Example valid id: t4JWTsagjhY4Ea-oIcXCeS7oqbNX9iWfPx6e-g
  */
-export function isDocumentIdValid(documentId: string | undefined): boolean {
-  if (documentId == null) return false;
-  return /[0-9A-Fa-f]{56}/g.test(documentId);
+export function isDocumentIdValid(documentId: string): boolean {
+  return /^[^\s/+]{38}$/g.test(documentId);
 }

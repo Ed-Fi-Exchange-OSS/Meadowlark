@@ -62,7 +62,7 @@ export function schoolGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
   };
 }
 
@@ -70,7 +70,7 @@ export function schoolGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
   };
 }
 

@@ -152,7 +152,7 @@ describe('given persistence succeeds as insert', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/cf9b1c9b5419192f46b14a23a29d0438579235baad5feaed7188c02d`;
+    const location = `/v3.3b/ed-fi/academicWeeks/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg`;
     expect(response.headers).toEqual({ Location: location });
   });
 });
@@ -188,7 +188,7 @@ describe('given persistence succeeds as update', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/cf9b1c9b5419192f46b14a23a29d0438579235baad5feaed7188c02d`;
+    const location = `/v3.3b/ed-fi/academicWeeks/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg`;
     expect(response.headers).toEqual({ Location: location });
   });
 });

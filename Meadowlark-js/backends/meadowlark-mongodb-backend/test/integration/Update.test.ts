@@ -63,7 +63,7 @@ describe('given the update of a non-existent document', () => {
 
   it('should not exist in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result).toBe(null);
   });
 
@@ -113,7 +113,7 @@ describe('given the update of an existing document', () => {
 
   it('should have updated the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result.documentIdentity[0].value).toBe('update2');
     expect(result.edfiDoc.changeToDoc).toBe(true);
   });
@@ -183,11 +183,11 @@ describe('given an update of a document that references a non-existent document 
 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('update4');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
+        "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
       ]
     `);
   });
@@ -277,11 +277,11 @@ describe('given an update of a document that references an existing document wit
 
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('update6');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "68234f9521018cb780e9d4904198618d3b12b44f83e488cc1606e29a",
+        "DslCPaclSHTM-ROKf5-EXZLY-ExqPbmYTxYoRA",
       ]
     `);
   });
@@ -383,7 +383,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   it('should not have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outRefs).toHaveLength(0);
   });
 });

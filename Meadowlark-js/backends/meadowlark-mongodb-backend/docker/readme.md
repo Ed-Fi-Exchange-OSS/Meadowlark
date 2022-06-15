@@ -31,12 +31,14 @@ authentication mechanism MongoDB supports is [Keyfile
 Authentication](https://www.mongodb.com/docs/v4.2/tutorial/deploy-replica-set-with-keyfile-access-control/),
 which is what is used here.
 
-The following command will start a temporary container with a volume that will
-be shared with the long-term Mongo containers. It will then use the temporary
-container to ru [mongo-key-file-setup.sh](scripts/mongo-key-file-setup.sh),
-which creates a key file for you and sets up proper file permissions inside the
-container. permissions and ownership of keyfiles. These commands should work on
-any operating system.
+## Running MongoDB with Debezium and Kafka
+
+### Create a Shared Volume with Keyfile
+
+The following commands use a temporary container to initialize the `mongo-auth` volume and
+create a keyfile with the proper permissions. This durable volume will be shared by the MongoDB containers
+at startup to enable Keyfile Authentication. Once the keyfile is created in the volume, the temporary
+container is deleted. These commands should work on any operating system.
 
 ```bash
 docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
@@ -45,8 +47,6 @@ docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-s
 docker exec mongo-temp /scripts/mongo-key-file-setup.sh
 docker rm -f mongo-temp
 ```
-
-## Running MongoDB with Debezium and Kafka
 
 ### Start the Containers
 

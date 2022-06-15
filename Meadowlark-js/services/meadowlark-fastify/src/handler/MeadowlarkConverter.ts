@@ -3,10 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, FrontendResponse, newFrontendRequest, FrontendHeaders } from '@edfi/meadowlark-core';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { newFrontendRequest, LOCATION_HEADER_NAME } from '@edfi/meadowlark-core';
+import type { FrontendRequest, FrontendResponse, FrontendHeaders } from '@edfi/meadowlark-core';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
 type CompatibleParameters = { [header: string]: string | undefined };
+
+const MEADOWLARK_STAGE = process.env.MEADOWLARK_STAGE || 'local';
 
 function getHeaders(fastifyRequest: FastifyRequest): FrontendHeaders {
   const headers = (fastifyRequest.headers as CompatibleParameters) ?? {};
@@ -31,21 +34,24 @@ function extractPath(fastifyRequest: FastifyRequest, stage: string): string {
 }
 
 export function fromRequest(fastifyRequest: FastifyRequest): FrontendRequest {
-  const stage = process.env.MEADOWLARK_STAGE || 'local';
-
   return {
     ...newFrontendRequest(),
-    path: extractPath(fastifyRequest, stage),
+    path: extractPath(fastifyRequest, MEADOWLARK_STAGE),
     traceId: fastifyRequest.id ?? '',
     body: fastifyRequest.body as string,
     headers: getHeaders(fastifyRequest),
     queryStringParameters: (fastifyRequest.query as CompatibleParameters) ?? {},
-    stage,
+    stage: MEADOWLARK_STAGE,
   };
 }
 
 export function respondWith(frontendResponse: FrontendResponse, fastifyReply: FastifyReply) {
   if (frontendResponse.headers != null) {
+    const locationHeader: string | undefined = frontendResponse.headers[LOCATION_HEADER_NAME];
+    if (locationHeader != null) {
+      // Need to add the stage to the location header, url will be of form `/path/resource`
+      frontendResponse.headers[LOCATION_HEADER_NAME] = `/${MEADOWLARK_STAGE}${locationHeader}`;
+    }
     fastifyReply.headers(frontendResponse.headers);
   }
   fastifyReply.code(frontendResponse.statusCode).send(frontendResponse.body);

@@ -22,11 +22,8 @@ function pathComponentsFrom(path: string): PathComponents | null {
     return null;
   }
 
-  // Confirm that the id value is a properly formed document id
   const { resourceId } = match.groups ?? null;
-  if (resourceId != null && !isDocumentIdValid(resourceId)) {
-    return null;
-  }
+
   return {
     version: match.groups.version,
     namespace: match.groups.namespace,
@@ -47,6 +44,13 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
 
   if (pathComponents === null) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404);
+    return { frontendRequest, frontendResponse: { body: '', statusCode: 404 } };
+  }
+
+  // Check for properly formed document id, if there is one
+  const { resourceId } = pathComponents;
+  if (resourceId != null && !isDocumentIdValid(resourceId)) {
+    writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${resourceId}`);
     return { frontendRequest, frontendResponse: { body: '', statusCode: 404 } };
   }
 

@@ -24,7 +24,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
 
   const putSchoolChangeNameOfInstitution: FrontendRequest = {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 123,
@@ -52,12 +52,13 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   it('should return put success', async () => {
     expect(updateResult.body).toEqual('');
     expect(updateResult.statusCode).toBe(204);
+    expect(updateResult.headers?.Location).toMatchInlineSnapshot(`undefined`);
   });
 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -69,7 +70,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
 
   const putSchoolEmptyBody: FrontendRequest = {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
     headers: CLIENT1_HEADERS,
     body: '{}',
   };
@@ -103,7 +104,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
 
   const putSchoolWrongIdentity: FrontendRequest = {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 789,
@@ -142,7 +143,7 @@ describe('given a POST of a school by one client followed by a PUT of the school
 
   const putSchoolChangeClient2: FrontendRequest = {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
     headers: CLIENT2_HEADERS,
     body: `{
       "schoolId": 123,
@@ -180,7 +181,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
 
   const putSchoolInvalidDescriptor: FrontendRequest = {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg',
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 123,

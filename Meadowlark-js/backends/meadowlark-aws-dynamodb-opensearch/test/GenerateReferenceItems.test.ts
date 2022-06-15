@@ -65,7 +65,7 @@ describe('when collecting foreign key references', () => {
     documentInfo.documentIdentity = parentIdentity;
 
     const fromParent = 'FREF#ID#09876554tuiolkjasdfasdfwe2w33afss';
-    const toPerson = 'TREF#ID#884650ad435c14971851aeeac416cb961c3931b3c982b7113a91187e';
+    const toPerson = 'TREF#ID#C55ZOVLcukMmWLyvqqW68TUFB1gmx4MlYlkefA';
 
     const description = {
       Type: 'TYPE#Ed-Fi#3.3.1-b#Parent',

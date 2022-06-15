@@ -54,3 +54,4 @@ export {
   dependencies,
 } from './handler/MetadataHandler';
 export { handler as oauthHandler } from './handler/OAuthHandler';
+export { LOCATION_HEADER_NAME } from './handler/Upsert';

@@ -67,7 +67,7 @@ describe('given the get of a non-existent document', () => {
 
   it('should not exist in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result).toBe(null);
   });
 

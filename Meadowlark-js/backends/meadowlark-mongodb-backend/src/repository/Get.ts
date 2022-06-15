@@ -12,9 +12,10 @@ export async function getDocumentById({ id }: GetRequest, client: MongoClient): 
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
 
   try {
-    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ id });
+    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ _id: id });
     if (result === null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
-    return { response: 'GET_SUCCESS', document: { id: result.id, ...result.edfiDoc } };
+    // eslint-disable-next-line no-underscore-dangle
+    return { response: 'GET_SUCCESS', document: { id: result._id, ...result.edfiDoc } };
   } catch (e) {
     return { response: 'UNKNOWN_FAILURE', document: {} };
   }

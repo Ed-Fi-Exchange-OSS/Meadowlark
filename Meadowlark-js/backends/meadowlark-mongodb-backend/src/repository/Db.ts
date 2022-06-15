@@ -31,8 +31,7 @@ export async function getNewClient(): Promise<MongoClient> {
 
     const collection = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
 
-    // Note this does nothing if the indexes already exist (triggers an index build otherwise)
-    await collection.createIndex({ id: 1 }, { unique: true });
+    // Note this does nothing if the index already exists (triggers an index build otherwise)
     await collection.createIndex({ outRefs: 1 });
 
     return newClient;

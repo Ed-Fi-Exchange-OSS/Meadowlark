@@ -62,7 +62,7 @@ describe('given the upsert of a new document', () => {
 
   it('should exist in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result.resourceName).toBe('School');
     expect(result.edfiDoc.call).toBe('one');
   });
@@ -149,7 +149,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
 
   it('should have the change in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result.edfiDoc.call).toBe('two');
   });
 });
@@ -206,7 +206,7 @@ describe('given an upsert of a new document that references a non-existent docum
 
   it('should have inserted the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('upsert4');
   });
 });
@@ -283,7 +283,7 @@ describe('given an upsert of a new document that references an existing document
 
   it('should have inserted the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('upsert6');
   });
 });
@@ -372,7 +372,7 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   it('should not have inserted the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result).toBe(null);
   });
 });
@@ -443,11 +443,11 @@ describe('given an update of a document that references a non-existent document 
 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('upsert4');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
+        "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
       ]
     `);
   });
@@ -537,11 +537,11 @@ describe('given an update of a document that references an existing document wit
 
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity[0].value).toBe('upsert6');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "a70c8f13d06baff1f0b5e4ae5fdfc5b679f2e90c2863f4c923bab62a",
+        "xQa2iY3pvOaXWs_--xdlZjOYgjJXvD9_wbI6EQ",
       ]
     `);
   });
@@ -643,7 +643,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   it('should not have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outRefs).toHaveLength(0);
   });
 });

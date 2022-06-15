@@ -22,7 +22,7 @@ describe('given there is no resourceId in a get request', () => {
 describe('given there is a resourceId in a get request', () => {
   const request: FrontendRequest = {
     ...newFrontendRequest(),
-    path: '/1/2/3/6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7',
+    path: '/1/2/3/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg',
   };
 
   beforeAll(async () => {

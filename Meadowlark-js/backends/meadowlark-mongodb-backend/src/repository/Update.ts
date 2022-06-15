@@ -59,7 +59,7 @@ export async function updateDocumentById(
       // Perform the document update
       Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-      const { matchedCount } = await mongoCollection.replaceOne({ id }, document, { session });
+      const { matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
       updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
     });
   } catch (e) {

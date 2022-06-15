@@ -19,7 +19,8 @@ const start = async () => {
 
     const stage = process.env.MEADOWLARK_STAGE || 'local';
 
-    await service.listen(port).then((address) => Logger.info(`Starting Meadowlark API at ${address}/${stage}`, null));
+    const address: string = await service.listen(port);
+    Logger.info(`Starting Meadowlark API at ${address}/${stage}`, null);
   } catch (err) {
     service.log.error(err);
     process.exit(1);
