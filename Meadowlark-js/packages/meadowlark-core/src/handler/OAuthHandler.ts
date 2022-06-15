@@ -14,13 +14,13 @@ import { authorizationHeader } from '../security/AuthorizationHeader';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
-type OAuthRequest = { grant_type?: string; client_id?: string; client_secret?: string };
+type OAuthRequest = { grant_type?: string; client_id?: string; client_secret?: string; Grant_type?: string };
 
 function createTokenResponse(token: Jwt): string {
   return JSON.stringify({
     access_token: token.compact(),
     token_type: 'bearer',
-    expires_in: 3845548881 - Math.floor(Date.now() / 1000),
+    expires_in: token.body.exp,
     refresh_token: 'not available',
   });
 }
@@ -31,6 +31,42 @@ function maskClientSecret(body: OAuthRequest): string {
   return `grant_type: ${body.grant_type || ''}, client_id: ${body.client_id || ''}, client_secret: ****${masked}`;
 }
 
+function parseRequest(frontendRequest: FrontendRequest): OAuthRequest | null {
+  if (frontendRequest.body == null) return null;
+
+  let body: OAuthRequest;
+  // startsWith accounts for possibility of the content-type being with or without encoding
+  if (frontendRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
+    body = querystring.parse(frontendRequest.body);
+  } else {
+    body = JSON.parse(frontendRequest.body);
+  }
+
+  // The Ed-Fi console bulk loader incorrectly uses "Grant_type" instead of "grant_type" (ODS-5466).
+  if (body.Grant_type) {
+    body.grant_type = body.Grant_type;
+  }
+
+  // There are two techniques for passing client id and client secret: directly in the payload, or as an Authorization
+  // header. Detect the latter, and then decode and parse the id and secret from the header.
+  if (body.client_id) return body;
+
+  if (!('authorization' in frontendRequest.headers)) {
+    return null;
+  }
+
+  // Extract from "Basic <encoded>" where encoded is the Base64 form of "client_id:client_secret"
+  const authHeader: string = frontendRequest.headers.authorization ?? '';
+  const split = Buffer.from(authHeader.slice(6), 'base64').toString('binary').split(':');
+  if (split.length !== 2) {
+    return null;
+  }
+
+  [body.client_id, body.client_secret] = split;
+
+  return body;
+}
+
 /*
  * OAuth2.0 style authentication endpoint. Currently backed by a hard-coded "in-memory" database of two sets of credentials.
  * Generates a JSON Web Token.
@@ -38,18 +74,12 @@ function maskClientSecret(body: OAuthRequest): string {
 export async function postToken(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   Logger.info('OAuthHandler.postToken', frontendRequest.traceId);
 
-  if (frontendRequest.body == null) {
+  const body = parseRequest(frontendRequest);
+  if (body == null) {
     return {
-      body: 'Try submitting an OAuth2.0 Client Credential form',
+      body: JSON.stringify({ error: 'Try submitting an OAuth2.0 Client Credential form' }),
       statusCode: 400,
     };
-  }
-
-  let body: OAuthRequest;
-  if (frontendRequest.headers['content-type'] === 'application/x-www-form-urlencoded') {
-    body = querystring.parse(frontendRequest.body);
-  } else {
-    body = JSON.parse(frontendRequest.body);
   }
   Logger.debug(maskClientSecret(body), frontendRequest.traceId);
 

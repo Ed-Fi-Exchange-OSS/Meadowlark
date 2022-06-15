@@ -27,8 +27,7 @@ const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark' };
 export function createToken(vendor: string): Jwt {
   const token: Jwt = create({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
 
-  // Year is 2091
-  token.setExpiration(3845548881000);
+  token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
   return token;
 }
 
@@ -46,11 +45,11 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     isMissing: false,
     isValid: jwt != null && !failureMessages.includes(jwt.message),
     isExpired: jwt.message === 'Jwt is expired',
-    issuer: jwt.body.iss ?? '',
-    audience: jwt.body.aud ?? '',
-    subject: jwt.body.sub ?? null,
-    issuedAt: jwt.body.iat ?? 0,
-    expiresAt: jwt.body.exp ?? 0,
+    issuer: jwt.body?.iss ?? '',
+    audience: jwt.body?.aud ?? '',
+    subject: jwt.body?.sub ?? null,
+    issuedAt: jwt.body?.iat ?? 0,
+    expiresAt: jwt.body?.exp ?? 0,
   };
 }
 
