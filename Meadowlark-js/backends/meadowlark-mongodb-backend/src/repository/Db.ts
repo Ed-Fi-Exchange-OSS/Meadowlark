@@ -8,7 +8,7 @@ import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
-export const DATABASE_NAME = 'meadowlark';
+export const DATABASE_NAME = process.env.MEADOWLARK_DATABASE_NAME || 'meadowlark';
 export const COLLECTION_NAME = 'documents';
 
 let singletonClient: MongoClient | null = null;
