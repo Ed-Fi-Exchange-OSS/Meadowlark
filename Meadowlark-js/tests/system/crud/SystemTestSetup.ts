@@ -29,7 +29,7 @@ export function newFrontendRequestTemplate(): FrontendRequest {
 export function schoolBodyClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools',
+    path: '/local/v3.3b/ed-fi/schools',
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 123,
@@ -43,7 +43,7 @@ export function schoolBodyClient1(): FrontendRequest {
 export function schoolBodyClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/schools',
+    path: '/local/v3.3b/ed-fi/schools',
     headers: CLIENT2_HEADERS,
     body: `{
     "schoolId": 123,
@@ -58,7 +58,7 @@ export function schoolGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: CLIENT1_HEADERS,
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
   };
 }
 
@@ -66,7 +66,7 @@ export function schoolGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: CLIENT2_HEADERS,
-    path: '/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
+    path: '/local/v3.3b/ed-fi/schools/8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6',
   };
 }
 
@@ -76,7 +76,7 @@ export const schoolDeleteClient2 = schoolGetClient2;
 export function academicWeekBodyClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
-    path: '/v3.3b/ed-fi/academicWeeks',
+    path: '/local/v3.3b/ed-fi/academicWeeks',
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolReference": {

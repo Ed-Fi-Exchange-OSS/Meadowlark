@@ -12,7 +12,7 @@ jest.setTimeout(40000);
 describe('given a DELETE of a school by id', () => {
   const schoolDeleteByIdRequest: InjectOptions = {
     method: 'DELETE',
-    url: '/v3.3b/ed-fi/schools/1',
+    url: '/local/v3.3b/ed-fi/schools/1',
     headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   };
 
