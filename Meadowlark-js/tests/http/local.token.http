@@ -70,6 +70,11 @@ grant_type=client_credentials
 GET http://localhost:3000/local/verify
 Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6ImY0Njk2MmI0LTM4ODUtNGNiYi1hOGI5LTJmOTU2OThjZDNlNSIsImlhdCI6MTY1NTI0NDkxNywiZXhwIjoxNzE4NDAxfQ.vuh5OSYZnZ30d0EmTLcesKSFnB7U_g2N0JS9sVvDzcI
 
+
+### A token that will last until 2091
+GET http://localhost:3000/local/verify
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
 ### Vendor 1 token
 @authToken1 = {{client1.response.body.$.access_token}}
 
