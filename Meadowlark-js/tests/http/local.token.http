@@ -22,15 +22,25 @@ content-type: application/json
 
 ### should succeed, vendor 1 (form encoded)
 POST http://localhost:3000/local/api/oauth/token
-Content-Type: application/x-www-form-urlencoded
+content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 &client_id=meadowlark_key_1
 &client_secret=meadowlark_secret_1
 
-### should succeed, vendor 2
+### should succeed, vendor 1 (form encoded, alternate using basic auth)
+# @name client1
 POST http://localhost:3000/local/api/oauth/token
-Content-Type: application/x-www-form-urlencoded
+content-type: application/x-www-form-urlencoded
+authorization: Basic bWVhZG93bGFya19rZXlfMTptZWFkb3dsYXJrX3NlY3JldF8x
+
+grant_type=client_credentials
+
+
+### should succeed, vendor 2
+# @name client2
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 &client_id=meadowlark_key_2
@@ -38,7 +48,7 @@ grant_type=client_credentials
 
 ### mix & match - should fail - expect 401
 POST http://localhost:3000/local/api/oauth/token
-Content-Type: application/x-www-form-urlencoded
+content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 &client_id=meadowlark_key_1
@@ -46,7 +56,7 @@ grant_type=client_credentials
 
 ### completely bogus - should fail - expect 401
 POST http://localhost:3000/local/api/oauth/token
-Content-Type: application/x-www-form-urlencoded
+content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 &client_id=meadowlark_key_1_bogus
@@ -56,17 +66,25 @@ grant_type=client_credentials
 # VERIFY
 #
 
-### Vendor 1 token
+### An expired token
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6ImY0Njk2MmI0LTM4ODUtNGNiYi1hOGI5LTJmOTU2OThjZDNlNSIsImlhdCI6MTY1NTI0NDkxNywiZXhwIjoxNzE4NDAxfQ.vuh5OSYZnZ30d0EmTLcesKSFnB7U_g2N0JS9sVvDzcI
+
+### Vendor 1 token
+@authToken1 = {{client1.response.body.$.access_token}}
+
+GET http://localhost:3000/local/verify
+Authorization: bearer {{authToken1}}
 
 ### Vendor 2 token
+@authToken2 = {{client2.response.body.$.access_token}}
+
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+Authorization: bearer {{authToken2}}
 
 ### Test a token that has been tampered with by changing the subject - expect 400
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6Indyb25nLVNJUyIsImp0aSI6IjkyNWE1Y2E2LTE3ZmQtNDIwNi1iMWQ4LTRhNTI3Y2EwZmNhMCIsImlhdCI6MTYzNjQ5MTE0NywiZXhwIjoxODg5MDE1OTAzfQ.e4Ah_ipWR9rOmris5xekJZLnWePtlIKO3A99_nrIETk
+Authorization: bearer a{{authToken2}}
 
 ### Gibberish token - expect 400
 GET http://localhost:3000/local/verify
@@ -83,7 +101,7 @@ Authorization: bearer
 ### Student owned by Vendor 1
 POST http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken1}}
 
 { 
     "studentUniqueId": "1",
@@ -95,7 +113,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 ### Student owned by Vendor 2
 POST http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+Authorization: bearer {{authToken2}}
 
 { 
     "studentUniqueId": "2",
@@ -107,7 +125,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 ### Vendor 1 attempts to POST on top of Vendor 2 Student - this is delegated to PUT under the covers - should fail - expect 404
 POST http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken1}}
 
 { 
     "studentUniqueId": "2",
@@ -122,19 +140,19 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 
 ### Vendor 1 GET of Student owned by Vendor 1
 GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken1}}
 
 ### Vendor 1 GET of Student owned by Vendor 2 - should fail - expect 404
 GET http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken1}}
 
 ### Vendor 2 GET of Student owned by Vendor 2
 GET http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+Authorization: bearer {{authToken2}}
 
 ### Vendor 2 GET of Student owned by Vendor 1 - should fail - expect 404
 GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+Authorization: bearer {{authToken2}}
 
 #
 # PUT by id (Requires ACCESS_TOKEN_REQUIRED=true environment variable)
@@ -143,7 +161,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 ### Vendor 2 PUT for Student owned by Vendor 2
 PUT http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
 content-type: application/json
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+Authorization: bearer {{authToken2}}
 
 { 
     "studentUniqueId": "2",
@@ -155,7 +173,7 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 ### Vendor 1 attempts to PUT on top of Vendor 2 Student - should fail - expect 404
 PUT http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
 content-type: application/json
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken2}}
 
 { 
     "studentUniqueId": "2",
@@ -170,8 +188,8 @@ Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZ
 
 ### Vendor 1 DELETE of Student owned by Vendor 1
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken1}}
 
 ### Vendor 1 DELETE of Student owned by Vendor 2 - should fail - expect 404
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+Authorization: bearer {{authToken2}}
