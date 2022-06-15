@@ -24,7 +24,7 @@ describe('when getting API version information', () => {
       }
     ],
     "urls": {
-      "dependencies": "",
+      "dependencies": "https://test_url/outside/metadata/data/v3/dependencies",
       "openApiMetadata": "https://test_url/outside/metadata/",
       "oauth": "mock_oauth",
       "dataManagementApi": "https://test_url/outside/v3.3b/",
@@ -70,7 +70,7 @@ describe('when getting API version information', () => {
       }
     ],
     "urls": {
-      "dependencies": "",
+      "dependencies": "http://localhost:3000/local/metadata/data/v3/dependencies",
       "openApiMetadata": "http://localhost:3000/local/metadata/",
       "oauth": "mock_oauth",
       "dataManagementApi": "http://localhost:3000/local/v3.3b/",
