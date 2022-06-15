@@ -8,7 +8,7 @@ import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
 import { getDocumentOwnershipByIdSql } from './QueryHelper';
 
-function extractIdFromUpsert(frontendRequest: FrontendRequest): string | null {
+function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
 
   return documentIdForDocumentInfo(frontendRequest.middleware.resourceInfo, frontendRequest.middleware.documentInfo);
@@ -23,7 +23,7 @@ export async function rejectByOwnershipSecurity(
 
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
-  if (id == null) id = extractIdFromUpsert(frontendRequest);
+  if (id == null) id = extractIdIfUpsert(frontendRequest);
 
   if (id == null) {
     Logger.error(`${functionName} - no id to secure against`, frontendRequest.traceId);

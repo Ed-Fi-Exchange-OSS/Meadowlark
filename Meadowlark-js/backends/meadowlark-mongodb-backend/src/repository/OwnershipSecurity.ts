@@ -9,7 +9,7 @@ import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { SecurityResult } from '../security/SecurityResponse';
 import { getCollection } from './Db';
 
-function extractIdFromUpsert(frontendRequest: FrontendRequest): string | null {
+function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
 
   return documentIdForDocumentInfo(frontendRequest.middleware.resourceInfo, frontendRequest.middleware.documentInfo);
@@ -25,7 +25,7 @@ export async function rejectByOwnershipSecurity(
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
-  if (id == null) id = extractIdFromUpsert(frontendRequest);
+  if (id == null) id = extractIdIfUpsert(frontendRequest);
 
   if (id == null) {
     Logger.error(`${functionName} - no id to secure against`, frontendRequest.traceId);
