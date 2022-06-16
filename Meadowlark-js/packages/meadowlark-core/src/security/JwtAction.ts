@@ -58,7 +58,8 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
  */
 export function verifyJwt(authorization?: string): JwtStatus {
   Logger.debug('JwtStatus.verifyJwt authorization header', null, authorization ?? '*None Supplied*');
-  if (authorization == null || !authorization.startsWith('bearer ')) {
+  // "Bearer" is case sensitive per the spec. Accept "bearer" for flexibility.
+  if (authorization == null || (!authorization.startsWith('Bearer ') && !authorization.startsWith('bearer '))) {
     return { ...newJwtStatus(), isMissing: true, isValid: false };
   }
 
