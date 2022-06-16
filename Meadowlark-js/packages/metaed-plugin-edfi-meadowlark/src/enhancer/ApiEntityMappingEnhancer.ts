@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType } from '@edfi/metaed-core';
-import { ApiEntityMapping } from '../model/ApiEntityMapping';
+import { ApiEntityMapping, NoApiEntityMapping } from '../model/ApiEntityMapping';
 import {
   assignabilityFor,
   descriptorCollectedPropertiesFrom,
@@ -40,6 +40,11 @@ function buildApiEntityMapping(entity: TopLevelEntity): ApiEntityMapping {
 export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
   getAllEntitiesOfType(metaEd, 'domainEntity', 'association').forEach((entity) => {
     (entity.data.meadowlark as EntityMeadowlarkData).apiMapping = buildApiEntityMapping(entity as TopLevelEntity);
+  });
+
+  // Descriptors have no API shape metadata
+  getAllEntitiesOfType(metaEd, 'descriptor').forEach((entity) => {
+    (entity.data.meadowlark as EntityMeadowlarkData).apiMapping = NoApiEntityMapping;
   });
 
   return {
