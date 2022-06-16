@@ -44,3 +44,20 @@ $options = @(
 
 Write-host -ForegroundColor Cyan $apiLoaderExe $options
 &dotnet $bulkLoader $options
+
+# Load Grand Bend
+$options = @(
+    "-b", $baseUrl,
+    "-d", (Resolve-Path "$($sampleDataDir)/Sample XML"),
+    "-w", $working,
+    "-k", $key,
+    "-s", $secret,
+	"-r", "1",
+    "-l", "1",
+    "-f",
+    "-n",
+    "-x", $xsdDirectory
+)
+
+Write-host -ForegroundColor Cyan $apiLoaderExe $options
+&dotnet $bulkLoader $options
