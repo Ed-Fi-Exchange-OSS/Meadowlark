@@ -16,6 +16,8 @@ import {
 import { decapitalize } from '../Utility';
 import { Assignable } from '../model/Assignable';
 import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
+import { DescriptorDocument } from '../model/DescriptorDocument';
+import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo';
 
 type NullableTopLevelEntity = { assignableTo: TopLevelEntity | null };
 
@@ -96,10 +98,19 @@ function documentIdentitiesFrom(
 }
 
 /**
+ * All descriptor documents have the same identity fields
+ */
+function descriptorDocumentIdentityWithSecurity(body: DescriptorDocument): DocumentIdentityWithSecurity {
+  return { documentIdentity: descriptorDocumentIdentityFrom(body), studentId: null, edOrgId: null };
+}
+
+/**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
  * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
 export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentityWithSecurity {
+  if (entity.type === 'descriptor') return descriptorDocumentIdentityWithSecurity(body as DescriptorDocument);
+
   const documentIdentitiesWithSecurity: DocumentIdentityWithSecurity[] = (
     entity.data.meadowlark as EntityMeadowlarkData
   ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>

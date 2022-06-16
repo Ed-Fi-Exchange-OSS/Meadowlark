@@ -21,6 +21,14 @@ import { singularize, topLevelNameOnEntity } from '../Utility';
 
 const enhancerName = 'JoiSchemaEnhancer';
 
+// All descriptor documents have the same schema
+const descriptorSchema = Joi.object({
+  namespace: Joi.string().required(),
+  codeValue: Joi.string().required(),
+  shortDescription: Joi.string().required(),
+  description: Joi.string().optional(),
+});
+
 /**
  * Returns a Joi schema fragment that specifies the API body element shape
  * corresponding to the given referential property.
@@ -228,12 +236,19 @@ function buildJoiSchema(entityForSchema: TopLevelEntity): Joi.AnySchema {
  * shape for each resource that corresponds to the MetaEd entity.
  */
 export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
+  // Build schemas for each domain entity and association
   getAllEntitiesOfType(metaEd, 'domainEntity', 'association', 'domainEntitySubclass', 'associationSubclass').forEach(
     (entity) => {
       const entityMeadowlarkData = entity.data.meadowlark as EntityMeadowlarkData;
       entityMeadowlarkData.joiSchema = buildJoiSchema(entity as TopLevelEntity);
     },
   );
+
+  // Attach descriptor schema to each descriptor
+  getAllEntitiesOfType(metaEd, 'descriptor').forEach((entity) => {
+    const entityMeadowlarkData = entity.data.meadowlark as EntityMeadowlarkData;
+    entityMeadowlarkData.joiSchema = descriptorSchema;
+  });
 
   return {
     enhancerName,

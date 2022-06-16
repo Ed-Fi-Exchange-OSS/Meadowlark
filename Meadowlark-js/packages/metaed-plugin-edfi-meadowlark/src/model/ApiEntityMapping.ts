@@ -54,5 +54,4 @@ export function newApiEntityMapping(): ApiEntityMapping {
 
 export const NoApiEntityMapping: ApiEntityMapping = deepFreeze({
   ...newApiEntityMapping(),
-  metaEdName: 'NoApiEntityMapping',
 });

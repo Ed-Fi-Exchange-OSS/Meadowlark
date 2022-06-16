@@ -10,13 +10,15 @@ import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
 import { getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
-import { DocumentInfo, newDocumentInfo } from '../model/DocumentInfo';
 import { Logger } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
 import { ResourceInfo } from '../model/ResourceInfo';
+import { DescriptorDocument } from '../model/DescriptorDocument';
+import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
+import { DocumentInfo } from '../model/DocumentInfo';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -28,13 +30,6 @@ type XmlDescriptorValue = {
 };
 
 type XmlDescriptorData = { [descriptorName: string]: XmlDescriptorValue[] };
-
-type DescriptorDocument = {
-  namespace: string;
-  codeValue: string;
-  shortDescription: string;
-  description: string;
-};
 
 /** Returns a new object */
 export function decapitalizeKeys(obj: object): object {
@@ -116,7 +111,6 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         continue;
       }
 
-      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
       const resourceInfo: ResourceInfo = {
         resourceName: descriptorName,
         projectName: 'Ed-Fi',
@@ -124,15 +118,8 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         isDescriptor: true,
       };
 
-      const documentInfo: DocumentInfo = {
-        ...newDocumentInfo(),
-        documentIdentity: [
-          {
-            name: 'descriptor',
-            value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
-          },
-        ],
-      };
+      const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
+      const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
       const putResult: UpsertResult = await getDocumentStore().upsertDocument({
         id: documentIdForDocumentInfo(resourceInfo, documentInfo),
@@ -143,12 +130,14 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         security: { ...newSecurity(), authorizationStrategy: 'FULL_ACCESS' },
         traceId: '-',
       });
+
       Logger.debug(
         `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
           putResult.failureMessage ?? 'OK'
         }`,
         '-',
       );
+
       if (!(putResult.response === 'INSERT_SUCCESS' || putResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
