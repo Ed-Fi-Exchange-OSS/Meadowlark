@@ -40,12 +40,17 @@ export function addEntityMeadowlarkDataTo(entity: ModelBase) {
  * Initialize all properties with Meadowlark data placeholder.
  */
 export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
-  getAllEntitiesOfType(metaEd, 'domainEntity', 'association', 'domainEntitySubclass', 'associationSubclass').forEach(
-    (entity) => {
-      if (entity.data.meadowlark == null) entity.data.meadowlark = {};
-      addEntityMeadowlarkDataTo(entity);
-    },
-  );
+  getAllEntitiesOfType(
+    metaEd,
+    'domainEntity',
+    'association',
+    'domainEntitySubclass',
+    'associationSubclass',
+    'descriptor',
+  ).forEach((entity) => {
+    if (entity.data.meadowlark == null) entity.data.meadowlark = {};
+    addEntityMeadowlarkDataTo(entity);
+  });
 
   return {
     enhancerName: 'EntityMeadowlarkDataSetupEnhancer',

@@ -11,7 +11,7 @@ jest.setTimeout(40000);
 
 const schoolPostRequest: InjectOptions = {
   method: 'POST',
-  url: '/v3.3b/ed-fi/schools',
+  url: '/local/v3.3b/ed-fi/schools',
   headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   payload: `{
     "schoolId": 123,

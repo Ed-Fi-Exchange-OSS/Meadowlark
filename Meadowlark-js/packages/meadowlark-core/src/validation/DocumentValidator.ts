@@ -67,7 +67,7 @@ export async function validateDocument(
   const documentReferences: DocumentReference[] = [];
   const descriptorReferences: DocumentReference[] = [];
 
-  if (!resourceInfo.isDescriptor && body != null) {
+  if (body != null) {
     const bodyValidation: string[] = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
     if (bodyValidation.length > 0) {
       errorBody = JSON.stringify({ message: bodyValidation });

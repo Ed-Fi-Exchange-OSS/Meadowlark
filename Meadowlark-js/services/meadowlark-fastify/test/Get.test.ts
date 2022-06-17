@@ -12,7 +12,7 @@ jest.setTimeout(40000);
 describe('given a GET of a school by id', () => {
   const schoolGetByIdRequest: InjectOptions = {
     method: 'GET',
-    url: '/v3.3b/ed-fi/schools/1',
+    url: '/local/v3.3b/ed-fi/schools/1',
     headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   };
 
@@ -47,7 +47,7 @@ describe('given a GET of a school by id', () => {
 describe('given a GET of a school query without path ending slash', () => {
   const schoolQueryRequest: InjectOptions = {
     method: 'GET',
-    url: '/v3.3b/ed-fi/schools?schoolId=123',
+    url: '/local/v3.3b/ed-fi/schools?schoolId=123',
     headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   };
 
@@ -86,7 +86,7 @@ describe('given a GET of a school query without path ending slash', () => {
 describe('given a GET of a school query with path ending slash', () => {
   const schoolQueryRequest: InjectOptions = {
     method: 'GET',
-    url: '/v3.3b/ed-fi/schools/?schoolId=123',
+    url: '/local/v3.3b/ed-fi/schools/?schoolId=123',
     headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   };
 

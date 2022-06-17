@@ -13,4 +13,7 @@ export abstract class Constants {
 
   static readonly swaggerDescriptorUrl: string =
     'https://edfidata.s3.us-west-2.amazonaws.com/Meadowlark/3.3.0-b-descriptor.json';
+
+  static readonly dependenciesUrl: string =
+    'https://edfidata.s3.us-west-2.amazonaws.com/Meadowlark/v3.3.0-b.dependencies.json';
 }

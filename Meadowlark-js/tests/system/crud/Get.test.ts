@@ -8,15 +8,13 @@ import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark
 import { MongoClient } from 'mongodb';
 import {
   schoolBodyClient1,
-  MONGO_DOCUMENT_STORE_PLUGIN,
-  TEST_SIGNING_KEY,
   schoolGetClient2,
   schoolGetClient1,
+  configureEnvironmentForMongoSystemTests,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
-process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
-process.env.SIGNING_KEY = TEST_SIGNING_KEY;
+configureEnvironmentForMongoSystemTests();
 
 describe('given a GET of a non-existent school', () => {
   let client: MongoClient;

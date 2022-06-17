@@ -3,51 +3,128 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable no-use-before-define */
+
 import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
+import { Logger } from '@edfi/meadowlark-core';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
-import { metaed, apiVersion, swaggerForResourcesAPI, swaggerForDescriptorsAPI } from './handler/MetadataHandler';
+import {
+  metaed,
+  apiVersion,
+  swaggerForResourcesAPI,
+  swaggerForDescriptorsAPI,
+  openApiUrlList,
+  dependencies,
+} from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
 
 export function buildService(): FastifyInstance {
-  const service = Fastify({
-    logger: true,
-    genReqId: () => randomUUID(),
-  });
-
-  if (process.env.FASTIFY_RATE_LIMIT == null || process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
-    // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
-    // effectiveness requires configuring for redis or an alternative store
-    service.register(FastifyRateLimit);
-  }
-
-  // override json parser to leave body as string
-  service.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
-    done(null, body);
-  });
-
-  // Matching crud operations handlers
-  service.get('/*', get);
-  service.post('/*', upsert);
-  service.put('/*', update);
-  service.delete('/*', deleteIt);
-
-  // MetaEd metadata handler
-  service.get('/metaed', metaed);
-
-  // API version handler
-  service.get('/', apiVersion);
-
-  // Swagger handlers
-  service.get('/metadata/resources/swagger.json', swaggerForResourcesAPI);
-  service.get('/metadata/descriptors/swagger.json', swaggerForDescriptorsAPI);
-
-  // OAuth handlers
-  service.post('/api/oauth/token', oauthHandler);
-  service.get('/createKey', oauthHandler);
-  service.get('/verify', oauthHandler);
+  const service = createFastifyService();
+  customizeRequestLogging(service);
+  alwaysRespondAsJson(service);
+  setupRateLimiting(service);
+  configureAcceptedContentTypes(service);
+  configureRouting(service);
 
   return service;
+
+  function createFastifyService(): FastifyInstance {
+    return Fastify({
+      logger: logWrapper(),
+      disableRequestLogging: true,
+      genReqId: () => randomUUID(),
+    });
+  }
+
+  function logWrapper(): FastifyLoggerInstance {
+    return {
+      info: (msg: string) => Logger.info(msg, null),
+      warn: (msg: string) => Logger.warn(msg, null),
+      error: (msg: string) => Logger.error(msg, null),
+      fatal: (msg: string) => Logger.error(msg, null),
+      trace: (msg: string) => Logger.debug(msg, null),
+      debug: (msg: string) => Logger.debug(msg, null),
+      child: (_) => logWrapper(),
+    };
+  }
+
+  function customizeRequestLogging(fastify: FastifyInstance): void {
+    // Customize the request logging so that request Id and extra info can be passed into the Meadowlark logger.
+    function now() {
+      return Date.now();
+    }
+
+    fastify.addHook('onRequest', (req, reply, done) => {
+      // eslint-disable-next-line dot-notation
+      reply.headers['startTime'] = now();
+      Logger.info('Request', req.id, { url: req.raw.url, contentType: req.headers['content-type'] });
+      done();
+    });
+
+    fastify.addHook('onResponse', (req, reply, done) => {
+      Logger.info('Response', req.id, {
+        url: req.raw.url,
+        statusCode: reply.raw.statusCode,
+        // eslint-disable-next-line dot-notation
+        durationMs: now() - Number(reply.headers['startTime']),
+      });
+      done();
+    });
+  }
+  function alwaysRespondAsJson(fastify: FastifyInstance): void {
+    fastify.addHook('onSend', (_request, reply, _payload, done) => {
+      reply.headers({ 'content-type': 'application/json' });
+      done();
+    });
+  }
+
+  function setupRateLimiting(fastify: FastifyInstance): void {
+    if (process.env.FASTIFY_RATE_LIMIT == null || process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
+      // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
+      // effectiveness requires configuring for redis or an alternative store
+      fastify.register(FastifyRateLimit);
+    }
+  }
+
+  function configureAcceptedContentTypes(fastify: FastifyInstance): void {
+    fastify.addContentTypeParser(
+      ['application/json', 'application/x-www-form-urlencoded'],
+      { parseAs: 'string' },
+      (_req, payload, done) => {
+        done(null, payload);
+      },
+    );
+  }
+
+  function configureRouting(fastify: FastifyInstance): void {
+    const stage: string = process.env.MEADOWLARK_STAGE || 'local';
+
+    // Matching crud operations handlers
+    fastify.get(`/${stage}/*`, get);
+    fastify.post(`/${stage}/*`, upsert);
+    fastify.put(`/${stage}/*`, update);
+    fastify.delete(`/${stage}/*`, deleteIt);
+
+    // MetaEd metadata handler
+    fastify.get(`/${stage}/metaed`, metaed);
+
+    // API version handler
+    fastify.get(`/${stage}`, apiVersion);
+    fastify.get(`/${stage}/`, apiVersion);
+
+    // Swagger handlers
+    fastify.get(`/${stage}/metadata`, openApiUrlList);
+    fastify.get(`/${stage}/metadata/`, openApiUrlList);
+    fastify.get(`/${stage}/metadata/resources/swagger.json`, swaggerForResourcesAPI);
+    fastify.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
+    fastify.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
+
+    // OAuth handlers
+    fastify.post(`/${stage}/api/oauth/token`, oauthHandler);
+    fastify.get(`/${stage}/createKey`, oauthHandler);
+    fastify.get(`/${stage}/verify`, oauthHandler);
+  }
 }

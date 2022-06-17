@@ -9,17 +9,15 @@ import { MongoClient } from 'mongodb';
 import {
   CLIENT1_HEADERS,
   schoolBodyClient1,
-  MONGO_DOCUMENT_STORE_PLUGIN,
   newFrontendRequestTemplate,
-  TEST_SIGNING_KEY,
   schoolGetClient1,
   academicWeekBodyClient1,
   schoolBodyClient2,
+  configureEnvironmentForMongoSystemTests,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
-process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
-process.env.SIGNING_KEY = TEST_SIGNING_KEY;
+configureEnvironmentForMongoSystemTests();
 
 describe('given a POST of a school', () => {
   let client: MongoClient;

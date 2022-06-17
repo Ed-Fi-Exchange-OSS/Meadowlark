@@ -9,16 +9,14 @@ import { MongoClient } from 'mongodb';
 import {
   CLIENT1_HEADERS,
   schoolBodyClient1,
-  MONGO_DOCUMENT_STORE_PLUGIN,
   newFrontendRequestTemplate,
   schoolGetClient1,
-  TEST_SIGNING_KEY,
   CLIENT2_HEADERS,
+  configureEnvironmentForMongoSystemTests,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
-process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
-process.env.SIGNING_KEY = TEST_SIGNING_KEY;
+configureEnvironmentForMongoSystemTests();
 
 describe('given a POST of a school followed by the PUT of the school with a changed field', () => {
   let client: MongoClient;

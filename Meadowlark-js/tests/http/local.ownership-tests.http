@@ -8,6 +8,7 @@
 
 ### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+content-type: application/json
 {{auth_header_1}}
 
 {
@@ -20,6 +21,7 @@ POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 
 ### Re-POST with different authorization header - expect 403.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+content-type: application/json
 {{auth_header_2}}
 
 {
@@ -43,6 +45,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146
 
 ### Try updating that resource using the same authorization header that created the record - expect success.
 PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+content-type: application/json
 {{auth_header_1}}
 
 {
@@ -55,6 +58,7 @@ PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146
 
 ### Try updating the resource with wrong authorization header - expect 403
 PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+content-type: application/json
 {{auth_header_2}}
 
 {

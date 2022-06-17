@@ -16,7 +16,7 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => `{
       }
     ],
     "urls": {
-      "dependencies": "",
+      "dependencies": "${serverBaseUrl}/metadata/data/v3/dependencies",
       "openApiMetadata": "${serverBaseUrl}/metadata/",
       "oauth": "${process.env.TOKEN_URL}",
       "dataManagementApi": "${serverBaseUrl}/v3.3b/",
