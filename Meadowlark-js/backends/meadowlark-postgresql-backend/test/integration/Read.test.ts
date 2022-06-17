@@ -14,11 +14,13 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  GetResult,
 } from '@edfi/meadowlark-core';
-import { Collection, MongoClient } from 'mongodb';
-import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
-import { getCollection, getNewClient } from '../../src/repository/Db';
+import type { PoolClient } from 'pg';
+import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
+import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
+import { getRecordExistsSql } from '../../src/repository/QueryHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);
@@ -41,8 +43,8 @@ const newUpsertRequest = (): UpsertRequest => ({
 });
 
 describe('given the get of a non-existent document', () => {
-  let client;
-  let getResult;
+  let client: PoolClient;
+  let getResult: GetResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -55,20 +57,20 @@ describe('given the get of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
+    client = await getSharedClient();
 
-    getResult = await getDocumentById({ ...newGetRequest(), id }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
+    await deleteAll(client);
+    await resetSharedClient();
   });
 
   it('should not exist in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
-    expect(result).toBe(null);
+    const result = await client.query(await getRecordExistsSql(id));
+
+    expect(result.rowCount).toBe(0);
   });
 
   it('should return get failure', async () => {
@@ -77,8 +79,8 @@ describe('given the get of a non-existent document', () => {
 });
 
 describe('given the get of an existing document', () => {
-  let client;
-  let getResult;
+  let client: PoolClient;
+  let getResult: any;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -91,7 +93,7 @@ describe('given the get of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
+    client = await getSharedClient();
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { inserted: 'yes' } };
 
     // insert the initial version
@@ -101,8 +103,8 @@ describe('given the get of an existing document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
+    await deleteAll(client);
+    await resetSharedClient();
   });
 
   it('should return the document', async () => {

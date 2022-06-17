@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
-import { Collection, MongoClient, WithId } from 'mongodb';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
-import { getCollection } from './Db';
+import { getDocumentOwnershipByIdSql } from './QueryHelper';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
@@ -17,12 +16,11 @@ function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
 
 export async function rejectByOwnershipSecurity(
   frontendRequest: FrontendRequest,
-  client: MongoClient,
+  client: PoolClient,
 ): Promise<SecurityResult> {
   const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
   if (id == null) id = extractIdIfUpsert(frontendRequest);
@@ -33,16 +31,15 @@ export async function rejectByOwnershipSecurity(
   }
 
   try {
-    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-      { id },
-      { projection: { createdBy: 1, _id: 0 } },
-    );
-    if (result === null) {
+    const result: QueryResult = await client.query(getDocumentOwnershipByIdSql(id));
+
+    if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
     const { clientName } = frontendRequest.middleware.security;
-    if (result.createdBy === clientName) {
+
+    if (result.rows[0].created_by === clientName) {
       Logger.debug(`${functionName} - access approved: id ${id}, clientName ${clientName}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }
