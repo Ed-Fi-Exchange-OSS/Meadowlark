@@ -9,7 +9,7 @@ import { getDocumentByIdSql } from './QueryHelper';
 
 export async function getDocumentById({ id }: GetRequest, client: PoolClient): Promise<GetResult> {
   try {
-    const queryResult: QueryResult = await client.query(await getDocumentByIdSql(id));
+    const queryResult: QueryResult = await client.query(getDocumentByIdSql(id));
 
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 

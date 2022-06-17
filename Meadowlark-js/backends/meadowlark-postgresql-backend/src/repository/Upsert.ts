@@ -19,14 +19,11 @@ export async function upsertDocument(
   let isInsert: boolean;
 
   try {
-    recordExistsResult = await client.query(await getRecordExistsSql(id));
+    recordExistsResult = await client.query(getRecordExistsSql(id));
 
     isInsert = !recordExistsResult.rowCount || recordExistsResult.rowCount === 0;
 
-    documentSql = await getDocumentInsertOrUpdateSql(
-      { id, resourceInfo, documentInfo, edfiDoc, validate, security },
-      isInsert,
-    );
+    documentSql = getDocumentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate, security }, isInsert);
   } catch (e) {
     Logger.error(e, traceId);
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };

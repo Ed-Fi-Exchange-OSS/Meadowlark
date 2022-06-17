@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import format from 'pg-format';
 
-export async function getDocumentByIdSql(documentId: string): Promise<string> {
+export function getDocumentByIdSql(documentId: string): string {
   return format(
     `
     SELECT document_id, document_identity, project_name, resource_name, resource_version,
@@ -15,15 +15,15 @@ export async function getDocumentByIdSql(documentId: string): Promise<string> {
   );
 }
 
-export async function getDocumentOwnershipByIdSql(documentId: string): Promise<string> {
+export function getDocumentOwnershipByIdSql(documentId: string): string {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export async function getRecordExistsSql(documentId: string): Promise<string> {
+export function getRecordExistsSql(documentId: string): string {
   return format('SELECT document_id FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export async function deleteDocumentByIdSql(documentId: string): Promise<string> {
+export function deleteDocumentByIdSql(documentId: string): string {
   const sql = format(
     'with del as (delete from meadowlark.documents WHERE document_id = %L returning id) select count (*) from del;',
     [documentId],
@@ -31,10 +31,10 @@ export async function deleteDocumentByIdSql(documentId: string): Promise<string>
   return sql;
 }
 
-export async function getDocumentInsertOrUpdateSql(
+export function getDocumentInsertOrUpdateSql(
   { id, resourceInfo, documentInfo, edfiDoc, validate, security },
   isInsert: boolean,
-): Promise<string> {
+): string {
   const documentValues = [
     id,
     JSON.stringify(documentInfo.documentIdentity),
