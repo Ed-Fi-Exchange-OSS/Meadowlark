@@ -68,7 +68,7 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result = await client.query(await getRecordExistsSql(id));
+    const result = await client.query(getRecordExistsSql(id));
 
     expect(result.rowCount).toBe(0);
   });

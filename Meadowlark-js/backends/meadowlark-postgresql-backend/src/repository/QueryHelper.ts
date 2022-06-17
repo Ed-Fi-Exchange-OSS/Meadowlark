@@ -25,9 +25,17 @@ export function getRecordExistsSql(documentId: string): string {
 
 export function deleteDocumentByIdSql(documentId: string): string {
   const sql = format(
-    'with del as (delete from meadowlark.documents WHERE document_id = %L returning id) select count (*) from del;',
+    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
     [documentId],
   );
+  return sql;
+}
+
+export function getReferencesInsert(documentId: string, referencedDocumentId: String): string {
+  const sql = format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
+    documentId,
+    referencedDocumentId,
+  ]);
   return sql;
 }
 

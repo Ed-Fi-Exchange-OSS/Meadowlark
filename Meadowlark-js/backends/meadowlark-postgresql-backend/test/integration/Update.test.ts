@@ -124,7 +124,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(await getDocumentByIdSql(id));
+    const result: any = await client.query(getDocumentByIdSql(id));
     // await getDocumentById({ ...newGetRequest(), id }, client);
 
     expect(result.rows[0].document_identity[0].value).toBe('update2');
@@ -196,7 +196,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const result: any = await client.query(await getDocumentByIdSql(documentWithReferencesId));
+    const result: any = await client.query(getDocumentByIdSql(documentWithReferencesId));
     // getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
 
     expect(result.rows[0].document_identity[0].value).toBe('update4');
