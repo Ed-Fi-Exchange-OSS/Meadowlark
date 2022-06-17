@@ -1,7 +1,7 @@
-// // SPDX-License-Identifier: Apache-2.0
-// // Licensed to the Ed-Fi Alliance under one or more agreements.
-// // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
-// // See the LICENSE and NOTICES files in the project root for more information.
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
 
 import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
@@ -65,7 +65,7 @@ export async function deleteDocumentById(
     }
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(await deleteDocumentByIdSql(id));
+    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
     deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
     client.query('COMMIT');
   } catch (e) {

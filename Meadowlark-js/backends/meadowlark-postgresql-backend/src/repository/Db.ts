@@ -6,7 +6,15 @@
 import { Pool, Client } from 'pg';
 import type { PoolClient } from 'pg';
 import { Logger } from '@edfi//meadowlark-core';
-import { createDocumentTableSql, createReferencesTableSql, createSchemaSql, GetCreateDatabaseSql } from './QueryHelper';
+import {
+  createDocumentTableSql,
+  createDocumentTableUniqueIndexSql,
+  createReferencesTableCheckingIndexSql,
+  createReferencesTableDeletingIndexSql,
+  createReferencesTableSql,
+  createSchemaSql,
+  getCreateDatabaseSql,
+} from './QueryHelper';
 
 let dbPool: Pool | null = null;
 
@@ -26,10 +34,13 @@ export async function checkExistsAndCreateTables(client: PoolClient) {
   try {
     await client.query(createSchemaSql);
     await client.query(createDocumentTableSql);
+    await client.query(createDocumentTableUniqueIndexSql);
     await client.query(createReferencesTableSql);
+    await client.query(createReferencesTableCheckingIndexSql);
+    await client.query(createReferencesTableDeletingIndexSql);
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-    Logger.error(`Error connecting PostgreSql. Error was ${message}`, null);
+    Logger.error(`Error connecting to PostgreSQL. Error was ${message}`, null);
     throw e;
   }
 }
@@ -52,7 +63,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     return poolClient;
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-    Logger.error(`Error connecting Postgres. Error was ${message}`, null);
+    Logger.error(`Error connecting to PostgreSQL. Error was ${message}`, null);
     // if this anything other than a DB doesn't exist error, there's a bigger problem and we don't want to continue
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
       throw e;
@@ -67,12 +78,12 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   const client: Client = new Client(dbConfiguration);
   try {
     client.connect();
-    await client.query(await GetCreateDatabaseSql(meadowlarkDbName));
+    await client.query(getCreateDatabaseSql(meadowlarkDbName));
 
     Logger.info(`Database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
-    Logger.error(`Error connecting Postgres. Error was ${message}`, null);
+    Logger.error(`Error connecting to PostgreSQL. Error was ${message}`, null);
     throw e;
   } finally {
     if (client != null) await client.end();

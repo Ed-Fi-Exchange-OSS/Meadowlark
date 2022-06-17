@@ -39,7 +39,7 @@ export async function updateDocumentById(
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-    const documentSql: string = await getDocumentInsertOrUpdateSql(
+    const documentSql: string = getDocumentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
       false,
     );
