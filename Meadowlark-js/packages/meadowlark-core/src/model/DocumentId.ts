@@ -33,6 +33,7 @@ export function documentIdForDocumentIdentity(
   // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
 
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
+
   const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${documentIdentity
     .map((element: DocumentElement) => `${element.name}=${element.value}`)
     .join('#')}`;
