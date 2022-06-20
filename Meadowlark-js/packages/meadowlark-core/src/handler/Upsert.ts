@@ -6,13 +6,23 @@
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentId';
 import { getDocumentStore } from '../plugin/PluginLoader';
-import { UpsertRequest } from '../message/UpsertRequest';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
-import { UpsertResult } from '../message/UpsertResult';
-import { FrontendRequest } from './FrontendRequest';
-import { FrontendResponse } from './FrontendResponse';
+import type { UpsertRequest } from '../message/UpsertRequest';
+import type { UpsertResult } from '../message/UpsertResult';
+import type { FrontendRequest } from './FrontendRequest';
+import type { FrontendResponse } from './FrontendResponse';
+import type { PathComponents } from '../model/PathComponents';
+
+export const LOCATION_HEADER_NAME: string = 'Location';
 
 const moduleName = 'Upsert';
+
+/**
+ * Derives the resource URI from the pathComponents and resourceId
+ */
+function locationFrom(pathComponents: PathComponents, resourceId: string): string {
+  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
+}
 
 /**
  * Entry point for API upsert requests
@@ -43,18 +53,20 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
-      const location = `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
       return {
         body: '',
         statusCode: 201,
-        headers: { ...headerMetadata, Location: location },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: locationFrom(pathComponents, resourceId) },
       };
     }
 
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
-      const location = `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
-      return { body: '', statusCode: 200, headers: { ...headerMetadata, Location: location } };
+      return {
+        body: '',
+        statusCode: 200,
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: locationFrom(pathComponents, resourceId) },
+      };
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {

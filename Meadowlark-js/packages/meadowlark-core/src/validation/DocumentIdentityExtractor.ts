@@ -117,7 +117,7 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
     documentIdentitiesFrom(identityReferenceComponent, body, entity, []),
   );
 
-  return documentIdentitiesWithSecurity.reduce(
+  const result = documentIdentitiesWithSecurity.reduce(
     (acc: DocumentIdentityWithSecurity, current: DocumentIdentityWithSecurity) => {
       acc.documentIdentity = [...acc.documentIdentity, ...current.documentIdentity];
       // Note that last non-null studentId/edOrgId wins
@@ -127,6 +127,11 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
     },
     { documentIdentity: NoDocumentIdentity, studentId: null, edOrgId: null },
   );
+
+  // Ensure proper ordering of identity fields, by name value ascending
+  result.documentIdentity.sort((a, b) => a.name.localeCompare(b.name));
+
+  return result;
 }
 
 /**

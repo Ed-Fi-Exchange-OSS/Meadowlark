@@ -49,12 +49,12 @@ Authorization: bearer {{token}}
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
 ### (Cold start for GET means this may take up to 5 seconds.)
-GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/6Urp7FzyrvCel-FTSeX-RT0WQvtkxS3t_5u3lA
 Authorization: bearer {{token}}
 
 
 ### Try getting that resource without authorization header - expect 401 Unauthorized.
-GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/b6b6e9604a327df2fbb1a32ff746ccc9b6f0c37f535950c3eeab373a
+GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/educationContents/6Urp7FzyrvCel-FTSeX-RT0WQvtkxS3t_5u3lA
 
 
 
@@ -85,7 +85,7 @@ Authorization: bearer {{token}}
 }
 
 
-### View all schools - should be one with id 7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+### View all schools - should be one with id Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
 Authorization: bearer {{token}}
 
@@ -102,7 +102,7 @@ Authorization: bearer {{token}}
 
 ### Attempt to update the school with an invalid educationOrganizationCategoryDescriptor - should fail
 ### (Cold start for PUT means this may take up to 5 seconds.)
-PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfZ
 content-type: application/json
 Authorization: bearer {{token}}
 
@@ -124,7 +124,7 @@ Authorization: bearer {{token}}
 
 
 ### Attempt to update the school with a valid educationOrganizationCategoryDescriptor - should succeed
-PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+PUT https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 content-type: application/json
 Authorization: bearer {{token}}
 
@@ -147,7 +147,7 @@ Authorization: bearer {{token}}
 
 ### Attempt to delete the school - should succeed
 ### (Cold start for DELETE means this may take up to 5 seconds.)
-DELETE https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/7a5cf3f4a68015c0922e24c73401a21e9fd1767ef60c0b3300f2301e
+DELETE https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 Authorization: bearer {{token}}
 
 

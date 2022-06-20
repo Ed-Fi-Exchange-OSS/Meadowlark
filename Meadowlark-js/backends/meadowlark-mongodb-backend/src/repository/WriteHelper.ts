@@ -14,12 +14,12 @@ import {
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
-export async function findReferencesById(
+export async function findReferencedDocumentIdsById(
   referenceIds: string[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocumentId[]> {
-  const findReferenceDocuments = mongoDocuments.find({ id: { $in: referenceIds } }, findOptions);
+  const findReferenceDocuments = mongoDocuments.find({ _id: { $in: referenceIds } }, findOptions);
   return (await findReferenceDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
 }
 
@@ -28,7 +28,7 @@ export async function findReferencesById(
  *
  * @param refsInDb The document references that were actually found in the db (id property only)
  * @param documentOutRefs The document references extracted from the document, as id strings
- * @param documentInfo The DocumentInfo of the document
+ * @param documentReferences The DocumentInfo of the document
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
@@ -36,7 +36,8 @@ export function findMissingReferences(
   documentOutRefs: string[],
   documentReferences: DocumentReference[],
 ): string[] {
-  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef.id);
+  // eslint-disable-next-line no-underscore-dangle
+  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef._id);
   const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, idsOfRefsInDb);
 
   // Gets the array indexes of the missing references, for the documentOutRefs array
@@ -53,8 +54,8 @@ export function findMissingReferences(
   );
 }
 
-// MongoDB FindOption to return only the indexed id field, making this a covered query (MongoDB will optimize)
-export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { id: 1, _id: 0 }, session });
+// MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
+export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)
 export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });
@@ -64,8 +65,8 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
  *
  * @param documentReferences References for the document
  * @param descriptorReferences Descriptor references for the document
- * @param outRefs The list of ids for the document references
- * @param documentCollection The MongoDb collection the documents are in
+ * @param outRefIds The list of ids for the document references
+ * @param mongoDocuments The MongoDb collection the documents are in
  * @param session A MongoDb session with a transaction in progress
  * @param traceId The trace id from a service call
  * @returns A array of validation failure message, if any
@@ -73,24 +74,30 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 export async function validateReferences(
   documentReferences: DocumentReference[],
   descriptorReferences: DocumentReference[],
-  outRefs: string[],
-  documentCollection: Collection<MeadowlarkDocument>,
+  outRefIds: string[],
+  mongoDocuments: Collection<MeadowlarkDocument>,
   session: ClientSession,
   traceId: string,
 ): Promise<string[]> {
   const failureMessages: string[] = [];
 
-  const referencesInDb = await findReferencesById(outRefs, documentCollection, onlyReturnId(session));
-  if (outRefs.length !== referencesInDb.length) {
+  const referenceIdsInDb: MeadowlarkDocumentId[] = await findReferencedDocumentIdsById(
+    outRefIds,
+    mongoDocuments,
+    onlyReturnId(session),
+  );
+
+  if (outRefIds.length !== referenceIdsInDb.length) {
     Logger.debug('mongodb.repository.Upsert.upsertDocument: documentReferences not found', traceId);
-    failureMessages.push(...findMissingReferences(referencesInDb, outRefs, documentReferences));
+    failureMessages.push(...findMissingReferences(referenceIdsInDb, outRefIds, documentReferences));
   }
 
-  // Validate descriptor references
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencesById(descriptorReferenceIds, documentCollection, onlyReturnId(session));
+
+  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, mongoDocuments, onlyReturnId(session));
+
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
     Logger.debug('mongodb.repository.Upsert.upsertDocument: descriptorReferences not found', traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
@@ -113,7 +120,7 @@ export function meadowlarkDocumentFrom(
     resourceName: resourceInfo.resourceName,
     resourceVersion: resourceInfo.resourceVersion,
     isDescriptor: resourceInfo.isDescriptor,
-    id,
+    _id: id,
     edfiDoc,
     outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
     validated: validate,

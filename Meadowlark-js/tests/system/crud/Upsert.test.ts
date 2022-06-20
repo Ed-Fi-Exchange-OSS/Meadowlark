@@ -40,12 +40,15 @@ describe('given a POST of a school', () => {
   it('should return insert success', async () => {
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
+    expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
+      `"/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg"`,
+    );
   });
 
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -129,7 +132,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"8d111d14579c51e8aff915e7746cda7e0730ed74837af960b31c4fa6\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -184,6 +187,9 @@ describe('given a POST of an academic week referencing a school that exists', ()
   it('should return success', async () => {
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
+    expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
+      `"/v3.3b/ed-fi/academicWeeks/t4JWTsagjhY4Ea-oIcXCeS7oqbNX9iWfPx6e-g"`,
+    );
   });
 });
 

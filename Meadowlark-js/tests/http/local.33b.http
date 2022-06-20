@@ -30,7 +30,7 @@ content-type: application/json
 
 ###
 @contentClassDescriptorLocation = {{contentClassDescriptor.response.headers.location}}
-GET http://localhost:3000/local{{contentClassDescriptorLocation}}
+GET http://localhost:3000/{{contentClassDescriptorLocation}}
 authorization: bearer {{authToken1}}
 
 
@@ -52,11 +52,11 @@ GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 authorization: bearer {{authToken1}}
 
 ### Get the created record (lower case)
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d11697ee199c159d12c63b2c3af6ddeb7686f79546
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
 authorization: bearer {{authToken1}}
 
 ### Update the created record
-PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d11697ee199c159d12c63b2c3af6ddeb7686f79546
+PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -69,7 +69,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Delete the created record
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/72d2c377a34196d11697ee199c159d12c63b2c3af6ddeb7686f79546
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
 authorization: bearer {{authToken1}}
 
 ### Strict validation is enabled, this will fail due to an invalid country
@@ -123,7 +123,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurname=World
 authorization: bearer {{authToken1}}
 
 ### Update this student
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/f28bc6a66993194981effdc24b2d7d3a33714ee9b41ea49731b03773
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/kKOLuEZJWjsDhpDiJOQlryLw_JBvzQ5KXTF2xg
 content-type: application/json
 reference-validation: false
 authorization: bearer {{authToken1}}
@@ -265,6 +265,45 @@ authorization: bearer {{authToken1}}
   },
   "maximumNumberOfSeats": 20,
   "optimalNumberOfSeats": 10
+}
+
+### Create a course
+POST http://localhost:3000/local/v3.3b/ed-fi/courses
+content-type: application/json
+reference-validation: true
+authorization: bearer {{authToken1}}
+
+{
+
+  "courseReference": {
+    "courseCode": "abfdddcde",
+    "educationOrganizationId": 122
+  }
+}
+
+
+# ******************* Example of bug RND-234 - see DocumentId.documentIdForDocumentIdentity()
+
+### Create a courseOffering
+POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
+content-type: application/json
+reference-validation: false
+authorization: bearer {{authToken1}}
+
+{
+  "localCourseCode": "abfdddcde",
+  "schoolReference": {
+    "schoolId": 122
+  },
+  "sessionReference": {
+    "sessionName": "d",
+    "schoolId": 122,
+    "schoolYear": 2034
+  },
+  "courseReference": {
+    "courseCode": "abfdddcde",
+    "educationOrganizationId": 122
+  }
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail

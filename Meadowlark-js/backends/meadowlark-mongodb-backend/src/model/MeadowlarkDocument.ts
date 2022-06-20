@@ -8,9 +8,9 @@ import { DocumentIdentity } from '@edfi/meadowlark-core';
 export interface MeadowlarkDocumentId {
   /**
    * A string hash derived from the project name, resource name, resource version
-   * and identity of the API document. This field will be a unique index on the collection.
+   * and identity of the API document. This field replaces the built-in MongoDB _id.
    */
-  id: string;
+  _id: string;
 }
 
 export interface MeadowlarkDocument extends MeadowlarkDocumentId {

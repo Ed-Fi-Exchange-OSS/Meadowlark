@@ -107,7 +107,7 @@ describe('given the delete of an existing document', () => {
 
   it('should have deleted the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id });
+    const result: any = await collection.findOne({ _id: id });
     expect(result).toBeNull();
   });
 });
@@ -176,7 +176,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: referencedDocumentId });
+    const result: any = await collection.findOne({ _id: referencedDocumentId });
     expect(result.documentIdentity[0].value).toBe('delete5');
   });
 });
@@ -244,7 +244,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   it('should not have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ id: referencedDocumentId });
+    const result: any = await collection.findOne({ _id: referencedDocumentId });
     expect(result).toBeNull();
   });
 });

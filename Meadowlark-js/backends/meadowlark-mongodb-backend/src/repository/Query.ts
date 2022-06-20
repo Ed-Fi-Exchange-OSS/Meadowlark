@@ -6,6 +6,9 @@
 import { QueryRequest, QueryResult } from '@edfi/meadowlark-core';
 import { MongoClient } from 'mongodb';
 
+/**
+ * The MongoDB backend does not support queries.
+ */
 export async function queryDocuments(_request: QueryRequest, _client: MongoClient): Promise<QueryResult> {
   return { response: 'UNKNOWN_FAILURE', documents: [] };
 }

@@ -34,7 +34,7 @@ export async function rejectByOwnershipSecurity(
 
   try {
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-      { id },
+      { _id: id },
       { projection: { createdBy: 1, _id: 0 } },
     );
     if (result === null) {

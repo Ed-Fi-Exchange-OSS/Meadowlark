@@ -13,7 +13,7 @@ import { onlyReturnId } from './WriteHelper';
 const onlyDocumentsReferencing = (id: string): Filter<MeadowlarkDocument> => ({ outRefs: id });
 
 // MongoDB FindOption to return at most 5 documents
-const limitFive = (session: ClientSession): FindOptions => ({ projection: { _id: 0 }, limit: 5, session });
+const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 export async function deleteDocumentById(
   { id, validate, traceId }: DeleteRequest,
@@ -60,7 +60,7 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const { deletedCount } = await mongoCollection.deleteOne({ id }, { session });
+      const { deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
       deleteResult.response = deletedCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
     });
   } catch (e) {

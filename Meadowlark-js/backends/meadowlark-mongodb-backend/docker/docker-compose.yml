@@ -67,6 +67,9 @@ services:
      - 3888:3888
     networks:
       - mongo-net
+    volumes:
+      - zookeeper-logs:/var/lib/zookeeper/log
+      - zookeeper-data:/var/lib/zookeeper/data
 
   # Kafka image from Debezium
   kafka:
@@ -126,6 +129,8 @@ volumes:
   mongo-log3:
   mongo-auth:
     external: true
+  zookeeper-logs:
+  zookeeper-data:
 
 networks:
   mongo-net:

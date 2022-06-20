@@ -47,7 +47,7 @@ export async function upsertDocument(
           );
 
           // Check whether this would have been an insert or update
-          const isInsert: boolean = (await mongoCollection.findOne({ id }, onlyReturnId(session))) == null;
+          const isInsert: boolean = (await mongoCollection.findOne({ _id: id }, onlyReturnId(session))) == null;
 
           upsertResult = {
             response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
@@ -62,7 +62,7 @@ export async function upsertDocument(
       // Perform the document upsert
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
 
-      const { upsertedCount } = await mongoCollection.replaceOne({ id }, document, asUpsert(session));
+      const { upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
       upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
     });
   } catch (e) {

@@ -46,11 +46,11 @@ reference-validation: true
 }
 
 ### 
-GET http://localhost:3000/local/v3.3b/ed-fi/schools/267c1bc87ead4ceb952db39440cfa77f8e6a498bb7c667ee3f752d6d
+GET http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 {{auth_header}}
 
 ### 
-PUT http://localhost:3000/local/v3.3b/ed-fi/schools/267c1bc87ead4ceb952db39440cfa77f8e6a498bb7c667ee3f752d6d
+PUT http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 content-type: application/json
 {{auth_header}}
 
@@ -71,7 +71,7 @@ content-type: application/json
 }
 
 ### 
-DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/267c1bc87ead4ceb952db39440cfa77f8e6a498bb7c667ee3f752d6d
+DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
 {{auth_header}}
 
 
@@ -93,11 +93,11 @@ reference-validation: false
 }
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/63bb825ab0ee7280f1faeac0ac7ad2334dc3ab04820f9631c06229d3
+GET http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
 {{auth_header}}
 
 ### 
-PUT http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/63bb825ab0ee7280f1faeac0ac7ad2334dc3ab04820f9631c06229d3
+PUT http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
 content-type: application/json
 {{auth_header}}
 reference-validation: true
@@ -114,7 +114,7 @@ reference-validation: true
 }
 
 ### 
-DELETE http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/63bb825ab0ee7280f1faeac0ac7ad2334dc3ab04820f9631c06229d3
+DELETE http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
 {{auth_header}}
 
 ###
