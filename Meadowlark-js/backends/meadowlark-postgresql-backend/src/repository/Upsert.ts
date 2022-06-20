@@ -11,10 +11,12 @@ import {
   DocumentReference,
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
+
 import {
+  getDeleteReferencesSql,
   getDocumentInsertOrUpdateSql,
-  getRecordExistsSql,
-  getReferencesInsert as getReferenceInsertSql,
+  getReferencesInsert,
+  getReturnDocumentIdSql,
 } from './QueryHelper';
 import { validateReferences } from './WriteHelper';
 
@@ -25,13 +27,13 @@ export async function upsertDocument(
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
   let recordExistsResult: QueryResult;
-  let outRefs;
   let documentUpsertSql: string;
   let isInsert: boolean;
 
-  try {
-    recordExistsResult = await client.query(getRecordExistsSql(id));
+  const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
+  try {
+    recordExistsResult = await client.query(getReturnDocumentIdSql(id));
     isInsert = !recordExistsResult.rowCount || recordExistsResult.rowCount === 0;
 
     documentUpsertSql = await getDocumentInsertOrUpdateSql(
@@ -46,10 +48,7 @@ export async function upsertDocument(
   try {
     await client.query('BEGIN');
 
-    // TODO - Reference validation to be added with RND-243
     if (validate) {
-      outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-      // client.query('SELECT ');
       const failures = await validateReferences(
         documentInfo.documentReferences,
         documentInfo.descriptorReferences,
@@ -60,7 +59,7 @@ export async function upsertDocument(
       // Abort on validation failure
       if (failures.length > 0) {
         Logger.debug(
-          `Postgresql.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
+          `postgresql.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
           traceId,
         );
         upsertResult = {
@@ -71,24 +70,25 @@ export async function upsertDocument(
         return upsertResult;
       }
     }
-    // Perform the document upsert
-    Logger.debug(`postgres.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
-    const documentInsertResult: QueryResult = await client.query(documentUpsertSql);
 
-    // Perform references insert, if reference validation is turned on
-    if (validate) {
-      // eslint-disable-next-line no-underscore-dangle
-      const upsertedDocumentId = documentInsertResult.rows[0].document_id;
-      outRefs.forEach(async (ref: string) => {
-        Logger.debug('postgres.repository.Upsert.upsertDocument', upsertedDocumentId, ref);
-        await client.query(getReferenceInsertSql(upsertedDocumentId, ref));
-      });
-    }
+    // Perform the document upsert
+    Logger.debug(`postgresql.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
+    await client.query(documentUpsertSql);
+
+    // Delete existing references in references table
+    Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
+    await client.query(getDeleteReferencesSql(id));
+
+    // Perform insert of references to the references table
+    outRefs.forEach(async (ref: string) => {
+      Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
+      await client.query(getReferencesInsert(id, ref));
+    });
 
     await client.query('COMMIT');
     upsertResult.response = isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS';
   } catch (e) {
-    Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);
+    Logger.error('postgresql.repository.Upsert.upsertDocument', traceId, e);
     await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }

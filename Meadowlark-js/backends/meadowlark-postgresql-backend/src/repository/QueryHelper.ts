@@ -4,32 +4,46 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import format from 'pg-format';
 
+// SQL for Selects
+
 export function getDocumentByIdSql(documentId: string): string {
   return format(
     `
-    SELECT document_id, document_identity, project_name, resource_name, resource_version,
-       is_descriptor, validated, created_by, edfi_doc
+    SELECT document_id, document_identity, edfi_doc
        FROM meadowlark.documents
        WHERE document_id = %L;`,
     [documentId],
   );
 }
 
+export function getRetrieveReferencesByDocumentIdSql(documentId: string): string {
+  return format('SELECT referenced_document_id FROM meadowlark.references WHERE parent_document_id=%L', [documentId]);
+}
+
 export function getDocumentOwnershipByIdSql(documentId: string): string {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export function getRecordExistsSql(documentId: string): string {
-  return format('SELECT document_id FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
+export function getReturnDocumentIdSql(documentId: string): string {
+  return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
 }
 
-export function deleteDocumentByIdSql(documentId: string): string {
-  const sql = format(
-    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
+export function getCheckIsReferencedDocumentSql(documentId: string): string {
+  return format(`SELECT exists (SELECT 1 FROM meadowlark.references WHERE referenced_document_id = %L LIMIT 1);`, [
+    documentId,
+  ]);
+}
+
+export function getReferencedByDocumentSql(documentId: string): string {
+  return format(
+    `SELECT document_id, resource_name, document_identity FROM meadowlark.references
+    JOIN meadowlark.documents on meadowlark.documents.document_id = meadowlark.references.referenced_document_id
+    WHERE referenced_document_id = %L LIMIT 5;`,
     [documentId],
   );
-  return sql;
 }
+
+// SQL for inserts/updates/upserts
 
 export function getReferencesInsert(documentId: string, referencedDocumentId: String): string {
   const sql = format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
@@ -96,6 +110,22 @@ export function getDocumentInsertOrUpdateSql(
   return documentSql;
 }
 
+// SQL for Deletes
+
+export function deleteDocumentByIdSql(documentId: string): string {
+  const sql = format(
+    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
+    [documentId],
+  );
+  return sql;
+}
+
+export function getDeleteReferencesSql(documentId: string): string {
+  const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [documentId]);
+  return sql;
+}
+
+// SQL for DDL
 export function getCreateDatabaseSql(meadowlarkDbName: string): string {
   return format('CREATE DATABASE %I', meadowlarkDbName);
 }

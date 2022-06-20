@@ -7,9 +7,8 @@ import R from 'ramda';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
-import { MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
-export async function findReferencesById(referenceIds: string[], client: PoolClient): Promise<MeadowlarkDocumentId[]> {
+export async function findReferencesById(referenceIds: string[], client: PoolClient): Promise<string[]> {
   if (referenceIds.length === 0) {
     return [];
   }
@@ -17,8 +16,8 @@ export async function findReferencesById(referenceIds: string[], client: PoolCli
   // const ids = referenceIds.join(",");
   const sql = format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
   const response: QueryResult = await client.query(sql);
-
-  return response.rows.map((val) => val.document_id) as MeadowlarkDocumentId[];
+  const docs = response.rows.map((val) => val.document_id);
+  return docs;
 }
 
 /**
@@ -30,12 +29,12 @@ export async function findReferencesById(referenceIds: string[], client: PoolCli
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
-  refsInDb: MeadowlarkDocumentId[],
+  refsInDb: string[],
   documentOutRefs: string[],
   documentReferences: DocumentReference[],
 ): string[] {
-  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef.id);
-  const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, idsOfRefsInDb);
+  // const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef.id);
+  const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, refsInDb);
 
   // Gets the array indexes of the missing references, for the documentOutRefs array
   const arrayIndexesOfMissing: number[] = outRefIdsNotInDb.map((outRefId) => documentOutRefs.indexOf(outRefId));
