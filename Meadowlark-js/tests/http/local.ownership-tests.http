@@ -33,18 +33,18 @@ content-type: application/json
 }
 
 ### Try getting that resource without authorization header - expect 401.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_1}}
 
 ### Try getting that resource with a different authorization header - expect 403
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_2}}
 
 ### Try updating that resource using the same authorization header that created the record - expect success.
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 content-type: application/json
 {{auth_header_1}}
 
@@ -57,7 +57,7 @@ content-type: application/json
 }
 
 ### Try updating the resource with wrong authorization header - expect 403
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 content-type: application/json
 {{auth_header_2}}
 
@@ -70,9 +70,9 @@ content-type: application/json
 }
 
 ### Try deleting that resource using the wrong authorization header - expect 403
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_2}}
 
 ### Try deleting that resource using the same authorization header that created the record - expect success.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/b2f23489dbddcd4146f1c0963740c92c115371096df0d1ab7bc281e2
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_1}}

@@ -144,19 +144,19 @@ Authorization: bearer {{authToken1}}
 #
 
 ### Vendor 1 GET of Student owned by Vendor 1
-GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
+GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 GET of Student owned by Vendor 2 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
+GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
 Authorization: bearer {{authToken1}}
 
 ### Vendor 2 GET of Student owned by Vendor 2
-GET http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
+GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
 Authorization: bearer {{authToken2}}
 
 ### Vendor 2 GET of Student owned by Vendor 1 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
+GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
 Authorization: bearer {{authToken2}}
 
 #
@@ -164,7 +164,7 @@ Authorization: bearer {{authToken2}}
 #
 
 ### Vendor 2 PUT for Student owned by Vendor 2
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
 content-type: application/json
 Authorization: bearer {{authToken2}}
 
@@ -176,9 +176,9 @@ Authorization: bearer {{authToken2}}
 }
 
 ### Vendor 1 attempts to PUT on top of Vendor 2 Student - should fail - expect 404
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
 content-type: application/json
-Authorization: bearer {{authToken2}}
+Authorization: bearer {{authToken1}}
 
 { 
     "studentUniqueId": "2",
@@ -192,9 +192,9 @@ Authorization: bearer {{authToken2}}
 #
 
 ### Vendor 1 DELETE of Student owned by Vendor 1
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/60ec15405b6ec68e00f39ab14dfd528ea0629fac44cc705add239b6c
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 DELETE of Student owned by Vendor 2 - should fail - expect 404
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/c8d83fedce3c74989b2be6b3f4d9cb13a116dff0e8602c31abf975cd
-Authorization: bearer {{authToken2}}
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+Authorization: bearer {{authToken1}}
