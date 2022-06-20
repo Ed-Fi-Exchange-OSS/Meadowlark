@@ -22,7 +22,12 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
-import { getDocumentByIdSql, getRecordExistsSql } from '../../src/repository/QueryHelper';
+import {
+  getDocumentByIdSql,
+  // getReturnDocumentIdSql,
+  getRetrieveReferencesByDocumentIdSql,
+  getReturnDocumentIdSql,
+} from '../../src/repository/QueryHelper';
 
 jest.setTimeout(40000);
 
@@ -72,7 +77,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(getRecordExistsSql(id));
+    const result = await client.query(getReturnDocumentIdSql(id));
 
     expect(result.rowCount).toBe(1);
   });
@@ -386,273 +391,281 @@ describe('given an upsert of a new document with one existing and one non-existe
   });
 });
 
-// // ----- Update mode
+// ----- Update mode
 
-// describe('given an update of a document that references a non-existent document with validation off', () => {
-//   let client;
-//   let upsertResult;
+describe('given an update of a document that references a non-existent document with validation off', () => {
+  let client;
+  let upsertResult;
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert4' }],
-//   };
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert4' }],
+  };
 
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//   const invalidReference: DocumentReference = {
-//     projectName: documentWithReferencesResourceInfo.projectName,
-//     resourceName: documentWithReferencesResourceInfo.resourceName,
-//     resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
-//     isDescriptor: false,
-//   };
+  const invalidReference: DocumentReference = {
+    projectName: documentWithReferencesResourceInfo.projectName,
+    resourceName: documentWithReferencesResourceInfo.resourceName,
+    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
+  };
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
 
-//     // Insert the original document with no reference
-//     await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: false,
-//       },
-//       client,
-//     );
+    // Insert the original document with no reference
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
+      client,
+    );
 
-//     // Update the document with an invalid reference
-//     documentWithReferencesInfo.documentReferences = [invalidReference];
-//     upsertResult = await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: false,
-//       },
-//       client,
-//     );
-//   });
+    // Update the document with an invalid reference
+    documentWithReferencesInfo.documentReferences = [invalidReference];
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: false,
+      },
+      client,
+    );
+  });
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await resetSharedClient();
+  });
 
-//   it('should have returned update success for the document with invalid reference but validation off', async () => {
-//     expect(upsertResult.response).toBe('UPDATE_SUCCESS');
-//   });
+  it('should have returned update success for the document with invalid reference but validation off', async () => {
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
+  });
 
-//   it('should have updated the document with an invalid reference in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: documentWithReferencesId });
-//     expect(result.documentIdentity[0].value).toBe('upsert4');
-//     expect(result.outRefs).toMatchInlineSnapshot(`
-//       Array [
-//         "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
-//       ]
-//     `);
-//   });
-// });
+  it('should have updated the document with an invalid reference in the db', async () => {
+    const docResult: any = await client.query(getDocumentByIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-// describe('given an update of a document that references an existing document with validation on', () => {
-//   let client;
-//   let upsertResult;
+    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    expect(docResult.rows[0].document_identity[0].value).toBe('upsert4');
+    expect(outRefs).toMatchInlineSnapshot(`
+        Array [
+          "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
+        ]
+      `);
+  });
+});
 
-//   const referencedResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
-//   const referencedDocumentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert5' }],
-//   };
-//   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+describe('given an update of a document that references an existing document with validation on', () => {
+  let client;
+  let upsertResult;
 
-//   const validReference: DocumentReference = {
-//     projectName: referencedResourceInfo.projectName,
-//     resourceName: referencedResourceInfo.resourceName,
-//     resourceVersion: referencedResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: referencedDocumentInfo.documentIdentity,
-//     isDescriptor: false,
-//   };
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert5' }],
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert6' }],
-//   };
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert6' }],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//     // The document that will be referenced
-//     await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: referencedDocumentId,
-//         resourceInfo: referencedResourceInfo,
-//         documentInfo: referencedDocumentInfo,
-//       },
-//       client,
-//     );
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
 
-//     // The original document with no reference
-//     await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: true,
-//       },
-//       client,
-//     );
+    // The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
-//     // The updated document with a valid reference
-//     documentWithReferencesInfo.documentReferences = [validReference];
-//     upsertResult = await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: true,
-//       },
-//       client,
-//     );
-//   });
+    // The original document with no reference
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
+      client,
+    );
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+    // The updated document with a valid reference
+    documentWithReferencesInfo.documentReferences = [validReference];
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
 
-//   it('should have returned update success for the document with a valid reference', async () => {
-//     expect(upsertResult.response).toBe('UPDATE_SUCCESS');
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await resetSharedClient();
+  });
 
-//   it('should have updated the document with a valid reference in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: documentWithReferencesId });
-//     expect(result.documentIdentity[0].value).toBe('upsert6');
-//     expect(result.outRefs).toMatchInlineSnapshot(`
-//       Array [
-//         "a70c8f13d06baff1f0b5e4ae5fdfc5b679f2e90c2863f4c923bab62a",
-//       ]
-//     `);
-//   });
-// });
+  it('should have returned update success for the document with a valid reference', async () => {
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
+  });
 
-// describe('given an update of a document with one existing and one non-existent reference with validation on', () => {
-//   let client;
-//   let upsertResult;
+  it('should have updated the document with a valid reference in the db', async () => {
+    const docResult: any = await client.query(getDocumentByIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-//   const referencedResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
-//   const referencedDocumentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert7' }],
-//   };
-//   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
-//   const validReference: DocumentReference = {
-//     projectName: referencedResourceInfo.projectName,
-//     resourceName: referencedResourceInfo.resourceName,
-//     resourceVersion: referencedResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: referencedDocumentInfo.documentIdentity,
-//     isDescriptor: false,
-//   };
+    expect(docResult.rows[0].document_identity[0].value).toBe('upsert6');
+    expect(outRefs).toMatchInlineSnapshot(`
+      Array [
+        "a70c8f13d06baff1f0b5e4ae5fdfc5b679f2e90c2863f4c923bab62a",
+      ]
+    `);
+  });
+});
 
-//   const invalidReference: DocumentReference = {
-//     projectName: referencedResourceInfo.projectName,
-//     resourceName: referencedResourceInfo.resourceName,
-//     resourceVersion: referencedResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
-//     isDescriptor: false,
-//   };
+describe('given an update of a document with one existing and one non-existent reference with validation on', () => {
+  let client;
+  let upsertResult;
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'upsert8' }],
-//   };
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert7' }],
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
 
-//     //  The document that will be referenced
-//     await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: referencedDocumentId,
-//         resourceInfo: referencedResourceInfo,
-//         documentInfo: referencedDocumentInfo,
-//       },
-//       client,
-//     );
+  const invalidReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    isDescriptor: false,
+  };
 
-//     // The original document with no references
-//     await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: true,
-//       },
-//       client,
-//     );
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'upsert8' }],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//     // The updated document with both valid and invalid references
-//     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
-//     upsertResult = await upsertDocument(
-//       {
-//         ...newUpsertRequest(),
-//         id: documentWithReferencesId,
-//         resourceInfo: documentWithReferencesResourceInfo,
-//         documentInfo: documentWithReferencesInfo,
-//         validate: true,
-//       },
-//       client,
-//     );
-//   });
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+    //  The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
-//   it('should have returned a failure to insert the document with an invalid reference', async () => {
-//     expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
-//     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-//       `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
-//     );
-//   });
+    // The original document with no references
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
+      client,
+    );
 
-//   it('should not have updated the document with an invalid reference in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: documentWithReferencesId });
-//     expect(result.outRefs).toHaveLength(0);
-//   });
-// });
+    // The updated document with both valid and invalid references
+    documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        documentInfo: documentWithReferencesInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    await resetSharedClient();
+  });
+
+  it('should have returned a failure to insert the document with an invalid reference', async () => {
+    expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
+    expect(upsertResult.failureMessage).toMatchInlineSnapshot(
+      `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
+    );
+  });
+
+  it('should not have updated the document with an invalid reference in the db', async () => {
+    await client.query(getDocumentByIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
+
+    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+
+    expect(outRefs).toHaveLength(0);
+  });
+});

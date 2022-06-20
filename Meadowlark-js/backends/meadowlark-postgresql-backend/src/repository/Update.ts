@@ -3,38 +3,50 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
+import {
+  UpdateResult,
+  Logger,
+  UpdateRequest,
+  DocumentReference,
+  documentIdForDocumentReference,
+} from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
-import { getDocumentInsertOrUpdateSql } from './QueryHelper';
+import { getDeleteReferencesSql, getDocumentInsertOrUpdateSql, getReferencesInsert } from './QueryHelper';
+import { validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: PoolClient,
 ): Promise<UpdateResult> {
-  const updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
+  let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
-  // let outRefs;
+  const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
   try {
     await client.query('BEGIN');
-    // TODO - Reference validation to be added with RND-243
-    // if (validate) {
-    // outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-    //   const failures = await validateReferenceEntitiesExist(outRefs, client, traceId);
-    //   // Abort on validation failure
-    //   if (failures.length > 0) {
-    //     Logger.debug(
-    //       `mongodb.repository.Upsert.updateDocumentById: Updating document id ${id} failed due to invalid references`,
-    //       traceId,
-    //     );
-    //     updateResult = {
-    //       response: 'UPDATE_FAILURE_REFERENCE',
-    //       failureMessage: `Reference validation failed: ${failures.join(',')}`,
-    //     };
-    //     await client.query('ROLLBACK');
-    //     return updateResult;
-    //   }
-    // }
+
+    if (validate) {
+      const failures = await validateReferences(
+        documentInfo.documentReferences,
+        documentInfo.descriptorReferences,
+        outRefs,
+        client,
+        traceId,
+      );
+      // Abort on validation failure
+      if (failures.length > 0) {
+        Logger.debug(
+          `postgresql.repository.Update.updateDocument: Inserting document id ${id} failed due to invalid references`,
+          traceId,
+        );
+        updateResult = {
+          response: 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: `Reference validation failed: ${failures.join(',')}`,
+        };
+        await client.query('ROLLBACK');
+        return updateResult;
+      }
+    }
 
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
@@ -44,6 +56,17 @@ export async function updateDocumentById(
       false,
     );
     const result: QueryResult = await client.query(documentSql);
+
+    // Delete existing references in references table
+    Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
+    await client.query(getDeleteReferencesSql(id));
+
+    // Perform insert of references to the references table
+    outRefs.forEach(async (ref: string) => {
+      Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
+      await client.query(getReferencesInsert(id, ref));
+    });
+
     await client.query('COMMIT');
 
     updateResult.response = result.rowCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
