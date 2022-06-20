@@ -19,5 +19,7 @@ GET http://localhost:3000/local/metadata/descriptors/swagger.json
 POST http://localhost:3000/local/api/oauth/token
 content-type: application/json
 
+{}
+
 ### Dependencies
 GET http://localhost:3000/local/metadata/data/v3/dependencies
