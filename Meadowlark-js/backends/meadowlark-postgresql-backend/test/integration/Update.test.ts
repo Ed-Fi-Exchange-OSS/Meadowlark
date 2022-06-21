@@ -205,7 +205,7 @@ describe('given an update of a document that references a non-existent document 
 
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
-        "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
+        "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
       ]
     `);
   });
@@ -301,7 +301,7 @@ describe('given an update of a document that references an existing document wit
     expect(docResult.rows[0].document_identity[0].value).toBe('update6');
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
-        "68234f9521018cb780e9d4904198618d3b12b44f83e488cc1606e29a",
+        "DslCPaclSHTM-ROKf5-EXZLY-ExqPbmYTxYoRA",
       ]
     `);
   });

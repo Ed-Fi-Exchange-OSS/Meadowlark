@@ -463,7 +463,7 @@ describe('given an update of a document that references a non-existent document 
     expect(docResult.rows[0].document_identity[0].value).toBe('upsert4');
     expect(outRefs).toMatchInlineSnapshot(`
         Array [
-          "c4bf52a9250e88d5b176e615faf9d8d2992830f51b9cae7a6ef8a91f",
+          "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
         ]
       `);
   });
@@ -560,7 +560,7 @@ describe('given an update of a document that references an existing document wit
     expect(docResult.rows[0].document_identity[0].value).toBe('upsert6');
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
-        "a70c8f13d06baff1f0b5e4ae5fdfc5b679f2e90c2863f4c923bab62a",
+        "xQa2iY3pvOaXWs_--xdlZjOYgjJXvD9_wbI6EQ",
       ]
     `);
   });
