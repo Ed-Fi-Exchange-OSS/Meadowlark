@@ -22,7 +22,7 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll } from '../../src/repository/Delete';
+import { deleteAll } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
 import { getDocumentByIdSql, getRetrieveReferencesByDocumentIdSql } from '../../src/repository/QueryHelper';
 

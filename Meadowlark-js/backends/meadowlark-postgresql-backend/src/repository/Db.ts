@@ -5,7 +5,7 @@
 
 import { Pool, Client } from 'pg';
 import type { PoolClient } from 'pg';
-import { Logger } from '@edfi//meadowlark-core';
+import { Logger } from '@edfi/meadowlark-core';
 import {
   createDocumentTableSql,
   createDocumentTableUniqueIndexSql,

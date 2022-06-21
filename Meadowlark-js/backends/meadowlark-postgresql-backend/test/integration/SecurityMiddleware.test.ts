@@ -20,7 +20,7 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll } from '../../src/repository/Delete';
+import { deleteAll } from './TestHelper';
 
 jest.setTimeout(40000);
 

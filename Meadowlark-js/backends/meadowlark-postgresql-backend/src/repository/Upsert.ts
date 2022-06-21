@@ -37,7 +37,7 @@ export async function upsertDocument(
 
     isInsert = !recordExistsResult.rows[0].exists;
 
-    documentUpsertSql = await getDocumentInsertOrUpdateSql(
+    documentUpsertSql = getDocumentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
       isInsert,
     );

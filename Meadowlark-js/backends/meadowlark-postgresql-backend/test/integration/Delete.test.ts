@@ -21,10 +21,11 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
+import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
 import { getDocumentByIdSql, getRetrieveReferencesByDocumentIdSql } from '../../src/repository/QueryHelper';
+import { deleteAll } from './TestHelper';
 
 jest.setTimeout(40000);
 

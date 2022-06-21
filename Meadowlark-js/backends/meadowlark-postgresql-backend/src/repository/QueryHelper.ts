@@ -45,7 +45,6 @@ export function getDocumentOwnershipByIdSql(documentId: string): string {
  * @returns SQL query string to determine document existence
  */
 export function getCheckDocumentExistsSql(documentId: string): string {
-  // return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
   return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
 

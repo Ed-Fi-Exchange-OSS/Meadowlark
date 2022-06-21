@@ -18,7 +18,7 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
-import { deleteAll } from '../../src/repository/Delete';
+import { deleteAll } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
 import { getDocumentByIdSql } from '../../src/repository/QueryHelper';
 import { upsertDocument } from '../../src/repository/Upsert';

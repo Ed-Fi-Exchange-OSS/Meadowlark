@@ -88,7 +88,7 @@ export async function validateReferences(
   );
 
   if (outRefIds.length !== referenceIdsInDb.length) {
-    Logger.debug('mongodb.repository.Upsert.upsertDocument: documentReferences not found', traceId);
+    Logger.debug('mongodb.repository.WriteHelper.validateReferences: documentReferences not found', traceId);
     failureMessages.push(...findMissingReferences(referenceIdsInDb, outRefIds, documentReferences));
   }
 
@@ -99,7 +99,7 @@ export async function validateReferences(
   const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, mongoDocuments, onlyReturnId(session));
 
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
-    Logger.debug('mongodb.repository.Upsert.upsertDocument: descriptorReferences not found', traceId);
+    Logger.debug('mongodb.repository.WriteHelper.validateReferences: descriptorReferences not found', traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
   }
 
