@@ -60,10 +60,10 @@ export async function updateDocumentById(request: UpdateRequest): Promise<Update
 }
 
 export async function securityMiddleware(middlewareModel: MiddlewareModel): Promise<MiddlewareModel> {
-  const client = await getSharedClient();
+  const poolClient: PoolClient = await getSharedClient();
   try {
-    return SecurityMiddleware.securityMiddleware(middlewareModel, client);
+    return SecurityMiddleware.securityMiddleware(middlewareModel, poolClient);
   } finally {
-    client.release();
+    poolClient.release();
   }
 }

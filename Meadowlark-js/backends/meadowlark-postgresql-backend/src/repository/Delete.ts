@@ -12,31 +12,6 @@ import {
   referencedByDocumentSql,
 } from './SqlHelper';
 
-/**
- * Deletes all data from the document and references table - should only be used for testing
- * @param client PostgreSQL client to perform queries
- * @returns Result of the delete action
- */
-export async function deleteAll(client: PoolClient): Promise<DeleteResult> {
-  const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
-
-  try {
-    await client.query('BEGIN');
-    await client.query('DELETE FROM meadowlark.documents;');
-    await client.query('DELETE FROM meadowlark.references;');
-    await client.query('COMMIT');
-    deleteResult.response = 'DELETE_SUCCESS';
-  } catch (e) {
-    Logger.error('postgres.repository.Upsert.upsertDocument', 'DELETE_ALL', e);
-    await client.query('ROLLBACK');
-    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-  } finally {
-    client.release();
-  }
-
-  return deleteResult;
-}
-
 export async function deleteDocumentById(
   { id, validate, traceId }: DeleteRequest,
   client: PoolClient,

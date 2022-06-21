@@ -20,8 +20,9 @@ import {
   DocumentReference,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
+import { deleteAll } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
+import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
 import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';

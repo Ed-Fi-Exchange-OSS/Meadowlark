@@ -20,7 +20,9 @@ export async function updateDocumentById(
 ): Promise<UpdateResult> {
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
-  const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
+  const outRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
+    documentIdForDocumentReference(dr),
+  );
 
   try {
     await client.query('BEGIN');

@@ -20,14 +20,9 @@ import {
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll } from '../../src/repository/Delete';
+import { deleteAll } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
-import {
-  checkDocumentExistsSql,
-  documentByIdSql,
-  // getReturnDocumentIdSql,
-  retrieveReferencesByDocumentIdSql,
-} from '../../src/repository/SqlHelper';
+import { checkDocumentExistsSql, documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 

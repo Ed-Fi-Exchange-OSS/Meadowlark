@@ -17,7 +17,7 @@ import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { deleteAll } from '../../src/repository/Delete';
+import { deleteAll } from './TestHelper';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { SecurityResult } from '../../src/security/SecurityResponse';
