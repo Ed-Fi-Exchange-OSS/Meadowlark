@@ -11,7 +11,7 @@ import {
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
-import { getDeleteReferencesSql, getDocumentInsertOrUpdateSql, getReferencesInsertSql } from './QueryHelper';
+import { deleteReferencesSql, documentInsertOrUpdateSql, referencesInsertSql } from './SqlHelper';
 import { validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
@@ -51,7 +51,7 @@ export async function updateDocumentById(
     // Perform the document update
     Logger.debug(`postgresql.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
 
-    const documentSql: string = getDocumentInsertOrUpdateSql(
+    const documentSql: string = documentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
       false,
     );
@@ -59,17 +59,17 @@ export async function updateDocumentById(
 
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
-    await client.query(getDeleteReferencesSql(id));
+    await client.query(deleteReferencesSql(id));
 
     // Perform insert of references to the references table
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(getReferencesInsertSql(id, ref));
+      await client.query(referencesInsertSql(id, ref));
     });
 
     await client.query('COMMIT');
 
-    updateResult.response = result.rowCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+    updateResult.response = result.rowCount && result.rowCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
   } catch (e) {
     await client.query('ROLLBACK');
     Logger.error('postgres.repository.Upsert.upsertDocument', traceId, e);

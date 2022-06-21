@@ -20,7 +20,7 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
-import { getDocumentByIdSql } from '../../src/repository/QueryHelper';
+import { documentByIdSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);
@@ -68,7 +68,7 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result = await client.query(getDocumentByIdSql(id));
+    const result = await client.query(documentByIdSql(id));
 
     expect(result.rowCount).toBe(0);
   });

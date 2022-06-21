@@ -12,12 +12,7 @@ import {
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
 
-import {
-  getDeleteReferencesSql,
-  getDocumentInsertOrUpdateSql,
-  getCheckDocumentExistsSql,
-  getReferencesInsertSql,
-} from './QueryHelper';
+import { deleteReferencesSql, documentInsertOrUpdateSql, checkDocumentExistsSql, referencesInsertSql } from './SqlHelper';
 import { validateReferences } from './WriteHelper';
 
 export async function upsertDocument(
@@ -33,21 +28,12 @@ export async function upsertDocument(
   const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
   try {
-    recordExistsResult = await client.query(getCheckDocumentExistsSql(id));
+    await client.query('BEGIN');
 
+    recordExistsResult = await client.query(checkDocumentExistsSql(id));
     isInsert = !recordExistsResult.rows[0].exists;
 
-    documentUpsertSql = await getDocumentInsertOrUpdateSql(
-      { id, resourceInfo, documentInfo, edfiDoc, validate, security },
-      isInsert,
-    );
-  } catch (e) {
-    Logger.error(e, traceId);
-    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-  }
-
-  try {
-    await client.query('BEGIN');
+    documentUpsertSql = documentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate, security }, isInsert);
 
     if (validate) {
       const failures = await validateReferences(
@@ -78,12 +64,12 @@ export async function upsertDocument(
 
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
-    await client.query(getDeleteReferencesSql(id));
+    await client.query(deleteReferencesSql(id));
 
     // Perform insert of references to the references table
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(getReferencesInsertSql(id, ref));
+      await client.query(referencesInsertSql(id, ref));
     });
 
     await client.query('COMMIT');

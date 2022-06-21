@@ -7,10 +7,10 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByIdSql,
-  getCheckIsReferencedDocumentSql,
-  getDeleteReferencesSql,
-  getReferencedByDocumentSql,
-} from './QueryHelper';
+  checkIsReferencedDocumentSql,
+  deleteReferencesSql,
+  referencedByDocumentSql,
+} from './SqlHelper';
 
 /**
  * Deletes all data from the document and references table - should only be used for testing
@@ -48,7 +48,7 @@ export async function deleteDocumentById(
 
     if (validate) {
       // Check for any references to the document to be deleted
-      const referencesResult = await client.query(getCheckIsReferencedDocumentSql(id));
+      const referencesResult = await client.query(checkIsReferencedDocumentSql(id));
 
       // Abort on validation failure
       if (referencesResult.rows[0].exists) {
@@ -58,7 +58,7 @@ export async function deleteDocumentById(
         );
 
         // Get the DocumentIdentities of up to five referring documents for failure message purposes
-        const referringDocuments = await client.query(getReferencedByDocumentSql(id));
+        const referringDocuments = await client.query(referencedByDocumentSql(id));
         const failures: string[] = referringDocuments.rows.map(
           (document) => `Resource ${document.resource_name} with identity '${JSON.stringify(document.document_identity)}'`,
         );
@@ -78,7 +78,7 @@ export async function deleteDocumentById(
 
     // Delete references where this is the parent document
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
-    await client.query(getDeleteReferencesSql(id));
+    await client.query(deleteReferencesSql(id));
 
     client.query('COMMIT');
   } catch (e) {

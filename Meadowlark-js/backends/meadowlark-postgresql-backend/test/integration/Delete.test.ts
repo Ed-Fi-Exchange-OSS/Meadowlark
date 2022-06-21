@@ -24,7 +24,7 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
-import { getDocumentByIdSql, getRetrieveReferencesByDocumentIdSql } from '../../src/repository/QueryHelper';
+import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -185,7 +185,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should still have the referenced document in the db', async () => {
-    const docResult: any = await client.query(getDocumentByIdSql(referencedDocumentId));
+    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
     expect(docResult.rows[0].document_identity[0].value).toBe('delete5');
   });
 });
@@ -252,12 +252,12 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should not have the referenced document in the db', async () => {
-    const docResult: any = await client.query(getDocumentByIdSql(referencedDocumentId));
+    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
     expect(docResult.rowCount).toEqual(0);
   });
 
   it('should not be the parent document in the references table', async () => {
-    const docResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(referencedDocumentId));
+    const docResult: any = await client.query(retrieveReferencesByDocumentIdSql(referencedDocumentId));
     expect(docResult.rowCount).toEqual(0);
   });
 });

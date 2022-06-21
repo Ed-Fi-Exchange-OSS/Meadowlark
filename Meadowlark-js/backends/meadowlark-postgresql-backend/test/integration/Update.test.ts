@@ -24,7 +24,7 @@ import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
-import { getDocumentByIdSql, getRetrieveReferencesByDocumentIdSql } from '../../src/repository/QueryHelper';
+import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -124,7 +124,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(getDocumentByIdSql(id));
+    const result: any = await client.query(documentByIdSql(id));
     // await getDocumentById({ ...newGetRequest(), id }, client);
 
     expect(result.rows[0].document_identity[0].value).toBe('update2');
@@ -196,8 +196,8 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: any = await client.query(getDocumentByIdSql(documentWithReferencesId));
-    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
@@ -294,8 +294,8 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: any = await client.query(getDocumentByIdSql(documentWithReferencesId));
-    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
     expect(docResult.rows[0].document_identity[0].value).toBe('update6');
@@ -402,7 +402,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {
-    const refsResult: any = await client.query(getRetrieveReferencesByDocumentIdSql(documentWithReferencesId));
+    const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
     expect(outRefs).toHaveLength(0);

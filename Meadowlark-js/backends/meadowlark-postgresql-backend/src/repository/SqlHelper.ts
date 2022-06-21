@@ -11,7 +11,7 @@ import format from 'pg-format';
  * @param documentId The identifier of the document to retrieve
  * @returns SQL query string to retrieve a document
  */
-export function getDocumentByIdSql(documentId: string): string {
+export function documentByIdSql(documentId: string): string {
   return format(
     `
     SELECT document_id, document_identity, edfi_doc
@@ -26,7 +26,7 @@ export function getDocumentByIdSql(documentId: string): string {
  * @param documentId The identifier of the document
  * @returns SQL query string to retrieve references
  */
-export function getRetrieveReferencesByDocumentIdSql(documentId: string): string {
+export function retrieveReferencesByDocumentIdSql(documentId: string): string {
   return format('SELECT referenced_document_id FROM meadowlark.references WHERE parent_document_id=%L', [documentId]);
 }
 
@@ -35,7 +35,7 @@ export function getRetrieveReferencesByDocumentIdSql(documentId: string): string
  * @param documentId The identifier of the document
  * @returns SQL query string to retrieve ownership
  */
-export function getDocumentOwnershipByIdSql(documentId: string): string {
+export function documentOwnershipByIdSql(documentId: string): string {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
@@ -44,7 +44,7 @@ export function getDocumentOwnershipByIdSql(documentId: string): string {
  * @param documentId Document id to check for existence
  * @returns SQL query string to determine document existence
  */
-export function getCheckDocumentExistsSql(documentId: string): string {
+export function checkDocumentExistsSql(documentId: string): string {
   // return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
   return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
@@ -54,7 +54,7 @@ export function getCheckDocumentExistsSql(documentId: string): string {
  * @param documentId Document id to check for references
  * @returns SQL query string to determine references existence
  */
-export function getCheckIsReferencedDocumentSql(documentId: string): string {
+export function checkIsReferencedDocumentSql(documentId: string): string {
   return format(`SELECT exists (SELECT 1 FROM meadowlark.references WHERE referenced_document_id = %L LIMIT 1);`, [
     documentId,
   ]);
@@ -66,7 +66,7 @@ export function getCheckIsReferencedDocumentSql(documentId: string): string {
  * @param documentId The document being referenced
  * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
  */
-export function getReferencedByDocumentSql(documentId: string): string {
+export function referencedByDocumentSql(documentId: string): string {
   return format(
     `SELECT document_id, resource_name, document_identity FROM meadowlark.references
     JOIN meadowlark.documents on meadowlark.documents.document_id = meadowlark.references.referenced_document_id
@@ -83,7 +83,7 @@ export function getReferencedByDocumentSql(documentId: string): string {
  * @param referencedDocumentId The document that is referenced
  * @returns SQL query string to insert reference into references table
  */
-export function getReferencesInsertSql(documentId: string, referencedDocumentId: String): string {
+export function referencesInsertSql(documentId: string, referencedDocumentId: String): string {
   return format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
     documentId,
     referencedDocumentId,
@@ -96,7 +96,7 @@ export function getReferencesInsertSql(documentId: string, referencedDocumentId:
  * @param isInsert is insert or update SQL re
  * @returns SQL query string for inserting or updating provided document info
  */
-export function getDocumentInsertOrUpdateSql(
+export function documentInsertOrUpdateSql(
   { id, resourceInfo, documentInfo, edfiDoc, validate, security },
   isInsert: boolean,
 ): string {
@@ -172,7 +172,7 @@ export function deleteDocumentByIdSql(documentId: string): string {
  * @param documentId the document id of the references we want to delete
  * @returns SQL query string to delete references
  */
-export function getDeleteReferencesSql(documentId: string): string {
+export function deleteReferencesSql(documentId: string): string {
   const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [documentId]);
   return sql;
 }
@@ -184,7 +184,7 @@ export function getDeleteReferencesSql(documentId: string): string {
  * @param meadowlarkDbName the name of the database to create
  * @returns SQL query string to create the database
  */
-export function getCreateDatabaseSql(meadowlarkDbName: string): string {
+export function createDatabaseSql(meadowlarkDbName: string): string {
   return format('CREATE DATABASE %I', meadowlarkDbName);
 }
 
