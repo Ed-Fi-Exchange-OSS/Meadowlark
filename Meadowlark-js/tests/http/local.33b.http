@@ -1,3 +1,8 @@
+#
+# Some of the tests in this file assume that the user has already run throuhg
+# the tests in `local.33b.assignable.http`.
+#
+
 ### Authenticate
 # @name client1
 POST http://localhost:3000/local/api/oauth/token
@@ -30,7 +35,7 @@ content-type: application/json
 
 ###
 @contentClassDescriptorLocation = {{contentClassDescriptor.response.headers.location}}
-GET http://localhost:3000/{{contentClassDescriptorLocation}}
+GET http://localhost:3000{{contentClassDescriptorLocation}}
 authorization: bearer {{authToken1}}
 
 
@@ -142,7 +147,7 @@ content-type: application/json
 authorization: bearer {{authToken1}}
 
 {
-    "schoolId": 99,
+    "schoolId": 123,
     "categories": [],
     "gradeLevels": []
 }
@@ -159,7 +164,7 @@ authorization: bearer {{authToken1}}
     },
     "interventionReference": {
         "interventionIdentificationCode": "111",
-        "educationOrganizationId": 99
+        "educationOrganizationId": 123
     }
 }
 
@@ -175,7 +180,7 @@ authorization: bearer {{authToken1}}
     },
     "interventionReference": {
         "interventionIdentificationCode": "111",
-        "educationOrganizationId": 99
+        "educationOrganizationId": 123
     }
 }
 
@@ -217,9 +222,8 @@ authorization: bearer {{authToken1}}
     ]
 }
 
-
 ### Create a location - school does not exist.
-## This has an unusual error message - complains about "educationOrganizationId" not existing rather than "schoolId"
+# This has an unusual error message - complains about "educationOrganizationId" not existing rather than "schoolId" RND-294
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -234,7 +238,34 @@ reference-validation: true
   "optimalNumberOfSeats": 10
 }
 
-###
+### Now the school _does_ exist
+POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
+reference-validation: true
+authorization: bearer {{authToken1}}
+
+{
+  "classroomIdentificationCode": "string",
+  "schoolReference": {
+    "schoolId": 123
+  },
+  "maximumNumberOfSeats": 20,
+  "optimalNumberOfSeats": 10
+}
+
+### Term, for supporting the session below
+POST http://localhost:3000/local/v3.3b/ed-fi/termDescriptors
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+  "codeValue": "Spring Semester",
+  "shortDescription": "Spring Semester",
+  "namespace": "uri://ed-fi.org/TermDescriptor"
+}
+
+
+### Create a Session
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -248,42 +279,29 @@ descriptor-validation: false
   "termDescriptor": "uri://ed-fi.org/TermDescriptor#Spring Semester",
   "totalInstructionalDays": 90,
   "schoolReference": {
-    "schoolId": 122
+    "schoolId": 123
   }
 }
 
-### Create a location
-POST http://localhost:3000/local/v3.3b/ed-fi/locations
-content-type: application/json
-reference-validation: true
-authorization: bearer {{authToken1}}
-
-{
-  "classroomIdentificationCode": "string",
-  "schoolReference": {
-    "schoolId": 122
-  },
-  "maximumNumberOfSeats": 20,
-  "optimalNumberOfSeats": 10
-}
-
 ### Create a course
+# Broken on MongoDB and PostgreSQL while "is assignable" is pending. RND-295
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
-
-  "courseReference": {
-    "courseCode": "abfdddcde",
-    "educationOrganizationId": 122
-  }
+    "courseCode": "span-101",
+    "educationOrganizationReference": {
+      "educationOrganizationId": 123
+    },
+    "courseTitle": "Spanish 101",
+    "numberOfParts": 1,
+    "identificationCodes": []
 }
 
 
 # ******************* Example of bug RND-234 - see DocumentId.documentIdForDocumentIdentity()
-
 ### Create a courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
@@ -438,7 +456,7 @@ authorization: bearer {{authToken1}}
 GET http://localhost:3000/local/v3.3b/ed-fi/GeneralStudentProgramAssociations
 authorization: bearer {{authToken1}}
 
-### RND-149: Account/AccountCode shape is wrong
+### This test covers the scenario previously seen in RND-149
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
 content-type: application/json
 reference-validation: false
@@ -568,11 +586,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### delete the record above
-# Manually confirm that all references were removed:
-# select * from "edfi-meadowlark-local" where
-#   (begins_with(pk, 'TREF') and sk = 'FREF#ID#a5d4132d14db015714ab08184174812ea09ec358d99a4bc3fb958306')
-#   or (pk = 'FREF#ID#a5d4132d14db015714ab08184174812ea09ec358d99a4bc3fb958306')
-DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/a5d4132d14db015714ab08184174812ea09ec358d99a4bc3fb958306
+DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/gyGSt9yVSJdYUxgdOemhBBWjyIa9f1sA5uOZaA
 authorization: bearer {{authToken1}}
 
 
@@ -581,4 +595,20 @@ authorization: bearer {{authToken1}}
 # purposes. Meadowlark does not yet support these values. The following queries should all return 200,
 # thus indicating that the three terms are ignored.
 GET http://localhost:3000/local/v3.3b/ed-fi/students/?limit=1&offset=2&totalCount=true
+authorization: bearer {{authToken1}}
+
+
+### A simple DELETE validation test
+# Try deleting a descriptor that is used by a school
+# !!! Currently this will succeed (which is not good) AND crash the application. RND-296
+DELETE http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+authorization: bearer {{authToken1}}
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+authorization: bearer {{authToken1}}
+
+
+### Try to delete school 123. Should be denied (409) because there are references to it
+DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg
 authorization: bearer {{authToken1}}

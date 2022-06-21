@@ -1,6 +1,18 @@
 @auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ###
+POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "US",
+    "shortDescription": "US",
+    "namespace": "uri://ed-fi.org/CountryDescriptor"
+}
+
+
+###
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header}}
@@ -22,6 +34,41 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools
 ###
 GET http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
 {{auth_header}}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "All Levels",
+    "shortDescription": "All Levels",
+    "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "School",
+    "shortDescription": "School",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
 
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
@@ -75,6 +122,29 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGug
 {{auth_header}}
 
 
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencyCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Independent",
+    "shortDescription": "Independent",
+    "namespace": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor"
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Local Education Agency",
+    "shortDescription": "Local Education Agency",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
@@ -117,7 +187,11 @@ reference-validation: true
 DELETE http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
 {{auth_header}}
 
-###
+
+### 
+GET http://localhost:3000/local/v3.3b/ed-fi/schools
+{{auth_header}}
+
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
@@ -141,6 +215,7 @@ reference-validation: true
 }
 
 ####
+# This is broken with MongoDB and PostgreSQL, as we need to build in "assignable" support as with DynamoDB. RND-295
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 {{auth_header}}
@@ -170,4 +245,29 @@ reference-validation: true
         "educationOrganizationId": 122
     },
     "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+
+
+### 
+# Don't delete this! Used by tests in other files.
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolId": 123,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": []
 }
