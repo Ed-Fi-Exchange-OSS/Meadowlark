@@ -13,7 +13,7 @@ services:
     # If no port provided through an env file, default to 5432
       - ${POSTGRES_PORT:-5432}:5432
     volumes:
-      - db:/var/lib/postgresql/data
+      - meadowlark-pgsql:/var/lib/postgresql/data
 volumes:
-  db:
+  meadowlark-pgsql:
     driver: local
