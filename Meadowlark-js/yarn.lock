@@ -1502,16 +1502,16 @@ __metadata:
     "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
     "@types/ramda": 0.27.64
-    "@types/semver": ^7.3.9
-    "@types/xml2js": ^0.4.9
+    "@types/semver": ^7.3.10
+    "@types/xml2js": ^0.4.11
     axios: ^0.25.0
     copyfiles: ^2.4.1
     didyoumean2: ^5.0.0
-    dotenv: ^16.0.0
+    dotenv: ^16.0.1
     emittery: ^0.11.0
     fast-memoize: ^2.5.2
     fs-extra: ^10.0.0
-    inquirer: ^8.2.0
+    inquirer: ^8.2.4
     jsinspect: ^0.12.7
     jssha: ^3.2.0
     njwt: ^1.2.0
@@ -1519,7 +1519,7 @@ __metadata:
     regenerator-runtime: ^0.13.9
     rimraf: ^3.0.2
     secure-random: ^1.1.2
-    semver: ^7.3.6
+    semver: ^7.3.7
     ts-invariant: ^0.9.4
     winston: ^3.7.2
     xml2js: ^0.4.23
@@ -1632,11 +1632,11 @@ __metadata:
   dependencies:
     "@edfi/metaed-core": 3.0.2-dev.1
     "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.1
-    "@hapi/code": ^8.0.5
+    "@hapi/code": ^8.0.7
     "@hapi/joi": ^17.1.1
     copyfiles: ^2.4.1
     deep-freeze: ^0.0.1
-    inflection: ^1.13.1
+    inflection: ^1.13.2
     rimraf: ^3.0.2
   languageName: unknown
   linkType: soft
@@ -1880,12 +1880,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hapi/code@npm:^8.0.5":
-  version: 8.0.5
-  resolution: "@hapi/code@npm:8.0.5::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40hapi%2Fcode%2F-%2F%40hapi%2Fcode-8.0.5.tgz"
+"@hapi/code@npm:^8.0.7":
+  version: 8.0.7
+  resolution: "@hapi/code@npm:8.0.7::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40hapi%2Fcode%2F-%2F%40hapi%2Fcode-8.0.7.tgz"
   dependencies:
     "@hapi/hoek": 9.x.x
-  checksum: f604faa0070b36a74ce8ed95acf9c09256b8e040452450303a982c2d68518023c10a77cea532280456ec798aab90ded6e526c80191cc2b4272e548fb5b124087
+  checksum: 65e9b1f6ebc885fce7b3476031664f9d46eaa170a1767c94be4bd76ccfb245c2328b496914d9f69f84abfaa5644a1807390ea3c5e4fa8f6caaac9d7c91ff0d44
   languageName: node
   linkType: hard
 
@@ -4037,13 +4037,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:^8.4.1":
-  version: 8.4.1
-  resolution: "@types/eslint@npm:8.4.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Feslint%2F-%2F%40types%2Feslint-8.4.1.tgz"
+"@types/eslint@npm:^8.4.3":
+  version: 8.4.3
+  resolution: "@types/eslint@npm:8.4.3::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Feslint%2F-%2F%40types%2Feslint-8.4.3.tgz"
   dependencies:
     "@types/estree": "*"
     "@types/json-schema": "*"
-  checksum: b5790997ee9d3820d16350192d41849b0e2448c9e93650acac672ddf502e35c0a5a25547172a9eec840a96687cd94ba1cee672cbd86640f8f4ff1b65960d2ab9
+  checksum: cc199be84e22754cc625b171c90852da2b563088d32f4161d310b70470eab47f9bc812774c61eab6530083a214fe634abc32d06ef38e0a5e29f68436331cfabb
   languageName: node
   linkType: hard
 
@@ -4333,10 +4333,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.3.9":
-  version: 7.3.9
-  resolution: "@types/semver@npm:7.3.9::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fsemver%2F-%2F%40types%2Fsemver-7.3.9.tgz"
-  checksum: 60bfcfdfa7f937be2c6f4b37ddb6714fb0f27b05fe4cbdfdd596a97d35ed95d13ee410efdd88e72a66449d0384220bf20055ab7d6b5df10de4990fbd20e5cbe0
+"@types/semver@npm:^7.3.10":
+  version: 7.3.10
+  resolution: "@types/semver@npm:7.3.10::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fsemver%2F-%2F%40types%2Fsemver-7.3.10.tgz"
+  checksum: 7047c2822b1759b2b950f39cfcf261f2b9dca47b4b55bdebba0905a8553631f1531eb0f59264ffe4834d1198c8331c8e0010a4cd742f4e0b60abbf399d134364
   languageName: node
   linkType: hard
 
@@ -4378,12 +4378,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/xml2js@npm:^0.4.9":
-  version: 0.4.9
-  resolution: "@types/xml2js@npm:0.4.9::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fxml2js%2F-%2F%40types%2Fxml2js-0.4.9.tgz"
+"@types/xml2js@npm:^0.4.11":
+  version: 0.4.11
+  resolution: "@types/xml2js@npm:0.4.11::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fxml2js%2F-%2F%40types%2Fxml2js-0.4.11.tgz"
   dependencies:
     "@types/node": "*"
-  checksum: 7e352c4aad0cc31edfcc5102353b64a59e3d75b8d232985c939668d26adba00e33ee38d2b6893a862186015de779672b582dd70c1a1cfccee62f987e13a7cb0a
+  checksum: d0e7d2a8c7e0a53147c777a6756bdea0eb26a3de0d3c1f42c17e63332e4e2dc532f687c19ca26a0518336f5de60e1ec4345d7ef71e7ba0656fcf3390c9388eb5
   languageName: node
   linkType: hard
 
@@ -7420,10 +7420,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.0.0":
-  version: 16.0.0
-  resolution: "dotenv@npm:16.0.0"
-  checksum: 664cebb51f0a9a1d1b930f51f0271e72e26d62feaecc9dc03df39453dd494b4e724809ca480fb3ec3213382b1ed3f791aaeb83569a137f9329ce58efd4853dbf
+"dotenv@npm:^16.0.1":
+  version: 16.0.1
+  resolution: "dotenv@npm:16.0.1"
+  checksum: f459ffce07b977b7f15d8cc4ee69cdff77d4dd8c5dc8c85d2d485ee84655352c2415f9dd09d42b5b5985ced3be186130871b34e2f3e2569ebc72fbc2e8096792
   languageName: node
   linkType: hard
 
@@ -10026,10 +10026,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inflection@npm:^1.13.1":
-  version: 1.13.1
-  resolution: "inflection@npm:1.13.1"
-  checksum: 0ae265f710f61320306207501931fe4248dace8e841fb911a33625df68f611bc3736d9f03be5abc5351ae3698c7830e35c400a3a092cd68e93aa3d8cc01cb73a
+"inflection@npm:^1.13.2":
+  version: 1.13.2
+  resolution: "inflection@npm:1.13.2"
+  checksum: e7ad0559384ed7c526813404bde843f8f17941d47625ad60fc3b09e46efde873dd9840818007c6bd4dbe388e6248fa033d5a8c405c5fc62738c51b118a0e940f
   languageName: node
   linkType: hard
 
@@ -10144,9 +10144,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inquirer@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "inquirer@npm:8.2.0"
+"inquirer@npm:^8.2.4":
+  version: 8.2.4
+  resolution: "inquirer@npm:8.2.4"
   dependencies:
     ansi-escapes: ^4.2.1
     chalk: ^4.1.1
@@ -10158,11 +10158,12 @@ __metadata:
     mute-stream: 0.0.8
     ora: ^5.4.1
     run-async: ^2.4.0
-    rxjs: ^7.2.0
+    rxjs: ^7.5.5
     string-width: ^4.1.0
     strip-ansi: ^6.0.0
     through: ^2.3.6
-  checksum: 861d1a9324ae933b49126b3541d94e4d6a2f2a25411b3f3cc00c34bf1bdab34146362d702cf289efe6d8034900dc5905bcf2ea716092a02b6fc390e5986dd236
+    wrap-ansi: ^7.0.0
+  checksum: dfcb6529d3af443dfea2241cb471508091b51f5121a088fdb8728b23ec9b349ef0a5e13a0ef2c8e19457b0bed22f7cbbcd561f7a4529d084c562a58c605e2655
   languageName: node
   linkType: hard
 
@@ -12351,13 +12352,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^7.4.0":
-  version: 7.8.1
-  resolution: "lru-cache@npm:7.8.1"
-  checksum: 31ea67388c9774300331d70f4affd5a433869bcf0fae5405f967d19d7b447930b713b0566a2e95362c9082034a8b496f3671ccf8f0c061d8e8048412663f9432
-  languageName: node
-  linkType: hard
-
 "lru-queue@npm:^0.1.0":
   version: 0.1.0
   resolution: "lru-queue@npm:0.1.0"
@@ -12528,7 +12522,7 @@ __metadata:
   resolution: "meadowlark-js@workspace:."
   dependencies:
     "@shelf/jest-mongodb": ^2.2.2
-    "@types/eslint": ^8.4.1
+    "@types/eslint": ^8.4.3
     "@types/jest": 27.4.1
     "@types/node": ^17.0.35
     "@typescript-eslint/eslint-plugin": 5.21.0
@@ -12552,7 +12546,7 @@ __metadata:
     pg-format: ^1.0.4
     prettier: 2.6.2
     rimraf: ^3.0.2
-    ts-jest: ^27.1.4
+    ts-jest: ^27.1.5
     ts-node: 8.8.1
     typescript: 4.6.3
   languageName: unknown
@@ -15820,12 +15814,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.2.0":
-  version: 7.5.2
-  resolution: "rxjs@npm:7.5.2"
+"rxjs@npm:^7.5.5":
+  version: 7.5.5
+  resolution: "rxjs@npm:7.5.5"
   dependencies:
     tslib: ^2.1.0
-  checksum: daf1fe7289de500b25d822fd96cde3c138c7902e8bf0e6aa12a3e70847a5cabeeb4d677f10e19387e1db44b12c5b1be0ff5c79b8cd63ed6ce891d765e566cf4d
+  checksum: e034f60805210cce756dd2f49664a8108780b117cf5d0e2281506e9e6387f7b4f1532d974a8c8b09314fa7a16dd2f6cff3462072a5789672b5dcb45c4173f3c6
   languageName: node
   linkType: hard
 
@@ -15992,7 +15986,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.2":
+"semver@npm:^7.3.2, semver@npm:^7.3.7":
   version: 7.3.7
   resolution: "semver@npm:7.3.7"
   dependencies:
@@ -16000,17 +15994,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 2fa3e877568cd6ce769c75c211beaed1f9fce80b28338cadd9d0b6c40f2e2862bafd62c19a6cff42f3d54292b7c623277bcab8816a2b5521cf15210d43e75232
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.6":
-  version: 7.3.6
-  resolution: "semver@npm:7.3.6"
-  dependencies:
-    lru-cache: ^7.4.0
-  bin:
-    semver: bin/semver.js
-  checksum: 9845f96b22268190b30025e02feca391451f2bd49b2c51920c27cc56744f64cbe397df089018fdb347d4b4fd800eabbd85661870eb63eb28055d2b72e457f759
   languageName: node
   linkType: hard
 
@@ -17596,9 +17579,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:^27.1.4":
-  version: 27.1.4
-  resolution: "ts-jest@npm:27.1.4"
+"ts-jest@npm:^27.1.5":
+  version: 27.1.5
+  resolution: "ts-jest@npm:27.1.5"
   dependencies:
     bs-logger: 0.x
     fast-json-stable-stringify: 2.x
@@ -17625,7 +17608,7 @@ __metadata:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: d2cc2719ed2884a880ab50d2c14c311834be9c88bc79d0064fa0189afce5c296d7676314d26cc3f7e82ddd52df272c2d4137a832c89616f30cbe8f43e30f9a29
+  checksum: 3ef51c538b82f49b3f529331c1a017871a2f90e7a9a6e69333304755036d121818c6b120e2ce32dd161ff8bb2487efec0c790753ecd39b46a9ed1ce0d241464c
   languageName: node
   linkType: hard
 
