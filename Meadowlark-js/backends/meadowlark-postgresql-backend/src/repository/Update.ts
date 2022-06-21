@@ -11,7 +11,7 @@ import {
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
-import { getDeleteReferencesSql, getDocumentInsertOrUpdateSql, getReferencesInsert } from './QueryHelper';
+import { getDeleteReferencesSql, getDocumentInsertOrUpdateSql, getReferencesInsertSql } from './QueryHelper';
 import { validateReferences } from './WriteHelper';
 
 export async function updateDocumentById(
@@ -64,7 +64,7 @@ export async function updateDocumentById(
     // Perform insert of references to the references table
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(getReferencesInsert(id, ref));
+      await client.query(getReferencesInsertSql(id, ref));
     });
 
     await client.query('COMMIT');

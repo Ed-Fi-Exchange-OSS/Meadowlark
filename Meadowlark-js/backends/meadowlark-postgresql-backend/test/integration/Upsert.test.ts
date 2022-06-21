@@ -23,10 +23,10 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from '../../src/repository/Delete';
 import { getDocumentById } from '../../src/repository/Get';
 import {
+  getCheckDocumentExistsSql,
   getDocumentByIdSql,
   // getReturnDocumentIdSql,
   getRetrieveReferencesByDocumentIdSql,
-  getReturnDocumentIdSql,
 } from '../../src/repository/QueryHelper';
 
 jest.setTimeout(40000);
@@ -77,7 +77,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(getReturnDocumentIdSql(id));
+    const result = await client.query(getCheckDocumentExistsSql(id));
 
     expect(result.rowCount).toBe(1);
   });

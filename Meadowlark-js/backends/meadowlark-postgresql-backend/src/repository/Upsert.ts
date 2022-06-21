@@ -15,8 +15,8 @@ import {
 import {
   getDeleteReferencesSql,
   getDocumentInsertOrUpdateSql,
-  getReferencesInsert,
-  getReturnDocumentIdSql,
+  getCheckDocumentExistsSql,
+  getReferencesInsertSql,
 } from './QueryHelper';
 import { validateReferences } from './WriteHelper';
 
@@ -33,8 +33,9 @@ export async function upsertDocument(
   const outRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
   try {
-    recordExistsResult = await client.query(getReturnDocumentIdSql(id));
-    isInsert = !recordExistsResult.rowCount || recordExistsResult.rowCount === 0;
+    recordExistsResult = await client.query(getCheckDocumentExistsSql(id));
+
+    isInsert = !recordExistsResult.rows[0].exists;
 
     documentUpsertSql = await getDocumentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
@@ -82,7 +83,7 @@ export async function upsertDocument(
     // Perform insert of references to the references table
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(getReferencesInsert(id, ref));
+      await client.query(getReferencesInsertSql(id, ref));
     });
 
     await client.query('COMMIT');

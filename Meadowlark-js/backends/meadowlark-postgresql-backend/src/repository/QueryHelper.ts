@@ -6,6 +6,11 @@ import format from 'pg-format';
 
 // SQL for Selects
 
+/**
+ * Function that produces a parametrized SQL query for retrieving a document (with identity)
+ * @param documentId The identifier of the document to retrieve
+ * @returns SQL query string to retrieve a document
+ */
 export function getDocumentByIdSql(documentId: string): string {
   return format(
     `
@@ -16,24 +21,51 @@ export function getDocumentByIdSql(documentId: string): string {
   );
 }
 
+/**
+ * Function that produces a parametrized SQL query for retrieving the references for a given document
+ * @param documentId The identifier of the document
+ * @returns SQL query string to retrieve references
+ */
 export function getRetrieveReferencesByDocumentIdSql(documentId: string): string {
   return format('SELECT referenced_document_id FROM meadowlark.references WHERE parent_document_id=%L', [documentId]);
 }
 
+/**
+ * Function that produces a parametrized SQL query for retrieving the ownership for a given document
+ * @param documentId The identifier of the document
+ * @returns SQL query string to retrieve ownership
+ */
 export function getDocumentOwnershipByIdSql(documentId: string): string {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
-export function getReturnDocumentIdSql(documentId: string): string {
-  return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
+/**
+ * Checks for the existence of a document in the database
+ * @param documentId Document id to check for existence
+ * @returns SQL query string to determine document existence
+ */
+export function getCheckDocumentExistsSql(documentId: string): string {
+  // return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
+  return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
 
+/**
+ * Checks if this document is referenced by other documents
+ * @param documentId Document id to check for references
+ * @returns SQL query string to determine references existence
+ */
 export function getCheckIsReferencedDocumentSql(documentId: string): string {
   return format(`SELECT exists (SELECT 1 FROM meadowlark.references WHERE referenced_document_id = %L LIMIT 1);`, [
     documentId,
   ]);
 }
 
+/**
+ * Returns up to five documents that reference this document - for error reporting when an attempt is made to delete
+ * the document
+ * @param documentId The document being referenced
+ * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
+ */
 export function getReferencedByDocumentSql(documentId: string): string {
   return format(
     `SELECT document_id, resource_name, document_identity FROM meadowlark.references
@@ -45,14 +77,25 @@ export function getReferencedByDocumentSql(documentId: string): string {
 
 // SQL for inserts/updates/upserts
 
-export function getReferencesInsert(documentId: string, referencedDocumentId: String): string {
-  const sql = format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
+/**
+ * Returns the SQL statement to insert a referenced document into the references table
+ * @param documentId The parent document of the reference
+ * @param referencedDocumentId The document that is referenced
+ * @returns SQL query string to insert reference into references table
+ */
+export function getReferencesInsertSql(documentId: string, referencedDocumentId: String): string {
+  return format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
     documentId,
     referencedDocumentId,
   ]);
-  return sql;
 }
 
+/**
+ * Returns the SQL statement for inserting or updating a document in the database
+ * @param param0 Document info for insert/update
+ * @param isInsert is insert or update SQL re
+ * @returns SQL query string for inserting or updating provided document info
+ */
 export function getDocumentInsertOrUpdateSql(
   { id, resourceInfo, documentInfo, edfiDoc, validate, security },
   isInsert: boolean,
@@ -112,26 +155,47 @@ export function getDocumentInsertOrUpdateSql(
 
 // SQL for Deletes
 
+/**
+ * Returns the SQL query for deleting a document from the database
+ * @param documentId the document to delete from the documents table
+ * @returns SQL query string to delete the document
+ */
 export function deleteDocumentByIdSql(documentId: string): string {
-  const sql = format(
+  return format(
     'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
     [documentId],
   );
-  return sql;
 }
 
+/**
+ * Returns the SQL query for deleting references to a document from the database
+ * @param documentId the document id of the references we want to delete
+ * @returns SQL query string to delete references
+ */
 export function getDeleteReferencesSql(documentId: string): string {
   const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [documentId]);
   return sql;
 }
 
 // SQL for DDL
+
+/**
+ * Returns the SQL to create the meadowlark database
+ * @param meadowlarkDbName the name of the database to create
+ * @returns SQL query string to create the database
+ */
 export function getCreateDatabaseSql(meadowlarkDbName: string): string {
   return format('CREATE DATABASE %I', meadowlarkDbName);
 }
 
+/**
+ * SQL query string to create schema in the meadowlark database
+ */
 export const createSchemaSql = 'CREATE SCHEMA IF NOT EXISTS meadowlark';
 
+/**
+ * SQL query string to create document table
+ */
 export const createDocumentTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.documents(
   id bigserial PRIMARY KEY,
@@ -149,6 +213,9 @@ export const createDocumentTableSql = `
 export const createDocumentTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(document_id)';
 
+/**
+ * SQL query string to crate references table
+ */
 export const createReferencesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.references(
   id bigserial PRIMARY KEY,

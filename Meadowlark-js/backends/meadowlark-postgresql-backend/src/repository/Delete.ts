@@ -12,7 +12,11 @@ import {
   getReferencedByDocumentSql,
 } from './QueryHelper';
 
-// This function should only be used for testing, it will clear out all data from both documents and references tables
+/**
+ * Deletes all data from the document and references table - should only be used for testing
+ * @param client PostgreSQL client to perform queries
+ * @returns Result of the delete action
+ */
 export async function deleteAll(client: PoolClient): Promise<DeleteResult> {
   const deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -44,12 +48,12 @@ export async function deleteDocumentById(
 
     if (validate) {
       // Check for any references to the document to be deleted
-      const anyReferences = await client.query(getCheckIsReferencedDocumentSql(id));
+      const referencesResult = await client.query(getCheckIsReferencedDocumentSql(id));
 
       // Abort on validation failure
-      if (anyReferences.rows[0].exists) {
+      if (referencesResult.rows[0].exists) {
         Logger.debug(
-          `mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
+          `postgres.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
           traceId,
         );
 
@@ -71,7 +75,9 @@ export async function deleteDocumentById(
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
     deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
+
     // Delete references where this is the parent document
+    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
     await client.query(getDeleteReferencesSql(id));
 
     client.query('COMMIT');
