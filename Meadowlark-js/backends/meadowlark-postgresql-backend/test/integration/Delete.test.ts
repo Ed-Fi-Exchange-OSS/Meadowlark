@@ -17,12 +17,15 @@ import {
   ResourceInfo,
   newResourceInfo,
   DeleteResult,
+  DocumentReference,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
+import { deleteAll } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { deleteAll, deleteDocumentById } from '../../src/repository/Delete';
+import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
+import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -120,140 +123,142 @@ describe('given the delete of an existing document', () => {
   });
 });
 
-// TODO - Reference validation to be added with RND-243
-// describe('given an delete of a document referenced by an existing document with validation on', () => {
-//   let client;
-//   let deleteResult;
+describe('given an delete of a document referenced by an existing document with validation on', () => {
+  let client;
+  let deleteResult;
 
-//   const referencedResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
 
-//   const referencedDocumentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'delete5' }],
-//   };
-//   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'delete5' }],
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
-//   const validReference: DocumentReference = {
-//     projectName: referencedResourceInfo.projectName,
-//     resourceName: referencedResourceInfo.resourceName,
-//     resourceVersion: referencedResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: referencedDocumentInfo.documentIdentity,
-//     isDescriptor: false,
-//   };
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'delete6' }],
-//     documentReferences: [validReference],
-//   };
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'delete6' }],
+    documentReferences: [validReference],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
 
-//     // The document that will be referenced
-//     await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
 
-//     // The referencing document that should cause the delete to fail
-//     await upsertDocument(
-//       { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
-//       client,
-//     );
+    // The referencing document that should cause the delete to fail
+    await upsertDocument(
+      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      client,
+    );
 
-//     deleteResult = await deleteDocumentById(
-//       { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
-//       client,
-//     );
-//   });
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
+      client,
+    );
+  });
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await resetSharedClient();
+  });
 
-//   it('should have returned delete failure due to existing reference', async () => {
-//     expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
-//   });
+  it('should have returned delete failure due to existing reference', async () => {
+    expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
+  });
 
-//   it('should still have the referenced document in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: referencedDocumentId });
-//     expect(result.documentIdentity[0].value).toBe('delete5');
-//   });
-// });
+  it('should still have the referenced document in the db', async () => {
+    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
+    expect(docResult.rows[0].document_identity[0].value).toBe('delete5');
+  });
+});
 
-// describe('given an delete of a document referenced by an existing document with validation off', () => {
-//   let client;
-//   let deleteResult;
+describe('given an delete of a document referenced by an existing document with validation off', () => {
+  let client;
+  let deleteResult;
 
-//   const referencedResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'School',
-//   };
-//   const referencedDocumentInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'delete5' }],
-//   };
-//   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'delete5' }],
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
-//   const validReference: DocumentReference = {
-//     projectName: referencedResourceInfo.projectName,
-//     resourceName: referencedResourceInfo.resourceName,
-//     resourceVersion: referencedResourceInfo.resourceVersion,
-//     isAssignableFrom: false,
-//     documentIdentity: referencedDocumentInfo.documentIdentity,
-//     isDescriptor: false,
-//   };
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    resourceVersion: referencedResourceInfo.resourceVersion,
+    isAssignableFrom: false,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
 
-//   const documentWithReferencesResourceInfo: ResourceInfo = {
-//     ...newResourceInfo(),
-//     resourceName: 'AcademicWeek',
-//   };
-//   const documentWithReferencesInfo: DocumentInfo = {
-//     ...newDocumentInfo(),
-//     documentIdentity: [{ name: 'natural', value: 'delete6' }],
-//     documentReferences: [validReference],
-//   };
-//   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'natural', value: 'delete6' }],
+    documentReferences: [validReference],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
-//   beforeAll(async () => {
-//     client = (await getNewClient()) as MongoClient;
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
 
-//     // The document that will be referenced
-//     await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
 
-//     // The referencing document that should cause the delete to fail
-//     await upsertDocument(
-//       { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
-//       client,
-//     );
+    // The referencing document that should cause the delete to fail
+    await upsertDocument(
+      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      client,
+    );
 
-//     deleteResult = await deleteDocumentById(
-//       { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: false },
-//       client,
-//     );
-//   });
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: false },
+      client,
+    );
+  });
 
-//   afterAll(async () => {
-//     await getCollection(client).deleteMany({});
-//     await client.close();
-//   });
+  afterAll(async () => {
+    await deleteAll(client);
+    await resetSharedClient();
+  });
 
-//   it('should have returned delete success', async () => {
-//     expect(deleteResult.response).toBe('DELETE_SUCCESS');
-//   });
+  it('should have returned delete success', async () => {
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
+  });
 
-//   it('should not have the referenced document in the db', async () => {
-//     const collection: Collection<MeadowlarkDocument> = getCollection(client);
-//     const result: any = await collection.findOne({ id: referencedDocumentId });
-//     expect(result).toBeNull();
-//   });
-// });
+  it('should not have the referenced document in the db', async () => {
+    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
+    expect(docResult.rowCount).toEqual(0);
+  });
+
+  it('should not be the parent document in the references table', async () => {
+    const docResult: any = await client.query(retrieveReferencesByDocumentIdSql(referencedDocumentId));
+    expect(docResult.rowCount).toEqual(0);
+  });
+});

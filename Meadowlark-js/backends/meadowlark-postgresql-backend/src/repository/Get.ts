@@ -5,11 +5,11 @@
 
 import type { PoolClient, QueryResult } from 'pg';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
-import { getDocumentByIdSql } from './QueryHelper';
+import { documentByIdSql } from './SqlHelper';
 
 export async function getDocumentById({ id }: GetRequest, client: PoolClient): Promise<GetResult> {
   try {
-    const queryResult: QueryResult = await client.query(getDocumentByIdSql(id));
+    const queryResult: QueryResult = await client.query(documentByIdSql(id));
 
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 

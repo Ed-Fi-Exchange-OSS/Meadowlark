@@ -5,7 +5,7 @@
 
 import { Pool, Client } from 'pg';
 import type { PoolClient } from 'pg';
-import { Logger } from '@edfi//meadowlark-core';
+import { Logger } from '@edfi/meadowlark-core';
 import {
   createDocumentTableSql,
   createDocumentTableUniqueIndexSql,
@@ -13,8 +13,8 @@ import {
   createReferencesTableDeletingIndexSql,
   createReferencesTableSql,
   createSchemaSql,
-  getCreateDatabaseSql,
-} from './QueryHelper';
+  createDatabaseSql,
+} from './SqlHelper';
 
 let dbPool: Pool | null = null;
 
@@ -78,7 +78,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   const client: Client = new Client(dbConfiguration);
   try {
     client.connect();
-    await client.query(getCreateDatabaseSql(meadowlarkDbName));
+    await client.query(createDatabaseSql(meadowlarkDbName));
 
     Logger.info(`Database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {
