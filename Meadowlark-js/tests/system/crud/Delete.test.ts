@@ -3,43 +3,31 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { deleteIt, FrontendResponse, upsert, get } from '@edfi/meadowlark-core';
+import { deleteIt, FrontendResponse, upsert, get, SystemTestClient } from '@edfi/meadowlark-core';
 import {
-  schoolBodyClient1,
-  schoolGetClient1,
+  backendToTest,
   schoolDeleteClient1,
-  configureEnvironmentForSystemTests,
   academicWeekBodyClient1,
   schoolDeleteClient2,
+  schoolBodyClient1,
+  schoolGetClient1,
 } from './SystemTestSetup';
 
-let backendToTest;
-
-(async () => {
-  const plugin = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
-  backendToTest = await import(plugin);
-})();
-
 jest.setTimeout(40000);
-configureEnvironmentForSystemTests();
 
 describe('given a DELETE of a non-existent school', () => {
-  let client;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     // Act
     deleteResult = await deleteIt(schoolDeleteClient1());
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
-    // Should be able to run the following in each afterAll, but with PostgreSQL if
-    // the pool is nulled and recreated the next describe block will run before
-    // teardown is complete, causing subsequent tests to fail because they can't connect to the DB
-    // backendToTest.TearDownAndReleasePool(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return not found from delete', async () => {
@@ -48,12 +36,12 @@ describe('given a DELETE of a non-existent school', () => {
 });
 
 describe('given a POST of a school by followed by a DELETE of the school', () => {
-  let client;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -63,8 +51,7 @@ describe('given a POST of a school by followed by a DELETE of the school', () =>
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
-    // backendToTest.TearDownAndReleasePool(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete success', async () => {
@@ -78,12 +65,12 @@ describe('given a POST of a school by followed by a DELETE of the school', () =>
 });
 
 describe('given a POST of a school by one client followed by a DELETE of the school by a second client', () => {
-  let client;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -93,8 +80,7 @@ describe('given a POST of a school by one client followed by a DELETE of the sch
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
-    // backendToTest.TearDownAndReleasePool(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete from client 2 as a 403 forbidden', async () => {
@@ -108,12 +94,12 @@ describe('given a POST of a school by one client followed by a DELETE of the sch
 });
 
 describe('given the DELETE of a school referenced by an academic week', () => {
-  let client;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
     await upsert(academicWeekBodyClient1());
@@ -124,7 +110,7 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   });
 
   afterAll(async () => {
-    backendToTest.TearDownAndReleasePool(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete failure due to a reference to the school', async () => {

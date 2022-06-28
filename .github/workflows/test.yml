@@ -66,3 +66,6 @@ jobs:
     - name: System tests
       run: yarn test:system
       working-directory: Meadowlark-js
+      env:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 'abcdefgh1!'

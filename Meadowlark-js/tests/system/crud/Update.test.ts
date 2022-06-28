@@ -3,28 +3,20 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, FrontendResponse, get, upsert, update } from '@edfi/meadowlark-core';
+import { FrontendRequest, FrontendResponse, get, upsert, update, SystemTestClient } from '@edfi/meadowlark-core';
 import {
+  backendToTest,
   CLIENT1_HEADERS,
   schoolBodyClient1,
   newFrontendRequestTemplate,
   schoolGetClient1,
   CLIENT2_HEADERS,
-  configureEnvironmentForSystemTests,
 } from './SystemTestSetup';
 
-let backendToTest;
-
-(async () => {
-  const plugin = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
-  backendToTest = await import(plugin);
-})();
-
 jest.setTimeout(40000);
-configureEnvironmentForSystemTests();
 
 describe('given a POST of a school followed by the PUT of the school with a changed field', () => {
-  let client;
+  let client: SystemTestClient;
   let updateResult: FrontendResponse;
 
   const putSchoolChangeNameOfInstitution: FrontendRequest = {
@@ -40,7 +32,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   };
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
     // Act
@@ -48,7 +40,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return put success', async () => {
@@ -67,7 +59,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
 });
 
 describe('given a POST of a school followed by the PUT with an empty body', () => {
-  let client;
+  let client: SystemTestClient;
   let updateResult: FrontendResponse;
 
   const putSchoolEmptyBody: FrontendRequest = {
@@ -78,7 +70,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
   };
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
     // Act
@@ -86,7 +78,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return put failure', async () => {
@@ -98,7 +90,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
 });
 
 describe('given a POST of a school followed by the PUT of the school with a different identity', () => {
-  let client;
+  let client: SystemTestClient;
   let updateResult: FrontendResponse;
 
   const putSchoolWrongIdentity: FrontendRequest = {
@@ -114,7 +106,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
   };
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
     // Act
@@ -122,7 +114,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return put failure', async () => {
@@ -134,7 +126,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
 });
 
 describe('given a POST of a school by one client followed by a PUT of the school by a second client', () => {
-  let client;
+  let client: SystemTestClient;
   let updateResult: FrontendResponse;
 
   const putSchoolChangeClient2: FrontendRequest = {
@@ -150,7 +142,7 @@ describe('given a POST of a school by one client followed by a PUT of the school
   };
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -159,7 +151,7 @@ describe('given a POST of a school by one client followed by a PUT of the school
   });
 
   afterAll(async () => {
-    backendToTest.TestingTeardown(client);
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return put as a 403 forbidden', async () => {
@@ -169,7 +161,7 @@ describe('given a POST of a school by one client followed by a PUT of the school
 });
 
 describe('given a POST of a school followed by a PUT adding a reference to an invalid descriptor', () => {
-  let client;
+  let client: SystemTestClient;
   let updateResult: FrontendResponse;
 
   const putSchoolInvalidDescriptor: FrontendRequest = {
@@ -186,7 +178,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
   };
 
   beforeAll(async () => {
-    client = await backendToTest.TestingSetup();
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -195,7 +187,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
   });
 
   afterAll(async () => {
-    backendToTest.TearDownAndReleasePool(client);
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing descriptor', async () => {

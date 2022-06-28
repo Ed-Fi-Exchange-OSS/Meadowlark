@@ -11,7 +11,6 @@ import {
   updateDocumentById,
   securityMiddleware,
 } from './BackendFacade';
-import { TestingSetup, TestingTeardown, TearDownAndReleasePool } from './repository/TestHelper';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
   return {
@@ -22,4 +21,5 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     securityMiddleware,
   };
 }
-export { TestingTeardown, TestingSetup, TearDownAndReleasePool };
+
+export { systemTestSetup, systemTestTeardown } from './repository/SystemTestHelper';
