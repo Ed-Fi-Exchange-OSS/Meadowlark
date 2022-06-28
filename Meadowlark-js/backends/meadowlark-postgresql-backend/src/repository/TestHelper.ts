@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { PoolClient } from 'pg';
+import { PoolClient } from 'pg';
+import { getSharedClient, resetSharedClient } from './Db';
 
 /**
  * Deletes all data from the document and references table
@@ -19,6 +20,34 @@ export async function deleteAll(client: PoolClient): Promise<void> {
     await client.query('ROLLBACK');
     throw e;
   } finally {
+    // client.release();
+  }
+}
+
+export async function TestingSetup(): Promise<PoolClient> {
+  const client = (await getSharedClient()) as PoolClient;
+  await deleteAll(client);
+  return client;
+}
+
+export async function TestingTeardown(client: PoolClient): Promise<boolean> {
+  try {
+    await deleteAll(client);
     client.release();
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function TearDownAndReleasePool(client: PoolClient): Promise<boolean> {
+  try {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+    return true;
+  } catch (e) {
+    return false;
   }
 }

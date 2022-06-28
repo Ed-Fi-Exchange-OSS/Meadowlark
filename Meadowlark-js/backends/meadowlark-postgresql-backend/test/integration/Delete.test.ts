@@ -20,7 +20,7 @@ import {
   DocumentReference,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
-import { deleteAll } from './TestHelper';
+import { deleteAll } from '../../src/repository/TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -76,7 +76,8 @@ describe('given the delete of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await resetSharedClient();
+    client.release();
+    // await resetSharedClient();
   });
 
   it('should return delete failure', async () => {
@@ -110,7 +111,8 @@ describe('given the delete of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
-    await resetSharedClient();
+    client.release();
+    // await resetSharedClient();
   });
 
   it('should return delete success', async () => {
@@ -178,7 +180,8 @@ describe('given an delete of a document referenced by an existing document with 
 
   afterAll(async () => {
     await deleteAll(client);
-    await resetSharedClient();
+    client.release();
+    // await resetSharedClient();
   });
 
   it('should have returned delete failure due to existing reference', async () => {
@@ -245,6 +248,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 

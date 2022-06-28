@@ -95,7 +95,7 @@ export function academicWeekBodyClient1(): FrontendRequest {
 }
 
 export function configureEnvironmentForMongoSystemTests(): void {
-  process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
+  // process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
   process.env.SIGNING_KEY = TEST_SIGNING_KEY;
   process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 }

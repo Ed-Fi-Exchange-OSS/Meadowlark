@@ -50,7 +50,10 @@
     "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration --runInBand",
     "test:system": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest system --runInBand",
     "test:unit:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
-    "prepare": "cd .. && husky install"
+    "prepare": "cd .. && husky install",
+    "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend yarn jest system --runInBand",
+    "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend yarn jest system --runInBand"
+
   },
   "husky": {
     "hooks": {

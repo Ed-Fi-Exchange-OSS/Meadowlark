@@ -11,6 +11,7 @@ import {
   updateDocumentById,
   securityMiddleware,
 } from './BackendFacade';
+import { TestingTeardown, TestingSetup, TearDownAndReleasePool } from './repository/TestHelper';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
   return {
@@ -24,3 +25,4 @@ export function initializeDocumentStore(): DocumentStorePlugin {
 
 // Accessible for system testing - this may turn into a generic setup/teardown datastore interface
 export { getNewClient, getCollection, resetSharedClient } from './repository/Db';
+export { TestingTeardown, TestingSetup, TearDownAndReleasePool };
