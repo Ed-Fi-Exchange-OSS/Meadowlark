@@ -69,10 +69,35 @@ content-type: application/json
     "learningResourceMetadataURI": "2143"
 }
 
-### Try deleting that resource using the wrong authorization header - expect 403
+### Creating a 2nd resource with 2nd authorization header - expect success.
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+content-type: application/json
+{{auth_header_2}}
+
+{
+    "contentIdentifier": "second",
+    "namespace": "43210",
+    "shortDescription": "abcd",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "21433"
+}
+
+### Query resource using 1st authorization header - expect only 1st record.
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/
+{{auth_header_1}}
+
+### Query resource using 2nd authorization header - expect only 2nd record.
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/
+{{auth_header_2}}
+
+### Try deleting 1st resource using the wrong authorization header - expect 403
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_2}}
 
-### Try deleting that resource using the same authorization header that created the record - expect success.
+### Try deleting 1st resource using the same authorization header that created the record - expect success.
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
 {{auth_header_1}}
+
+### Delete 2nd resource using the same authorization header that created the record - expect success.
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
+{{auth_header_2}}
