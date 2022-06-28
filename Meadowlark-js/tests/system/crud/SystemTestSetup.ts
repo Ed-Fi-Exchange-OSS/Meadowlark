@@ -5,7 +5,6 @@
 
 import { FrontendRequest, newFrontendRequest } from '@edfi/meadowlark-core';
 
-export const MONGO_DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
 export const TEST_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
 
@@ -94,8 +93,9 @@ export function academicWeekBodyClient1(): FrontendRequest {
   };
 }
 
-export function configureEnvironmentForMongoSystemTests(): void {
-  // process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
+export function configureEnvironmentForSystemTests(): void {
   process.env.SIGNING_KEY = TEST_SIGNING_KEY;
   process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
+  // TODO - Remove - Testing purposes only
+  // process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-postgresql-backend';
 }

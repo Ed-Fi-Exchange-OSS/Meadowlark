@@ -4,8 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { FrontendRequest, FrontendResponse, get, upsert } from '@edfi/meadowlark-core';
-import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark-mongodb-backend';
-import { MongoClient } from 'mongodb';
 import {
   CLIENT1_HEADERS,
   schoolBodyClient1,
@@ -13,28 +11,32 @@ import {
   schoolGetClient1,
   academicWeekBodyClient1,
   schoolBodyClient2,
-  configureEnvironmentForMongoSystemTests,
+  configureEnvironmentForSystemTests,
 } from './SystemTestSetup';
 
+let backendToTest;
+
+(async () => {
+  const plugin = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
+  backendToTest = await import(plugin);
+})();
+
 jest.setTimeout(40000);
-configureEnvironmentForMongoSystemTests();
+configureEnvironmentForSystemTests();
 
 describe('given a POST of a school', () => {
-  let client: MongoClient;
+  let client;
   let upsertResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     upsertResult = await upsert(schoolBodyClient1());
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return insert success', async () => {
@@ -55,7 +57,7 @@ describe('given a POST of a school', () => {
 });
 
 describe('given a POST of a school with an empty body', () => {
-  let client: MongoClient;
+  let client;
   let upsertResult: FrontendResponse;
 
   const schoolEmptyBody: FrontendRequest = {
@@ -66,17 +68,14 @@ describe('given a POST of a school with an empty body', () => {
   };
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     upsertResult = await upsert(schoolEmptyBody);
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return insert failure', async () => {
@@ -88,7 +87,7 @@ describe('given a POST of a school with an empty body', () => {
 });
 
 describe('given a POST of a school followed by a second POST of the school with a changed field', () => {
-  let client: MongoClient;
+  let client;
   let firstUpsertResult: FrontendResponse;
   let secondUpsertResult: FrontendResponse;
 
@@ -105,8 +104,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   };
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     firstUpsertResult = await upsert(schoolBodyClient1());
@@ -114,9 +112,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {
@@ -139,21 +135,18 @@ describe('given a POST of a school followed by a second POST of the school with 
 });
 
 describe('given a POST of an academic week referencing a school that does not exist', () => {
-  let client: MongoClient;
+  let client;
   let upsertResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     upsertResult = await upsert(academicWeekBodyClient1());
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -165,12 +158,11 @@ describe('given a POST of an academic week referencing a school that does not ex
 });
 
 describe('given a POST of an academic week referencing a school that exists', () => {
-  let client: MongoClient;
+  let client;
   let upsertResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -179,9 +171,7 @@ describe('given a POST of an academic week referencing a school that exists', ()
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return success', async () => {
@@ -194,7 +184,7 @@ describe('given a POST of an academic week referencing a school that exists', ()
 });
 
 describe('given a POST of an academic week referencing a school that exists followed by a second POST changing to reference a missing school', () => {
-  let client: MongoClient;
+  let client;
   let upsertResult: FrontendResponse;
 
   const academicWeekWithMissingSchool: FrontendRequest = {
@@ -213,8 +203,7 @@ describe('given a POST of an academic week referencing a school that exists foll
   };
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     await upsert(schoolBodyClient1());
     await upsert(academicWeekBodyClient1());
@@ -224,9 +213,7 @@ describe('given a POST of an academic week referencing a school that exists foll
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -238,13 +225,12 @@ describe('given a POST of an academic week referencing a school that exists foll
 });
 
 describe('given a POST of a school by one client followed by a second POST of the school by a second client', () => {
-  let client: MongoClient;
+  let client;
   let firstUpsertResult: FrontendResponse;
   let secondUpsertResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     firstUpsertResult = await upsert(schoolBodyClient1());
@@ -252,9 +238,7 @@ describe('given a POST of a school by one client followed by a second POST of th
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TearDownAndReleasePool(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {

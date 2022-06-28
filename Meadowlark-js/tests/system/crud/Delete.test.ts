@@ -8,7 +8,7 @@ import {
   schoolBodyClient1,
   schoolGetClient1,
   schoolDeleteClient1,
-  configureEnvironmentForMongoSystemTests,
+  configureEnvironmentForSystemTests,
   academicWeekBodyClient1,
   schoolDeleteClient2,
 } from './SystemTestSetup';
@@ -16,15 +16,12 @@ import {
 let backendToTest;
 
 (async () => {
-  // TODO - Remove the following lines - this is for being able to test within VSCode due to no environment set
-  process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-postgresql-backend';
-  // process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
   const plugin = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
   backendToTest = await import(plugin);
 })();
 
 jest.setTimeout(40000);
-configureEnvironmentForMongoSystemTests();
+configureEnvironmentForSystemTests();
 
 describe('given a DELETE of a non-existent school', () => {
   let client;

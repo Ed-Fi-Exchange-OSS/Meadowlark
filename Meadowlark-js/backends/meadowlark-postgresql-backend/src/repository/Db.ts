@@ -23,7 +23,7 @@ const dbConfiguration = {
   port: Number(process.env.POSTGRES_PORT ?? 5432),
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  database: 'meadowlark',
+  database: process.env.MEADOWLARK_DATABASE_NAME ?? 'meadowlark',
 };
 
 /**

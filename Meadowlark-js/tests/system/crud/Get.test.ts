@@ -4,34 +4,36 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { FrontendResponse, get, upsert } from '@edfi/meadowlark-core';
-import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark-mongodb-backend';
-import { MongoClient } from 'mongodb';
 import {
   schoolBodyClient1,
   schoolGetClient2,
   schoolGetClient1,
-  configureEnvironmentForMongoSystemTests,
+  configureEnvironmentForSystemTests,
 } from './SystemTestSetup';
 
+let backendToTest;
+
+(async () => {
+  const plugin = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
+  backendToTest = await import(plugin);
+})();
+
 jest.setTimeout(40000);
-configureEnvironmentForMongoSystemTests();
+configureEnvironmentForSystemTests();
 
 describe('given a GET of a non-existent school', () => {
-  let client: MongoClient;
+  let client;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     // Act
     getResult = await get(schoolGetClient1());
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TestingTeardown(client);
   });
 
   it('should return not found', async () => {
@@ -41,12 +43,11 @@ describe('given a GET of a non-existent school', () => {
 });
 
 describe('given a POST of a school by one client followed by a GET of the school by a second client', () => {
-  let client: MongoClient;
+  let client;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.TestingSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -55,9 +56,7 @@ describe('given a POST of a school by one client followed by a GET of the school
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.TearDownAndReleasePool(client);
   });
 
   it('should return get as a 403 forbidden', async () => {
