@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { ResourceInfo } from '../model/ResourceInfo';
+import { Security } from '../security/Security';
 import { PaginationParameters } from './PaginationParameters';
 
 export type QueryRequest = {
@@ -11,4 +12,5 @@ export type QueryRequest = {
   queryStringParameters: object;
   paginationParameters: PaginationParameters;
   traceId: string;
+  security: Security;
 };

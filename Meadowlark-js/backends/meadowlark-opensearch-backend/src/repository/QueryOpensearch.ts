@@ -25,7 +25,7 @@ export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
 // TODO: RND-203 unsafe for SQL injection
 /**
  * Convert query string parameters from http request to OpenSearch
- * SQL WHERE conditions.
+ * SQL WHERE conditions. Returns empty string if there are none.
  */
 function whereConditionsFrom(queryStringParameters: object): string {
   return Object.entries(queryStringParameters)
@@ -34,7 +34,7 @@ function whereConditionsFrom(queryStringParameters: object): string {
 }
 
 /**
- * This mechanism of SQL querying is specific to OpenSearch (vs OpenSearch)
+ * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
  */
 async function performSqlQuery(client: Client, query: string): Promise<any> {
   return client.transport.request({
@@ -42,6 +42,14 @@ async function performSqlQuery(client: Client, query: string): Promise<any> {
     path: '/_opendistro/_sql',
     body: { query },
   });
+}
+
+/**
+ * Returns well-formed WHERE clause from existing where clause and new clause
+ */
+function appendedWhereClause(existingWhereClause: string, newWhereClause: string): string {
+  if (existingWhereClause === '') return newWhereClause;
+  return `${existingWhereClause} AND ${newWhereClause}`;
 }
 
 /**
@@ -55,13 +63,29 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   let documents: any = [];
   try {
     let query = `SELECT info FROM ${indexFromResourceInfo(resourceInfo)}`;
+    let whereClause: string = '';
+
+    // API client requested filters
     if (Object.entries(queryStringParameters).length > 0) {
-      query += ` WHERE ${whereConditionsFrom(queryStringParameters)} ORDER BY _doc`;
+      whereClause = whereConditionsFrom(queryStringParameters);
     }
+
+    // Ownership-based security filter
+    if (request.security.authorizationStrategy === 'OWNERSHIP_BASED') {
+      const securityWhereClause = `createdBy = '${request.security.clientName}'`;
+      whereClause = appendedWhereClause(whereClause, securityWhereClause);
+    }
+
+    if (whereClause !== '') {
+      query += ` WHERE ${whereClause}`;
+    }
+
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 
-    Logger.debug(`meadowlark-opensearch: queryDocuments executing query: ${query}`, traceId);
+    query += ' ORDER BY _doc';
+
+    Logger.debug(`meadowlark-opensearch-backend: queryDocuments executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
 

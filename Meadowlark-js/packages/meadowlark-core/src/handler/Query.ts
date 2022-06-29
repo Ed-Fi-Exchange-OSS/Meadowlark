@@ -32,6 +32,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     queryStringParameters: cleanQueryParameters,
     paginationParameters,
     traceId: frontendRequest.traceId,
+    security: frontendRequest.middleware.security,
   };
 
   beforeQueryDocuments(request);
