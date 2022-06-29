@@ -16,7 +16,7 @@ import {
   createDatabaseSql,
 } from './SqlHelper';
 
-let dbPool: Pool | null = null;
+let singletonDbPool: Pool | null = null;
 
 const dbConfiguration = {
   host: process.env.POSTGRES_HOST ?? 'localhost',
@@ -55,8 +55,8 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     // an error. If this happens, we will create a client connection to the postgres database, create the meadowlark
     // database, and disconnect. From there reconnect the pool to the meadowlark database and continue
 
-    dbPool = new Pool(dbConfiguration);
-    const poolClient: PoolClient = await dbPool.connect();
+    singletonDbPool = new Pool(dbConfiguration);
+    const poolClient: PoolClient = await singletonDbPool.connect();
 
     Logger.info(`Connected to ${dbConfiguration.database} successfully`, null);
 
@@ -68,7 +68,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
       throw e;
     }
-    if (dbPool != null) dbPool.end();
+    if (singletonDbPool != null) singletonDbPool.end();
   }
 
   // The meadowlark DB doesn't exist, create a separate client that connects to the postgres(default) DB to create
@@ -90,31 +90,34 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   }
 
   dbConfiguration.database = 'meadowlark';
-  dbPool = new Pool(dbConfiguration);
+  singletonDbPool = new Pool(dbConfiguration);
 
-  return dbPool.connect();
+  return singletonDbPool.connect();
 }
 
 /**
  * Return the shared client
  */
 export async function getSharedClient(): Promise<PoolClient> {
-  if (dbPool == null) {
+  if (singletonDbPool == null) {
     const client: PoolClient = await createConnectionPoolAndReturnClient();
     await checkExistsAndCreateTables(client);
     return client;
   }
 
   // Returns new Postgres Client
-  return dbPool.connect();
+  return singletonDbPool.connect();
 }
+
 /**
- * Due to the creation/tear down process in integration tests, the pool was still ending when we were
- * trying to start it for the next set of tests, nulling the pool allows to be created in time for tests
+ * Nulls out the singleton pool, then closes it
  */
 export async function resetSharedClient() {
-  if (dbPool != null) {
-    await dbPool.end();
+  const savedDbPool: Pool | null = singletonDbPool;
+  if (singletonDbPool != null) {
+    singletonDbPool = null;
+    if (savedDbPool != null) {
+      await savedDbPool.end();
+    }
   }
-  dbPool = null;
 }
