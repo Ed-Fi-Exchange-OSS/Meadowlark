@@ -33,6 +33,7 @@ export async function getNewClient(): Promise<MongoClient> {
 
     // Note this does nothing if the index already exists (triggers an index build otherwise)
     await collection.createIndex({ outRefs: 1 });
+    await collection.createIndex({ existenceIds: 1 });
 
     return newClient;
   } catch (e) {

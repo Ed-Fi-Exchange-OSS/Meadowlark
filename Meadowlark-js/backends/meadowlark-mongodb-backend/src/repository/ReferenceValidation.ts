@@ -5,13 +5,7 @@
 
 import R from 'ramda';
 import { ClientSession, Collection, FindOptions, ReplaceOptions } from 'mongodb';
-import {
-  documentIdForDocumentReference,
-  DocumentInfo,
-  DocumentReference,
-  Logger,
-  ResourceInfo,
-} from '@edfi/meadowlark-core';
+import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
 export async function findReferencedDocumentIdsById(
@@ -19,8 +13,8 @@ export async function findReferencedDocumentIdsById(
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocumentId[]> {
-  const findReferenceDocuments = mongoDocuments.find({ _id: { $in: referenceIds } }, findOptions);
-  return (await findReferenceDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
+  const findReferencedDocuments = mongoDocuments.find({ existenceIds: { $in: referenceIds } }, findOptions);
+  return (await findReferencedDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
 }
 
 /**
@@ -104,26 +98,4 @@ export async function validateReferences(
   }
 
   return failureMessages;
-}
-
-export function meadowlarkDocumentFrom(
-  resourceInfo: ResourceInfo,
-  documentInfo: DocumentInfo,
-  id: string,
-  edfiDoc: object,
-  validate: boolean,
-  createdBy: string,
-): MeadowlarkDocument {
-  return {
-    documentIdentity: documentInfo.documentIdentity,
-    projectName: resourceInfo.projectName,
-    resourceName: resourceInfo.resourceName,
-    resourceVersion: resourceInfo.resourceVersion,
-    isDescriptor: resourceInfo.isDescriptor,
-    _id: id,
-    edfiDoc,
-    outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
-    validated: validate,
-    createdBy,
-  };
 }

@@ -11,6 +11,7 @@ import { DocumentIdentity } from './DocumentIdentity';
 import { DocumentInfo } from './DocumentInfo';
 import { DocumentReference } from './DocumentReference';
 import { ResourceInfo } from './ResourceInfo';
+import { SuperclassInfo } from './SuperclassInfo';
 
 /**
  * Converts Base64 to Base64Url by character replacement and truncation of padding.
@@ -44,16 +45,25 @@ export function documentIdForDocumentIdentity(
 }
 
 /**
- * Returns the id of the given DocumentInfo, using the project name, resource name, resource version
- * and identity of the API document.
- * If the given documentInfo is assignable, uses that information for the document id.
+ * Returns the id of the given DocumentInfo, using the project name, resource name and identity of the API document.
  */
 export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
-  // If this is an assignable entity, use the assignableIdentity for the id instead of the actual document identity
-  const documentIdentity: DocumentIdentity =
-    documentInfo.assignableInfo == null ? documentInfo.documentIdentity : documentInfo.assignableInfo.assignableIdentity;
+  return documentIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+}
 
-  return documentIdForDocumentIdentity(resourceInfo, documentIdentity);
+/**
+ * Returns the id of the given DocumentInfo superclass, using the project name, resource name
+ * and identity of the superclass document.
+ */
+export function documentIdForSuperclassInfo(superclassInfo: SuperclassInfo): string {
+  const resourceInfo: ResourceInfo = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    resourceVersion: '', // Not relevant
+    isDescriptor: false, // Descriptors are never superclasses
+  };
+
+  return documentIdForDocumentIdentity(resourceInfo, superclassInfo.documentIdentity);
 }
 
 /**

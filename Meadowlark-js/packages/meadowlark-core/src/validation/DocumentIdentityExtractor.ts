@@ -14,12 +14,12 @@ import {
   EntityPropertyMeadowlarkData,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { decapitalize } from '../Utility';
-import { Assignable } from '../model/Assignable';
+import { SuperclassInfo } from '../model/SuperclassInfo';
 import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo';
 
-type NullableTopLevelEntity = { assignableTo: TopLevelEntity | null };
+type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
 
 /**
  * The identity of a document, along with security information
@@ -135,36 +135,41 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
 }
 
 /**
- * Substitute an assignableIdentity from an already constructed DocumentIdentity, if the entity should have one.
- * If the entity is a subclass with an identity rename, replace the renamed identity property with the original
- * superclass identity property name, thereby putting it in superclass form.
+ * Create a SuperclassInfo from an already constructed DocumentIdentity, if the entity should have one.
+ * If the entity is a subclass with an identity rename, replace the renamed identity property with the
+ * original superclass identity property name, thereby putting it in superclass form.
  *
  * For example, School is a subclass of EducationOrganization which renames educationOrganizationId
- * to schoolId. An example document identity for a School is { name: schoolId, value: 123 }. The equivalent assignable identity
- * for this School would be { name: educationOrganizationId, value: 123 }.
+ * to schoolId. An example document identity for a School is { name: schoolId, value: 123 }. The
+ * equivalent superclass identity for this School would be { name: educationOrganizationId, value: 123 }.
  *
  */
-export function deriveAssignableFrom(entity: TopLevelEntity, documentIdentity: DocumentIdentity): Assignable | null {
-  const { assignableTo }: NullableTopLevelEntity = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
-  if (assignableTo == null) return null;
+export function deriveSuperclassInfoFrom(entity: TopLevelEntity, documentIdentity: DocumentIdentity): SuperclassInfo | null {
+  const { superclass }: NullableTopLevelEntity = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
+  if (superclass == null) return null;
   const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
-  if (identityRename == null) return { assignableToName: assignableTo.metaEdName, assignableIdentity: documentIdentity };
+  if (identityRename == null) {
+    return { resourceName: superclass.metaEdName, documentIdentity, projectName: superclass.namespace.projectName };
+  }
 
   const subclassName = decapitalize(identityRename.metaEdName);
   const superclassName = decapitalize(identityRename.baseKeyName);
 
   const elementToSubstitute: number = documentIdentity.findIndex((element) => element.name === subclassName);
-  if (elementToSubstitute === -1) return { assignableToName: assignableTo.metaEdName, assignableIdentity: documentIdentity };
+  if (elementToSubstitute === -1) {
+    return { resourceName: superclass.metaEdName, documentIdentity, projectName: superclass.namespace.projectName };
+  }
 
   // copy both DocumentIdentity and the individual DocumentElement so original is not mutated
-  const identityCopy: DocumentIdentity = [...documentIdentity];
-  identityCopy[elementToSubstitute] = {
+  const superclassIdentity: DocumentIdentity = [...documentIdentity];
+  superclassIdentity[elementToSubstitute] = {
     ...documentIdentity[elementToSubstitute],
     name: superclassName,
   };
 
   return {
-    assignableToName: assignableTo.metaEdName,
-    assignableIdentity: identityCopy,
+    resourceName: superclass.metaEdName,
+    projectName: superclass.namespace.projectName,
+    documentIdentity: superclassIdentity,
   };
 }

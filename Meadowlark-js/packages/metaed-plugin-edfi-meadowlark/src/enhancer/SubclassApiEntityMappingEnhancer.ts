@@ -11,7 +11,7 @@ import {
   identityReferenceComponentsFrom,
   referenceGroupsFrom,
   descriptorCollectedPropertiesFrom,
-  assignabilityFor,
+  superclassFor,
 } from './ApiEntityMappingEnhancerBase';
 import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 
@@ -50,7 +50,7 @@ function buildApiEntityMappingForSubclass(entity: TopLevelEntity): ApiEntityMapp
     identityReferenceComponents: identityReferenceComponentsFrom(combinedIdentityProperties),
     referenceGroups: referenceGroupsFrom(combinedProperties),
     descriptorCollectedProperties: descriptorCollectedPropertiesFrom(entity),
-    assignableTo: assignabilityFor(entity),
+    superclass: superclassFor(entity),
   };
 }
 

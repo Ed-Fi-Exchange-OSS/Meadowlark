@@ -173,7 +173,6 @@ describe('given an upsert of a new document that references a non-existent docum
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
     resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -229,7 +228,6 @@ describe('given an upsert of a new document that references an existing document
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -306,7 +304,6 @@ describe('given an upsert of a new document with one existing and one non-existe
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -315,7 +312,6 @@ describe('given an upsert of a new document with one existing and one non-existe
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -398,7 +394,6 @@ describe('given an update of a document that references a non-existent document 
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
     resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -471,7 +466,6 @@ describe('given an update of a document that references an existing document wit
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -565,7 +559,6 @@ describe('given an update of a document with one existing and one non-existent r
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -574,7 +567,6 @@ describe('given an update of a document with one existing and one non-existent r
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };

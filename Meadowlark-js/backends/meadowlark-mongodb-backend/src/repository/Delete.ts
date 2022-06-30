@@ -7,7 +7,7 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, Filter, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { onlyReturnId } from './WriteHelper';
+import { onlyReturnId } from './ReferenceValidation';
 
 // MongoDB Filter on documents with the given id in their outRefs list
 const onlyDocumentsReferencing = (id: string): Filter<MeadowlarkDocument> => ({ outRefs: id });

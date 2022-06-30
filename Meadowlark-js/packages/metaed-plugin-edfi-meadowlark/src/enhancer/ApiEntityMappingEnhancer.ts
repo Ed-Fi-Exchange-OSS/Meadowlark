@@ -6,7 +6,7 @@
 import { MetaEdEnvironment, EnhancerResult, TopLevelEntity, getAllEntitiesOfType } from '@edfi/metaed-core';
 import { ApiEntityMapping, NoApiEntityMapping } from '../model/ApiEntityMapping';
 import {
-  assignabilityFor,
+  superclassFor,
   descriptorCollectedPropertiesFrom,
   flattenedIdentityPropertiesFrom,
   identityReferenceComponentsFrom,
@@ -27,7 +27,7 @@ function buildApiEntityMapping(entity: TopLevelEntity): ApiEntityMapping {
     identityReferenceComponents: identityReferenceComponentsFrom(identityProperties),
     referenceGroups: referenceGroupsFrom(properties),
     descriptorCollectedProperties: descriptorCollectedPropertiesFrom(entity),
-    assignableTo: assignabilityFor(entity),
+    superclass: superclassFor(entity),
   };
 }
 

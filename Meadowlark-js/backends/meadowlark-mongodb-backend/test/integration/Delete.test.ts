@@ -131,7 +131,6 @@ describe('given an delete of a document referenced by an existing document with 
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -199,7 +198,6 @@ describe('given an delete of a document referenced by an existing document with 
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
     resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };

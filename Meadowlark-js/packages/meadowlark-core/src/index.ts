@@ -33,6 +33,7 @@ export {
   documentIdForDocumentInfo,
   documentIdForDocumentReference,
   documentIdForDocumentIdentity,
+  documentIdForSuperclassInfo,
 } from './model/DocumentId';
 export type { DocumentInfo } from './model/DocumentInfo';
 export { newDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';

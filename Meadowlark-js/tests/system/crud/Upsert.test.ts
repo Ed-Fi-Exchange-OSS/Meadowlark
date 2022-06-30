@@ -35,14 +35,14 @@ describe('given a POST of a school', () => {
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
-      `"/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg"`,
+      `"/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ"`,
     );
   });
 
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -120,7 +120,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -143,7 +143,7 @@ describe('given a POST of an academic week referencing a school that does not ex
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"educationOrganizationId\\\\\\",\\\\\\"value\\\\\\":123}]\\"}"`,
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]\\"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
@@ -210,7 +210,7 @@ describe('given a POST of an academic week referencing a school that exists foll
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"educationOrganizationId\\\\\\",\\\\\\"value\\\\\\":999}]\\"}"`,
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":999}]\\"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });

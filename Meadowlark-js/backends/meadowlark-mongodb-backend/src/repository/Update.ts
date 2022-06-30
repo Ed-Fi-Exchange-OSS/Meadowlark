@@ -5,9 +5,9 @@
 
 import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { meadowlarkDocumentFrom, validateReferences } from './WriteHelper';
+import { validateReferences } from './ReferenceValidation';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,

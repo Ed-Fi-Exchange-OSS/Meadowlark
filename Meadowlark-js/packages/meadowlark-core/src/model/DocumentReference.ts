@@ -29,16 +29,6 @@ export type DocumentReference = {
   isDescriptor: boolean;
 
   /**
-   * True if the referenced entity is assignable from other entities (meaning it is a superclass),
-   *
-   * Example 1: School is not a superclass. isAssignableFrom would be false if the reference
-   *            was to a School.
-   * Example 2: EducationOrganization is a superclass of School, LocalEducationAgency, and others. isAssignableFrom
-   *            would be true if the reference was to an EducationOrganization.
-   */
-  isAssignableFrom: boolean;
-
-  /**
    * The document identity representing this reference.
    */
   documentIdentity: DocumentIdentity;

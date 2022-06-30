@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { Assignable } from './Assignable';
+import type { SuperclassInfo } from './SuperclassInfo';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { DocumentReference } from './DocumentReference';
 import { NoDocumentIdentity } from './DocumentIdentity';
@@ -28,10 +28,9 @@ export interface DocumentInfo {
   descriptorReferences: DocumentReference[];
 
   /**
-   * If this resource is assignable to another resource (meaning it is part of a subclass/superclass relationship)
-   * this is the assignable document identity and superclass information.
+   * If this document is a subclass, this provides the document superclass information.
    */
-  assignableInfo: Assignable | null;
+  superclassInfo: SuperclassInfo | null;
 
   /**
    * The student id extracted from the API document, if any (for security)
@@ -50,7 +49,7 @@ export interface DocumentInfo {
 export function newDocumentInfo(): DocumentInfo {
   return {
     documentIdentity: NoDocumentIdentity,
-    assignableInfo: null,
+    superclassInfo: null,
     documentReferences: [],
     descriptorReferences: [],
     studentId: null,
