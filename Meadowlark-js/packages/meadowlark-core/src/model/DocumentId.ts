@@ -10,7 +10,7 @@ import { DocumentElement } from './DocumentElement';
 import { DocumentIdentity } from './DocumentIdentity';
 import { DocumentInfo } from './DocumentInfo';
 import { DocumentReference } from './DocumentReference';
-import { ResourceInfo } from './ResourceInfo';
+import { BaseResourceInfo, ResourceInfo } from './ResourceInfo';
 import { SuperclassInfo } from './SuperclassInfo';
 
 /**
@@ -27,7 +27,7 @@ function toBase64Url(base64: string): string {
  * for use as a document id.
  */
 export function documentIdForDocumentIdentity(
-  { projectName, resourceName, isDescriptor }: ResourceInfo,
+  { projectName, resourceName, isDescriptor }: BaseResourceInfo,
   documentIdentity: DocumentIdentity,
 ): string {
   // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
@@ -56,10 +56,9 @@ export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentIn
  * and identity of the superclass document.
  */
 export function documentIdForSuperclassInfo(superclassInfo: SuperclassInfo): string {
-  const resourceInfo: ResourceInfo = {
+  const resourceInfo: BaseResourceInfo = {
     projectName: superclassInfo.projectName,
     resourceName: superclassInfo.resourceName,
-    resourceVersion: '', // Not relevant
     isDescriptor: false, // Descriptors are never superclasses
   };
 
@@ -75,7 +74,6 @@ export function documentIdForDocumentReference(documentReference: DocumentRefere
     {
       projectName: documentReference.projectName,
       resourceName: documentReference.resourceName,
-      resourceVersion: documentReference.resourceVersion,
       isDescriptor: documentReference.isDescriptor,
     },
     documentReference.documentIdentity,

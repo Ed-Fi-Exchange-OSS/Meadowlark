@@ -7,10 +7,12 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, Filter, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { onlyReturnId } from './ReferenceValidation';
+import { onlyReturnId, onlyReturnExistenceIds } from './ReferenceValidation';
 
-// MongoDB Filter on documents with the given id in their outRefs list
-const onlyDocumentsReferencing = (id: string): Filter<MeadowlarkDocument> => ({ outRefs: id });
+// MongoDB Filter on documents with the given existenceIds in their outRefs list
+const onlyDocumentsReferencing = (existenceIds: string[]): Filter<MeadowlarkDocument> => ({
+  outRefs: { $in: existenceIds },
+});
 
 // MongoDB FindOption to return at most 5 documents
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
@@ -27,33 +29,45 @@ export async function deleteDocumentById(
   try {
     await session.withTransaction(async () => {
       if (validate) {
-        // Check for any references to the document to be deleted
-        const anyReferences: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-          onlyDocumentsReferencing(id),
-          onlyReturnId(session),
+        // Read for existenceIds to validate against
+        const deleteCandidate: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+          { _id: id },
+          onlyReturnExistenceIds(session),
         );
 
-        // Abort on validation failure
-        if (anyReferences) {
-          Logger.debug(
-            `mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
-            traceId,
+        if (deleteCandidate == null) {
+          deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
+        } else {
+          // Check for any references to the document to be deleted
+          const anyReferences: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+            onlyDocumentsReferencing(deleteCandidate.existenceIds),
+            onlyReturnId(session),
           );
 
-          // Get the DocumentIdentities of up to five referring documents for failure message purposes
-          const referringDocuments = await mongoCollection.find(onlyDocumentsReferencing(id), limitFive(session)).toArray();
+          // Abort on validation failure
+          if (anyReferences) {
+            Logger.debug(
+              `mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
+              traceId,
+            );
 
-          const failures: string[] = referringDocuments.map(
-            (document) => `Resource ${document.resourceName} with identity '${JSON.stringify(document.documentIdentity)}'`,
-          );
+            // Get the DocumentIdentities of up to five referring documents for failure message purposes
+            const referringDocuments = await mongoCollection
+              .find(onlyDocumentsReferencing(deleteCandidate.existenceIds), limitFive(session))
+              .toArray();
 
-          deleteResult = {
-            response: 'DELETE_FAILURE_REFERENCE',
-            failureMessage: `Delete failed due to existing references to document: ${failures.join(',')}`,
-          };
+            const failures: string[] = referringDocuments.map(
+              (document) => `Resource ${document.resourceName} with identity '${JSON.stringify(document.documentIdentity)}'`,
+            );
 
-          await session.abortTransaction();
-          return;
+            deleteResult = {
+              response: 'DELETE_FAILURE_REFERENCE',
+              failureMessage: `Delete failed due to existing references to document: ${failures.join(',')}`,
+            };
+
+            await session.abortTransaction();
+            return;
+          }
         }
       }
 

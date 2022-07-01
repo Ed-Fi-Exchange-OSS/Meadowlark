@@ -210,7 +210,6 @@ export function constructAssignablePutItem(
             {
               projectName: resourceInfo.projectName,
               resourceName: resourceInfo.resourceName,
-              resourceVersion: resourceInfo.resourceVersion,
               isDescriptor: false,
             },
             documentInfo.superclassInfo.documentIdentity,

@@ -18,12 +18,6 @@ export type DocumentReference = {
   resourceName: string;
 
   /**
-   * The resource version as a string. This is the same as the MetaEd project version
-   * the entity is defined in e.g. "3.3.1-b" for a 3.3b data standard entity.
-   */
-  resourceVersion: string;
-
-  /**
    * Whether this document is a descriptor. Descriptors are treated differently from other documents
    */
   isDescriptor: boolean;

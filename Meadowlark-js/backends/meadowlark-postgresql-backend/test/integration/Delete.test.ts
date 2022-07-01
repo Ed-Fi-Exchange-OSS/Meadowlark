@@ -143,7 +143,6 @@ describe('given an delete of a document referenced by an existing document with 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -210,7 +209,6 @@ describe('given an delete of a document referenced by an existing document with 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };

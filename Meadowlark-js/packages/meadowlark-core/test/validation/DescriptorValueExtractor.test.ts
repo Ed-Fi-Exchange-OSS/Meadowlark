@@ -84,7 +84,6 @@ describe('when extracting single descriptor value from domain entity', () => {
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -148,7 +147,6 @@ describe('when extracting descriptor values from domain entity with the same nam
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -424,7 +422,6 @@ describe('when extracting collection from domain entity subclass with no naming 
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "SchoolCategoryDescriptor",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [

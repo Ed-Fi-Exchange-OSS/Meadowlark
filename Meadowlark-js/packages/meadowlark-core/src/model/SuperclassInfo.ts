@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity } from './DocumentIdentity';
+import { DocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
 
 /**
  * The optional superclass information for a DocumentInfo. Applies only to documents that are subclasses,
@@ -38,3 +38,14 @@ export type SuperclassInfo = {
    */
   resourceName: string;
 };
+
+/**
+ * Creates a new empty SuperclassInfo object
+ */
+export function newSuperclassInfo(): SuperclassInfo {
+  return {
+    documentIdentity: NoDocumentIdentity,
+    projectName: '',
+    resourceName: '',
+  };
+}

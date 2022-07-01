@@ -113,7 +113,6 @@ describe('when extracting document references from domain entity referencing one
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -129,7 +128,6 @@ describe('when extracting document references from domain entity referencing one
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -145,7 +143,6 @@ describe('when extracting document references from domain entity referencing one
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -209,7 +206,6 @@ describe('when extracting with optional reference in body', () => {
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -327,7 +323,6 @@ describe('when extracting optional collection in body', () => {
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -339,7 +334,6 @@ describe('when extracting optional collection in body', () => {
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
       ]
     `);

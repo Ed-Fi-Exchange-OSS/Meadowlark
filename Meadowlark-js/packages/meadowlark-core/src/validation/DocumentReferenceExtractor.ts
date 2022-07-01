@@ -179,7 +179,6 @@ function documentReferencesFromReferenceGroup(
     result.push({
       projectName: referenceGroup.sourceProperty.namespace.projectName,
       resourceName,
-      resourceVersion: referenceGroup.sourceProperty.namespace.projectVersion,
       documentIdentity,
       isDescriptor: false,
     });

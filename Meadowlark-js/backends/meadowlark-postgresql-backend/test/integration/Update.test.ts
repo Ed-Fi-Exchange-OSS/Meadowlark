@@ -153,7 +153,6 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -230,7 +229,6 @@ describe('given an update of a document that references an existing document wit
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -326,7 +324,6 @@ describe('given an update of a document with one existing and one non-existent r
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -334,7 +331,6 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
