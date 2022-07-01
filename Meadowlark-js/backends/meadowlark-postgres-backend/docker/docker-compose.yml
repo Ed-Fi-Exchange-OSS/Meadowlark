@@ -1,0 +1,19 @@
+version: '3'
+services:
+  db:
+    container_name: Postgres-Meadowlark
+    image: postgres:14.3-alpine
+    restart: always
+    environment:
+    # If username and password not provided through and env file
+    # default to postres/abcdefgh1!
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-abcdefgh1!}
+    ports:
+    # If no port provided through an env file, default to 5432
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - meadowlark-pgsql:/var/lib/postgresql/data
+volumes:
+  meadowlark-pgsql:
+    driver: local

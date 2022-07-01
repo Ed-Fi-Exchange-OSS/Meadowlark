@@ -1,0 +1,33 @@
+{
+  "name": "@edfi/meadowlark-postgres-backend",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark backend plugin for PostgreSQL",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  },
+  "dependencies": {
+    "@edfi/meadowlark-core": "0.2.0-dev.0",
+    "pg": "^8.7.3",
+    "pg-format": "1.0.4",
+    "postgres": "^3.2.4",
+    "ramda": "^0.28.0",
+    "ts-invariant": "^0.9.4"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2"
+  }
+}

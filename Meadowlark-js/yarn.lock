@@ -1564,6 +1564,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@edfi/meadowlark-postgres-backend@workspace:backends/meadowlark-postgres-backend":
+  version: 0.0.0-use.local
+  resolution: "@edfi/meadowlark-postgres-backend@workspace:backends/meadowlark-postgres-backend"
+  dependencies:
+    "@edfi/meadowlark-core": 0.2.0-dev.0
+    copyfiles: ^2.4.1
+    pg: ^8.7.3
+    pg-format: 1.0.4
+    postgres: ^3.2.4
+    ramda: ^0.28.0
+    rimraf: ^3.0.2
+    ts-invariant: ^0.9.4
+  languageName: unknown
+  linkType: soft
+
 "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend"
@@ -12544,6 +12559,7 @@ __metadata:
     mongodb: ^4.5.0
     pg: ^8.7.3
     pg-format: ^1.0.4
+    postgres: ^3.2.4
     prettier: 2.6.2
     rimraf: ^3.0.2
     ts-jest: ^27.1.5
@@ -14473,7 +14489,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-format@npm:^1.0.4":
+"pg-format@npm:1.0.4, pg-format@npm:^1.0.4":
   version: 1.0.4
   resolution: "pg-format@npm:1.0.4"
   checksum: 159b43ad57d2f963f1072def86080dd2a6dd42c1a86046e388d47b491e00afe795139520eb01c8dffc43ac0243c77b3c4c5882d0ec5f488bb3281f17458b1b3d
@@ -14699,6 +14715,13 @@ __metadata:
   dependencies:
     xtend: ^4.0.0
   checksum: 746b71f93805ae33b03528e429dc624706d1f9b20ee81bf743263efb6a0cd79ae02a642a8a480dbc0f09547b4315ab7df6ce5ec0be77ed700bac42730f5c76b2
+  languageName: node
+  linkType: hard
+
+"postgres@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "postgres@npm:3.2.4"
+  checksum: 613d09d66927bd436e286685881fa40297bac97ca3fc34359abf347f1e9cf00fb3c6fea328b004c632c507129e279883354b4e411d9c0c7478f88d670df78503
   languageName: node
   linkType: hard
 

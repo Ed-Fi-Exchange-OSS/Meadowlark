@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import { GetResult, GetRequest } from '@edfi/meadowlark-core';
+// import { documentByIdSql } from './SqlHelper';
+import { Sql } from 'postgres';
+
+export async function getDocumentById({ id }: GetRequest, client: Sql<any>): Promise<GetResult> {
+  try {
+    client``;
+    // const queryResult: QueryResult = await client.query(documentByIdSql(id));
+
+    // if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+
+    // const response: GetResult = {
+    //   response: 'GET_SUCCESS',
+    //   document: { id: queryResult.rows[0].document_id, ...queryResult.rows[0].edfi_doc },
+    // };
+    // return response;
+    return {response:'UNKNOWN_FAILURE', document:[id]}
+  } catch (e) {
+    return { response: 'UNKNOWN_FAILURE', document: [] };
+  }
+}
