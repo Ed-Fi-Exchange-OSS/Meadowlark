@@ -1,0 +1,15 @@
+{
+  "name": "@edfi/meadowlark-system-tests",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark system tests",
+  "license": "Apache-2.0",
+  "private": true,
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [],
+  "devDependencies": {
+    "@edfi/meadowlark-core": "0.2.0-dev.0"
+  }
+}

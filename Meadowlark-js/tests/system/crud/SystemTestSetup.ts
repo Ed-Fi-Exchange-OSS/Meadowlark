@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, Logger } from '@edfi/meadowlark-core';
+import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, SystemTestClient, Logger } from '@edfi/meadowlark-core';
 
 // Enviroment setup
 const TEST_SIGNING_KEY =
@@ -14,11 +14,26 @@ process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
 
 // eslint-disable-next-line import/no-mutable-exports
-export let backendToTest: SystemTestablePlugin;
+let backend: SystemTestablePlugin;
 (async () => {
   Logger.warn(`**** System test loading package '${process.env.DOCUMENT_STORE_PLUGIN}'`, null);
-  backendToTest = await import(process.env.DOCUMENT_STORE_PLUGIN ?? '');
+  backend = await import(process.env.DOCUMENT_STORE_PLUGIN ?? '');
 })();
+
+// Adds 500ms pause before each system test setup, giving time for any prior db teardown to complete
+export const backendToTest: SystemTestablePlugin = {
+  systemTestSetup: async (): Promise<SystemTestClient> => {
+    await new Promise((r) => {
+      setTimeout(r, 500);
+    });
+    return backend.systemTestSetup();
+  },
+  systemTestTeardown: async (client: SystemTestClient): Promise<void> => {
+    backend.systemTestTeardown(client);
+  },
+};
+
+// Test data
 
 export const CLIENT1_HEADERS = {
   Authorization:

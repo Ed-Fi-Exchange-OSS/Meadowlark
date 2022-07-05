@@ -1580,6 +1580,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@edfi/meadowlark-system-tests@workspace:tests/system":
+  version: 0.0.0-use.local
+  resolution: "@edfi/meadowlark-system-tests@workspace:tests/system"
+  dependencies:
+    "@edfi/meadowlark-core": 0.2.0-dev.0
+  languageName: unknown
+  linkType: soft
+
 "@edfi/metaed-core@npm:3.0.2-dev.1":
   version: 3.0.2-dev.1
   resolution: "@edfi/metaed-core@npm:3.0.2-dev.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.2-dev.1.tgz"
