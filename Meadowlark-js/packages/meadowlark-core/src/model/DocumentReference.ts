@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity } from './DocumentIdentity';
+import { documentIdForDocumentIdentity } from './DocumentIdentity';
+import type { DocumentIdentity } from './DocumentIdentity';
 
 export type DocumentReference = {
   /**
@@ -27,3 +28,18 @@ export type DocumentReference = {
    */
   documentIdentity: DocumentIdentity;
 };
+
+/**
+ * Returns the id of the given DocumentReference, using the project name, resource name, resource version
+ * and identity of the API document.
+ */
+export function documentIdForDocumentReference(documentReference: DocumentReference): string {
+  return documentIdForDocumentIdentity(
+    {
+      projectName: documentReference.projectName,
+      resourceName: documentReference.resourceName,
+      isDescriptor: documentReference.isDescriptor,
+    },
+    documentReference.documentIdentity,
+  );
+}

@@ -120,7 +120,7 @@ export function foreignKeyConditions(resourceInfo: ResourceInfo, documentInfo: D
       isDescriptor: false,
     };
 
-    // TODO: Needs updating to RND-275 changes
+    // TODO: RND-306 - Needs updating based on RND-275 changes
     // if (documentReference.isAssignableFrom) {
     //   return conditionCheckFromAssignable(entityTypeInfo, documentReference.documentIdentity);
     // }

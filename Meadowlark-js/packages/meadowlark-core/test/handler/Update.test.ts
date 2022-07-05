@@ -7,7 +7,7 @@ import { update } from '../../src/handler/Update';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
-import { documentIdForDocumentInfo } from '../../src/model/DocumentId';
+import { documentIdForDocumentInfo } from '../../src/model/DocumentInfo';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';

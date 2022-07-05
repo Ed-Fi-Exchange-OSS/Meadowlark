@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { documentIdForDocumentInfo } from '../model/DocumentId';
+import { documentIdForDocumentInfo } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
 import type { UpsertRequest } from '../message/UpsertRequest';

@@ -11,14 +11,13 @@ import path from 'path';
 import xml2js from 'xml2js';
 import { getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
 import { Logger } from '../Logger';
-import { documentIdForDocumentInfo } from '../model/DocumentId';
+import { documentIdForDocumentInfo, DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
-import { DocumentInfo } from '../model/DocumentInfo';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
