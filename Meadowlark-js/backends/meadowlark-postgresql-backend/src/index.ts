@@ -21,3 +21,5 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     securityMiddleware,
   };
 }
+
+export { systemTestSetup, systemTestTeardown } from './repository/SystemTestHelper';

@@ -3,37 +3,31 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { deleteIt, FrontendResponse, get, upsert } from '@edfi/meadowlark-core';
-import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark-mongodb-backend';
-import { MongoClient } from 'mongodb';
+import { deleteIt, FrontendResponse, upsert, get, SystemTestClient } from '@edfi/meadowlark-core';
 import {
-  schoolBodyClient1,
-  schoolDeleteClient2,
-  schoolGetClient1,
+  backendToTest,
   schoolDeleteClient1,
   academicWeekBodyClient1,
-  configureEnvironmentForMongoSystemTests,
+  schoolDeleteClient2,
+  schoolBodyClient1,
+  schoolGetClient1,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
-configureEnvironmentForMongoSystemTests();
 
 describe('given a DELETE of a non-existent school', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     // Act
     deleteResult = await deleteIt(schoolDeleteClient1());
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return not found from delete', async () => {
@@ -42,13 +36,12 @@ describe('given a DELETE of a non-existent school', () => {
 });
 
 describe('given a POST of a school by followed by a DELETE of the school', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -58,9 +51,7 @@ describe('given a POST of a school by followed by a DELETE of the school', () =>
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete success', async () => {
@@ -74,13 +65,12 @@ describe('given a POST of a school by followed by a DELETE of the school', () =>
 });
 
 describe('given a POST of a school by one client followed by a DELETE of the school by a second client', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -90,9 +80,7 @@ describe('given a POST of a school by one client followed by a DELETE of the sch
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete from client 2 as a 403 forbidden', async () => {
@@ -106,13 +94,12 @@ describe('given a POST of a school by one client followed by a DELETE of the sch
 });
 
 describe('given the DELETE of a school referenced by an academic week', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
     await upsert(academicWeekBodyClient1());
@@ -123,9 +110,7 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return delete failure due to a reference to the school', async () => {

@@ -64,6 +64,7 @@ describe('given the get of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -104,6 +105,7 @@ describe('given the get of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 

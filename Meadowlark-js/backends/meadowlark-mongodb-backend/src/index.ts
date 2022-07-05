@@ -24,3 +24,4 @@ export function initializeDocumentStore(): DocumentStorePlugin {
 
 // Accessible for system testing - this may turn into a generic setup/teardown datastore interface
 export { getNewClient, getCollection, resetSharedClient } from './repository/Db';
+export { systemTestSetup, systemTestTeardown } from './repository/SystemTestHelper';

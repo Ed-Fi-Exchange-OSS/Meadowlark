@@ -46,6 +46,7 @@ describe('given the upsert where no document id is specified', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -76,6 +77,7 @@ describe('given the getById of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -133,6 +135,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -189,6 +192,7 @@ describe('given the getById of a document not owned by the requestor', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 

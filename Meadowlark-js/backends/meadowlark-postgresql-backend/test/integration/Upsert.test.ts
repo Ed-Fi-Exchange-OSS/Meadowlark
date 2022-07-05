@@ -68,6 +68,7 @@ describe('given the upsert of a new document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -115,6 +116,7 @@ describe('given the upsert of an existing document twice', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -154,6 +156,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     // End the connection with the database
     await resetSharedClient();
   });
@@ -208,6 +211,7 @@ describe('given an upsert of a new document that references a non-existent docum
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -285,6 +289,7 @@ describe('given an upsert of a new document that references an existing document
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -370,6 +375,7 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -443,6 +449,7 @@ describe('given an update of a document that references a non-existent document 
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -539,6 +546,7 @@ describe('given an update of a document that references an existing document wit
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -645,6 +653,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 

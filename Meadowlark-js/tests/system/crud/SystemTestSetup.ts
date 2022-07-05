@@ -3,11 +3,37 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, newFrontendRequest } from '@edfi/meadowlark-core';
+import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, SystemTestClient, Logger } from '@edfi/meadowlark-core';
 
-export const MONGO_DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
-export const TEST_SIGNING_KEY =
+// Enviroment setup
+const TEST_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+process.env.SIGNING_KEY = TEST_SIGNING_KEY;
+process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
+
+if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
+
+// eslint-disable-next-line import/no-mutable-exports
+let backend: SystemTestablePlugin;
+(async () => {
+  Logger.warn(`**** System test loading package '${process.env.DOCUMENT_STORE_PLUGIN}'`, null);
+  backend = await import(process.env.DOCUMENT_STORE_PLUGIN ?? '');
+})();
+
+// Adds 500ms pause before each system test setup, giving time for any prior db teardown to complete
+export const backendToTest: SystemTestablePlugin = {
+  systemTestSetup: async (): Promise<SystemTestClient> => {
+    await new Promise((r) => {
+      setTimeout(r, 500);
+    });
+    return backend.systemTestSetup();
+  },
+  systemTestTeardown: async (client: SystemTestClient): Promise<void> => {
+    backend.systemTestTeardown(client);
+  },
+};
+
+// Test data
 
 export const CLIENT1_HEADERS = {
   Authorization:
@@ -92,10 +118,4 @@ export function academicWeekBodyClient1(): FrontendRequest {
       "totalInstructionalDays": 30
     }`,
   };
-}
-
-export function configureEnvironmentForMongoSystemTests(): void {
-  process.env.DOCUMENT_STORE_PLUGIN = MONGO_DOCUMENT_STORE_PLUGIN;
-  process.env.SIGNING_KEY = TEST_SIGNING_KEY;
-  process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 }

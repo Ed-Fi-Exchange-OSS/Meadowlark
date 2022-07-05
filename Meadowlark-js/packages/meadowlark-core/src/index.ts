@@ -7,6 +7,7 @@ export type { DocumentStorePlugin } from './plugin/backend/DocumentStorePlugin';
 export { NoDocumentStorePlugin } from './plugin/backend/NoDocumentStorePlugin';
 export type { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';
 export { NoQueryHandlerPlugin } from './plugin/backend/NoQueryHandlerPlugin';
+export type { SystemTestClient, SystemTestablePlugin } from './plugin/backend/SystemTestablePlugin';
 export { Subscribe } from './plugin/listener/Subscribe';
 export type { GetResult } from './message/GetResult';
 export type { DeleteResult } from './message/DeleteResult';

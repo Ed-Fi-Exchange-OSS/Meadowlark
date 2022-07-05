@@ -3,35 +3,24 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendResponse, get, upsert } from '@edfi/meadowlark-core';
-import { getNewClient, getCollection, resetSharedClient } from '@edfi/meadowlark-mongodb-backend';
-import { MongoClient } from 'mongodb';
-import {
-  schoolBodyClient1,
-  schoolGetClient2,
-  schoolGetClient1,
-  configureEnvironmentForMongoSystemTests,
-} from './SystemTestSetup';
+import { FrontendResponse, get, SystemTestClient, upsert } from '@edfi/meadowlark-core';
+import { backendToTest, schoolBodyClient1, schoolGetClient2, schoolGetClient1 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
-configureEnvironmentForMongoSystemTests();
 
 describe('given a GET of a non-existent school', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     // Act
     getResult = await get(schoolGetClient1());
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return not found', async () => {
@@ -41,12 +30,11 @@ describe('given a GET of a non-existent school', () => {
 });
 
 describe('given a POST of a school by one client followed by a GET of the school by a second client', () => {
-  let client: MongoClient;
+  let client: SystemTestClient;
   let getResult: FrontendResponse;
 
   beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    await getCollection(client).deleteMany({});
+    client = await backendToTest.systemTestSetup();
 
     await upsert(schoolBodyClient1());
 
@@ -55,9 +43,7 @@ describe('given a POST of a school by one client followed by a GET of the school
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-    await resetSharedClient();
+    backendToTest.systemTestTeardown(client);
   });
 
   it('should return get as a 403 forbidden', async () => {

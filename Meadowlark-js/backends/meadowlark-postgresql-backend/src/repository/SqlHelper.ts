@@ -68,8 +68,8 @@ export function checkIsReferencedDocumentSql(documentId: string): string {
  */
 export function referencedByDocumentSql(documentId: string): string {
   return format(
-    `SELECT document_id, resource_name, document_identity FROM meadowlark.references
-    JOIN meadowlark.documents on meadowlark.documents.document_id = meadowlark.references.referenced_document_id
+    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents
+    JOIN meadowlark.references on meadowlark.documents.document_id = meadowlark.references.parent_document_id
     WHERE referenced_document_id = %L LIMIT 5;`,
     [documentId],
   );

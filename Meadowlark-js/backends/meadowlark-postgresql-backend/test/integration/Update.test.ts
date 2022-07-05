@@ -70,6 +70,7 @@ describe('given the update of a non-existent document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -116,6 +117,7 @@ describe('given the update of an existing document', () => {
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -188,6 +190,7 @@ describe('given an update of a document that references a non-existent document 
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -286,6 +289,7 @@ describe('given an update of a document that references an existing document wit
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
@@ -391,6 +395,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   afterAll(async () => {
     await deleteAll(client);
+    client.release();
     await resetSharedClient();
   });
 
