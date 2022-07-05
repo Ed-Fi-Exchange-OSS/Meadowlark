@@ -1,3 +1,9 @@
+# These tests are intended to validate handling of superclass relationships.
+# - Can we create entities that have a superclass, e.g. a School (superclass: Education Organization)?
+# - Can we access that created entity correctly?
+# - When a request comes in with a document that references an Education Organization, can we validate the
+#   educationOrganizationId properly even though there is no "educationOrganization" entity?
+
 @auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ###
@@ -71,6 +77,7 @@ content-type: application/json
 }
 
 ### 
+# @name school122
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -93,11 +100,12 @@ reference-validation: true
 }
 
 ### 
-GET http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
+@schoolDocumentlocation = {{school122.response.headers.location}}
+GET http://localhost:3000{{schoolDocumentlocation}}
 {{auth_header}}
 
 ### 
-PUT http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
+PUT http://localhost:3000{{schoolDocumentlocation}}
 content-type: application/json
 {{auth_header}}
 
@@ -118,7 +126,7 @@ content-type: application/json
 }
 
 ### 
-DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/Dc9UZUgsSCWVw5IAwAqNoVGugRCeKGrht8vNfQ
+DELETE http://localhost:3000{{schoolDocumentlocation}}
 {{auth_header}}
 
 
@@ -146,6 +154,7 @@ content-type: application/json
 }
 
 ### 
+# @name lea12
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
 {{auth_header}}
@@ -163,11 +172,12 @@ reference-validation: false
 }
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
+@schoolDocumentLocation = {{lea12.response.headers.location}}
+GET http://localhost:3000{{schoolDocumentLocation}}
 {{auth_header}}
 
 ### 
-PUT http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
+PUT http://localhost:3000{{schoolDocumentLocation}}
 content-type: application/json
 {{auth_header}}
 reference-validation: true
@@ -184,7 +194,7 @@ reference-validation: true
 }
 
 ### 
-DELETE http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies/XUs_dCtp-dr640G-EZZrgiGmYu-y8k6dzMsL2w
+DELETE http://localhost:3000{{schoolDocumentLocation}}
 {{auth_header}}
 
 
@@ -199,7 +209,7 @@ content-type: application/json
 reference-validation: true
 
 {
-    "schoolId": 12,
+    "schoolId": 122,
     "nameOfInstitution": "A School",
     "educationOrganizationCategories" : [
         {
@@ -215,7 +225,6 @@ reference-validation: true
 }
 
 ####
-# This is broken with MongoDB and PostgreSQL, as we need to build in "assignable" support as with DynamoDB. RND-295
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 {{auth_header}}
@@ -223,12 +232,23 @@ reference-validation: true
 
 {
     "educationOrganizationReference": {
-        "educationOrganizationId": 12
+        "educationOrganizationId": 122
     },
     "courseCode": "1234",
     "courseTitle": "A Course",
     "numberOfParts": 1,
     "identificationCodes": []
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/SexDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Female",
+    "shortDescription": "Female",
+    "namespace": "uri://ed-fi.org/SexDescriptor"
 }
 
 ####
