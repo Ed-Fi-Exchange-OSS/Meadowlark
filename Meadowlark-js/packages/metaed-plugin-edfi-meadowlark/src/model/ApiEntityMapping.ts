@@ -17,29 +17,32 @@ export type ApiEntityMapping = {
    * of the entity, in sorted order.
    */
   flattenedIdentityProperties: EntityProperty[];
+
   /**
    * The ReferenceComponents of all of the identity properties
    * of the entity.
    */
   identityReferenceComponents: ReferenceComponent[];
+
   /**
    * The ReferenceGroups of all of the properties of the entity.
    */
   referenceGroups: ReferenceGroup[];
+
   /**
    * ApiPropertyMappings of all of the descriptor properties on the entity.
    */
   descriptorCollectedProperties: CollectedProperty[];
+
   /**
    * If the entity for this mapping is in a subclass/superclass relationship, this is the superclass entity
-   * which it can be assigned to. (MetaEd only allows a single level of subclassing.)
+   * (MetaEd only allows a single level of subclassing.)
    *
    * Example 1: If the entity for this mapping is School (subclass of EducationOrganization),
-   *            then assignableTo would be EducationOrganization.
-   * Example 2: If the entity is EducationOrganziation (a superclass), assignableTo would also be EducationOrganization.
-   * Example 3: If the entity is GradingPeriod (neither subclass nor superclass), assignableTo would be null.
+   *            then superclass would be EducationOrganization.
+   * Example 2: If the entity is GradingPeriod (not a subclass), assignableTo would be null.
    */
-  assignableTo: TopLevelEntity | null;
+  superclass: TopLevelEntity | null;
 };
 
 export function newApiEntityMapping(): ApiEntityMapping {
@@ -48,7 +51,7 @@ export function newApiEntityMapping(): ApiEntityMapping {
     identityReferenceComponents: [],
     referenceGroups: [],
     descriptorCollectedProperties: [],
-    assignableTo: null,
+    superclass: null,
   };
 }
 

@@ -15,8 +15,6 @@ import {
   ReferenceGroup,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { DocumentReference } from '../model/DocumentReference';
-import { deriveAssignableFrom } from './DocumentIdentityExtractor';
-import { Assignable } from '../model/Assignable';
 import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DocumentElement } from '../model/DocumentElement';
 
@@ -172,11 +170,7 @@ function documentReferencesFromReferenceGroup(
 
   const result: DocumentReference[] = [];
 
-  const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
   documentIdentities.forEach((documentIdentity) => {
-    // Check if this reference is to an assignable entity. If so, the identity to a superclass
-    const assignable: Assignable | null = deriveAssignableFrom(referencedEntity, documentIdentity);
-
     let resourceName = referenceGroup.sourceProperty.metaEdName;
     if (referenceGroup.sourceProperty.type === 'descriptor') {
       resourceName = normalizeDescriptorSuffix(resourceName);
@@ -185,9 +179,7 @@ function documentReferencesFromReferenceGroup(
     result.push({
       projectName: referenceGroup.sourceProperty.namespace.projectName,
       resourceName,
-      resourceVersion: referenceGroup.sourceProperty.namespace.projectVersion,
-      documentIdentity: assignable == null ? documentIdentity : assignable.assignableIdentity,
-      isAssignableFrom: referencedEntity.subclassedBy.length > 0,
+      documentIdentity,
       isDescriptor: false,
     });
   });

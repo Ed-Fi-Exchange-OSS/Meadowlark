@@ -120,9 +120,10 @@ export function foreignKeyConditions(resourceInfo: ResourceInfo, documentInfo: D
       isDescriptor: false,
     };
 
-    if (documentReference.isAssignableFrom) {
-      return conditionCheckFromAssignable(entityTypeInfo, documentReference.documentIdentity);
-    }
+    // TODO: RND-306 - Needs updating based on RND-275 changes
+    // if (documentReference.isAssignableFrom) {
+    //   return conditionCheckFromAssignable(entityTypeInfo, documentReference.documentIdentity);
+    // }
 
     return conditionCheckFrom(entityTypeInfo, documentReference.documentIdentity);
   });
@@ -190,13 +191,13 @@ export function constructAssignablePutItem(
   resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
 ): TransactWriteItem | null {
-  if (documentInfo.assignableInfo == null) return null;
+  if (documentInfo.superclassInfo == null) return null;
 
-  // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
+  // TODO: Note for the future, this assumes the "superclass" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
     resourceInfo.projectName,
     resourceInfo.resourceVersion,
-    documentInfo.assignableInfo.assignableToName,
+    documentInfo.superclassInfo.resourceName,
   );
 
   return {
@@ -209,10 +210,9 @@ export function constructAssignablePutItem(
             {
               projectName: resourceInfo.projectName,
               resourceName: resourceInfo.resourceName,
-              resourceVersion: resourceInfo.resourceVersion,
               isDescriptor: false,
             },
-            documentInfo.assignableInfo.assignableIdentity,
+            documentInfo.superclassInfo.documentIdentity,
           ),
         ),
       },
@@ -229,13 +229,13 @@ export function constructAssignableDeleteItem(
   resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
 ): TransactWriteItem | null {
-  if (documentInfo.assignableInfo == null) return null;
+  if (documentInfo.superclassInfo == null) return null;
 
-  // TODO: Note for the future, this assumes the "assignable to" entity is in the same project/namespace as the given entity
+  // TODO: Note for the future, this assumes the "superclass" entity is in the same project/namespace as the given entity
   const assignableToType = entityTypeStringFromComponents(
     resourceInfo.projectName,
     resourceInfo.resourceVersion,
-    documentInfo.assignableInfo.assignableToName,
+    documentInfo.superclassInfo.resourceName,
   );
 
   return {

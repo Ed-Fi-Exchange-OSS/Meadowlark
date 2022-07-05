@@ -48,18 +48,14 @@ describe('when collecting foreign key references', () => {
     resourceInfo.resourceVersion = '3.3.1-b';
     documentInfo.documentReferences.push({
       projectName: resourceInfo.projectName,
-      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'Person',
       documentIdentity: personNK,
-      isAssignableFrom: false,
       isDescriptor: false,
     });
     documentInfo.documentReferences.push({
       projectName: resourceInfo.projectName,
-      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'EducationOrganization',
       documentIdentity: [{ name: 'educationOrganization.educationOrganizationId', value: '234' }],
-      isAssignableFrom: false,
       isDescriptor: false,
     });
     documentInfo.documentIdentity = parentIdentity;
@@ -119,7 +115,6 @@ describe('when collecting foreign key references', () => {
     resourceInfo.resourceVersion = '3.3.1-b';
     documentInfo.descriptorReferences.push({
       projectName: resourceInfo.projectName,
-      resourceVersion: resourceInfo.resourceVersion,
       resourceName: 'SomethingDescriptor',
       documentIdentity: [
         {
@@ -127,7 +122,6 @@ describe('when collecting foreign key references', () => {
           value: 'something',
         },
       ],
-      isAssignableFrom: false,
       isDescriptor: true,
     });
     documentInfo.documentIdentity = parentIdentity;

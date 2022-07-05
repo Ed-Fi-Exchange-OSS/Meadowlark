@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity } from './DocumentIdentity';
+import { documentIdForDocumentIdentity } from './DocumentIdentity';
+import type { DocumentIdentity } from './DocumentIdentity';
 
 export type DocumentReference = {
   /**
@@ -18,28 +19,27 @@ export type DocumentReference = {
   resourceName: string;
 
   /**
-   * The resource version as a string. This is the same as the MetaEd project version
-   * the entity is defined in e.g. "3.3.1-b" for a 3.3b data standard entity.
-   */
-  resourceVersion: string;
-
-  /**
    * Whether this document is a descriptor. Descriptors are treated differently from other documents
    */
   isDescriptor: boolean;
-
-  /**
-   * True if the referenced entity is assignable from other entities (meaning it is a superclass),
-   *
-   * Example 1: School is not a superclass. isAssignableFrom would be false if the reference
-   *            was to a School.
-   * Example 2: EducationOrganization is a superclass of School, LocalEducationAgency, and others. isAssignableFrom
-   *            would be true if the reference was to an EducationOrganization.
-   */
-  isAssignableFrom: boolean;
 
   /**
    * The document identity representing this reference.
    */
   documentIdentity: DocumentIdentity;
 };
+
+/**
+ * Returns the id of the given DocumentReference, using the project name, resource name, resource version
+ * and identity of the API document.
+ */
+export function documentIdForDocumentReference(documentReference: DocumentReference): string {
+  return documentIdForDocumentIdentity(
+    {
+      projectName: documentReference.projectName,
+      resourceName: documentReference.resourceName,
+      isDescriptor: documentReference.isDescriptor,
+    },
+    documentReference.documentIdentity,
+  );
+}

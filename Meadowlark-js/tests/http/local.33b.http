@@ -1,6 +1,6 @@
 #
 # Some of the tests in this file assume that the user has already run throuhg
-# the tests in `local.33b.assignable.http`.
+# the tests in `local.33b.superclass.http`.
 #
 
 ### Authenticate
@@ -77,7 +77,7 @@ authorization: bearer {{authToken1}}
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
 authorization: bearer {{authToken1}}
 
-### Strict validation is enabled, this will fail due to an invalid country
+### 400: Strict validation is enabled, this will fail due to an invalid country
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -103,6 +103,23 @@ authorization: bearer {{authToken1}}
     "lastSurname": "World",
     "birthDate": "2001-01-01",
     "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#AD3"
+}
+
+
+###
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/kKOLuEZJWjsDhpDiJOQlryLw_JBvzQ5KXTF2xg
+authorization: bearer {{authToken1}}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "codeValue": "US",
+  "shortDescription": "US",
+  "description": "US",
+  "namespace": "uri://ed-fi.org/CountryDescriptor"
 }
 
 ### Now it contains a valid country
@@ -223,7 +240,6 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a location - school does not exist.
-# This has an unusual error message - complains about "educationOrganizationId" not existing rather than "schoolId" RND-294
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -264,12 +280,11 @@ authorization: bearer {{authToken1}}
   "namespace": "uri://ed-fi.org/TermDescriptor"
 }
 
-
 ### Create a Session
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
 content-type: application/json
 authorization: bearer {{authToken1}}
-descriptor-validation: false
+descriptor-validation: true
 
 {
   "sessionName": "d",
@@ -284,7 +299,6 @@ descriptor-validation: false
 }
 
 ### Create a course
-# Broken on MongoDB and PostgreSQL while "is assignable" is pending. RND-295
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 reference-validation: true
@@ -300,31 +314,31 @@ authorization: bearer {{authToken1}}
     "identificationCodes": []
 }
 
-
-# ******************* Example of bug RND-234 - see DocumentId.documentIdForDocumentIdentity()
 ### Create a courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
-reference-validation: false
+reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
   "localCourseCode": "abfdddcde",
   "schoolReference": {
-    "schoolId": 122
+    "schoolId": 123
   },
   "sessionReference": {
     "sessionName": "d",
-    "schoolId": 122,
+    "schoolId": 123,
     "schoolYear": 2034
   },
   "courseReference": {
-    "courseCode": "abfdddcde",
-    "educationOrganizationId": 122
+    "courseCode": "span-101",
+    "educationOrganizationId": 123
   }
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
+## !! Currently failing, but should be a valid request.
+# Example of bug RND-234 ?? - see DocumentId.documentIdForDocumentIdentity()
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -333,22 +347,42 @@ authorization: bearer {{authToken1}}
     "sectionIdentifier": "c00v",
     "courseOfferingReference": {
       "localCourseCode": "abfdddcde",
-      "schoolId": 122,
+      "schoolId": 123,
       "schoolYear": 2034,
       "sessionName": "d"
     },
     "locationReference": {
       "classroomIdentificationCode": "string",
-      "schoolId": 122
+      "schoolId": 123
+    }
+}
+
+### This version temporarly disables reference validation. Remove it after fixing RND-234.
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
+authorization: bearer {{authToken1}}
+reference-validation: false
+
+{ 
+    "sectionIdentifier": "c00v",
+    "courseOfferingReference": {
+      "localCourseCode": "abfdddcde",
+      "schoolId": 123,
+      "schoolYear": 2034,
+      "sessionName": "d"
+    },
+    "locationReference": {
+      "classroomIdentificationCode": "string",
+      "schoolId": 123
     }
 }
 
 ### Should fail due to the presence of the section above
-DELETE http://localhost:3000/local/v3.3b/ed-fi/courseOfferings/234e2415074c782efb93362c62926a5c48ece972b52b7e9010fa6280
+DELETE http://localhost:3000/local/v3.3b/ed-fi/courseOfferings/-epMUEx3z2sXHsjmOtmXdfHZMmggxbj_9sL6TA
 authorization: bearer {{authToken1}}
 
-### If the above failed, now try deleting the section and then run above again. Should work now - if the TREFs were deleted
-DELETE http://localhost:3000/local/v3.3b/ed-fi/sections/d6f94aa9b424e4004eaa4a81cb00ae58775c5d317472d5adb1cb10b0
+### If the above failed, now try deleting the section and then run above again. Should work now
+DELETE http://localhost:3000/local/v3.3b/ed-fi/sections/txtK94BT9QZfS-OhuJzbZa5WFcDcXKqhAOBwFw
 authorization: bearer {{authToken1}}
 
 ######## List all with GET
@@ -415,11 +449,22 @@ authorization: bearer {{authToken1}}
     "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
 }
 
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/GradeLevelDescriptors
+content-type: application/application/json
+authorization: bearer {{authToken1}}
+
+{
+  "codeValue": "10",
+  "shortDescription": "10",
+  "description": "10",
+  "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
 
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 content-type: application/json
-descriptor-validation: false
 authorization: bearer {{authToken1}}
 
 { 
@@ -427,14 +472,14 @@ authorization: bearer {{authToken1}}
         "studentUniqueId": "s0zf6d1123d3e"
     },
     "schoolReference": {
-        "schoolId": 122
+        "schoolId": 123
     },
     "entryDate": "2020-01-01",
-    "entryGradeLevelDescriptor": "10"
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10"
 }
 
 ######## GET by ID
-GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/4239e9771c21da48596769748893ba634c28466be1286cd2226b9b93
+GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/gypI96NaEU6Aat_Eg14MTK8rXKo7JGIyDzeIHQ
 authorization: bearer {{authToken1}}
 
 
@@ -610,5 +655,5 @@ authorization: bearer {{authToken1}}
 
 
 ### Try to delete school 123. Should be denied (409) because there are references to it
-DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg
+DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 authorization: bearer {{authToken1}}

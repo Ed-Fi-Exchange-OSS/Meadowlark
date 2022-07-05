@@ -29,15 +29,14 @@ export type { FrontendRequest, FrontendHeaders } from './handler/FrontendRequest
 export { newFrontendRequest } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
 export { newFrontendResponse } from './handler/FrontendResponse';
-export {
-  documentIdForDocumentInfo,
-  documentIdForDocumentReference,
-  documentIdForDocumentIdentity,
-} from './model/DocumentId';
+export { documentIdForDocumentIdentity } from './model/DocumentIdentity';
+export { documentIdForDocumentReference } from './model/DocumentReference';
 export type { DocumentInfo } from './model/DocumentInfo';
-export { newDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
+export { newDocumentInfo, documentIdForDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
 export type { ResourceInfo } from './model/ResourceInfo';
 export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
+export type { SuperclassInfo } from './model/SuperclassInfo';
+export { newSuperclassInfo, documentIdForSuperclassInfo } from './model/SuperclassInfo';
 export { Logger } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 export type { MiddlewareModel } from './middleware/MiddlewareModel';

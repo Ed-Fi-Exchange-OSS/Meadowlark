@@ -15,6 +15,8 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  newSuperclassInfo,
+  SuperclassInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -112,7 +114,7 @@ describe('given the delete of an existing document', () => {
   });
 });
 
-describe('given an delete of a document referenced by an existing document with validation on', () => {
+describe('given the delete of a document referenced by an existing document with validation on', () => {
   let client;
   let deleteResult;
 
@@ -130,8 +132,6 @@ describe('given an delete of a document referenced by an existing document with 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -181,7 +181,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 });
 
-describe('given an delete of a document referenced by an existing document with validation off', () => {
+describe('given the delete of a document referenced by an existing document with validation off', () => {
   let client;
   let deleteResult;
 
@@ -198,8 +198,6 @@ describe('given an delete of a document referenced by an existing document with 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -246,5 +244,90 @@ describe('given an delete of a document referenced by an existing document with 
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: referencedDocumentId });
     expect(result).toBeNull();
+  });
+});
+
+describe('given the delete of a subclass document referenced by an existing document as a superclass', () => {
+  let client;
+  let deleteResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    projectName: 'Ed-Fi',
+  };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    superclassInfo,
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const referenceAsSuperclass: DocumentReference = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    documentIdentity: superclassInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferenceResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferenceDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'week', value: 'delete6' }],
+    documentReferences: [referenceAsSuperclass],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(
+    documentWithReferenceResourceInfo,
+    documentWithReferenceDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+
+    // The referencing document that should cause the delete to fail
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should have returned delete failure due to existing reference', async () => {
+    expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
+  });
+
+  it('should still have the referenced document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ _id: referencedDocumentId });
+    expect(result.documentIdentity[0].name).toBe('schoolId');
+    expect(result.documentIdentity[0].value).toBe('123');
   });
 });

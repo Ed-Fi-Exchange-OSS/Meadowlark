@@ -51,14 +51,13 @@ export function descriptorCollectedPropertiesFrom(entity: TopLevelEntity): Colle
 }
 
 /**
- * If the entity for this mapping is in a subclass/superclass relationship, returns the superclass entity
+ * If the entity for this mapping is a subclass, returns the superclass entity
  * which it can be assigned to, otherwise null. Note MetaEd only allows a single level of subclassing.
  */
-export function assignabilityFor(entity: TopLevelEntity): TopLevelEntity | null {
+export function superclassFor(entity: TopLevelEntity): TopLevelEntity | null {
   // Specifically exclude Domain Entity/Association Extensions - just to be safe
   if (entity.type === 'domainEntityExtension' || entity.type === 'associationExtension') return null;
   // If it's a subclass, return its superclass
   if (entity.baseEntity != null) return entity.baseEntity;
-  // If it's a superclass, return itself
-  return entity.subclassedBy.length > 0 ? entity : null;
+  return null;
 }

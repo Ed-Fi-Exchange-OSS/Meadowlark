@@ -110,11 +110,9 @@ describe('when extracting document references from domain entity referencing one
               "value": "24",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -127,11 +125,9 @@ describe('when extracting document references from domain entity referencing one
               "value": "25",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -144,11 +140,9 @@ describe('when extracting document references from domain entity referencing one
               "value": "23",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -209,11 +203,9 @@ describe('when extracting with optional reference in body', () => {
               "value": "abc",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
-          "resourceVersion": "",
         },
       ]
     `);
@@ -328,11 +320,9 @@ describe('when extracting optional collection in body', () => {
               "value": "z1",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
         Object {
           "documentIdentity": Array [
@@ -341,11 +331,9 @@ describe('when extracting optional collection in body', () => {
               "value": "z2",
             },
           ],
-          "isAssignableFrom": false,
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
-          "resourceVersion": "",
         },
       ]
     `);

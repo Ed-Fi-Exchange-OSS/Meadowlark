@@ -5,9 +5,9 @@
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { UpsertResult, Logger, UpsertRequest } from '@edfi/meadowlark-core';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { asUpsert, meadowlarkDocumentFrom, onlyReturnId, validateReferences } from './WriteHelper';
+import { asUpsert, onlyReturnId, validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
   { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,

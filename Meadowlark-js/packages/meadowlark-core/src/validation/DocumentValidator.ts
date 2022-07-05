@@ -7,12 +7,16 @@ import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import { extractDocumentIdentity, deriveAssignableFrom, DocumentIdentityWithSecurity } from './DocumentIdentityExtractor';
+import {
+  extractDocumentIdentity,
+  deriveSuperclassInfoFrom,
+  DocumentIdentityWithSecurity,
+} from './DocumentIdentityExtractor';
 import { decapitalize } from '../Utility';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
-import { Assignable } from '../model/Assignable';
+import { SuperclassInfo } from '../model/SuperclassInfo';
 import { NoDocumentIdentity } from '../model/DocumentIdentity';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { getMatchingMetaEdModelFrom } from '../metaed/ResourceNameMapping';
@@ -63,7 +67,7 @@ export async function validateDocument(
     studentId: null,
     edOrgId: null,
   };
-  let assignableInfo: Assignable | null = null;
+  let superclassInfo: SuperclassInfo | null = null;
   const documentReferences: DocumentReference[] = [];
   const descriptorReferences: DocumentReference[] = [];
 
@@ -80,7 +84,7 @@ export async function validateDocument(
 
   if (!resourceInfo.isDescriptor) {
     // We need to do this even if no body for deletes
-    assignableInfo = deriveAssignableFrom(matchingMetaEdModel, documentIdentityWithSecurity.documentIdentity);
+    superclassInfo = deriveSuperclassInfoFrom(matchingMetaEdModel, documentIdentityWithSecurity.documentIdentity);
   }
 
   return {
@@ -88,7 +92,7 @@ export async function validateDocument(
       documentReferences,
       descriptorReferences,
       ...documentIdentityWithSecurity,
-      assignableInfo,
+      superclassInfo,
     },
     errorBody,
   };

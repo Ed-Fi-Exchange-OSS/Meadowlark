@@ -14,6 +14,8 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  newSuperclassInfo,
+  SuperclassInfo,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -172,8 +174,6 @@ describe('given an upsert of a new document that references a non-existent docum
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -228,8 +228,6 @@ describe('given an upsert of a new document that references an existing document
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -305,8 +303,6 @@ describe('given an upsert of a new document with one existing and one non-existe
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -314,8 +310,6 @@ describe('given an upsert of a new document with one existing and one non-existe
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -377,6 +371,98 @@ describe('given an upsert of a new document with one existing and one non-existe
   });
 });
 
+describe('given an upsert of a subclass document referenced by an existing document as a superclass', () => {
+  let client;
+  let upsertResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    projectName: 'Ed-Fi',
+  };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    superclassInfo,
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const referenceAsSuperclass: DocumentReference = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    documentIdentity: superclassInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferenceResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferenceDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'week', value: 'update6' }],
+    documentReferences: [referenceAsSuperclass],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(
+    documentWithReferenceResourceInfo,
+    documentWithReferenceDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    //  The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+
+    // The new upserted document with reference as superclass
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferenceResourceInfo,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return success for document insert with a valid reference to superclass', async () => {
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should have a valid reference to superclass in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    expect(result.outRefs).toMatchInlineSnapshot(`
+      Array [
+        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+      ]
+    `);
+  });
+});
+
 // ----- Update mode
 
 describe('given an update of a document that references a non-existent document with validation off', () => {
@@ -397,8 +483,6 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    resourceVersion: documentWithReferencesResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -470,8 +554,6 @@ describe('given an update of a document that references an existing document wit
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -564,8 +646,6 @@ describe('given an update of a document with one existing and one non-existent r
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: referencedDocumentInfo.documentIdentity,
     isDescriptor: false,
   };
@@ -573,8 +653,6 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    resourceVersion: referencedResourceInfo.resourceVersion,
-    isAssignableFrom: false,
     documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
     isDescriptor: false,
   };
@@ -645,5 +723,109 @@ describe('given an update of a document with one existing and one non-existent r
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outRefs).toHaveLength(0);
+  });
+});
+
+describe('given an update of a subclass document referenced by an existing document as a superclass', () => {
+  let client;
+  let upsertResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    projectName: 'Ed-Fi',
+  };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    superclassInfo,
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const referenceAsSuperclass: DocumentReference = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    documentIdentity: superclassInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferenceResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferenceDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'week', value: 'update6' }],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(
+    documentWithReferenceResourceInfo,
+    documentWithReferenceDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    //  The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+
+    // The original document with no reference
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferenceResourceInfo,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+
+    // The updated document with reference as superclass
+    documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferenceResourceInfo,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return success for the document with a valid reference to superclass', async () => {
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have updated the document with a valid reference to superclass in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    expect(result.outRefs).toMatchInlineSnapshot(`
+      Array [
+        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+      ]
+    `);
   });
 });

@@ -65,9 +65,7 @@ function extractDescriptorValuesFromBody(
   return [
     {
       projectName: collectedProperty.property.namespace.projectName,
-      resourceVersion: collectedProperty.property.namespace.projectVersion,
       resourceName: normalizeDescriptorSuffix(apiMapping.metaEdName),
-      isAssignableFrom: false,
       documentIdentity: [
         {
           name: 'descriptor',
