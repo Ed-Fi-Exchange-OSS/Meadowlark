@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { ClientSession, Collection, FindOptions, ReplaceOptions } from 'mongodb';
+import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions } from 'mongodb';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
@@ -55,6 +55,11 @@ export const onlyReturnId = (session: ClientSession): FindOptions => ({ projecti
 export const onlyReturnExistenceIds = (session: ClientSession): FindOptions => ({
   projection: { existenceIds: 1 },
   session,
+});
+
+// MongoDB Filter on documents with the given existenceIds in their outRefs list
+export const onlyDocumentsReferencing = (existenceIds: string[]): Filter<MeadowlarkDocument> => ({
+  outRefs: { $in: existenceIds },
 });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)
