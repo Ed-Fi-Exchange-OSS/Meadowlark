@@ -291,3 +291,8 @@ reference-validation: true
     ],
     "gradeLevels": []
 }
+
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
+{{auth_header}}
