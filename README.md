@@ -4,6 +4,14 @@
  src="images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png" align="right"
  width="300">
 
+:heavy_exclamation_mark: This was a SPIKE branch to determine the feasibility of
+replacing the standard Node PostgreSQL library
+[PG](https://www.npmjs.com/package/pg) with a possibly more performant version
+[Postgres.js](https://www.npmjs.com/package/postgres). While the performance
+improvements are impressive the use of the library is a bit odd and has some
+weird patterns, for the time being we are going to continue with the pg library
+but keeping this code around and may revisit later :heavy_exclamation_mark:
+
 The Meadowlark code and releases provide a deployable, distributable,
 proof-of-concept for a cloud-native (i.e., built on cloud services)
 implementation of the Ed-Fi API surface. It therefore replicates the data
@@ -34,5 +42,5 @@ specific language governing permissions and limitations under the License.
 See [NOTICES](NOTICES.md) for additional copyright and license notifications.
 
 Meadowlark image: Copyright &copy; Joel Chamberlain, [some rights
-reserved](http://creativecommons.org/licenses/by-nc/4.0/).
-[Original source](https://www.inaturalist.org/observations/38032376).
+reserved](http://creativecommons.org/licenses/by-nc/4.0/). [Original
+source](https://www.inaturalist.org/observations/38032376).
