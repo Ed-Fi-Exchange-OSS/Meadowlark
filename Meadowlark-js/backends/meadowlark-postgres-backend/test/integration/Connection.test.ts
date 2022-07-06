@@ -40,6 +40,7 @@ describe('Test Connection to Postgres Successful', () => {
   });
 
   afterAll(async () => {
+    deleteAll(client);
     resetSharedClient();
   });
 });

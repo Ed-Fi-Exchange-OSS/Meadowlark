@@ -3,22 +3,22 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { PoolClient } from 'pg';
+import postgres from 'postgres';
 
 /**
  * Deletes all data from the document and references table
  * @param client PostgreSQL client to perform queries
  */
-export async function deleteAll(client: PoolClient): Promise<void> {
+export async function deleteAll(client: postgres.Sql<any>): Promise<void> {
   try {
-    await client.query('BEGIN');
-    await client.query('DELETE FROM meadowlark.documents;');
-    await client.query('DELETE FROM meadowlark.references;');
-    await client.query('COMMIT');
+    // eslint-disable-next-line no-shadow
+    await client.begin(async (client) => {
+      client`DELETE FROM meadowlark.documents;`;
+      client`DELETE FROM meadowlark.references;`;
+    });
   } catch (e) {
-    await client.query('ROLLBACK');
     throw e;
   } finally {
-    client.release();
+    client.end();
   }
 }
