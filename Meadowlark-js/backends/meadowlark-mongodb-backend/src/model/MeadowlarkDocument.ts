@@ -87,6 +87,12 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * Creator of this document
    */
   createdBy: string;
+
+  /**
+   * An ObjectId managed by Meadowlark transactions for read locking. Optional because it does not need to be
+   * set in code. See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
+   */
+  lock?: any;
 }
 
 export function meadowlarkDocumentFrom(

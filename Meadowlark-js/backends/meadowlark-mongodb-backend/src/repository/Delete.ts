@@ -4,15 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
-import { ClientSession, Collection, Filter, FindOptions, MongoClient, WithId } from 'mongodb';
+import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { onlyReturnId, onlyReturnExistenceIds } from './ReferenceValidation';
-
-// MongoDB Filter on documents with the given existenceIds in their outRefs list
-const onlyDocumentsReferencing = (existenceIds: string[]): Filter<MeadowlarkDocument> => ({
-  outRefs: { $in: existenceIds },
-});
+import { onlyReturnId, onlyReturnExistenceIds, onlyDocumentsReferencing } from './ReferenceValidation';
 
 // MongoDB FindOption to return at most 5 documents
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
