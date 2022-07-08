@@ -7,4 +7,5 @@ import { PoolClient } from 'pg';
 export async function deleteAll(client: PoolClient): Promise<void> {
   await client.query('TRUNCATE TABLE meadowlark.documents');
   await client.query('TRUNCATE TABLE meadowlark.references');
+  await client.query('TRUNCATE TABLE meadowlark.existence');
 }

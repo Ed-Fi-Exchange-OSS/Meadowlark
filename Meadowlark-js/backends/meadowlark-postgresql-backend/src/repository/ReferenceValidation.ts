@@ -6,16 +6,21 @@
 import R from 'ramda';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { PoolClient, QueryResult } from 'pg';
-import format from 'pg-format';
+import { documentByReferenceId, existenceIdsByDocumentId } from './SqlHelper';
 
 export async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
   if (referenceIds.length === 0) {
     return [];
   }
 
-  const sql = format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
+  const sql = documentByReferenceId(referenceIds);
   const response: QueryResult = await client.query(sql);
-  return response.rows.map((val) => val.document_id);
+  const references = response.rows.map((val) => val.document_id);
+
+  const existenceIdsSql = existenceIdsByDocumentId(referenceIds);
+  const existRef = await client.query(existenceIdsSql);
+  references.push(existRef.rows.map((val) => val.sub_class_identifier));
+  return references;
 }
 
 /**

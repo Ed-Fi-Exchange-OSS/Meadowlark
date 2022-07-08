@@ -10,10 +10,12 @@ import {
   Logger,
   DocumentReference,
   documentIdForDocumentReference,
+  documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
 
+import format from 'pg-format';
 import { deleteReferencesSql, documentInsertOrUpdateSql, checkDocumentExistsSql, referencesInsertSql } from './SqlHelper';
-import { validateReferences } from './WriteHelper';
+import { validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
@@ -61,6 +63,18 @@ export async function upsertDocument(
     // Perform the document upsert
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
     await client.query(documentUpsertSql);
+
+    if (documentInfo.superclassInfo != null) {
+      const superClassId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      const existenceValues = [id, superClassId];
+      const sqlString = format(
+        `INSERT INTO meadowlark.existence
+      (sub_class_identifier, super_class_identifier)
+      VALUES (%L)`,
+        existenceValues,
+      );
+      await client.query(sqlString);
+    }
 
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);

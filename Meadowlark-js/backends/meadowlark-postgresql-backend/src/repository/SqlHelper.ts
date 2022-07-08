@@ -6,6 +6,12 @@ import format from 'pg-format';
 
 // SQL for Selects
 
+export const documentByReferenceId = (referenceIds: string[]): string =>
+  format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
+
+export const existenceIdsByDocumentId = (documentIds: string[]): string =>
+  format(`SELECT sub_class_identifier FROM meadowlark.existence WHERE super_class_identifier IN (%L)`, documentIds);
+
 /**
  * Function that produces a parametrized SQL query for retrieving a document (with identity)
  * @param documentId The identifier of the document to retrieve
@@ -229,3 +235,11 @@ export const createReferencesTableCheckingIndexSql =
 // For reference removal in transaction with parent update/delete
 export const createReferencesTableDeletingIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_document_id)';
+
+// TODO@SAA - Do we need the identifier of the document that contains the reference (i.e. in the case of the
+// academic week referencing a school and passed an ed-org) is the main document (academic week required?)
+export const createExistenceTableSql = `
+  CREATE TABLE IF NOT EXISTS meadowlark.existence(
+    id bigserial PRIMARY KEY,
+    sub_class_identifier VARCHAR NULL,
+    super_class_identifier VARCHAR NULL);`;
