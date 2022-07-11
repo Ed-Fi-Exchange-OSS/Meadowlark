@@ -225,7 +225,7 @@ describe('when building domain entity with nested choice and inline commons', ()
   });
 });
 
-describe('when building domain entity with non-Association/DomainEntity collection named with prefix of parent entity', () => {
+describe('when building domain entity with scalar collection named with prefix of parent entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespaceName = 'EdFi';
   const domainEntityName = 'EducationContent';
@@ -681,7 +681,7 @@ describe('when building domain entity with a common with a choice', () => {
   });
 });
 
-describe('when building domain entity with a common collection with a choice', () => {
+describe('when building domain entity with a common and a common collection with parent entity prefix', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespaceName = 'EdFi';
   let namespace: any = null;
@@ -692,29 +692,26 @@ describe('when building domain entity with a common collection with a choice', (
       .withStartDomainEntity('Assessment')
       .withDocumentation('doc')
       .withIntegerIdentity('AssessmentIdentifier', 'doc')
-      .withCommonProperty('ContentStandard', 'doc', false, true)
+      .withCommonProperty('AssessmentScore', 'doc', false, true)
+      .withCommonProperty('AssessmentPeriod', 'doc', false, false)
       .withEndDomainEntity()
 
-      .withStartCommon('ContentStandard')
+      .withStartCommon('AssessmentScore')
       .withDocumentation('doc')
-      .withStringProperty('Title', 'doc', false, false, '30')
-      .withChoiceProperty('PublicationDateChoice', 'doc', false, false)
+      .withStringProperty('MinimumScore', 'doc', false, false, '30')
       .withEndCommon()
 
-      .withStartChoice('PublicationDateChoice')
+      .withStartCommon('AssessmentPeriod')
       .withDocumentation('doc')
-      .withStringProperty('PublicationDate', 'doc', true, false, '30')
-      .withStringProperty('PublicationYear', 'doc', true, false, '30')
-      .withEndChoice()
+      .withStringProperty('BeginDate', 'doc', false, false, '30')
+      .withEndCommon()
       .withEndNamespace()
       .sendToListener(new NamespaceBuilder(metaEd, []))
-      .sendToListener(new ChoiceBuilder(metaEd, []))
       .sendToListener(new CommonBuilder(metaEd, []))
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     namespace = metaEd.namespace.get(namespaceName);
 
-    choiceReferenceEnhancer(metaEd);
     commonReferenceEnhancer(metaEd);
 
     entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
@@ -730,16 +727,15 @@ describe('when building domain entity with a common collection with a choice', (
     const entity = namespace.entity.domainEntity.get('Assessment');
     const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
 
-    const [, contentStandardSchema] = expectSubschemas(joiSchema, [
+    const [, assessmentScoreSchema, assessmentPeriodSchema] = expectSubschemas(joiSchema, [
       { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
-      { name: 'contentStandards', presence: 'optional', type: 'array' },
+      { name: 'scores', presence: 'optional', type: 'array' },
+      { name: 'period', presence: 'optional', type: 'object' },
     ]);
 
-    expectSubschemaArray(contentStandardSchema, [
-      { name: 'title', presence: 'optional', type: 'string' },
-      { name: 'publicationDate', presence: 'optional', type: 'string' },
-      { name: 'publicationYear', presence: 'optional', type: 'string' },
-    ]);
+    expectSubschemaArray(assessmentScoreSchema, [{ name: 'minimumScore', presence: 'optional', type: 'string' }]);
+
+    expectSubschemas(assessmentPeriodSchema, [{ name: 'beginDate', presence: 'optional', type: 'string' }]);
   });
 });
 
