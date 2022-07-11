@@ -618,3 +618,65 @@ describe('when building domain entity with a descriptor collection with role nam
     });
   });
 });
+
+describe('when building domain entity with a common with a choice', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('Assessment')
+      .withDocumentation('doc')
+      .withIntegerIdentity('AssessmentIdentifier', 'doc')
+      .withCommonProperty('ContentStandard', 'doc', false, false)
+      .withEndDomainEntity()
+
+      .withStartCommon('ContentStandard')
+      .withDocumentation('doc')
+      .withStringProperty('Title', 'doc', false, false, '30')
+      .withChoiceProperty('PublicationDateChoice', 'doc', false, false)
+      .withEndCommon()
+
+      .withStartChoice('PublicationDateChoice')
+      .withDocumentation('doc')
+      .withStringProperty('PublicationDate', 'doc', true, false, '30')
+      .withStringProperty('PublicationYear', 'doc', true, false, '30')
+      .withEndChoice()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new ChoiceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    choiceReferenceEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, contentStandardSchema] = expectSubschemas(joiSchema, [
+      { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
+      { name: 'contentStandard', presence: 'optional', type: 'object' },
+    ]);
+
+    expectSubschemas(contentStandardSchema, [
+      { name: 'title', presence: 'optional', type: 'string' },
+      { name: 'publicationDate', presence: 'optional', type: 'string' },
+      { name: 'publicationYear', presence: 'optional', type: 'string' },
+    ]);
+  });
+});
