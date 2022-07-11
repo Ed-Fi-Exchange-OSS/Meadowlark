@@ -500,3 +500,121 @@ describe('when building domain entity subclass with common collection and descri
     ]);
   });
 });
+
+describe('when building association with a common collection in a common collection', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('StudentEducationOrganizationAssociation')
+      .withDocumentation('doc')
+      .withIntegerIdentity('Student', 'doc')
+      .withCommonProperty('Address', 'doc', false, true)
+      .withEndDomainEntity()
+
+      .withStartCommon('Address')
+      .withDocumentation('doc')
+      .withStringProperty('StreetNumberName', 'doc', true, false, '30')
+      .withCommonProperty('Period', 'doc', false, true)
+      .withEndCommon()
+
+      .withStartCommon('Period')
+      .withDocumentation('doc')
+      .withIntegerIdentity('BeginDate', 'doc')
+      .withIntegerProperty('EndDate', 'doc', false, false)
+      .withEndCommon()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    commonReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('StudentEducationOrganizationAssociation');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, addressesSchema] = expectSubschemas(joiSchema, [
+      { name: 'student', presence: 'required', type: 'number' },
+      { name: 'addresses', presence: 'optional', type: 'array' },
+    ]);
+
+    const [, periodsSchema] = expectSubschemaArray(addressesSchema, [
+      { name: 'streetNumberName', presence: 'required', type: 'string' },
+      { name: 'periods', presence: 'optional', type: 'array' },
+    ]);
+
+    expectSubschemaArray(periodsSchema, [
+      { name: 'beginDate', presence: 'required', type: 'number' },
+      { name: 'endDate', presence: 'optional', type: 'number' },
+    ]);
+  });
+});
+
+describe('when building domain entity with a descriptor collection with role name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('Assessment')
+      .withDocumentation('doc')
+      .withIntegerIdentity('AssessmentIdentifier', 'doc')
+      .withDescriptorProperty('GradeLevel', 'doc', false, true, 'Assessed')
+      .withEndDomainEntity()
+
+      .withStartDescriptor('GradeLevel')
+      .withDocumentation('doc')
+      .withEndDescriptor()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    descriptorReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, assessedGradeLevelsSchema] = expectSubschemas(joiSchema, [
+      { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
+      { name: 'assessedGradeLevels', presence: 'optional', type: 'array' },
+    ]);
+
+    expectSubschemaReferenceArray(assessedGradeLevelsSchema, {
+      name: 'gradeLevelDescriptor',
+      presence: 'required',
+      type: 'string',
+    });
+  });
+});

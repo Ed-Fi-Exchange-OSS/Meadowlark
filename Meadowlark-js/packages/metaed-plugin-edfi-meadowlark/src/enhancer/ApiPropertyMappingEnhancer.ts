@@ -37,7 +37,7 @@ function parentPrefixRemovalConvention(property: EntityProperty): string {
  * API descriptor reference property names are suffixed with "Descriptor"
  */
 function apiDescriptorReferenceName(property): string {
-  return normalizeDescriptorSuffix(uncapitalize(property.fullPropertyName));
+  return normalizeDescriptorSuffix(uncapitalize(property.metaEdName));
 }
 
 /**
