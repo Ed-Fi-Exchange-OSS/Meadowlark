@@ -12,18 +12,26 @@ import {
   CommonBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
+  DomainEntitySubclassBuilder,
+  DescriptorBuilder,
 } from '@edfi/metaed-core';
 import {
   domainEntityReferenceEnhancer,
   choiceReferenceEnhancer,
   inlineCommonReferenceEnhancer,
+  commonReferenceEnhancer,
+  descriptorReferenceEnhancer,
+  domainEntitySubclassBaseClassEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer, EntityMeadowlarkData } from '../../src/model/EntityMeadowlarkData';
+import { enhance as subclassPropertyNamingCollisionEnhancer } from '../../src/enhancer/SubclassPropertyNamingCollisionEnhancer';
 import { enhance as referenceComponentEnhancer } from '../../src/enhancer/ReferenceComponentEnhancer';
 import { enhance as apiPropertyMappingEnhancer } from '../../src/enhancer/ApiPropertyMappingEnhancer';
 import { enhance as apiEntityMappingEnhancer } from '../../src/enhancer/ApiEntityMappingEnhancer';
+import { enhance as subclassApiEntityMappingEnhancer } from '../../src/enhancer/SubclassApiEntityMappingEnhancer';
 import { enhance as propertyCollectingEnhancer } from '../../src/enhancer/PropertyCollectingEnhancer';
+import { enhance as subclassPropertyCollectingEnhancer } from '../../src/enhancer/SubclassPropertyCollectingEnhancer';
 import { enhance } from '../../src/enhancer/JoiSchemaEnhancer';
 import { expectSubschemas, expectSubschemaReferenceArray, expectSubschemaScalarArray } from './JoiTestHelper';
 import { validate } from './JoiTestValidator';
@@ -356,5 +364,75 @@ describe('when building domain entity with an enumeration with the name SchoolYe
     const maxRule = schoolYearSchema._rules[1];
     expect(maxRule.name).toBe('max');
     expect(maxRule.args.limit).toBe(2100);
+  });
+});
+
+describe('when building domain entity subclass with common collection and descriptor identity in superclass', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  const domainEntitySubclassName = 'CommunityOrganization';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartAbstractEntity('EducationOrganization')
+      .withDocumentation('doc')
+      .withIntegerIdentity('EducationOrganizationId', 'doc')
+      .withCommonProperty('EducationOrganizationIdentificationCode', 'doc', false, true)
+      .withEndAbstractEntity()
+
+      .withStartDomainEntitySubclass(domainEntitySubclassName, 'EducationOrganization')
+      .withDocumentation('doc')
+      .withIntegerIdentityRename('CommunityOrganizationId', 'EducationOrganizationId', 'doc')
+      .withEndDomainEntitySubclass()
+
+      .withStartCommon('EducationOrganizationIdentificationCode')
+      .withDocumentation('doc')
+      .withStringProperty('IdentificationCode', 'doc', true, false, '30')
+      .withDescriptorIdentity('EducationOrganizationIdentificationSystem', 'doc')
+      .withEndCommon()
+
+      .withStartDescriptor('EducationOrganizationIdentificationSystem')
+      .withDocumentation('doc')
+      .withEndDescriptor()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntitySubclassBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    domainEntitySubclassBaseClassEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+    descriptorReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    subclassPropertyNamingCollisionEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    subclassPropertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    subclassApiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntitySubclass.get(domainEntitySubclassName);
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [identificationCodesSchema] = expectSubschemas(joiSchema, [
+      { name: 'communityOrganizationId', presence: 'required', type: 'number' },
+      { name: 'identificationCodes', presence: 'optional', type: 'array' },
+    ]);
+
+    expectSubschemas(identificationCodesSchema, [
+      { name: 'identificationCode', presence: 'required', type: 'string' },
+      { name: 'educationOrganizationIdentificationSystemDescriptor', presence: 'required', type: 'string' },
+    ]);
   });
 });

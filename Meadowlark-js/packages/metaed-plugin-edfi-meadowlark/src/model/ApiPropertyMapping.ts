@@ -47,6 +47,10 @@ export type ApiPropertyMapping = {
    * The descriptor collection name, or empty string if not a descriptor collection
    */
   descriptorCollectionName: string;
+  /**
+   * Whether the property is a common collection.
+   */
+  isCommonCollection: boolean;
 };
 
 export function newApiPropertyMapping(): ApiPropertyMapping {
@@ -60,6 +64,7 @@ export function newApiPropertyMapping(): ApiPropertyMapping {
     referenceCollectionName: '',
     isDescriptorCollection: false,
     descriptorCollectionName: '',
+    isCommonCollection: false,
   };
 }
 

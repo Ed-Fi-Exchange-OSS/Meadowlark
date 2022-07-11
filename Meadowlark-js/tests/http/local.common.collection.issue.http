@@ -1,0 +1,168 @@
+#### These are the manual components of the automated system tests
+
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+### API Version
+GET http://localhost:3000/metaed
+{{auth_header}}
+
+
+####################
+
+### Demonstrate problem with common collections - telephones at top level, periods nested in scalar common
+POST http://localhost:3000/local/v3.3b/ed-fi/staffEducationOrganizationContactAssociations
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "contactTitle": "string",
+  "educationOrganizationReference": {
+    "educationOrganizationId": 0
+  },
+  "staffReference": {
+    "staffUniqueId": "string"
+  },
+  "electronicMailAddress": "string",
+  "address": {
+    "addressTypeDescriptor": "string",
+    "localeDescriptor": "string",
+    "stateAbbreviationDescriptor": "string",
+    "apartmentRoomSuiteNumber": "string",
+    "buildingSiteNumber": "string",
+    "city": "string",
+    "congressionalDistrict": "string",
+    "countyFIPSCode": "string",
+    "doNotPublishIndicator": true,
+    "latitude": "string",
+    "longitude": "string",
+    "nameOfCounty": "string",
+    "postalCode": "string",
+    "streetNumberName": "string",
+    "periods": [
+      {
+        "beginDate": "2022-07-07",
+        "endDate": "2022-07-07"
+      }
+    ]
+  },
+  "telephones": [
+    {
+      "telephoneNumberTypeDescriptor": "string",
+      "telephoneNumber": "string",
+      "doNotPublishIndicator": true,
+      "orderOfPriority": 0,
+      "textMessageCapabilityIndicator": true
+    }
+  ]
+}
+
+### Demonstrate problem with common collections, choice in content standard, uri casing?
+POST http://localhost:3000/local/v3.3b/ed-fi/assessments
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "academicSubjects": [
+    {
+      "academicSubjectDescriptor": "string"
+    }
+  ],
+  "assessmentIdentifier": "string",
+  "namespace": "string",
+  "educationOrganizationReference": {
+    "educationOrganizationId": 0
+  },
+  "adaptiveAssessment": true,
+  "assessedGradeLevels": [
+    {
+      "gradeLevelDescriptor": "string"
+    }
+  ],
+  "assessmentCategoryDescriptor": "string",
+  "assessmentFamily": "string",
+  "assessmentForm": "string",
+  "assessmentTitle": "string",
+  "assessmentVersion": 0,
+  "contentStandard": {
+    "publicationStatusDescriptor": "string",
+    "beginDate": "2022-07-08",
+    "endDate": "2022-07-08",
+    "publicationDate": "2022-07-08",
+    "publicationYear": 0,
+    "title": "string",
+    "uri": "string",
+    "version": "string",
+    "mandatingEducationOrganizationReference": {
+      "educationOrganizationId": 0
+    },
+    "authors": [
+      {
+        "author": "string"
+      }
+    ]
+  },
+  "identificationCodes": [
+    {
+      "assessmentIdentificationSystemDescriptor": "string",
+      "assigningOrganizationIdentificationCode": "string",
+      "identificationCode": "string"
+    }
+  ],
+  "languages": [
+    {
+      "languageDescriptor": "string"
+    }
+  ],
+  "maxRawScore": 0,
+  "nomenclature": "string",
+  "performanceLevels": [
+    {
+      "assessmentReportingMethodDescriptor": "string",
+      "performanceLevelDescriptor": "string",
+      "resultDatatypeTypeDescriptor": "string",
+      "maximumScore": "string",
+      "minimumScore": "string"
+    }
+  ],
+  "period": {
+    "assessmentPeriodDescriptor": "string",
+    "beginDate": "2022-07-08",
+    "endDate": "2022-07-08"
+  },
+  "platformTypes": [
+    {
+      "platformTypeDescriptor": "string"
+    }
+  ],
+  "programs": [
+    {
+      "programReference": {
+        "educationOrganizationId": 0,
+        "programName": "string",
+        "programTypeDescriptor": "string"
+      }
+    }
+  ],
+  "revisionDate": "2022-07-08",
+  "scores": [
+    {
+      "assessmentReportingMethodDescriptor": "string",
+      "resultDatatypeTypeDescriptor": "string",
+      "maximumScore": "string",
+      "minimumScore": "string"
+    }
+  ],
+  "sections": [
+    {
+      "sectionReference": {
+        "localCourseCode": "string",
+        "schoolId": 0,
+        "schoolYear": 2000,
+        "sectionIdentifier": "string",
+        "sessionName": "string"
+      }
+    }
+  ]
+}
