@@ -742,3 +742,42 @@ describe('when building domain entity with a common collection with a choice', (
     ]);
   });
 });
+
+describe('when building domain entity with an all-caps property', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('Assessment')
+      .withDocumentation('doc')
+      .withIntegerIdentity('AssessmentIdentifier', 'doc')
+      .withStringProperty('URI', 'doc', false, false, '30')
+      .withEndDomainEntity()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    expectSubschemas(joiSchema, [
+      { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
+      { name: 'uri', presence: 'optional', type: 'string' },
+    ]);
+  });
+});
