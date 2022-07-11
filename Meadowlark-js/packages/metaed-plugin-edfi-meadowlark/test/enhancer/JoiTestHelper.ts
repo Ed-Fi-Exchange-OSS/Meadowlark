@@ -37,3 +37,14 @@ export function expectSubschemaScalarArray(joiSchema: any, schemaProperty: Schem
   expect(subschema.schema.type).toBe(schemaProperty.type);
   return subschema.schema;
 }
+
+export function expectSubschemaArray(joiSchema: any, schemaProperties: SchemaProperty[]) {
+  const subschemas: any[] = [...joiSchema.$_terms.items[0]._ids._byKey.values()];
+  if (subschemas.length !== schemaProperties.length) throw new Error('schema property length wrong');
+  subschemas.forEach((subschema, index) => {
+    expect(subschema.id).toBe(schemaProperties[index].name);
+    expect(subschema.schema._flags.presence).toBe(schemaProperties[index].presence);
+    expect(subschema.schema.type).toBe(schemaProperties[index].type);
+  });
+  return subschemas.map((s) => s.schema);
+}

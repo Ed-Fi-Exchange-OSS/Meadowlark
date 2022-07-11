@@ -70,7 +70,7 @@ function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifi
  * Returns a Joi schema fragment that specifies the API body element shape
  * corresponding to the given common collection property.
  */
- function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
+function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
   const schemaDefinition: { [key: string]: Joi.AnySchema } = {};
   const referenceProperties = property.referencedEntity.properties;
   referenceProperties.forEach((rp) => {

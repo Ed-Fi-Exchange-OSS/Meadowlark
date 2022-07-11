@@ -33,7 +33,12 @@ import { enhance as subclassApiEntityMappingEnhancer } from '../../src/enhancer/
 import { enhance as propertyCollectingEnhancer } from '../../src/enhancer/PropertyCollectingEnhancer';
 import { enhance as subclassPropertyCollectingEnhancer } from '../../src/enhancer/SubclassPropertyCollectingEnhancer';
 import { enhance } from '../../src/enhancer/JoiSchemaEnhancer';
-import { expectSubschemas, expectSubschemaReferenceArray, expectSubschemaScalarArray } from './JoiTestHelper';
+import {
+  expectSubschemas,
+  expectSubschemaReferenceArray,
+  expectSubschemaScalarArray,
+  expectSubschemaArray,
+} from './JoiTestHelper';
 import { validate } from './JoiTestValidator';
 
 describe('when building simple domain entity referencing another referencing another with identity', () => {
@@ -367,6 +372,65 @@ describe('when building domain entity with an enumeration with the name SchoolYe
   });
 });
 
+describe('when building domain entity with a simple common collection', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('Assessment')
+      .withDocumentation('doc')
+      .withIntegerIdentity('AssessmentIdentifier', 'doc')
+      .withCommonProperty('AssessmentIdentificationCode', 'doc', false, true)
+      .withEndDomainEntity()
+
+      .withStartCommon('AssessmentIdentificationCode')
+      .withDocumentation('doc')
+      .withStringProperty('IdentificationCode', 'doc', true, false, '30')
+      .withDescriptorIdentity('AssessmentIdentificationSystem', 'doc')
+      .withEndCommon()
+
+      .withStartDescriptor('AssessmentIdentificationSystem')
+      .withDocumentation('doc')
+      .withEndDescriptor()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    commonReferenceEnhancer(metaEd);
+    descriptorReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, identificationCodesSchema] = expectSubschemas(joiSchema, [
+      { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
+      { name: 'identificationCodes', presence: 'optional', type: 'array' },
+    ]);
+
+    expectSubschemaArray(identificationCodesSchema, [
+      { name: 'identificationCode', presence: 'required', type: 'string' },
+      { name: 'assessmentIdentificationSystemDescriptor', presence: 'required', type: 'string' },
+    ]);
+  });
+});
+
 describe('when building domain entity subclass with common collection and descriptor identity in superclass', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespaceName = 'EdFi';
@@ -425,12 +489,12 @@ describe('when building domain entity subclass with common collection and descri
     const entity = namespace.entity.domainEntitySubclass.get(domainEntitySubclassName);
     const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
 
-    const [identificationCodesSchema] = expectSubschemas(joiSchema, [
+    const [, identificationCodesSchema] = expectSubschemas(joiSchema, [
       { name: 'communityOrganizationId', presence: 'required', type: 'number' },
       { name: 'identificationCodes', presence: 'optional', type: 'array' },
     ]);
 
-    expectSubschemas(identificationCodesSchema, [
+    expectSubschemaArray(identificationCodesSchema, [
       { name: 'identificationCode', presence: 'required', type: 'string' },
       { name: 'educationOrganizationIdentificationSystemDescriptor', presence: 'required', type: 'string' },
     ]);
