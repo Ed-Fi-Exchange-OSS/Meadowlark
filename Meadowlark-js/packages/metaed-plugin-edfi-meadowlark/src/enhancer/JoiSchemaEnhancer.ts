@@ -62,10 +62,10 @@ function joiTypeForReferentialProperty(property: ReferentialProperty, propertyMo
 }
 
 /**
- * Returns a Joi schema fragment that specifies the API body element shape
- * corresponding to the given scalar common property.
+ * Returns a Joi schema of the properties of a referenced Common entity, handling issues of parent naming,
+ * and choice/inline common property pull-up
  */
-function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifier: PropertyModifier) {
+function schemaFromPropertiesOfCommon(property: CommonProperty, propertyModifier: PropertyModifier) {
   const schemaDefinition: { [key: string]: Joi.AnySchema } = {};
   const { collectedProperties } = property.referencedEntity.data.meadowlark as EntityMeadowlarkData;
 
@@ -81,6 +81,15 @@ function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifi
     schemaDefinition[prefixedName(referencePropertyApiMapping.fullName, concatenatedPropertyModifier)] =
       joiTypeAndCardinalityFor(collectedProperty.property, concatenatedPropertyModifier);
   });
+  return schemaDefinition;
+}
+
+/**
+ * Returns a Joi schema fragment that specifies the API body element shape
+ * corresponding to the given scalar common property.
+ */
+function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifier: PropertyModifier) {
+  const schemaDefinition: { [key: string]: Joi.AnySchema } = schemaFromPropertiesOfCommon(property, propertyModifier);
   return Joi.object(schemaDefinition);
 }
 
@@ -89,15 +98,8 @@ function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifi
  * corresponding to the given common collection property.
  */
 function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
-  const schemaDefinition: { [key: string]: Joi.AnySchema } = {};
-  const referenceProperties = property.referencedEntity.properties;
-  referenceProperties.forEach((rp) => {
-    const referencePropertyApiMapping = (rp.data.meadowlark as EntityPropertyMeadowlarkData).apiMapping;
-    schemaDefinition[prefixedName(referencePropertyApiMapping.fullName, propertyModifier)] = joiTypeAndCardinalityFor(
-      rp,
-      propertyModifier,
-    );
-  });
+  const schemaDefinition: { [key: string]: Joi.AnySchema } = schemaFromPropertiesOfCommon(property, propertyModifier);
+
   const arrayOfReferences = Joi.array().items(schemaDefinition);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
     ? arrayOfReferences.required()
