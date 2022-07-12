@@ -78,7 +78,7 @@ function schemaFromPropertiesOfCommon(property: CommonProperty, propertyModifier
     const referencePropertyApiMapping = (collectedProperty.property.data.meadowlark as EntityPropertyMeadowlarkData)
       .apiMapping;
 
-    schemaDefinition[prefixedName(referencePropertyApiMapping.fullName, concatenatedPropertyModifier)] =
+    schemaDefinition[prefixedName(referencePropertyApiMapping.topLevelName, concatenatedPropertyModifier)] =
       joiTypeAndCardinalityFor(collectedProperty.property, concatenatedPropertyModifier);
   });
   return schemaDefinition;

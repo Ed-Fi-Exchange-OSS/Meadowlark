@@ -777,3 +777,66 @@ describe('when building domain entity with an all-caps property', () => {
     ]);
   });
 });
+
+describe('when building domain entity with a common with a domain entity reference with a role name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('Assessment')
+      .withDocumentation('doc')
+      .withIntegerIdentity('AssessmentIdentifier', 'doc')
+      .withCommonProperty('ContentStandard', 'doc', false, false)
+      .withEndDomainEntity()
+
+      .withStartCommon('ContentStandard')
+      .withDocumentation('doc')
+      .withStringProperty('Title', 'doc', false, false, '30')
+      .withDomainEntityProperty('EducationOrganization', 'doc', false, false, false, 'Mandating')
+      .withEndCommon()
+
+      .withStartDomainEntity('EducationOrganization')
+      .withDocumentation('doc')
+      .withIntegerIdentity('EducationOrganizationId', 'doc')
+      .withEndDomainEntity()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    domainEntityReferenceEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, contentStandardSchema] = expectSubschemas(joiSchema, [
+      { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
+      { name: 'contentStandard', presence: 'optional', type: 'object' },
+    ]);
+
+    const [, mandatingEducationOrganizationSchema] = expectSubschemas(contentStandardSchema, [
+      { name: 'title', presence: 'optional', type: 'string' },
+      { name: 'mandatingEducationOrganizationReference', presence: 'optional', type: 'object' },
+    ]);
+
+    expectSubschemas(mandatingEducationOrganizationSchema, [
+      { name: 'educationOrganizationId', presence: 'required', type: 'number' },
+    ]);
+  });
+});
