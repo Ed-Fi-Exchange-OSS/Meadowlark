@@ -13,8 +13,14 @@ import {
   documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
 
-import format from 'pg-format';
-import { deleteReferencesSql, documentInsertOrUpdateSql, checkDocumentExistsSql, referencesInsertSql } from './SqlHelper';
+import {
+  deleteReferencesSql,
+  documentInsertOrUpdateSql,
+  checkDocumentExistsSql,
+  referencesInsertSql,
+  deleteExistenceIdsByDocumentId,
+  addToExistence,
+} from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
@@ -64,16 +70,14 @@ export async function upsertDocument(
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
     await client.query(documentUpsertSql);
 
+    // Delete existing values from the existence table
+    await client.query(deleteExistenceIdsByDocumentId(id));
+
+    // Perform insert of existence ids
+    await client.query(addToExistence(id, id));
     if (documentInfo.superclassInfo != null) {
-      const superClassId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      const existenceValues = [id, superClassId];
-      const sqlString = format(
-        `INSERT INTO meadowlark.existence
-      (sub_class_identifier, super_class_identifier)
-      VALUES (%L)`,
-        existenceValues,
-      );
-      await client.query(sqlString);
+      const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      await client.query(addToExistence(id, existenceId));
     }
 
     // Delete existing references in references table

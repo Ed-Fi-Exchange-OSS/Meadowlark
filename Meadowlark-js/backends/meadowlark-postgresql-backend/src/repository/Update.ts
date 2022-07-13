@@ -12,7 +12,7 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import { deleteReferencesSql, documentInsertOrUpdateSql, referencesInsertSql } from './SqlHelper';
-import { validateReferences } from './WriteHelper';
+import { validateReferences } from './ReferenceValidation';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,

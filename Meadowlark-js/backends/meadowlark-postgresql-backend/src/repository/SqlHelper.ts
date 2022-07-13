@@ -6,11 +6,37 @@ import format from 'pg-format';
 
 // SQL for Selects
 
-export const documentByReferenceId = (referenceIds: string[]): string =>
-  format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
+// TODO@SAA - Delete before PR if unused
+// export const documentByReferenceId = (referenceIds: string[]): string =>
+//   format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
 
 export const existenceIdsByDocumentId = (documentIds: string[]): string =>
-  format(`SELECT sub_class_identifier FROM meadowlark.existence WHERE super_class_identifier IN (%L)`, documentIds);
+  format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentIds);
+
+export const deleteExistenceIdsByDocumentId = (documentId: string): string =>
+  format(
+    `DELETE from meadowlark.existence
+  WHERE document_id = %L`,
+    [documentId],
+  );
+
+// TODO@SAA - Delete before PR if unused
+// export const superClassBySubClassId = (documentId: string): string =>
+//   format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, documentId);
+
+// TODO@SAA - Delete before PR if unused
+// export const checkSuperclassReferenceExists = (superClassReference: string): string =>
+//   format(`SELECT exists (SELECT 1 FROM meadowlark.existence WHERE super_class_identifier = %L LIMIT 1);`, [
+//     superClassReference,
+//   ]);
+
+export const addToExistence = (documentId: string, existenceId: string): string =>
+  format(
+    `INSERT INTO meadowlark.existence
+    (document_id, existence_id)
+    VALUES (%L)`,
+    [documentId, existenceId],
+  );
 
 /**
  * Function that produces a parametrized SQL query for retrieving a document (with identity)
@@ -25,15 +51,6 @@ export function documentByIdSql(documentId: string): string {
        WHERE document_id = %L;`,
     [documentId],
   );
-}
-
-/**
- * Function that produces a parametrized SQL query for retrieving the references for a given document
- * @param documentId The identifier of the document
- * @returns SQL query string to retrieve references
- */
-export function retrieveReferencesByDocumentIdSql(documentId: string): string {
-  return format('SELECT referenced_document_id FROM meadowlark.references WHERE parent_document_id=%L', [documentId]);
 }
 
 /**
@@ -236,10 +253,8 @@ export const createReferencesTableCheckingIndexSql =
 export const createReferencesTableDeletingIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_document_id)';
 
-// TODO@SAA - Do we need the identifier of the document that contains the reference (i.e. in the case of the
-// academic week referencing a school and passed an ed-org) is the main document (academic week required?)
 export const createExistenceTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.existence(
     id bigserial PRIMARY KEY,
-    sub_class_identifier VARCHAR NULL,
-    super_class_identifier VARCHAR NULL);`;
+    document_id VARCHAR,
+    existence_id VARCHAR NULL);`;
