@@ -11,6 +11,7 @@ import {
   isReferentialProperty,
   ReferentialProperty,
   normalizeDescriptorSuffix,
+  DescriptorProperty,
 } from '@edfi/metaed-core';
 import { isTopLevelReference, isDescriptor, uncapitalize, pluralize } from '../Utility';
 import { ApiPropertyMapping } from '../model/ApiPropertyMapping';
@@ -38,8 +39,9 @@ function parentPrefixRemovalConvention(property: EntityProperty): string {
 /**
  * API descriptor reference property names are suffixed with "Descriptor"
  */
-function apiDescriptorReferenceName(property): string {
-  return normalizeDescriptorSuffix(uncapitalize(property.metaEdName));
+function apiDescriptorReferenceName(property: DescriptorProperty): string {
+  if (property.isCollection) return normalizeDescriptorSuffix(uncapitalize(property.metaEdName));
+  return normalizeDescriptorSuffix(uncapitalize(property.fullPropertyName));
 }
 
 /**
@@ -56,7 +58,7 @@ function apiFullName(property: EntityProperty, { removePrefixes }: NamingOptions
   if (property.isCollection && !removePrefixes) {
     return uncapitalize(pluralize(property.fullPropertyName));
   }
-  if (isDescriptor(property)) return apiDescriptorReferenceName(property);
+  if (isDescriptor(property)) return apiDescriptorReferenceName(property as DescriptorProperty);
 
   return uncapitalize(property.fullPropertyName);
 }
@@ -120,7 +122,7 @@ function buildApiPropertyMapping(property: EntityProperty): ApiPropertyMapping {
     isReferenceCollection,
     referenceCollectionName: isReferenceCollection ? apiReferenceName(property) : '',
     isDescriptorCollection,
-    descriptorCollectionName: isDescriptorCollection ? apiDescriptorReferenceName(property) : '',
+    descriptorCollectionName: isDescriptorCollection ? apiDescriptorReferenceName(property as DescriptorProperty) : '',
     isCommonCollection,
   };
 }

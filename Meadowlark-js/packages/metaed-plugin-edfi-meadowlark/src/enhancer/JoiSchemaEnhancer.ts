@@ -5,7 +5,7 @@
 
 /* eslint-disable no-use-before-define */
 
-// TODO: Need to upgrade to latest joi (https://joi.dev/), which is now top-level and no longer under hapi
+// TODO: RND-67 Replace Joi with JSON Schema
 import Joi from '@hapi/joi';
 import {
   getAllEntitiesOfType,
