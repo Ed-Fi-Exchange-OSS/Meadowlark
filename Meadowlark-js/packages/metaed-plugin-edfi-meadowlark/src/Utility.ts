@@ -24,6 +24,8 @@ export function isDescriptor(property: EntityProperty): boolean {
 
 export function uncapitalize(text: string): string {
   if (text == null || typeof text !== 'string') return '';
+  // Handle text like "URI" -> "uri"
+  if (text === text.toUpperCase()) return text.toLowerCase();
   return text.charAt(0).toLowerCase() + text.substr(1);
 }
 

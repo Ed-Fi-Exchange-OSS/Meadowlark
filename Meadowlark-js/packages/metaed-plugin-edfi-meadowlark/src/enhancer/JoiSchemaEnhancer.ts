@@ -3,7 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-// TODO: Need to upgrade to latest joi (https://joi.dev/), which is now top-level and no longer under hapi
+/* eslint-disable no-use-before-define */
+
+// TODO: RND-67 Replace Joi with JSON Schema
 import Joi from '@hapi/joi';
 import {
   getAllEntitiesOfType,
@@ -30,6 +32,18 @@ const descriptorSchema = Joi.object({
 });
 
 /**
+ * Returns a new PropertyModifier that is the concatenation of two. Used for Commons and sub-Commons,
+ * where there is a chain of parent modifiers that cannot be completely pre-computed
+ * (without a different design, like pre-computing all possible paths).
+ */
+function propertyModifierConcat(p1: PropertyModifier, p2: PropertyModifier): PropertyModifier {
+  return {
+    optionalDueToParent: p1.optionalDueToParent || p2.optionalDueToParent,
+    parentPrefixes: [...p1.parentPrefixes, ...p2.parentPrefixes],
+  };
+}
+
+/**
  * Returns a Joi schema fragment that specifies the API body element shape
  * corresponding to the given referential property.
  */
@@ -39,7 +53,6 @@ function joiTypeForReferentialProperty(property: ReferentialProperty, propertyMo
 
   referencedEntityApiMapping.flattenedIdentityProperties.forEach((ip) => {
     const identityPropertyApiMapping = (ip.data.meadowlark as EntityPropertyMeadowlarkData).apiMapping;
-    // eslint-disable-next-line no-use-before-define
     schemaDefinition[prefixedName(identityPropertyApiMapping.fullName, propertyModifier)] = joiTypeAndCardinalityFor(
       ip,
       propertyModifier,
@@ -49,21 +62,48 @@ function joiTypeForReferentialProperty(property: ReferentialProperty, propertyMo
 }
 
 /**
- * Returns a Joi schema fragment that specifies the API body element shape
- * corresponding to the given common property.
+ * Returns a Joi schema of the properties of a referenced Common entity, handling issues of parent naming,
+ * and choice/inline common property pull-up
  */
-function joiTypeForCommonProperty(property: CommonProperty, propertyModifier: PropertyModifier) {
+function schemaFromPropertiesOfCommon(property: CommonProperty, propertyModifier: PropertyModifier) {
   const schemaDefinition: { [key: string]: Joi.AnySchema } = {};
-  const referenceProperties = property.referencedEntity.properties;
-  referenceProperties.forEach((rp) => {
-    const referencePropertyApiMapping = (rp.data.meadowlark as EntityPropertyMeadowlarkData).apiMapping;
-    // eslint-disable-next-line no-use-before-define
-    schemaDefinition[prefixedName(referencePropertyApiMapping.fullName, propertyModifier)] = joiTypeAndCardinalityFor(
-      rp,
+  const { collectedProperties } = property.referencedEntity.data.meadowlark as EntityMeadowlarkData;
+
+  collectedProperties.forEach((collectedProperty) => {
+    const concatenatedPropertyModifier: PropertyModifier = propertyModifierConcat(
       propertyModifier,
+      collectedProperty.propertyModifier,
     );
+
+    const referencePropertyApiMapping = (collectedProperty.property.data.meadowlark as EntityPropertyMeadowlarkData)
+      .apiMapping;
+
+    schemaDefinition[prefixedName(referencePropertyApiMapping.topLevelName, concatenatedPropertyModifier)] =
+      joiTypeAndCardinalityFor(collectedProperty.property, concatenatedPropertyModifier);
   });
+  return schemaDefinition;
+}
+
+/**
+ * Returns a Joi schema fragment that specifies the API body element shape
+ * corresponding to the given scalar common property.
+ */
+function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifier: PropertyModifier) {
+  const schemaDefinition: { [key: string]: Joi.AnySchema } = schemaFromPropertiesOfCommon(property, propertyModifier);
   return Joi.object(schemaDefinition);
+}
+
+/**
+ * Returns a Joi schema fragment that specifies the API body element shape
+ * corresponding to the given common collection property.
+ */
+function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
+  const schemaDefinition: { [key: string]: Joi.AnySchema } = schemaFromPropertiesOfCommon(property, propertyModifier);
+
+  const arrayOfReferences = Joi.array().items(schemaDefinition);
+  return property.isRequiredCollection && !propertyModifier.optionalDueToParent
+    ? arrayOfReferences.required()
+    : arrayOfReferences.optional();
 }
 
 /**
@@ -84,7 +124,7 @@ function joiTypeFor(property: EntityProperty, propertyModifier: PropertyModifier
     case 'choice':
       break;
     case 'common':
-      result = joiTypeForCommonProperty(property as CommonProperty, propertyModifier);
+      result = joiTypeForScalarCommonProperty(property as CommonProperty, propertyModifier);
       break;
     case 'currency':
       result = Joi.number().strict();
@@ -205,6 +245,7 @@ function joiTypeAndCardinalityFor(property: EntityProperty, propertyModifier: Pr
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
   if (apiMapping.isReferenceCollection) return joiTypeForReferenceCollection(property, propertyModifier);
   if (apiMapping.isDescriptorCollection) return joiTypeForDescriptorCollection(property, propertyModifier);
+  if (apiMapping.isCommonCollection) return joiTypeForCommonCollection(property as CommonProperty, propertyModifier);
   if (property.isRequiredCollection && !propertyModifier.optionalDueToParent)
     return joiArrayFor(property, propertyModifier).required();
   if ((property.isRequiredCollection && propertyModifier.optionalDueToParent) || property.isOptionalCollection)

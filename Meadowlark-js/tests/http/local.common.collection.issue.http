@@ -1,0 +1,306 @@
+#### These are the manual components of the automated system tests
+
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
+
+### API Version
+GET http://localhost:3000/local/metaed
+{{auth_header}}
+
+
+####################
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/staffs
+{{auth_header}}
+content-type: application/json
+
+{
+  "staffUniqueId": "staff-123",
+  "firstName": "Primero",
+  "lastSurname": "Apellido"
+}
+
+
+### Demonstrate problem with common collections - telephones at top level, periods nested in scalar common
+POST http://localhost:3000/local/v3.3b/ed-fi/staffEducationOrganizationContactAssociations
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "contactTitle": "string",
+  "educationOrganizationReference": {
+    "educationOrganizationId": 123
+  },
+  "staffReference": {
+    "staffUniqueId": "staff-123"
+  },
+  "electronicMailAddress": "string",
+  "address": {
+    "addressTypeDescriptor": "string",
+    "localeDescriptor": "string",
+    "stateAbbreviationDescriptor": "string",
+    "apartmentRoomSuiteNumber": "string",
+    "buildingSiteNumber": "string",
+    "city": "string",
+    "congressionalDistrict": "string",
+    "countyFIPSCode": "string",
+    "doNotPublishIndicator": true,
+    "latitude": "string",
+    "longitude": "string",
+    "nameOfCounty": "string",
+    "postalCode": "string",
+    "streetNumberName": "string",
+    "periods": [
+      {
+        "beginDate": "2022-07-07",
+        "endDate": "2022-07-07"
+      }
+    ]
+  },
+  "telephones": [
+    {
+      "telephoneNumberTypeDescriptor": "string",
+      "telephoneNumber": "string",
+      "doNotPublishIndicator": true,
+      "orderOfPriority": 0,
+      "textMessageCapabilityIndicator": true
+    }
+  ]
+}
+
+### Demonstrate problem with common collections, choice in content standard, uri casing?
+## When the original problem is fixed, should fail with simple reference validation errors
+POST http://localhost:3000/local/v3.3b/ed-fi/assessments
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "academicSubjects": [
+    {
+      "academicSubjectDescriptor": "string"
+    }
+  ],
+  "assessmentIdentifier": "string",
+  "namespace": "string",
+  "educationOrganizationReference": {
+    "educationOrganizationId": 0
+  },
+  "adaptiveAssessment": true,
+  "assessedGradeLevels": [
+    {
+      "gradeLevelDescriptor": "string"
+    }
+  ],
+  "assessmentCategoryDescriptor": "string",
+  "assessmentFamily": "string",
+  "assessmentForm": "string",
+  "assessmentTitle": "string",
+  "assessmentVersion": 0,
+  "contentStandard": {
+    "publicationStatusDescriptor": "string",
+    "beginDate": "2022-07-08",
+    "endDate": "2022-07-08",
+    "publicationDate": "2022-07-08",
+    "publicationYear": 0,
+    "title": "string",
+    "uri": "string",
+    "version": "string",
+    "mandatingEducationOrganizationReference": {
+      "educationOrganizationId": 0
+    },
+    "authors": [
+      {
+        "author": "string"
+      }
+    ]
+  },
+  "identificationCodes": [
+    {
+      "assessmentIdentificationSystemDescriptor": "string",
+      "assigningOrganizationIdentificationCode": "string",
+      "identificationCode": "string"
+    }
+  ],
+  "languages": [
+    {
+      "languageDescriptor": "string"
+    }
+  ],
+  "maxRawScore": 0,
+  "nomenclature": "string",
+  "performanceLevels": [
+    {
+      "assessmentReportingMethodDescriptor": "string",
+      "performanceLevelDescriptor": "string",
+      "resultDatatypeTypeDescriptor": "string",
+      "maximumScore": "string",
+      "minimumScore": "string"
+    }
+  ],
+  "period": {
+    "assessmentPeriodDescriptor": "string",
+    "beginDate": "2022-07-08",
+    "endDate": "2022-07-08"
+  },
+  "platformTypes": [
+    {
+      "platformTypeDescriptor": "string"
+    }
+  ],
+  "programs": [
+    {
+      "programReference": {
+        "educationOrganizationId": 0,
+        "programName": "string",
+        "programTypeDescriptor": "string"
+      }
+    }
+  ],
+  "revisionDate": "2022-07-08",
+  "scores": [
+    {
+      "assessmentReportingMethodDescriptor": "string",
+      "resultDatatypeTypeDescriptor": "string",
+      "maximumScore": "string",
+      "minimumScore": "string"
+    }
+  ],
+  "sections": [
+    {
+      "sectionReference": {
+        "localCourseCode": "string",
+        "schoolId": 0,
+        "schoolYear": 2000,
+        "sectionIdentifier": "string",
+        "sessionName": "string"
+      }
+    }
+  ]
+}
+
+### Demonstrate problem with top level descriptors from original fix
+## When the original problem is fixed, should fail with simple reference validation errors
+POST http://localhost:3000/local/v3.3b/ed-fi/students
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "studentUniqueId": "string",
+  "personReference": {
+    "personId": "string",
+    "sourceSystemDescriptor": "string"
+  },
+  "birthCity": "string",
+  "birthCountryDescriptor": "string",
+  "birthDate": "2022-07-12",
+  "birthInternationalProvince": "string",
+  "birthSexDescriptor": "string",
+  "birthStateAbbreviationDescriptor": "string",
+  "citizenshipStatusDescriptor": "string",
+  "dateEnteredUS": "2022-07-12",
+  "firstName": "string",
+  "generationCodeSuffix": "string",
+  "identificationDocuments": [
+    {
+      "identificationDocumentUseDescriptor": "string",
+      "personalInformationVerificationDescriptor": "string",
+      "issuerCountryDescriptor": "string",
+      "documentExpirationDate": "2022-07-12",
+      "documentTitle": "string",
+      "issuerDocumentIdentificationCode": "string",
+      "issuerName": "string"
+    }
+  ],
+  "lastSurname": "string",
+  "maidenName": "string",
+  "middleName": "string",
+  "multipleBirthStatus": true,
+  "otherNames": [
+    {
+      "otherNameTypeDescriptor": "string",
+      "firstName": "string",
+      "generationCodeSuffix": "string",
+      "lastSurname": "string",
+      "middleName": "string",
+      "personalTitlePrefix": "string"
+    }
+  ],
+  "personalIdentificationDocuments": [
+    {
+      "identificationDocumentUseDescriptor": "string",
+      "personalInformationVerificationDescriptor": "string",
+      "issuerCountryDescriptor": "string",
+      "documentExpirationDate": "2022-07-12",
+      "documentTitle": "string",
+      "issuerDocumentIdentificationCode": "string",
+      "issuerName": "string"
+    }
+  ],
+  "personalTitlePrefix": "string",
+  "visas": [
+    {
+      "visaDescriptor": "string"
+    }
+  ]
+}
+
+### Demonstrate problem with top level descriptors from original fix, school year
+POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "entryDate": "2022-07-12",
+  "calendarReference": {
+    "calendarCode": "string",
+    "schoolId": 0,
+    "schoolYear": 2000
+  },
+  "classOfSchoolYearTypeReference": {
+    "schoolYear": 2000
+  },
+  "graduationPlanReference": {
+    "educationOrganizationId": 0,
+    "graduationPlanTypeDescriptor": "string",
+    "graduationSchoolYear": 2000
+  },
+  "schoolReference": {
+    "schoolId": 0
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2000
+  },
+  "studentReference": {
+    "studentUniqueId": "string"
+  },
+  "alternativeGraduationPlans": [
+    {
+      "alternativeGraduationPlanReference": {
+        "educationOrganizationId": 0,
+        "graduationPlanTypeDescriptor": "string",
+        "graduationSchoolYear": 2000
+      }
+    }
+  ],
+  "educationPlans": [
+    {
+      "educationPlanDescriptor": "string"
+    }
+  ],
+  "employedWhileEnrolled": true,
+  "entryGradeLevelDescriptor": "string",
+  "entryGradeLevelReasonDescriptor": "string",
+  "entryTypeDescriptor": "string",
+  "exitWithdrawDate": "2022-07-12",
+  "exitWithdrawTypeDescriptor": "string",
+  "fullTimeEquivalency": 0,
+  "primarySchool": true,
+  "repeatGradeIndicator": true,
+  "residencyStatusDescriptor": "string",
+  "schoolChoiceTransfer": true,
+  "termCompletionIndicator": true
+}

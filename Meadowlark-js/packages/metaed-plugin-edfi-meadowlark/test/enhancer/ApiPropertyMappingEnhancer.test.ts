@@ -10,6 +10,7 @@ import {
   MetaEdTextBuilder,
   NamespaceBuilder,
   DomainEntitySubclassBuilder,
+  CommonBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
@@ -64,6 +65,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "sectionIdentifier",
         "descriptorCollectionName": "",
         "fullName": "sectionIdentifier",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "SectionIdentifier",
@@ -77,6 +79,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "localCourseCode",
         "descriptorCollectionName": "",
         "fullName": "localCourseCode",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "LocalCourseCode",
@@ -90,6 +93,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "classPeriodName",
         "descriptorCollectionName": "",
         "fullName": "classPeriodName",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "ClassPeriodName",
@@ -103,6 +107,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "schoolId",
         "descriptorCollectionName": "",
         "fullName": "schoolId",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "SchoolId",
@@ -118,6 +123,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "courseOfferingReference",
         "descriptorCollectionName": "",
         "fullName": "courseOffering",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "CourseOffering",
@@ -131,6 +137,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "classPeriods",
         "descriptorCollectionName": "",
         "fullName": "classPeriods",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": true,
         "metaEdName": "ClassPeriod",
@@ -144,6 +151,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "School",
@@ -157,6 +165,7 @@ describe('when building simple domain entity referencing another referencing ano
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "School",
@@ -215,6 +224,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "sectionIdentifier",
         "descriptorCollectionName": "",
         "fullName": "sectionIdentifier",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "SectionIdentifier",
@@ -228,6 +238,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "localCourseCode",
         "descriptorCollectionName": "",
         "fullName": "localCourseCode",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "LocalCourseCode",
@@ -241,6 +252,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "classPeriodName",
         "descriptorCollectionName": "",
         "fullName": "classPeriodName",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "ClassPeriodName",
@@ -254,6 +266,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "schoolId",
         "descriptorCollectionName": "",
         "fullName": "schoolId",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "SchoolId",
@@ -269,6 +282,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "courseOfferingReference",
         "descriptorCollectionName": "",
         "fullName": "courseOffering",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "CourseOffering",
@@ -282,6 +296,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "classPeriods",
         "descriptorCollectionName": "",
         "fullName": "classPeriods",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": true,
         "metaEdName": "ClassPeriod",
@@ -295,6 +310,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "School",
@@ -308,6 +324,7 @@ describe('when domain entity has a reference with same role name as entity name'
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
+        "isCommonCollection": false,
         "isDescriptorCollection": false,
         "isReferenceCollection": false,
         "metaEdName": "School",
@@ -359,5 +376,52 @@ describe('when superclass and subclass will have a naming collision issue', () =
     const schoolPropertyApiMapping = metaEd.propertyIndex.string[1].data.meadowlark.apiMapping;
     expect(schoolPropertyApiMapping.decollisionedTopLevelName).toBe('schoolCategories');
     expect(schoolPropertyApiMapping.topLevelName).toBe('categories');
+  });
+});
+
+describe('when building simple domain entity with common collection', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('ClassPeriod')
+      .withDocumentation('doc')
+      .withStringIdentity('ClassPeriodName', 'doc', '30')
+      .withCommonProperty('MeetingTime', 'doc', false, true)
+      .withEndDomainEntity()
+
+      .withStartCommon('MeetingTime')
+      .withIntegerIdentity('StartTime', 'doc')
+      .withEndCommon()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be valid', () => {
+    expect(metaEd.propertyIndex.common).toHaveLength(1);
+    expect(metaEd.propertyIndex.common[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
+      Object {
+        "decollisionedTopLevelName": "meetingTimes",
+        "descriptorCollectionName": "",
+        "fullName": "meetingTimes",
+        "isCommonCollection": true,
+        "isDescriptorCollection": false,
+        "isReferenceCollection": false,
+        "metaEdName": "MeetingTime",
+        "metaEdType": "unknown",
+        "referenceCollectionName": "",
+        "topLevelName": "meetingTimes",
+      }
+    `);
   });
 });
