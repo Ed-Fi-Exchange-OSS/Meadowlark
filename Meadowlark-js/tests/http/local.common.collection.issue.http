@@ -3,11 +3,23 @@
 @auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ### API Version
-GET http://localhost:3000/metaed
+GET http://localhost:3000/local/metaed
 {{auth_header}}
 
 
 ####################
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/staffs
+{{auth_header}}
+content-type: application/json
+
+{
+  "staffUniqueId": "staff-123",
+  "firstName": "Primero",
+  "lastSurname": "Apellido"
+}
+
 
 ### Demonstrate problem with common collections - telephones at top level, periods nested in scalar common
 POST http://localhost:3000/local/v3.3b/ed-fi/staffEducationOrganizationContactAssociations
@@ -18,10 +30,10 @@ content-type: application/json
 {
   "contactTitle": "string",
   "educationOrganizationReference": {
-    "educationOrganizationId": 0
+    "educationOrganizationId": 123
   },
   "staffReference": {
-    "staffUniqueId": "string"
+    "staffUniqueId": "staff-123"
   },
   "electronicMailAddress": "string",
   "address": {
@@ -58,6 +70,7 @@ content-type: application/json
 }
 
 ### Demonstrate problem with common collections, choice in content standard, uri casing?
+## When the original problem is fixed, should fail with simple reference validation errors
 POST http://localhost:3000/local/v3.3b/ed-fi/assessments
 {{auth_header}}
 reference-validation: true
@@ -168,6 +181,7 @@ content-type: application/json
 }
 
 ### Demonstrate problem with top level descriptors from original fix
+## When the original problem is fixed, should fail with simple reference validation errors
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 {{auth_header}}
 reference-validation: true

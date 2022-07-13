@@ -657,3 +657,67 @@ authorization: bearer {{authToken1}}
 ### Try to delete school 123. Should be denied (409) because there are references to it
 DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 authorization: bearer {{authToken1}}
+
+
+### Issue covered by RND-297
+POST http://localhost:3000/local/v3.3b/ed-fi/parents
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "parentUniqueId": "778791",
+  "firstName": "Arthur",
+  "lastSurname": "Woods",
+  "personalTitlePrefix": "Mr",
+  "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Male",
+  "electronicMails": [],
+  "internationalAddresses": [],
+  "languages": [],
+  "otherNames": [],
+  "addresses": [
+    {
+      "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Home",
+      "city": "Grand Bend",
+      "postalCode": "78834",
+      "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+      "streetNumberName": "54 Rocky Clarendon Avenue",
+      "nameOfCounty": "WILLISTON",
+      "periods": []
+    }
+  ],
+  "telephones": [
+    {
+      "telephoneNumber": "(950) 959 3641",
+      "telephoneNumberTypeDescriptor": "uri://ed-fi.org/TelephoneNumberTypeDescriptor#Other",
+      "orderOfPriority": 1
+    }
+  ]
+}
+
+
+### Issue covered by RND-298
+POST http://localhost:3000/local/v3.3b/ed-fi/communityOrganizations
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+
+{
+    "communityOrganizationId": 19,
+    "nameOfInstitution": "Communities in Schools",
+    "shortNameOfInstitution": "CIS",
+    "addresses": [],
+    "categories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ],
+    "identificationCodes": [
+      {
+        "educationOrganizationIdentificationSystemDescriptor": "uri://ed-fi.org/EducationOrganizationIdentificationSystemDescriptor#SEA",
+        "identificationCode": "19"
+      }
+    ],
+    "indicators": [],
+    "institutionTelephones": [],
+    "internationalAddresses": []
+}
