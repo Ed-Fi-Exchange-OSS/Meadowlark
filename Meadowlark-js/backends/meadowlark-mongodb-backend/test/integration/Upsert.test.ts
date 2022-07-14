@@ -732,7 +732,7 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'LocalEducationAgency',
+    resourceName: 'School',
     projectName: 'Ed-Fi',
   };
 
@@ -745,7 +745,7 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'LocalEducationAgencyId', value: '123' }],
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
     superclassInfo,
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
@@ -759,14 +759,11 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const documentWithReferenceResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'Survey',
+    resourceName: 'AcademicWeek',
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [
-      { name: 'IdentificationCode', value: 'update6' },
-      { name: 'URI', value: 'uri://ed-fi.org' },
-    ],
+    documentIdentity: [{ name: 'week', value: 'update6' }],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(
     documentWithReferenceResourceInfo,
