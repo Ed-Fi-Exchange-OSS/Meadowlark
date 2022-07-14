@@ -61,18 +61,6 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Jest :: System Tests",
-      "program": "${workspaceRoot}/node_modules/jest-cli/bin/jest.js",
-      "args": [
-        "--testPathPattern=tests/system/crud",
-        "--maxWorkers=1"
-      ],
-      "console": "integratedTerminal",
-      "sourceMaps": true
     }
   ]
 }
