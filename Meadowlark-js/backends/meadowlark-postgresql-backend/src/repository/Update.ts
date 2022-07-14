@@ -13,7 +13,7 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
-  addToExistence,
+  existenceInsertSql,
   deleteExistenceIdsByDocumentId,
   deleteReferencesSql,
   documentInsertOrUpdateSql,
@@ -70,10 +70,10 @@ export async function updateDocumentById(
     await client.query(deleteExistenceIdsByDocumentId(id));
 
     // Perform insert of existence ids
-    await client.query(addToExistence(id, id));
+    await client.query(existenceInsertSql(id, id));
     if (documentInfo.superclassInfo != null) {
       const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      await client.query(addToExistence(id, existenceId));
+      await client.query(existenceInsertSql(id, existenceId));
     }
 
     // Delete existing references in references table

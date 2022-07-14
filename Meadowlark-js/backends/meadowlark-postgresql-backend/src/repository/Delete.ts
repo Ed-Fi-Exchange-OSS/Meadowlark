@@ -10,6 +10,7 @@ import {
   checkIsReferencedDocumentSql,
   deleteReferencesSql,
   referencedByDocumentSql,
+  deleteExistenceIdsByDocumentId,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -54,6 +55,10 @@ export async function deleteDocumentById(
     // Delete references where this is the parent document
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
     await client.query(deleteReferencesSql(id));
+
+    // Delete this document from the existence table
+    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting existence entries with id ${id}`, traceId);
+    await client.query(deleteExistenceIdsByDocumentId(id));
 
     client.query('COMMIT');
   } catch (e) {

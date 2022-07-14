@@ -22,12 +22,12 @@ import {
   SuperclassInfo,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
-import { deleteAll } from './TestHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
-import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
+import { documentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -335,7 +335,8 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   afterAll(async () => {
     deleteAll(client);
-    await client.close();
+    client.release();
+    await resetSharedClient();
   });
 
   it('should have returned delete failure due to existing reference', async () => {
@@ -343,9 +344,8 @@ describe('given the delete of a subclass document referenced by an existing docu
   });
 
   it('should still have the referenced document in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
-    const val = result.rows[0].document_identity[0].value;
-    expect(result.documentIdentity[0].name).toBe('schoolId');
-    expect(result.documentIdentity[0].value).toBe('123');
+    const result: any = await client.query(documentByIdSql(referencedDocumentId));
+    expect(result.rows[0].document_identity[0].name).toBe('schoolId');
+    expect(result.rows[0].document_identity[0].value).toBe('123');
   });
 });

@@ -6,37 +6,13 @@ import format from 'pg-format';
 
 // SQL for Selects
 
-// TODO@SAA - Delete before PR if unused
-// export const documentByReferenceId = (referenceIds: string[]): string =>
-//   format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
-
+/**
+ * Function that returns a SQL query for checking whether references exist for a given list of document ids
+ * @param documentIds the list of documents to check for existence
+ * @returns SQL query to check for existence ids
+ */
 export const existenceIdsByDocumentId = (documentIds: string[]): string =>
   format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentIds);
-
-export const deleteExistenceIdsByDocumentId = (documentId: string): string =>
-  format(
-    `DELETE from meadowlark.existence
-  WHERE document_id = %L`,
-    [documentId],
-  );
-
-// TODO@SAA - Delete before PR if unused
-// export const superClassBySubClassId = (documentId: string): string =>
-//   format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, documentId);
-
-// TODO@SAA - Delete before PR if unused
-// export const checkSuperclassReferenceExists = (superClassReference: string): string =>
-//   format(`SELECT exists (SELECT 1 FROM meadowlark.existence WHERE super_class_identifier = %L LIMIT 1);`, [
-//     superClassReference,
-//   ]);
-
-export const addToExistence = (documentId: string, existenceId: string): string =>
-  format(
-    `INSERT INTO meadowlark.existence
-    (document_id, existence_id)
-    VALUES (%L)`,
-    [documentId, existenceId],
-  );
 
 /**
  * Function that produces a parametrized SQL query for retrieving a document (with identity)
@@ -78,9 +54,7 @@ export function checkDocumentExistsSql(documentId: string): string {
  * @returns SQL query string to determine references existence
  */
 export function checkIsReferencedDocumentSql(documentId: string): string {
-  return format(`SELECT exists (SELECT 1 FROM meadowlark.references WHERE referenced_document_id = %L LIMIT 1);`, [
-    documentId,
-  ]);
+  return format(`SELECT exists (SELECT 1 FROM meadowlark.existence WHERE existence_id = %L LIMIT 1);`, [documentId]);
 }
 
 /**
@@ -99,6 +73,20 @@ export function referencedByDocumentSql(documentId: string): string {
 }
 
 // SQL for inserts/updates/upserts
+
+/**
+ * Returns the SQL statement to insert a document into the existence table
+ * @param documentId the document being inserted
+ * @param existenceId the existence id being inserted, this may be the same as the docuementId
+ * @returns SQL query string to insert into the existence table
+ */
+export const existenceInsertSql = (documentId: string, existenceId: string): string =>
+  format(
+    `INSERT INTO meadowlark.existence
+   (document_id, existence_id)
+   VALUES (%L)`,
+    [documentId, existenceId],
+  );
 
 /**
  * Returns the SQL statement to insert a referenced document into the references table
@@ -199,6 +187,18 @@ export function deleteReferencesSql(documentId: string): string {
   const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [documentId]);
   return sql;
 }
+
+/**
+ * Returns the SQL query for deleting values from the existence table when a document is being deleted
+ * @param documentId the id of the document we're trying to remove from the existence table
+ * @returns SQL query string for deleting existence ids
+ */
+export const deleteExistenceIdsByDocumentId = (documentId: string): string =>
+  format(
+    `DELETE from meadowlark.existence
+  WHERE document_id = %L`,
+    [documentId],
+  );
 
 // SQL for DDL
 

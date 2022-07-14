@@ -36,13 +36,6 @@ const newUpsertRequest = (): UpsertRequest => ({
   traceId: 'traceId',
 });
 
-// const newGetRequest = (): GetRequest => ({
-//   id: '',
-//   resourceInfo: NoResourceInfo,
-//   security: { ...newSecurity() },
-//   traceId: 'traceId',
-// });
-
 describe('given the upsert of a new document', () => {
   let client: PoolClient;
   let upsertResult: UpsertResult;
@@ -755,7 +748,6 @@ describe('given an update of a subclass document referenced by an existing docum
   it('should have updated the document with a valid reference to superclass in the db', async () => {
     const result: any = await client.query(verifyExistenceId(referencedDocumentId));
     const outRefs = result.rows.map((row) => row.existence_id);
-    // const val = result.rows[0].document_identity[0].value;
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
         "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",

@@ -19,7 +19,7 @@ import {
   checkDocumentExistsSql,
   referencesInsertSql,
   deleteExistenceIdsByDocumentId,
-  addToExistence,
+  existenceInsertSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -74,10 +74,10 @@ export async function upsertDocument(
     await client.query(deleteExistenceIdsByDocumentId(id));
 
     // Perform insert of existence ids
-    await client.query(addToExistence(id, id));
+    await client.query(existenceInsertSql(id, id));
     if (documentInfo.superclassInfo != null) {
       const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      await client.query(addToExistence(id, existenceId));
+      await client.query(existenceInsertSql(id, existenceId));
     }
 
     // Delete existing references in references table
