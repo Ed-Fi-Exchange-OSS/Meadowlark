@@ -24,9 +24,9 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll } from './TestHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql, verifyExistenceId } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
-import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
+import { documentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -503,8 +503,9 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
-    expect(result.outRefs).toMatchInlineSnapshot(`
+    const result: any = await client.query(verifyExistenceId(referencedDocumentId));
+    const outRefs = result.rows.map((row) => row.existence_id);
+    expect(outRefs).toMatchInlineSnapshot(`
       Array [
         "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
       ]
