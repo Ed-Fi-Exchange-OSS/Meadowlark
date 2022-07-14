@@ -48,6 +48,7 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
     'associationSubclass',
     'descriptor',
     'common',
+    'schoolYearEnumeration',
   ).forEach((entity) => {
     if (entity.data.meadowlark == null) entity.data.meadowlark = {};
     addEntityMeadowlarkDataTo(entity);

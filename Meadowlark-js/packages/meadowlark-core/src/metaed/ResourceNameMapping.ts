@@ -12,6 +12,7 @@ import {
   DomainEntitySubclass,
   MetaEdEnvironment,
   normalizeDescriptorSuffix,
+  SchoolYearEnumeration,
   TopLevelEntity,
 } from '@edfi/metaed-core';
 import { pluralize } from '@edfi/metaed-plugin-edfi-meadowlark';
@@ -76,6 +77,16 @@ function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<str
   if (descriptors != null) {
     for (const descriptor of descriptors) {
       mappingForNamespace.set(pluralize(normalizeDescriptorSuffix(decapitalize(descriptor.metaEdName))), descriptor);
+    }
+  }
+
+  const schoolYearEnumerations: IterableIterator<SchoolYearEnumeration> | undefined = metaEd.namespace
+    .get(namespace)
+    ?.entity.schoolYearEnumeration.values();
+  if (schoolYearEnumerations != null) {
+    const schoolYearEnumeration: SchoolYearEnumeration = Array.from(schoolYearEnumerations)[0];
+    if (schoolYearEnumeration != null) {
+      mappingForNamespace.set(resourceNameFrom(`${schoolYearEnumeration.metaEdName}Type`), schoolYearEnumeration);
     }
   }
 

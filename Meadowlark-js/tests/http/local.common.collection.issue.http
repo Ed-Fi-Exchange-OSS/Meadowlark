@@ -304,3 +304,15 @@ content-type: application/json
   "schoolChoiceTransfer": true,
   "termCompletionIndicator": true
 }
+
+### Demonstrate problem with school year resource
+POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+  "schoolYear": 2100,
+  "currentSchoolYear": true,
+  "schoolYearDescription": "string"
+}

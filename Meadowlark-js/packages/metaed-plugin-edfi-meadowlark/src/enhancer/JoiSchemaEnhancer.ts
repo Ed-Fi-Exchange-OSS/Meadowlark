@@ -31,6 +31,13 @@ const descriptorSchema = Joi.object({
   description: Joi.string().optional(),
 });
 
+// SchoolYearEnumeration is a hardcoded exception in the ODS/API
+const schoolYearEnumerationSchema = Joi.object({
+  schoolYear: Joi.number().min(1900).max(2100).strict(),
+  currentSchoolYear: Joi.boolean().required(),
+  schoolYearDescription: Joi.string().optional(),
+});
+
 /**
  * Returns a new PropertyModifier that is the concatenation of two. Used for Commons and sub-Commons,
  * where there is a chain of parent modifiers that cannot be completely pre-computed
@@ -238,6 +245,20 @@ function joiArrayFor(property: EntityProperty, propertyModifier: PropertyModifie
 }
 
 /**
+ * Returns a Joi schema fragment that specifies the API body element shape
+ * corresponding to the given school year enumeration.
+ */
+function joiTypeForSchoolYearEnumeration(property: EntityProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
+  // We ignore whether this is a collection because there are no collections of school year in the DS,
+  // so the shape of a school year collection is unknown.
+  const result = Joi.object().keys({
+    schoolYear: Joi.number().min(1900).max(2100).required(),
+  });
+
+  return property.isRequired && !propertyModifier.optionalDueToParent ? result.required() : result.optional();
+}
+
+/**
  * Returns a Joi schema fragment that specifies the type and cardinality of the API body element
  * corresponding to the given property, with possible modifications
  */
@@ -265,7 +286,12 @@ function buildJoiSchema(entityForSchema: TopLevelEntity): Joi.AnySchema {
   collectedProperties.forEach(({ property, propertyModifier }) => {
     const topLevelName = topLevelNameOnEntity(entityForSchema, property);
     const schemaObjectBaseName = prefixedName(topLevelName, propertyModifier);
-    schemaDefinition[schemaObjectBaseName] = joiTypeAndCardinalityFor(property, propertyModifier);
+    if (property.type === 'schoolYearEnumeration') {
+      // School year enumerations act like entities with a "schoolYear" property in the ODS/API, but do not have them in the model
+      schemaDefinition[schemaObjectBaseName] = joiTypeForSchoolYearEnumeration(property, propertyModifier);
+    } else {
+      schemaDefinition[schemaObjectBaseName] = joiTypeAndCardinalityFor(property, propertyModifier);
+    }
   });
 
   return Joi.object(schemaDefinition);
@@ -289,6 +315,12 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
   getAllEntitiesOfType(metaEd, 'descriptor').forEach((entity) => {
     const entityMeadowlarkData = entity.data.meadowlark as EntityMeadowlarkData;
     entityMeadowlarkData.joiSchema = descriptorSchema;
+  });
+
+  // Attach school year enumeration schema
+  getAllEntitiesOfType(metaEd, 'schoolYearEnumeration').forEach((entity) => {
+    const entityMeadowlarkData = entity.data.meadowlark as EntityMeadowlarkData;
+    entityMeadowlarkData.joiSchema = schoolYearEnumerationSchema;
   });
 
   return {
