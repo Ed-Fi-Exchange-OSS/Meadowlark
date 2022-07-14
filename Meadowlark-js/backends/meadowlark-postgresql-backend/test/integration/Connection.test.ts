@@ -44,6 +44,6 @@ describe('Test Connection to Postgres Successful', () => {
 
   afterAll(async () => {
     client.release();
-    resetSharedClient();
+    await resetSharedClient();
   });
 });

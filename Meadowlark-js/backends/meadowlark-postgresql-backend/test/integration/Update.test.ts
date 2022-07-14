@@ -17,8 +17,8 @@ import {
   GetResult,
   GetRequest,
   UpdateResult,
-  newSuperclassInfo,
   SuperclassInfo,
+  newSuperclassInfo,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -454,7 +454,6 @@ describe('given an update of a subclass document referenced by an existing docum
 
   beforeAll(async () => {
     client = (await getSharedClient()) as PoolClient;
-
     //  The document that will be referenced
     await upsertDocument(
       {
@@ -465,7 +464,6 @@ describe('given an update of a subclass document referenced by an existing docum
       },
       client,
     );
-
     // The original document with no reference
     await upsertDocument(
       {
@@ -477,7 +475,6 @@ describe('given an update of a subclass document referenced by an existing docum
       },
       client,
     );
-
     // The updated document with reference as superclass
     documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
     updateResult = await updateDocumentById(
@@ -493,9 +490,9 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   afterAll(async () => {
-    deleteAll(client);
+    await deleteAll(client);
     client.release();
-    resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should return success for the document with a valid reference to superclass', async () => {

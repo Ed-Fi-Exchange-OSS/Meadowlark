@@ -79,7 +79,7 @@ describe('given the delete of a non-existent document', () => {
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should return delete failure', async () => {
@@ -114,7 +114,7 @@ describe('given the delete of an existing document', () => {
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should return delete success', async () => {
@@ -181,7 +181,7 @@ describe('given an delete of a document referenced by an existing document with 
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should have returned delete failure due to existing reference', async () => {
@@ -312,10 +312,8 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   beforeAll(async () => {
     client = (await getSharedClient()) as PoolClient;
-
     // The document that will be referenced
     await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
-
     // The referencing document that should cause the delete to fail
     await upsertDocument(
       {
@@ -326,7 +324,6 @@ describe('given the delete of a subclass document referenced by an existing docu
       },
       client,
     );
-
     deleteResult = await deleteDocumentById(
       { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
       client,
@@ -334,7 +331,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   });
 
   afterAll(async () => {
-    deleteAll(client);
+    await deleteAll(client);
     client.release();
     await resetSharedClient();
   });
