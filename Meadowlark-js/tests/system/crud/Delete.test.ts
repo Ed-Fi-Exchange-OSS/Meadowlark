@@ -15,26 +15,6 @@ import {
 
 jest.setTimeout(40000);
 
-describe('given a DELETE of a non-existent school', () => {
-  let client: SystemTestClient;
-  let deleteResult: FrontendResponse;
-
-  beforeAll(async () => {
-    client = await backendToTest.systemTestSetup();
-
-    // Act
-    deleteResult = await deleteIt(schoolDeleteClient1());
-  });
-
-  afterAll(async () => {
-    await backendToTest.systemTestTeardown(client);
-  });
-
-  it('should return not found from delete', async () => {
-    expect(deleteResult.statusCode).toBe(404);
-  });
-});
-
 describe('given a POST of a school by followed by a DELETE of the school', () => {
   let client: SystemTestClient;
   let deleteResult: FrontendResponse;
@@ -122,5 +102,25 @@ describe('given the DELETE of a school referenced by an academic week', () => {
 
   it('should return still found from get', async () => {
     expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given a DELETE of a non-existent school', () => {
+  let client: SystemTestClient;
+  let deleteResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = await backendToTest.systemTestSetup();
+
+    // Act
+    deleteResult = await deleteIt(schoolDeleteClient1());
+  });
+
+  afterAll(async () => {
+    await backendToTest.systemTestTeardown(client);
+  });
+
+  it('should return not found from delete', async () => {
+    expect(deleteResult.statusCode).toBe(404);
   });
 });
