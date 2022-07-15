@@ -11,8 +11,11 @@ import format from 'pg-format';
  * @param documentIds the list of documents to check for existence
  * @returns SQL query to check for existence ids
  */
-export const existenceIdsByDocumentId = (documentIds: string[]): string =>
-  format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentIds);
+export const existenceIdsForDocument = (existenceId: string): string =>
+  format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, existenceId);
+
+export const existenceIdsToVerify = (existenceIds: string[]): string =>
+  format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, existenceIds);
 
 /**
  * Function that produces a parametrized SQL query for retrieving a document (with identity)
@@ -44,21 +47,23 @@ export function documentOwnershipByIdSql(documentId: string): string {
  * @returns SQL query string to determine document existence
  */
 export function checkDocumentExistsSql(documentId: string): string {
-  // return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L;`, [documentId]);
   return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
+// format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, [documentId]);
+export const checkForReferencesByDocumentId = (documentId: string[]): string =>
+  format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
 
-/**
- * Checks if this document is referenced by other documents
- * @param documentId Document id to check for references
- * @returns SQL query string to determine references existence
- */
-export function checkIsReferencedDocumentSql(documentId: string): string {
-  return format(
-    `SELECT exists (SELECT 1 FROM meadowlark.existence WHERE existence_id = %L AND document_id != %1$L LIMIT 1);`,
-    [documentId],
-  );
-}
+// /**
+//  * Checks if this document is referenced by other documents
+//  * @param documentId Document id to check for references
+//  * @returns SQL query string to determine references existence
+//  */
+// export function checkIsReferencedDocumentSql(documentId: string): string {
+//   return format(
+//     `SELECT exists (SELECT 1 FROM meadowlark.existence WHERE document_id = %L AND existence_id != %1$L LIMIT 1);`,
+//     [documentId],
+//   );
+// }
 
 /**
  * Returns up to five documents that reference this document - for error reporting when an attempt is made to delete
@@ -260,4 +265,4 @@ export const createExistenceTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.existence(
     id bigserial PRIMARY KEY,
     document_id VARCHAR,
-    existence_id VARCHAR NULL);`;
+    existence_id VARCHAR);`;

@@ -7,10 +7,11 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByIdSql,
-  checkIsReferencedDocumentSql,
   deleteReferencesSql,
   referencedByDocumentSql,
   deleteExistenceIdsByDocumentId,
+  existenceIdsForDocument,
+  existenceIdsToVerify,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -18,16 +19,27 @@ export async function deleteDocumentById(
   client: PoolClient,
 ): Promise<DeleteResult> {
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
+  let references;
 
   try {
     client.query('BEGIN');
 
     if (validate) {
-      // Check for any references to the document to be deleted
-      const referencesResult = await client.query(checkIsReferencedDocumentSql(id));
+      // Check for any references to the document to be deleted (including itself)
+      const existenceIdResult = await client.query(existenceIdsForDocument(id));
 
-      // Abort on validation failure
-      if (referencesResult.rows[0].exists) {
+      if (!existenceIdResult || existenceIdResult.rowCount === 0) {
+        deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
+        return deleteResult;
+      }
+
+      // We have all the possible id's for this document check if the document is referenced by other documents
+      const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
+      const referenceResult = await client.query(existenceIdsToVerify(validDocIds));
+      references = referenceResult.rows.filter((ref) => ref.document_id !== id);
+
+      // Abort on validation failure - This document is referenced by another document
+      if (references.length > 0) {
         Logger.debug(
           `postgres.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
           traceId,
@@ -49,7 +61,8 @@ export async function deleteDocumentById(
     }
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
+    const testSql = deleteDocumentByIdSql(id);
+    const deleteQueryResult: QueryResult = await client.query(testSql);
     deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
 
     // Delete references where this is the parent document
