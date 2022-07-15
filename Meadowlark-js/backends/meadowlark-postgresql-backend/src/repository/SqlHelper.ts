@@ -54,7 +54,10 @@ export function checkDocumentExistsSql(documentId: string): string {
  * @returns SQL query string to determine references existence
  */
 export function checkIsReferencedDocumentSql(documentId: string): string {
-  return format(`SELECT exists (SELECT 1 FROM meadowlark.existence WHERE existence_id = %L LIMIT 1);`, [documentId]);
+  return format(
+    `SELECT exists (SELECT 1 FROM meadowlark.existence WHERE existence_id = %L AND document_id != %1$L LIMIT 1);`,
+    [documentId],
+  );
 }
 
 /**
