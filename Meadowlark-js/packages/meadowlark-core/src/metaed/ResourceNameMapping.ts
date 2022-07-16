@@ -18,95 +18,126 @@ import {
 import { pluralize } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { decapitalize } from '../Utility';
 
-// simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
-/** This is a mapping of resource names to MetaEd model objects, partitioned by namespace */
-const resourceMappingCache: Map<string, Map<string, TopLevelEntity>> = new Map();
+/**
+ * A mapping of resource names to MetaEd models
+ */
+type ResourceNameToMetaEdModelMap = Map<string, TopLevelEntity>;
 
+/**
+ * A MetaEd project (AKA namespace) name
+ */
+type ProjectName = string;
+
+// simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
+/** This is a cache of project names to a mapping of resource names to MetaEd model objects */
+let resourceMappingCache: Map<ProjectName, ResourceNameToMetaEdModelMap> = new Map();
+
+/**
+ * For tests only - resets the resource mapping cache
+ */
+export function resetCache(): void {
+  resourceMappingCache = new Map();
+}
+
+/**
+ * Converts a MetaEd model name to its resource name
+ */
 function resourceNameFrom(metaEdName: string): string {
   return pluralize(decapitalize(metaEdName));
 }
 
-function getResourceCache(metaEd: MetaEdEnvironment, namespace: string): Map<string, TopLevelEntity> {
-  let mappingForNamespace: Map<string, TopLevelEntity> | undefined = resourceMappingCache.get(namespace);
-  if (mappingForNamespace != null) return mappingForNamespace;
+/**
+ * Creates a mapping between resource names and the MetaEd model object that the resource
+ * refers to, for all model objects in the given MetaEd project. Caches the results for future calls.
+ */
+function getResourceNameMappingForNamespace(metaEd: MetaEdEnvironment, projectName: string): ResourceNameToMetaEdModelMap {
+  let resourceNameMapping: ResourceNameToMetaEdModelMap | undefined = resourceMappingCache.get(projectName);
+  if (resourceNameMapping != null) return resourceNameMapping;
 
-  mappingForNamespace = new Map();
+  resourceNameMapping = new Map();
 
   const domainEntities: IterableIterator<DomainEntity> | undefined = metaEd.namespace
-    .get(namespace)
+    .get(projectName)
     ?.entity.domainEntity.values();
   if (domainEntities != null) {
     for (const domainEntity of domainEntities) {
+      // Abstract entities are not resources (e.g. EducationOrganization)
       if (!domainEntity.isAbstract) {
-        mappingForNamespace.set(resourceNameFrom(domainEntity.metaEdName), domainEntity);
+        resourceNameMapping.set(resourceNameFrom(domainEntity.metaEdName), domainEntity);
       }
     }
   }
 
   const associations: IterableIterator<Association> | undefined = metaEd.namespace
-    .get(namespace)
+    .get(projectName)
     ?.entity.association.values();
   if (associations != null) {
     for (const association of associations) {
       // This is a workaround for the fact that the ODS/API required GeneralStudentProgramAssociation to
       // be abstract although there is no MetaEd language annotation to make an Association abstract.
       if (association.metaEdName !== 'GeneralStudentProgramAssociation')
-        mappingForNamespace.set(resourceNameFrom(association.metaEdName), association);
+        resourceNameMapping.set(resourceNameFrom(association.metaEdName), association);
     }
   }
 
   const domainEntitySubclasses: IterableIterator<DomainEntitySubclass> | undefined = metaEd.namespace
-    .get(namespace)
+    .get(projectName)
     ?.entity.domainEntitySubclass.values();
   if (domainEntitySubclasses != null) {
     for (const domainEntitySubclass of domainEntitySubclasses) {
-      mappingForNamespace.set(resourceNameFrom(domainEntitySubclass.metaEdName), domainEntitySubclass);
+      resourceNameMapping.set(resourceNameFrom(domainEntitySubclass.metaEdName), domainEntitySubclass);
     }
   }
 
   const associationSubclasses: IterableIterator<AssociationSubclass> | undefined = metaEd.namespace
-    .get(namespace)
+    .get(projectName)
     ?.entity.associationSubclass.values();
   if (associationSubclasses != null) {
     for (const associationSubclass of associationSubclasses) {
-      mappingForNamespace.set(resourceNameFrom(associationSubclass.metaEdName), associationSubclass);
+      resourceNameMapping.set(resourceNameFrom(associationSubclass.metaEdName), associationSubclass);
     }
   }
 
-  const descriptors: IterableIterator<Descriptor> | undefined = metaEd.namespace.get(namespace)?.entity.descriptor.values();
+  const descriptors: IterableIterator<Descriptor> | undefined = metaEd.namespace
+    .get(projectName)
+    ?.entity.descriptor.values();
   if (descriptors != null) {
     for (const descriptor of descriptors) {
-      mappingForNamespace.set(pluralize(normalizeDescriptorSuffix(decapitalize(descriptor.metaEdName))), descriptor);
+      resourceNameMapping.set(pluralize(normalizeDescriptorSuffix(decapitalize(descriptor.metaEdName))), descriptor);
     }
   }
 
   const schoolYearEnumerations: IterableIterator<SchoolYearEnumeration> | undefined = metaEd.namespace
-    .get(namespace)
+    .get(projectName)
     ?.entity.schoolYearEnumeration.values();
   if (schoolYearEnumerations != null) {
     const schoolYearEnumeration: SchoolYearEnumeration = Array.from(schoolYearEnumerations)[0];
     if (schoolYearEnumeration != null) {
-      mappingForNamespace.set(resourceNameFrom(`${schoolYearEnumeration.metaEdName}Type`), schoolYearEnumeration);
+      resourceNameMapping.set(resourceNameFrom(`${schoolYearEnumeration.metaEdName}Type`), schoolYearEnumeration);
     }
   }
 
-  resourceMappingCache.set(namespace, mappingForNamespace);
-  return mappingForNamespace;
+  resourceMappingCache.set(projectName, resourceNameMapping);
+  return resourceNameMapping;
 }
 
 /**
+ * Looks up the MetaEd model that a given resource name refers to, for a given MetaEd project.
  * Returns top-level MetaEd entity matching the given resourceName, if it exists
  */
-export function getMatchingMetaEdModelFrom(
+export function getMetaEdModelForResourceName(
   resourceName: string,
   metaEd: MetaEdEnvironment,
-  namespace: string,
+  projectName: string,
 ): TopLevelEntity | undefined {
-  const localNamespace = namespace === 'ed-fi' ? 'EdFi' : namespace;
-  return getResourceCache(metaEd, localNamespace).get(resourceName);
+  const localNamespace = projectName === 'ed-fi' ? 'EdFi' : projectName;
+  return getResourceNameMappingForNamespace(metaEd, localNamespace).get(resourceName);
 }
 
-export function getResourceNames(metaEd: MetaEdEnvironment, namespace: string): string[] {
-  const localNamespace = namespace === 'ed-fi' ? 'EdFi' : namespace;
-  return [...getResourceCache(metaEd, localNamespace).keys()];
+/**
+ * Returns all resource names for a given project name
+ */
+export function getResourceNamesForProject(metaEd: MetaEdEnvironment, projectName: string): string[] {
+  const adjustedProjectName = projectName === 'ed-fi' ? 'EdFi' : projectName;
+  return [...getResourceNameMappingForNamespace(metaEd, adjustedProjectName).keys()];
 }

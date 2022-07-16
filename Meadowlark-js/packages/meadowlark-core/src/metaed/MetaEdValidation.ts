@@ -7,7 +7,7 @@ import Joi from '@hapi/joi';
 import didYouMean from 'didyoumean2';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
-import { getMatchingMetaEdModelFrom, getResourceNames } from './ResourceNameMapping';
+import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
 
 /**
  * Creates a new empty ResourceMatchResult object
@@ -31,7 +31,7 @@ export function matchResourceNameToMetaEd(
   metaEd: MetaEdEnvironment,
   namespace: string,
 ): ResourceMatchResult {
-  const matchingMetaEdModel: TopLevelEntity | undefined = getMatchingMetaEdModelFrom(resourceName, metaEd, namespace);
+  const matchingMetaEdModel: TopLevelEntity | undefined = getMetaEdModelForResourceName(resourceName, metaEd, namespace);
   if (matchingMetaEdModel != null) {
     return {
       ...newResourceMatchResult(),
@@ -42,7 +42,7 @@ export function matchResourceNameToMetaEd(
     };
   }
 
-  const suggestion = didYouMean(resourceName, getResourceNames(metaEd, namespace));
+  const suggestion = didYouMean(resourceName, getResourceNamesForProject(metaEd, namespace));
   if (suggestion == null) return newResourceMatchResult();
 
   const suggestedName = Array.isArray(suggestion) ? suggestion[0] : suggestion;
