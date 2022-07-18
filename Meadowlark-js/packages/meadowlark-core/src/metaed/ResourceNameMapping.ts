@@ -49,6 +49,10 @@ function resourceNameFrom(metaEdName: string): string {
 /**
  * Creates a mapping between resource names and the MetaEd model object that the resource
  * refers to, for all model objects in the given MetaEd project. Caches the results for future calls.
+ *
+ * In the MetaEd internal model, each model object type in a project (namespace) is stored in a separate collection.
+ * For example, all core Domain Entities are in the collection "metaEd.namespace('EdFi').entity.domainEntity".
+ * We iterate through each model type that is expressed as an API resource.
  */
 function getResourceNameMappingForNamespace(metaEd: MetaEdEnvironment, projectName: string): ResourceNameToMetaEdModelMap {
   let resourceNameMapping: ResourceNameToMetaEdModelMap | undefined = resourceMappingCache.get(projectName);
@@ -107,6 +111,8 @@ function getResourceNameMappingForNamespace(metaEd: MetaEdEnvironment, projectNa
     }
   }
 
+  // SchoolYearEnumeration is its own model type. Though there is only one of them, it is stored in a collection
+  // like all other model types for consistency.
   const schoolYearEnumerations: IterableIterator<SchoolYearEnumeration> | undefined = metaEd.namespace
     .get(projectName)
     ?.entity.schoolYearEnumeration.values();
