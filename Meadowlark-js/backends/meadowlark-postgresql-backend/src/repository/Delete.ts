@@ -62,8 +62,7 @@ export async function deleteDocumentById(
     }
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
-    const testSql = deleteDocumentByIdSql(id);
-    const deleteQueryResult: QueryResult = await client.query(testSql);
+    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
     deleteResult.response = deleteQueryResult.rows[0].count === '0' ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
 
     // Delete references where this is the parent document

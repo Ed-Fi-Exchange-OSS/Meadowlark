@@ -49,21 +49,9 @@ export function documentOwnershipByIdSql(documentId: string): string {
 export function checkDocumentExistsSql(documentId: string): string {
   return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
-// format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, [documentId]);
+
 export const checkForReferencesByDocumentId = (documentId: string[]): string =>
   format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
-
-// /**
-//  * Checks if this document is referenced by other documents
-//  * @param documentId Document id to check for references
-//  * @returns SQL query string to determine references existence
-//  */
-// export function checkIsReferencedDocumentSql(documentId: string): string {
-//   return format(
-//     `SELECT exists (SELECT 1 FROM meadowlark.existence WHERE document_id = %L AND existence_id != %1$L LIMIT 1);`,
-//     [documentId],
-//   );
-// }
 
 /**
  * Returns up to five documents that reference this document - for error reporting when an attempt is made to delete
@@ -266,3 +254,11 @@ export const createExistenceTableSql = `
     id bigserial PRIMARY KEY,
     document_id VARCHAR,
     existence_id VARCHAR);`;
+
+// For reference checking by document id
+export const createExistenceTableDocumentIndexSql =
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_checking ON meadowlark.existence(document_id)';
+
+// For reference checking by existence id
+export const createExistenceTableExistenceIndexSql =
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_checking ON meadowlark.existence(existence_id)';
