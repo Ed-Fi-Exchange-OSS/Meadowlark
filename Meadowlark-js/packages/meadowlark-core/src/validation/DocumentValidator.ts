@@ -19,7 +19,7 @@ import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { SuperclassInfo } from '../model/SuperclassInfo';
 import { NoDocumentIdentity } from '../model/DocumentIdentity';
 import { ResourceInfo } from '../model/ResourceInfo';
-import { getMatchingMetaEdModelFrom } from '../metaed/ResourceNameMapping';
+import { getMetaEdModelForResourceName } from '../metaed/ResourceNameMapping';
 import { Logger } from '../Logger';
 import { PathComponents } from '../model/PathComponents';
 
@@ -50,7 +50,7 @@ export async function validateDocument(
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd } = await loadMetaEdState(modelNpmPackage);
 
-  const matchingMetaEdModel: TopLevelEntity | undefined = getMatchingMetaEdModelFrom(
+  const matchingMetaEdModel: TopLevelEntity | undefined = getMetaEdModelForResourceName(
     lowerResourceName,
     metaEd,
     pathComponents.namespace,

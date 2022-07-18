@@ -13,113 +13,308 @@ import {
   AssociationBuilder,
   AssociationSubclassBuilder,
   DescriptorBuilder,
+  EnumerationBuilder,
 } from '@edfi/metaed-core';
-import { getMatchingMetaEdModelFrom } from '../../src/metaed/ResourceNameMapping';
+import { getMetaEdModelForResourceName, resetCache } from '../../src/metaed/ResourceNameMapping';
 
-describe('when looking for a MetaEd model matching a resource name', () => {
+describe('when looking for a domain entity model matching a resource name', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const NAMESPACE = 'EdFi';
+  const namespace = 'EdFi';
 
   beforeAll(() => {
     MetaEdTextBuilder.build()
-      .withBeginNamespace(NAMESPACE)
+      .withBeginNamespace(namespace)
       .withStartDomainEntity('Section')
       .withDocumentation('doc')
       .withStringIdentity('SectionIdentifier', 'doc', '30')
       .withEndDomainEntity()
+      .withEndNamespace()
 
-      .withStartDomainEntitySubclass('SubSection', 'Section')
-      .withStringIdentity('Whatever', 'doc', '9999999')
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+  });
+
+  describe('and given upper case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('Sections', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('sections', metaEd, namespace)).toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('section', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for a domain entity subclass model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+      .withStartDomainEntity('EducationOrganization')
+      .withDocumentation('doc')
+      .withIntegerIdentity('EducationOrganizationId', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntitySubclass('School', 'EducationOrganization')
+      .withIntegerIdentity('SchoolId', 'doc')
       .withEndDomainEntitySubclass()
+      .withEndNamespace()
 
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []))
+      .sendToListener(new DomainEntitySubclassBuilder(metaEd, []));
+  });
+
+  describe('and given upper case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('Schools', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('schools', metaEd, namespace)).toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('school', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for a non-GeneralStudentProgramAssociation association model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
       .withStartAssociation('SectionAssociation')
       .withDocumentation('doc')
       .withStringIdentity('SectionIdentifier', 'doc', '30')
       .withEndAssociation()
 
-      .withStartAssociationSubclass('SubAssociation', 'SectionAssociation')
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new AssociationBuilder(metaEd, []));
+  });
+
+  describe('and given upper case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('SectionAssociations', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('sectionAssociations', metaEd, namespace)).toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('sectionAssociation', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for the GeneralStudentProgramAssociation model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+      .withStartAssociation('GeneralStudentProgramAssociation')
       .withDocumentation('doc')
-      .withStringIdentity('SectionIdentifier', 'doc', '30')
+      .withIntegerIdentity('EducationOrganizationId', 'doc')
+      .withEndAssociation()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new AssociationBuilder(metaEd, []));
+  });
+
+  describe('and given upper case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('GeneralStudentProgramAssociations', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('generalStudentProgramAssociations', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('generalStudentProgramAssociation', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for an association subclass model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+      .withStartAssociation('GeneralStudentProgramAssociation')
+      .withDocumentation('doc')
+      .withIntegerIdentity('EducationOrganizationId', 'doc')
+      .withEndAssociation()
+
+      .withStartAssociationSubclass('StudentProgramAssociation', 'GeneralStudentProgramAssociation')
+      .withDocumentation('doc')
+      .withIntegerIdentity('Service', 'doc')
       .withEndAssociationSubclass()
 
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new AssociationBuilder(metaEd, []))
+      .sendToListener(new AssociationSubclassBuilder(metaEd, []));
+  });
+
+  describe('and given upper case resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('StudentProgramAssociations', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('studentProgramAssociations', metaEd, namespace)).toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('studentProgramAssociation', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for a descriptor model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
       .withStartDescriptor('GradeLevel')
       .withDocumentation('doc')
       .withEndDescriptor()
 
-      .withEndNamespace()
       .sendToListener(new NamespaceBuilder(metaEd, []))
-      .sendToListener(new DomainEntityBuilder(metaEd, []))
-      .sendToListener(new DomainEntitySubclassBuilder(metaEd, []))
-      .sendToListener(new AssociationBuilder(metaEd, []))
-      .sendToListener(new AssociationSubclassBuilder(metaEd, []))
       .sendToListener(new DescriptorBuilder(metaEd, []));
   });
 
-  describe('given entity exists', () => {
-    describe('and given upper case domain entity name', () => {
-      it('returns false', () => {
-        expect(getMatchingMetaEdModelFrom('Sections', metaEd, NAMESPACE)).not.toBeDefined();
-      });
+  describe('and given upper case resource name without "Descriptor" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('GradeLevels', metaEd, namespace)).not.toBeDefined();
     });
+  });
 
-    describe('and given lower case domain entity name', () => {
-      it('returns true', () => {
-        expect(getMatchingMetaEdModelFrom('sections', metaEd, NAMESPACE)).toBeDefined();
-      });
+  describe('and given lower case resource name without "Descriptor" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('gradeLevels', metaEd, namespace)).not.toBeDefined();
     });
+  });
 
-    describe('and given upper case domain sub entity name', () => {
-      it('returns false', () => {
-        expect(getMatchingMetaEdModelFrom('SubSections', metaEd, NAMESPACE)).not.toBeDefined();
-      });
+  describe('and given upper case resource name with "Descriptor" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('GradeLevelDescriptors', metaEd, namespace)).not.toBeDefined();
     });
+  });
 
-    describe('and given lower case domain sub entity name', () => {
-      it('returns true', () => {
-        expect(getMatchingMetaEdModelFrom('subSections', metaEd, NAMESPACE)).toBeDefined();
-      });
+  describe('and given lower case resource name with "Descriptor" suffix', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('gradeLevelDescriptors', metaEd, namespace)).toBeDefined();
     });
+  });
 
-    describe('and given upper case association name', () => {
-      it('returns false', () => {
-        expect(getMatchingMetaEdModelFrom('SectionAssociations', metaEd, NAMESPACE)).not.toBeDefined();
-      });
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('gradeLevelDescriptor', metaEd, namespace)).not.toBeDefined();
     });
+  });
+});
 
-    describe('and given lower case association name', () => {
-      it('returns true', () => {
-        expect(getMatchingMetaEdModelFrom('sectionAssociations', metaEd, NAMESPACE)).toBeDefined();
-      });
-    });
+describe('when looking for the SchoolYear model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
 
-    describe('and given upper case association sub name', () => {
-      it('returns false', () => {
-        expect(getMatchingMetaEdModelFrom('SubAssociations', metaEd, NAMESPACE)).not.toBeDefined();
-      });
-    });
+  beforeAll(() => {
+    resetCache();
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
 
-    describe('and given lower case association sub name', () => {
-      it('returns true', () => {
-        expect(getMatchingMetaEdModelFrom('subAssociations', metaEd, NAMESPACE)).toBeDefined();
-      });
-    });
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []));
+  });
 
-    describe('and given upper case descriptor name', () => {
-      it('returns false', () => {
-        expect(getMatchingMetaEdModelFrom('GradeLevelDescriptors', metaEd, NAMESPACE)).not.toBeDefined();
-      });
+  describe('and given upper case resource name without "Type" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('SchoolYears', metaEd, namespace)).not.toBeDefined();
     });
+  });
 
-    describe('and given lower case descriptor name', () => {
-      it('returns true', () => {
-        expect(getMatchingMetaEdModelFrom('gradeLevelDescriptors', metaEd, NAMESPACE)).toBeDefined();
-      });
+  describe('and given lower case resource name without "Type" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('schoolYears', metaEd, namespace)).not.toBeDefined();
     });
+  });
+
+  describe('and given upper case resource name with "Type" suffix', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('SchoolYearTypes', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+
+  describe('and given lower case resource name with "Type" suffix', () => {
+    it('returns true', () => {
+      expect(getMetaEdModelForResourceName('schoolYearTypes', metaEd, namespace)).toBeDefined();
+    });
+  });
+
+  describe('and given non-pluralized resource name', () => {
+    it('returns false', () => {
+      expect(getMetaEdModelForResourceName('schoolYearType', metaEd, namespace)).not.toBeDefined();
+    });
+  });
+});
+
+describe('when looking for a non-existant model matching a resource name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+
+  beforeAll(() => {
+    resetCache();
   });
 
   describe('given entity does not exist', () => {
     it('returns false', () => {
-      expect(getMatchingMetaEdModelFrom('DoesNotExist', metaEd, NAMESPACE)).not.toBeDefined();
+      expect(getMetaEdModelForResourceName('DoesNotExist', metaEd, namespace)).not.toBeDefined();
     });
   });
 });

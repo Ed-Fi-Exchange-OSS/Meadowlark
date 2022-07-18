@@ -20,7 +20,8 @@ content-type: application/json
 #
 ## Graduation Plans
 # Core problem: schoolyear. This may be related to RND-131. The sample payload
-# comes straight from the ODS/API 5.3.x.
+# comes straight from the ODS/API 5.3.x. RND-131 alone did not resolve the issue,
+# and the new issue is logged in RND-314.
 #
 
 ###

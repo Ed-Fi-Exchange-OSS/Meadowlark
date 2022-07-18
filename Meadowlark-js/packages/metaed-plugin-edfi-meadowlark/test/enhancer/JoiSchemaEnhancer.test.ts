@@ -14,6 +14,7 @@ import {
   NamespaceBuilder,
   DomainEntitySubclassBuilder,
   DescriptorBuilder,
+  EnumerationBuilder,
 } from '@edfi/metaed-core';
 import {
   domainEntityReferenceEnhancer,
@@ -22,6 +23,7 @@ import {
   commonReferenceEnhancer,
   descriptorReferenceEnhancer,
   domainEntitySubclassBaseClassEnhancer,
+  enumerationReferenceEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer, EntityMeadowlarkData } from '../../src/model/EntityMeadowlarkData';
@@ -38,6 +40,7 @@ import {
   expectSubschemaReferenceArray,
   expectSubschemaScalarArray,
   expectSubschemaArray,
+  expectSchoolYearConstraints,
 } from './JoiTestHelper';
 import { validate } from './JoiTestValidator';
 
@@ -311,64 +314,6 @@ describe('when building domain entity with Association/DomainEntity collection n
       { name: 'contentIdentifier', presence: 'required', type: 'string' },
       { name: 'educationContentSuffixNames', presence: 'required', type: 'array' },
     ]);
-  });
-});
-
-describe('when building domain entity with an enumeration with the name SchoolYear', () => {
-  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const namespaceName = 'EdFi';
-  const domainEntityName = 'EducationContent';
-  let namespace: any = null;
-
-  beforeAll(() => {
-    MetaEdTextBuilder.build()
-      .withBeginNamespace(namespaceName)
-      .withStartDomainEntity(domainEntityName)
-      .withDocumentation('doc')
-      .withStringIdentity('ContentIdentifier', 'doc', '30')
-      .withEnumerationProperty('SchoolYear', 'doc', true, false)
-      .withEndDomainEntity()
-      .withEndNamespace()
-
-      .sendToListener(new NamespaceBuilder(metaEd, []))
-      .sendToListener(new DomainEntityBuilder(metaEd, []));
-
-    namespace = metaEd.namespace.get(namespaceName);
-
-    domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-    enhance(metaEd);
-  });
-
-  it('should validate the SchoolYear enumeration', () => {
-    const entity = namespace.entity.domainEntity.get(domainEntityName);
-    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
-    expectSubschemas(joiSchema, [
-      { name: 'contentIdentifier', presence: 'required', type: 'string' },
-      { name: 'schoolYear', presence: 'required', type: 'number' },
-    ]);
-  });
-
-  it('should have the correct SchoolYear range', () => {
-    const entity = namespace.entity.domainEntity.get(domainEntityName);
-    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
-    const subschemas: any[] = [...(joiSchema as any)._ids._byKey.values()];
-    expect(subschemas[1].id).toBe('schoolYear');
-
-    const schoolYearSchema: any = subschemas[1].schema;
-
-    const minRule = schoolYearSchema._rules[0];
-    expect(minRule.name).toBe('min');
-    expect(minRule.args.limit).toBe(1900);
-
-    const maxRule = schoolYearSchema._rules[1];
-    expect(maxRule.name).toBe('max');
-    expect(maxRule.args.limit).toBe(2100);
   });
 });
 
@@ -883,6 +828,112 @@ describe('when building domain entity with a common with a domain entity referen
 
     expectSubschemas(mandatingEducationOrganizationSchema, [
       { name: 'educationOrganizationId', presence: 'required', type: 'number' },
+    ]);
+  });
+});
+
+describe('when building domain entity with two school year enumerations, one role named', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('StudentSchoolAssociation')
+      .withDocumentation('doc')
+      .withIntegerIdentity('SchoolId', 'doc')
+      .withEnumerationProperty('SchoolYear', 'doc', false, false)
+      .withEnumerationProperty('SchoolYear', 'doc', false, false, 'ClassOf')
+      .withEndDomainEntity()
+
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    enumerationReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, schoolYearSchema, classOfSchoolYearSchema] = expectSubschemas(joiSchema, [
+      { name: 'schoolId', presence: 'required', type: 'number' },
+      { name: 'schoolYearTypeReference', presence: 'optional', type: 'object' },
+      { name: 'classOfSchoolYearTypeReference', presence: 'optional', type: 'object' },
+    ]);
+    expectSubschemas(schoolYearSchema, [{ name: 'schoolYear', presence: 'required', type: 'number' }]);
+    expectSubschemas(classOfSchoolYearSchema, [{ name: 'schoolYear', presence: 'required', type: 'number' }]);
+
+    expectSchoolYearConstraints(schoolYearSchema);
+    expectSchoolYearConstraints(classOfSchoolYearSchema);
+  });
+});
+
+describe('when building domain entity with reference to domain entity with school year enumeration as part of identity', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('StudentSchoolAssociation')
+      .withDocumentation('doc')
+      .withIntegerIdentity('SchoolId', 'doc')
+      .withDomainEntityProperty('Calendar', 'doc', false, false)
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Calendar')
+      .withDocumentation('doc')
+      .withIntegerIdentity('SchoolId', 'doc')
+      .withIdentityProperty('enumeration', 'SchoolYear', 'doc')
+      .withEndDomainEntity()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    domainEntityReferenceEnhancer(metaEd);
+    enumerationReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
+    const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
+
+    const [, calendarSchema] = expectSubschemas(joiSchema, [
+      { name: 'schoolId', presence: 'required', type: 'number' },
+      { name: 'calendarReference', presence: 'optional', type: 'object' },
+    ]);
+    expectSubschemas(calendarSchema, [
+      { name: 'schoolId', presence: 'required', type: 'number' },
+      { name: 'schoolYear', presence: 'required', type: 'number' },
     ]);
   });
 });

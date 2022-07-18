@@ -71,12 +71,20 @@ function apiReferenceName(property: EntityProperty): string {
 }
 
 /**
+ * School year enumeration property names are "SchoolYearTypeReference" prefixed with role name
+ */
+function apiSchoolYearEnumerationName(property: EntityProperty): string {
+  return uncapitalize(`${property.roleName}SchoolYearTypeReference`);
+}
+
+/**
  * The naming for a property when it is at the top level of the request body.
  *
  * Non-reference property names are different from reference property ones, and
  * reference property array names are different still.
  */
 function apiTopLevelName(property: EntityProperty, { removePrefixes }: NamingOptions): string {
+  if (property.type === 'schoolYearEnumeration') return apiSchoolYearEnumerationName(property);
   if (!isTopLevelReference(property)) return apiFullName(property, { removePrefixes });
   if (property.isRequiredCollection || property.isOptionalCollection) return apiFullName(property, { removePrefixes });
   return apiReferenceName(property);

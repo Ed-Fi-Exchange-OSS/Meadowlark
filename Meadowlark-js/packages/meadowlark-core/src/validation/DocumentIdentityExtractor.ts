@@ -18,6 +18,8 @@ import { SuperclassInfo } from '../model/SuperclassInfo';
 import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo';
+import { SchoolYearEnumerationDocument } from '../model/SchoolYearEnumerationDocument';
+import { schoolYearEnumerationDocumentIdentityFrom } from '../model/SchoolYearEnumerationDocumentInfo';
 
 type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
 
@@ -105,11 +107,22 @@ function descriptorDocumentIdentityWithSecurity(body: DescriptorDocument): Docum
 }
 
 /**
+ * School year enumerations are hard-coded in the ODS/API
+ */
+function schoolYearEnumerationDocumentIdentityWithSecurity(
+  body: SchoolYearEnumerationDocument,
+): DocumentIdentityWithSecurity {
+  return { documentIdentity: schoolYearEnumerationDocumentIdentityFrom(body), studentId: null, edOrgId: null };
+}
+
+/**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
  * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
 export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentityWithSecurity {
   if (entity.type === 'descriptor') return descriptorDocumentIdentityWithSecurity(body as DescriptorDocument);
+  if (entity.type === 'schoolYearEnumeration')
+    return schoolYearEnumerationDocumentIdentityWithSecurity(body as SchoolYearEnumerationDocument);
 
   const documentIdentitiesWithSecurity: DocumentIdentityWithSecurity[] = (
     entity.data.meadowlark as EntityMeadowlarkData

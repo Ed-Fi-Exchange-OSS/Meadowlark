@@ -29,7 +29,7 @@ describe('given a valid resource name but body fails schema validation', () => {
       } as any),
     );
 
-    mockMatchEndpointToMetaEd = jest.spyOn(ResourceNameMapping, 'getMatchingMetaEdModelFrom').mockReturnValue({
+    mockMatchEndpointToMetaEd = jest.spyOn(ResourceNameMapping, 'getMetaEdModelForResourceName').mockReturnValue({
       ...newDomainEntity(),
       metaEdName: 'DomainEntityName',
       data: { meadowlark: { apiMapping: { assignableTo: null } } },

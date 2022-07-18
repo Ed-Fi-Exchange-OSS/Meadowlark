@@ -281,6 +281,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a Session
+### This will fail until RND-314 is resolved
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -288,7 +289,9 @@ descriptor-validation: true
 
 {
   "sessionName": "d",
-  "schoolYear": 2034,
+  "schoolYearTypeReference": {
+    "schoolYear": 2034
+  },
   "beginDate": "2021-01-01",
   "endDate": "2021-06-01",
   "termDescriptor": "uri://ed-fi.org/TermDescriptor#Spring Semester",
