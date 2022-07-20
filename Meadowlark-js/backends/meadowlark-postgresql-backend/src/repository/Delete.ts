@@ -19,7 +19,6 @@ export async function deleteDocumentById(
   client: PoolClient,
 ): Promise<DeleteResult> {
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
-  let references;
 
   try {
     client.query('BEGIN');
@@ -28,7 +27,7 @@ export async function deleteDocumentById(
       // Check for any references to the document to be deleted (including itself)
       const existenceIdResult = await client.query(existenceIdsForDocument(id));
       // If the record doesn't exist, exit
-      if (!existenceIdResult || existenceIdResult.rowCount === 0) {
+      if (existenceIdResult?.rowCount === 0) {
         await client.query('ROLLBACK');
         deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
         return deleteResult;
@@ -37,7 +36,7 @@ export async function deleteDocumentById(
       // We have all the possible id's for this document check if the document is referenced by other documents
       const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
       const referenceResult = await client.query(existenceIdsToVerify(validDocIds));
-      references = referenceResult.rows.filter((ref) => ref.document_id !== id);
+      const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
 
       // Abort on validation failure - This document is referenced by another document
       if (references.length > 0) {

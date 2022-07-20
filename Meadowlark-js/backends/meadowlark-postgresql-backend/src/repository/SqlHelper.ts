@@ -11,11 +11,13 @@ import format from 'pg-format';
  * @param documentIds the list of documents to check for existence
  * @returns SQL query to check for existence ids
  */
-export const existenceIdsForDocument = (existenceId: string): string =>
-  format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, existenceId);
+export function existenceIdsForDocument(existenceId: string): string {
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, existenceId);
+}
 
-export const existenceIdsToVerify = (existenceIds: string[]): string =>
-  format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, existenceIds);
+export function existenceIdsToVerify(existenceIds: string[]): string {
+  return format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, existenceIds);
+}
 
 /**
  * Function that produces a parametrized SQL query for retrieving a document (with identity)
@@ -50,8 +52,9 @@ export function checkDocumentExistsSql(documentId: string): string {
   return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
 }
 
-export const checkForReferencesByDocumentId = (documentId: string[]): string =>
-  format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
+export function checkForReferencesByDocumentId(documentId: string[]): string {
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
+}
 
 /**
  * Returns up to five documents that reference this document - for error reporting when an attempt is made to delete
@@ -76,13 +79,14 @@ export function referencedByDocumentSql(documentId: string): string {
  * @param existenceId the existence id being inserted, this may be the same as the docuementId
  * @returns SQL query string to insert into the existence table
  */
-export const existenceInsertSql = (documentId: string, existenceId: string): string =>
-  format(
+export function existenceInsertSql(documentId: string, existenceId: string): string {
+  return format(
     `INSERT INTO meadowlark.existence
-   (document_id, existence_id)
-   VALUES (%L)`,
+     (document_id, existence_id)
+     VALUES (%L)`,
     [documentId, existenceId],
   );
+}
 
 /**
  * Returns the SQL statement to insert a referenced document into the references table
@@ -189,12 +193,13 @@ export function deleteReferencesSql(documentId: string): string {
  * @param documentId the id of the document we're trying to remove from the existence table
  * @returns SQL query string for deleting existence ids
  */
-export const deleteExistenceIdsByDocumentId = (documentId: string): string =>
-  format(
+export function deleteExistenceIdsByDocumentId(documentId: string): string {
+  return format(
     `DELETE from meadowlark.existence
   WHERE document_id = %L`,
     [documentId],
   );
+}
 
 // SQL for DDL
 
@@ -257,8 +262,8 @@ export const createExistenceTableSql = `
 
 // For reference checking by document id
 export const createExistenceTableDocumentIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_checking ON meadowlark.existence(document_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_document_id ON meadowlark.existence(document_id)';
 
 // For reference checking by existence id
 export const createExistenceTableExistenceIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_checking ON meadowlark.existence(existence_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_existence_id ON meadowlark.existence(existence_id)';
