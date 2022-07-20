@@ -9,6 +9,7 @@ import { getValueFromEnvironment } from '../Environment';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
+import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
 
 function signingKey(): Buffer {
   const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
@@ -41,15 +42,30 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   const failureMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
 
+  // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
+  // otherwise this is not a valid token
+  let NO_ROLES_INCLUDED = false;
+  let authStrategyFromJWT = '';
+  if (jwt.body.roles === null || jwt.body.roles?.length === 0) {
+    NO_ROLES_INCLUDED = true;
+  } else {
+    authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
+    if (authStrategyFromJWT === '') {
+      NO_ROLES_INCLUDED = true;
+    }
+  }
+
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message),
+    isValid: jwt != null && !failureMessages.includes(jwt.message) && !NO_ROLES_INCLUDED,
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
     subject: jwt.body?.sub ?? null,
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
+    roles: jwt.body?.roles ?? [],
+    authorizationStrategy: authStrategyFromJWT ?? '',
   };
 }
 

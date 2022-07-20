@@ -72,7 +72,9 @@ describe('given an error response from authorize', () => {
 describe('given a valid response from authorize', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const subject = 'Subject';
-  const jwtStatus: JwtStatus = { ...newJwtStatus(), subject };
+  const roles = ['vendor'];
+  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const jwtStatus: JwtStatus = { ...newJwtStatus(), subject, roles, authorizationStrategy };
   let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 

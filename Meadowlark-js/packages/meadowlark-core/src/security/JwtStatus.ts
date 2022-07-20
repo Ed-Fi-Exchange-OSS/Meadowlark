@@ -15,6 +15,8 @@ export interface JwtStatus {
   subject: string | null;
   issuedAt: number;
   expiresAt: number;
+  roles: string[];
+  authorizationStrategy: string;
 }
 
 export function newJwtStatus() {
@@ -27,6 +29,8 @@ export function newJwtStatus() {
     subject: null,
     issuedAt: 0,
     expiresAt: 0,
+    roles: [],
+    authorizationStrategy: '',
   };
 }
 

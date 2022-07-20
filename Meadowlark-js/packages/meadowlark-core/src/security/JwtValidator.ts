@@ -41,6 +41,17 @@ export function validateJwt(authorizationHeader: string | undefined): JwtValidat
     };
   }
 
+  if (!jwtStatus.roles || jwtStatus.roles.length === 0 || jwtStatus.authorizationStrategy === '') {
+    return {
+      jwtStatus,
+      errorResponse: {
+        statusCode: 401,
+        body: '{ "error": "invalid_token", "error_description": "Roles are missing or roles are invalid on token" }',
+        headers: { 'WWW-Authenticate': 'Bearer' },
+      },
+    };
+  }
+
   return {
     jwtStatus,
     errorResponse: {

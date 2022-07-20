@@ -7,6 +7,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { validateJwt } from '../security/JwtValidator';
 import { authorizationHeader } from '../security/AuthorizationHeader';
 import { MiddlewareModel } from './MiddlewareModel';
+import { AuthorizationStrategy } from '../security/Security';
 
 const moduleName = 'AuthorizationMiddleware';
 
@@ -27,9 +28,8 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     return { frontendRequest, frontendResponse: errorResponse };
   }
 
-  // TODO RND-262: Pick out authorization strategy from JWT
   frontendRequest.middleware.security = {
-    authorizationStrategy: 'OWNERSHIP_BASED',
+    authorizationStrategy: jwtStatus.authorizationStrategy as AuthorizationStrategy,
     clientName: jwtStatus.subject ?? 'UNKNOWN',
   };
   return { frontendRequest, frontendResponse: null };
