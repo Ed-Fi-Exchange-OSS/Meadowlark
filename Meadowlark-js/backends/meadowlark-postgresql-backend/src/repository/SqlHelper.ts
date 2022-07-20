@@ -8,15 +8,11 @@ import format from 'pg-format';
 
 /**
  * Function that returns a SQL query for checking whether references exist for a given list of document ids
- * @param documentIds the list of documents to check for existence
+ * @param documentId the document to check for existence
  * @returns SQL query to check for existence ids
  */
-export function existenceIdsForDocument(existenceId: string): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, existenceId);
-}
-
-export function existenceIdsToVerify(existenceIds: string[]): string {
-  return format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, existenceIds);
+export function existenceIdsForDocument(documentId: string): string {
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, documentId);
 }
 
 /**
@@ -44,16 +40,13 @@ export function documentOwnershipByIdSql(documentId: string): string {
 }
 
 /**
- * Checks for the existence of a document in the database
- * @param documentId Document id to check for existence
- * @returns SQL query string to determine document existence
+ * Function that produces a parameterized SQL query for retrieving values from the existence table based on a given
+ * existenceId. This allows for reference checking from the existence table for deletes and general reference validation
+ * @param documentId the id of the document we're checking references for
+ * @returns SQL query string to retrieve references
  */
-export function checkDocumentExistsSql(documentId: string): string {
-  return format(`SELECT exists (SELECT 1 FROM meadowlark.documents WHERE document_id = %L LIMIT 1);`, [documentId]);
-}
-
 export function checkForReferencesByDocumentId(documentId: string[]): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
+  return format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
 }
 
 /**

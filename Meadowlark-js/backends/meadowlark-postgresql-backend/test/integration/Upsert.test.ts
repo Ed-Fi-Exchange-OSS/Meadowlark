@@ -20,7 +20,7 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { checkDocumentExistsSql, documentByIdSql } from '../../src/repository/SqlHelper';
+import { documentByIdSql, existenceIdsForDocument } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyExistenceId } from './TestHelper';
 
@@ -66,7 +66,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(checkDocumentExistsSql(id));
+    const result = await client.query(existenceIdsForDocument(id));
 
     expect(result.rowCount).toBe(1);
   });

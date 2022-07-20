@@ -11,7 +11,7 @@ import {
   referencedByDocumentSql,
   deleteExistenceIdsByDocumentId,
   existenceIdsForDocument,
-  existenceIdsToVerify,
+  checkForReferencesByDocumentId,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -35,7 +35,7 @@ export async function deleteDocumentById(
 
       // We have all the possible id's for this document check if the document is referenced by other documents
       const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-      const referenceResult = await client.query(existenceIdsToVerify(validDocIds));
+      const referenceResult = await client.query(checkForReferencesByDocumentId(validDocIds));
       const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
 
       // Abort on validation failure - This document is referenced by another document

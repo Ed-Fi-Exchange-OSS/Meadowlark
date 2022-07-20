@@ -16,10 +16,10 @@ import {
 import {
   deleteReferencesSql,
   documentInsertOrUpdateSql,
-  checkDocumentExistsSql,
   referencesInsertSql,
   deleteExistenceIdsByDocumentId,
   existenceInsertSql,
+  existenceIdsForDocument,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -38,8 +38,8 @@ export async function upsertDocument(
   try {
     await client.query('BEGIN');
 
-    recordExistsResult = await client.query(checkDocumentExistsSql(id));
-    isInsert = !recordExistsResult.rows[0].exists;
+    recordExistsResult = await client.query(existenceIdsForDocument(id));
+    isInsert = recordExistsResult.rowCount === 0;
 
     documentUpsertSql = documentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate, security }, isInsert);
 
