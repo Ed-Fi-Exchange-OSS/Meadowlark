@@ -14,6 +14,9 @@ import {
   createReferencesTableSql,
   createSchemaSql,
   createDatabaseSql,
+  createExistenceTableSql,
+  createExistenceTableDocumentIndexSql,
+  createExistenceTableExistenceIndexSql,
 } from './SqlHelper';
 
 let singletonDbPool: Pool | null = null;
@@ -38,6 +41,9 @@ export async function checkExistsAndCreateTables(client: PoolClient) {
     await client.query(createReferencesTableSql);
     await client.query(createReferencesTableCheckingIndexSql);
     await client.query(createReferencesTableDeletingIndexSql);
+    await client.query(createExistenceTableSql);
+    await client.query(createExistenceTableDocumentIndexSql);
+    await client.query(createExistenceTableExistenceIndexSql);
   } catch (e) {
     const message = e.constructor.name.includes('Error') ? e.message : 'unknown';
     Logger.error(`Error connecting to PostgreSQL. Error was ${message}`, null);

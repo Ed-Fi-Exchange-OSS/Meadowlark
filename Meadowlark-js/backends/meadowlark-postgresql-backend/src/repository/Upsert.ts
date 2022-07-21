@@ -10,10 +10,18 @@ import {
   Logger,
   DocumentReference,
   documentIdForDocumentReference,
+  documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
 
-import { deleteReferencesSql, documentInsertOrUpdateSql, checkDocumentExistsSql, referencesInsertSql } from './SqlHelper';
-import { validateReferences } from './WriteHelper';
+import {
+  deleteReferencesSql,
+  documentInsertOrUpdateSql,
+  referencesInsertSql,
+  deleteExistenceIdsByDocumentId,
+  existenceInsertSql,
+  existenceIdsForDocument,
+} from './SqlHelper';
+import { validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
@@ -30,8 +38,8 @@ export async function upsertDocument(
   try {
     await client.query('BEGIN');
 
-    recordExistsResult = await client.query(checkDocumentExistsSql(id));
-    isInsert = !recordExistsResult.rows[0].exists;
+    recordExistsResult = await client.query(existenceIdsForDocument(id));
+    isInsert = recordExistsResult.rowCount === 0;
 
     documentUpsertSql = documentInsertOrUpdateSql({ id, resourceInfo, documentInfo, edfiDoc, validate, security }, isInsert);
 
@@ -62,6 +70,16 @@ export async function upsertDocument(
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
     await client.query(documentUpsertSql);
 
+    // Delete existing values from the existence table
+    await client.query(deleteExistenceIdsByDocumentId(id));
+
+    // Perform insert of existence ids
+    await client.query(existenceInsertSql(id, id));
+    if (documentInfo.superclassInfo != null) {
+      const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      await client.query(existenceInsertSql(id, existenceId));
+    }
+
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
     await client.query(deleteReferencesSql(id));
@@ -70,6 +88,7 @@ export async function upsertDocument(
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(referencesInsertSql(id, ref));
+      await client.query(existenceInsertSql(id, ref));
     });
 
     await client.query('COMMIT');

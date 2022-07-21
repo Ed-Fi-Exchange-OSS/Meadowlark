@@ -10,19 +10,19 @@ import {
   newSecurity,
   documentIdForDocumentInfo,
   UpsertRequest,
-  UpsertResult,
   DocumentReference,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
-  GetRequest,
+  SuperclassInfo,
+  newSuperclassInfo,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
+import { documentByIdSql, existenceIdsForDocument } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll } from './TestHelper';
-import { getDocumentById } from '../../src/repository/Get';
-import { checkDocumentExistsSql, documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql, verifyExistenceId } from './TestHelper';
 
 jest.setTimeout(40000);
 
@@ -32,13 +32,6 @@ const newUpsertRequest = (): UpsertRequest => ({
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
-  security: { ...newSecurity() },
-  traceId: 'traceId',
-});
-
-const newGetRequest = (): GetRequest => ({
-  id: '',
-  resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId',
 });
@@ -73,7 +66,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(checkDocumentExistsSql(id));
+    const result = await client.query(existenceIdsForDocument(id));
 
     expect(result.rowCount).toBe(1);
   });
@@ -162,9 +155,9 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   });
 
   it('should have the change in the db', async () => {
-    const result: any = await getDocumentById({ ...newGetRequest(), id }, client);
+    const result: any = await client.query(documentByIdSql(id));
 
-    expect(result.document.call).toBe('two');
+    expect(result.rows[0].edfi_doc.call).toBe('two');
   });
 });
 
@@ -655,5 +648,110 @@ describe('given an update of a document with one existing and one non-existent r
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
     expect(outRefs).toHaveLength(0);
+  });
+});
+
+describe('given an update of a subclass document referenced by an existing document as a superclass', () => {
+  let client;
+  let upsertResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    projectName: 'Ed-Fi',
+  };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    superclassInfo,
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const referenceAsSuperclass: DocumentReference = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    documentIdentity: superclassInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferenceResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferenceDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'week', value: 'update6' }],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(
+    documentWithReferenceResourceInfo,
+    documentWithReferenceDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+
+    //  The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: referencedDocumentId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+
+    // The original document with no reference
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferenceResourceInfo,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+
+    // The updated document with reference as superclass
+    documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferenceResourceInfo,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return success for the document with a valid reference to superclass', async () => {
+    expect(upsertResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have updated the document with a valid reference to superclass in the db', async () => {
+    const result: any = await client.query(verifyExistenceId(referencedDocumentId));
+    const outRefs = result.rows.map((row) => row.existence_id);
+    expect(outRefs).toMatchInlineSnapshot(`
+      Array [
+        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+      ]
+    `);
   });
 });

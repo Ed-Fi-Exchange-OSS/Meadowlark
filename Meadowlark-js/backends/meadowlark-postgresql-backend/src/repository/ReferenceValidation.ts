@@ -5,17 +5,17 @@
 
 import R from 'ramda';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
-import { PoolClient, QueryResult } from 'pg';
-import format from 'pg-format';
+import { PoolClient } from 'pg';
+import { checkForReferencesByDocumentId } from './SqlHelper';
 
 export async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
   if (referenceIds.length === 0) {
     return [];
   }
 
-  const sql = format('SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L)', referenceIds);
-  const response: QueryResult = await client.query(sql);
-  return response.rows.map((val) => val.document_id);
+  const existRef = await client.query(checkForReferencesByDocumentId(referenceIds));
+  const references = existRef.rows.map((val) => val.existence_id);
+  return references;
 }
 
 /**

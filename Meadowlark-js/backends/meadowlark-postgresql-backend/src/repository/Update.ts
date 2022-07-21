@@ -9,10 +9,17 @@ import {
   UpdateRequest,
   DocumentReference,
   documentIdForDocumentReference,
+  documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
-import { deleteReferencesSql, documentInsertOrUpdateSql, referencesInsertSql } from './SqlHelper';
-import { validateReferences } from './WriteHelper';
+import {
+  existenceInsertSql,
+  deleteExistenceIdsByDocumentId,
+  deleteReferencesSql,
+  documentInsertOrUpdateSql,
+  referencesInsertSql,
+} from './SqlHelper';
+import { validateReferences } from './ReferenceValidation';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
@@ -59,6 +66,16 @@ export async function updateDocumentById(
     );
     const result: QueryResult = await client.query(documentSql);
 
+    // Delete existing values from the existence table
+    await client.query(deleteExistenceIdsByDocumentId(id));
+
+    // Perform insert of existence ids
+    await client.query(existenceInsertSql(id, id));
+    if (documentInfo.superclassInfo != null) {
+      const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      await client.query(existenceInsertSql(id, existenceId));
+    }
+
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
     await client.query(deleteReferencesSql(id));
@@ -67,6 +84,7 @@ export async function updateDocumentById(
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(referencesInsertSql(id, ref));
+      await client.query(existenceInsertSql(id, ref));
     });
 
     await client.query('COMMIT');

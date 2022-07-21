@@ -7,9 +7,11 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByIdSql,
-  checkIsReferencedDocumentSql,
   deleteReferencesSql,
   referencedByDocumentSql,
+  deleteExistenceIdsByDocumentId,
+  existenceIdsForDocument,
+  checkForReferencesByDocumentId,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -22,11 +24,22 @@ export async function deleteDocumentById(
     client.query('BEGIN');
 
     if (validate) {
-      // Check for any references to the document to be deleted
-      const referencesResult = await client.query(checkIsReferencedDocumentSql(id));
+      // Check for any references to the document to be deleted (including itself)
+      const existenceIdResult = await client.query(existenceIdsForDocument(id));
+      // If the record doesn't exist, exit
+      if (existenceIdResult?.rowCount === 0) {
+        await client.query('ROLLBACK');
+        deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
+        return deleteResult;
+      }
 
-      // Abort on validation failure
-      if (referencesResult.rows[0].exists) {
+      // We have all the possible id's for this document check if the document is referenced by other documents
+      const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
+      const referenceResult = await client.query(checkForReferencesByDocumentId(validDocIds));
+      const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
+
+      // Abort on validation failure - This document is referenced by another document
+      if (references.length > 0) {
         Logger.debug(
           `postgres.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
           traceId,
@@ -54,6 +67,10 @@ export async function deleteDocumentById(
     // Delete references where this is the parent document
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
     await client.query(deleteReferencesSql(id));
+
+    // Delete this document from the existence table
+    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting existence entries with id ${id}`, traceId);
+    await client.query(deleteExistenceIdsByDocumentId(id));
 
     client.query('COMMIT');
   } catch (e) {

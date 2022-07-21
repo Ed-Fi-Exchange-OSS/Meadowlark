@@ -18,14 +18,16 @@ import {
   newResourceInfo,
   DeleteResult,
   DocumentReference,
+  newSuperclassInfo,
+  SuperclassInfo,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
-import { deleteAll } from './TestHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { getDocumentById } from '../../src/repository/Get';
-import { documentByIdSql, retrieveReferencesByDocumentIdSql } from '../../src/repository/SqlHelper';
+import { documentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -77,7 +79,7 @@ describe('given the delete of a non-existent document', () => {
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should return delete failure', async () => {
@@ -112,7 +114,7 @@ describe('given the delete of an existing document', () => {
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should return delete success', async () => {
@@ -179,7 +181,7 @@ describe('given an delete of a document referenced by an existing document with 
   afterAll(async () => {
     await deleteAll(client);
     client.release();
-    // await resetSharedClient();
+    await resetSharedClient();
   });
 
   it('should have returned delete failure due to existing reference', async () => {
@@ -260,5 +262,87 @@ describe('given an delete of a document referenced by an existing document with 
   it('should not be the parent document in the references table', async () => {
     const docResult: any = await client.query(retrieveReferencesByDocumentIdSql(referencedDocumentId));
     expect(docResult.rowCount).toEqual(0);
+  });
+});
+
+describe('given the delete of a subclass document referenced by an existing document as a superclass', () => {
+  let client;
+  let deleteResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    projectName: 'Ed-Fi',
+  };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    superclassInfo,
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const referenceAsSuperclass: DocumentReference = {
+    projectName: superclassInfo.projectName,
+    resourceName: superclassInfo.resourceName,
+    documentIdentity: superclassInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferenceResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+  const documentWithReferenceDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: [{ name: 'week', value: 'delete6' }],
+    documentReferences: [referenceAsSuperclass],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(
+    documentWithReferenceResourceInfo,
+    documentWithReferenceDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    // The referencing document that should cause the delete to fail
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: documentWithReferencesId,
+        documentInfo: documentWithReferenceDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should have returned delete failure due to existing reference', async () => {
+    expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
+  });
+
+  it('should still have the referenced document in the db', async () => {
+    const result: any = await client.query(documentByIdSql(referencedDocumentId));
+    expect(result.rows[0].document_identity[0].name).toBe('schoolId');
+    expect(result.rows[0].document_identity[0].value).toBe('123');
   });
 });
