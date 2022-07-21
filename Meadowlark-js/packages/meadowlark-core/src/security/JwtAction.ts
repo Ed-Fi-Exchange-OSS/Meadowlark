@@ -44,20 +44,17 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
   // otherwise this is not a valid token
-  let NO_ROLES_INCLUDED = false;
   let authStrategyFromJWT = '';
-  if (jwt.body.roles === null || jwt.body.roles?.length === 0) {
-    NO_ROLES_INCLUDED = true;
-  } else {
+
+  // TODO@SAA - Check with Brad preference between current if and:
+  // jwt.body?.roles != null && jwt.body.roles.length > 0
+  if ((jwt.body?.roles?.length ?? 0) > 0) {
     authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
-    if (authStrategyFromJWT === '') {
-      NO_ROLES_INCLUDED = true;
-    }
   }
 
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message) && !NO_ROLES_INCLUDED,
+    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT !== '',
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
@@ -65,7 +62,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
     roles: jwt.body?.roles ?? [],
-    authorizationStrategy: authStrategyFromJWT ?? '',
+    authorizationStrategy: authStrategyFromJWT,
   };
 }
 
