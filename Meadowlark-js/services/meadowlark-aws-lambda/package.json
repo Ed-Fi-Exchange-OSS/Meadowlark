@@ -19,9 +19,7 @@
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2",
     "serverless": "2.69.1",
-    "serverless-dynamodb-local": "0.2.40",
     "serverless-offline": "8.3.1",
-    "serverless-plugin-offline-dynamodb-stream": "1.0.20",
     "source-map-support": "^0.5.21"
   },
   "scripts": {
@@ -29,7 +27,6 @@
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
-    "init:local-dynamodb": "yarn serverless dynamodb install",
     "deploy:aws": "yarn build && yarn serverless deploy --aws-profile default --stage",
     "teardown:aws": "yarn serverless remove --aws-profile default --stage",
     "load:descriptors:local": "yarn serverless invoke local -f loadDescriptors",

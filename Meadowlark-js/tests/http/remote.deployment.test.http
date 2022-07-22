@@ -152,6 +152,5 @@ Authorization: bearer {{token}}
 
 
 ### View all schools - should be none. If still there, try again - maybe went too fast
-# and DynamoDB eventual consistency is not yet consistent.
 GET https://{{hostname}}/{{stage}}/v3.3b/ed-fi/schools
 Authorization: bearer {{token}}

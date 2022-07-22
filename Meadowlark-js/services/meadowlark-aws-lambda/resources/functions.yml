@@ -77,20 +77,6 @@ swaggerForDescriptorsAPI:
         path: /metadata/descriptors/swagger.json
         cors: true
 
-updateExternalStorage:
-  handler: ../../backends/meadowlark-aws-dynamodb-opensearch/dist/DynamoDbStreamHandler.updateExternalStorage
-  environment:
-    ES_ENDPOINT:
-      Fn::GetAtt: [ OpenSearchInstance, DomainEndpoint ]
-  events:
-    - stream:
-        type: dynamodb
-        arn:
-          Fn::GetAtt: [ entityTable, StreamArn ]
-        startingPosition: LATEST
-        batchSize: 1
-        enabled: true
-
 loadDescriptors:
   handler: dist/handler/DescriptorLoader.loadDescriptors
   timeout: 120
