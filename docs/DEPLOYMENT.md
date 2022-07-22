@@ -1,5 +1,8 @@
 # Meadowlark Remote Deployment
 
+| ❗ AWS remote deployment is temporarily unavailable, because we have removed DynamoDB and have not yet scripted any deploy process for either MongoDB or PostgreSQL. |
+| -- |
+
 Meadowlark currently supports deployment to AWS. Remote deployment is performed
 using the [Serverless Framework](https://www.serverless.com/framework/docs)
 tool. Remote deployment does not require the local setup outlined in
@@ -17,7 +20,7 @@ tool. Remote deployment does not require the local setup outlined in
 Note: Meadowlark API security is in the proof-of-concept stage.
 
 If you haven't already, copy the .env.example to a `.env.<stage>` file. For
-example, if you wish to have a stage (aka environment) called "dev" in AWS: 
+example, if you wish to have a stage (aka environment) called "dev" in AWS:
 `cp .env.example .env.dev`. There are two environment variables that deal with API
 security. Both are used by an AWS deployment.
 
@@ -248,17 +251,6 @@ required, must be loaded in order to use descriptor validation.
 * Run `yarn load:descriptors:aws dev` to invoke the Meadowlark Lambda function
   that loads descriptors into the "dev" stage. Be patient, as this may take up
   to 90 seconds to complete.
-
-### View the Meadowlark DynamoDB Table
-
-Meadowlark uses a [single table
-design](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/)
-in DynamoDB. [NoSQL Workbench for
-DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.html)
-is the recommended way to browse a Meadowlark DynamoDB table. The Meadowlark
-table for a stack is named with an `edfi-meadowlark` prefix followed by the
-stage name. For example, a "dev" stage table will be named
-`edfi-meadowlark-dev`.
 
 ### Test a Meadowlark AWS Deployment
 
