@@ -5,8 +5,10 @@
 
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { oauthHandler } from '@edfi/meadowlark-core';
+import { initializeLogging, oauthHandler } from '@edfi/meadowlark-core';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
+
+initializeLogging();
 
 export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
   return respondWith(await oauthHandler(fromRequest(event, context)));

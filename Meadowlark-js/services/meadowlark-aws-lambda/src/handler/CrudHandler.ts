@@ -10,8 +10,11 @@ import {
   upsert as meadowlarkUpsert,
   get as meadowlarkGet,
   deleteIt as meadowlarkDelete,
+  initializeLogging,
 } from '@edfi/meadowlark-core';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
+
+initializeLogging();
 
 /**
  * Entry point for API POST requests

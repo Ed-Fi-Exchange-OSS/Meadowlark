@@ -37,7 +37,7 @@ export type { ResourceInfo } from './model/ResourceInfo';
 export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
 export type { SuperclassInfo } from './model/SuperclassInfo';
 export { newSuperclassInfo, documentIdForSuperclassInfo } from './model/SuperclassInfo';
-export { Logger } from './Logger';
+export { Logger, initializeLogging } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 export type { MiddlewareModel } from './middleware/MiddlewareModel';
 export { doNothingMiddleware } from './middleware/DoNothingMiddleware';

@@ -33,6 +33,7 @@
       "port": 9229,
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/services/meadowlark-fastify",
+      "envFile": "${workspaceFolder}/services/meadowlark-fastify/.env",
       "justMyCode": false
     },
     {
