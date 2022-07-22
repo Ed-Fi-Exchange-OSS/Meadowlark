@@ -46,8 +46,6 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
   // otherwise this is not a valid token
   let authStrategyFromJWT = '';
 
-  // TODO@SAA - Check with Brad preference between current if and:
-  // jwt.body?.roles != null && jwt.body.roles.length > 0
   if ((jwt.body?.roles?.length ?? 0) > 0) {
     authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
   }
