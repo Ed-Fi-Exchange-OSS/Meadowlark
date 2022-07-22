@@ -20,7 +20,7 @@ function signingKey(): Buffer {
 }
 const cachedSigningKey = memoize(signingKey);
 
-const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark' };
+const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: ['vendor'] };
 
 /*
  * Creates a standard Meadowlark Jwt.

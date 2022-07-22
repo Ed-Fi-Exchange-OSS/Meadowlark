@@ -41,7 +41,7 @@ export function validateJwt(authorizationHeader: string | undefined): JwtValidat
     };
   }
 
-  if (jwtStatus.roles.length === 0 || jwtStatus.authorizationStrategy === '') {
+  if (jwtStatus.authorizationStrategy === '') {
     return {
       jwtStatus,
       errorResponse: {
