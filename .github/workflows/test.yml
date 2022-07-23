@@ -12,19 +12,6 @@ jobs:
   test:
     name: Full testing process
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-      pull-requests: write
-      statuses: write
-      id-token: write
-      checks: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'typescript' ]
 
     steps:
     - name: Checkout repository
