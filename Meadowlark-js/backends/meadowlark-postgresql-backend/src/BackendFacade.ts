@@ -9,6 +9,8 @@ import {
   GetRequest,
   GetResult,
   MiddlewareModel,
+  QueryRequest,
+  QueryResult,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
@@ -20,6 +22,7 @@ import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Get from './repository/Get';
 import * as Update from './repository/Update';
+import * as Query from './repository/Query';
 import { getSharedClient } from './repository/Db';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 
@@ -63,6 +66,15 @@ export async function securityMiddleware(middlewareModel: MiddlewareModel): Prom
   const poolClient: PoolClient = await getSharedClient();
   try {
     return SecurityMiddleware.securityMiddleware(middlewareModel, poolClient);
+  } finally {
+    poolClient.release();
+  }
+}
+
+export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return Query.queryDocuments(request, poolClient);
   } finally {
     poolClient.release();
   }

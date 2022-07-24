@@ -3,7 +3,7 @@
 @auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
 
 ### API Version
-GET http://localhost:3000/metaed
+GET http://localhost:3000/local/metaed
 {{auth_header}}
 
 
@@ -24,7 +24,7 @@ content-type: application/json
 
 
 ### Get the created record
-GET http://localhost:3000/local/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg
+GET http://localhost:3000/local/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 {{auth_header}}
 
 ### Query the created record
@@ -33,7 +33,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools/?nameOfInstitution=abc
 
 
 ### Update the created record
-PUT http://localhost:3000/local/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg
+PUT http://localhost:3000/local/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 {{auth_header}}
 reference-validation: true
 content-type: application/json
@@ -46,7 +46,7 @@ content-type: application/json
 }
 
 ### Delete the created record
-DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/x1GptgyYapmpBGiZegIbM2XC_NLMVVjisNLEtg
+DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 {{auth_header}}
 
 
@@ -112,7 +112,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks
 
 
 ### Query schools
-GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=12
+GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
 {{auth_header}}
 
 
