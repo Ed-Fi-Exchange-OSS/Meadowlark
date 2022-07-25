@@ -21,12 +21,13 @@ function signingKey(): Buffer {
 }
 const cachedSigningKey = memoize(signingKey);
 
-const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: ['vendor'] };
+const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: [] as string[] };
 
 /*
  * Creates a standard Meadowlark Jwt.
  */
-export function createToken(vendor: string): Jwt {
+export function createToken(vendor: string, role: string): Jwt {
+  claims.roles = [role];
   const token: Jwt = create({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
 
   token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
