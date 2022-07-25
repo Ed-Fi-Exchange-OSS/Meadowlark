@@ -2,8 +2,8 @@
 # Be sure to load all descriptors into the database first.
 
 
-@auth_header_1=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxfQ.WF5ABFZAvNsLDZktwa8VxDR846fGptRXJObtQitbL8I
-@auth_header_2=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODF9.2QGyvx9flXdM9wjEHX_VPmeacCI3nm8WcV-T5AWxeWo
+@auth_header_1=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjNkNTliNzVmLWE3NjItNGJhYS05MTE2LTE5YzgyZmRmOGRlMyIsImlhdCI6MTYzNjU2MjA2MCwiZXhwIjozODQ1NTQ4ODgxLCJyb2xlcyI6WyJ2ZW5kb3IiXX0.lUkNIloI8s63UkMK_hlf1iFn0P65hualLPPZcawMQZ4
+@auth_header_2=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODEsInJvbGVzIjpbInZlbmRvciJdfQ.1nTCwqHcUmuUwNBF8Z2NTHqTg8HPN0mWUQ10TqOCEi0
 
 
 ### Try creating a new resource with authorization header - expect success.
@@ -81,6 +81,50 @@ content-type: application/json
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
     "learningResourceMetadataURI": "21433"
 }
+
+@auth_header_3=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoidGhlLWJlc3Rlc3Qtc2lzIiwianRpIjoiODI1ZDQ0YjgtYTgxMS00Y2ZmLWJlZjgtY2M4YTY2MTY5YmUwIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.g5rw2vrcXK29YjAONhlYmqUF13PRYZHbtMYpTFDi0mc
+### Get this using the host / FULL_ACCESS authorization - expect success
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
+{{auth_header_3}}
+
+### Get all resources using the host host token
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+{{auth_header_3}}
+
+### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
+POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+content-type: application/json
+reference-validation: true
+{{auth_header_3}}
+
+{ 
+    "studentUniqueId": "s0zf6d1123d3e12",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+### Atempt to access the record with an incorrect authorization header - expect 403
+POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+content-type: application/json
+reference-validation: true
+{{auth_header_2}}
+
+{ 
+    "studentUniqueId": "s0zf6d1123d3e12",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+### Delete Resource with HOST/FULL_ACCESS authorization - Expect success
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/lqojnbvIhjZVo_T-ojp81kjuAC-sjppXmgcZGA
+content-type: application/json
+reference-validation: true
+{{auth_header_3}}
+
 
 ### Query resource using 1st authorization header - expect only 1st record.
 GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/

@@ -7,16 +7,26 @@ type HardcodedCredential = {
   key: string;
   secret: string;
   vendor: string;
+  role: string;
 };
 
 export const client1: HardcodedCredential = {
   key: 'meadowlark_key_1',
   secret: 'meadowlark_secret_1',
   vendor: 'super-great-SIS',
+  role: 'vendor',
 };
 
 export const client2: HardcodedCredential = {
   key: 'meadowlark_key_2',
   secret: 'meadowlark_secret_2',
   vendor: 'small-town-sis',
+  role: 'vendor',
+};
+
+export const client3: HardcodedCredential = {
+  key: 'meadowlark_key_3',
+  secret: 'meadowlark_secret_3',
+  vendor: 'the-bestest-sis',
+  role: 'host',
 };

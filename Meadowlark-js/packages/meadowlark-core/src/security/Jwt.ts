@@ -11,6 +11,7 @@ interface JwtBody extends nJwtBody {
   sub?: string;
   iat?: number;
   exp?: number;
+  roles?: string[];
 }
 
 /**

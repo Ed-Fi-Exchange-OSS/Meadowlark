@@ -9,6 +9,8 @@ import { getValueFromEnvironment } from '../Environment';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
+import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
+import { AuthorizationStrategy } from './Security';
 
 function signingKey(): Buffer {
   const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
@@ -19,12 +21,13 @@ function signingKey(): Buffer {
 }
 const cachedSigningKey = memoize(signingKey);
 
-const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark' };
+const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: [] as string[] };
 
 /*
  * Creates a standard Meadowlark Jwt.
  */
-export function createToken(vendor: string): Jwt {
+export function createToken(vendor: string, role: string): Jwt {
+  claims.roles = [role];
   const token: Jwt = create({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
 
   token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
@@ -41,15 +44,25 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   const failureMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
 
+  // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
+  // otherwise this is not a valid token
+  let authStrategyFromJWT: AuthorizationStrategy = 'UNDEFINED';
+
+  if ((jwt.body?.roles?.length ?? 0) > 0) {
+    authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
+  }
+
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message),
+    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT !== 'UNDEFINED',
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
     subject: jwt.body?.sub ?? null,
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
+    roles: jwt.body?.roles ?? [],
+    authorizationStrategy: authStrategyFromJWT as AuthorizationStrategy,
   };
 }
 
