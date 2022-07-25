@@ -82,8 +82,16 @@ content-type: application/json
     "learningResourceMetadataURI": "21433"
 }
 
-### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
 @auth_header_3=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoidGhlLWJlc3Rlc3Qtc2lzIiwianRpIjoiODI1ZDQ0YjgtYTgxMS00Y2ZmLWJlZjgtY2M4YTY2MTY5YmUwIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.g5rw2vrcXK29YjAONhlYmqUF13PRYZHbtMYpTFDi0mc
+### Get this using the host / FULL_ACCESS authorization - expect success
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
+{{auth_header_3}}
+
+### Get all resources using the host host token
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+{{auth_header_3}}
+
+### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 reference-validation: true
