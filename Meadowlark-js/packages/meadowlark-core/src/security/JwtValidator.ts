@@ -41,7 +41,7 @@ export function validateJwt(authorizationHeader: string | undefined): JwtValidat
     };
   }
 
-  if (jwtStatus.authorizationStrategy === '') {
+  if (jwtStatus.authorizationStrategy === 'UNDEFINED') {
     return {
       jwtStatus,
       errorResponse: {

@@ -10,6 +10,7 @@ import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
 import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
+import { AuthorizationStrategy } from './Security';
 
 function signingKey(): Buffer {
   const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
@@ -52,7 +53,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT !== '',
+    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT !== 'UNDEFINED',
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
@@ -60,7 +61,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
     roles: jwt.body?.roles ?? [],
-    authorizationStrategy: authStrategyFromJWT,
+    authorizationStrategy: authStrategyFromJWT as AuthorizationStrategy,
   };
 }
 
