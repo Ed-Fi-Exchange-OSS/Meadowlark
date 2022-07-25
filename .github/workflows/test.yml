@@ -12,17 +12,6 @@ jobs:
   test:
     name: Full testing process
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-      pull-requests: write
-      statuses: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'typescript' ]
 
     steps:
     - name: Checkout repository
@@ -44,8 +33,10 @@ jobs:
       working-directory: Meadowlark-js
 
     - name: Unit tests with code coverage
-      run: yarn test:unit:coverage --ci
+      run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
       working-directory: Meadowlark-js
+      env:
+        JEST_JUNIT_OUTPUT_DIR: unit-tests
 
     - name: Archive coverage results
       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
@@ -57,15 +48,41 @@ jobs:
       run: |
         sudo systemctl start postgresql.service
         sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
-        yarn test:integration
+        yarn test:integration --ci --config ./jest.ci-config.js
       working-directory: Meadowlark-js
       env:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: 'abcdefgh1!'
+        JEST_JUNIT_OUTPUT_DIR: integration-tests
 
     - name: System tests
-      run: yarn test:system
+      run: yarn test:system --ci --config ./jest.ci-config.js
       working-directory: Meadowlark-js
       env:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: 'abcdefgh1!'
+        JEST_JUNIT_OUTPUT_DIR: system-tests
+
+    - name: Unit Test Report
+      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+      if: success() || failure()
+      with:
+        name: Unit Test Results
+        path: 'Meadowlark-js/unit-tests/*.xml'
+        reporter: jest-junit
+
+    - name: Integration Test Report
+      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+      if: success() || failure()
+      with:
+        name: Integration Test Results
+        path: 'Meadowlark-js/integration-tests/*.xml'
+        reporter: jest-junit
+
+    - name: System Test Report
+      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+      if: success() || failure()
+      with:
+        name: System Test Results
+        path: 'Meadowlark-js/system-tests/*.xml'
+        reporter: jest-junit

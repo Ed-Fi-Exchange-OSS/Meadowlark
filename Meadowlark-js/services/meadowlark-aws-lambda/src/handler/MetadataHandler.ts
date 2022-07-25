@@ -6,7 +6,10 @@
 /* eslint-disable-next-line import/no-unresolved */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import * as Meadowlark from '@edfi/meadowlark-core';
+import { initializeLogging } from '@edfi/meadowlark-core';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
+
+initializeLogging();
 
 /**
  * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd

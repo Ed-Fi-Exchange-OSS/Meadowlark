@@ -4,10 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { FastifyInstance } from 'fastify';
-import { Logger } from '@edfi/meadowlark-core';
+import { Logger, initializeLogging } from '@edfi/meadowlark-core';
 import { buildService } from './Service';
 
 const start = async () => {
+  initializeLogging();
+
   const service: FastifyInstance = buildService();
   try {
     let port: number = 3000;

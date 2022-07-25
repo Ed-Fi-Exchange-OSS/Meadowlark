@@ -700,9 +700,9 @@ __metadata:
   dependencies:
     "@edfi/ed-fi-model-3.1": 3.0.1
     "@edfi/ed-fi-model-3.3b": 3.0.1
-    "@edfi/metaed-core": 3.0.2-dev.1
+    "@edfi/metaed-core": 3.0.2-dev.10
     "@edfi/metaed-plugin-edfi-meadowlark": 0.2.0-dev.0
-    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.1
+    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.10
     "@hapi/joi": ^17.1.1
     "@types/fs-extra": ^8.1.2
     "@types/hapi__joi": ^16.0.12
@@ -766,7 +766,7 @@ __metadata:
   resolution: "@edfi/meadowlark-opensearch-backend@workspace:backends/meadowlark-opensearch-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
-    "@edfi/metaed-core": 3.0.2-dev.1
+    "@edfi/metaed-core": 3.0.2-dev.10
     "@opensearch-project/opensearch": ^1.1.0
     copyfiles: ^2.4.1
     rimraf: ^3.0.2
@@ -797,9 +797,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/metaed-core@npm:3.0.2-dev.1":
-  version: 3.0.2-dev.1
-  resolution: "@edfi/metaed-core@npm:3.0.2-dev.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.2-dev.1.tgz"
+"@edfi/metaed-core@npm:3.0.2-dev.10":
+  version: 3.0.2-dev.10
+  resolution: "@edfi/metaed-core@npm:3.0.2-dev.10::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-core%2F-%2F%40edfi%2Fmetaed-core-3.0.2-dev.10.tgz"
   dependencies:
     ajv: ^6.12.6
     antlr4: 4.6.1-patched.0
@@ -816,7 +816,7 @@ __metadata:
     sugar: ^2.0.6
     topo: 2.0.2
     winston: 3.7.2
-  checksum: 6a385e967b3c060f78e731a538e18fd8b7c488c9fad3f275b9f119981f18863821ac9e9f86eb4c85b1059e3e4e6f3a2fc314bbb260e0e187ceeec3a04acc8380
+  checksum: 0e3fc486e70d9a40f62f50e0b493818d0717fcd59f24d358eb21d4ec6aebdf614c488fbdb7b70fa7bc416a28292988c9dd186f674f5f7cc04504f10e135158de
   languageName: node
   linkType: hard
 
@@ -824,8 +824,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@edfi/metaed-plugin-edfi-meadowlark@workspace:packages/metaed-plugin-edfi-meadowlark"
   dependencies:
-    "@edfi/metaed-core": 3.0.2-dev.1
-    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.1
+    "@edfi/metaed-core": 3.0.2-dev.10
+    "@edfi/metaed-plugin-edfi-unified": 3.0.2-dev.10
     "@hapi/code": ^8.0.7
     "@hapi/joi": ^17.1.1
     copyfiles: ^2.4.1
@@ -835,14 +835,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.1":
-  version: 3.0.2-dev.1
-  resolution: "@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-plugin-edfi-unified%2F-%2F%40edfi%2Fmetaed-plugin-edfi-unified-3.0.2-dev.1.tgz"
+"@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.10":
+  version: 3.0.2-dev.10
+  resolution: "@edfi/metaed-plugin-edfi-unified@npm:3.0.2-dev.10::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40edfi%2Fmetaed-plugin-edfi-unified%2F-%2F%40edfi%2Fmetaed-plugin-edfi-unified-3.0.2-dev.10.tgz"
   dependencies:
-    "@edfi/metaed-core": 3.0.2-dev.1
+    "@edfi/metaed-core": 3.0.2-dev.10
     ramda: ^0.28.0
     winston: 3.7.2
-  checksum: 6c6536c6330c53e7ac1abccd19f8aebc388bc1dee5e9ad6a0c6b0cb74aadd01338ff41d32a8e5a8379dd6883c8d869cdf9a6a6870d13de518d5973a6c4fdfd6a
+  checksum: 6ef7995f830cbe4d68b8998b3cfea1fb5958867b88f2bd481b73b8220d129748dbc46b1ddbdfc55c58bb7cae811ad1f9058b3183e23f96bb09cd19efafc20fe3
   languageName: node
   linkType: hard
 
@@ -10096,6 +10096,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jest-junit@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "jest-junit@npm:14.0.0"
+  dependencies:
+    mkdirp: ^1.0.4
+    strip-ansi: ^6.0.1
+    uuid: ^8.3.2
+    xml: ^1.0.1
+  checksum: 89d6755f895360be9440d0feacc1a7da9adf23fa9a58746f6f80946cd55d91ba3d32314698615090682684d8315518a166fe46a60cdbd16b38e0c5c8d6418e55
+  languageName: node
+  linkType: hard
+
 "jest-leak-detector@npm:^27.5.1":
   version: 27.5.1
   resolution: "jest-leak-detector@npm:27.5.1"
@@ -11530,6 +11542,7 @@ __metadata:
     husky: ^7.0.4
     jest: 27.5.1
     jest-environment-node: ^27.0.0
+    jest-junit: ^14.0.0
     lerna: ^3.22.1
     mongodb: ^4.5.0
     pg: ^8.7.3
@@ -17509,6 +17522,13 @@ __metadata:
     sax: ">=0.6.0"
     xmlbuilder: ~11.0.0
   checksum: ca0cf2dfbf6deeaae878a891c8fbc0db6fd04398087084edf143cdc83d0509ad0fe199b890f62f39c4415cf60268a27a6aed0d343f0658f8779bd7add690fa98
+  languageName: node
+  linkType: hard
+
+"xml@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "xml@npm:1.0.1"
+  checksum: 11b5545ef3f8fec3fa29ce251f50ad7b6c97c103ed4d851306ec23366f5fa4699dd6a942262df52313a0cd1840ab26256da253c023bad3309d8ce46fe6020ca0
   languageName: node
   linkType: hard
 
