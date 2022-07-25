@@ -82,8 +82,8 @@ content-type: application/json
     "learningResourceMetadataURI": "21433"
 }
 
-### Create Resource from token with HOST/FULL_ACCESS authorization
-@auth_header_3=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoic3VwZXItZ3JlYXQtU0lTIiwianRpIjoiODI1ZDQ0YjgtYTgxMS00Y2ZmLWJlZjgtY2M4YTY2MTY5YmUwIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.8JV9V_-YhxfXz05k9XblkLcxFRMl-FmN_gKiME69QHM
+### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
+@auth_header_3=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoidGhlLWJlc3Rlc3Qtc2lzIiwianRpIjoiODI1ZDQ0YjgtYTgxMS00Y2ZmLWJlZjgtY2M4YTY2MTY5YmUwIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.g5rw2vrcXK29YjAONhlYmqUF13PRYZHbtMYpTFDi0mc
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 reference-validation: true
@@ -97,7 +97,21 @@ reference-validation: true
     "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
 }
 
-### Delete Resource with HOST/FULL_ACCESS authorization
+### Atempt to access the record with an incorrect authorization header - expect 403
+POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+content-type: application/json
+reference-validation: true
+{{auth_header_2}}
+
+{ 
+    "studentUniqueId": "s0zf6d1123d3e12",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+### Delete Resource with HOST/FULL_ACCESS authorization - Expect success
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/lqojnbvIhjZVo_T-ojp81kjuAC-sjppXmgcZGA
 content-type: application/json
 reference-validation: true
