@@ -45,7 +45,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
   // otherwise this is not a valid token
-  let authStrategyFromJWT = '';
+  let authStrategyFromJWT: AuthorizationStrategy = 'UNDEFINED';
 
   if ((jwt.body?.roles?.length ?? 0) > 0) {
     authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
