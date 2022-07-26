@@ -4,7 +4,15 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { FrontendResponse, get, SystemTestClient, upsert } from '@edfi/meadowlark-core';
-import { backendToTest, schoolBodyClient1, schoolGetClient2, schoolGetClient1 } from './SystemTestSetup';
+import {
+  backendToTest,
+  schoolBodyClient1,
+  schoolGetClient2,
+  schoolGetClient1,
+  descriptorGetClient1,
+  descriptorGetClient2,
+  descriptorBodyClient1,
+} from './SystemTestSetup';
 
 jest.setTimeout(40000);
 
@@ -49,5 +57,30 @@ describe('given a POST of a school by one client followed by a GET of the school
   it('should return get as a 403 forbidden', async () => {
     expect(getResult.body).toEqual('');
     expect(getResult.statusCode).toBe(403);
+  });
+});
+
+describe('given a POST of a descriptor by one client followed by a GET of the school by a second client', () => {
+  let client: SystemTestClient;
+  let getResult: FrontendResponse;
+  let getResult1: FrontendResponse;
+
+  beforeAll(async () => {
+    client = await backendToTest.systemTestSetup();
+
+    await upsert(descriptorBodyClient1());
+
+    // Act
+    getResult = await get(descriptorGetClient1());
+    getResult1 = await get(descriptorGetClient2());
+  });
+
+  afterAll(async () => {
+    backendToTest.systemTestTeardown(client);
+  });
+
+  it('GET Should return successful from ', async () => {
+    expect(getResult.statusCode).toBe(200);
+    expect(getResult1.statusCode).toBe(200);
   });
 });
