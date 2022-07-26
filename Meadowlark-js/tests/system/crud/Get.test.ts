@@ -60,7 +60,7 @@ describe('given a POST of a school by one client followed by a GET of the school
   });
 });
 
-describe('given a POST of a descriptor by one client followed by a GET of the school by a second client', () => {
+describe('given a POST of a descriptor by one client followed by a GET of the descriptor by a second (non-owner) client', () => {
   let client: SystemTestClient;
   let getResult: FrontendResponse;
   let getResult1: FrontendResponse;
@@ -79,7 +79,7 @@ describe('given a POST of a descriptor by one client followed by a GET of the sc
     backendToTest.systemTestTeardown(client);
   });
 
-  it('GET Should return successful from ', async () => {
+  it('GET Should return successful from both clients ', async () => {
     expect(getResult.statusCode).toBe(200);
     expect(getResult1.statusCode).toBe(200);
   });
