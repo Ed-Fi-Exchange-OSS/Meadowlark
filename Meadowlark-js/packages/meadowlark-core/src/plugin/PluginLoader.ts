@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import dotenv from 'dotenv';
 import R from 'ramda';
 import { Logger, writeErrorToLog } from '../Logger';
 import { DocumentStoreInitializer } from './backend/DocumentStoreInitializer';
@@ -14,8 +13,6 @@ import { NoQueryHandlerPlugin } from './backend/NoQueryHandlerPlugin';
 import { QueryHandlerInitializer } from './backend/QueryHandlerInitializer';
 import { QueryHandlerPlugin } from './backend/QueryHandlerPlugin';
 import { Subscribe } from './listener/Subscribe';
-
-dotenv.config();
 
 let loadedDocumentStore: DocumentStorePlugin = NoDocumentStorePlugin;
 let loadedQueryHandler: QueryHandlerPlugin = NoQueryHandlerPlugin;
