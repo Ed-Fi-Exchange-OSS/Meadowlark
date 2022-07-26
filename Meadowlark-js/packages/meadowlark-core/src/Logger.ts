@@ -6,20 +6,44 @@
 import winston from 'winston';
 import { FrontendRequest } from './handler/FrontendRequest';
 
-const offline = process.env.IS_LOCAL === 'true';
+const timestampFormat: string = 'YYYY-MM-DD HH:mm:SS';
+
+const convertErrorToString = (err) => {
+  // Preserve any dictionary, but otherwise convert to string
+  if (err != null && err.constructor !== Object) {
+    return err.toString();
+  }
+  return err;
+};
 
 const format = winston.format.combine(
   winston.format.label({
     label: 'Meadowlark',
   }),
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:SS',
+    format: timestampFormat,
   }),
   winston.format.json(),
 );
 
 const offlineFormat = winston.format.combine(
-  winston.format.cli(),
+  winston.format.timestamp({
+    format: timestampFormat,
+  }),
+  winston.format.printf(({ level, message, timestamp, extra }) => {
+    let m = message;
+    let e = extra ?? '';
+
+    if (typeof message === 'object') {
+      // TypeScript thinks that this is a string, but it there are cases where it ends up being an object
+      m = convertErrorToString(m);
+    }
+    if (typeof extra === 'object') {
+      e = JSON.stringify(extra);
+    }
+
+    return `${timestamp} ${level} ${m} ${e}`;
+  }),
   winston.format.colorize({
     all: true,
   }),
@@ -45,9 +69,10 @@ let logger: winston.Logger = winston.createLogger({
 export function initializeLogging(): void {
   if (isInitialized) return;
 
+  const offline = process.env.IS_LOCAL === 'true';
   isInitialized = true;
   logger = winston.createLogger({
-    level: process.env.LOG_LEVEL?.toLocaleLowerCase() || (offline ? 'debug' : 'info'),
+    level: process.env.LOG_LEVEL?.toLocaleLowerCase() ?? (offline ? 'debug' : 'info'),
     transports: [
       new winston.transports.Console({
         format: offline ? offlineFormat : format,
@@ -57,17 +82,15 @@ export function initializeLogging(): void {
 }
 
 export const Logger = {
+  // This object is tuned for use in many situations without further customization. For example, it can be used directly in
+  // Fastify, so long as it continues to have definitions for: fatal, error, warn, info, debug, trace, child.
+
+  fatal: (message: string, err?: any | null) => {
+    logger.error({ message, err: convertErrorToString(err) });
+    process.exit(1);
+  },
   error: (message: string, traceId: string | null, err?: any | null) => {
-    let error: object;
-
-    // Preserve any dictionary, but otherwise convert to string
-    if (err != null && err.constructor !== Object) {
-      error = err.toString();
-    } else {
-      error = err;
-    }
-
-    logger.error({ message, error, traceId });
+    logger.error({ message, error: convertErrorToString(err), traceId });
   },
   warn: (message: string, traceId: string | null) => {
     logger.warn({ message, traceId });
@@ -78,6 +101,10 @@ export const Logger = {
   debug: (message: string, traceId: string | null, extra?: any | null) => {
     logger.debug({ message, traceId, extra });
   },
+  trace: (message: string) => {
+    logger.debug(message);
+  },
+  child: () => Logger,
 };
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
