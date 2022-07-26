@@ -384,3 +384,278 @@ describe('when extracting optional collection not in body', () => {
     expect(result).toMatchInlineSnapshot(`Array []`);
   });
 });
+
+describe('when extracting document references with two levels of identities on a collection reference', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentReference[] = [];
+
+  const body = {
+    sectionIdentifier: 'Bob',
+    courseOfferingReference: {
+      localCourseCode: 'abc',
+      schoolId: '23',
+    },
+    classPeriods: [
+      {
+        classPeriodReference: {
+          schoolId: '24',
+          classPeriodName: 'c1',
+          sessionName: 's1',
+        },
+      },
+      {
+        classPeriodReference: {
+          schoolId: '25',
+          classPeriodName: 'c2',
+          sessionName: 's2',
+        },
+      },
+    ],
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('Section')
+      .withDocumentation('doc')
+      .withStringIdentity('SectionIdentifier', 'doc', '30')
+      .withDomainEntityProperty('ClassPeriod', 'doc', true, true)
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('ClassPeriod')
+      .withDocumentation('doc')
+      .withStringIdentity('ClassPeriodName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withDomainEntityIdentity('Session', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('School')
+      .withDocumentation('doc')
+      .withStringIdentity('SchoolId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const section = namespace.entity.domainEntity.get('Section');
+    result = extractDocumentReferences(section, body);
+  });
+
+  it('should have two references down to "schoolId"', () => {
+    expect(result).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "c1",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "24",
+            },
+            Object {
+              "name": "sessionReference.schoolId",
+              "value": "24",
+            },
+            Object {
+              "name": "sessionReference.sessionName",
+              "value": "s1",
+            },
+          ],
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+        },
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "c2",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "25",
+            },
+            Object {
+              "name": "sessionReference.schoolId",
+              "value": "25",
+            },
+            Object {
+              "name": "sessionReference.sessionName",
+              "value": "s2",
+            },
+          ],
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+        },
+      ]
+    `);
+  });
+});
+
+describe('when extracting document references with three levels of identities on a collection reference', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentReference[] = [];
+
+  const body = {
+    sectionIdentifier: 'Bob',
+    courseOfferingReference: {
+      localCourseCode: 'abc',
+      schoolId: '23',
+    },
+    classPeriods: [
+      {
+        classPeriodReference: {
+          schoolId: '24',
+          classPeriodName: 'c1',
+          sessionName: 's1',
+          thirdLevelName: 't1',
+        },
+      },
+      {
+        classPeriodReference: {
+          schoolId: '25',
+          classPeriodName: 'c2',
+          sessionName: 's2',
+          thirdLevelName: 't2',
+        },
+      },
+    ],
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('Section')
+      .withDocumentation('doc')
+      .withStringIdentity('SectionIdentifier', 'doc', '30')
+      .withDomainEntityProperty('ClassPeriod', 'doc', true, true)
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('ClassPeriod')
+      .withDocumentation('doc')
+      .withStringIdentity('ClassPeriodName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withDomainEntityIdentity('Session', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withDomainEntityIdentity('SecondLevel', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('School')
+      .withDocumentation('doc')
+      .withStringIdentity('SchoolId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('SecondLevel')
+      .withDocumentation('doc')
+      .withStringIdentity('SecondLevelName', 'doc', '30')
+      .withDomainEntityIdentity('ThirdLevel', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('ThirdLevel')
+      .withDocumentation('doc')
+      .withStringIdentity('ThirdLevelName', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const section = namespace.entity.domainEntity.get('Section');
+    result = extractDocumentReferences(section, body);
+  });
+
+  it('should have ClassPeriod references down to "thirdLevelName"', () => {
+    expect(result).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "c1",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "24",
+            },
+            Object {
+              "name": "sessionReference.secondLevelName",
+              "value": undefined,
+            },
+            Object {
+              "name": "sessionReference.thirdLevelName",
+              "value": "t1",
+            },
+            Object {
+              "name": "sessionReference.sessionName",
+              "value": "s1",
+            },
+          ],
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+        },
+        Object {
+          "documentIdentity": Array [
+            Object {
+              "name": "classPeriodName",
+              "value": "c2",
+            },
+            Object {
+              "name": "schoolReference.schoolId",
+              "value": "25",
+            },
+            Object {
+              "name": "sessionReference.secondLevelName",
+              "value": undefined,
+            },
+            Object {
+              "name": "sessionReference.thirdLevelName",
+              "value": "t2",
+            },
+            Object {
+              "name": "sessionReference.sessionName",
+              "value": "s2",
+            },
+          ],
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "ClassPeriod",
+        },
+      ]
+    `);
+  });
+});
