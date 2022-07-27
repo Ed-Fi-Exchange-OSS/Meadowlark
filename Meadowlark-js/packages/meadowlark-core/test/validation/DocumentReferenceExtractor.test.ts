@@ -519,16 +519,13 @@ describe('when extracting document references with three levels of identities on
 
   const body = {
     sectionIdentifier: 'Bob',
-    courseOfferingReference: {
-      localCourseCode: 'abc',
-      schoolId: '23',
-    },
     classPeriods: [
       {
         classPeriodReference: {
           schoolId: '24',
           classPeriodName: 'c1',
           sessionName: 's1',
+          secondLevelName: 'e1',
           thirdLevelName: 't1',
         },
       },
@@ -537,6 +534,7 @@ describe('when extracting document references with three levels of identities on
           schoolId: '25',
           classPeriodName: 'c2',
           sessionName: 's2',
+          secondLevelName: 'e2',
           thirdLevelName: 't2',
         },
       },
@@ -613,7 +611,7 @@ describe('when extracting document references with three levels of identities on
             },
             Object {
               "name": "sessionReference.secondLevelName",
-              "value": undefined,
+              "value": "e1",
             },
             Object {
               "name": "sessionReference.thirdLevelName",
@@ -640,7 +638,7 @@ describe('when extracting document references with three levels of identities on
             },
             Object {
               "name": "sessionReference.secondLevelName",
-              "value": undefined,
+              "value": "e2",
             },
             Object {
               "name": "sessionReference.thirdLevelName",
