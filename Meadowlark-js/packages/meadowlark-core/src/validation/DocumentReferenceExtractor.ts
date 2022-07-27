@@ -84,19 +84,19 @@ const multiZip = (...theArrays) => {
 function documentPathsFromSubReferenceComponent(
   subReferenceComponent: ReferenceComponent,
   referenceComponentTopLevelName: string,
-  result: string[],
-) {
+): string[] {
   const propertyMeadowlarkData: EntityPropertyMeadowlarkData = subReferenceComponent.sourceProperty.data.meadowlark;
 
   if (isReferenceElement(subReferenceComponent)) {
-    result.push(`${referenceComponentTopLevelName}.${propertyMeadowlarkData.apiMapping.fullName}`);
-  } else {
-    (subReferenceComponent as ReferenceGroup).referenceComponents.forEach(
-      (childSubReferenceComponent: ReferenceComponent) => {
-        documentPathsFromSubReferenceComponent(childSubReferenceComponent, referenceComponentTopLevelName, result);
-      },
-    );
+    return [`${referenceComponentTopLevelName}.${propertyMeadowlarkData.apiMapping.fullName}`];
   }
+
+  const result: string[] = [];
+  (subReferenceComponent as ReferenceGroup).referenceComponents.forEach((childSubReferenceComponent: ReferenceComponent) => {
+    result.push(...documentPathsFromSubReferenceComponent(childSubReferenceComponent, referenceComponentTopLevelName));
+  });
+
+  return result;
 }
 
 /**
@@ -107,15 +107,17 @@ function documentPathsFromSubReferenceComponent(
  */
 function documentPathsFromReferenceComponents(referenceComponents: ReferenceComponent[], entity: TopLevelEntity): string[] {
   const result: string[] = [];
+
   referenceComponents.forEach((referenceComponent) => {
     if (isReferenceElement(referenceComponent)) {
       const propertyMeadowlarkData: EntityPropertyMeadowlarkData = referenceComponent.sourceProperty.data.meadowlark;
       result.push(propertyMeadowlarkData.apiMapping.fullName);
     } else {
       const referenceComponentTopLevelName = topLevelNameOnEntity(entity, referenceComponent.sourceProperty);
-      documentPathsFromSubReferenceComponent(referenceComponent, referenceComponentTopLevelName, result);
+      result.push(...documentPathsFromSubReferenceComponent(referenceComponent, referenceComponentTopLevelName));
     }
   });
+
   return result;
 }
 

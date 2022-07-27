@@ -40,9 +40,6 @@ export function documentIdForDocumentIdentity(
   { projectName, resourceName, isDescriptor }: BaseResourceInfo,
   documentIdentity: DocumentIdentity,
 ): string {
-  // TODO: This needs to be investigated (see RND-234) Might be due to a problem with extracted document reference paths.
-  // const nks = documentIdentity.replace(/\.school=/g, '.schoolId=');
-
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
 
   const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${documentIdentity
