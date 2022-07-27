@@ -155,3 +155,32 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M
 ### Delete 2nd resource using the same authorization header that created the record - expect success.
 DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
 {{auth_header_2}}
+
+
+### Add descriptor with first client
+POST http://localhost:3000/local/v3.3b/ed-fi/absenceEventCategoryDescriptors
+content-type: application/json
+{{auth_header_1}}
+
+{
+  "codeValue": "Test Client 1",
+  "shortDescription": "Test Client 1",
+  "namespace": "uri://ed-fi.org/AbsenceEventCategoryDescriptor"
+}
+
+### Add descriptor with second client
+POST http://localhost:3000/local/v3.3b/ed-fi/absenceEventCategoryDescriptors
+content-type: application/json
+{{auth_header_2}}
+
+{
+  "codeValue": "Test Client 2",
+  "shortDescription": "Test Client 2",
+  "namespace": "uri://ed-fi.org/AbsenceEventCategoryDescriptor"
+}
+
+### Get All AbsenceEventCategory Descriptors - should see both client 1 and client 2, also shows descriptors going to 
+### OpenSearch
+GET http://localhost:3000/local/v3.3b/ed-fi/absenceEventCategoryDescriptors
+content-type: application/json
+{{auth_header_3}}

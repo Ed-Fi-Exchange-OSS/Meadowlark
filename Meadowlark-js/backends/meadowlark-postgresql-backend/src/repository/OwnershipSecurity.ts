@@ -21,7 +21,7 @@ export async function rejectByOwnershipSecurity(
   const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
-  // RND-234 If it's a GET request and a descriptor, ignore ownership
+  // If it's a GET request and a descriptor, ignore ownership
   if (
     frontendRequest.middleware.resourceInfo.isDescriptor &&
     (frontendRequest.action === 'getById' || frontendRequest.action === 'query')

@@ -70,8 +70,8 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       whereClause = whereConditionsFrom(queryStringParameters);
     }
 
-    // Ownership-based security filter
-    if (request.security.authorizationStrategy === 'OWNERSHIP_BASED') {
+    // Ownership-based security filter - if the resource is a descriptor we will ignore security
+    if (request.security.authorizationStrategy === 'OWNERSHIP_BASED' && !resourceInfo.isDescriptor) {
       const securityWhereClause = `createdBy = '${request.security.clientName}'`;
       whereClause = appendedWhereClause(whereClause, securityWhereClause);
     }
