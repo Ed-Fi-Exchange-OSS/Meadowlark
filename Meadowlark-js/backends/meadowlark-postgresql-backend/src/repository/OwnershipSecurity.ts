@@ -21,6 +21,15 @@ export async function rejectByOwnershipSecurity(
   const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
   Logger.info(functionName, frontendRequest.traceId, frontendRequest);
 
+  // If it's a GET request and a descriptor, ignore ownership
+  if (
+    frontendRequest.middleware.resourceInfo.isDescriptor &&
+    (frontendRequest.action === 'getById' || frontendRequest.action === 'query')
+  ) {
+    Logger.debug(`GET style request for a descriptor, bypassing ownership check`, frontendRequest.traceId);
+    return 'NOT_APPLICABLE';
+  }
+
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
   if (id == null) id = extractIdIfUpsert(frontendRequest);

@@ -47,15 +47,6 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
 
-  // Ignore if a descriptor.
-  if (request.resourceInfo.isDescriptor) {
-    Logger.debug(
-      `UpdateOpensearch.upsertToOpensearch Skipping ${JSON.stringify(opensearchRequest)} since it is a descriptor entity`,
-      request.traceId,
-    );
-    return;
-  }
-
   Logger.debug(
     `UpdateOpensearch.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
     request.traceId,
