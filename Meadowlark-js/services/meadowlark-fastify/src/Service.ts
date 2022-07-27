@@ -33,22 +33,10 @@ export function buildService(): FastifyInstance {
 
   function createFastifyService(): FastifyInstance {
     return Fastify({
-      logger: logWrapper(),
+      logger: Logger as FastifyLoggerInstance,
       disableRequestLogging: true,
       genReqId: () => randomUUID(),
     });
-  }
-
-  function logWrapper(): FastifyLoggerInstance {
-    return {
-      info: (msg: string) => Logger.info(msg, null),
-      warn: (msg: string) => Logger.warn(msg, null),
-      error: (msg: string) => Logger.error(msg, null),
-      fatal: (msg: string) => Logger.error(msg, null),
-      trace: (msg: string) => Logger.debug(msg, null),
-      debug: (msg: string) => Logger.debug(msg, null),
-      child: (_) => logWrapper(),
-    };
   }
 
   function customizeRequestLogging(fastify: FastifyInstance): void {
