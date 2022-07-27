@@ -8,11 +8,6 @@ import { Logger } from '@edfi//meadowlark-core';
 
 let singletonClient: Client | null = null;
 
-function maskPassword(message: string, password: string): string {
-  const re = new RegExp(password, 'g');
-  return message.replace(re, '****');
-}
-
 /**
  * Create and return an OpenSearch connection object
  */
@@ -28,15 +23,10 @@ export async function getNewClient(): Promise<Client> {
   try {
     return new Client(clientOpts);
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
+    const masked = { ...clientOpts } as any;
+    delete masked.auth?.password;
 
-    Logger.error(
-      maskPassword(
-        `meadowlark-opensearch: error connecting with client opts: ${JSON.stringify(clientOpts)}. Error was ${message}`,
-        clientOpts.auth?.password ?? '',
-      ),
-      null,
-    );
+    Logger.error(`meadowlark-opensearch: error connecting with options ${JSON.stringify(masked)}`, null, e);
     throw e;
   }
 }
