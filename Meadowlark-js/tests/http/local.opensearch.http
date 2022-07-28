@@ -1,0 +1,83 @@
+#
+# Assumes that you have already run tests in local.33b.http
+#
+
+
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+### 200: empty result (Wrong case on the 'N' below)
+GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurName=World
+authorization: bearer {{authToken1}}
+
+### 200: actual result (correct case)
+GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurname=World
+authorization: bearer {{authToken1}}
+
+### 200: valid limit and offset
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1&offset=2
+authorization: bearer {{authToken1}}
+
+### 400: limit without offset
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1
+authorization: bearer {{authToken1}}
+
+### 400: offset without limit
+GET http://localhost:3000/local/v3.3b/ed-fi/students?offset=1
+authorization: bearer {{authToken1}}
+
+### 400: negative limit
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=-1&offset=2
+authorization: bearer {{authToken1}}
+
+### 400: negative offset
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1&offset=-2
+authorization: bearer {{authToken1}}
+
+### 400: non-numeric limit
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=abc&offset=1
+authorization: bearer {{authToken1}}
+
+### 400: non-numeric offset
+GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1&offset=abc
+authorization: bearer {{authToken1}}
+
+### 200: multiple query terms
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthDate=2022-07-28&birthCity=Austin
+authorization: bearer {{authToken1}}
+
+### 400: access a different client's data
+GET http://localhost:3000/local/v3.3b/ed-fi/students?createdBy=another
+authorization: bearer {{authToken1}}
+
+### 400: invalid query term
+GET http://localhost:3000/local/v3.3b/ed-fi/students?asdfasdfa=another
+authorization: bearer {{authToken1}}
+
+### 400: malformed query term
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birth%27City=another
+authorization: bearer {{authToken1}}
+
+### 200: empty array (SQL injection attack is thwarted)
+# plain text: a' or studentUniqueId is not null #
+# attempting to escape from the ownership validation with the comment at end,
+# and to return every student
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a%27%20or%20studentUniqueId%20is%20not%20null%20%23
+authorization: bearer {{authToken1}}
+
+### 200: empty array (SQL injection attack is thwarted)
+# plain text: a\' or studentUniqueId is not null #
+# attempting to escape the escape of apostrophes
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a%5C%27%20or%20studentUniqueId%20is%20not%20null%20%23
+authorization: bearer {{authToken1}}
