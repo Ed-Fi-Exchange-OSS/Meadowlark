@@ -24,6 +24,7 @@
     "@opensearch-project/opensearch": "^1.1.0"
   },
   "devDependencies": {
+    "@short.io/opensearch-mock": "^0.3.1",
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2"
   }
