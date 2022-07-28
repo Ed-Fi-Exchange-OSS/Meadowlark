@@ -32,16 +32,6 @@ export interface DocumentInfo {
    * If this document is a subclass, this provides the document superclass information.
    */
   superclassInfo: SuperclassInfo | null;
-
-  /**
-   * The student id extracted from the API document, if any (for security)
-   */
-  studentId: string | null;
-
-  /**
-   * The education organization id extracted from the API document, if any (for security)
-   */
-  edOrgId: string | null;
 }
 
 /**
@@ -53,8 +43,6 @@ export function newDocumentInfo(): DocumentInfo {
     superclassInfo: null,
     documentReferences: [],
     descriptorReferences: [],
-    studentId: null,
-    edOrgId: null,
   };
 }
 

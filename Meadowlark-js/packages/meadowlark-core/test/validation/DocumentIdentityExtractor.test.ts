@@ -19,12 +19,13 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractDocumentIdentity, DocumentIdentityWithSecurity } from '../../src/validation/DocumentIdentityExtractor';
+import { extractDocumentIdentity } from '../../src/validation/DocumentIdentityExtractor';
+import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: DocumentIdentityWithSecurity | null = null;
+  let result: DocumentIdentity = NoDocumentIdentity;
 
   const body = {
     notImportant: false,
@@ -85,7 +86,7 @@ describe('when extracting natural key from domain entity referencing another ref
   });
 
   it('should be correct', () => {
-    expect(result?.documentIdentity).toMatchInlineSnapshot(`
+    expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
           "name": "classPeriodReference.classPeriodName",

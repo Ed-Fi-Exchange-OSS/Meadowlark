@@ -15,7 +15,7 @@ import {
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { decapitalize } from '../Utility';
 import { SuperclassInfo } from '../model/SuperclassInfo';
-import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
+import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo';
 import { SchoolYearEnumerationDocument } from '../model/SchoolYearEnumerationDocument';
@@ -24,32 +24,13 @@ import { schoolYearEnumerationDocumentIdentityFrom } from '../model/SchoolYearEn
 type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
 
 /**
- * The identity of a document, along with security information
- */
-export type DocumentIdentityWithSecurity = {
-  /**
-   * The identity of a document
-   */
-  documentIdentity: DocumentIdentity;
-  /**
-   * The student id value in the document, or null if one does not exist
-   */
-  studentId: string | null;
-  /**
-   * The education organization id value in the document, or null if one does not exist
-   */
-
-  edOrgId: string | null;
-};
-
-/**
  * Takes a non-reference property representing a portion of the identity of a MetaEd entity,
  * an API JSON body matching that entity, and a path to the location of the property value
  * in the JSON body, and returns that portion of the document identity extracted from the JSON body.
  *
  * documentPath is a path in the JSON body as a string array with one path segment per array element.
  */
-function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentityWithSecurity {
+function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentity {
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
   const documentPathAsString: string = [...documentPath, apiMapping.fullName].join('.');
   const elementValue: string | undefined = R.path([...documentPath, apiMapping.fullName], body);
@@ -59,11 +40,7 @@ function singleIdentityFrom(property: EntityProperty, body: object, documentPath
     `Identity element value for ${property.metaEdName} not found in ${JSON.stringify(body)} at ${documentPathAsString}`,
   );
 
-  return {
-    documentIdentity: [{ name: documentPathAsString, value: elementValue }],
-    studentId: apiMapping.fullName === 'studentUniqueId' ? elementValue : null,
-    edOrgId: ['schoolId', 'educationOrganizationId'].includes(apiMapping.fullName) ? elementValue : null,
-  };
+  return [{ name: documentPathAsString, value: elementValue }];
 }
 
 /**
@@ -81,12 +58,12 @@ function documentIdentitiesFrom(
   body: object,
   entity: TopLevelEntity,
   documentPath: string[],
-): DocumentIdentityWithSecurity[] {
+): DocumentIdentity[] {
   if (isReferenceElement(identityReferenceComponent)) {
     return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
   }
 
-  const result: DocumentIdentityWithSecurity[] = [];
+  const result: DocumentIdentity[] = [];
   identityReferenceComponent.referenceComponents.forEach((childComponent: ReferenceComponent) => {
     const identityTopLevelName = topLevelNameOnEntity(entity, identityReferenceComponent.sourceProperty);
     const newDocumentPath: string[] = documentPath.length > 0 ? documentPath : [identityTopLevelName];
@@ -100,49 +77,27 @@ function documentIdentitiesFrom(
 }
 
 /**
- * All descriptor documents have the same identity fields
- */
-function descriptorDocumentIdentityWithSecurity(body: DescriptorDocument): DocumentIdentityWithSecurity {
-  return { documentIdentity: descriptorDocumentIdentityFrom(body), studentId: null, edOrgId: null };
-}
-
-/**
- * School year enumerations are hard-coded in the ODS/API
- */
-function schoolYearEnumerationDocumentIdentityWithSecurity(
-  body: SchoolYearEnumerationDocument,
-): DocumentIdentityWithSecurity {
-  return { documentIdentity: schoolYearEnumerationDocumentIdentityFrom(body), studentId: null, edOrgId: null };
-}
-
-/**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
  * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
-export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentityWithSecurity {
-  if (entity.type === 'descriptor') return descriptorDocumentIdentityWithSecurity(body as DescriptorDocument);
+export function extractDocumentIdentity(entity: TopLevelEntity, body: object): DocumentIdentity {
+  if (entity.type === 'descriptor') return descriptorDocumentIdentityFrom(body as DescriptorDocument);
   if (entity.type === 'schoolYearEnumeration')
-    return schoolYearEnumerationDocumentIdentityWithSecurity(body as SchoolYearEnumerationDocument);
+    return schoolYearEnumerationDocumentIdentityFrom(body as SchoolYearEnumerationDocument);
 
-  const documentIdentitiesWithSecurity: DocumentIdentityWithSecurity[] = (
+  // identityReferenceComponents can represent a tree of identity information, thus the need to
+  // flatmap into identities per top level component.
+  const documentIdentities: DocumentIdentity[] = (
     entity.data.meadowlark as EntityMeadowlarkData
   ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>
     documentIdentitiesFrom(identityReferenceComponent, body, entity, []),
   );
 
-  const result = documentIdentitiesWithSecurity.reduce(
-    (acc: DocumentIdentityWithSecurity, current: DocumentIdentityWithSecurity) => {
-      acc.documentIdentity = [...acc.documentIdentity, ...current.documentIdentity];
-      // Note that last non-null studentId/edOrgId wins
-      if (current.studentId != null) acc.studentId = current.studentId;
-      if (current.edOrgId != null) acc.edOrgId = current.edOrgId;
-      return acc;
-    },
-    { documentIdentity: NoDocumentIdentity, studentId: null, edOrgId: null },
-  );
+  // Combine the individual document identities from the top level components into a single one
+  const result: DocumentIdentity = documentIdentities.flat();
 
   // Ensure proper ordering of identity fields, by name value ascending
-  result.documentIdentity.sort((a, b) => a.name.localeCompare(b.name));
+  result.sort((a, b) => a.name.localeCompare(b.name));
 
   return result;
 }
