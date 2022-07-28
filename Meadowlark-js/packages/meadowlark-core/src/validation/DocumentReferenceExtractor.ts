@@ -77,6 +77,29 @@ const multiZip = (...theArrays) => {
 };
 
 /**
+ * Recursively collects JSON document paths from sub-ReferenceComponents, which represent identities that are
+ * references to other entities. In a MetaEd model, there is no limit to the number of entities that reference others
+ * as a part of their identity.
+ */
+function documentPathsFromSubReferenceComponent(
+  subReferenceComponent: ReferenceComponent,
+  referenceComponentTopLevelName: string,
+): string[] {
+  const propertyMeadowlarkData: EntityPropertyMeadowlarkData = subReferenceComponent.sourceProperty.data.meadowlark;
+
+  if (isReferenceElement(subReferenceComponent)) {
+    return [`${referenceComponentTopLevelName}.${propertyMeadowlarkData.apiMapping.fullName}`];
+  }
+
+  const result: string[] = [];
+  (subReferenceComponent as ReferenceGroup).referenceComponents.forEach((childSubReferenceComponent: ReferenceComponent) => {
+    result.push(...documentPathsFromSubReferenceComponent(childSubReferenceComponent, referenceComponentTopLevelName));
+  });
+
+  return result;
+}
+
+/**
  * Takes the list of ReferenceComponents in a ReferenceGroup and the specific entity this is on, and returns a list
  * of dot-separated JSON document paths for each ReferenceComponent.
  *
@@ -84,21 +107,17 @@ const multiZip = (...theArrays) => {
  */
 function documentPathsFromReferenceComponents(referenceComponents: ReferenceComponent[], entity: TopLevelEntity): string[] {
   const result: string[] = [];
+
   referenceComponents.forEach((referenceComponent) => {
     if (isReferenceElement(referenceComponent)) {
       const propertyMeadowlarkData: EntityPropertyMeadowlarkData = referenceComponent.sourceProperty.data.meadowlark;
       result.push(propertyMeadowlarkData.apiMapping.fullName);
     } else {
-      referenceComponent.referenceComponents.forEach((childReferenceComponent) => {
-        const childPropertyMeadowlarkData: EntityPropertyMeadowlarkData =
-          childReferenceComponent.sourceProperty.data.meadowlark;
-
-        const referenceComponentTopLevelName = topLevelNameOnEntity(entity, referenceComponent.sourceProperty);
-        // assuming only two levels, meaning child is always a ReferenceElement
-        result.push(`${referenceComponentTopLevelName}.${childPropertyMeadowlarkData.apiMapping.fullName}`);
-      });
+      const referenceComponentTopLevelName = topLevelNameOnEntity(entity, referenceComponent.sourceProperty);
+      result.push(...documentPathsFromSubReferenceComponent(referenceComponent, referenceComponentTopLevelName));
     }
   });
+
   return result;
 }
 

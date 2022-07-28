@@ -340,31 +340,9 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
-## !! Currently failing, but should be a valid request.
-# Example of bug RND-234 ?? - see DocumentId.documentIdForDocumentIdentity()
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
 authorization: bearer {{authToken1}}
-
-{ 
-    "sectionIdentifier": "c00v",
-    "courseOfferingReference": {
-      "localCourseCode": "abfdddcde",
-      "schoolId": 123,
-      "schoolYear": 2034,
-      "sessionName": "d"
-    },
-    "locationReference": {
-      "classroomIdentificationCode": "string",
-      "schoolId": 123
-    }
-}
-
-### This version temporarly disables reference validation. Remove it after fixing RND-234.
-POST http://localhost:3000/local/v3.3b/ed-fi/sections
-content-type: application/json
-authorization: bearer {{authToken1}}
-reference-validation: false
 
 { 
     "sectionIdentifier": "c00v",
