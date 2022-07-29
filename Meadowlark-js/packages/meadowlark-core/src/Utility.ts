@@ -8,3 +8,23 @@ export function decapitalize(str: string): string {
   if (str.length === 1) return str.toLowerCase();
   return str[0].toLowerCase() + str.slice(1);
 }
+
+/** Use in JSON.stringify. */
+export function omitEmptyArrays(_: string, value: any): any {
+  if (Array.isArray(value) && value.length === 0) {
+    return undefined;
+  }
+
+  return value;
+}
+
+/** Creates a message structured similar to that provided by ASP.NET APIs */
+export function createInvalidRequestResponse(modelState: { [key: string]: string[] }): string {
+  return JSON.stringify(
+    {
+      message: 'The request is invalid.',
+      modelState,
+    },
+    omitEmptyArrays,
+  );
+}

@@ -22,14 +22,25 @@ export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
     .replace(/\./g, '-');
 }
 
-// TODO: RND-203 unsafe for SQL injection
+/**
+ * Sanitizes input by escaping single all apostrophes. If \' is present, then someone is trying to evade the sanitization. In
+ * that case, replace the search term with an empty string.
+ */
+function sanitize(input: string): string {
+  if (input.indexOf(`\\'`) > -1) {
+    return '';
+  }
+
+  return input.replaceAll(`'`, `\\'`);
+}
+
 /**
  * Convert query string parameters from http request to OpenSearch
  * SQL WHERE conditions. Returns empty string if there are none.
  */
 function whereConditionsFrom(queryStringParameters: object): string {
   return Object.entries(queryStringParameters)
-    .map(([field, value]) => `${field} = '${value}'`)
+    .map(([field, value]) => `${field} = '${sanitize(value)}'`)
     .join(' AND ');
 }
 
@@ -80,15 +91,14 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       query += ` WHERE ${whereClause}`;
     }
 
+    query += ' ORDER BY _doc';
+
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
-
-    query += ' ORDER BY _doc';
 
     Logger.debug(`meadowlark-opensearch-backend: queryDocuments executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
-
     Logger.debug(`Result: ${JSON.stringify(body)}`, traceId);
     documents = body.datarows.map((datarow) => JSON.parse(datarow));
   } catch (e) {

@@ -6,6 +6,7 @@
 import Joi from '@hapi/joi';
 import didYouMean from 'didyoumean2';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
+import R from 'ramda';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
 
@@ -59,6 +60,23 @@ export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, bod
   });
   if (validationResult.error != null) {
     return validationResult.error.details.map((item) => item.message.replace(/"/g, ''));
+  }
+
+  return [];
+}
+
+/**
+ * Validates that those properties which are present actually belong in the body.
+ */
+export function validatePartialEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): string[] {
+  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(body, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+  if (validationResult != null) {
+    const onlyValidProperties = validationResult.value;
+
+    return R.without(Object.keys(onlyValidProperties), Object.keys(body));
   }
 
   return [];

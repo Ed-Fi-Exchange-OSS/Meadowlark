@@ -18,6 +18,7 @@ import * as Delete from './Delete';
 import * as Query from './Query';
 import * as GetById from './GetById';
 import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
+import { validateQueryString } from '../middleware/ValidateQueryStringMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -49,7 +50,7 @@ function getByIdStack(): MiddlewareStack {
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
 function queryStack(): MiddlewareStack {
-  return R.once(R.pipe(authorize, R.andThen(resourceValidation)));
+  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(validateQueryString)));
 }
 
 /**
