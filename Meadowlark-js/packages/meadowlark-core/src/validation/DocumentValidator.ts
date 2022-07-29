@@ -5,7 +5,7 @@
 import { TopLevelEntity } from '@edfi/metaed-core';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
-import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
+import { validateEntityBodyAgainstSchema, validatePartialEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
 import { extractDocumentIdentity, deriveSuperclassInfoFrom } from './DocumentIdentityExtractor';
 import { decapitalize } from '../Utility';
@@ -30,6 +30,21 @@ export type DocumentValidationResult = {
   documentInfo: DocumentInfo;
 };
 
+export type PropertyValidationResult = {
+  /**
+   * Error message for validation failure
+   */
+  errorBody?: string;
+};
+
+async function getMatchingMetaEdModel(pathComponents: PathComponents): Promise<TopLevelEntity | undefined> {
+  const lowerResourceName = decapitalize(pathComponents.endpointName);
+  const modelNpmPackage = modelPackageFor(pathComponents.version);
+  const { metaEd } = await loadMetaEdState(modelNpmPackage);
+
+  return getMetaEdModelForResourceName(lowerResourceName, metaEd, pathComponents.namespace);
+}
+
 /**
  * Dynamically performs validation of a document against a resource.
  *
@@ -42,15 +57,7 @@ export async function validateDocument(
   body: object,
   traceId: string,
 ): Promise<DocumentValidationResult> {
-  const lowerResourceName = decapitalize(pathComponents.endpointName);
-  const modelNpmPackage = modelPackageFor(pathComponents.version);
-  const { metaEd } = await loadMetaEdState(modelNpmPackage);
-
-  const matchingMetaEdModel: TopLevelEntity | undefined = getMetaEdModelForResourceName(
-    lowerResourceName,
-    metaEd,
-    pathComponents.namespace,
-  );
+  const matchingMetaEdModel = await getMatchingMetaEdModel(pathComponents);
 
   if (matchingMetaEdModel == null) {
     Logger.error('DocumentValidator.validateDocument: Fatal error - matchingMetaEdModel not found', traceId);
@@ -88,4 +95,32 @@ export async function validateDocument(
     },
     errorBody,
   };
+}
+
+/**
+ * Validates that the provided object properties belong with the MetaEd resource specified by the PathComponents.
+ */
+export async function confirmThatPropertiesBelongToDocumentType(
+  pathComponents: PathComponents,
+  properties: object,
+  traceId: string,
+): Promise<PropertyValidationResult> {
+  const matchingMetaEdModel = await getMatchingMetaEdModel(pathComponents);
+
+  if (matchingMetaEdModel == null) {
+    Logger.error(
+      'DocumentValidator.confirmThatPropertiesBelongToDocumentType: Fatal error - matchingMetaEdModel not found',
+      traceId,
+    );
+    return { errorBody: 'Fatal error' };
+  }
+
+  const bodyValidation: string[] = validatePartialEntityBodyAgainstSchema(matchingMetaEdModel, properties);
+  if (bodyValidation.length > 0) {
+    return {
+      errorBody: JSON.stringify({ invalidQueryTerms: bodyValidation }),
+    };
+  }
+
+  return {};
 }

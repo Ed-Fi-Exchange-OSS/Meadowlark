@@ -165,7 +165,7 @@ describe('when querying for students', () => {
         >;
         const limit = '1';
         const offset = '2';
-        const expectedQuery = '{"query":"SELECT info FROM ed-fi$3-3-1-b$student LIMIT 1 OFFSET 2 ORDER BY _doc"}';
+        const expectedQuery = '{"query":"SELECT info FROM ed-fi$3-3-1-b$student ORDER BY _doc LIMIT 1 OFFSET 2"}';
 
         beforeAll(async () => {
           const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
@@ -214,7 +214,7 @@ describe('when querying for students', () => {
         const limit = '1';
         const offset = '2';
         const expectedQuery =
-          '{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = \'a\' AND birthDate = \'2022-07-28\' LIMIT 1 OFFSET 2 ORDER BY _doc"}';
+          '{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = \'a\' AND birthDate = \'2022-07-28\' ORDER BY _doc LIMIT 1 OFFSET 2"}';
 
         beforeAll(async () => {
           const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
