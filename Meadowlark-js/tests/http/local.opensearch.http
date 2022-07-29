@@ -71,13 +71,19 @@ authorization: bearer {{authToken1}}
 
 ### 200: empty array (SQL injection attack is thwarted)
 # plain text: a' or studentUniqueId is not null #
-# attempting to escape from the ownership validation with the comment at end,
+# Attempting to escape from the ownership validation with the comment at end,
 # and to return every student
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a'%20or%20studentUniqueId%20is%20not%20null%20%23
+authorization: bearer {{authToken1}}
+
+### 200: empty array (SQL injection attack is thwarted)
+# plain text: a' or studentUniqueId is not null #
+# Encodes the apostrophe as %27
 GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a%27%20or%20studentUniqueId%20is%20not%20null%20%23
 authorization: bearer {{authToken1}}
 
 ### 200: empty array (SQL injection attack is thwarted)
 # plain text: a\' or studentUniqueId is not null #
-# attempting to escape the escape of apostrophes
+# Attempting to escape the escape of apostrophes
 GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a%5C%27%20or%20studentUniqueId%20is%20not%20null%20%23
 authorization: bearer {{authToken1}}
