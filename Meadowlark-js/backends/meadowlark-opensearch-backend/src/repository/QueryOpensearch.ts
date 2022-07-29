@@ -91,10 +91,10 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       query += ` WHERE ${whereClause}`;
     }
 
+    query += ' ORDER BY _doc';
+
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
-
-    query += ' ORDER BY _doc';
 
     Logger.debug(`meadowlark-opensearch-backend: queryDocuments executing query: ${query}`, traceId);
 
