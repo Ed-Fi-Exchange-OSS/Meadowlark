@@ -5,8 +5,7 @@
 
 import { ApiError, ApiResponse, Client } from '@opensearch-project/opensearch';
 import Mock from '@short.io/opensearch-mock';
-import { PaginationParameters, QueryRequest, QueryResult } from '@edfi/meadowlark-core';
-import { AuthorizationStrategy } from '@edfi/meadowlark-core/dist/security/Security';
+import { PaginationParameters, QueryRequest, QueryResult, AuthorizationStrategy } from '@edfi/meadowlark-core';
 import {
   TransportRequestCallback,
   TransportRequestParams,
