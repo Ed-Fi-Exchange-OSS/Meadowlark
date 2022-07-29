@@ -11,6 +11,9 @@ import {
   schoolDeleteClient2,
   schoolBodyClient1,
   schoolGetClient1,
+  schoolCategoryDescriptorBody,
+  schoolBodyWithDescriptorReference,
+  schoolCategoryDelete,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -116,6 +119,38 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
       `"{\\"message\\":\\"Delete failed due to existing references to document: Resource AcademicWeek with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolReference.schoolId\\\\\\",\\\\\\"value\\\\\\":123},{\\\\\\"name\\\\\\":\\\\\\"weekIdentifier\\\\\\",\\\\\\"value\\\\\\":\\\\\\"1st\\\\\\"}]'\\"}"`,
+    );
+    expect(deleteResult.statusCode).toBe(409);
+  });
+
+  it('should return still found from get', async () => {
+    expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given the DELETE of a descriptor referenced by a school', () => {
+  let client: SystemTestClient;
+  let deleteResult: FrontendResponse;
+  let getResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = await backendToTest.systemTestSetup();
+
+    await upsert(schoolCategoryDescriptorBody());
+    await upsert(schoolBodyWithDescriptorReference());
+
+    // Act
+    deleteResult = await deleteIt(schoolCategoryDelete());
+    getResult = await get(schoolGetClient1());
+  });
+
+  afterAll(async () => {
+    await backendToTest.systemTestTeardown(client);
+  });
+
+  it('should return delete failure due to a reference to the school', async () => {
+    expect(deleteResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]'\\"}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });

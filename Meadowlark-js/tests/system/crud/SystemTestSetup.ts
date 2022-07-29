@@ -149,3 +149,44 @@ export function descriptorGetClient2(): FrontendRequest {
     path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/iAJs9ozLKVAzev_3uNkiENZZfPU_PoI3qwet9Q',
   };
 }
+
+export function schoolCategoryDescriptorBody(): FrontendRequest {
+  return {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/schoolCategoryDescriptors',
+    headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
+    body: `{
+      "codeValue": "All Levels",
+      "shortDescription": "All Levels",
+      "description": "All Levels",
+      "namespace":"uri://ed-fi.org/SchoolCategoryDescriptor"
+    }`,
+  };
+}
+
+export function schoolBodyWithDescriptorReference(): FrontendRequest {
+  return {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/schools',
+    headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
+    body: `{
+    "schoolId": 123,
+    "schoolCategories": [
+      {
+           "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+      }
+    ],
+    "gradeLevels": [],
+    "nameOfInstitution": "abc",
+    "educationOrganizationCategories": []
+  }`,
+  };
+}
+
+export function schoolCategoryDelete(): FrontendRequest {
+  return {
+    ...newFrontendRequestTemplate(),
+    headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
+    path: '/v3.3b/ed-fi/schoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ',
+  };
+}

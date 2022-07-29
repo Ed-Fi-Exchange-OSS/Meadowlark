@@ -4,7 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { UpsertResult, Logger, UpsertRequest } from '@edfi/meadowlark-core';
+import {
+  UpsertResult,
+  Logger,
+  UpsertRequest,
+  DocumentReference,
+  documentIdForDocumentReference,
+} from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
 import { asUpsert, onlyReturnId, validateReferences } from './ReferenceValidation';
@@ -58,6 +64,12 @@ export async function upsertDocument(
           return;
         }
       }
+
+      // Adding descriptors to outRefs for reference checking
+      const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+        documentIdForDocumentReference(dr),
+      );
+      document.outRefs.push(...descriptorOutRefs);
 
       // Perform the document upsert
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);

@@ -84,6 +84,12 @@ export async function upsertDocument(
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
     await client.query(deleteReferencesSql(id));
 
+    // Adding descriptors to outRefs for reference checking
+    const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+      documentIdForDocumentReference(dr),
+    );
+    outRefs.push(...descriptorOutRefs);
+
     // Perform insert of references to the references table
     outRefs.forEach(async (ref: string) => {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
