@@ -29,6 +29,10 @@ authorization: bearer {{authToken1}}
 GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1&offset=2
 authorization: bearer {{authToken1}}
 
+### 400: capitalized limit and offset (Meadowlark is case sensitive, unlike the ODS/API)
+GET http://localhost:3000/local/v3.3b/ed-fi/students?Limit=1&Offset=2
+authorization: bearer {{authToken1}}
+
 ### 400: limit without offset
 GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1
 authorization: bearer {{authToken1}}

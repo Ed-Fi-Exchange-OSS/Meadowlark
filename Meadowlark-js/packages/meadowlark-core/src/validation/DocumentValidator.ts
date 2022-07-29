@@ -8,7 +8,7 @@ import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { validateEntityBodyAgainstSchema, validatePartialEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
 import { extractDocumentIdentity, deriveSuperclassInfoFrom } from './DocumentIdentityExtractor';
-import { decapitalize } from '../Utility';
+import { decapitalize, createInvalidRequestResponse } from '../Utility';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
@@ -117,8 +117,9 @@ export async function confirmThatPropertiesBelongToDocumentType(
 
   const bodyValidation: string[] = validatePartialEntityBodyAgainstSchema(matchingMetaEdModel, properties);
   if (bodyValidation.length > 0) {
+    const modelState = Object.assign({}, ...bodyValidation.map((x) => ({ [x]: 'Invalid property' })));
     return {
-      errorBody: JSON.stringify({ invalidQueryTerms: bodyValidation }),
+      errorBody: createInvalidRequestResponse(modelState),
     };
   }
 

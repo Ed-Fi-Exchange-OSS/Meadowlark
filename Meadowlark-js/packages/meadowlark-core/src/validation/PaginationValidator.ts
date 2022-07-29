@@ -1,4 +1,6 @@
+/* eslint-disable no-use-before-define */ // function declarations are hoisted properly in ES6
 import { PaginationParameters } from '../message/PaginationParameters';
+import { createInvalidRequestResponse } from '../Utility';
 
 const isNotPositiveInteger = (value: string): Boolean => !Number(value) || Number.parseInt(value, 10) < 1;
 
@@ -11,27 +13,36 @@ export function validatePaginationParameters(parameters: PaginationParameters): 
     return undefined;
   }
 
-  const invalidQueryTerms: string[] = [];
-  if (parameters.limit != null) {
-    if (isNotPositiveInteger(parameters.limit)) {
-      invalidQueryTerms.push('limit');
-    }
-  }
+  const limit: string[] = [];
+  const offset: string[] = [];
 
-  if (parameters.offset != null) {
-    if (isNotPositiveInteger(parameters.offset)) {
-      invalidQueryTerms.push('offset');
-    }
+  validateLimit();
+  validateOffset();
 
-    // Can't have an offset without a limit (but reverse _is_ acceptable)
-    if (parameters.limit == null) {
-      invalidQueryTerms.push('limit');
-    }
-  }
-
-  if (invalidQueryTerms.length > 0) {
-    return JSON.stringify({ invalidQueryTerms });
+  if (limit.length > 0 || offset.length > 0) {
+    return createInvalidRequestResponse({ limit, offset });
   }
 
   return undefined;
+
+  function validateLimit() {
+    if (parameters.limit != null) {
+      if (isNotPositiveInteger(parameters.limit)) {
+        limit.push('Must be set to a numeric value >= 1');
+      }
+    }
+  }
+
+  function validateOffset() {
+    if (parameters.offset != null) {
+      if (isNotPositiveInteger(parameters.offset)) {
+        offset.push('Must be set to a numeric value >= 1');
+      }
+
+      // Can't have an offset without a limit (but reverse _is_ acceptable)
+      if (parameters.limit == null) {
+        limit.push('Limit must be provided when using offset');
+      }
+    }
+  }
 }

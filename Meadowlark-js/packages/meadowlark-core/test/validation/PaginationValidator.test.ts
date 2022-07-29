@@ -23,28 +23,69 @@ describe('when validating pagination parameters', () => {
     });
   });
 
+  const errorNegativeLimit = {
+    message: 'The request is invalid.',
+    modelState: {
+      limit: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorNegativeOffset = {
+    message: 'The request is invalid.',
+    modelState: {
+      offset: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorNegativeOffsetAndLimit = {
+    message: 'The request is invalid.',
+    modelState: {
+      limit: ['Must be set to a numeric value >= 1'],
+      offset: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorAlphaLimit = {
+    message: 'The request is invalid.',
+    modelState: {
+      limit: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorAlphaOffset = {
+    message: 'The request is invalid.',
+    modelState: {
+      offset: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorAlphaOffsetAndLimit = {
+    message: 'The request is invalid.',
+    modelState: {
+      limit: ['Must be set to a numeric value >= 1'],
+      offset: ['Must be set to a numeric value >= 1'],
+    },
+  };
+  const errorOffsetWithoutLimit = {
+    message: 'The request is invalid.',
+    modelState: {
+      limit: ['Limit must be provided when using offset'],
+    },
+  };
+
   describe('given erroneous inputs', () => {
     it.each([
-      ['1', '-1', ['offset']],
-      ['-1', '1', ['limit']],
-      ['-1', '-1', ['limit', 'offset']],
-      ['1', 'a', ['offset']],
-      ['a', '1', ['limit']],
-      ['a', 'a', ['limit', 'offset']],
-      [undefined, '1', ['limit']],
+      ['1', '-1', JSON.stringify(errorNegativeOffset)],
+      ['-1', '1', JSON.stringify(errorNegativeLimit)],
+      ['-1', '-1', JSON.stringify(errorNegativeOffsetAndLimit)],
+      ['a', '1', JSON.stringify(errorAlphaLimit)],
+      ['1', 'b', JSON.stringify(errorAlphaOffset)],
+      ['a', 'b', JSON.stringify(errorAlphaOffsetAndLimit)],
+      [undefined, '1', JSON.stringify(errorOffsetWithoutLimit)],
     ])('limit = %s and offset = %s should return an error message', (limit, offset, errors) => {
       const parameters: PaginationParameters = {
         limit,
         offset,
       };
 
-      const expected = JSON.stringify({
-        invalidQueryTerms: errors,
-      });
-
       const result = validatePaginationParameters(parameters);
 
-      expect(result).toBe(expected);
+      expect(result).toBe(errors);
     });
   });
 });
