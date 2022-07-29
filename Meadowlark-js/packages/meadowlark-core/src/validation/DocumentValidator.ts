@@ -7,17 +7,13 @@ import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import {
-  extractDocumentIdentity,
-  deriveSuperclassInfoFrom,
-  DocumentIdentityWithSecurity,
-} from './DocumentIdentityExtractor';
+import { extractDocumentIdentity, deriveSuperclassInfoFrom } from './DocumentIdentityExtractor';
 import { decapitalize } from '../Utility';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { DocumentReference } from '../model/DocumentReference';
 import { extractDescriptorValues } from './DescriptorValueExtractor';
 import { SuperclassInfo } from '../model/SuperclassInfo';
-import { NoDocumentIdentity } from '../model/DocumentIdentity';
+import { DocumentIdentity, NoDocumentIdentity } from '../model/DocumentIdentity';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { getMetaEdModelForResourceName } from '../metaed/ResourceNameMapping';
 import { Logger } from '../Logger';
@@ -62,11 +58,7 @@ export async function validateDocument(
   }
 
   let errorBody: string | undefined;
-  let documentIdentityWithSecurity: DocumentIdentityWithSecurity = {
-    documentIdentity: NoDocumentIdentity,
-    studentId: null,
-    edOrgId: null,
-  };
+  let documentIdentity: DocumentIdentity = NoDocumentIdentity;
   let superclassInfo: SuperclassInfo | null = null;
   const documentReferences: DocumentReference[] = [];
   const descriptorReferences: DocumentReference[] = [];
@@ -76,7 +68,7 @@ export async function validateDocument(
     if (bodyValidation.length > 0) {
       errorBody = JSON.stringify({ message: bodyValidation });
     } else {
-      documentIdentityWithSecurity = extractDocumentIdentity(matchingMetaEdModel, body);
+      documentIdentity = extractDocumentIdentity(matchingMetaEdModel, body);
       documentReferences.push(...extractDocumentReferences(matchingMetaEdModel, body));
       descriptorReferences.push(...extractDescriptorValues(matchingMetaEdModel, body));
     }
@@ -84,14 +76,14 @@ export async function validateDocument(
 
   if (!resourceInfo.isDescriptor) {
     // We need to do this even if no body for deletes
-    superclassInfo = deriveSuperclassInfoFrom(matchingMetaEdModel, documentIdentityWithSecurity.documentIdentity);
+    superclassInfo = deriveSuperclassInfoFrom(matchingMetaEdModel, documentIdentity);
   }
 
   return {
     documentInfo: {
       documentReferences,
       descriptorReferences,
-      ...documentIdentityWithSecurity,
+      documentIdentity,
       superclassInfo,
     },
     errorBody,
