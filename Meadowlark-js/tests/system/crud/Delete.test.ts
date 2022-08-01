@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { deleteIt, FrontendResponse, upsert, get, SystemTestClient } from '@edfi/meadowlark-core';
+import { deleteIt, FrontendResponse, upsert, get, SystemTestClient, update } from '@edfi/meadowlark-core';
 import {
   backendToTest,
   schoolDeleteClient1,
@@ -128,7 +128,7 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   });
 });
 
-describe('given the DELETE of a descriptor referenced by a school', () => {
+describe('given the DELETE of a descriptor referenced by a school on an UPSERT', () => {
   let client: SystemTestClient;
   let deleteResult: FrontendResponse;
   let getResult: FrontendResponse;
@@ -138,6 +138,44 @@ describe('given the DELETE of a descriptor referenced by a school', () => {
 
     await upsert(schoolCategoryDescriptorBody());
     await upsert(schoolBodyWithDescriptorReference());
+
+    // Act
+    deleteResult = await deleteIt(schoolCategoryDelete());
+    getResult = await get(schoolGetClient1());
+  });
+
+  afterAll(async () => {
+    await backendToTest.systemTestTeardown(client);
+  });
+
+  it('should return delete failure due to a reference to the school', async () => {
+    expect(deleteResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]'\\"}"`,
+    );
+    expect(deleteResult.statusCode).toBe(409);
+  });
+
+  it('should return still found from get', async () => {
+    expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given the DELETE of a descriptor referenced by a school after an UPDATE', () => {
+  let client: SystemTestClient;
+  let deleteResult: FrontendResponse;
+  let getResult: FrontendResponse;
+
+  beforeAll(async () => {
+    client = await backendToTest.systemTestSetup();
+
+    await upsert(schoolCategoryDescriptorBody());
+    await upsert(schoolBodyWithDescriptorReference());
+
+    // Original school inserted, add id so it can be updated
+    const schoolToUpdate = schoolBodyWithDescriptorReference();
+    schoolToUpdate.path = '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ';
+
+    await update(schoolToUpdate);
 
     // Act
     deleteResult = await deleteIt(schoolCategoryDelete());
