@@ -136,14 +136,6 @@ authorization: bearer {{authToken1}}
     "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
 }
 
-### Wrong case on the 'N' below - expect 200 with empty array
-GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurName=World
-authorization: bearer {{authToken1}}
-
-### Correct case
-GET http://localhost:3000/local/v3.3b/ed-fi/students/?lastSurname=World
-authorization: bearer {{authToken1}}
-
 ### Update this student
 PUT http://localhost:3000/local/v3.3b/ed-fi/students/kKOLuEZJWjsDhpDiJOQlryLw_JBvzQ5KXTF2xg
 content-type: application/json

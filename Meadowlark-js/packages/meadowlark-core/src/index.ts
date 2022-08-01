@@ -21,7 +21,7 @@ export type { UpsertRequest } from './message/UpsertRequest';
 export type { QueryRequest } from './message/QueryRequest';
 export type { PaginationParameters } from './message/PaginationParameters';
 export type { Security } from './security/Security';
-export { newSecurity } from './security/Security';
+export { newSecurity, AuthorizationStrategy } from './security/Security';
 export type { DocumentElement } from './model/DocumentElement';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
