@@ -3,7 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
+import {
+  UpdateResult,
+  Logger,
+  UpdateRequest,
+  documentIdForDocumentReference,
+  DocumentReference,
+} from '@edfi/meadowlark-core';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
@@ -55,6 +61,12 @@ export async function updateDocumentById(
           return;
         }
       }
+
+      // Adding descriptors to outRefs for reference checking
+      const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+        documentIdForDocumentReference(dr),
+      );
+      document.outRefs.push(...descriptorOutRefs);
 
       // Perform the document update
       Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
