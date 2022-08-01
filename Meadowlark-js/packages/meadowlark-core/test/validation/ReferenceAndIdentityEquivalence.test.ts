@@ -113,12 +113,9 @@ describe('when comparing identities with references from domain entity referenci
     const section = namespace.entity.domainEntity.get('Section');
     referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
     const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody).documentIdentity;
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
     const courseOffering = namespace.entity.domainEntity.get('CourseOffering');
-    courseOfferingIdentityExtractionResult = extractDocumentIdentity(
-      courseOffering,
-      courseOfferingIdentityBody,
-    ).documentIdentity;
+    courseOfferingIdentityExtractionResult = extractDocumentIdentity(courseOffering, courseOfferingIdentityBody);
   });
 
   it('should have classPeriod reference and identity match', () => {
@@ -233,7 +230,7 @@ describe('when comparing identities with references with three levels of identit
     const section = namespace.entity.domainEntity.get('Section');
     referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
     const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody).documentIdentity;
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
   });
 
   it('should have classPeriod reference and identity match', () => {
@@ -324,7 +321,7 @@ describe('when comparing identities with references with two levels of identitie
     const section = namespace.entity.domainEntity.get('Section');
     referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
     const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody).documentIdentity;
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
   });
 
   it('should have classPeriod reference and identity match', () => {
