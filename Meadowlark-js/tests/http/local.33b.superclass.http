@@ -296,3 +296,70 @@ reference-validation: true
 ###
 GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
 {{auth_header}}
+
+###
+# These set of tests are to show that given a speific type of education organization (in this case
+# a school) Make sure to 
+
+### Create a LocalEducationAgencyCategory Descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencyCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Independent",
+    "shortDescription": "Independent",
+    "namespace": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor"
+}
+### Create a LocalEducationAgency
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "localEducationAgencyId": 125,
+    "nameOfInstitution": "A School",
+    "categories":[],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+### Create a location with a LEA - should fail
+POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolReference":{
+        "schoolId": 125
+    },
+    "classroomIdentificationCode":"Test Assigning LEA"
+}
+
+### Atempt to assign School to location - Should succeed
+POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolReference":{
+        "schoolId": 123
+    },
+    "classroomIdentificationCode":"Test Assigning School"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [],
+    "schoolCategories": [],
+    "gradeLevels": []
+}
