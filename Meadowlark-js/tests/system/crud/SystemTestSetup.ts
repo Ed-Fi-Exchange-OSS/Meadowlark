@@ -11,7 +11,7 @@ const TEST_SIGNING_KEY =
 process.env.SIGNING_KEY = TEST_SIGNING_KEY;
 process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 
-if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
+if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-postgresql-backend';
 
 // eslint-disable-next-line import/no-mutable-exports
 let backend: SystemTestablePlugin;

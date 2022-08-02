@@ -311,6 +311,7 @@ content-type: application/json
     "shortDescription": "Independent",
     "namespace": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor"
 }
+
 ### Create a LocalEducationAgency
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
@@ -324,7 +325,7 @@ reference-validation: true
     "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
 }
 
-### Create a location with a LEA - should fail
+### Create a location with a LEA - should fail with 400 - Bad Request
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}
@@ -337,20 +338,7 @@ reference-validation: true
     "classroomIdentificationCode":"Test Assigning LEA"
 }
 
-### Atempt to assign School to location - Should succeed
-POST http://localhost:3000/local/v3.3b/ed-fi/locations
-content-type: application/json
-{{auth_header}}
-reference-validation: true
-
-{
-    "schoolReference":{
-        "schoolId": 123
-    },
-    "classroomIdentificationCode":"Test Assigning School"
-}
-
-###
+### Create School
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -362,4 +350,17 @@ reference-validation: true
     "educationOrganizationCategories" : [],
     "schoolCategories": [],
     "gradeLevels": []
+}
+
+### Atempt to assign School to location - Should succeed
+POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolReference":{
+        "schoolId": 124
+    },
+    "classroomIdentificationCode":"Test Assigning School"
 }
