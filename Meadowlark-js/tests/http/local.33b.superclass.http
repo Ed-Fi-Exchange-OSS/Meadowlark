@@ -298,8 +298,8 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools?schoolId=123
 {{auth_header}}
 
 ###
-# These set of tests are to show that given a speific type of education organization (in this case
-# a school) Make sure to 
+# Verify that when a specific subclass type is referenced on an entity, that only that type can be referenced, trying to 
+# reference another subclass should fail 
 
 ### Create a LocalEducationAgencyCategory Descriptor
 POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencyCategoryDescriptors
