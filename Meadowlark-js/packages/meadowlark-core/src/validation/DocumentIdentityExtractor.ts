@@ -60,6 +60,10 @@ function documentIdentitiesFrom(
   documentPath: string[],
 ): DocumentIdentity[] {
   if (isReferenceElement(identityReferenceComponent)) {
+    // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
+    if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
+      documentPath.push('schoolYearTypeReference');
+    }
     return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
   }
 

@@ -9,8 +9,9 @@ import {
   DomainEntityBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
+  EnumerationBuilder,
 } from '@edfi/metaed-core';
-import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
+import { domainEntityReferenceEnhancer, enumerationReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
   entityPropertyMeadowlarkDataSetupEnhancer,
   apiEntityMappingEnhancer,
@@ -107,6 +108,66 @@ describe('when extracting natural key from domain entity referencing another ref
         Object {
           "name": "sectionIdentifier",
           "value": "Bob",
+        },
+      ]
+    `);
+  });
+});
+
+describe('when extracting natural key from domain entity with school year in identity', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentIdentity = NoDocumentIdentity;
+
+  const body = {
+    sessionName: 's',
+    schoolYearTypeReference: {
+      schoolYear: 2022,
+    },
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withEnumerationIdentity('SchoolYear', 'doc')
+      .withEndDomainEntity()
+
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    enumerationReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const session = namespace.entity.domainEntity.get('Session');
+    result = extractDocumentIdentity(session, body);
+  });
+
+  it('should be correct', () => {
+    expect(result).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "name": "schoolYearTypeReference.schoolYear",
+          "value": 2022,
+        },
+        Object {
+          "name": "sessionName",
+          "value": "s",
         },
       ]
     `);
