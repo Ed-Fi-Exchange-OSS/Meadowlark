@@ -40,7 +40,9 @@ See [Running on Localhost](LOCALHOST.md).
 Meadowlark is bundled with test scripts to exercise the API.
 
 * Run `yarn build` from the root `Meadowlark-js` directory.
-* Run `yarn start:local` from the root `Meadowlark-js` directory.
+* cd into your chosen service (fastify or AWS Lambda)
+* Run `yarn build`
+* Run `yarn start:local`
 * Use a test/http/local.*.http file to make API calls.
   * Reference validation can be disabled by adding the header
     `reference-validation: false`.
@@ -51,8 +53,9 @@ Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not
 required, must be loaded in order for descriptors to validate successfully.
 
 * Run `yarn start:local` in one shell.
-* In a second shell, run `yarn load:descriptors:local` to invoke the Meadowlark
-* Lambda function that loads descriptors into the "dev" stage.
+* In a second shell, cd into /Meadowlark/eng and the run Invoke-Bulkload.ps1 script
+  * Note: This requires building the [Bulk Load Client Utility](https://techdocs.ed-fi.org/display/ODSAPIS3V53/Bulk+Load+Client+Utility)
+* If using AWS-lambda as your service layer, you can also run `yarn load:descriptors:local` from the /Meadowlark-js/services/meadowlark-aws-lambda folder to load descriptors
 
 ## Other Build Scripts
 
