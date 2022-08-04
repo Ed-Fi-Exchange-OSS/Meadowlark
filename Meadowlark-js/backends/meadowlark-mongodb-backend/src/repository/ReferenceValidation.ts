@@ -79,22 +79,25 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 export async function validateReferences(
   documentReferences: DocumentReference[],
   descriptorReferences: DocumentReference[],
-  outRefIds: string[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   session: ClientSession,
   traceId: string,
 ): Promise<string[]> {
   const failureMessages: string[] = [];
 
+  const referencedDocumentIds: string[] = documentReferences.map((dr: DocumentReference) =>
+    documentIdForDocumentReference(dr),
+  );
+
   const referenceIdsInDb: MeadowlarkDocumentId[] = await findReferencedDocumentIdsById(
-    outRefIds,
+    referencedDocumentIds,
     mongoDocuments,
     onlyReturnId(session),
   );
 
-  if (outRefIds.length !== referenceIdsInDb.length) {
+  if (referencedDocumentIds.length !== referenceIdsInDb.length) {
     Logger.debug('mongodb.repository.WriteHelper.validateReferences: documentReferences not found', traceId);
-    failureMessages.push(...findMissingReferences(referenceIdsInDb, outRefIds, documentReferences));
+    failureMessages.push(...findMissingReferences(referenceIdsInDb, referencedDocumentIds, documentReferences));
   }
 
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>

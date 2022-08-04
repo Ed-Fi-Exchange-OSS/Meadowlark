@@ -4,30 +4,15 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import {
-  UpsertResult,
-  Logger,
-  UpsertRequest,
-  DocumentReference,
-  documentIdForDocumentReference,
-} from '@edfi/meadowlark-core';
+import { UpsertResult, Logger, UpsertRequest } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getCollection } from './Db';
+import { getCollection, writeLockReferencedDocuments } from './Db';
 import { asUpsert, onlyReturnId, validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
   { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-    resourceInfo,
-    documentInfo,
-    id,
-    edfiDoc,
-    validate,
-    security.clientName,
-  );
-
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
@@ -39,7 +24,6 @@ export async function upsertDocument(
         const failures = await validateReferences(
           documentInfo.documentReferences,
           documentInfo.descriptorReferences,
-          document.outRefs,
           mongoCollection,
           session,
           traceId,
@@ -65,11 +49,16 @@ export async function upsertDocument(
         }
       }
 
-      // Adding descriptors to outRefs for reference checking
-      const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
-        documentIdForDocumentReference(dr),
+      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+        resourceInfo,
+        documentInfo,
+        id,
+        edfiDoc,
+        validate,
+        security.clientName,
       );
-      document.outRefs.push(...descriptorOutRefs);
+
+      writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
 
       // Perform the document upsert
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
