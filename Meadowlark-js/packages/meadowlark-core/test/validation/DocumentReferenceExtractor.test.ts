@@ -100,46 +100,28 @@ describe('when extracting document references from domain entity referencing one
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "z1",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "24",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "z1",
+            "schoolReference.schoolId": "24",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "z2",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "25",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "z2",
+            "schoolReference.schoolId": "25",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "localCourseCode",
-              "value": "abc",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "23",
-            },
-          ],
+          "documentIdentity": Object {
+            "localCourseCode": "abc",
+            "schoolReference.schoolId": "23",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
@@ -197,12 +179,9 @@ describe('when extracting with optional reference in body', () => {
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "localCourseCode",
-              "value": "abc",
-            },
-          ],
+          "documentIdentity": Object {
+            "localCourseCode": "abc",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "CourseOffering",
@@ -314,23 +293,17 @@ describe('when extracting optional collection in body', () => {
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "z1",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "z1",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "z2",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "z2",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
@@ -462,47 +435,23 @@ describe('when extracting document references with two levels of identities on a
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "c1",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "24",
-            },
-            Object {
-              "name": "sessionReference.schoolId",
-              "value": "24",
-            },
-            Object {
-              "name": "sessionReference.sessionName",
-              "value": "s1",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "c1",
+            "schoolReference.schoolId": "24",
+            "sessionReference.schoolId": "24",
+            "sessionReference.sessionName": "s1",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "c2",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "25",
-            },
-            Object {
-              "name": "sessionReference.schoolId",
-              "value": "25",
-            },
-            Object {
-              "name": "sessionReference.sessionName",
-              "value": "s2",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "c2",
+            "schoolReference.schoolId": "25",
+            "sessionReference.schoolId": "25",
+            "sessionReference.sessionName": "s2",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
@@ -600,55 +549,25 @@ describe('when extracting document references with three levels of identities on
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "c1",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "24",
-            },
-            Object {
-              "name": "sessionReference.secondLevelName",
-              "value": "e1",
-            },
-            Object {
-              "name": "sessionReference.thirdLevelName",
-              "value": "t1",
-            },
-            Object {
-              "name": "sessionReference.sessionName",
-              "value": "s1",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "c1",
+            "schoolReference.schoolId": "24",
+            "sessionReference.secondLevelName": "e1",
+            "sessionReference.sessionName": "s1",
+            "sessionReference.thirdLevelName": "t1",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "classPeriodName",
-              "value": "c2",
-            },
-            Object {
-              "name": "schoolReference.schoolId",
-              "value": "25",
-            },
-            Object {
-              "name": "sessionReference.secondLevelName",
-              "value": "e2",
-            },
-            Object {
-              "name": "sessionReference.thirdLevelName",
-              "value": "t2",
-            },
-            Object {
-              "name": "sessionReference.sessionName",
-              "value": "s2",
-            },
-          ],
+          "documentIdentity": Object {
+            "classPeriodName": "c2",
+            "schoolReference.schoolId": "25",
+            "sessionReference.secondLevelName": "e2",
+            "sessionReference.sessionName": "s2",
+            "sessionReference.thirdLevelName": "t2",
+          },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",

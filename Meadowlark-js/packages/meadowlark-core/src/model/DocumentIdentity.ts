@@ -6,23 +6,21 @@
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { createHash } from 'node:crypto';
 import type { Hash } from 'node:crypto';
-import type { DocumentElement } from './DocumentElement';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
- * A DocumentIdentity is an array of DocumentElements that represents the complete identity
- * of an Ed-Fi document. In Ed-Fi documents, these are always a list of document elements
- * from the top level of the document (never nested in sub-objects, and never collections).
+ * A DocumentIdentity is an object with key-value pairs that represents the complete identity of an Ed-Fi document.
+ * In Ed-Fi documents, these are always a list of document elements from the top level of the document
+ * (never nested in sub-objects, and never collections). The keys are the document path (dot-separated).
  *
- * This is an array because many documents have multiple values as part of their identity. The
- * array is always ordered by name ascending.
+ * This can be a series of key-value pairs because many documents have multiple values as part of their identity.
  */
-export type DocumentIdentity = DocumentElement[];
+export type DocumentIdentity = { [key: string]: string };
 
 /**
  * The null object for DocumentIdentity
  */
-export const NoDocumentIdentity: DocumentIdentity = [];
+export const NoDocumentIdentity: DocumentIdentity = {};
 
 /**
  * Converts Base64 to Base64Url by character replacement and truncation of padding.
@@ -42,8 +40,9 @@ export function documentIdForDocumentIdentity(
 ): string {
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
 
-  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${documentIdentity
-    .map((element: DocumentElement) => `${element.name}=${element.value}`)
+  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${Object.keys(documentIdentity)
+    .sort()
+    .map((key) => `${key}=${documentIdentity[key]}`)
     .join('#')}`;
 
   const shaObj: Hash = createHash('sha3-224');

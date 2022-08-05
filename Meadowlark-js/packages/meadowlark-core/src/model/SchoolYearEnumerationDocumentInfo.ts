@@ -13,12 +13,9 @@ import { DocumentInfo, newDocumentInfo } from './DocumentInfo';
 export function schoolYearEnumerationDocumentIdentityFrom(
   schoolYearEnumerationDocument: SchoolYearEnumerationDocument,
 ): DocumentIdentity {
-  return [
-    {
-      name: 'schoolYear',
-      value: schoolYearEnumerationDocument.schoolYear.toString(),
-    },
-  ];
+  return {
+    schoolYear: schoolYearEnumerationDocument.schoolYear.toString(),
+  };
 }
 
 /**

@@ -39,13 +39,11 @@ function extractForDescriptorCollection(
         resourceVersion: collectedProperty.property.namespace.projectVersion,
         resourceName: apiMapping.metaEdName,
         isAssignableFrom: false,
-        documentIdentity: [
-          {
-            name: 'descriptor',
-            value:
-              bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
-          },
-        ],
+        documentIdentity: {
+          descriptor:
+            bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
+        },
+
         isDescriptor: true,
       } as DocumentReference),
   );
@@ -66,12 +64,7 @@ function extractDescriptorValuesFromBody(
     {
       projectName: collectedProperty.property.namespace.projectName,
       resourceName: normalizeDescriptorSuffix(apiMapping.metaEdName),
-      documentIdentity: [
-        {
-          name: 'descriptor',
-          value: body[bodyDescriptorName],
-        },
-      ],
+      documentIdentity: { descriptor: body[bodyDescriptorName] },
       isDescriptor: true,
     },
   ];
