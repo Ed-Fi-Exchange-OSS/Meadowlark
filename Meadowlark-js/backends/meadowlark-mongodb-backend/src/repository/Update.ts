@@ -3,31 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import {
-  UpdateResult,
-  Logger,
-  UpdateRequest,
-  documentIdForDocumentReference,
-  DocumentReference,
-} from '@edfi/meadowlark-core';
+import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getCollection } from './Db';
+import { getCollection, writeLockReferencedDocuments } from './Db';
 import { validateReferences } from './ReferenceValidation';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-    resourceInfo,
-    documentInfo,
-    id,
-    edfiDoc,
-    validate,
-    security.clientName,
-  );
-
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
@@ -39,7 +24,6 @@ export async function updateDocumentById(
         const failures = await validateReferences(
           documentInfo.documentReferences,
           documentInfo.descriptorReferences,
-          document.outRefs,
           mongoCollection,
           session,
           traceId,
@@ -48,7 +32,7 @@ export async function updateDocumentById(
         // Abort on validation failure
         if (failures.length > 0) {
           Logger.debug(
-            `mongodb.repository.Upsert.updateDocumentById: Updating document id ${id} failed due to invalid references`,
+            `mongodb.repository.Update.updateDocumentById: Updating document id ${id} failed due to invalid references`,
             traceId,
           );
 
@@ -62,11 +46,16 @@ export async function updateDocumentById(
         }
       }
 
-      // Adding descriptors to outRefs for reference checking
-      const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
-        documentIdForDocumentReference(dr),
+      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+        resourceInfo,
+        documentInfo,
+        id,
+        edfiDoc,
+        validate,
+        security.clientName,
       );
-      document.outRefs.push(...descriptorOutRefs);
+
+      writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
 
       // Perform the document update
       Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);

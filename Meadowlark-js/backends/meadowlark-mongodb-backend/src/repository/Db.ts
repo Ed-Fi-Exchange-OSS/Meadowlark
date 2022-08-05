@@ -3,7 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, MongoClient, Logger as MongoLogger, LoggerLevel, ReadConcernLevel, W } from 'mongodb';
+import {
+  Collection,
+  MongoClient,
+  Logger as MongoLogger,
+  LoggerLevel,
+  ReadConcernLevel,
+  W,
+  ClientSession,
+  ObjectId,
+} from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
@@ -66,4 +75,21 @@ export async function getSharedClient(): Promise<MongoClient> {
 
 export function getCollection(client: MongoClient): Collection<MeadowlarkDocument> {
   return client.db(DATABASE_NAME).collection(COLLECTION_NAME);
+}
+
+/**
+ * Write lock referenced documents as part of the upsert/update process. This will prevent the issue of
+ * a concurrent delete operation removing a to-be referenced document in the middle of the transaction.
+ * See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
+ */
+export function writeLockReferencedDocuments(
+  mongoCollection: Collection<MeadowlarkDocument>,
+  referencedDocumentIds: string[],
+  session: ClientSession,
+) {
+  mongoCollection.updateMany(
+    { existenceIds: { $in: referencedDocumentIds } },
+    { $set: { lock: new ObjectId() } },
+    { session },
+  );
 }

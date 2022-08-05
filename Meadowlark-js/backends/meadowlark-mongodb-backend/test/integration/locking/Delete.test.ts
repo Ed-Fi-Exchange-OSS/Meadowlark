@@ -15,9 +15,9 @@ import {
   ResourceInfo,
   newResourceInfo,
 } from '@edfi/meadowlark-core';
-import { ClientSession, Collection, MongoClient, ObjectId } from 'mongodb';
+import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
-import { getCollection, getNewClient } from '../../../src/repository/Db';
+import { getCollection, getNewClient, writeLockReferencedDocuments } from '../../../src/repository/Db';
 import {
   validateReferences,
   asUpsert,
@@ -81,7 +81,7 @@ const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom(
   '',
 );
 
-describe('given a delete document transaction concurrent with an insert document referencing the delete - without a read for write lock ', () => {
+describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
   let client: MongoClient;
 
   beforeAll(async () => {
@@ -101,7 +101,6 @@ describe('given a delete document transaction concurrent with an insert document
     const upsertFailures = await validateReferences(
       academicWeekDocumentInfo.documentReferences,
       [],
-      academicWeekDocument.outRefs,
       mongoCollection,
       upsertSession,
       '',
@@ -110,8 +109,12 @@ describe('given a delete document transaction concurrent with an insert document
     // Should be no reference validation failures for AcademicWeek document
     expect(upsertFailures).toHaveLength(0);
 
+    // ***** Read-for-write lock the validated referenced documents in the insert
+    // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
+    writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outRefs, upsertSession);
+
     // ----
-    // Start transaction to delete the School document - it interferes with the AcademicWeek insert referencing the School
+    // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
     // ----
     const deleteSession: ClientSession = client.startSession();
     deleteSession.startTransaction();
@@ -128,106 +131,11 @@ describe('given a delete document transaction concurrent with an insert document
       onlyReturnId(deleteSession),
     );
 
-    expect(anyReferences).toBeNull();
-
-    // Delete the School document
-    const { deletedCount } = await mongoCollection.deleteOne({ _id: schoolDocumentId }, { session: deleteSession });
-
-    expect(deletedCount).toBe(1);
-
-    // ----
-    // End transaction to delete the School document
-    // ----
-    deleteSession.commitTransaction();
-
-    // Perform the insert of AcademicWeek document
-    const { upsertedCount } = await mongoCollection.replaceOne(
-      { _id: academicWeekDocumentId },
-      academicWeekDocument,
-      asUpsert(upsertSession),
-    );
-
-    // **** The insert of AcademicWeek document should NOT have be successful - but was
-    expect(upsertedCount).toBe(1);
-
-    // ----
-    // End transaction to insert the AcademicWeek document
-    // ----
-    upsertSession.commitTransaction();
-  });
-
-  afterAll(async () => {
-    await getCollection(client).deleteMany({});
-    await client.close();
-  });
-
-  it('deleted the School document in the db anyway, this is a failed reference validation implementation!', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
-    const result: any = await collection.findOne({ _id: schoolDocumentId });
-    expect(result).toBeNull();
-  });
-});
-
-describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
-  let client: MongoClient;
-
-  beforeAll(async () => {
-    client = (await getNewClient()) as MongoClient;
-    const mongoDocuments: Collection<MeadowlarkDocument> = getCollection(client);
-
-    // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, client);
-
-    // ----
-    // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
-    // ----
-    const upsertSession: ClientSession = client.startSession();
-    upsertSession.startTransaction();
-
-    // Check for reference validation failures on AcademicWeek document - School is still there
-    const upsertFailures = await validateReferences(
-      academicWeekDocumentInfo.documentReferences,
-      [],
-      academicWeekDocument.outRefs,
-      mongoDocuments,
-      upsertSession,
-      '',
-    );
-
-    // Should be no reference validation failures for AcademicWeek document
-    expect(upsertFailures).toHaveLength(0);
-
-    // ***** Read-for-write lock the validated referenced documents in the insert
-    // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    mongoDocuments.updateMany(
-      { existenceIds: { $in: academicWeekDocument.outRefs } },
-      { $set: { lock: new ObjectId() } },
-      { session: upsertSession },
-    );
-
-    // ----
-    // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
-    // ----
-    const deleteSession: ClientSession = client.startSession();
-    deleteSession.startTransaction();
-
-    // Get the existenceIds for the School document, used to check for references to it as School or as EducationOrganization
-    const deleteCandidate: any = await mongoDocuments.findOne(
-      { _id: schoolDocumentId },
-      onlyReturnExistenceIds(deleteSession),
-    );
-
-    // Check for any references to the School document
-    const anyReferences = await mongoDocuments.findOne(
-      onlyDocumentsReferencing(deleteCandidate.existenceIds),
-      onlyReturnId(deleteSession),
-    );
-
     // Delete transaction sees no references yet, though we are about to add one
     expect(anyReferences).toBeNull();
 
     // Perform the insert of AcademicWeek document, adding a reference to to to-be-deleted document
-    const { upsertedCount } = await mongoDocuments.replaceOne(
+    const { upsertedCount } = await mongoCollection.replaceOne(
       { _id: academicWeekDocumentId },
       academicWeekDocument,
       asUpsert(upsertSession),
@@ -243,7 +151,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
     try {
-      await mongoDocuments.deleteOne({ _id: schoolDocumentId }, { session: deleteSession });
+      await mongoCollection.deleteOne({ _id: schoolDocumentId }, { session: deleteSession });
     } catch (e) {
       expect(e).toMatchInlineSnapshot(`[MongoServerError: WriteConflict]`);
     }

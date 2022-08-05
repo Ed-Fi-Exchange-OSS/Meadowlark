@@ -95,6 +95,13 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   lock?: any;
 }
 
+function referencedDocumentIdsFrom(documentInfo: DocumentInfo): string[] {
+  return [
+    ...documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
+    ...documentInfo.descriptorReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
+  ];
+}
+
 export function meadowlarkDocumentFrom(
   resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
@@ -117,7 +124,7 @@ export function meadowlarkDocumentFrom(
     _id: id,
     edfiDoc,
     existenceIds,
-    outRefs: documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr)),
+    outRefs: referencedDocumentIdsFrom(documentInfo),
     validated: validate,
     createdBy,
   };
