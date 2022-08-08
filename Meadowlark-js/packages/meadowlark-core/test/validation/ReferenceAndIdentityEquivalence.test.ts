@@ -24,10 +24,6 @@ import { extractDocumentIdentity } from '../../src/validation/DocumentIdentityEx
 import { DocumentReference } from '../../src/model/DocumentReference';
 import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
 
-function valueCompare(a, b) {
-  return a.value.localeCompare(b.value);
-}
-
 describe('when comparing identities with references from domain entity referencing one as identity and another as collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
@@ -120,16 +116,12 @@ describe('when comparing identities with references from domain entity referenci
 
   it('should have classPeriod reference and identity match', () => {
     const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity.sort(valueCompare)).toEqual(
-      classPeriodIdentityExtractionResult.sort(valueCompare),
-    );
+    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 
   it('should have courseOffering reference and identity match', () => {
     const [, , courseOfferingReferenceExtractonResult] = referenceExtractionResult;
-    expect(courseOfferingReferenceExtractonResult.documentIdentity.sort(valueCompare)).toEqual(
-      courseOfferingIdentityExtractionResult.sort(valueCompare),
-    );
+    expect(courseOfferingReferenceExtractonResult.documentIdentity).toEqual(courseOfferingIdentityExtractionResult);
   });
 });
 
@@ -235,9 +227,7 @@ describe('when comparing identities with references with three levels of identit
 
   it('should have classPeriod reference and identity match', () => {
     const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity.sort(valueCompare)).toEqual(
-      classPeriodIdentityExtractionResult.sort(valueCompare),
-    );
+    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 });
 
@@ -326,8 +316,6 @@ describe('when comparing identities with references with two levels of identitie
 
   it('should have classPeriod reference and identity match', () => {
     const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity.sort(valueCompare)).toEqual(
-      classPeriodIdentityExtractionResult.sort(valueCompare),
-    );
+    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 });

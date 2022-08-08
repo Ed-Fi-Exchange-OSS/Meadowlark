@@ -143,7 +143,7 @@ describe('given a POST of an academic week referencing a school that does not ex
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]\\"}"`,
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity {\\\\\\"schoolId\\\\\\":123}\\"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
@@ -210,7 +210,7 @@ describe('given a POST of an academic week referencing a school that exists foll
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity [{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":999}]\\"}"`,
+      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity {\\\\\\"schoolId\\\\\\":999}\\"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });

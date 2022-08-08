@@ -75,12 +75,9 @@ describe('when extracting single descriptor value from domain entity', () => {
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/grade",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/grade",
+          },
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
@@ -138,12 +135,9 @@ describe('when extracting descriptor values from domain entity with the same nam
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/grade",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/grade",
+          },
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
@@ -210,12 +204,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/grade1",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/grade1",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",
@@ -223,12 +214,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
           "resourceVersion": "",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/grade2",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/grade2",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",
@@ -236,12 +224,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
           "resourceVersion": "",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/grade3",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/grade3",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",
@@ -320,12 +305,9 @@ describe('when extracting collection from domain entity subclass with naming col
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/schoolValue",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/schoolValue",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",
@@ -333,12 +315,9 @@ describe('when extracting collection from domain entity subclass with naming col
           "resourceVersion": "",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/edOrgValue",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/edOrgValue",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",
@@ -413,23 +392,17 @@ describe('when extracting collection from domain entity subclass with no naming 
     expect(result).toMatchInlineSnapshot(`
       Array [
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/schoolValue",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/schoolValue",
+          },
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "SchoolCategoryDescriptor",
         },
         Object {
-          "documentIdentity": Array [
-            Object {
-              "name": "descriptor",
-              "value": "uri://ed-fi.org/edOrgValue",
-            },
-          ],
+          "documentIdentity": Object {
+            "descriptor": "uri://ed-fi.org/edOrgValue",
+          },
           "isAssignableFrom": false,
           "isDescriptor": true,
           "projectName": "EdFi",

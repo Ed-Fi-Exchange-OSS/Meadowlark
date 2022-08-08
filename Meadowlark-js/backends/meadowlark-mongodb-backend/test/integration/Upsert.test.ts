@@ -44,7 +44,7 @@ describe('given the upsert of a new document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert1' }],
+    documentIdentity: { natural: 'upsert1' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -86,7 +86,7 @@ describe('given the upsert of an existing document twice', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert2' }],
+    documentIdentity: { natural: 'upsert2' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -132,7 +132,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert3' }],
+    documentIdentity: { natural: 'upsert3' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -166,7 +166,7 @@ describe('given an upsert of a new document that references a non-existent docum
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert4' }],
+    documentIdentity: { natural: 'upsert4' },
   };
 
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -174,7 +174,7 @@ describe('given an upsert of a new document that references a non-existent docum
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    documentIdentity: { natural: 'not a valid reference' },
     isDescriptor: false,
   };
   documentWithReferencesInfo.documentReferences = [invalidReference];
@@ -207,7 +207,7 @@ describe('given an upsert of a new document that references a non-existent docum
   it('should have inserted the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity[0].value).toBe('upsert4');
+    expect(result.documentIdentity.natural).toBe('upsert4');
   });
 });
 
@@ -221,7 +221,7 @@ describe('given an upsert of a new document that references an existing document
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert5' }],
+    documentIdentity: { natural: 'upsert5' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -238,7 +238,7 @@ describe('given an upsert of a new document that references an existing document
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert6' }],
+    documentIdentity: { natural: 'upsert6' },
     documentReferences: [validReference],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -282,7 +282,7 @@ describe('given an upsert of a new document that references an existing document
   it('should have inserted the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity[0].value).toBe('upsert6');
+    expect(result.documentIdentity.natural).toBe('upsert6');
   });
 });
 
@@ -296,7 +296,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert7' }],
+    documentIdentity: { natural: 'upsert7' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -310,7 +310,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    documentIdentity: { natural: 'not a valid reference' },
     isDescriptor: false,
   };
 
@@ -320,7 +320,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert8' }],
+    documentIdentity: { natural: 'upsert8' },
     documentReferences: [validReference, invalidReference],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -360,7 +360,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('INSERT_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
+      `"Reference validation failed: Resource School is missing identity {\\"natural\\":\\"not a valid reference\\"}"`,
     );
   });
 
@@ -383,14 +383,14 @@ describe('given an upsert of a subclass document referenced by an existing docum
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    documentIdentity: { educationOrganizationId: '123' },
     resourceName: 'EducationOrganization',
     projectName: 'Ed-Fi',
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
@@ -408,7 +408,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'week', value: 'update6' }],
+    documentIdentity: { week: 'update6' },
     documentReferences: [referenceAsSuperclass],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(
@@ -475,7 +475,7 @@ describe('given an update of a document that references a non-existent document 
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert4' }],
+    documentIdentity: { natural: 'upsert4' },
   };
 
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -483,7 +483,7 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    documentIdentity: { natural: 'not a valid reference' },
     isDescriptor: false,
   };
 
@@ -528,7 +528,7 @@ describe('given an update of a document that references a non-existent document 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity[0].value).toBe('upsert4');
+    expect(result.documentIdentity.natural).toBe('upsert4');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
         "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
@@ -547,7 +547,7 @@ describe('given an update of a document that references an existing document wit
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert5' }],
+    documentIdentity: { natural: 'upsert5' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -564,7 +564,7 @@ describe('given an update of a document that references an existing document wit
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert6' }],
+    documentIdentity: { natural: 'upsert6' },
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
@@ -620,7 +620,7 @@ describe('given an update of a document that references an existing document wit
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity[0].value).toBe('upsert6');
+    expect(result.documentIdentity.natural).toBe('upsert6');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
         "xQa2iY3pvOaXWs_--xdlZjOYgjJXvD9_wbI6EQ",
@@ -639,7 +639,7 @@ describe('given an update of a document with one existing and one non-existent r
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert7' }],
+    documentIdentity: { natural: 'upsert7' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -653,7 +653,7 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: [{ name: 'natural', value: 'not a valid reference' }],
+    documentIdentity: { natural: 'not a valid reference' },
     isDescriptor: false,
   };
 
@@ -663,7 +663,7 @@ describe('given an update of a document with one existing and one non-existent r
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'upsert8' }],
+    documentIdentity: { natural: 'upsert8' },
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
@@ -715,7 +715,7 @@ describe('given an update of a document with one existing and one non-existent r
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity [{\\"name\\":\\"natural\\",\\"value\\":\\"not a valid reference\\"}]"`,
+      `"Reference validation failed: Resource School is missing identity {\\"natural\\":\\"not a valid reference\\"}"`,
     );
   });
 
@@ -738,14 +738,14 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    documentIdentity: { educationOrganizationId: '123' },
     resourceName: 'EducationOrganization',
     projectName: 'Ed-Fi',
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
@@ -763,7 +763,7 @@ describe('given an update of a subclass document referenced by an existing docum
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'week', value: 'update6' }],
+    documentIdentity: { week: 'update6' },
   };
   const documentWithReferencesId = documentIdForDocumentInfo(
     documentWithReferenceResourceInfo,

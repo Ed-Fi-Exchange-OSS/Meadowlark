@@ -47,7 +47,7 @@ const schoolResourceInfo: ResourceInfo = {
 
 const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [{ name: 'schoolId', value: '123' }],
+  documentIdentity: { schoolId: '123' },
 };
 const schoolDocumentId = documentIdForDocumentInfo(schoolResourceInfo, schoolDocumentInfo);
 
@@ -64,10 +64,11 @@ const academicWeekResourceInfo: ResourceInfo = {
 };
 const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [
-    { name: 'schoolId', value: '123' },
-    { name: 'weekIdentifier', value: '1' },
-  ],
+  documentIdentity: {
+    schoolId: '123',
+    weekIdentifier: '1',
+  },
+
   documentReferences: [referenceToSchool],
 };
 const academicWeekDocumentId = documentIdForDocumentInfo(academicWeekResourceInfo, academicWeekDocumentInfo);
@@ -170,8 +171,6 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   it('should have still have the School document in the db - a success', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: schoolDocumentId });
-    expect(result.documentIdentity).toHaveLength(1);
-    expect(result.documentIdentity[0].name).toBe('schoolId');
-    expect(result.documentIdentity[0].value).toBe('123');
+    expect(result.documentIdentity.schoolId).toBe('123');
   });
 });

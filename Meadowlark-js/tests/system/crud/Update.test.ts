@@ -192,7 +192,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
 
   it('should return failure due to missing descriptor', async () => {
     expect(updateResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource InternetAccessDescriptor is missing identity [{\\\\\\"name\\\\\\":\\\\\\"descriptor\\\\\\",\\\\\\"value\\\\\\":\\\\\\"invalid\\\\\\"}]\\"}"`,
+      `"{\\"message\\":\\"Reference validation failed: Resource InternetAccessDescriptor is missing identity {\\\\\\"descriptor\\\\\\":\\\\\\"invalid\\\\\\"}\\"}"`,
     );
     expect(updateResult.statusCode).toBe(400);
   });

@@ -52,7 +52,7 @@ describe('given the get of a non-existent document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'get1' }],
+    documentIdentity: { natural: 'get1' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -89,7 +89,7 @@ describe('given the get of an existing document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'get2' }],
+    documentIdentity: { natural: 'get2' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 

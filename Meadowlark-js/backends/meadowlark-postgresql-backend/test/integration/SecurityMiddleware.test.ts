@@ -99,7 +99,7 @@ describe('given the getById of a document owned by the requestor', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'get2' }],
+    documentIdentity: { natural: 'get2' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -156,7 +156,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'get2' }],
+    documentIdentity: { natural: 'get2' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 

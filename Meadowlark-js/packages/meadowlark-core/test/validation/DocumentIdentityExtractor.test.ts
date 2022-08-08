@@ -88,28 +88,13 @@ describe('when extracting natural key from domain entity referencing another ref
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "name": "classPeriodReference.classPeriodName",
-          "value": "z",
-        },
-        Object {
-          "name": "classPeriodReference.schoolId",
-          "value": "23",
-        },
-        Object {
-          "name": "courseOfferingReference.localCourseCode",
-          "value": "abc",
-        },
-        Object {
-          "name": "courseOfferingReference.schoolId",
-          "value": "23",
-        },
-        Object {
-          "name": "sectionIdentifier",
-          "value": "Bob",
-        },
-      ]
+      Object {
+        "classPeriodReference.classPeriodName": "z",
+        "classPeriodReference.schoolId": "23",
+        "courseOfferingReference.localCourseCode": "abc",
+        "courseOfferingReference.schoolId": "23",
+        "sectionIdentifier": "Bob",
+      }
     `);
   });
 });
@@ -160,16 +145,10 @@ describe('when extracting natural key from domain entity with school year in ide
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "name": "schoolYearTypeReference.schoolYear",
-          "value": 2022,
-        },
-        Object {
-          "name": "sessionName",
-          "value": "s",
-        },
-      ]
+      Object {
+        "schoolYearTypeReference.schoolYear": 2022,
+        "sessionName": "s",
+      }
     `);
   });
 });

@@ -66,7 +66,7 @@ describe('given the delete of a non-existent document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete1' }],
+    documentIdentity: { natural: 'delete1' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -97,7 +97,7 @@ describe('given the delete of an existing document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete2' }],
+    documentIdentity: { natural: 'delete2' },
   };
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
@@ -138,7 +138,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete5' }],
+    documentIdentity: { natural: 'delete5' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -155,7 +155,7 @@ describe('given an delete of a document referenced by an existing document with 
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete6' }],
+    documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -190,7 +190,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   it('should still have the referenced document in the db', async () => {
     const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
-    expect(docResult.rows[0].document_identity[0].value).toBe('delete5');
+    expect(docResult.rows[0].document_identity.natural).toBe('delete5');
   });
 });
 
@@ -204,7 +204,7 @@ describe('given an delete of a document referenced by an existing document with 
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete5' }],
+    documentIdentity: { natural: 'delete5' },
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
 
@@ -221,7 +221,7 @@ describe('given an delete of a document referenced by an existing document with 
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'natural', value: 'delete6' }],
+    documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
@@ -277,14 +277,14 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: [{ name: 'educationOrganizationId', value: '123' }],
+    documentIdentity: { educationOrganizationId: '123' },
     resourceName: 'EducationOrganization',
     projectName: 'Ed-Fi',
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'schoolId', value: '123' }],
+    documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
   const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
@@ -302,7 +302,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ name: 'week', value: 'delete6' }],
+    documentIdentity: { week: 'delete6' },
     documentReferences: [referenceAsSuperclass],
   };
   const documentWithReferencesId = documentIdForDocumentInfo(
@@ -342,7 +342,6 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   it('should still have the referenced document in the db', async () => {
     const result: any = await client.query(documentByIdSql(referencedDocumentId));
-    expect(result.rows[0].document_identity[0].name).toBe('schoolId');
-    expect(result.rows[0].document_identity[0].value).toBe('123');
+    expect(result.rows[0].document_identity.schoolId).toBe('123');
   });
 });

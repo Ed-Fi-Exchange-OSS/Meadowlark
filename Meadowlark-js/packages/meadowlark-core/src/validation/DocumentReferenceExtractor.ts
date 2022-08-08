@@ -16,7 +16,27 @@ import {
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { DocumentReference } from '../model/DocumentReference';
 import { DocumentIdentity } from '../model/DocumentIdentity';
-import { DocumentElement } from '../model/DocumentElement';
+
+/**
+ * A DocumentElement is a name/value pair taken from an Ed-Fi document that expresses part of
+ * the document identity.
+ *
+ * For example in a Student document, studentUniqueId is a part of a Student
+ * document's identity. { "studentUniqueId": "1" } in a specific Student document body
+ * represents that part of the identity (in relational database terms, it would be part
+ *  of the "natural key").
+ */
+type DocumentElement = {
+  /**
+   * A document path name and value pair.
+   */
+  name: string;
+
+  /**
+   * The value taken from the document body.
+   */
+  value: string;
+};
 
 // document paths shaped as an array for ramdajs 'path' function
 // return value is arrays of document paths, grouped (with arrays) by path endings to line up with name array
@@ -122,6 +142,16 @@ function documentPathsFromReferenceComponents(referenceComponents: ReferenceComp
 }
 
 /**
+ * Collapses an array of DocumentElement objects into a single DocumentIdentity.
+ */
+function documentIdentityFrom(documentElements: DocumentElement[]): DocumentIdentity {
+  return documentElements.reduce((accumulator: DocumentIdentity, current: DocumentElement) => {
+    accumulator[current.name] = current.value;
+    return accumulator;
+  }, {});
+}
+
+/**
  * Takes a ReferenceGroup representing a reference on a MetaEd entity, along with
  * an API JSON document matching that entity, and returns a document identity
  * for each reference.
@@ -160,11 +190,20 @@ function documentIdentitiesFromReferenceGroup(
 
   if (orderedAndGroupedByEnding.length === 0) return [];
 
-  const documentIdentities: DocumentIdentity[] = multiZip(...orderedAndGroupedByEnding);
-  // example result for documentIdentities after multiZip():
+  const documentIdentitiesAsElements: DocumentElement[][] = multiZip(...orderedAndGroupedByEnding);
+  // example result for documentIdentitiesAsElements after multiZip():
   // [
   //   [{name: 'classPeriodName', value: 'z1'}, {name: 'schoolId', value: '24'}, {name: 'studentId', value: '333'}],
   //   [{name: 'classPeriodName', value: 'z2'}, {name: 'schoolId', value: '25'}, {name: 'studentId', value: '444'}],
+  // ]
+
+  const documentIdentities: DocumentIdentity[] = documentIdentitiesAsElements.map((documentElements: DocumentElement[]) =>
+    documentIdentityFrom(documentElements),
+  );
+  // example result for documentIdentities after map() using documentIdentityFrom():
+  // [
+  //   { classPeriodName: 'z1', schoolId: '24', studentId: '333'},
+  //   { classPeriodName: 'z2', schoolId: '25', studentId: '444'},
   // ]
 
   return documentIdentities;

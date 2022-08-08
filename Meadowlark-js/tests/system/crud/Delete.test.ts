@@ -117,9 +117,11 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   });
 
   it('should return delete failure due to a reference to the school', async () => {
-    expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource AcademicWeek with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolReference.schoolId\\\\\\",\\\\\\"value\\\\\\":123},{\\\\\\"name\\\\\\":\\\\\\"weekIdentifier\\\\\\",\\\\\\"value\\\\\\":\\\\\\"1st\\\\\\"}]'\\"}"`,
+    expect(deleteResult.body).toMatch(
+      'Delete failed due to existing references to document: Resource AcademicWeek with identity',
     );
+    expect(deleteResult.body).toMatch('\\"schoolReference.schoolId\\":123');
+    expect(deleteResult.body).toMatch('\\"weekIdentifier\\":\\"1st');
     expect(deleteResult.statusCode).toBe(409);
   });
 
@@ -150,7 +152,7 @@ describe('given the DELETE of a descriptor referenced by a school on an UPSERT',
 
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]'\\"}"`,
+      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '{\\\\\\"schoolId\\\\\\":123}'\\"}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });
@@ -188,7 +190,7 @@ describe('given the DELETE of a descriptor referenced by a school after an UPDAT
 
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '[{\\\\\\"name\\\\\\":\\\\\\"schoolId\\\\\\",\\\\\\"value\\\\\\":123}]'\\"}"`,
+      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '{\\\\\\"schoolId\\\\\\":123}'\\"}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });

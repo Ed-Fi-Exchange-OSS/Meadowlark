@@ -40,7 +40,7 @@ function singleIdentityFrom(property: EntityProperty, body: object, documentPath
     `Identity element value for ${property.metaEdName} not found in ${JSON.stringify(body)} at ${documentPathAsString}`,
   );
 
-  return [{ name: documentPathAsString, value: elementValue }];
+  return { [documentPathAsString]: elementValue };
 }
 
 /**
@@ -81,6 +81,16 @@ function documentIdentitiesFrom(
 }
 
 /**
+ * Collapses an array of DocumentIdentity objects into a single DocumentIdentity.
+ */
+function documentIdentityFrom(documentIdentities: DocumentIdentity[]): DocumentIdentity {
+  return documentIdentities.reduce(
+    (accumulator: DocumentIdentity, current: DocumentIdentity) => ({ ...accumulator, ...current }),
+    {},
+  );
+}
+
+/**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and
  * extracts the document identity information from the JSON body. Also extracts security information, if any.
  */
@@ -98,12 +108,7 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
   );
 
   // Combine the individual document identities from the top level components into a single one
-  const result: DocumentIdentity = documentIdentities.flat();
-
-  // Ensure proper ordering of identity fields, by name value ascending
-  result.sort((a, b) => a.name.localeCompare(b.name));
-
-  return result;
+  return documentIdentityFrom(documentIdentities);
 }
 
 /**
@@ -127,17 +132,16 @@ export function deriveSuperclassInfoFrom(entity: TopLevelEntity, documentIdentit
   const subclassName = decapitalize(identityRename.metaEdName);
   const superclassName = decapitalize(identityRename.baseKeyName);
 
-  const elementToSubstitute: number = documentIdentity.findIndex((element) => element.name === subclassName);
-  if (elementToSubstitute === -1) {
+  if (documentIdentity[subclassName] == null) {
     return { resourceName: superclass.metaEdName, documentIdentity, projectName: superclass.namespace.projectName };
   }
 
-  // copy both DocumentIdentity and the individual DocumentElement so original is not mutated
-  const superclassIdentity: DocumentIdentity = [...documentIdentity];
-  superclassIdentity[elementToSubstitute] = {
-    ...documentIdentity[elementToSubstitute],
-    name: superclassName,
-  };
+  // copy the DocumentIdentity so the original is not affected
+  const superclassIdentity: DocumentIdentity = { ...documentIdentity };
+
+  // Replace subclassName with superclassName
+  delete superclassIdentity[subclassName];
+  superclassIdentity[superclassName] = documentIdentity[subclassName];
 
   return {
     resourceName: superclass.metaEdName,

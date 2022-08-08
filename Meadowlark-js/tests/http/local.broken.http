@@ -45,25 +45,6 @@ content-type: application/json
 }
 
 #
-## Parents
-#
-
-###
-GET http://localhost:3000/local/v3.3b/ed-fi/parents
-authorization: bearer {{authToken1}}
-
-###
-POST http://localhost:3000/local/v3.3b/ed-fi/sexDescriptors
-authorization: bearer {{authToken1}}
-content-type: application/json
-
-{
-  "codeValue": "Male",
-  "shortDescription": "Male",
-  "namespace": "uri://ed-fi.org/SexDescriptor"
-}
-
-#
 ## PostSecondaryInstitutions
 #
 

@@ -11,12 +11,9 @@ import { DocumentInfo, newDocumentInfo } from './DocumentInfo';
  * Creates a new DocumentIdentity from the given DescriptorDocument
  */
 export function descriptorDocumentIdentityFrom(descriptorDocument: DescriptorDocument): DocumentIdentity {
-  return [
-    {
-      name: 'descriptor',
-      value: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
-    },
-  ];
+  return {
+    descriptor: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
+  };
 }
 
 /**
