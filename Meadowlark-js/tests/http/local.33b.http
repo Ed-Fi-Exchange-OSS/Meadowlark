@@ -273,7 +273,6 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a Session
-### This will fail until RND-314 is resolved
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -309,7 +308,20 @@ authorization: bearer {{authToken1}}
     "identificationCodes": []
 }
 
+### Create a school year
+POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
+content-type: application/json
+reference-validation: true
+authorization: bearer {{authToken1}}
+
+{
+  "schoolYear": 2034,
+  "currentSchoolYear": false
+}
+
+
 ### Create a courseOffering
+### This is now failing, unknown reason. RND-338.
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
 reference-validation: true
