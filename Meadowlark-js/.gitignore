@@ -10,9 +10,6 @@ dist/
 docs/
 yarn-error.log
 
-# Serverless directories
-.serverless/
-
 # AWS emulator directories
 .dynamodb/
 dynamodb_local_data/
