@@ -55,12 +55,16 @@ export function checkForReferencesByDocumentId(documentId: string[]): string {
  * @param documentId The document being referenced
  * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
  */
-export function referencedByDocumentSql(documentId: string): string {
+export function referencedByDocumentSql(documentIds: string[]): string {
+  // return format(
+  //   `SELECT document_id, resource_name, document_identity FROM meadowlark.documents
+  //   JOIN meadowlark.references on meadowlark.documents.document_id = meadowlark.references.parent_document_id
+  //   WHERE referenced_document_id = %L LIMIT 5;`,
+  //   [documentId],
+  // );
   return format(
-    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents
-    JOIN meadowlark.references on meadowlark.documents.document_id = meadowlark.references.parent_document_id
-    WHERE referenced_document_id = %L LIMIT 5;`,
-    [documentId],
+    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L)`,
+    documentIds,
   );
 }
 

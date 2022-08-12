@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { deleteIt, FrontendResponse, upsert, get, SystemTestClient, update } from '@edfi/meadowlark-core';
+import { deleteIt, FrontendResponse, upsert, get, SystemTestClient, update, FrontendRequest } from '@edfi/meadowlark-core';
 import {
   backendToTest,
   schoolDeleteClient1,
@@ -14,6 +14,8 @@ import {
   schoolCategoryDescriptorBody,
   schoolBodyWithDescriptorReference,
   schoolCategoryDelete,
+  newFrontendRequestTemplate,
+  CLIENT1_HEADERS,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -197,5 +199,46 @@ describe('given the DELETE of a descriptor referenced by a school after an UPDAT
 
   it('should return still found from get', async () => {
     expect(getResult.statusCode).toBe(200);
+  });
+});
+
+describe('given the DELETE of a school referenced by a course', () => {
+  let client: SystemTestClient;
+  let deleteResult: FrontendResponse;
+
+  const courseThatReferencesSchool: FrontendRequest = {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/courses',
+    headers: CLIENT1_HEADERS,
+    body: `{
+      "educationOrganizationReference": {
+          "educationOrganizationId": 123
+      },
+      "courseCode": "1234",
+      "courseTitle": "A Course",
+      "numberOfParts": 1,
+      "identificationCodes": []
+  }`,
+  };
+
+  beforeAll(async () => {
+    client = await backendToTest.systemTestSetup();
+
+    await upsert(schoolBodyClient1());
+    await upsert(courseThatReferencesSchool);
+
+    // Act
+    deleteResult = await deleteIt(schoolDeleteClient1());
+  });
+
+  afterAll(async () => {
+    await backendToTest.systemTestTeardown(client);
+  });
+
+  it('should return delete failure due to a reference to the school', async () => {
+    expect(deleteResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource Course with identity '{\\\\\\"courseCode\\\\\\":\\\\\\"1234\\\\\\",\\\\\\"educationOrganizationReference.educationOrganizationId\\\\\\":123}'\\"}"`,
+    );
+    expect(deleteResult.statusCode).toBe(409);
   });
 });
