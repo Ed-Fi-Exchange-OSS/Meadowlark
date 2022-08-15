@@ -9,6 +9,7 @@ interface JwtBody extends nJwtBody {
   iss?: string;
   aud?: string;
   sub?: string;
+  client_id?: string;
   iat?: number;
   exp?: number;
   roles?: string[];

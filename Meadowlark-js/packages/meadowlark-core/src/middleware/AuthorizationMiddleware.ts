@@ -30,7 +30,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
   frontendRequest.middleware.security = {
     authorizationStrategy: jwtStatus.authorizationStrategy as AuthorizationStrategy,
-    clientId: jwtStatus.subject ?? 'UNKNOWN',
+    clientId: jwtStatus.clientId ?? 'UNKNOWN',
   };
   return { frontendRequest, frontendResponse: null };
 }

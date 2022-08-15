@@ -11,7 +11,7 @@ export type AuthorizationStrategy = 'OWNERSHIP_BASED' | 'FULL_ACCESS' | 'UNDEFIN
 export type Security = {
   // Security via document ownership
   authorizationStrategy: AuthorizationStrategy;
-  // Client Id string pulled from JWT subject
+  // Client Id string pulled from JWT client_id
   clientId: string;
 };
 
