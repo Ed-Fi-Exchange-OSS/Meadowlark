@@ -203,13 +203,14 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools
 {{auth_header}}
 
 ### 
+# @name school250
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
 reference-validation: true
 
 {
-    "schoolId": 122,
+    "schoolId": 250,
     "nameOfInstitution": "A School",
     "educationOrganizationCategories" : [
         {
@@ -232,7 +233,7 @@ reference-validation: true
 
 {
     "educationOrganizationReference": {
-        "educationOrganizationId": 122
+        "educationOrganizationId": 250
     },
     "courseCode": "1234",
     "courseTitle": "A Course",
@@ -262,11 +263,15 @@ reference-validation: true
         "studentUniqueId": "abc"
     },
     "educationOrganizationReference": {
-        "educationOrganizationId": 122
+        "educationOrganizationId": 250
     },
     "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
 }
 
+### Attempt to delete the school, this should fail with a Status Code of 409 due existing references
+@school250Documentlocation = {{school250.response.headers.location}}
+DELETE http://localhost:3000{{school250Documentlocation}}
+{{auth_header}}
 
 
 ### 

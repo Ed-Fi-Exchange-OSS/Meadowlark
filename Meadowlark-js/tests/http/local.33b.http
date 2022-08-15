@@ -321,7 +321,7 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
-### This is now failing, unknown reason. RND-338.
+### This is now failing on MongoDB. RND-338.
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
 reference-validation: true
@@ -464,12 +464,12 @@ authorization: bearer {{authToken1}}
 }
 
 ######## GET by ID
-GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/gypI96NaEU6Aat_Eg14MTK8rXKo7JGIyDzeIHQ
+GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/LCEK0AxHRDUHK-5LVBlQKIarJHE83o1dVNgKWA
 authorization: bearer {{authToken1}}
 
 
 ###### GET Query
-GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations?interventionReference.interventionIdentificationCode=111
+GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations?interventionIdentificationCode=111
 authorization: bearer {{authToken1}}
 
 
@@ -628,9 +628,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/students/?limit=1&offset=2&totalCoun
 authorization: bearer {{authToken1}}
 
 
-### A simple DELETE validation test
-# Try deleting a descriptor that is used by a school
-# !!! Currently this will succeed (which is not good) AND crash the application. RND-296
+###
 DELETE http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
 authorization: bearer {{authToken1}}
 
@@ -639,12 +637,12 @@ GET http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4Pgrh
 authorization: bearer {{authToken1}}
 
 
-### Try to delete school 123. Should be denied (409) because there are references to it
+### Try to delete school 123. Should be denied (409) because there are references to it. Solved in RND-327.
 DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
 authorization: bearer {{authToken1}}
 
 
-### Issue covered by RND-297
+### Create a parent. Solved in RND-298.
 POST http://localhost:3000/local/v3.3b/ed-fi/parents
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -654,7 +652,7 @@ content-type: application/json
   "firstName": "Arthur",
   "lastSurname": "Woods",
   "personalTitlePrefix": "Mr",
-  "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Male",
+  "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female",
   "electronicMails": [],
   "internationalAddresses": [],
   "languages": [],
@@ -680,7 +678,7 @@ content-type: application/json
 }
 
 
-### Issue covered by RND-298
+### Create a community organization. Solved in RND-298.
 POST http://localhost:3000/local/v3.3b/ed-fi/communityOrganizations
 authorization: bearer {{authToken1}}
 content-type: application/json
