@@ -46,7 +46,7 @@ describe('when querying for students', () => {
     authorizationStrategy: AuthorizationStrategy,
     queryStringParameters: any,
     paginationParameters: PaginationParameters,
-    clientName = 'hi',
+    clientId = 'hi',
   ): QueryRequest => ({
     resourceInfo: {
       projectName: 'ed-fi',
@@ -56,7 +56,7 @@ describe('when querying for students', () => {
     },
     queryStringParameters,
     paginationParameters,
-    security: { authorizationStrategy, clientName },
+    security: { authorizationStrategy, clientId },
     traceId: 'tracer',
   });
 

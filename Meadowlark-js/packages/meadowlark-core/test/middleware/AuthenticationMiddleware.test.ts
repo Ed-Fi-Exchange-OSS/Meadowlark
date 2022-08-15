@@ -96,7 +96,7 @@ describe('given a valid response from authorize', () => {
 
   it('adds security to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.security.authorizationStrategy).toBe('OWNERSHIP_BASED');
-    expect(resultChain.frontendRequest.middleware.security.clientName).toBe(subject);
+    expect(resultChain.frontendRequest.middleware.security.clientId).toBe(subject);
   });
 
   it('does not create a response', () => {

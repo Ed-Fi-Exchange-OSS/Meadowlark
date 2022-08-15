@@ -52,7 +52,7 @@ export async function updateDocumentById(
         id,
         edfiDoc,
         validate,
-        security.clientName,
+        security.clientId,
       );
 
       writeLockReferencedDocuments(mongoCollection, document.outRefs, session);

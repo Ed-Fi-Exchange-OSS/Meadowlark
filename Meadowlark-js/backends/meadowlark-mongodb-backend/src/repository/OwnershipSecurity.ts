@@ -50,12 +50,12 @@ export async function rejectByOwnershipSecurity(
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
-    const { clientName } = frontendRequest.middleware.security;
-    if (result.createdBy === clientName) {
-      Logger.debug(`${functionName} - access approved: id ${id}, clientName ${clientName}`, frontendRequest.traceId);
+    const { clientId } = frontendRequest.middleware.security;
+    if (result.createdBy === clientId) {
+      Logger.debug(`${functionName} - access approved: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }
-    Logger.debug(`${functionName} - access denied: id ${id}, clientName ${clientName}`, frontendRequest.traceId);
+    Logger.debug(`${functionName} - access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
     return 'ACCESS_DENIED';
   } catch (e) {
     return 'UNKNOWN_FAILURE';
