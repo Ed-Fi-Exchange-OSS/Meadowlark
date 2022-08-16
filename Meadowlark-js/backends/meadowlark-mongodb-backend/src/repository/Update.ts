@@ -55,7 +55,7 @@ export async function updateDocumentById(
         security.clientName,
       );
 
-      writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
+      await writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
 
       // Perform the document update
       Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);

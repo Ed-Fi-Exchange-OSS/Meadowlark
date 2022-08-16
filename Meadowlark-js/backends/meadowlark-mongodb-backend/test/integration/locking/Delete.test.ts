@@ -112,7 +112,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // ***** Read-for-write lock the validated referenced documents in the insert
     // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outRefs, upsertSession);
+    await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outRefs, upsertSession);
 
     // ----
     // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School

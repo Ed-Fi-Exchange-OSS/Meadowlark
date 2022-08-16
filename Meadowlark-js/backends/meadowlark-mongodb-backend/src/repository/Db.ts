@@ -82,12 +82,12 @@ export function getCollection(client: MongoClient): Collection<MeadowlarkDocumen
  * a concurrent delete operation removing a to-be referenced document in the middle of the transaction.
  * See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
  */
-export function writeLockReferencedDocuments(
+export async function writeLockReferencedDocuments(
   mongoCollection: Collection<MeadowlarkDocument>,
   referencedDocumentIds: string[],
   session: ClientSession,
-) {
-  mongoCollection.updateMany(
+): Promise<void> {
+  await mongoCollection.updateMany(
     { existenceIds: { $in: referencedDocumentIds } },
     { $set: { lock: new ObjectId() } },
     { session },
