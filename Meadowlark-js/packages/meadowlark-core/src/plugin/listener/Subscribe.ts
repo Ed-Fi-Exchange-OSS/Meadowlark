@@ -34,63 +34,63 @@ export type AfterDelete = [request: DeleteRequest, result: DeleteResult];
 export type AfterQuery = [request: QueryRequest, result: QueryResult];
 
 export const Subscribe = {
-  beforeUpsertDocument: (hook: (request: UpsertRequest) => void) => {
-    emitter.on(BEFORE_UPSERT_DOCUMENT, (request: UpsertRequest) => {
-      hook(request);
+  beforeUpsertDocument: (hook: (request: UpsertRequest) => Promise<void>) => {
+    emitter.on(BEFORE_UPSERT_DOCUMENT, async (request: UpsertRequest) => {
+      await hook(request);
     });
   },
 
-  afterUpsertDocument: (hook: (request: UpsertRequest, result: UpsertResult) => void) => {
-    emitter.on(AFTER_UPSERT_DOCUMENT, ([request, result]: AfterUpsert) => {
-      hook(request, result);
+  afterUpsertDocument: (hook: (request: UpsertRequest, result: UpsertResult) => Promise<void>) => {
+    emitter.on(AFTER_UPSERT_DOCUMENT, async ([request, result]: AfterUpsert) => {
+      await hook(request, result);
     });
   },
 
-  beforeGetDocumentById: (hook: (rrequest: GetRequest) => void) => {
-    emitter.on(BEFORE_GET_DOCUMENT_BY_ID, (request: GetRequest) => {
-      hook(request);
+  beforeGetDocumentById: (hook: (rrequest: GetRequest) => Promise<void>) => {
+    emitter.on(BEFORE_GET_DOCUMENT_BY_ID, async (request: GetRequest) => {
+      await hook(request);
     });
   },
 
-  afterGetDocumentById: (hook: (request: GetRequest, result: GetResult) => void) => {
-    emitter.on(AFTER_GET_DOCUMENT_BY_ID, ([request, result]: AfterGet) => {
-      hook(request, result);
+  afterGetDocumentById: (hook: (request: GetRequest, result: GetResult) => Promise<void>) => {
+    emitter.on(AFTER_GET_DOCUMENT_BY_ID, async ([request, result]: AfterGet) => {
+      await hook(request, result);
     });
   },
 
-  beforeUpdateDocumentById: (hook: (request: UpdateRequest) => void) => {
-    emitter.on(BEFORE_UPDATE_DOCUMENT_BY_ID, (request: UpdateRequest) => {
-      hook(request);
+  beforeUpdateDocumentById: (hook: (request: UpdateRequest) => Promise<void>) => {
+    emitter.on(BEFORE_UPDATE_DOCUMENT_BY_ID, async (request: UpdateRequest) => {
+      await hook(request);
     });
   },
 
-  afterUpdateDocumentById: (hook: (request: UpdateRequest, result: UpdateResult) => void) => {
-    emitter.on(AFTER_UPDATE_DOCUMENT_BY_ID, ([request, result]: AfterUpdate) => {
-      hook(request, result);
+  afterUpdateDocumentById: (hook: (request: UpdateRequest, result: UpdateResult) => Promise<void>) => {
+    emitter.on(AFTER_UPDATE_DOCUMENT_BY_ID, async ([request, result]: AfterUpdate) => {
+      await hook(request, result);
     });
   },
 
-  beforeDeleteDocumentById: (hook: (request: DeleteRequest) => void) => {
-    emitter.on(BEFORE_DELETE_DOCUMENT_BY_ID, (request: DeleteRequest) => {
-      hook(request);
+  beforeDeleteDocumentById: (hook: (request: DeleteRequest) => Promise<void>) => {
+    emitter.on(BEFORE_DELETE_DOCUMENT_BY_ID, async (request: DeleteRequest) => {
+      await hook(request);
     });
   },
 
-  afterDeleteDocumentById: (hook: (request: DeleteRequest, result: DeleteResult) => void) => {
-    emitter.on(AFTER_DELETE_DOCUMENT_BY_ID, ([request, result]: AfterDelete) => {
-      hook(request, result);
+  afterDeleteDocumentById: (hook: (request: DeleteRequest, result: DeleteResult) => Promise<void>) => {
+    emitter.on(AFTER_DELETE_DOCUMENT_BY_ID, async ([request, result]: AfterDelete) => {
+      await hook(request, result);
     });
   },
 
-  beforeQueryDocuments: (hook: (request: QueryRequest) => void) => {
-    emitter.on(BEFORE_QUERY_DOCUMENTS, (request: QueryRequest) => {
-      hook(request);
+  beforeQueryDocuments: (hook: (request: QueryRequest) => Promise<void>) => {
+    emitter.on(BEFORE_QUERY_DOCUMENTS, async (request: QueryRequest) => {
+      await hook(request);
     });
   },
 
-  afterQueryDocuments: (hook: (request: QueryRequest, result: QueryResult) => void) => {
-    emitter.on(AFTER_QUERY_DOCUMENTS, ([request, result]: AfterQuery) => {
-      hook(request, result);
+  afterQueryDocuments: (hook: (request: QueryRequest, result: QueryResult) => Promise<void>) => {
+    emitter.on(AFTER_QUERY_DOCUMENTS, async ([request, result]: AfterQuery) => {
+      await hook(request, result);
     });
   },
 };

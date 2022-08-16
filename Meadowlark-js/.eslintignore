@@ -2,3 +2,7 @@ coverage/
 dist/
 docs/
 node_modules/
+.eslintrc.js
+jest.ci-config.js
+jest-mongodb-config.js
+jest.config.js

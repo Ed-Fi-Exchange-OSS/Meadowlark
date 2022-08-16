@@ -35,9 +35,9 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     security: frontendRequest.middleware.security,
   };
 
-  beforeQueryDocuments(request);
+  await beforeQueryDocuments(request);
   const result: QueryResult = await getQueryHandler().queryDocuments(request);
-  afterQueryDocuments(request, result);
+  await afterQueryDocuments(request, result);
 
   const { response, documents } = result;
 

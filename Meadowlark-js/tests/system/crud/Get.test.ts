@@ -28,7 +28,7 @@ describe('given a GET of a non-existent school', () => {
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return not found', async () => {
@@ -51,7 +51,7 @@ describe('given a POST of a school by one client followed by a GET of the school
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return get as a 403 forbidden', async () => {
@@ -76,7 +76,7 @@ describe('given a POST of a descriptor by one client followed by a GET of the de
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('GET Should return successful from both clients ', async () => {

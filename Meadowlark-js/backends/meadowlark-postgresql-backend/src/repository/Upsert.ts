@@ -91,11 +91,12 @@ export async function upsertDocument(
     outRefs.push(...descriptorOutRefs);
 
     // Perform insert of references to the references table
-    outRefs.forEach(async (ref: string) => {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const ref of outRefs) {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(referencesInsertSql(id, ref));
       await client.query(existenceInsertSql(id, ref));
-    });
+    }
 
     await client.query('COMMIT');
     upsertResult.response = isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS';

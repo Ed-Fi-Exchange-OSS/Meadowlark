@@ -3,6 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+// Disable no-floating-promises because Fastify has a multi-async style and we aren't using the one eslint is flagging
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import { newFrontendRequest, LOCATION_HEADER_NAME } from '@edfi/meadowlark-core';
 import type { FrontendRequest, FrontendResponse, FrontendHeaders } from '@edfi/meadowlark-core';
 import type { FastifyReply, FastifyRequest } from 'fastify';

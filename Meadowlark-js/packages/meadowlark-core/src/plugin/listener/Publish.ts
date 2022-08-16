@@ -23,42 +23,42 @@ export const AFTER_QUERY_DOCUMENTS = Symbol('AFTER_QUERY_DOCUMENTS');
 
 export const emitter: Emittery = new Emittery();
 
-export function beforeUpsertDocument(request: UpsertRequest) {
-  emitter.emit(BEFORE_UPSERT_DOCUMENT, request);
+export async function beforeUpsertDocument(request: UpsertRequest) {
+  await emitter.emit(BEFORE_UPSERT_DOCUMENT, request);
 }
 
-export function afterUpsertDocument(request: UpsertRequest, result: UpsertResult) {
-  emitter.emit(AFTER_UPSERT_DOCUMENT, [request, result]);
+export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult) {
+  await emitter.emit(AFTER_UPSERT_DOCUMENT, [request, result]);
 }
 
-export function beforeGetDocumentById(request: GetRequest) {
-  emitter.emit(BEFORE_GET_DOCUMENT_BY_ID, request);
+export async function beforeGetDocumentById(request: GetRequest) {
+  await emitter.emit(BEFORE_GET_DOCUMENT_BY_ID, request);
 }
 
-export function afterGetDocumentById(request: GetRequest, result: GetResult) {
-  emitter.emit(AFTER_GET_DOCUMENT_BY_ID, [request, result]);
+export async function afterGetDocumentById(request: GetRequest, result: GetResult) {
+  await emitter.emit(AFTER_GET_DOCUMENT_BY_ID, [request, result]);
 }
 
-export function beforeUpdateDocumentById(request: UpdateRequest) {
-  emitter.emit(BEFORE_UPDATE_DOCUMENT_BY_ID, request);
+export async function beforeUpdateDocumentById(request: UpdateRequest) {
+  await emitter.emit(BEFORE_UPDATE_DOCUMENT_BY_ID, request);
 }
 
-export function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult) {
-  emitter.emit(AFTER_UPDATE_DOCUMENT_BY_ID, [request, result]);
+export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult) {
+  await emitter.emit(AFTER_UPDATE_DOCUMENT_BY_ID, [request, result]);
 }
 
-export function beforeDeleteDocumentById(request: DeleteRequest) {
-  emitter.emit(BEFORE_DELETE_DOCUMENT_BY_ID, request);
+export async function beforeDeleteDocumentById(request: DeleteRequest) {
+  await emitter.emit(BEFORE_DELETE_DOCUMENT_BY_ID, request);
 }
 
-export function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult) {
-  emitter.emit(AFTER_DELETE_DOCUMENT_BY_ID, [request, result]);
+export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult) {
+  await emitter.emit(AFTER_DELETE_DOCUMENT_BY_ID, [request, result]);
 }
 
-export function beforeQueryDocuments(request: QueryRequest) {
-  emitter.emit(BEFORE_QUERY_DOCUMENTS, request);
+export async function beforeQueryDocuments(request: QueryRequest) {
+  await emitter.emit(BEFORE_QUERY_DOCUMENTS, request);
 }
 
-export function afterQueryDocuments(request: QueryRequest, result: QueryResult) {
-  emitter.emit(AFTER_QUERY_DOCUMENTS, [request, result]);
+export async function afterQueryDocuments(request: QueryRequest, result: QueryResult) {
+  await emitter.emit(AFTER_QUERY_DOCUMENTS, [request, result]);
 }

@@ -21,14 +21,14 @@ export async function queryDocuments(request: QueryRequest): Promise<QueryResult
   return QueryOpensearch.queryDocuments(request, await getSharedClient());
 }
 
-export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult) {
+export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult): Promise<void> {
   return UpdateOpensearch.afterDeleteDocumentById(request, result, await getSharedClient());
 }
 
-export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult) {
+export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult): Promise<void> {
   return UpdateOpensearch.afterUpsertDocument(request, result, await getSharedClient());
 }
 
-export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult) {
+export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult): Promise<void> {
   return UpdateOpensearch.afterUpdateDocumentById(request, result, await getSharedClient());
 }

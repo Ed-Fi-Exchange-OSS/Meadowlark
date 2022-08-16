@@ -28,7 +28,7 @@ describe('given a POST of a school', () => {
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return insert success', async () => {
@@ -67,7 +67,7 @@ describe('given a POST of a school with an empty body', () => {
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return insert failure', async () => {
@@ -104,7 +104,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {
@@ -138,7 +138,7 @@ describe('given a POST of an academic week referencing a school that does not ex
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -163,7 +163,7 @@ describe('given a POST of an academic week referencing a school that exists', ()
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return success', async () => {
@@ -205,7 +205,7 @@ describe('given a POST of an academic week referencing a school that exists foll
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -230,7 +230,7 @@ describe('given a POST of a school by one client followed by a second POST of th
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {
