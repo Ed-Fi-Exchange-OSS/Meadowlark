@@ -16,27 +16,27 @@ import { DocumentStorePlugin } from './DocumentStorePlugin';
 import { MiddlewareModel } from '../../middleware/MiddlewareModel';
 
 export const NoDocumentStorePlugin: DocumentStorePlugin = {
-  upsertDocument: ({ traceId }: UpsertRequest): Promise<UpsertResult> => {
+  upsertDocument: async ({ traceId }: UpsertRequest): Promise<UpsertResult> => {
     Logger.warn('NoDocumentStorePlugin.upsertDocument(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 
-  getDocumentById: ({ traceId }: GetRequest): Promise<GetResult> => {
+  getDocumentById: async ({ traceId }: GetRequest): Promise<GetResult> => {
     Logger.warn('NoDocumentStorePlugin.getDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE', document: {} });
   },
 
-  updateDocumentById: ({ traceId }: UpdateRequest): Promise<UpdateResult> => {
+  updateDocumentById: async ({ traceId }: UpdateRequest): Promise<UpdateResult> => {
     Logger.warn('NoDocumentStorePlugin.updateDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 
-  deleteDocumentById: ({ traceId }: DeleteRequest): Promise<DeleteResult> => {
+  deleteDocumentById: async ({ traceId }: DeleteRequest): Promise<DeleteResult> => {
     Logger.warn('NoDocumentStorePlugin.deleteDocumentById(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 
-  securityMiddleware: (middlewareModel: MiddlewareModel): Promise<MiddlewareModel> => {
+  securityMiddleware: async (middlewareModel: MiddlewareModel): Promise<MiddlewareModel> => {
     Logger.warn(
       'NoDocumentStorePlugin.securityMiddleware(): No backend plugin has been configured',
       middlewareModel.frontendRequest.traceId,

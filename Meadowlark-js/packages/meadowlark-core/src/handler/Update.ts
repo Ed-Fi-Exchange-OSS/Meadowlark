@@ -46,9 +46,9 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       traceId: frontendRequest.traceId,
     };
 
-    beforeUpdateDocumentById(request);
+    await beforeUpdateDocumentById(request);
     const result: UpdateResult = await getDocumentStore().updateDocumentById(request);
-    afterUpdateDocumentById(request, result);
+    await afterUpdateDocumentById(request, result);
 
     const { response, failureMessage } = result;
 

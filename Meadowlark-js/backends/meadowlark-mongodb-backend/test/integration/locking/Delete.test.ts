@@ -148,7 +148,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // ----
     // End transaction to insert the AcademicWeek document
     // ----
-    upsertSession.commitTransaction();
+    await upsertSession.commitTransaction();
 
     // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
     try {
@@ -160,7 +160,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // ----
     // End transaction to delete the School document
     // ----
-    deleteSession.abortTransaction();
+    await deleteSession.abortTransaction();
   });
 
   afterAll(async () => {

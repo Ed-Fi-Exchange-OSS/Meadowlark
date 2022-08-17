@@ -32,7 +32,7 @@ describe('given persistence is going to fail', () => {
   beforeAll(async () => {
     mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
       ...NoDocumentStorePlugin,
-      queryDocuments: () =>
+      queryDocuments: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
           documents: [],
@@ -65,7 +65,7 @@ describe('given successful query result', () => {
   beforeAll(async () => {
     mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
       ...NoDocumentStorePlugin,
-      queryDocuments: () =>
+      queryDocuments: async () =>
         Promise.resolve({
           response: 'QUERY_SUCCESS',
           documents: [goodResult],

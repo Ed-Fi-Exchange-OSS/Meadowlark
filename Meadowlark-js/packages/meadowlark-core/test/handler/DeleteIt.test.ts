@@ -58,7 +58,7 @@ describe('given delete has unknown failure', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      deleteDocumentById: () =>
+      deleteDocumentById: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
           failureMessage: expectedError,
@@ -89,7 +89,7 @@ describe('given id does not exist', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      deleteDocumentById: () =>
+      deleteDocumentById: async () =>
         Promise.resolve({
           response: 'DELETE_FAILURE_NOT_EXISTS',
         }),
@@ -120,7 +120,7 @@ describe('given the document to be deleted is referenced by other documents ', (
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      deleteDocumentById: () =>
+      deleteDocumentById: async () =>
         Promise.resolve({
           response: 'DELETE_FAILURE_REFERENCE',
           failureMessage: expectedError,
@@ -151,7 +151,7 @@ describe('given a valid request', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      deleteDocumentById: () =>
+      deleteDocumentById: async () =>
         Promise.resolve({
           response: 'DELETE_SUCCESS',
         }),

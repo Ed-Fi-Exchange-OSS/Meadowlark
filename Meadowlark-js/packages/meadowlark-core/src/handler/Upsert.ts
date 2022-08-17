@@ -45,9 +45,9 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       traceId: frontendRequest.traceId,
     };
 
-    beforeUpsertDocument(request);
+    await beforeUpsertDocument(request);
     const result: UpsertResult = await getDocumentStore().upsertDocument(request);
-    afterUpsertDocument(request, result);
+    await afterUpsertDocument(request, result);
 
     const { response, failureMessage } = result;
 

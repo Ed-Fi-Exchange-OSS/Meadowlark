@@ -29,7 +29,7 @@ export const backendToTest: SystemTestablePlugin = {
     return backend.systemTestSetup();
   },
   systemTestTeardown: async (client: SystemTestClient): Promise<void> => {
-    backend.systemTestTeardown(client);
+    await backend.systemTestTeardown(client);
   },
 };
 

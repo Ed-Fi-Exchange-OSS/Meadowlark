@@ -40,7 +40,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return put success', async () => {
@@ -78,7 +78,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return put failure', async () => {
@@ -114,7 +114,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return put failure', async () => {
@@ -151,7 +151,7 @@ describe('given a POST of a school by one client followed by a PUT of the school
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return put as a 403 forbidden', async () => {
@@ -187,7 +187,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing descriptor', async () => {
