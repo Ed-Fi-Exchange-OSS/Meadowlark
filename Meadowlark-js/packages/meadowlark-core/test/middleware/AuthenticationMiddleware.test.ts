@@ -71,10 +71,10 @@ describe('given an error response from authorize', () => {
 
 describe('given a valid response from authorize', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  const subject = 'Subject';
+  const clientId = 'ClientId';
   const roles = ['vendor'];
   const authorizationStrategy = 'OWNERSHIP_BASED';
-  const jwtStatus: JwtStatus = { ...newJwtStatus(), subject, roles, authorizationStrategy };
+  const jwtStatus: JwtStatus = { ...newJwtStatus(), clientId, roles, authorizationStrategy };
   let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
 
@@ -96,7 +96,7 @@ describe('given a valid response from authorize', () => {
 
   it('adds security to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.security.authorizationStrategy).toBe('OWNERSHIP_BASED');
-    expect(resultChain.frontendRequest.middleware.security.clientName).toBe(subject);
+    expect(resultChain.frontendRequest.middleware.security.clientId).toBe(clientId);
   });
 
   it('does not create a response', () => {

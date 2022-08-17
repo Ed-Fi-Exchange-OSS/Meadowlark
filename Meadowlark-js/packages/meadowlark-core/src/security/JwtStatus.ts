@@ -15,6 +15,7 @@ export interface JwtStatus {
   issuer: string;
   audience: string;
   subject: string | null;
+  clientId: string | null;
   issuedAt: number;
   expiresAt: number;
   roles: string[];
@@ -29,6 +30,7 @@ export function newJwtStatus() {
     issuer: '',
     audience: '',
     subject: null,
+    clientId: null,
     issuedAt: 0,
     expiresAt: 0,
     roles: [],

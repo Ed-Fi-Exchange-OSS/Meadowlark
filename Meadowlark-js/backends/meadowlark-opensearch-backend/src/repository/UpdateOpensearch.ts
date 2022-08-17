@@ -58,7 +58,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
         id: opensearchRequest.id,
         info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
-        createdBy: request.security.clientName,
+        createdBy: request.security.clientId,
       },
       refresh: true,
     });

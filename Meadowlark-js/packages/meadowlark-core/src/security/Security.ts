@@ -11,14 +11,14 @@ export type AuthorizationStrategy = 'OWNERSHIP_BASED' | 'FULL_ACCESS' | 'UNDEFIN
 export type Security = {
   // Security via document ownership
   authorizationStrategy: AuthorizationStrategy;
-  // Client name string pulled from JWT subject
-  clientName: string;
+  // Client Id string pulled from JWT client_id
+  clientId: string;
 };
 
 export function newSecurity(): Security {
   return {
     authorizationStrategy: 'UNDEFINED',
-    clientName: 'UNKNOWN',
+    clientId: 'UNKNOWN',
   };
 }
 

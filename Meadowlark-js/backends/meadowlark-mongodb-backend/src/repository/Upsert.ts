@@ -55,7 +55,7 @@ export async function upsertDocument(
         id,
         edfiDoc,
         validate,
-        security.clientName,
+        security.clientId,
       );
 
       await writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
