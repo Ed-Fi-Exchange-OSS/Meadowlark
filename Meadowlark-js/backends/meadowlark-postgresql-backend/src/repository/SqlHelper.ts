@@ -11,8 +11,11 @@ import format from 'pg-format';
  * @param documentId the document to check for existence
  * @returns SQL query to check for existence ids
  */
-export function existenceIdsForDocument(documentId: string): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, documentId);
+export function existenceIdsForDocument(documentId: string, forUpdate: boolean): string {
+  return format(
+    `SELECT existence_id FROM meadowlark.existence WHERE document_id = %L ${forUpdate ? ' FOR UPDATE' : ''}`,
+    documentId,
+  );
 }
 
 /**
@@ -56,12 +59,6 @@ export function checkForReferencesByDocumentId(documentId: string[]): string {
  * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
  */
 export function referencedByDocumentSql(documentIds: string[]): string {
-  // return format(
-  //   `SELECT document_id, resource_name, document_identity FROM meadowlark.documents
-  //   JOIN meadowlark.references on meadowlark.documents.document_id = meadowlark.references.parent_document_id
-  //   WHERE referenced_document_id = %L LIMIT 5;`,
-  //   [documentId],
-  // );
   return format(
     `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L)`,
     documentIds,
