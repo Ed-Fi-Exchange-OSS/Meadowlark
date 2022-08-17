@@ -60,7 +60,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
     subject: jwt.body?.sub ?? null,
-    clientId: jwt.body.client_id ?? null,
+    clientId: jwt.body?.client_id ?? null,
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
     roles: jwt.body?.roles ?? [],
