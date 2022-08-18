@@ -14,7 +14,7 @@ import {
 
 export interface MeadowlarkDocumentId {
   /**
-   * A string hash derived from the project name, resource name, resource version
+   * A string hash derived from the project name, resource name
    * and identity of the API document. This field replaces the built-in MongoDB _id.
    */
   _id: string;

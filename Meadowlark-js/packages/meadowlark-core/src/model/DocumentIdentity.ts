@@ -4,8 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { createHash } from 'node:crypto';
-import type { Hash } from 'node:crypto';
+import crypto from 'node:crypto';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
@@ -32,27 +31,38 @@ function toBase64Url(base64: string): string {
 }
 
 /**
- * Returns a SHA-224 hash for the given document identity for use as a document id.
+ * Hashes a string with the SHAKE256, returning a Base64 hash with the specified length given in bytes
+ */
+function toHash(data: string, lengthInBytes: number): string {
+  return crypto.createHash('shake256', { outputLength: lengthInBytes }).update(data).digest('base64');
+}
+
+/**
+ * Returns a 224-bit document id for the given document identity, as a concatenation of two Base64Url hashes.
+ *
+ * The first 96 bits (12 bytes) are a SHAKE256 hash of the resource info.
+ * The remaining 128 bits (16 bytes) are a SHAKE256 hash of the document identity.
+ *
+ * The resulting Base64Url string is 38 characters long. The first 16 characters are the resource info hash and
+ * the remaining 22 characters are the identity hash.
  */
 export function documentIdForDocumentIdentity(
   { projectName, resourceName, isDescriptor }: BaseResourceInfo,
   documentIdentity: DocumentIdentity,
 ): string {
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
-
-  const stringifiedIdentity: string = `${projectName}#${normalizedResourceName}#${Object.keys(documentIdentity)
+  const resourceInfoString = `${projectName}#${normalizedResourceName}`;
+  const documentIdentityString: string = Object.keys(documentIdentity)
     .sort()
     .map((key) => `${key}=${documentIdentity[key]}`)
-    .join('#')}`;
+    .join('#');
 
-  const shaObj: Hash = createHash('sha3-224');
-  shaObj.update(stringifiedIdentity);
-  return toBase64Url(shaObj.digest('base64'));
+  return toBase64Url(`${toHash(resourceInfoString, 12)}${toHash(documentIdentityString, 16)}`);
 }
 
 /**
- * Document Ids are 38 character base64url strings. No whitespace, plus or slash allowed
- * Example valid id: t4JWTsagjhY4Ea-oIcXCeS7oqbNX9iWfPx6e-g
+ * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
+ * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
  */
 export function isDocumentIdValid(documentId: string): boolean {
   return /^[^\s/+]{38}$/g.test(documentId);

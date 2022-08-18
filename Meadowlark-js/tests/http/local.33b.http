@@ -638,7 +638,7 @@ authorization: bearer {{authToken1}}
 
 
 ### Try to delete school 123. Should be denied (409) because there are references to it. Solved in RND-327.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ
+DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ
 authorization: bearer {{authToken1}}
 
 

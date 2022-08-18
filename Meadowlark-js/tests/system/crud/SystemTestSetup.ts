@@ -88,7 +88,7 @@ export function schoolGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ',
+    path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
 }
 
@@ -96,7 +96,7 @@ export function schoolGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
-    path: '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ',
+    path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
 }
 
@@ -138,7 +138,7 @@ export function descriptorGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/iAJs9ozLKVAzev_3uNkiENZZfPU_PoI3qwet9Q',
+    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
 }
 
@@ -146,7 +146,7 @@ export function descriptorGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
-    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/iAJs9ozLKVAzev_3uNkiENZZfPU_PoI3qwet9Q',
+    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
 }
 
@@ -187,6 +187,6 @@ export function schoolCategoryDelete(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/schoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ',
+    path: '/v3.3b/ed-fi/schoolCategoryDescriptors/2ch5Vfdy8AARhPR3h-69z6l1y2mrsIEa1wvxIQ',
   };
 }

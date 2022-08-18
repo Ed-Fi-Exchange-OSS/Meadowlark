@@ -457,7 +457,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+        "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
   });
@@ -531,7 +531,7 @@ describe('given an update of a document that references a non-existent document 
     expect(result.documentIdentity.natural).toBe('upsert4');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
+        "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
     `);
   });
@@ -623,7 +623,7 @@ describe('given an update of a document that references an existing document wit
     expect(result.documentIdentity.natural).toBe('upsert6');
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "xQa2iY3pvOaXWs_--xdlZjOYgjJXvD9_wbI6EQ",
+        "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
       ]
     `);
   });
@@ -824,7 +824,7 @@ describe('given an update of a subclass document referenced by an existing docum
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outRefs).toMatchInlineSnapshot(`
       Array [
-        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+        "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
   });
