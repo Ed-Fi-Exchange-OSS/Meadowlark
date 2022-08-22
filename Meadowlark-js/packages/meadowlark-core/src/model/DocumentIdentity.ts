@@ -40,7 +40,7 @@ function toHash(data: string, lengthInBytes: number): string {
 /**
  * Returns the 12 byte SHAKE256 hash form of a ResourceInfo.
  */
-function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }: BaseResourceInfo) {
+export function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }: BaseResourceInfo) {
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
   const resourceInfoString = `${projectName}#${normalizedResourceName}`;
   return toHash(resourceInfoString, 12);
@@ -68,19 +68,4 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
  */
 export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
   return toBase64Url(`${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`);
-}
-
-/**
- * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
- * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
- */
-export function isDocumentIdWellFormed(documentId: string): boolean {
-  return /^[^\s/+]{38}$/g.test(documentId);
-}
-
-/**
- * Returns true if resource info hash matches resource info portion of document id
- */
-export function isDocumentIdValidForResource(documentId: string, resourceInfo: BaseResourceInfo): boolean {
-  return documentId.startsWith(resourceInfoHashFrom(resourceInfo));
 }

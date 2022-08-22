@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isDocumentIdValidForResource } from '../model/DocumentIdentity';
+import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'ValidateResourceIdMiddleware';
