@@ -150,10 +150,11 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     );
 
     const insertResult = await insertClient.query(documentUpsertSql);
-    outRefs.forEach(async (ref: string) => {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const ref of outRefs) {
       await insertClient.query(referencesInsertSql(academicWeekDocumentId, ref));
       await insertClient.query(existenceInsertSql(academicWeekDocumentId, ref));
-    });
+    }
 
     // **** The insert of AcademicWeek document should have been successful
     expect(insertResult.rowCount).toEqual(1);
