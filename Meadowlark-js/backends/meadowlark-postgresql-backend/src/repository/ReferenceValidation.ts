@@ -53,6 +53,7 @@ export function findMissingReferences(
  * @param documentReferences References for the document
  * @param descriptorReferences Descriptor references for the document
  * @param outRefs The list of ids for the document references
+ * @param client The PostgreSQL client used for querying the database
  * @param traceId The trace id from a service call
  * @returns A array of validation failure message, if any
  */

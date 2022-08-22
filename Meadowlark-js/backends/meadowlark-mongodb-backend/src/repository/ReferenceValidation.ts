@@ -70,7 +70,6 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
  *
  * @param documentReferences References for the document
  * @param descriptorReferences Descriptor references for the document
- * @param outRefIds The list of ids for the document references
  * @param mongoDocuments The MongoDb collection the documents are in
  * @param session A MongoDb session with a transaction in progress
  * @param traceId The trace id from a service call

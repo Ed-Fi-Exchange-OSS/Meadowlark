@@ -25,7 +25,7 @@ export async function deleteDocumentById(
 
     if (validate) {
       // Check for any references to the document to be deleted (including itself)
-      const existenceIdResult = await client.query(existenceIdsForDocument(id, false));
+      const existenceIdResult = await client.query(existenceIdsForDocument(id));
       // If the record doesn't exist, exit
       if (existenceIdResult?.rowCount === 0) {
         await client.query('ROLLBACK');
