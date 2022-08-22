@@ -91,7 +91,7 @@ describe('given the getById of a document owned by the requestor', () => {
   let result: MiddlewareModel;
 
   const authorizationStrategy = 'OWNERSHIP_BASED';
-  const clientName = 'ThisClient';
+  const clientId = 'ThisClient';
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -109,7 +109,7 @@ describe('given the getById of a document owned by the requestor', () => {
     documentInfo,
     edfiDoc: {},
     validate: false,
-    security: { authorizationStrategy, clientName } as Security,
+    security: { authorizationStrategy, clientId } as Security,
     traceId: 'traceId',
   };
 
@@ -119,7 +119,7 @@ describe('given the getById of a document owned by the requestor', () => {
     middleware: {
       ...newFrontendRequestMiddleware(),
       pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientName },
+      security: { authorizationStrategy, clientId },
     },
   };
 
@@ -166,7 +166,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     documentInfo,
     edfiDoc: {},
     validate: false,
-    security: { authorizationStrategy, clientName: 'DocumentOwner' } as Security,
+    security: { authorizationStrategy, clientId: 'DocumentOwner' } as Security,
     traceId: 'traceId',
   };
 
@@ -176,7 +176,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     middleware: {
       ...newFrontendRequestMiddleware(),
       pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientName: 'NotTheDocumentOwner' },
+      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
     },
   };
 

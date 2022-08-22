@@ -29,7 +29,7 @@ export const backendToTest: SystemTestablePlugin = {
     return backend.systemTestSetup();
   },
   systemTestTeardown: async (client: SystemTestClient): Promise<void> => {
-    backend.systemTestTeardown(client);
+    await backend.systemTestTeardown(client);
   },
 };
 
@@ -37,12 +37,12 @@ export const backendToTest: SystemTestablePlugin = {
 
 export const CLIENT1_HEADERS = {
   Authorization:
-    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJqdGkiOiIyNGMyMDIyMC1mMjg1LTRlNjMtYThmNC1iMmRkYzM5MzAwMDQiLCJpYXQiOjE2NTg1MjM0MDgsImV4cCI6MjY1ODUyNzAwOH0.S2C44HoFMr5ZYSUkbZoAV2pz7Z1Xi40yynH17GOBVoY',
+    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJjbGllbnRfaWQiOiJjM1Z3WlhJdFozSmxZWFF0VTBsVCIsImp0aSI6IjI0YzIwMjIwLWYyODUtNGU2My1hOGY0LWIyZGRjMzkzMDAwNCIsImlhdCI6MTY1ODUyMzQwOCwiZXhwIjoyNjU4NTI3MDA4fQ.0Nxd34sGJwkNj4FN8s0iBulZppkCHsQ1lT9JVQTNcxM',
 };
 
 export const CLIENT2_HEADERS = {
   Authorization:
-    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwianRpIjoiMGQwZWZmYTctYWExZi00N2E3LTk4NzktNDdhOGJkOWMzMWJiIiwiaWF0IjoxNjM2NTYyMDc5LCJleHAiOjM4NDU1NDg4ODEsInJvbGVzIjpbInZlbmRvciJdfQ.1nTCwqHcUmuUwNBF8Z2NTHqTg8HPN0mWUQ10TqOCEi0',
+    'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwiY2xpZW50X2lkIjoiYzIxaGJHd3RkRzkzYmkxemFYTT0iLCJqdGkiOiIwZDBlZmZhNy1hYTFmLTQ3YTctOTg3OS00N2E4YmQ5YzMxYmIiLCJpYXQiOjE2MzY1NjIwNzksImV4cCI6Mzg0NTU0ODg4MSwicm9sZXMiOlsidmVuZG9yIl19.kh1qtfWMrAHhIyJ7y2rsL103n7iGyWKavhrY7_FTL2w',
 };
 
 export const JSON_HEADER = {
@@ -88,7 +88,7 @@ export function schoolGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ',
+    path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
 }
 
@@ -96,7 +96,7 @@ export function schoolGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
-    path: '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ',
+    path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
 }
 
@@ -138,7 +138,7 @@ export function descriptorGetClient1(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/iAJs9ozLKVAzev_3uNkiENZZfPU_PoI3qwet9Q',
+    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
 }
 
@@ -146,7 +146,7 @@ export function descriptorGetClient2(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
-    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/iAJs9ozLKVAzev_3uNkiENZZfPU_PoI3qwet9Q',
+    path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
 }
 
@@ -187,6 +187,6 @@ export function schoolCategoryDelete(): FrontendRequest {
   return {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
-    path: '/v3.3b/ed-fi/schoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ',
+    path: '/v3.3b/ed-fi/schoolCategoryDescriptors/2ch5Vfdy8AARhPR3h-69z6l1y2mrsIEa1wvxIQ',
   };
 }

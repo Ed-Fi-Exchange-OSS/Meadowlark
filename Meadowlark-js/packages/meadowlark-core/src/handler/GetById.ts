@@ -30,9 +30,9 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     traceId: frontendRequest.traceId,
   };
 
-  beforeGetDocumentById(request);
+  await beforeGetDocumentById(request);
   const result: GetResult = await getDocumentStore().getDocumentById(request);
-  afterGetDocumentById(request, result);
+  await afterGetDocumentById(request, result);
 
   const { response, document } = result;
 

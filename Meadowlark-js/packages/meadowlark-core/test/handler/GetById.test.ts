@@ -56,7 +56,7 @@ describe('given database lookup has unknown failure', () => {
     request.middleware.headerMetadata = metaEdHeaders;
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      getDocumentById: () =>
+      getDocumentById: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
           document: {},
@@ -91,7 +91,7 @@ describe('given id does not exist', () => {
     request.middleware.headerMetadata = metaEdHeaders;
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      getDocumentById: () =>
+      getDocumentById: async () =>
         Promise.resolve({
           response: 'GET_FAILURE_NOT_EXISTS',
           document: {},
@@ -127,7 +127,7 @@ describe('given a valid request', () => {
     request.middleware.headerMetadata = metaEdHeaders;
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      getDocumentById: () =>
+      getDocumentById: async () =>
         Promise.resolve({
           response: 'GET_SUCCESS',
           document,

@@ -88,19 +88,19 @@ export async function postToken(frontendRequest: FrontendRequest): Promise<Front
 
     if (clientId === client1.key && clientSecret === client1.secret) {
       return {
-        body: createTokenResponse(createToken(client1.vendor, client1.role)),
+        body: createTokenResponse(createToken(client1.key, client1.vendor, client1.role)),
         statusCode: 200,
       };
     }
     if (clientId === client2.key && clientSecret === client2.secret) {
       return {
-        body: createTokenResponse(createToken(client2.vendor, client1.role)),
+        body: createTokenResponse(createToken(client2.key, client2.vendor, client1.role)),
         statusCode: 200,
       };
     }
     if (clientId === client3.key && clientSecret === client3.secret) {
       return {
-        body: createTokenResponse(createToken(client3.vendor, client3.role)),
+        body: createTokenResponse(createToken(client3.key, client3.vendor, client3.role)),
         statusCode: 200,
       };
     }

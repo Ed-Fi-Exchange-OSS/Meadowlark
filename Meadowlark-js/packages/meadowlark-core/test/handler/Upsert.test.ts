@@ -34,7 +34,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      upsertDocument: () =>
+      upsertDocument: async () =>
         Promise.resolve({
           response: 'INSERT_FAILURE_REFERENCE',
           failureMessage: expectedError,
@@ -65,7 +65,7 @@ describe('given persistence is going to throw a reference error on update though
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      upsertDocument: () =>
+      upsertDocument: async () =>
         Promise.resolve({
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: 'Reference failure',
@@ -97,7 +97,7 @@ describe('given persistence is going to fail', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      upsertDocument: () =>
+      upsertDocument: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
           failureMessage: expectedError,
@@ -128,7 +128,7 @@ describe('given persistence succeeds as insert', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      upsertDocument: () =>
+      upsertDocument: async () =>
         Promise.resolve({
           response: 'INSERT_SUCCESS',
           failureMessage: null,
@@ -152,7 +152,7 @@ describe('given persistence succeeds as insert', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg`;
+    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
     expect(response.headers).toEqual({ Location: location });
   });
 });
@@ -164,7 +164,7 @@ describe('given persistence succeeds as update', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      upsertDocument: () =>
+      upsertDocument: async () =>
         Promise.resolve({
           response: 'UPDATE_SUCCESS',
           failureMessage: null,
@@ -188,7 +188,7 @@ describe('given persistence succeeds as update', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg`;
+    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
     expect(response.headers).toEqual({ Location: location });
   });
 });

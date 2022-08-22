@@ -68,12 +68,12 @@ grant_type=client_credentials
 
 ### An expired token
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6ImY0Njk2MmI0LTM4ODUtNGNiYi1hOGI5LTJmOTU2OThjZDNlNSIsImlhdCI6MTY1NTI0NDkxNywiZXhwIjoxNzE4NDAxfQ.vuh5OSYZnZ30d0EmTLcesKSFnB7U_g2N0JS9sVvDzcI
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImNsaWVudF9pZCI6ImMzVndaWEl0WjNKbFlYUXRVMGxUIiwianRpIjoiZjQ2OTYyYjQtMzg4NS00Y2JiLWE4YjktMmY5NTY5OGNkM2U1IiwiaWF0IjoxNjU1MjQ0OTE3LCJleHAiOjE3MTg0MDF9.iuIAVDeszM_f-yzqylY65zim87WJtau-0HQUj30x66U
 
 
 ### A token that will last until 2091
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJqdGkiOiI4MjVkNDRiOC1hODExLTRjZmYtYmVmOC1jYzhhNjYxNjliZTAiLCJpYXQiOjE2NTg1MjQyMzUsImV4cCI6MzgxOTUyNzgzNX0.rwgDguAxPgJDLRiADLEK9dN-9n8ZJdxU3SpTbJDQRV8
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJjbGllbnRfaWQiOiJjM1Z3WlhJdFozSmxZWFF0VTBsVCIsImp0aSI6IjgyNWQ0NGI4LWE4MTEtNGNmZi1iZWY4LWNjOGE2NjE2OWJlMCIsImlhdCI6MTY1ODUyNDIzNSwiZXhwIjozODE5NTI3ODM1fQ.C8i49lPIDaa_JE_PIUXi9P1szbyn7k08IZPRZyzzPoI
 
 ### Vendor 1 token
 @authToken1 = {{client1.response.body.$.access_token}}
@@ -101,11 +101,11 @@ Authorization: bearer
 
 ### Host Token - Should return FULL_ACCESS auth
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoic3VwZXItZ3JlYXQtU0lTIiwianRpIjoiODI1ZDQ0YjgtYTgxMS00Y2ZmLWJlZjgtY2M4YTY2MTY5YmUwIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.8JV9V_-YhxfXz05k9XblkLcxFRMl-FmN_gKiME69QHM
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoic3VwZXItZ3JlYXQtU0lTIiwiY2xpZW50X2lkIjoiYzNWd1pYSXRaM0psWVhRdFUwbFQiLCJqdGkiOiI4MjVkNDRiOC1hODExLTRjZmYtYmVmOC1jYzhhNjYxNjliZTAiLCJpYXQiOjE2NTg1MjQyMzUsImV4cCI6MjY1ODUyNzgzNX0.fW21zPCqz6uVDBWAiBWmRrUBDGn1ZMCVlyMr7y2Cju8
 
 ### Missing roles should return invalid_token - Roles are missing or roles are invalid on token
 GET http://localhost:3000/local/verify
-Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjgyNWQ0NGI4LWE4MTEtNGNmZi1iZWY4LWNjOGE2NjE2OWJlMCIsImlhdCI6MTY1ODUyNDIzNSwiZXhwIjoyNjU4NTI3ODM1fQ.iWGgKL7Mg-Vl1ZvKTLaykZ9g5UqgcEYmAJgIVTOZCgk
+Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjgyNWQ0NGI4LWE4MTEtNGNmZi1iZWY4LWNjOGE2NjE2OWJlMCIsImNsaWVudF9pZCI6ImMzVndaWEl0WjNKbFlYUXRVMGxUIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.nj2ajxWjv0Vfqrx9200xVOds_hiOMPXcf6I0dYTkw_M
 
 #
 # POST (Requires ACCESS_TOKEN_REQUIRED=true environment variable)
@@ -152,19 +152,19 @@ Authorization: bearer {{authToken1}}
 #
 
 ### Vendor 1 GET of Student owned by Vendor 1
-GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 GET of Student owned by Vendor 2 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken1}}
 
 ### Vendor 2 GET of Student owned by Vendor 2
-GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken2}}
 
 ### Vendor 2 GET of Student owned by Vendor 1 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken2}}
 
 #
@@ -172,7 +172,7 @@ Authorization: bearer {{authToken2}}
 #
 
 ### Vendor 2 PUT for Student owned by Vendor 2
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 content-type: application/json
 Authorization: bearer {{authToken2}}
 
@@ -184,7 +184,7 @@ Authorization: bearer {{authToken2}}
 }
 
 ### Vendor 1 attempts to PUT on top of Vendor 2 Student - should fail - expect 404
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 content-type: application/json
 Authorization: bearer {{authToken1}}
 
@@ -200,9 +200,9 @@ Authorization: bearer {{authToken1}}
 #
 
 ### Vendor 1 DELETE of Student owned by Vendor 1
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 DELETE of Student owned by Vendor 2 - should fail - expect 404
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken1}}

@@ -103,7 +103,7 @@ describe('given a valid path with resourceId', () => {
   let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
-    frontendRequest.path = '/1/2/3/41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg';
+    frontendRequest.path = '/1/2/3/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA';
 
     // Act
     resultChain = await parsePath({ frontendRequest, frontendResponse: null });
@@ -118,7 +118,7 @@ describe('given a valid path with resourceId', () => {
       Object {
         "endpointName": "3",
         "namespace": "2",
-        "resourceId": "41AiptSy4zB1LVa5K7YmGOQl9VvB4wX3Odiobg",
+        "resourceId": "aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA",
         "version": "1",
       }
     `);

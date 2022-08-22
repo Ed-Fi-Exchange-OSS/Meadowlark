@@ -177,7 +177,7 @@ describe('given the DELETE of a descriptor referenced by a school after an UPDAT
 
     // Original school inserted, add id so it can be updated
     const schoolToUpdate = schoolBodyWithDescriptorReference();
-    schoolToUpdate.path = '/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ';
+    schoolToUpdate.path = '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ';
 
     await update(schoolToUpdate);
 

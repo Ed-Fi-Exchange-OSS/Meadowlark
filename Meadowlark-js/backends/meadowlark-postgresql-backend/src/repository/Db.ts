@@ -74,7 +74,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     if (e.message !== `database "${dbConfiguration.database}" does not exist`) {
       throw e;
     }
-    if (singletonDbPool != null) singletonDbPool.end();
+    if (singletonDbPool != null) await singletonDbPool.end();
   }
 
   // The meadowlark DB doesn't exist, create a separate client that connects to the postgres(default) DB to create
@@ -83,7 +83,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   dbConfiguration.database = 'postgres';
   const client: Client = new Client(dbConfiguration);
   try {
-    client.connect();
+    await client.connect();
     await client.query(createDatabaseSql(meadowlarkDbName));
 
     Logger.info(`Database ${meadowlarkDbName} created successfully`, null);

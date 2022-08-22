@@ -58,7 +58,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
         id: opensearchRequest.id,
         info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
-        createdBy: request.security.clientName,
+        createdBy: request.security.clientId,
       },
       refresh: true,
     });
@@ -74,7 +74,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
 export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult, client: Client) {
   Logger.info('UpdateOpenSearch.afterUpsertDocument', request.traceId);
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
-  upsertToOpensearch(request, client);
+  await upsertToOpensearch(request, client);
 }
 
 /**
@@ -83,5 +83,5 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: Client) {
   Logger.info('UpdateOpenSearch.afterUpdateDocumentById', request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
-  upsertToOpensearch(request, client);
+  await upsertToOpensearch(request, client);
 }

@@ -118,7 +118,7 @@ export function documentInsertOrUpdateSql(
     resourceInfo.resourceVersion,
     resourceInfo.isDescriptor,
     validate,
-    security.clientName,
+    security.clientId,
     edfiDoc,
   ];
 

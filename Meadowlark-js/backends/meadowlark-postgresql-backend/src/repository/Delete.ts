@@ -21,7 +21,7 @@ export async function deleteDocumentById(
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    client.query('BEGIN');
+    await client.query('BEGIN');
 
     if (validate) {
       // Check for any references to the document to be deleted (including itself)
@@ -73,7 +73,7 @@ export async function deleteDocumentById(
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting existence entries with id ${id}`, traceId);
     await client.query(deleteExistenceIdsByDocumentId(id));
 
-    client.query('COMMIT');
+    await client.query('COMMIT');
   } catch (e) {
     Logger.error('postgresql.repository.Delete.deleteDocumentById', traceId, e);
     await client.query('ROLLBACK');

@@ -34,9 +34,9 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       traceId: frontendRequest.traceId,
     };
 
-    beforeDeleteDocumentById(request);
+    await beforeDeleteDocumentById(request);
     const result: DeleteResult = await getDocumentStore().deleteDocumentById(request);
-    afterDeleteDocumentById(request, result);
+    await afterDeleteDocumentById(request, result);
 
     const { response, failureMessage } = result;
 

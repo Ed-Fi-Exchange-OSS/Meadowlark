@@ -28,21 +28,21 @@ describe('given a POST of a school', () => {
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return insert success', async () => {
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
-      `"/v3.3b/ed-fi/schools/L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ"`,
+      `"/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ"`,
     );
   });
 
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -67,7 +67,7 @@ describe('given a POST of a school with an empty body', () => {
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return insert failure', async () => {
@@ -104,7 +104,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {
@@ -120,7 +120,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"L9gXuk9vioIoG64QKp8NFO2f3AOe78fV-HrtfQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -138,7 +138,7 @@ describe('given a POST of an academic week referencing a school that does not ex
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -163,14 +163,14 @@ describe('given a POST of an academic week referencing a school that exists', ()
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return success', async () => {
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
-      `"/v3.3b/ed-fi/academicWeeks/t4JWTsagjhY4Ea-oIcXCeS7oqbNX9iWfPx6e-g"`,
+      `"/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g"`,
     );
   });
 });
@@ -205,7 +205,7 @@ describe('given a POST of an academic week referencing a school that exists foll
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return failure due to missing reference', async () => {
@@ -230,7 +230,7 @@ describe('given a POST of a school by one client followed by a second POST of th
   });
 
   afterAll(async () => {
-    backendToTest.systemTestTeardown(client);
+    await backendToTest.systemTestTeardown(client);
   });
 
   it('should return 1st post 201 as an insert', async () => {

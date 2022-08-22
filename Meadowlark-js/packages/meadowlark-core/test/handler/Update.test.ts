@@ -38,7 +38,7 @@ describe('given the requested document does not exist', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      updateDocumentById: () =>
+      updateDocumentById: async () =>
         Promise.resolve({
           response: 'UPDATE_FAILURE_NOT_EXISTS',
           failureMessage: 'Does not exist',
@@ -70,7 +70,7 @@ describe('given the new document has an invalid reference ', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      updateDocumentById: () =>
+      updateDocumentById: async () =>
         Promise.resolve({
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: expectedError,
@@ -101,7 +101,7 @@ describe('given the update succeeds', () => {
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      updateDocumentById: () =>
+      updateDocumentById: async () =>
         Promise.resolve({
           response: 'UPDATE_SUCCESS',
         }),
@@ -145,7 +145,7 @@ describe('given the resourceId of the update does not match the id derived from 
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
       ...NoDocumentStorePlugin,
-      updateDocumentById: () =>
+      updateDocumentById: async () =>
         Promise.resolve({
           response: 'UPDATE_SUCCESS',
         }),
