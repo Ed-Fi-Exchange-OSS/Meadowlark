@@ -8,14 +8,16 @@ import format from 'pg-format';
 
 /**
  * Function that returns a SQL query for checking whether references exist for a given list of document ids
+ * This has a secondary function of locking this row for proper updating and deleting
  * @param documentId the document to check for existence
  * @returns SQL query to check for existence ids
  */
-export function existenceIdsForDocument(documentId: string, forUpdate: boolean): string {
-  return format(
-    `SELECT existence_id FROM meadowlark.existence WHERE document_id = %L ${forUpdate ? ' FOR UPDATE' : ''}`,
-    documentId,
-  );
+export function existenceIdsForDocument(documentId: string): string {
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId); //
+}
+
+export function existenceCheckForDocument(documentId: string): string {
+  return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L`, documentId); // FOR UPDATE
 }
 
 /**
@@ -49,7 +51,10 @@ export function documentOwnershipByIdSql(documentId: string): string {
  * @returns SQL query string to retrieve references
  */
 export function checkForReferencesByDocumentId(documentId: string[]): string {
-  return format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
+  return format(
+    `SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    documentId,
+  );
 }
 
 /**

@@ -66,7 +66,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(existenceIdsForDocument(id, true));
+    const result = await client.query(existenceIdsForDocument(id));
 
     expect(result.rowCount).toBe(1);
   });
