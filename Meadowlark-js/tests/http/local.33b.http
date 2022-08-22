@@ -57,11 +57,11 @@ GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 authorization: bearer {{authToken1}}
 
 ### Get the created record (lower case)
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
 authorization: bearer {{authToken1}}
 
 ### Update the created record
-PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
+PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -74,7 +74,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Delete the created record
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/rss_5FH6lvpFOUG2AncoHucLzmQugNUejJSXHQ
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
 authorization: bearer {{authToken1}}
 
 ### 400: Strict validation is enabled, this will fail due to an invalid country
@@ -107,7 +107,7 @@ authorization: bearer {{authToken1}}
 
 
 ###
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/kKOLuEZJWjsDhpDiJOQlryLw_JBvzQ5KXTF2xg
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
 authorization: bearer {{authToken1}}
 
 ###
@@ -137,7 +137,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Update this student
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/kKOLuEZJWjsDhpDiJOQlryLw_JBvzQ5KXTF2xg
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
 content-type: application/json
 reference-validation: false
 authorization: bearer {{authToken1}}
@@ -246,6 +246,32 @@ reference-validation: true
   "optimalNumberOfSeats": 10
 }
 
+### Create school 123 without validation
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+reference-validation: false
+authorization: bearer {{authToken1}}
+
+{
+    "schoolId": 123,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
 ### Now the school _does_ exist
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
@@ -344,6 +370,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
+### This is now failing on MongoDB. RND-338.
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
 authorization: bearer {{authToken1}}

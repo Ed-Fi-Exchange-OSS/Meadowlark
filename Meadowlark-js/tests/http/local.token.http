@@ -152,19 +152,19 @@ Authorization: bearer {{authToken1}}
 #
 
 ### Vendor 1 GET of Student owned by Vendor 1
-GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 GET of Student owned by Vendor 2 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken1}}
 
 ### Vendor 2 GET of Student owned by Vendor 2
-GET http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken2}}
 
 ### Vendor 2 GET of Student owned by Vendor 1 - should fail - expect 404
-GET http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+GET http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken2}}
 
 #
@@ -172,7 +172,7 @@ Authorization: bearer {{authToken2}}
 #
 
 ### Vendor 2 PUT for Student owned by Vendor 2
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 content-type: application/json
 Authorization: bearer {{authToken2}}
 
@@ -184,7 +184,7 @@ Authorization: bearer {{authToken2}}
 }
 
 ### Vendor 1 attempts to PUT on top of Vendor 2 Student - should fail - expect 404
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 content-type: application/json
 Authorization: bearer {{authToken1}}
 
@@ -200,9 +200,9 @@ Authorization: bearer {{authToken1}}
 #
 
 ### Vendor 1 DELETE of Student owned by Vendor 1
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/utYLCfYQU8S8rId4Zhnh7ff_qVJuBVvuPsHNFw
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122-E_3xsQrCBCmNqUBDPLyfA
 Authorization: bearer {{authToken1}}
 
 ### Vendor 1 DELETE of Student owned by Vendor 2 - should fail - expect 404
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/ocMiTYZuplv3KoW3scR2KJxtJWk_RnGebuEdiQ
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122fEjh3kkivOq7W7vskq0EcQ
 Authorization: bearer {{authToken1}}

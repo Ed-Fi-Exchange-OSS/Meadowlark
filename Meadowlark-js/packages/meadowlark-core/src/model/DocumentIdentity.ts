@@ -31,14 +31,14 @@ function toBase64Url(base64: string): string {
 }
 
 /**
- * Hashes a string with the SHAKE256, returning a Base64 hash with the specified length given in bytes
+ * Hashes a string with the SHAKE256, returning a Base64Url hash with the specified length given in bytes
  */
 function toHash(data: string, lengthInBytes: number): string {
-  return crypto.createHash('shake256', { outputLength: lengthInBytes }).update(data).digest('base64');
+  return toBase64Url(crypto.createHash('shake256', { outputLength: lengthInBytes }).update(data).digest('base64'));
 }
 
 /**
- * Returns the 12 byte SHAKE256 hash form of a ResourceInfo.
+ * Returns the 12 byte SHAKE256 Base64Url encoded hash form of a ResourceInfo.
  */
 export function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }: BaseResourceInfo) {
   const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
@@ -47,7 +47,7 @@ export function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }
 }
 
 /**
- * Returns the 16 byte SHAKE256 hash form of a DocumentIdentity.
+ * Returns the 16 byte SHAKE256 Base64Url encoded hash form of a DocumentIdentity.
  */
 function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
   const documentIdentityString = Object.keys(documentIdentity)
@@ -60,12 +60,12 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
 /**
  * Returns a 224-bit document id for the given document identity, as a concatenation of two Base64Url hashes.
  *
- * The first 96 bits (12 bytes) are a SHAKE256 hash of the resource info.
- * The remaining 128 bits (16 bytes) are a SHAKE256 hash of the document identity.
+ * The first 96 bits (12 bytes) are a SHAKE256 Base64Url encoded hash of the resource info.
+ * The remaining 128 bits (16 bytes) are a SHAKE256 Base64Url encoded hash of the document identity.
  *
  * The resulting Base64Url string is 38 characters long. The first 16 characters are the resource info hash and
  * the remaining 22 characters are the identity hash.
  */
 export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
-  return toBase64Url(`${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`);
+  return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`;
 }
