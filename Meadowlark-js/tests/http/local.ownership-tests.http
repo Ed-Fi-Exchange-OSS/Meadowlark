@@ -34,18 +34,18 @@ content-type: application/json
 }
 
 ### Try getting that resource without authorization header - expect 401.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 
 ### Try getting that resource using the same authorization header that created the record - expect success.
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 {{auth_header_1}}
 
 ### Try getting that resource with a different authorization header - expect 403
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 {{auth_header_2}}
 
 ### Try updating that resource using the same authorization header that created the record - expect success.
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 content-type: application/json
 {{auth_header_1}}
 
@@ -58,7 +58,7 @@ content-type: application/json
 }
 
 ### Try updating the resource with wrong authorization header - expect 403
-PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+PUT http://localhost:3000/local/v3.3b/ed-fi/EducationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 content-type: application/json
 {{auth_header_2}}
 
@@ -84,7 +84,7 @@ content-type: application/json
 }
 
 ### Get this using the host / FULL_ACCESS authorization - expect success
-GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
+GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents/c4ak9D7jEwS-MCAYiY-urPsWWs0lJp7PH8I-5w
 {{auth_header_3}}
 
 ### Get all resources using the host host token
@@ -120,7 +120,7 @@ reference-validation: true
 }
 
 ### Delete Resource with HOST/FULL_ACCESS authorization - Expect success
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/lqojnbvIhjZVo_T-ojp81kjuAC-sjppXmgcZGA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M801224CfZEcHrCmTjyLf11mBYrw
 content-type: application/json
 reference-validation: true
 {{auth_header_3}}
@@ -145,15 +145,15 @@ GET http://localhost:3000/local/v3.3b/ed-fi/educationContents?contentIdentifier=
 
 
 ### Try deleting 1st resource using the wrong authorization header - expect 403
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 {{auth_header_2}}
 
 ### Try deleting 1st resource using the same authorization header that created the record - expect success.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/YKe0uvuOUdWgG2M086S1i1-o6lg_BmwjFVQyJA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYBzajOD421Q23lVSGomW5oQ
 {{auth_header_1}}
 
 ### Delete 2nd resource using the same authorization header that created the record - expect success.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/1vvBcOeM1WsZkfwgE-edz-dPgkHJY7uyBrEkuQ
+DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYiY-urPsWWs0lJp7PH8I-5w
 {{auth_header_2}}
 
 

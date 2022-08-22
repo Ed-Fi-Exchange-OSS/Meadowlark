@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isDocumentIdValid } from '../model/DocumentIdentity';
+import { isDocumentIdWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
 import type { MiddlewareModel } from './MiddlewareModel';
 
@@ -49,7 +49,7 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
 
   // Check for properly formed document id, if there is one
   const { resourceId } = pathComponents;
-  if (resourceId != null && !isDocumentIdValid(resourceId)) {
+  if (resourceId != null && !isDocumentIdWellFormed(resourceId)) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${resourceId}`);
     return { frontendRequest, frontendResponse: { body: '', statusCode: 404 } };
   }

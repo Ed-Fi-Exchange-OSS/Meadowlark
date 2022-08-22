@@ -447,7 +447,7 @@ describe('given an update of a document that references a non-existent document 
     expect(docResult.rows[0].document_identity.natural).toBe('upsert4');
     expect(outRefs).toMatchInlineSnapshot(`
         Array [
-          "iWC9ClbnyZUAkYO5Gsk3d9wTUaaw46YGOLW6pA",
+          "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
         ]
       `);
   });
@@ -543,7 +543,7 @@ describe('given an update of a document that references an existing document wit
     expect(docResult.rows[0].document_identity.natural).toBe('upsert6');
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
-        "xQa2iY3pvOaXWs_--xdlZjOYgjJXvD9_wbI6EQ",
+        "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
       ]
     `);
   });
@@ -749,7 +749,7 @@ describe('given an update of a subclass document referenced by an existing docum
     const outRefs = result.rows.map((row) => row.existence_id);
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
-        "1nBlOlzqpwwK81d1UZAZ70MXy_G4gWUlmMvgjw",
+        "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
   });

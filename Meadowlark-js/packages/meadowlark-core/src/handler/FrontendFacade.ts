@@ -9,6 +9,7 @@ import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
 import { resourceValidation } from '../middleware/ValidateResourceMiddleware';
+import { resourceIdValidation } from '../middleware/ValidateResourceIdMiddleware';
 import { documentValidation } from '../middleware/ValidateDocumentMiddleware';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
@@ -22,8 +23,8 @@ import { validateQueryString } from '../middleware/ValidateQueryStringMiddleware
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
-// Middleware stack builder for methods with a body in the request (POST, PUT)
-function methodWithBodyStack(): MiddlewareStack {
+// Middleware stack builder for post - body, no id
+function postStack(): MiddlewareStack {
   return R.once(
     R.pipe(
       authorize,
@@ -36,16 +37,45 @@ function methodWithBodyStack(): MiddlewareStack {
   );
 }
 
-// Middleware stack builder for deletes - no body
-function deleteStack(): MiddlewareStack {
+// Middleware stack builder put, body and id
+function putStack(): MiddlewareStack {
   return R.once(
-    R.pipe(authorize, R.andThen(parsePath), R.andThen(resourceValidation), R.andThen(getDocumentStore().securityMiddleware)),
+    R.pipe(
+      authorize,
+      R.andThen(parsePath),
+      R.andThen(parseBody),
+      R.andThen(resourceValidation),
+      R.andThen(resourceIdValidation),
+      R.andThen(documentValidation),
+      R.andThen(getDocumentStore().securityMiddleware),
+    ),
   );
 }
 
-// Middleware stack builder for GetById - parsePath gets run earlier, no body - document store security
+// Middleware stack builder for deletes - no body, has id
+function deleteStack(): MiddlewareStack {
+  return R.once(
+    R.pipe(
+      authorize,
+      R.andThen(parsePath),
+      R.andThen(resourceValidation),
+      R.andThen(resourceValidation),
+      R.andThen(resourceIdValidation),
+      R.andThen(getDocumentStore().securityMiddleware),
+    ),
+  );
+}
+
+// Middleware stack builder for GetById - parsePath gets run earlier, no body, has id - document store security
 function getByIdStack(): MiddlewareStack {
-  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(getDocumentStore().securityMiddleware)));
+  return R.once(
+    R.pipe(
+      authorize,
+      R.andThen(resourceValidation),
+      R.andThen(resourceIdValidation),
+      R.andThen(getDocumentStore().securityMiddleware),
+    ),
+  );
 }
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
@@ -124,7 +154,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     frontendRequest.action = 'updateById';
 
     await ensurePluginsLoaded();
-    const stack: MiddlewareStack = methodWithBodyStack();
+    const stack: MiddlewareStack = putStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
@@ -145,7 +175,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     frontendRequest.action = 'upsert';
 
     await ensurePluginsLoaded();
-    const stack: MiddlewareStack = methodWithBodyStack();
+    const stack: MiddlewareStack = postStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
     // if there is a response posted by the stack, we are done
