@@ -107,7 +107,7 @@ function joiTypeForScalarCommonProperty(property: CommonProperty, propertyModifi
 function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
   const schemaDefinition: { [key: string]: Joi.AnySchema } = schemaFromPropertiesOfCommon(property, propertyModifier);
 
-  const arrayOfReferences = Joi.array().items(schemaDefinition);
+  const arrayOfReferences = Joi.array().min(1).items(schemaDefinition);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
     ? arrayOfReferences.required()
     : arrayOfReferences.optional();
@@ -210,7 +210,7 @@ function joiTypeForReferenceCollection(property: EntityProperty, propertyModifie
       },
     ).required(),
   });
-  const arrayOfReferences = Joi.array().items(referenceShape);
+  const arrayOfReferences = Joi.array().min(1).items(referenceShape);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
     ? arrayOfReferences.required()
     : arrayOfReferences.optional();
@@ -225,7 +225,7 @@ function joiTypeForDescriptorCollection(property: EntityProperty, propertyModifi
   const referenceShape = Joi.object().keys({
     [prefixedName(apiMapping.descriptorCollectionName, propertyModifier)]: Joi.string().required(),
   });
-  const arrayOfReferences = Joi.array().items(referenceShape);
+  const arrayOfReferences = Joi.array().min(1).items(referenceShape);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
     ? arrayOfReferences.required()
     : arrayOfReferences.optional();
@@ -237,11 +237,13 @@ function joiTypeForDescriptorCollection(property: EntityProperty, propertyModifi
  */
 function joiArrayFor(property: EntityProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
-  return Joi.array().items(
-    Joi.object({
-      [singularize(prefixedName(apiMapping.fullName, propertyModifier))]: joiTypeFor(property, propertyModifier),
-    }),
-  );
+  return Joi.array()
+    .min(1)
+    .items(
+      Joi.object({
+        [singularize(prefixedName(apiMapping.fullName, propertyModifier))]: joiTypeFor(property, propertyModifier),
+      }),
+    );
 }
 
 /**

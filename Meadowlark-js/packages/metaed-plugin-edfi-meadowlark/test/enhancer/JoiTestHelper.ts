@@ -11,6 +11,10 @@ type SchemaProperty = {
   type: string;
 };
 
+function ensureArrayRequiresAtLeastOneElement(joiSchema: any) {
+  expect(joiSchema._singleRules.get('min').args.limit).toBe(1);
+}
+
 export function expectSubschemas(joiSchema: any, schemaProperties: SchemaProperty[]): any[] {
   const subschemas: any[] = [...joiSchema._ids._byKey.values()];
   if (subschemas.length !== schemaProperties.length)
@@ -24,6 +28,7 @@ export function expectSubschemas(joiSchema: any, schemaProperties: SchemaPropert
 }
 
 export function expectSubschemaReferenceArray(joiSchema: any, schemaProperty: SchemaProperty) {
+  ensureArrayRequiresAtLeastOneElement(joiSchema);
   const subschema: any = [...joiSchema.$_terms.items[0]._ids._byKey.values()][0];
   expect(subschema.id).toBe(schemaProperty.name);
   expect(subschema.schema._flags.presence).toBe(schemaProperty.presence);
@@ -32,6 +37,7 @@ export function expectSubschemaReferenceArray(joiSchema: any, schemaProperty: Sc
 }
 
 export function expectSubschemaScalarArray(joiSchema: any, schemaProperty: SchemaProperty) {
+  ensureArrayRequiresAtLeastOneElement(joiSchema);
   const subschema: any = [...joiSchema.$_terms.items[0]._ids._byKey.values()][0];
   expect(subschema.id).toBe(schemaProperty.name);
   expect(subschema.schema._flags.presence).toBeUndefined();
@@ -40,6 +46,7 @@ export function expectSubschemaScalarArray(joiSchema: any, schemaProperty: Schem
 }
 
 export function expectSubschemaArray(joiSchema: any, schemaProperties: SchemaProperty[]) {
+  ensureArrayRequiresAtLeastOneElement(joiSchema);
   const subschemas: any[] = [...joiSchema.$_terms.items[0]._ids._byKey.values()];
   if (subschemas.length !== schemaProperties.length)
     throw new Error(`schema length expected ${schemaProperties.length} but got ${subschemas.length}`);
