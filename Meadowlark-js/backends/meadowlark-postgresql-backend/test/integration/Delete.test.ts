@@ -194,6 +194,78 @@ describe('given an delete of a document referenced by an existing document with 
   });
 });
 
+describe('given an delete of a document with an outbound reference only, with validation on', () => {
+  let client;
+  let deleteResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'delete15' },
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'delete16' },
+    documentReferences: [validReference],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+
+    // The referencing document that will be deleted
+    await upsertDocument(
+      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      client,
+    );
+
+    deleteResult = await deleteDocumentById(
+      {
+        ...newDeleteRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return delete success', async () => {
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
+  });
+
+  it('should have deleted the document in the db', async () => {
+    const result: GetResult = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
+    expect(result.response).toBe('GET_FAILURE_NOT_EXISTS');
+  });
+});
+
 describe('given an delete of a document referenced by an existing document with validation off', () => {
   let client;
   let deleteResult;

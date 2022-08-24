@@ -11,7 +11,7 @@ const TEST_SIGNING_KEY =
 process.env.SIGNING_KEY = TEST_SIGNING_KEY;
 process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 
-if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
+if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-postgresql-backend';
 
 // eslint-disable-next-line import/no-mutable-exports
 let backend: SystemTestablePlugin;
@@ -63,9 +63,17 @@ export function schoolBodyClient1(): FrontendRequest {
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
       "schoolId": 123,
-      "gradeLevels": [],
+      "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+      ],
       "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
+      "educationOrganizationCategories": [
+        {
+          "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+      ]
     }`,
   };
 }
@@ -77,9 +85,17 @@ export function schoolBodyClient2(): FrontendRequest {
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
     body: `{
     "schoolId": 123,
-    "gradeLevels": [],
+    "gradeLevels": [
+      {
+          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+      }
+    ],
     "nameOfInstitution": "abc",
-    "educationOrganizationCategories": []
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
   }`,
   };
 }
@@ -129,7 +145,7 @@ export function descriptorBodyClient1(): FrontendRequest {
       "codeValue": "test1",
       "shortDescription": "test1",
       "description": "test1",
-      "namespace":"uri://ed-fi.org/AbsenceEventCategoryDescriptor"
+      "namespace": "uri://ed-fi.org/AbsenceEventCategoryDescriptor"
     }`,
   };
 }
@@ -159,7 +175,7 @@ export function schoolCategoryDescriptorBody(): FrontendRequest {
       "codeValue": "All Levels",
       "shortDescription": "All Levels",
       "description": "All Levels",
-      "namespace":"uri://ed-fi.org/SchoolCategoryDescriptor"
+      "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
     }`,
   };
 }
@@ -176,9 +192,17 @@ export function schoolBodyWithDescriptorReference(): FrontendRequest {
            "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
       }
     ],
-    "gradeLevels": [],
+    "gradeLevels": [
+      {
+          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+      }
+    ],
     "nameOfInstitution": "abc",
-    "educationOrganizationCategories": []
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
   }`,
   };
 }
@@ -188,5 +212,33 @@ export function schoolCategoryDelete(): FrontendRequest {
     ...newFrontendRequestTemplate(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     path: '/v3.3b/ed-fi/schoolCategoryDescriptors/2ch5Vfdy8AARhPR3h-69z6l1y2mrsIEa1wvxIQ',
+  };
+}
+
+export function gradeLevelDescriptorBody(): FrontendRequest {
+  return {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/gradeLevelDescriptors',
+    headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
+    body: `{
+      "codeValue": "First Grade",
+      "shortDescription": "First Grade",
+      "description": "First Grade",
+      "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+    }`,
+  };
+}
+
+export function educationOrganizationCategoryDescriptorBody(): FrontendRequest {
+  return {
+    ...newFrontendRequestTemplate(),
+    path: '/v3.3b/ed-fi/educationOrganizationCategoryDescriptors',
+    headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
+    body: `{
+      "codeValue": "Other",
+      "shortDescription": "Other",
+      "description": "Other",
+      "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+    }`,
   };
 }

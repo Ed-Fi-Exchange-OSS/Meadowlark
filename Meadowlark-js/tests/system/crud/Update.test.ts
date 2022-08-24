@@ -11,6 +11,8 @@ import {
   newFrontendRequestTemplate,
   schoolGetClient1,
   CLIENT2_HEADERS,
+  educationOrganizationCategoryDescriptorBody,
+  gradeLevelDescriptorBody,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -25,15 +27,25 @@ describe('given a POST of a school followed by the PUT of the school with a chan
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 123,
-      "gradeLevels": [],
+      "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+      ],
       "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
-      "educationOrganizationCategories": []
+      "educationOrganizationCategories": [
+        {
+          "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+      ]
     }`,
   };
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     // Act
     updateResult = await update(putSchoolChangeNameOfInstitution);
@@ -52,7 +64,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -72,6 +84,8 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     // Act
     updateResult = await update(putSchoolEmptyBody);
@@ -99,15 +113,25 @@ describe('given a POST of a school followed by the PUT of the school with a diff
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 789,
-      "gradeLevels": [],
+      "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+      ],
       "nameOfInstitution": "abc",
-      "educationOrganizationCategories": []
+      "educationOrganizationCategories": [
+        {
+          "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+      ]
     }`,
   };
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     // Act
     updateResult = await update(putSchoolWrongIdentity);
@@ -135,15 +159,25 @@ describe('given a POST of a school by one client followed by a PUT of the school
     headers: CLIENT2_HEADERS,
     body: `{
       "schoolId": 123,
-      "gradeLevels": [],
+      "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+      ],
       "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
-      "educationOrganizationCategories": []
+      "educationOrganizationCategories": [
+        {
+          "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+      ]
     }`,
   };
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
 
     // Act
@@ -170,9 +204,17 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
     headers: CLIENT1_HEADERS,
     body: `{
       "schoolId": 123,
-      "gradeLevels": [],
+      "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+      ],
       "nameOfInstitution": "abc",
-      "educationOrganizationCategories": [],
+      "educationOrganizationCategories": [
+        {
+          "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+      ],
       "internetAccessDescriptor": "invalid"
     }`,
   };
@@ -180,6 +222,8 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
 
     // Act

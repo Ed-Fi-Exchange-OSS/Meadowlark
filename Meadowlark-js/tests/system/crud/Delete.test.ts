@@ -16,6 +16,8 @@ import {
   schoolCategoryDelete,
   newFrontendRequestTemplate,
   CLIENT1_HEADERS,
+  gradeLevelDescriptorBody,
+  educationOrganizationCategoryDescriptorBody,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -48,6 +50,8 @@ describe('given a POST of a school by followed by a DELETE of the school', () =>
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
 
     // Act
@@ -77,6 +81,8 @@ describe('given a POST of a school by one client followed by a DELETE of the sch
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
 
     // Act
@@ -106,6 +112,8 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     await upsert(academicWeekBodyClient1());
 
@@ -140,6 +148,8 @@ describe('given the DELETE of a descriptor referenced by a school on an UPSERT',
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolCategoryDescriptorBody());
     await upsert(schoolBodyWithDescriptorReference());
 
@@ -172,6 +182,8 @@ describe('given the DELETE of a descriptor referenced by a school after an UPDAT
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolCategoryDescriptorBody());
     await upsert(schoolBodyWithDescriptorReference());
 
@@ -217,13 +229,20 @@ describe('given the DELETE of a school referenced by a course', () => {
       "courseCode": "1234",
       "courseTitle": "A Course",
       "numberOfParts": 1,
-      "identificationCodes": []
+      "identificationCodes": [
+        {
+          "courseIdentificationSystemDescriptor": "uri://ed-fi.org/CourseIdentificationSystemDescriptor#Other",
+          "identificationCode": "abc"
+        }
+      ]
   }`,
   };
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     await upsert(courseThatReferencesSchool);
 
