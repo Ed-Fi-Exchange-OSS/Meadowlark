@@ -10,6 +10,33 @@ GET http://localhost:3000/metaed
 
 #################### School
 
+### Create a GradeLevel descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/gradeLevelDescriptors
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "codeValue": "First Grade",
+    "shortDescription": "First Grade",
+    "description": "First Grade",
+    "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
+### Create an EducationOrganizationCategory descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
+{{auth_header}}
+reference-validation: true
+content-type: application/json
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "description": "Other",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+
 ### Create a School record
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 {{auth_header}}
@@ -18,11 +45,18 @@ content-type: application/json
 
 {
     "schoolId": 123,
-    "gradeLevels": [],
+    "gradeLevels": [
+      {
+          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+      }
+    ],
     "nameOfInstitution": "abc",
-    "educationOrganizationCategories": []
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
 }
-
 
 ### Get the created record
 GET http://localhost:3000/local/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ
@@ -41,9 +75,17 @@ content-type: application/json
 
 {
     "schoolId": 123,
-    "gradeLevels": [],
+    "gradeLevels": [
+      {
+          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+      }
+    ],
     "nameOfInstitution": "abc*****",
-    "educationOrganizationCategories": []
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
 }
 
 ### Delete the created record

@@ -331,7 +331,12 @@ authorization: bearer {{authToken1}}
     },
     "courseTitle": "Spanish 101",
     "numberOfParts": 1,
-    "identificationCodes": []
+    "identificationCodes": [
+      {
+        "identificationCode": "string",
+        "courseIdentificationSystemDescriptor": "string"
+      }
+    ]
 }
 
 ### Create a school year
@@ -417,6 +422,32 @@ authorization: bearer {{authToken1}}
 GET http://localhost:3000/local/v3.3b/ed-fi/BehaviorDescriptors/41e20a8e3e29596a206ab2eec7118910c7f190ada37148f007357a64
 authorization: bearer {{authToken1}}
 
+### Create an EducationOrganizationCategory descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
+authorization: bearer {{authToken1}}
+reference-validation: true
+content-type: application/json
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "description": "Other",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+### Create an LocalEducationAgencyCategory descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencyCategoryDescriptors
+authorization: bearer {{authToken1}}
+reference-validation: true
+content-type: application/json
+
+{
+    "codeValue": "Independent",
+    "shortDescription": "Independent",
+    "description": "Independent",
+    "namespace": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor"
+}
+
 
 ### 
 POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencies
@@ -427,7 +458,11 @@ authorization: bearer {{authToken1}}
     "localEducationAgencyId": 2231,
     "nameOfInstitution": "Grand Bend School District",
     "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent",
-    "categories": []
+    "categories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
 }
 
 ####
@@ -442,9 +477,26 @@ authorization: bearer {{authToken1}}
     "courseCode": "1234",
     "courseTitle": "A Course",
     "numberOfParts": 1,
-    "identificationCodes": []
+    "identificationCodes": [
+      {
+        "identificationCode": "string",
+        "courseIdentificationSystemDescriptor": "string"
+      }
+    ]
 }
 
+### Create a Sex descriptor
+POST http://localhost:3000/local/v3.3b/ed-fi/sexDescriptors
+authorization: bearer {{authToken1}}
+reference-validation: true
+content-type: application/json
+
+{
+    "codeValue": "Female",
+    "shortDescription": "Female",
+    "description": "Female",
+    "namespace": "uri://ed-fi.org/SexDescriptor"
+}
 
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentEducationOrganizationAssociations
@@ -491,7 +543,7 @@ authorization: bearer {{authToken1}}
 }
 
 ######## GET by ID
-GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/LCEK0AxHRDUHK-5LVBlQKIarJHE83o1dVNgKWA
+GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/KbK3nYKOeuNj1aASuMm2IlM3nTtcvlVfDLTSeg
 authorization: bearer {{authToken1}}
 
 
@@ -643,7 +695,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### delete the record above
-DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/gyGSt9yVSJdYUxgdOemhBBWjyIa9f1sA5uOZaA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/maSXphjSRux6PX3WbbQKovXlVJEmso06cecAZw
 authorization: bearer {{authToken1}}
 
 
@@ -726,8 +778,5 @@ content-type: application/json
         "educationOrganizationIdentificationSystemDescriptor": "uri://ed-fi.org/EducationOrganizationIdentificationSystemDescriptor#SEA",
         "identificationCode": "19"
       }
-    ],
-    "indicators": [],
-    "institutionTelephones": [],
-    "internationalAddresses": []
+    ]
 }
