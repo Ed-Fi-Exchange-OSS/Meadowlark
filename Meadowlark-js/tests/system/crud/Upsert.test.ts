@@ -12,6 +12,8 @@ import {
   schoolGetClient1,
   academicWeekBodyClient1,
   schoolBodyClient2,
+  educationOrganizationCategoryDescriptorBody,
+  gradeLevelDescriptorBody,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -22,6 +24,9 @@ describe('given a POST of a school', () => {
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
+
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
 
     // Act
     upsertResult = await upsert(schoolBodyClient1());
@@ -42,7 +47,7 @@ describe('given a POST of a school', () => {
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -89,14 +94,25 @@ describe('given a POST of a school followed by a second POST of the school with 
     headers: CLIENT1_HEADERS,
     body: `{
         "schoolId": 123,
-        "gradeLevels": [],
+        "gradeLevels": [
+          {
+              "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+          }
+        ],
         "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
-        "educationOrganizationCategories": []
+        "educationOrganizationCategories": [
+          {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+          }
+        ]
       }`,
   };
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
+
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
 
     // Act
     firstUpsertResult = await upsert(schoolBodyClient1());
@@ -120,7 +136,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[]}"`,
+      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -155,6 +171,9 @@ describe('given a POST of an academic week referencing a school that exists', ()
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
+
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
 
     await upsert(schoolBodyClient1());
 
@@ -197,6 +216,8 @@ describe('given a POST of an academic week referencing a school that exists foll
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
     await upsert(academicWeekBodyClient1());
 
@@ -223,6 +244,9 @@ describe('given a POST of a school by one client followed by a second POST of th
 
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
+
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
 
     // Act
     firstUpsertResult = await upsert(schoolBodyClient1());

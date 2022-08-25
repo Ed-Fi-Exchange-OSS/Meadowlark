@@ -109,7 +109,7 @@ function joiTypeForCommonCollection(property: CommonProperty, propertyModifier: 
 
   const arrayOfReferences = Joi.array().items(schemaDefinition);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
-    ? arrayOfReferences.required()
+    ? arrayOfReferences.required().min(1)
     : arrayOfReferences.optional();
 }
 
@@ -212,7 +212,7 @@ function joiTypeForReferenceCollection(property: EntityProperty, propertyModifie
   });
   const arrayOfReferences = Joi.array().items(referenceShape);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
-    ? arrayOfReferences.required()
+    ? arrayOfReferences.required().min(1)
     : arrayOfReferences.optional();
 }
 
@@ -227,7 +227,7 @@ function joiTypeForDescriptorCollection(property: EntityProperty, propertyModifi
   });
   const arrayOfReferences = Joi.array().items(referenceShape);
   return property.isRequiredCollection && !propertyModifier.optionalDueToParent
-    ? arrayOfReferences.required()
+    ? arrayOfReferences.required().min(1)
     : arrayOfReferences.optional();
 }
 
@@ -235,7 +235,7 @@ function joiTypeForDescriptorCollection(property: EntityProperty, propertyModifi
  * Returns a Joi schema fragment that specifies the API body element shape
  * corresponding to the given collection property.
  */
-function joiArrayFor(property: EntityProperty, propertyModifier: PropertyModifier): Joi.AnySchema {
+function joiArrayFor(property: EntityProperty, propertyModifier: PropertyModifier): Joi.ArraySchema {
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
   return Joi.array().items(
     Joi.object({
@@ -268,7 +268,7 @@ function joiTypeAndCardinalityFor(property: EntityProperty, propertyModifier: Pr
   if (apiMapping.isDescriptorCollection) return joiTypeForDescriptorCollection(property, propertyModifier);
   if (apiMapping.isCommonCollection) return joiTypeForCommonCollection(property as CommonProperty, propertyModifier);
   if (property.isRequiredCollection && !propertyModifier.optionalDueToParent)
-    return joiArrayFor(property, propertyModifier).required();
+    return joiArrayFor(property, propertyModifier).required().min(1);
   if ((property.isRequiredCollection && propertyModifier.optionalDueToParent) || property.isOptionalCollection)
     return joiArrayFor(property, propertyModifier).optional();
   if ((property.isRequired || property.isPartOfIdentity) && !propertyModifier.optionalDueToParent)

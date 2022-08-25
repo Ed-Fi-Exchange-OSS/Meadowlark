@@ -54,6 +54,17 @@ content-type: application/json
 }
 
 ###
+POST http://localhost:3000/local/v3.3b/ed-fi/GradeLevelDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "First Grade",
+    "shortDescription": "First Grade",
+    "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
+###
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
 content-type: application/json
 {{auth_header}}
@@ -96,7 +107,11 @@ reference-validation: true
              "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
         }
     ],
-    "gradeLevels": []
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
 }
 
 ### 
@@ -222,7 +237,11 @@ reference-validation: true
              "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
         }
     ],
-    "gradeLevels": []
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
 }
 
 ####
@@ -294,7 +313,11 @@ reference-validation: true
              "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
         }
     ],
-    "gradeLevels": []
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
 }
 
 
@@ -352,9 +375,21 @@ reference-validation: true
 {
     "schoolId": 124,
     "nameOfInstitution": "A School",
-    "educationOrganizationCategories" : [],
-    "schoolCategories": [],
-    "gradeLevels": []
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
 }
 
 ### Atempt to assign School to location - Should succeed

@@ -181,6 +181,78 @@ describe('given the delete of a document referenced by an existing document with
   });
 });
 
+describe('given an delete of a document with an outbound reference only, with validation on', () => {
+  let client;
+  let deleteResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'AcademicWeek',
+  };
+
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'delete15' },
+  };
+  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const documentWithReferencesResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentWithReferencesInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'delete16' },
+    documentReferences: [validReference],
+  };
+  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    // The document that will be referenced
+    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+
+    // The referencing document that will be deleted
+    await upsertDocument(
+      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      client,
+    );
+
+    deleteResult = await deleteDocumentById(
+      {
+        ...newDeleteRequest(),
+        id: documentWithReferencesId,
+        resourceInfo: documentWithReferencesResourceInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return delete success', async () => {
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
+  });
+
+  it('should have deleted the document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    expect(result).toBeNull();
+  });
+});
+
 describe('given the delete of a document referenced by an existing document with validation off', () => {
   let client;
   let deleteResult;

@@ -107,11 +107,15 @@ describe('when building simple domain entity referencing another referencing ano
       { name: 'schoolId', presence: 'required', type: 'string' },
     ]);
 
-    const classPeriodReferenceSchema = expectSubschemaReferenceArray(classPeriodSchema, {
-      name: 'classPeriodReference',
-      presence: 'required',
-      type: 'object',
-    });
+    const classPeriodReferenceSchema = expectSubschemaReferenceArray(
+      classPeriodSchema,
+      {
+        name: 'classPeriodReference',
+        presence: 'required',
+        type: 'object',
+      },
+      true,
+    );
 
     expectSubschemas(classPeriodReferenceSchema, [
       { name: 'classPeriodName', presence: 'required', type: 'string' },
@@ -156,6 +160,7 @@ describe('when building domain entity with nested choice and inline commons', ()
       .withDocumentation('doc')
       .withStringIdentity('ContentIdentifier', 'doc', '30')
       .withChoiceProperty('LearningResourceChoice', 'doc', true, false)
+      .withStringProperty('RequiredURI', 'doc', true, true, '30')
       .withEndDomainEntity()
 
       .withStartChoice('LearningResourceChoice')
@@ -199,13 +204,17 @@ describe('when building domain entity with nested choice and inline commons', ()
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     const { joiSchema } = entity.data.meadowlark as EntityMeadowlarkData;
 
-    const [, , , derivativeSourceEducationContentSchema, derivativeSourceURISchema] = expectSubschemas(joiSchema, [
-      { name: 'contentIdentifier', presence: 'required', type: 'string' },
-      { name: 'learningResourceMetadataURI', presence: 'required', type: 'string' },
-      { name: 'description', presence: 'optional', type: 'string' },
-      { name: 'derivativeSourceEducationContents', presence: 'optional', type: 'array' },
-      { name: 'derivativeSourceURIs', presence: 'optional', type: 'array' },
-    ]);
+    const [, , , derivativeSourceEducationContentSchema, derivativeSourceURISchema, requiredURISchema] = expectSubschemas(
+      joiSchema,
+      [
+        { name: 'contentIdentifier', presence: 'required', type: 'string' },
+        { name: 'learningResourceMetadataURI', presence: 'required', type: 'string' },
+        { name: 'description', presence: 'optional', type: 'string' },
+        { name: 'derivativeSourceEducationContents', presence: 'optional', type: 'array' },
+        { name: 'derivativeSourceURIs', presence: 'optional', type: 'array' },
+        { name: 'requiredURIs', presence: 'required', type: 'array' },
+      ],
+    );
 
     const derivativeSourceEducationContentReferenceSchema = expectSubschemaReferenceArray(
       derivativeSourceEducationContentSchema,
@@ -214,17 +223,32 @@ describe('when building domain entity with nested choice and inline commons', ()
         presence: 'required',
         type: 'object',
       },
+      false,
     );
 
     expectSubschemas(derivativeSourceEducationContentReferenceSchema, [
       { name: 'contentIdentifier', presence: 'optional', type: 'string' },
     ]);
 
-    expectSubschemaScalarArray(derivativeSourceURISchema, {
-      name: 'derivativeSourceURI',
-      presence: 'optional',
-      type: 'string',
-    });
+    expectSubschemaScalarArray(
+      derivativeSourceURISchema,
+      {
+        name: 'derivativeSourceURI',
+        presence: 'optional',
+        type: 'string',
+      },
+      false,
+    );
+
+    expectSubschemaScalarArray(
+      requiredURISchema,
+      {
+        name: 'requiredURI',
+        presence: 'required',
+        type: 'string',
+      },
+      true,
+    );
   });
 });
 
@@ -369,10 +393,14 @@ describe('when building domain entity with a simple common collection', () => {
       { name: 'identificationCodes', presence: 'optional', type: 'array' },
     ]);
 
-    expectSubschemaArray(identificationCodesSchema, [
-      { name: 'identificationCode', presence: 'required', type: 'string' },
-      { name: 'assessmentIdentificationSystemDescriptor', presence: 'required', type: 'string' },
-    ]);
+    expectSubschemaArray(
+      identificationCodesSchema,
+      [
+        { name: 'identificationCode', presence: 'required', type: 'string' },
+        { name: 'assessmentIdentificationSystemDescriptor', presence: 'required', type: 'string' },
+      ],
+      false,
+    );
   });
 });
 
@@ -439,10 +467,14 @@ describe('when building domain entity subclass with common collection and descri
       { name: 'identificationCodes', presence: 'optional', type: 'array' },
     ]);
 
-    expectSubschemaArray(identificationCodesSchema, [
-      { name: 'identificationCode', presence: 'required', type: 'string' },
-      { name: 'educationOrganizationIdentificationSystemDescriptor', presence: 'required', type: 'string' },
-    ]);
+    expectSubschemaArray(
+      identificationCodesSchema,
+      [
+        { name: 'identificationCode', presence: 'required', type: 'string' },
+        { name: 'educationOrganizationIdentificationSystemDescriptor', presence: 'required', type: 'string' },
+      ],
+      false,
+    );
   });
 });
 
@@ -498,15 +530,23 @@ describe('when building association with a common collection in a common collect
       { name: 'addresses', presence: 'optional', type: 'array' },
     ]);
 
-    const [, periodsSchema] = expectSubschemaArray(addressesSchema, [
-      { name: 'streetNumberName', presence: 'required', type: 'string' },
-      { name: 'periods', presence: 'optional', type: 'array' },
-    ]);
+    const [, periodsSchema] = expectSubschemaArray(
+      addressesSchema,
+      [
+        { name: 'streetNumberName', presence: 'required', type: 'string' },
+        { name: 'periods', presence: 'optional', type: 'array' },
+      ],
+      false,
+    );
 
-    expectSubschemaArray(periodsSchema, [
-      { name: 'beginDate', presence: 'required', type: 'number' },
-      { name: 'endDate', presence: 'optional', type: 'number' },
-    ]);
+    expectSubschemaArray(
+      periodsSchema,
+      [
+        { name: 'beginDate', presence: 'required', type: 'number' },
+        { name: 'endDate', presence: 'optional', type: 'number' },
+      ],
+      false,
+    );
   });
 });
 
@@ -602,11 +642,15 @@ describe('when building domain entity with a descriptor collection with role nam
       { name: 'assessedGradeLevels', presence: 'optional', type: 'array' },
     ]);
 
-    expectSubschemaReferenceArray(assessedGradeLevelsSchema, {
-      name: 'gradeLevelDescriptor',
-      presence: 'required',
-      type: 'string',
-    });
+    expectSubschemaReferenceArray(
+      assessedGradeLevelsSchema,
+      {
+        name: 'gradeLevelDescriptor',
+        presence: 'required',
+        type: 'string',
+      },
+      false,
+    );
   });
 });
 
@@ -683,13 +727,13 @@ describe('when building domain entity with a common and a common collection with
       .withStartDomainEntity('Assessment')
       .withDocumentation('doc')
       .withIntegerIdentity('AssessmentIdentifier', 'doc')
-      .withCommonProperty('AssessmentScore', 'doc', false, true)
+      .withCommonProperty('AssessmentScore', 'doc', true, true)
       .withCommonProperty('AssessmentPeriod', 'doc', false, false)
       .withEndDomainEntity()
 
       .withStartCommon('AssessmentScore')
       .withDocumentation('doc')
-      .withStringProperty('MinimumScore', 'doc', false, false, '30')
+      .withStringProperty('MinimumScore', 'doc', true, false, '30')
       .withEndCommon()
 
       .withStartCommon('AssessmentPeriod')
@@ -720,11 +764,11 @@ describe('when building domain entity with a common and a common collection with
 
     const [, assessmentScoreSchema, assessmentPeriodSchema] = expectSubschemas(joiSchema, [
       { name: 'assessmentIdentifier', presence: 'required', type: 'number' },
-      { name: 'scores', presence: 'optional', type: 'array' },
+      { name: 'scores', presence: 'required', type: 'array' },
       { name: 'period', presence: 'optional', type: 'object' },
     ]);
 
-    expectSubschemaArray(assessmentScoreSchema, [{ name: 'minimumScore', presence: 'optional', type: 'string' }]);
+    expectSubschemaArray(assessmentScoreSchema, [{ name: 'minimumScore', presence: 'required', type: 'string' }], true);
 
     expectSubschemas(assessmentPeriodSchema, [{ name: 'beginDate', presence: 'optional', type: 'string' }]);
   });

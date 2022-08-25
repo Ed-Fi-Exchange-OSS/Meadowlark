@@ -12,6 +12,8 @@ import {
   descriptorGetClient1,
   descriptorGetClient2,
   descriptorBodyClient1,
+  educationOrganizationCategoryDescriptorBody,
+  gradeLevelDescriptorBody,
 } from './SystemTestSetup';
 
 jest.setTimeout(40000);
@@ -44,6 +46,8 @@ describe('given a POST of a school by one client followed by a GET of the school
   beforeAll(async () => {
     client = await backendToTest.systemTestSetup();
 
+    await upsert(educationOrganizationCategoryDescriptorBody());
+    await upsert(gradeLevelDescriptorBody());
     await upsert(schoolBodyClient1());
 
     // Act
