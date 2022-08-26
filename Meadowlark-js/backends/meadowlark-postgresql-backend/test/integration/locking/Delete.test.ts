@@ -20,7 +20,7 @@ import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
-  checkForReferencesByDocumentId,
+  checkIfDocumentReferenced,
   deleteDocumentByIdSql,
   deleteExistenceIdsByDocumentId,
   documentByIdSql,
@@ -123,7 +123,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       const existenceIdResult = await deleteClient.query(existenceIdsForDocument(schoolDocumentId));
 
       const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-      const referenceResult = await deleteClient.query(checkForReferencesByDocumentId(validDocIds));
+      const referenceResult = await deleteClient.query(checkIfDocumentReferenced(validDocIds));
       const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolDocumentId);
 
       expect(anyReferences.length).toEqual(0);
@@ -205,7 +205,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
     // See if there are existing references to this document
     const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-    const referenceResult = await deleteClient.query(checkForReferencesByDocumentId(validDocIds));
+    const referenceResult = await deleteClient.query(checkIfDocumentReferenced(validDocIds));
     const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolDocumentId);
 
     expect(anyReferences.length).toEqual(0);
