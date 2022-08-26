@@ -352,7 +352,6 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
-### This is now failing on MongoDB. RND-338.
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
 reference-validation: true
@@ -375,7 +374,6 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
-### This is now failing on MongoDB. RND-338.
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
 authorization: bearer {{authToken1}}
