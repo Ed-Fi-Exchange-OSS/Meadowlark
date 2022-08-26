@@ -6,14 +6,14 @@
 import R from 'ramda';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
-import { checkForReferencesByDocumentId } from './SqlHelper';
+import { validateReferenceExistence } from './SqlHelper';
 
 export async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
   if (referenceIds.length === 0) {
     return [];
   }
-
-  const existRef = await client.query(checkForReferencesByDocumentId(referenceIds));
+  const sql = validateReferenceExistence(referenceIds);
+  const existRef = await client.query(sql);
   const references = existRef.rows.map((val) => val.existence_id);
   return references;
 }

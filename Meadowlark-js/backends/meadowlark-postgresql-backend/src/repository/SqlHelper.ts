@@ -6,6 +6,10 @@ import format from 'pg-format';
 
 // SQL for Selects
 
+export function checkIfDocumentReferenced(existenceIds: string[]): string {
+  return format(`SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`, existenceIds); // FOR UPDATE
+}
+
 /**
  * Function that returns a SQL query for checking whether references exist for a given list of document ids
  * This has a secondary function of locking this row for proper updating and deleting
@@ -47,13 +51,13 @@ export function documentOwnershipByIdSql(documentId: string): string {
 /**
  * Function that produces a parameterized SQL query for retrieving values from the existence table based on a given
  * existenceId. This allows for reference checking from the existence table for deletes and general reference validation
- * @param documentId the id of the document we're checking references for
+ * @param documentIds the id of the document we're checking references for
  * @returns SQL query string to retrieve references
  */
-export function checkForReferencesByDocumentId(documentId: string[]): string {
+export function validateReferenceExistence(documentIds: string[]): string {
   return format(
-    `SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
-    documentId,
+    `SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    documentIds,
   );
 }
 
@@ -65,7 +69,7 @@ export function checkForReferencesByDocumentId(documentId: string[]): string {
  */
 export function referencedByDocumentSql(documentIds: string[]): string {
   return format(
-    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L)`,
+    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
     documentIds,
   );
 }

@@ -1,0 +1,94 @@
+
+@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJjbGllbnRfaWQiOiJjM1Z3WlhJdFozSmxZWFF0VTBsVCIsImp0aSI6IjI0YzIwMjIwLWYyODUtNGU2My1hOGY0LWIyZGRjMzkzMDAwNCIsImlhdCI6MTY1ODUyMzQwOCwiZXhwIjoyNjU4NTI3MDA4fQ.0Nxd34sGJwkNj4FN8s0iBulZppkCHsQ1lT9JVQTNcxM
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "All Levels",
+    "shortDescription": "All Levels",
+    "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/GradeLevelDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "First Grade",
+    "shortDescription": "First Grade",
+    "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+### Create School
+# @name school124
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+### Atempt to assign School to location - Should succeed
+POST http://localhost:3000/local/v3.3b/ed-fi/locations
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "schoolReference":{
+        "schoolId": 124
+    },
+    "classroomIdentificationCode":"Test Assigning School"
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/courses
+content-type: application/json
+{{auth_header}}
+reference-validation: true
+
+{
+    "educationOrganizationReference": {
+        "educationOrganizationId": 124
+    },
+    "courseCode": "1234",
+    "courseTitle": "A Course",
+    "numberOfParts": 1,
+    "identificationCodes": []
+}
+###
+@schoolDocumentlocation = {{school124.response.headers.location}}
+DELETE http://localhost:3000{{schoolDocumentlocation}}
+{{auth_header}}
