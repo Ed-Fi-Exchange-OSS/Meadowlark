@@ -40,6 +40,7 @@ authorization: bearer {{authToken1}}
 
 
 ### Created an EducationContents record
+# @name educationContents
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -52,16 +53,16 @@ authorization: bearer {{authToken1}}
     "learningResourceMetadataURI": "2143"
 }
 
-### Get all EducationContents records
-GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
+### Get all EducationContents records - use lower first letter
+GET http://localhost:3000/local/v3.3b/ed-fi/educationContents
 authorization: bearer {{authToken1}}
 
-### Get the created record (lower case)
-GET http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
+### Get the created record
+GET http://localhost:3000{{educationContents.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ### Update the created record
-PUT http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
+PUT http://localhost:3000{{educationContents.response.headers.location}}
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -74,7 +75,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Delete the created record
-DELETE http://localhost:3000/local/v3.3b/ed-fi/educationContents/c4ak9D7jEwS-MCAYejlBKlZ-cFmxlx9yGbUvDA
+DELETE http://localhost:3000{{educationContents.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ### 400: Strict validation is enabled, this will fail due to an invalid country
@@ -123,6 +124,7 @@ content-type: application/json
 }
 
 ### Now it contains a valid country
+# @name student
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 reference-validation: true
@@ -136,8 +138,9 @@ authorization: bearer {{authToken1}}
     "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
 }
 
+
 ### Update this student
-PUT http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+PUT http://localhost:3000{{student.response.headers.location}}
 content-type: application/json
 reference-validation: false
 authorization: bearer {{authToken1}}
@@ -352,6 +355,7 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
+# @name courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
 reference-validation: true
@@ -374,6 +378,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a section that references that courseOffering. Should cause deletion to fail
+# @name section
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -393,11 +398,11 @@ authorization: bearer {{authToken1}}
 }
 
 ### Should fail due to the presence of the section above
-DELETE http://localhost:3000/local/v3.3b/ed-fi/courseOfferings/-epMUEx3z2sXHsjmOtmXdfHZMmggxbj_9sL6TA
+DELETE http://localhost:3000{{courseOffering.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ### If the above failed, now try deleting the section and then run above again. Should work now
-DELETE http://localhost:3000/local/v3.3b/ed-fi/sections/txtK94BT9QZfS-OhuJzbZa5WFcDcXKqhAOBwFw
+DELETE http://localhost:3000{{section.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ######## List all with GET
