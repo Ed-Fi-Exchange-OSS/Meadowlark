@@ -4,7 +4,17 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { loadDescriptors as meadowlarkLoadDescriptors } from '@edfi/meadowlark-core';
+import { FastifyRequest, FastifyReply } from 'fastify';
 
-export async function loadDescriptors(): Promise<void> {
-  return meadowlarkLoadDescriptors();
+/**
+ * A trigger to call the loadDescriptors function via a Fastify endpoint.
+ * Only available when the stage is explicitly set to "local".
+ */
+export async function loadDescriptors(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  if (process.env.MEADOWLARK_STAGE !== 'local') {
+    await reply.code(404).send('');
+    return;
+  }
+  await meadowlarkLoadDescriptors();
+  await reply.code(202).send('');
 }

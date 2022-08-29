@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
+import { ensurePluginsLoaded, getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
 import { Logger } from '../Logger';
 import { documentIdForDocumentInfo, DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
@@ -18,6 +18,8 @@ import { decapitalize } from '../Utility';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
+import { UpsertRequest } from '../message/UpsertRequest';
+import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -86,6 +88,8 @@ async function readDescriptors(directoryPath: string): Promise<XmlDescriptorData
 }
 
 async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise<void> {
+  await ensurePluginsLoaded();
+
   let loadCount = 0;
   for (const [descriptorName, descriptorReferences] of Object.entries(descriptorData)) {
     if (!descriptorName.endsWith('Descriptor')) {
@@ -120,7 +124,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const descriptorDocument: DescriptorDocument = decapitalizeKeys(descriptorReference) as DescriptorDocument;
       const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
-      const putResult: UpsertResult = await getDocumentStore().upsertDocument({
+      const upsertRequest: UpsertRequest = {
         id: documentIdForDocumentInfo(resourceInfo, documentInfo),
         resourceInfo,
         documentInfo,
@@ -128,20 +132,24 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         validate: true,
         security: { ...newSecurity(), authorizationStrategy: 'FULL_ACCESS' },
         traceId: '-',
-      });
+      };
+
+      await beforeUpsertDocument(upsertRequest);
+      const upsertResult: UpsertResult = await getDocumentStore().upsertDocument(upsertRequest);
+      await afterUpsertDocument(upsertRequest, upsertResult);
 
       Logger.debug(
         `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
-          putResult.failureMessage ?? 'OK'
+          upsertResult.failureMessage ?? 'OK'
         }`,
         '-',
       );
 
-      if (!(putResult.response === 'INSERT_SUCCESS' || putResult.response === 'UPDATE_SUCCESS')) {
+      if (!(upsertResult.response === 'INSERT_SUCCESS' || upsertResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
             documentInfo.documentIdentity,
-          )} failed: ${putResult.failureMessage}`,
+          )} failed: ${upsertResult.failureMessage}`,
           'n/a',
         );
       } else {
