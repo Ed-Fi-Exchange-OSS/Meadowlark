@@ -130,8 +130,12 @@ function documentPathsFromReferenceComponents(referenceComponents: ReferenceComp
 
   referenceComponents.forEach((referenceComponent) => {
     if (isReferenceElement(referenceComponent)) {
-      const propertyMeadowlarkData: EntityPropertyMeadowlarkData = referenceComponent.sourceProperty.data.meadowlark;
-      result.push(propertyMeadowlarkData.apiMapping.fullName);
+      if (referenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
+        result.push('schoolYearTypeReference.schoolYear');
+      } else {
+        const propertyMeadowlarkData: EntityPropertyMeadowlarkData = referenceComponent.sourceProperty.data.meadowlark;
+        result.push(propertyMeadowlarkData.apiMapping.fullName);
+      }
     } else {
       const referenceComponentTopLevelName = topLevelNameOnEntity(entity, referenceComponent.sourceProperty);
       result.push(...documentPathsFromSubReferenceComponent(referenceComponent, referenceComponentTopLevelName));

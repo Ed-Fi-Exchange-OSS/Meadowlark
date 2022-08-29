@@ -9,8 +9,9 @@ import {
   DomainEntityBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
+  EnumerationBuilder,
 } from '@edfi/metaed-core';
-import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
+import { domainEntityReferenceEnhancer, enumerationReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
   entityPropertyMeadowlarkDataSetupEnhancer,
   apiEntityMappingEnhancer,
@@ -571,6 +572,77 @@ describe('when extracting document references with three levels of identities on
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
+        },
+      ]
+    `);
+  });
+});
+
+describe('when extracting with school year reference in body', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentReference[] = [];
+
+  const body = {
+    localCourseCode: 'abc',
+    sessionReference: {
+      sessionName: 'def',
+      schoolId: 123,
+      schoolYear: 2022,
+    },
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withEnumerationIdentity('SchoolYear', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('CourseOffering')
+      .withDocumentation('doc')
+      .withStringIdentity('LocalCourseCode', 'doc', '30')
+      .withDomainEntityProperty('Session', 'doc', false, false)
+      .withEndDomainEntity()
+
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    enumerationReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const courseOffering = namespace.entity.domainEntity.get('CourseOffering');
+    result = extractDocumentReferences(courseOffering, body);
+  });
+
+  it('should have references', () => {
+    expect(result).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "documentIdentity": Object {
+            "schoolYearTypeReference.schoolYear": 2022,
+            "sessionName": "def",
+          },
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "Session",
         },
       ]
     `);
