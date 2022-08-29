@@ -6,8 +6,14 @@ import format from 'pg-format';
 
 // SQL for Selects
 
+/**
+ * Function that returns a parameterized SQL query for checking whether a document that is being deleted has been referenced
+ * by other documents
+ * @param existenceIds the existenceId's for the document to check for references
+ * @returns SQL query to check the existence table to verify if a document is being referenced
+ */
 export function checkIfDocumentReferenced(existenceIds: string[]): string {
-  return format(`SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`, existenceIds); // FOR UPDATE
+  return format(`SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`, existenceIds);
 }
 
 /**
@@ -18,10 +24,6 @@ export function checkIfDocumentReferenced(existenceIds: string[]): string {
  */
 export function existenceIdsForDocument(documentId: string): string {
   return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId); //
-}
-
-export function existenceCheckForDocument(documentId: string): string {
-  return format(`SELECT document_id FROM meadowlark.documents WHERE document_id = %L`, documentId); // FOR UPDATE
 }
 
 /**
@@ -56,7 +58,7 @@ export function documentOwnershipByIdSql(documentId: string): string {
  */
 export function validateReferenceExistence(documentIds: string[]): string {
   return format(
-    `SELECT document_id FROM meadowlark.documents WHERE document_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    `SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
     documentIds,
   );
 }
