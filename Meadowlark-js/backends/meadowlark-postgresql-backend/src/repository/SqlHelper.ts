@@ -23,7 +23,7 @@ export function checkIfDocumentReferenced(existenceIds: string[]): string {
  * @returns SQL query to check for existence ids
  */
 export function existenceIdsForDocument(documentId: string): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId); //
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId);
 }
 
 /**
@@ -81,7 +81,7 @@ export function referencedByDocumentSql(documentIds: string[]): string {
 /**
  * Returns the SQL statement to insert a document into the existence table
  * @param documentId the document being inserted
- * @param existenceId the existence id being inserted, this may be the same as the docuementId
+ * @param existenceId the existence id being inserted, this may be the same as the documentId
  * @returns SQL query string to insert into the existence table
  */
 export function existenceInsertSql(documentId: string, existenceId: string): string {
