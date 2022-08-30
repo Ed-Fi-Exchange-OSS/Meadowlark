@@ -1,0 +1,25 @@
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+GET http://localhost:3000/local/loadDescriptors
+authorization: bearer {{authToken1}}
+
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
+authorization: bearer {{authToken1}}
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors?limit=10&offset=5
+authorization: bearer {{authToken1}}

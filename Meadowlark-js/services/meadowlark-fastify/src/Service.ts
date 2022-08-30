@@ -22,6 +22,7 @@ import {
   dependencies,
 } from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
+import { loadDescriptors } from './handler/DescriptorLoader';
 
 export function buildService(): FastifyInstance {
   const service = createFastifyService();
@@ -116,5 +117,8 @@ export function buildService(): FastifyInstance {
     fastify.post(`/${stage}/api/oauth/token`, oauthHandler);
     fastify.get(`/${stage}/createKey`, oauthHandler);
     fastify.get(`/${stage}/verify`, oauthHandler);
+
+    // Descriptor loader
+    fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
   }
 }
