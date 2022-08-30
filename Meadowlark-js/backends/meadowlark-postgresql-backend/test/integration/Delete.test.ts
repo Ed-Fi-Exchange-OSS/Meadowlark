@@ -10,23 +10,20 @@ import {
   newSecurity,
   documentIdForDocumentInfo,
   DeleteRequest,
-  GetRequest,
-  GetResult,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
-  DeleteResult,
   DocumentReference,
   newSuperclassInfo,
   SuperclassInfo,
+  DeleteResult,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { getDocumentById } from '../../src/repository/Get';
 import { documentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
@@ -45,13 +42,6 @@ const newDeleteRequest = (): DeleteRequest => ({
   id: '',
   resourceInfo: NoResourceInfo,
   validate: false,
-  security: { ...newSecurity() },
-  traceId: 'traceId',
-});
-
-const newGetRequest = (): GetRequest => ({
-  id: '',
-  resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId',
 });
@@ -122,8 +112,8 @@ describe('given the delete of an existing document', () => {
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id }, client);
-    expect(result.response).toBe('GET_FAILURE_NOT_EXISTS');
+    const result: any = await client.query(documentByIdSql(id));
+    expect(result.rowCount).toEqual(0);
   });
 });
 
@@ -257,16 +247,13 @@ describe('given an delete of a document with an outbound reference only, with va
   });
 
   it('should return delete success', async () => {
-    // TODO: restore in RND-309
-    // expect(deleteResult.response).toBe('DELETE_SUCCESS');
-    expect(deleteResult.response).toBe('DELETE_FAILURE_REFERENCE');
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: GetResult = await getDocumentById({ ...newGetRequest(), id: documentWithReferencesId }, client);
-    // TODO: restore in RND-309
-    // expect(result.response).toBe('GET_FAILURE_NOT_EXISTS');
-    expect(result.response).toBe('GET_SUCCESS');
+    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
+
+    expect(result.rowCount).toEqual(0);
   });
 });
 

@@ -95,7 +95,6 @@ export async function upsertDocument(
     for (const ref of outRefs) {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(referencesInsertSql(id, ref));
-      await client.query(existenceInsertSql(id, ref));
     }
 
     await client.query('COMMIT');

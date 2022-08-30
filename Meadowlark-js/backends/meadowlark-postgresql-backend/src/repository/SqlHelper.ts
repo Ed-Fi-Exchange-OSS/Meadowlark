@@ -7,12 +7,23 @@ import format from 'pg-format';
 // SQL for Selects
 
 /**
+ * Function that returns a parameterized SQL query for checking whether a document that is being deleted has been referenced
+ * by other documents
+ * @param existenceIds the existenceId's for the document to check for references
+ * @returns SQL query to check the existence table to verify if a document is being referenced
+ */
+export function checkIfDocumentReferenced(existenceIds: string[]): string {
+  return format(`SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`, existenceIds);
+}
+
+/**
  * Function that returns a SQL query for checking whether references exist for a given list of document ids
+ * This has a secondary function of locking this row for proper updating and deleting
  * @param documentId the document to check for existence
  * @returns SQL query to check for existence ids
  */
 export function existenceIdsForDocument(documentId: string): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L`, documentId);
+  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId);
 }
 
 /**
@@ -42,11 +53,14 @@ export function documentOwnershipByIdSql(documentId: string): string {
 /**
  * Function that produces a parameterized SQL query for retrieving values from the existence table based on a given
  * existenceId. This allows for reference checking from the existence table for deletes and general reference validation
- * @param documentId the id of the document we're checking references for
+ * @param documentIds the id of the document we're checking references for
  * @returns SQL query string to retrieve references
  */
-export function checkForReferencesByDocumentId(documentId: string[]): string {
-  return format(`SELECT document_id, existence_id FROM meadowlark.existence WHERE existence_id IN (%L)`, documentId);
+export function validateReferenceExistence(documentIds: string[]): string {
+  return format(
+    `SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    documentIds,
+  );
 }
 
 /**
@@ -56,14 +70,8 @@ export function checkForReferencesByDocumentId(documentId: string[]): string {
  * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
  */
 export function referencedByDocumentSql(documentIds: string[]): string {
-  // return format(
-  //   `SELECT document_id, resource_name, document_identity FROM meadowlark.documents
-  //   JOIN meadowlark.references on meadowlark.documents.document_id = meadowlark.references.parent_document_id
-  //   WHERE referenced_document_id = %L LIMIT 5;`,
-  //   [documentId],
-  // );
   return format(
-    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L)`,
+    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
     documentIds,
   );
 }
@@ -73,7 +81,7 @@ export function referencedByDocumentSql(documentIds: string[]): string {
 /**
  * Returns the SQL statement to insert a document into the existence table
  * @param documentId the document being inserted
- * @param existenceId the existence id being inserted, this may be the same as the docuementId
+ * @param existenceId the existence id being inserted, this may be the same as the documentId
  * @returns SQL query string to insert into the existence table
  */
 export function existenceInsertSql(documentId: string, existenceId: string): string {

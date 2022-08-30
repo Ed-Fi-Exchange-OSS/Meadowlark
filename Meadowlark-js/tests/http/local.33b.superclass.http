@@ -137,7 +137,9 @@ content-type: application/json
              "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
         }
     ],
-    "gradeLevels": []
+    "gradeLevels": [
+        {"gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"}
+    ]
 }
 
 ### 
@@ -244,6 +246,17 @@ reference-validation: true
     ]
 }
 
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/CourseIdentificationSystemDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "namespace": "uri://ed-fi.org/CourseIdentificationSystemDescriptors"
+}
+
 ####
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
@@ -257,7 +270,12 @@ reference-validation: true
     "courseCode": "1234",
     "courseTitle": "A Course",
     "numberOfParts": 1,
-    "identificationCodes": []
+    "identificationCodes": [
+        {
+            "identificationCode":"testId",
+            "courseIdentificationSystemDescriptor":"uri://ed-fi.org/CourseIdentificationSystemDescriptor#Other"
+        }
+    ]
 }
 
 ###
@@ -349,7 +367,11 @@ reference-validation: true
 {
     "localEducationAgencyId": 125,
     "nameOfInstitution": "A School",
-    "categories":[],
+      "categories" : [
+        {
+         "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
     "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
 }
 

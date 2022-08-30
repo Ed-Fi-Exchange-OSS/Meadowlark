@@ -10,8 +10,8 @@ import {
   deleteReferencesSql,
   referencedByDocumentSql,
   deleteExistenceIdsByDocumentId,
-  checkForReferencesByDocumentId,
   existenceIdsForDocument,
+  checkIfDocumentReferenced,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -35,7 +35,7 @@ export async function deleteDocumentById(
 
       // We have all the possible id's for this document check if the document is referenced by other documents
       const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-      const referenceResult = await client.query(checkForReferencesByDocumentId(validDocIds));
+      const referenceResult = await client.query(checkIfDocumentReferenced(validDocIds));
       const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
 
       // Abort on validation failure - This document is referenced by another document
@@ -46,7 +46,7 @@ export async function deleteDocumentById(
         );
 
         // Get the DocumentIdentities of up to five referring documents for failure message purposes
-        const referenceIds = references.map((ref) => ref.document_id);
+        const referenceIds = references.map((ref) => ref.parent_document_id);
         const referringDocuments = await client.query(referencedByDocumentSql(referenceIds));
         const failures: string[] = referringDocuments.rows.map(
           (document) => `Resource ${document.resource_name} with identity '${JSON.stringify(document.document_identity)}'`,
