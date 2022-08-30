@@ -6,16 +6,22 @@
 import R from 'ramda';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
-import { validateReferenceExistence } from './SqlHelper';
+import { validateReferenceExistenceSql } from './SqlHelper';
 
-export async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
+/**
+ * Finds whether the given reference ids are actually documents in the db.
+ *
+ * @param referenceIds The reference ids to check for existence in the db
+ * @param client The PostgreSQL client used for querying the database
+ * @returns The subset of the given reference ids that are actually documents in the db
+ */
+async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
   if (referenceIds.length === 0) {
     return [];
   }
-  const sql = validateReferenceExistence(referenceIds);
-  const existRef = await client.query(sql);
-  const references = existRef.rows.map((val) => val.existence_id);
-  return references;
+
+  const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds));
+  return referenceExistenceResult.rows.map((val) => val.alias_id);
 }
 
 /**

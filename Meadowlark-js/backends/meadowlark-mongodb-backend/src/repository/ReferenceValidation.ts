@@ -8,7 +8,15 @@ import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions } from '
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
-export async function findReferencedDocumentIdsById(
+/**
+ * Finds whether the given reference ids are actually documents in the db.
+ *
+ * @param referenceIds The reference ids to check for existence in the db
+ * @param mongoDocuments The MongoDb collection the documents are in
+ * @param findOptions MongoDb findOptions for the query
+ * @returns The subset of the given reference ids that are actually documents in the db
+ */
+async function findReferencedDocumentIdsById(
   referenceIds: string[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,

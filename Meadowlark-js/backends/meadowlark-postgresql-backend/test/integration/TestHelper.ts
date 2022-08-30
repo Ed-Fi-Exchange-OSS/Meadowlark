@@ -8,14 +8,14 @@ import format from 'pg-format';
 export async function deleteAll(client: PoolClient): Promise<void> {
   await client.query('TRUNCATE TABLE meadowlark.documents');
   await client.query('TRUNCATE TABLE meadowlark.references');
-  await client.query('TRUNCATE TABLE meadowlark.existence');
+  await client.query('TRUNCATE TABLE meadowlark.aliases');
 }
 
-export const verifyExistenceId = (existenceId: string): string =>
+export const verifyAliasId = (aliasId: string): string =>
   format(
-    `SELECT existence_id from meadowlark.existence
-  WHERE document_id = %L AND existence_id != %1$L`,
-    [existenceId],
+    `SELECT alias_id from meadowlark.aliases
+  WHERE document_id = %L AND alias_id != %1$L`,
+    [aliasId],
   );
 
 /**

@@ -24,7 +24,7 @@ import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { documentByIdSql } from '../../src/repository/SqlHelper';
+import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -112,7 +112,7 @@ describe('given the delete of an existing document', () => {
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: any = await client.query(documentByIdSql(id));
+    const result: any = await client.query(findDocumentByIdSql(id));
     expect(result.rowCount).toEqual(0);
   });
 });
@@ -179,7 +179,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should still have the referenced document in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
+    const docResult: any = await client.query(findDocumentByIdSql(referencedDocumentId));
     expect(docResult.rows[0].document_identity.natural).toBe('delete5');
   });
 });
@@ -251,7 +251,7 @@ describe('given an delete of a document with an outbound reference only, with va
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const result: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
 
     expect(result.rowCount).toEqual(0);
   });
@@ -318,7 +318,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should not have the referenced document in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(referencedDocumentId));
+    const docResult: any = await client.query(findDocumentByIdSql(referencedDocumentId));
     expect(docResult.rowCount).toEqual(0);
   });
 
@@ -404,7 +404,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   });
 
   it('should still have the referenced document in the db', async () => {
-    const result: any = await client.query(documentByIdSql(referencedDocumentId));
+    const result: any = await client.query(findDocumentByIdSql(referencedDocumentId));
     expect(result.rows[0].document_identity.schoolId).toBe('123');
   });
 });

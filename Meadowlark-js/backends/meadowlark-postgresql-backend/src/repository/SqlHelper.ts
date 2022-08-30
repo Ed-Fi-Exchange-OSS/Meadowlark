@@ -7,31 +7,38 @@ import format from 'pg-format';
 // SQL for Selects
 
 /**
- * Function that returns a parameterized SQL query for checking whether a document that is being deleted has been referenced
- * by other documents
- * @param existenceIds the existenceId's for the document to check for references
- * @returns SQL query to check the existence table to verify if a document is being referenced
+ * Returns the SQL query that does a reverse lookup to find the ids of documents that reference the given ids.
+ *
+ * @param referencedDocumentIds the ids of the documents that are being referenced
+ * @returns a SQL query to find the ids of the documents referencing the given ids
  */
-export function checkIfDocumentReferenced(existenceIds: string[]): string {
-  return format(`SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`, existenceIds);
+export function findReferencingDocumentIdsSql(referencedDocumentIds: string[]): string {
+  return format(
+    `SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`,
+    referencedDocumentIds,
+  );
 }
 
 /**
- * Function that returns a SQL query for checking whether references exist for a given list of document ids
- * This has a secondary function of locking this row for proper updating and deleting
- * @param documentId the document to check for existence
- * @returns SQL query to check for existence ids
+ * Returns the SQL query to find the alias ids for a given document. Alias ids include the document id
+ * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ *
+ * This has a secondary function of read-for-write locking this row for proper updating and deleting.
+ *
+ * @param documentId the id of the document to find aliases for
+ * @returns a SQL query to find the alias ids of the given document
  */
-export function existenceIdsForDocument(documentId: string): string {
-  return format(`SELECT existence_id FROM meadowlark.existence WHERE document_id = %L FOR SHARE NOWAIT`, documentId);
+export function findAliasIdsForDocumentSql(documentId: string): string {
+  return format(`SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`, documentId);
 }
 
 /**
- * Function that produces a parametrized SQL query for retrieving a document (with identity)
+ * Returns the SQL statement for retrieving a document (with identity)
  * @param documentId The identifier of the document to retrieve
  * @returns SQL query string to retrieve a document
  */
-export function documentByIdSql(documentId: string): string {
+export function findDocumentByIdSql(documentId: string): string {
   return format(
     `
     SELECT document_id, document_identity, edfi_doc
@@ -42,64 +49,64 @@ export function documentByIdSql(documentId: string): string {
 }
 
 /**
- * Function that produces a parametrized SQL query for retrieving the ownership for a given document
+ * Returns the SQL query for retrieving the ownership for a given document
  * @param documentId The identifier of the document
  * @returns SQL query string to retrieve ownership
  */
-export function documentOwnershipByIdSql(documentId: string): string {
+export function findOwnershipForDocumentSql(documentId: string): string {
   return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [documentId]);
 }
 
 /**
- * Function that produces a parameterized SQL query for retrieving values from the existence table based on a given
- * existenceId. This allows for reference checking from the existence table for deletes and general reference validation
+ * Returns the SQL statement for retrieving alias ids from the aliases table for the given
+ * documents. This allows for checking for the existence of documents from the aliases table for deletes
+ * and general reference validation.
+ *
  * @param documentIds the id of the document we're checking references for
- * @returns SQL query string to retrieve references
+ * @returns SQL query string to retrieve existing alias ids
  */
-export function validateReferenceExistence(documentIds: string[]): string {
-  return format(
-    `SELECT existence_id FROM meadowlark.existence WHERE existence_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
-    documentIds,
-  );
+export function validateReferenceExistenceSql(documentIds: string[]): string {
+  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id IN (%L) FOR NO KEY UPDATE NOWAIT`, documentIds);
 }
 
 /**
- * Returns up to five documents that reference this document - for error reporting when an attempt is made to delete
- * the document
- * @param documentId The document being referenced
- * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referenced document
+ * Returns the SQL statement to find up to five documents that reference this document.
+ * This is for error reporting when an attempt is made to delete the document.
+ *
+ * @param referringDocumentIds The referring documents
+ * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referring documents
  */
-export function referencedByDocumentSql(documentIds: string[]): string {
+export function findReferringDocumentInfoForErrorReportingSql(referringDocumentIds: string[]): string {
   return format(
-    `SELECT document_id, resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
-    documentIds,
+    `SELECT resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
+    referringDocumentIds,
   );
 }
 
 // SQL for inserts/updates/upserts
 
 /**
- * Returns the SQL statement to insert a document into the existence table
- * @param documentId the document being inserted
- * @param existenceId the existence id being inserted, this may be the same as the documentId
- * @returns SQL query string to insert into the existence table
+ * Returns the SQL statement to add an alias entry to the alias table
+ * @param documentId the document with the given alias id
+ * @param aliasId the alias id for the given document, this may be the same as the documentId
+ * @returns SQL query string to insert into the aliases table
  */
-export function existenceInsertSql(documentId: string, existenceId: string): string {
+export function insertAliasSql(documentId: string, aliasId: string): string {
   return format(
-    `INSERT INTO meadowlark.existence
-     (document_id, existence_id)
+    `INSERT INTO meadowlark.aliases
+     (document_id, alias_id)
      VALUES (%L)`,
-    [documentId, existenceId],
+    [documentId, aliasId],
   );
 }
 
 /**
- * Returns the SQL statement to insert a referenced document into the references table
+ * Returns the SQL statement to insert an outbound reference for a document into the references table
  * @param documentId The parent document of the reference
  * @param referencedDocumentId The document that is referenced
  * @returns SQL query string to insert reference into references table
  */
-export function referencesInsertSql(documentId: string, referencedDocumentId: String): string {
+export function insertOutboundReferencesSql(documentId: string, referencedDocumentId: String): string {
   return format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
     documentId,
     referencedDocumentId,
@@ -184,23 +191,25 @@ export function deleteDocumentByIdSql(documentId: string): string {
 }
 
 /**
- * Returns the SQL query for deleting references to a document from the database
- * @param documentId the document id of the references we want to delete
+ * Returns the SQL query for deleting the outbound references of a document from the database.
+ * Used as part of deleting the document itself.
+ *
+ * @param documentId the id of the document whose outbound references we want to delete
  * @returns SQL query string to delete references
  */
-export function deleteReferencesSql(documentId: string): string {
+export function deleteOutboundReferencesOfDocumentSql(documentId: string): string {
   const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [documentId]);
   return sql;
 }
 
 /**
- * Returns the SQL query for deleting values from the existence table when a document is being deleted
- * @param documentId the id of the document we're trying to remove from the existence table
- * @returns SQL query string for deleting existence ids
+ * Returns the SQL query for deleting aliases for a given document id. Used as part of deleting the document itself.
+ * @param documentId the id of the document we're deleting aliases for
+ * @returns SQL query string for deleting aliases
  */
-export function deleteExistenceIdsByDocumentId(documentId: string): string {
+export function deleteAliasesForDocumentSql(documentId: string): string {
   return format(
-    `DELETE from meadowlark.existence
+    `DELETE from meadowlark.aliases
   WHERE document_id = %L`,
     [documentId],
   );
@@ -243,7 +252,7 @@ export const createDocumentTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(document_id)';
 
 /**
- * SQL query string to crate references table
+ * SQL query string to create the references table
  */
 export const createReferencesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.references(
@@ -259,16 +268,19 @@ export const createReferencesTableCheckingIndexSql =
 export const createReferencesTableDeletingIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_document_id)';
 
-export const createExistenceTableSql = `
-  CREATE TABLE IF NOT EXISTS meadowlark.existence(
+/**
+ * SQL query string to create the aliases table
+ */
+export const createAliasesTableSql = `
+  CREATE TABLE IF NOT EXISTS meadowlark.aliases(
     id bigserial PRIMARY KEY,
     document_id VARCHAR,
-    existence_id VARCHAR);`;
+    alias_id VARCHAR);`;
 
-// For reference checking by document id
-export const createExistenceTableDocumentIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_document_id ON meadowlark.existence(document_id)';
+// For finding alias ids given a document id
+export const createAliasesTableDocumentIndexSql =
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_document_id ON meadowlark.aliases(document_id)';
 
-// For reference checking by existence id
-export const createExistenceTableExistenceIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_existence_existence_id ON meadowlark.existence(existence_id)';
+// For finding document ids given an alias id
+export const createAliasesTableAliasIndexSql =
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_alias_id ON meadowlark.aliases(alias_id)';

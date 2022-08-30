@@ -20,9 +20,9 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { documentByIdSql, existenceIdsForDocument } from '../../src/repository/SqlHelper';
+import { findDocumentByIdSql, findAliasIdsForDocumentSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll, retrieveReferencesByDocumentIdSql, verifyExistenceId } from './TestHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 
 jest.setTimeout(40000);
 
@@ -66,7 +66,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(existenceIdsForDocument(id));
+    const result = await client.query(findAliasIdsForDocumentSql(id));
 
     expect(result.rowCount).toBe(1);
   });
@@ -155,7 +155,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   });
 
   it('should have the change in the db', async () => {
-    const result: any = await client.query(documentByIdSql(id));
+    const result: any = await client.query(findDocumentByIdSql(id));
 
     expect(result.rows[0].edfi_doc.call).toBe('two');
   });
@@ -211,7 +211,7 @@ describe('given an upsert of a new document that references a non-existent docum
   });
 
   it('should have inserted the document with an invalid reference in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const result: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     expect(result.rows[0].document_identity.natural).toBe('upsert4');
   });
 });
@@ -286,7 +286,7 @@ describe('given an upsert of a new document that references an existing document
   });
 
   it('should have inserted the document with a valid reference in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const result: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     expect(result.rows[0].document_identity.natural).toBe('upsert6');
   });
 });
@@ -371,7 +371,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   });
 
   it('should not have inserted the document with an invalid reference in the db', async () => {
-    const result: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const result: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     expect(result.rowCount).toEqual(0);
   });
 });
@@ -440,7 +440,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
@@ -535,7 +535,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
@@ -641,7 +641,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {
-    await client.query(documentByIdSql(documentWithReferencesId));
+    await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
@@ -745,8 +745,8 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
-    const result: any = await client.query(verifyExistenceId(referencedDocumentId));
-    const outRefs = result.rows.map((row) => row.existence_id);
+    const result: any = await client.query(verifyAliasId(referencedDocumentId));
+    const outRefs = result.rows.map((row) => row.alias_id);
     expect(outRefs).toMatchInlineSnapshot(`
       Array [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",

@@ -7,11 +7,11 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByIdSql,
-  deleteReferencesSql,
-  referencedByDocumentSql,
-  deleteExistenceIdsByDocumentId,
-  existenceIdsForDocument,
-  checkIfDocumentReferenced,
+  deleteOutboundReferencesOfDocumentSql,
+  findReferringDocumentInfoForErrorReportingSql,
+  deleteAliasesForDocumentSql,
+  findAliasIdsForDocumentSql,
+  findReferencingDocumentIdsSql,
 } from './SqlHelper';
 
 export async function deleteDocumentById(
@@ -24,21 +24,24 @@ export async function deleteDocumentById(
     await client.query('BEGIN');
 
     if (validate) {
-      // Check for any references to the document to be deleted (including itself)
-      const existenceIdResult = await client.query(existenceIdsForDocument(id));
-      // If the record doesn't exist, exit
-      if (existenceIdResult?.rowCount === 0) {
+      // Find the alias ids for the document to be deleted
+      const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(id));
+
+      // All documents have alias ids. If no alias ids were found, the document doesn't exist
+      if (documentAliasIdsResult?.rowCount === 0) {
         await client.query('ROLLBACK');
         deleteResult.response = 'DELETE_FAILURE_NOT_EXISTS';
         return deleteResult;
       }
 
-      // We have all the possible id's for this document check if the document is referenced by other documents
-      const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-      const referenceResult = await client.query(checkIfDocumentReferenced(validDocIds));
+      // Extract from the query result
+      const documentAliasIds: string[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
+
+      // Find any documents that reference this document, either it's own id or an alias
+      const referenceResult = await client.query(findReferencingDocumentIdsSql(documentAliasIds));
       const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
 
-      // Abort on validation failure - This document is referenced by another document
+      // If this document is referenced, it's a validation failure
       if (references.length > 0) {
         Logger.debug(
           `postgres.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
@@ -47,7 +50,7 @@ export async function deleteDocumentById(
 
         // Get the DocumentIdentities of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref.parent_document_id);
-        const referringDocuments = await client.query(referencedByDocumentSql(referenceIds));
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql(referenceIds));
         const failures: string[] = referringDocuments.rows.map(
           (document) => `Resource ${document.resource_name} with identity '${JSON.stringify(document.document_identity)}'`,
         );
@@ -60,6 +63,7 @@ export async function deleteDocumentById(
         return deleteResult;
       }
     }
+
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
@@ -67,11 +71,11 @@ export async function deleteDocumentById(
 
     // Delete references where this is the parent document
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
-    await client.query(deleteReferencesSql(id));
+    await client.query(deleteOutboundReferencesOfDocumentSql(id));
 
-    // Delete this document from the existence table
-    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting existence entries with id ${id}`, traceId);
-    await client.query(deleteExistenceIdsByDocumentId(id));
+    // Delete this document from the aliases table
+    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting alias entries with id ${id}`, traceId);
+    await client.query(deleteAliasesForDocumentSql(id));
 
     await client.query('COMMIT');
   } catch (e) {

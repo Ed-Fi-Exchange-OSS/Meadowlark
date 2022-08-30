@@ -10,14 +10,14 @@ export async function systemTestSetup(): Promise<PoolClient> {
   const client = (await getSharedClient()) as PoolClient;
   await client.query('TRUNCATE TABLE meadowlark.documents');
   await client.query('TRUNCATE TABLE meadowlark.references');
-  await client.query('TRUNCATE TABLE meadowlark.existence');
+  await client.query('TRUNCATE TABLE meadowlark.aliases');
   return client;
 }
 
 export async function systemTestTeardown(client: PoolClient): Promise<void> {
   await client.query('TRUNCATE TABLE meadowlark.documents');
   await client.query('TRUNCATE TABLE meadowlark.references');
-  await client.query('TRUNCATE TABLE meadowlark.existence');
+  await client.query('TRUNCATE TABLE meadowlark.aliases');
   client.release();
   await resetSharedClient();
 }
