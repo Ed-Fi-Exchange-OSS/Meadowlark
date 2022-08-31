@@ -234,7 +234,7 @@ authorization: bearer {{authToken1}}
     ]
 }
 
-### Create a location - school does not exist.
+### Create a location - school does not exist. Should return 400
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
