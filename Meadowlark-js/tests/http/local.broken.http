@@ -1,7 +1,7 @@
 ##
-## Not yet functioning 2022-06-16 
+## Resolves issue described in RND-349. Assumes that everything in 
+## local.33b.superclass.http has been run.
 ## 
-
 
 ### Authenticate
 # @name client1
@@ -17,16 +17,18 @@ content-type: application/json
 ###
 @authToken1 = {{client1.response.body.$.access_token}}
 
-#
-## Graduation Plans
-# Core problem: schoolyear. This may be related to RND-131. The sample payload
-# comes straight from the ODS/API 5.3.x. RND-131 alone did not resolve the issue,
-# and the new issue is logged in RND-314.
-#
-
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlanTypeDescriptors
 authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+"codeValue": "Recommended",
+"description": "Recommended",
+"shortDescription": "Recommended",
+"namespace": "uri://ed-fi.org/GraduationPlanTypeDescriptor"
+}
+
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
@@ -43,3 +45,7 @@ content-type: application/json
   "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Recommended",
   "totalRequiredCredits": 28
 }
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+authorization: bearer {{authToken1}}
