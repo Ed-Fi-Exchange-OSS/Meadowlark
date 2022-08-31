@@ -9,7 +9,8 @@ import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
 /**
- * Finds whether the given reference ids are actually documents in the db.
+ * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
+ * array for this existence check.
  *
  * @param referenceIds The reference ids to check for existence in the db
  * @param mongoDocuments The MongoDb collection the documents are in
@@ -21,7 +22,7 @@ async function findReferencedDocumentIdsById(
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocumentId[]> {
-  const findReferencedDocuments = mongoDocuments.find({ existenceIds: { $in: referenceIds } }, findOptions);
+  const findReferencedDocuments = mongoDocuments.find({ aliasIds: { $in: referenceIds } }, findOptions);
   return (await findReferencedDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
 }
 
@@ -59,15 +60,15 @@ export function findMissingReferences(
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
 export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
-// MongoDB FindOption to return only the existenceIds field
-export const onlyReturnExistenceIds = (session: ClientSession): FindOptions => ({
-  projection: { existenceIds: 1 },
+// MongoDB FindOption to return only the aliasIds field
+export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
+  projection: { aliasIds: 1 },
   session,
 });
 
-// MongoDB Filter on documents with the given existenceIds in their outRefs list
-export const onlyDocumentsReferencing = (existenceIds: string[]): Filter<MeadowlarkDocument> => ({
-  outRefs: { $in: existenceIds },
+// MongoDB Filter on documents with the given aliasIds in their outRefs list
+export const onlyDocumentsReferencing = (aliasIds: string[]): Filter<MeadowlarkDocument> => ({
+  outRefs: { $in: aliasIds },
 });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)

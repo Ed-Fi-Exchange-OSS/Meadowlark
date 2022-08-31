@@ -7,7 +7,7 @@ import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
-import { onlyReturnId, onlyReturnExistenceIds, onlyDocumentsReferencing } from './ReferenceValidation';
+import { onlyReturnId, onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
 
 // MongoDB FindOption to return at most 5 documents
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
@@ -24,10 +24,10 @@ export async function deleteDocumentById(
   try {
     await session.withTransaction(async () => {
       if (validate) {
-        // Read for existenceIds to validate against
+        // Read for aliasIds to validate against
         const deleteCandidate: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
           { _id: id },
-          onlyReturnExistenceIds(session),
+          onlyReturnAliasIds(session),
         );
 
         if (deleteCandidate == null) {
@@ -35,7 +35,7 @@ export async function deleteDocumentById(
         } else {
           // Check for any references to the document to be deleted
           const anyReferences: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-            onlyDocumentsReferencing(deleteCandidate.existenceIds),
+            onlyDocumentsReferencing(deleteCandidate.aliasIds),
             onlyReturnId(session),
           );
 
@@ -48,7 +48,7 @@ export async function deleteDocumentById(
 
             // Get the DocumentIdentities of up to five referring documents for failure message purposes
             const referringDocuments = await mongoCollection
-              .find(onlyDocumentsReferencing(deleteCandidate.existenceIds), limitFive(session))
+              .find(onlyDocumentsReferencing(deleteCandidate.aliasIds), limitFive(session))
               .toArray();
 
             const failures: string[] = referringDocuments.map(
