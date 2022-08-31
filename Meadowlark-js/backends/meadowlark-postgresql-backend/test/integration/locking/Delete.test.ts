@@ -20,14 +20,14 @@ import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
-  checkIfDocumentReferenced,
+  findReferencingDocumentIdsSql,
   deleteDocumentByIdSql,
-  deleteExistenceIdsByDocumentId,
-  documentByIdSql,
+  deleteAliasesForDocumentSql,
+  findDocumentByIdSql,
   documentInsertOrUpdateSql,
-  existenceIdsForDocument,
-  existenceInsertSql,
-  referencesInsertSql,
+  findAliasIdsForDocumentSql,
+  insertAliasSql,
+  insertOutboundReferencesSql,
 } from '../../../src/repository/SqlHelper';
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
@@ -94,7 +94,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // ----
     // try {
     await insertClient.query('BEGIN');
-    const outRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
+    const outboundRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
 
@@ -103,7 +103,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const upsertFailures = await validateReferences(
       academicWeekDocumentInfo.documentReferences,
       [],
-      outRefs,
+      outboundRefs,
       insertClient,
       '',
     );
@@ -117,19 +117,19 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     await deleteClient.query('BEGIN');
 
     try {
-      // Get the existence id's for the document we're trying to delete, because the update transaction is trying
+      // Get the alias ids for the document we're trying to delete, because the update transaction is trying
       // to use our school, this is where the code will throw a locking error. This is technically the last line
       // of code in this try block that should execute
-      const existenceIdResult = await deleteClient.query(existenceIdsForDocument(schoolDocumentId));
+      const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentSql(schoolDocumentId));
 
-      const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-      const referenceResult = await deleteClient.query(checkIfDocumentReferenced(validDocIds));
+      const validDocIds = aliasIdResult.rows.map((ref) => ref.alias_id);
+      const referenceResult = await deleteClient.query(findReferencingDocumentIdsSql(validDocIds));
       const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolDocumentId);
 
       expect(anyReferences.length).toEqual(0);
 
       await deleteClient.query(deleteDocumentByIdSql(schoolDocumentId));
-      await deleteClient.query(deleteExistenceIdsByDocumentId(schoolDocumentId));
+      await deleteClient.query(deleteAliasesForDocumentSql(schoolDocumentId));
       await deleteClient.query('COMMIT');
     } catch (e1) {
       await deleteClient.query('ROLLBACK');
@@ -151,9 +151,9 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     const insertResult = await insertClient.query(documentUpsertSql);
     // eslint-disable-next-line no-restricted-syntax
-    for (const ref of outRefs) {
-      await insertClient.query(referencesInsertSql(academicWeekDocumentId, ref));
-      await insertClient.query(existenceInsertSql(academicWeekDocumentId, ref));
+    for (const ref of outboundRefs) {
+      await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
+      await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
     }
 
     // **** The insert of AcademicWeek document should have been successful
@@ -174,7 +174,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const docResult: any = await insertClient.query(documentByIdSql(schoolDocumentId));
+    const docResult: any = await insertClient.query(findDocumentByIdSql(schoolDocumentId));
     expect(docResult.rows[0].document_identity.schoolId).toBe('123');
   });
 });
@@ -195,29 +195,29 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // ----
     await deleteClient.query('BEGIN');
 
-    // Retrieve the existence id's for the school that we're trying to delete, this call will also
+    // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
-    const existenceIdResult = await deleteClient.query(existenceIdsForDocument(schoolDocumentId));
+    const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentSql(schoolDocumentId));
 
     // The school is in the database
-    expect(existenceIdResult.rowCount).toEqual(1);
+    expect(aliasIdResult.rowCount).toEqual(1);
 
     // See if there are existing references to this document
-    const validDocIds = existenceIdResult.rows.map((ref) => ref.existence_id);
-    const referenceResult = await deleteClient.query(checkIfDocumentReferenced(validDocIds));
+    const validDocIds = aliasIdResult.rows.map((ref) => ref.alias_id);
+    const referenceResult = await deleteClient.query(findReferencingDocumentIdsSql(validDocIds));
     const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolDocumentId);
 
     expect(anyReferences.length).toEqual(0);
 
     // Delete the document
     await deleteClient.query(deleteDocumentByIdSql(schoolDocumentId));
-    await deleteClient.query(deleteExistenceIdsByDocumentId(schoolDocumentId));
+    await deleteClient.query(deleteAliasesForDocumentSql(schoolDocumentId));
 
     // Start the insert
     await insertClient.query('BEGIN');
 
-    const outRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
+    const outboundRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
 
@@ -228,7 +228,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       const upsertFailures = await validateReferences(
         academicWeekDocumentInfo.documentReferences,
         [],
-        outRefs,
+        outboundRefs,
         insertClient,
         '',
       );
@@ -251,9 +251,9 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       const insertResult = await insertClient.query(documentUpsertSql);
       expect(insertResult.rowCount).toEqual(0);
       // eslint-disable-next-line no-restricted-syntax
-      for (const ref of outRefs) {
-        await insertClient.query(referencesInsertSql(academicWeekDocumentId, ref));
-        await insertClient.query(existenceInsertSql(academicWeekDocumentId, ref));
+      for (const ref of outboundRefs) {
+        await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
+        await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
       }
       await insertClient.query('COMMIT');
     } catch (e1) {
@@ -273,8 +273,8 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const schoolDocResult: any = await insertClient.query(documentByIdSql(schoolDocumentId));
-    const awDocResult: any = await insertClient.query(documentByIdSql(academicWeekDocumentId));
+    const schoolDocResult: any = await insertClient.query(findDocumentByIdSql(schoolDocumentId));
+    const awDocResult: any = await insertClient.query(findDocumentByIdSql(academicWeekDocumentId));
     expect(schoolDocResult.rowCount).toEqual(0);
     expect(awDocResult.rowCount).toEqual(0);
   });

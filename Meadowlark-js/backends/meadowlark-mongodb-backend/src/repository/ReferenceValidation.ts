@@ -8,12 +8,21 @@ import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions } from '
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
-export async function findReferencedDocumentIdsById(
+/**
+ * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
+ * array for this existence check.
+ *
+ * @param referenceIds The reference ids to check for existence in the db
+ * @param mongoDocuments The MongoDb collection the documents are in
+ * @param findOptions MongoDb findOptions for the query
+ * @returns The subset of the given reference ids that are actually documents in the db
+ */
+async function findReferencedDocumentIdsById(
   referenceIds: string[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocumentId[]> {
-  const findReferencedDocuments = mongoDocuments.find({ existenceIds: { $in: referenceIds } }, findOptions);
+  const findReferencedDocuments = mongoDocuments.find({ aliasIds: { $in: referenceIds } }, findOptions);
   return (await findReferencedDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
 }
 
@@ -21,21 +30,21 @@ export async function findReferencedDocumentIdsById(
  * Finds references in the document that are missing in the database
  *
  * @param refsInDb The document references that were actually found in the db (id property only)
- * @param documentOutRefs The document references extracted from the document, as id strings
+ * @param documentOutboundRefs The document outbound references extracted from the document, as id strings
  * @param documentReferences The DocumentInfo of the document
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
   refsInDb: MeadowlarkDocumentId[],
-  documentOutRefs: string[],
+  documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
 ): string[] {
   // eslint-disable-next-line no-underscore-dangle
   const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef._id);
-  const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, idsOfRefsInDb);
+  const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
 
-  // Gets the array indexes of the missing references, for the documentOutRefs array
-  const arrayIndexesOfMissing: number[] = outRefIdsNotInDb.map((outRefId) => documentOutRefs.indexOf(outRefId));
+  // Gets the array indexes of the missing references, for the documentOutboundRefs array
+  const arrayIndexesOfMissing: number[] = outRefIdsNotInDb.map((outRefId) => documentOutboundRefs.indexOf(outRefId));
 
   // Pick out the DocumentReferences of the missing from the entire array of DocumentReferences,
   const pickedDocumentReferencesOfMissing: DocumentReference[] = R.props(
@@ -51,15 +60,15 @@ export function findMissingReferences(
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
 export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
-// MongoDB FindOption to return only the existenceIds field
-export const onlyReturnExistenceIds = (session: ClientSession): FindOptions => ({
-  projection: { existenceIds: 1 },
+// MongoDB FindOption to return only the aliasIds field
+export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
+  projection: { aliasIds: 1 },
   session,
 });
 
-// MongoDB Filter on documents with the given existenceIds in their outRefs list
-export const onlyDocumentsReferencing = (existenceIds: string[]): Filter<MeadowlarkDocument> => ({
-  outRefs: { $in: existenceIds },
+// MongoDB Filter on documents with the given aliasIds in their outboundRefs list
+export const onlyDocumentsReferencing = (aliasIds: string[]): Filter<MeadowlarkDocument> => ({
+  outboundRefs: { $in: aliasIds },
 });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)

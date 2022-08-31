@@ -24,9 +24,9 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll, retrieveReferencesByDocumentIdSql, verifyExistenceId } from './TestHelper';
+import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
-import { documentByIdSql } from '../../src/repository/SqlHelper';
+import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 
 jest.setTimeout(40000);
 
@@ -128,7 +128,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(documentByIdSql(id));
+    const result: any = await client.query(findDocumentByIdSql(id));
     // await getDocumentById({ ...newGetRequest(), id }, client);
 
     expect(result.rows[0].document_identity.natural).toBe('update2');
@@ -199,14 +199,14 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
     expect(docResult.rows[0].document_identity.natural).toBe('update4');
 
-    expect(outRefs).toMatchInlineSnapshot(`
+    expect(outboundRefs).toMatchInlineSnapshot(`
       Array [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
@@ -296,12 +296,12 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: any = await client.query(documentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
     expect(docResult.rows[0].document_identity.natural).toBe('update6');
-    expect(outRefs).toMatchInlineSnapshot(`
+    expect(outboundRefs).toMatchInlineSnapshot(`
       Array [
         "Qw5FvPdKxAXWnGghsMh3I61yLFfls4Q949Fk2w",
       ]
@@ -403,8 +403,8 @@ describe('given an update of a document with one existing and one non-existent r
   it('should not have updated the document with an invalid reference in the db', async () => {
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
-    expect(outRefs).toHaveLength(0);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    expect(outboundRefs).toHaveLength(0);
   });
 });
 
@@ -500,9 +500,9 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
-    const result: any = await client.query(verifyExistenceId(referencedDocumentId));
-    const outRefs = result.rows.map((row) => row.existence_id);
-    expect(outRefs).toMatchInlineSnapshot(`
+    const result: any = await client.query(verifyAliasId(referencedDocumentId));
+    const outboundRefs = result.rows.map((row) => row.alias_id);
+    expect(outboundRefs).toMatchInlineSnapshot(`
       Array [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]

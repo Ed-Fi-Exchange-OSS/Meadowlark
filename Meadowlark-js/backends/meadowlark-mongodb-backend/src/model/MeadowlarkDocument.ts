@@ -52,13 +52,13 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * An array of ids extracted from the ODS/API document for all externally
    * referenced documents.
    */
-  outRefs: string[];
+  outboundRefs: string[];
 
   /**
    * An array of ids this document will satisfy when reference validation performs existence checks.
-   * This array always includes the document id. If this document is a subclass, the array will also
+   * This array always includes the document id itself. If this document is a subclass, the array will also
    * contain the id of this document in superclass form (superclass name and project, identity property
-   * naming differences - like schoolId versus educationOrganizationId - accounted for).
+   * naming differences - like schoolId versus educationOrganizationId - accounted for). Such an id is an alias.
    *
    * The idea is that a subclass document provides the existence validation of both the document as its given type
    * AND as a reference to the superclass when the identity is equivalent.
@@ -71,7 +71,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    *          a reference from ClassPeriod to a School with schoolId=123, as well as a reference from
    *          Assessment to EducationOrganization with educationOrganizationId=123.
    */
-  existenceIds: string[];
+  aliasIds: string[];
 
   /**
    * True if this document has been reference and descriptor validated.
@@ -110,9 +110,9 @@ export function meadowlarkDocumentFrom(
   validate: boolean,
   createdBy: string,
 ): MeadowlarkDocument {
-  const existenceIds: string[] = [id];
+  const aliasIds: string[] = [id];
   if (documentInfo.superclassInfo != null) {
-    existenceIds.push(documentIdForSuperclassInfo(documentInfo.superclassInfo));
+    aliasIds.push(documentIdForSuperclassInfo(documentInfo.superclassInfo));
   }
 
   return {
@@ -123,8 +123,8 @@ export function meadowlarkDocumentFrom(
     isDescriptor: resourceInfo.isDescriptor,
     _id: id,
     edfiDoc,
-    existenceIds,
-    outRefs: referencedDocumentIdsFrom(documentInfo),
+    aliasIds,
+    outboundRefs: referencedDocumentIdsFrom(documentInfo),
     validated: validate,
     createdBy,
   };

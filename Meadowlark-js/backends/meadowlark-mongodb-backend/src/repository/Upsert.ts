@@ -58,7 +58,7 @@ export async function upsertDocument(
         security.clientId,
       );
 
-      await writeLockReferencedDocuments(mongoCollection, document.outRefs, session);
+      await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
       // Perform the document upsert
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);

@@ -41,8 +41,8 @@ export async function getNewClient(): Promise<MongoClient> {
     const collection = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
 
     // Note this does nothing if the index already exists (triggers an index build otherwise)
-    await collection.createIndex({ outRefs: 1 });
-    await collection.createIndex({ existenceIds: 1 });
+    await collection.createIndex({ outboundRefs: 1 });
+    await collection.createIndex({ aliasIds: 1 });
 
     return newClient;
   } catch (e) {
@@ -88,7 +88,7 @@ export async function writeLockReferencedDocuments(
   session: ClientSession,
 ): Promise<void> {
   await mongoCollection.updateMany(
-    { existenceIds: { $in: referencedDocumentIds } },
+    { aliasIds: { $in: referencedDocumentIds } },
     { $set: { lock: new ObjectId() } },
     { session },
   );

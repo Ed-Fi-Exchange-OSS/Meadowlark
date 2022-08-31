@@ -13,11 +13,11 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
-  existenceInsertSql,
-  deleteExistenceIdsByDocumentId,
-  deleteReferencesSql,
+  insertAliasSql,
+  deleteAliasesForDocumentSql,
+  deleteOutboundReferencesOfDocumentSql,
   documentInsertOrUpdateSql,
-  referencesInsertSql,
+  insertOutboundReferencesSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -27,7 +27,7 @@ export async function updateDocumentById(
 ): Promise<UpdateResult> {
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
-  const outRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
+  const outboundRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
 
@@ -38,7 +38,7 @@ export async function updateDocumentById(
       const failures = await validateReferences(
         documentInfo.documentReferences,
         documentInfo.descriptorReferences,
-        outRefs,
+        outboundRefs,
         client,
         traceId,
       );
@@ -66,31 +66,31 @@ export async function updateDocumentById(
     );
     const result: QueryResult = await client.query(documentSql);
 
-    // Delete existing values from the existence table
-    await client.query(deleteExistenceIdsByDocumentId(id));
+    // Delete existing values from the aliases table
+    await client.query(deleteAliasesForDocumentSql(id));
 
-    // Perform insert of existence ids
-    await client.query(existenceInsertSql(id, id));
+    // Perform insert of alias ids
+    await client.query(insertAliasSql(id, id));
     if (documentInfo.superclassInfo != null) {
-      const existenceId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      await client.query(existenceInsertSql(id, existenceId));
+      const superclassAliasId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      await client.query(insertAliasSql(id, superclassAliasId));
     }
 
     // Delete existing references in references table
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
-    await client.query(deleteReferencesSql(id));
+    await client.query(deleteOutboundReferencesOfDocumentSql(id));
 
-    // Adding descriptors to outRefs for reference checking
-    const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+    // Adding descriptors to outboundRefs for reference checking
+    const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
-    outRefs.push(...descriptorOutRefs);
+    outboundRefs.push(...descriptorOutboundRefs);
 
     // Perform insert of references to the references table
     // eslint-disable-next-line no-restricted-syntax
-    for (const ref of outRefs) {
+    for (const ref of outboundRefs) {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(referencesInsertSql(id, ref));
+      await client.query(insertOutboundReferencesSql(id, ref));
     }
 
     await client.query('COMMIT');

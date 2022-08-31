@@ -21,7 +21,7 @@ import { getCollection, getNewClient, writeLockReferencedDocuments } from '../..
 import {
   validateReferences,
   asUpsert,
-  onlyReturnExistenceIds,
+  onlyReturnAliasIds,
   onlyDocumentsReferencing,
   onlyReturnId,
 } from '../../../src/repository/ReferenceValidation';
@@ -112,7 +112,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // ***** Read-for-write lock the validated referenced documents in the insert
     // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outRefs, upsertSession);
+    await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outboundRefs, upsertSession);
 
     // ----
     // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
@@ -120,15 +120,12 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const deleteSession: ClientSession = client.startSession();
     deleteSession.startTransaction();
 
-    // Get the existenceIds for the School document, used to check for references to it as School or as EducationOrganization
-    const deleteCandidate: any = await mongoCollection.findOne(
-      { _id: schoolDocumentId },
-      onlyReturnExistenceIds(deleteSession),
-    );
+    // Get the aliasIds for the School document, used to check for references to it as School or as EducationOrganization
+    const deleteCandidate: any = await mongoCollection.findOne({ _id: schoolDocumentId }, onlyReturnAliasIds(deleteSession));
 
     // Check for any references to the School document
     const anyReferences = await mongoCollection.findOne(
-      onlyDocumentsReferencing(deleteCandidate.existenceIds),
+      onlyDocumentsReferencing(deleteCandidate.aliasIds),
       onlyReturnId(deleteSession),
     );
 

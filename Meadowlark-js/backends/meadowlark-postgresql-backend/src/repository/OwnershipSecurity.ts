@@ -6,7 +6,7 @@
 import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
-import { documentOwnershipByIdSql } from './SqlHelper';
+import { findOwnershipForDocumentSql } from './SqlHelper';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
   if (frontendRequest.action !== 'upsert') return null;
@@ -40,7 +40,7 @@ export async function rejectByOwnershipSecurity(
   }
 
   try {
-    const result: QueryResult = await client.query(documentOwnershipByIdSql(id));
+    const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
 
     if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
