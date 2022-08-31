@@ -455,7 +455,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
   it('should have a valid reference to superclass in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.outRefs).toMatchInlineSnapshot(`
+    expect(result.outboundRefs).toMatchInlineSnapshot(`
       Array [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
@@ -529,7 +529,7 @@ describe('given an update of a document that references a non-existent document 
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('upsert4');
-    expect(result.outRefs).toMatchInlineSnapshot(`
+    expect(result.outboundRefs).toMatchInlineSnapshot(`
       Array [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
@@ -621,7 +621,7 @@ describe('given an update of a document that references an existing document wit
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('upsert6');
-    expect(result.outRefs).toMatchInlineSnapshot(`
+    expect(result.outboundRefs).toMatchInlineSnapshot(`
       Array [
         "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
       ]
@@ -722,7 +722,7 @@ describe('given an update of a document with one existing and one non-existent r
   it('should not have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.outRefs).toHaveLength(0);
+    expect(result.outboundRefs).toHaveLength(0);
   });
 });
 
@@ -822,7 +822,7 @@ describe('given an update of a subclass document referenced by an existing docum
   it('should have updated the document with a valid reference to superclass in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.outRefs).toMatchInlineSnapshot(`
+    expect(result.outboundRefs).toMatchInlineSnapshot(`
       Array [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]

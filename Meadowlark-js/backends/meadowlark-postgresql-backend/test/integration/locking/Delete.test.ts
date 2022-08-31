@@ -94,7 +94,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // ----
     // try {
     await insertClient.query('BEGIN');
-    const outRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
+    const outboundRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
 
@@ -103,7 +103,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const upsertFailures = await validateReferences(
       academicWeekDocumentInfo.documentReferences,
       [],
-      outRefs,
+      outboundRefs,
       insertClient,
       '',
     );
@@ -151,7 +151,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     const insertResult = await insertClient.query(documentUpsertSql);
     // eslint-disable-next-line no-restricted-syntax
-    for (const ref of outRefs) {
+    for (const ref of outboundRefs) {
       await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
       await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
     }
@@ -217,7 +217,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Start the insert
     await insertClient.query('BEGIN');
 
-    const outRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
+    const outboundRefs = academicWeekDocumentInfo.documentReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
 
@@ -228,7 +228,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       const upsertFailures = await validateReferences(
         academicWeekDocumentInfo.documentReferences,
         [],
-        outRefs,
+        outboundRefs,
         insertClient,
         '',
       );
@@ -251,7 +251,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       const insertResult = await insertClient.query(documentUpsertSql);
       expect(insertResult.rowCount).toEqual(0);
       // eslint-disable-next-line no-restricted-syntax
-      for (const ref of outRefs) {
+      for (const ref of outboundRefs) {
         await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
         await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
       }

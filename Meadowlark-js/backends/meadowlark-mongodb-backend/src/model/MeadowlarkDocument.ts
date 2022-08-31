@@ -52,7 +52,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * An array of ids extracted from the ODS/API document for all externally
    * referenced documents.
    */
-  outRefs: string[];
+  outboundRefs: string[];
 
   /**
    * An array of ids this document will satisfy when reference validation performs existence checks.
@@ -124,7 +124,7 @@ export function meadowlarkDocumentFrom(
     _id: id,
     edfiDoc,
     aliasIds,
-    outRefs: referencedDocumentIdsFrom(documentInfo),
+    outboundRefs: referencedDocumentIdsFrom(documentInfo),
     validated: validate,
     createdBy,
   };

@@ -30,21 +30,21 @@ async function findReferencedDocumentIdsById(
  * Finds references in the document that are missing in the database
  *
  * @param refsInDb The document references that were actually found in the db (id property only)
- * @param documentOutRefs The document references extracted from the document, as id strings
+ * @param documentOutboundRefs The document outbound references extracted from the document, as id strings
  * @param documentReferences The DocumentInfo of the document
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
   refsInDb: MeadowlarkDocumentId[],
-  documentOutRefs: string[],
+  documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
 ): string[] {
   // eslint-disable-next-line no-underscore-dangle
   const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef._id);
-  const outRefIdsNotInDb: string[] = R.difference(documentOutRefs, idsOfRefsInDb);
+  const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
 
-  // Gets the array indexes of the missing references, for the documentOutRefs array
-  const arrayIndexesOfMissing: number[] = outRefIdsNotInDb.map((outRefId) => documentOutRefs.indexOf(outRefId));
+  // Gets the array indexes of the missing references, for the documentOutboundRefs array
+  const arrayIndexesOfMissing: number[] = outRefIdsNotInDb.map((outRefId) => documentOutboundRefs.indexOf(outRefId));
 
   // Pick out the DocumentReferences of the missing from the entire array of DocumentReferences,
   const pickedDocumentReferencesOfMissing: DocumentReference[] = R.props(
@@ -66,9 +66,9 @@ export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
   session,
 });
 
-// MongoDB Filter on documents with the given aliasIds in their outRefs list
+// MongoDB Filter on documents with the given aliasIds in their outboundRefs list
 export const onlyDocumentsReferencing = (aliasIds: string[]): Filter<MeadowlarkDocument> => ({
-  outRefs: { $in: aliasIds },
+  outboundRefs: { $in: aliasIds },
 });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)

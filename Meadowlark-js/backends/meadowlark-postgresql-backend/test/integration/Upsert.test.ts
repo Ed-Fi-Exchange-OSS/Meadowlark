@@ -443,9 +443,9 @@ describe('given an update of a document that references a non-existent document 
     const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
     expect(docResult.rows[0].document_identity.natural).toBe('upsert4');
-    expect(outRefs).toMatchInlineSnapshot(`
+    expect(outboundRefs).toMatchInlineSnapshot(`
         Array [
           "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
         ]
@@ -538,10 +538,10 @@ describe('given an update of a document that references an existing document wit
     const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
     expect(docResult.rows[0].document_identity.natural).toBe('upsert6');
-    expect(outRefs).toMatchInlineSnapshot(`
+    expect(outboundRefs).toMatchInlineSnapshot(`
       Array [
         "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
       ]
@@ -644,9 +644,9 @@ describe('given an update of a document with one existing and one non-existent r
     await client.query(findDocumentByIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
-    const outRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
 
-    expect(outRefs).toHaveLength(0);
+    expect(outboundRefs).toHaveLength(0);
   });
 });
 
@@ -746,8 +746,8 @@ describe('given an update of a subclass document referenced by an existing docum
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
     const result: any = await client.query(verifyAliasId(referencedDocumentId));
-    const outRefs = result.rows.map((row) => row.alias_id);
-    expect(outRefs).toMatchInlineSnapshot(`
+    const outboundRefs = result.rows.map((row) => row.alias_id);
+    expect(outboundRefs).toMatchInlineSnapshot(`
       Array [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]

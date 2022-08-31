@@ -27,7 +27,7 @@ export async function updateDocumentById(
 ): Promise<UpdateResult> {
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
-  const outRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
+  const outboundRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
 
@@ -38,7 +38,7 @@ export async function updateDocumentById(
       const failures = await validateReferences(
         documentInfo.documentReferences,
         documentInfo.descriptorReferences,
-        outRefs,
+        outboundRefs,
         client,
         traceId,
       );
@@ -80,15 +80,15 @@ export async function updateDocumentById(
     Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
     await client.query(deleteOutboundReferencesOfDocumentSql(id));
 
-    // Adding descriptors to outRefs for reference checking
-    const descriptorOutRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
+    // Adding descriptors to outboundRefs for reference checking
+    const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
       documentIdForDocumentReference(dr),
     );
-    outRefs.push(...descriptorOutRefs);
+    outboundRefs.push(...descriptorOutboundRefs);
 
     // Perform insert of references to the references table
     // eslint-disable-next-line no-restricted-syntax
-    for (const ref of outRefs) {
+    for (const ref of outboundRefs) {
       Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(insertOutboundReferencesSql(id, ref));
     }
