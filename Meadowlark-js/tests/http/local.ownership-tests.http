@@ -32,7 +32,7 @@ content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_",
+    "client_id": "meadowlark_key_3",
     "client_secret": "meadowlark_secret_3"
 }
 ###
