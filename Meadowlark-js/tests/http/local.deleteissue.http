@@ -115,7 +115,16 @@ reference-validation: true
         }
     ]
 }
-###
+### This delete will fail because the school is referenced by the location and the ed-org is referenced 
+# by the course
 @schoolDocumentlocation = {{school124.response.headers.location}}
 DELETE http://localhost:3000{{schoolDocumentlocation}}
+{{auth_header}}
+
+### Delete location
+DELETE http://localhost:3000/local/v3.3b/ed-fi/locations/2_wmVcaVb7e8wDIW6zrsXyt9oMDFGnSa4I71pg
+{{auth_header}}
+
+### Delete course, if you re-run school delete above it will succeed
+DELETE http://localhost:3000/local/v3.3b/ed-fi/courses/gVk6pvR7T3njmrMaLWyeGs6QcSz4Nh39LNeueA
 {{auth_header}}

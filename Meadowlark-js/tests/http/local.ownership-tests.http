@@ -1,11 +1,42 @@
 ### Set `ACCESS_TOKEN_REQUIRED=true` environment variable before `yarn start:local`
 # Be sure to load all descriptors into the database first.
 
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
 
-@auth_header_1=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImNsaWVudF9pZCI6ImMzVndaWEl0WjNKbFlYUXRVMGxUIiwianRpIjoiM2Q1OWI3NWYtYTc2Mi00YmFhLTkxMTYtMTljODJmZGY4ZGUzIiwiaWF0IjoxNjM2NTYyMDYwLCJleHAiOjM4NDU1NDg4ODEsInJvbGVzIjpbInZlbmRvciJdfQ.fRcfIgRtfNjfX9-W_U8K0p8q74Sr2wHGjKrWKMzIobM
-@auth_header_2=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InNtYWxsLXRvd24tc2lzIiwiY2xpZW50X2lkIjoiYzIxaGJHd3RkRzkzYmkxemFYTT0iLCJqdGkiOiIwZDBlZmZhNy1hYTFmLTQ3YTctOTg3OS00N2E4YmQ5YzMxYmIiLCJpYXQiOjE2MzY1NjIwNzksImV4cCI6Mzg0NTU0ODg4MSwicm9sZXMiOlsidmVuZG9yIl19.kh1qtfWMrAHhIyJ7y2rsL103n7iGyWKavhrY7_FTL2w
-@auth_header_3=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbImhvc3QiXSwic3ViIjoidGhlLWJlc3Rlc3Qtc2lzIiwiY2xpZW50X2lkIjoiZEdobExXSmxjM1JsYzNRdGMybHoiLCJqdGkiOiI4MjVkNDRiOC1hODExLTRjZmYtYmVmOC1jYzhhNjYxNjliZTAiLCJpYXQiOjE2NTg1MjQyMzUsImV4cCI6MjY1ODUyNzgzNX0.44P9If8UZpEY5tNY_cxlcmPXEKeGw4Dlm1Jm8XnG9xM
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+###
+@auth_header_1=Authorization: bearer {{client1.response.body.$.access_token}}
+###
+# @name client2
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
 
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_2",
+    "client_secret": "meadowlark_secret_2"
+}
+###
+@auth_header_2=Authorization: bearer {{client2.response.body.$.access_token}}
+###
+# @name client3
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_3",
+    "client_secret": "meadowlark_secret_3"
+}
+###
+@auth_header_3=Authorization: bearer {{client3.response.body.$.access_token}}
 
 ### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents

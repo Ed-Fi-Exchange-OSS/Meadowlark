@@ -13,10 +13,11 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
-  insertAliasSql,
-  deleteAliasesForDocumentSql,
-  deleteOutboundReferencesOfDocumentSql,
   documentInsertOrUpdateSql,
+  findAliasIdsForDocumentSql,
+  deleteAliasesForDocumentSql,
+  insertAliasSql,
+  deleteOutboundReferencesOfDocumentSql,
   insertOutboundReferencesSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
@@ -33,6 +34,13 @@ export async function updateDocumentById(
 
   try {
     await client.query('BEGIN');
+
+    const recordExistsResult = await client.query(findAliasIdsForDocumentSql(id));
+
+    if (recordExistsResult.rowCount === 0) {
+      updateResult.response = 'UPDATE_FAILURE_NOT_EXISTS';
+      return updateResult;
+    }
 
     if (validate) {
       const failures = await validateReferences(

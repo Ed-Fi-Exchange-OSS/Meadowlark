@@ -4,7 +4,19 @@
 # - When a request comes in with a document that references an Education Organization, can we validate the
 #   educationOrganizationId properly even though there is no "educationOrganization" entity?
 
-@auth_header=Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInJvbGVzIjpbInZlbmRvciJdLCJzdWIiOiJzdXBlci1ncmVhdC1TSVMiLCJjbGllbnRfaWQiOiJjM1Z3WlhJdFozSmxZWFF0VTBsVCIsImp0aSI6IjI0YzIwMjIwLWYyODUtNGU2My1hOGY0LWIyZGRjMzkzMDAwNCIsImlhdCI6MTY1ODUyMzQwOCwiZXhwIjoyNjU4NTI3MDA4fQ.0Nxd34sGJwkNj4FN8s0iBulZppkCHsQ1lT9JVQTNcxM
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
@@ -19,6 +31,7 @@ content-type: application/json
 
 
 ###
+# @name studentabc
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header}}
@@ -31,6 +44,11 @@ reference-validation: true
     "birthDate": "2001-01-01",
     "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
 }
+
+### 
+@studentDocumentlocation = {{studentabc.response.headers.location}}
+DELETE http://localhost:3000{{studentDocumentlocation}}
+{{auth_header}}
 
 ### 
 GET http://localhost:3000/local/v3.3b/ed-fi/schools
