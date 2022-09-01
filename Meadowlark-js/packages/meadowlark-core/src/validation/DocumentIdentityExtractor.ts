@@ -72,9 +72,9 @@ function documentIdentitiesFrom(
   if (isReferenceElement(identityReferenceComponent)) {
     // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
     if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
-      if (identityReferenceComponent.sourceProperty.roleName) {
-        const roleName = decapitalize(identityReferenceComponent.sourceProperty.roleName?.trim());
-        documentPath.push(`${roleName}SchoolYearTypeReference`);
+      const { roleName } = identityReferenceComponent.sourceProperty;
+      if (roleName != null && roleName.trim().length > 0) {
+        documentPath.push(`${decapitalize(roleName)}SchoolYearTypeReference`);
       } else {
         documentPath.push('schoolYearTypeReference');
       }
