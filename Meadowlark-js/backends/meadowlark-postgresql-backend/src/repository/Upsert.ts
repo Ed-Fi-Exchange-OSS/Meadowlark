@@ -46,14 +46,14 @@ export async function upsertDocument(
 
       if (superclassAliasIdInUse) {
         Logger.debug(
-          `postgresql.repository.Upsert.upsertDocument: Upserting document id ${id} failed due another subclass with the same identity`,
+          `postgresql.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to another subclass with the same identity`,
           traceId,
         );
 
         await client.query('ROLLBACK');
         return {
           response: 'INSERT_FAILURE_CONFLICT',
-          failureMessage: `Insert failed: the identity is in use by another resource with the same superclass`,
+          failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
         };
       }
     }

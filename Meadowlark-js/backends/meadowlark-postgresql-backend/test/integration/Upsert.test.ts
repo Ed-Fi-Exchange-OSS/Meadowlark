@@ -451,7 +451,7 @@ describe('given an upsert of a subclass document when a different subclass has t
   it('should return failure for document insert with same superclass identity as a different superclass', async () => {
     expect(upsertResult.response).toBe('INSERT_FAILURE_CONFLICT');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Insert failed: the identity is in use by another resource with the same superclass"`,
+      `"Insert failed: the identity is in use by 'LocalEducationAgency' which is also a(n) 'EducationOrganization'"`,
     );
   });
 
