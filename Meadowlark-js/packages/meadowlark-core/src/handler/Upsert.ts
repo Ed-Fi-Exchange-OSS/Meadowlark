@@ -74,7 +74,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       return { body: '', statusCode: 409, headers: headerMetadata };
     }
 
-    if (response === 'INSERT_FAILURE_REFERENCE') {
+    if (response === 'INSERT_FAILURE_REFERENCE' || response === 'INSERT_FAILURE_CONFLICT') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, failureMessage);
       return {
         body: JSON.stringify({ message: failureMessage }),

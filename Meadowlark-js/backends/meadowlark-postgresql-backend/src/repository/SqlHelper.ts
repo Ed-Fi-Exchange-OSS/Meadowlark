@@ -34,6 +34,20 @@ export function findAliasIdsForDocumentSql(documentId: string): string {
 }
 
 /**
+ * Returns the SQL query to find the existence of an alias id. Alias ids include the document id
+ * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ *
+ * This function does NOT read-for-write lock.
+ *
+ * @param documentId the id of the document to find aliases for
+ * @returns a SQL query to find the alias ids of the given document
+ */
+export function findAliasIdSql(documentId: string): string {
+  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id = %L`, documentId);
+}
+
+/**
  * Returns the SQL statement for retrieving a document (with identity)
  * @param documentId The identifier of the document to retrieve
  * @returns SQL query string to retrieve a document

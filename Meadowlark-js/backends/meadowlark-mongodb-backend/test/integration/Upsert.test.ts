@@ -16,6 +16,7 @@ import {
   newResourceInfo,
   newSuperclassInfo,
   SuperclassInfo,
+  DocumentIdentity,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -460,6 +461,90 @@ describe('given an upsert of a subclass document referenced by an existing docum
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
+  });
+});
+
+describe('given an upsert of a subclass document when a different subclass has the same superclass identity', () => {
+  let client;
+  let upsertResult;
+
+  const documentIdentity: DocumentIdentity = { educationOrganizationId: '123' };
+
+  const superclassInfo: SuperclassInfo = {
+    ...newSuperclassInfo(),
+    documentIdentity,
+    resourceName: 'EducationOrganization',
+    projectName: 'Ed-Fi',
+  };
+
+  const existingSubclassResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const existingSubclassDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { schoolId: '123' },
+    superclassInfo,
+  };
+  const existingSubclassId = documentIdForDocumentInfo(existingSubclassResourceInfo, existingSubclassDocumentInfo);
+
+  const sameSuperclassIdentityResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'LocalEducationAgency',
+  };
+  const sameSuperclassIdentityDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { localEducationAgencyId: '123' },
+    superclassInfo,
+  };
+  const sameSuperclassIdentityId = documentIdForDocumentInfo(
+    sameSuperclassIdentityResourceInfo,
+    sameSuperclassIdentityDocumentInfo,
+  );
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    //  The existing subclass
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: existingSubclassId,
+        resourceInfo: existingSubclassResourceInfo,
+        documentInfo: existingSubclassDocumentInfo,
+      },
+      client,
+    );
+
+    // The new upserted subclass with the same superclass identity
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        id: sameSuperclassIdentityId,
+        resourceInfo: sameSuperclassIdentityResourceInfo,
+        documentInfo: sameSuperclassIdentityDocumentInfo,
+        validate: true,
+      },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await getCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return failure for document insert with same superclass identity as a different superclass', async () => {
+    expect(upsertResult.response).toBe('INSERT_FAILURE_CONFLICT');
+    expect(upsertResult.failureMessage).toMatchInlineSnapshot(
+      `"Insert failed: the identity is in use by 'LocalEducationAgency' which is also a(n) 'EducationOrganization'"`,
+    );
+  });
+
+  it('should not have inserted the document with the same superclass identity in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const result: any = await collection.findOne({ _id: sameSuperclassIdentityId });
+    expect(result).toBe(null);
   });
 });
 
