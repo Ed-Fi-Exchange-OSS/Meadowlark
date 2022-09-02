@@ -35,7 +35,7 @@ function singleIdentityFrom(property: EntityProperty, body: object, documentPath
 
   let path: string[];
 
-  if (property.type === 'schoolYearEnumeration' && property.roleName) {
+  if (property.type === 'schoolYearEnumeration' && property.roleName !== '') {
     path = [...documentPath, 'schoolYear'];
   } else {
     path = [...documentPath, apiMapping.fullName];
@@ -73,7 +73,7 @@ function documentIdentitiesFrom(
     // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
     if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
       const { roleName } = identityReferenceComponent.sourceProperty;
-      if (roleName != null && roleName.trim().length > 0) {
+      if (roleName !== '') {
         documentPath.push(`${decapitalize(roleName)}SchoolYearTypeReference`);
       } else {
         documentPath.push('schoolYearTypeReference');
