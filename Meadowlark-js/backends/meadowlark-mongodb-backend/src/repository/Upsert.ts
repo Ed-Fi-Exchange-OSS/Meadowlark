@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { UpsertResult, Logger, UpsertRequest } from '@edfi/meadowlark-core';
+import { UpsertResult, Logger, UpsertRequest, documentIdForSuperclassInfo } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getCollection, writeLockReferencedDocuments } from './Db';
 import { asUpsert, onlyReturnId, validateReferences } from './ReferenceValidation';
@@ -20,6 +20,31 @@ export async function upsertDocument(
 
   try {
     await session.withTransaction(async () => {
+      // Check whether this is an insert or update
+      const isInsert: boolean = (await mongoCollection.findOne({ _id: id }, onlyReturnId(session))) == null;
+
+      // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
+      if (isInsert && documentInfo.superclassInfo != null) {
+        const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+        const superclassAliasIdInUse: boolean =
+          (await mongoCollection.findOne({ aliasIds: superclassAliasId }, onlyReturnId(session))) != null;
+
+        if (superclassAliasIdInUse) {
+          Logger.debug(
+            `mongodb.repository.Upsert.upsertDocument: Upserting document id ${id} failed due another subclass with the same identity`,
+            traceId,
+          );
+
+          upsertResult = {
+            response: 'INSERT_FAILURE_CONFLICT',
+            failureMessage: `Insert failed: the identity is in use by another resource with the same superclass`,
+          };
+
+          await session.abortTransaction();
+          return;
+        }
+      }
+
       if (validate) {
         const failures = await validateReferences(
           documentInfo.documentReferences,
@@ -35,9 +60,6 @@ export async function upsertDocument(
             `mongodb.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to invalid references`,
             traceId,
           );
-
-          // Check whether this would have been an insert or update
-          const isInsert: boolean = (await mongoCollection.findOne({ _id: id }, onlyReturnId(session))) == null;
 
           upsertResult = {
             response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',

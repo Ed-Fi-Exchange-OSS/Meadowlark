@@ -20,6 +20,7 @@ import {
   deleteAliasesForDocumentSql,
   insertAliasSql,
   findAliasIdsForDocumentSql,
+  findAliasIdSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -27,15 +28,35 @@ export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: PoolClient,
 ): Promise<UpsertResult> {
-  let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
-
   const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
   try {
     await client.query('BEGIN');
 
+    // Check whether this is an insert or update
     const documentExistsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(id));
     const isInsert: boolean = documentExistsResult.rowCount === 0;
+
+    // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
+    if (isInsert && documentInfo.superclassInfo != null) {
+      const superclassAliasIdInUseResult = await client.query(
+        findAliasIdSql(documentIdForSuperclassInfo(documentInfo.superclassInfo)),
+      );
+      const superclassAliasIdInUse: boolean = superclassAliasIdInUseResult.rowCount !== 0;
+
+      if (superclassAliasIdInUse) {
+        Logger.debug(
+          `postgresql.repository.Upsert.upsertDocument: Upserting document id ${id} failed due another subclass with the same identity`,
+          traceId,
+        );
+
+        await client.query('ROLLBACK');
+        return {
+          response: 'INSERT_FAILURE_CONFLICT',
+          failureMessage: `Insert failed: the identity is in use by another resource with the same superclass`,
+        };
+      }
+    }
 
     const documentUpsertSql: string = documentInsertOrUpdateSql(
       { id, resourceInfo, documentInfo, edfiDoc, validate, security },
@@ -56,12 +77,12 @@ export async function upsertDocument(
           `postgresql.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
           traceId,
         );
-        upsertResult = {
+
+        await client.query('ROLLBACK');
+        return {
           response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
           failureMessage: `Reference validation failed: ${failures.join(',')}`,
         };
-        await client.query('ROLLBACK');
-        return upsertResult;
       }
     }
 
@@ -97,12 +118,10 @@ export async function upsertDocument(
     }
 
     await client.query('COMMIT');
-    upsertResult.response = isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS';
+    return { response: isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS' };
   } catch (e) {
     Logger.error('postgresql.repository.Upsert.upsertDocument', traceId, e);
     await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
-
-  return upsertResult;
 }
