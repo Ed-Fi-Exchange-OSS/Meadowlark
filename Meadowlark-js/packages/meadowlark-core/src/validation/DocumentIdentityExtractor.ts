@@ -32,8 +32,18 @@ type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
  */
 function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentity {
   const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
-  const documentPathAsString: string = [...documentPath, apiMapping.fullName].join('.');
-  const elementValue: string | undefined = R.path([...documentPath, apiMapping.fullName], body);
+
+  let path: string[];
+
+  if (property.type === 'schoolYearEnumeration' && property.roleName !== '') {
+    path = [...documentPath, 'schoolYear'];
+  } else {
+    path = [...documentPath, apiMapping.fullName];
+  }
+
+  const documentPathAsString: string = path.join('.');
+
+  const elementValue: string | undefined = R.path(path, body);
 
   invariant(
     elementValue != null,
@@ -62,7 +72,12 @@ function documentIdentitiesFrom(
   if (isReferenceElement(identityReferenceComponent)) {
     // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
     if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
-      documentPath.push('schoolYearTypeReference');
+      const { roleName } = identityReferenceComponent.sourceProperty;
+      if (roleName !== '') {
+        documentPath.push(`${decapitalize(roleName)}SchoolYearTypeReference`);
+      } else {
+        documentPath.push('schoolYearTypeReference');
+      }
     }
     return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
   }

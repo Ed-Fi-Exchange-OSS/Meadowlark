@@ -152,3 +152,54 @@ describe('when extracting natural key from domain entity with school year in ide
     `);
   });
 });
+
+describe('when extracting natural key from domain entity with school year that has a role name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentIdentity = NoDocumentIdentity;
+
+  const body = {
+    graduationSchoolYearTypeReference: {
+      schoolYear: 2022,
+    },
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('GraduationPlan')
+      .withDocumentation('doc')
+      .withEnumerationIdentity('SchoolYear', 'doc', 'Graduation')
+      .withEndDomainEntity()
+
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    enumerationReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const session = namespace.entity.domainEntity.get('GraduationPlan');
+    result = extractDocumentIdentity(session, body);
+  });
+
+  it('should be correct', () => {
+    expect(result).toMatchInlineSnapshot(`
+      Object {
+        "graduationSchoolYearTypeReference.schoolYear": 2022,
+      }
+    `);
+  });
+});

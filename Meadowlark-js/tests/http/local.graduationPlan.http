@@ -1,0 +1,51 @@
+##
+## Resolves issue described in RND-349. Assumes that everything in 
+## local.33b.superclass.http has been run.
+## 
+
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlanTypeDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+"codeValue": "Recommended",
+"description": "Recommended",
+"shortDescription": "Recommended",
+"namespace": "uri://ed-fi.org/GraduationPlanTypeDescriptor"
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "educationOrganizationReference": {
+    "educationOrganizationId": 123
+  },
+  "graduationSchoolYearTypeReference": {
+    "schoolYear": 2035
+  },
+  "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Recommended",
+  "totalRequiredCredits": 28
+}
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+authorization: bearer {{authToken1}}
