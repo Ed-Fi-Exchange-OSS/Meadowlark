@@ -14,6 +14,7 @@ import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
 const moduleName = 'Query';
+const TOTAL_COUNT_HEADER_NAME: string = 'total-count';
 
 const removeDisallowedQueryParameters = R.omit(['offset', 'limit', 'totalCount']);
 const onlyPaginationParameters = R.pick(['offset', 'limit']);
@@ -54,9 +55,15 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
 
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
   const body = JSON.stringify(documents);
+
+  const headers = {
+    ...frontendRequest.middleware.headerMetadata,
+    [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
+  };
+
   return {
     body,
     statusCode: 200,
-    headers: frontendRequest.middleware.headerMetadata,
+    headers,
   };
 }
