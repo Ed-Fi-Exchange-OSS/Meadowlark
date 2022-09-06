@@ -6,7 +6,7 @@ Instructions for running a local "developer" environment on localhost:
 2. Enable [Yarn](https://yarnpkg.com/getting-started/install) as the package manager
 3. Install [Docker Desktop](https://www.docker.com)
 4. Review the [General Docker Guidance](../Meadowlark-js/docker/using-docker.md) for Meadowlark
-5. The Meadowlark runtime currently requires running both either PostgreSQL or
+5. The Meadowlark runtime currently requires running either PostgreSQL or
    MongoDB as the primary datastore, and OpenSearch as a secondary storage for
    high-performance queries. Before running the Meadowlark code, startup local
    instances of the data stores that you wish to use. The repository comes with
