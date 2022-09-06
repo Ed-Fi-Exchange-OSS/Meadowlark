@@ -2,8 +2,14 @@
 
 These are the instructions for setting up a local environment for Meadowlark
 development and testing. These instructions are independent of remote
-deployment. For remote deployment instructions, please see
-[DEPLOYMENT.md](DEPLOYMENT.md).
+deployment.
+
+## Required Toolkit
+
+* NodeJs 16
+* Yarn 3
+* Docker Desktop or equivalent
+* Visual Studio Code (recommended)
 
 ## Repo structure
 
@@ -53,9 +59,13 @@ Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not
 required, must be loaded in order for descriptors to validate successfully.
 
 * Run `yarn start:local` in one shell.
-* In a second shell, cd into /Meadowlark/eng and the run Invoke-Bulkload.ps1 script
-  * Note: This requires building the [Bulk Load Client Utility](https://techdocs.ed-fi.org/display/ODSAPIS3V53/Bulk+Load+Client+Utility)
-* If using AWS-lambda as your service layer, you can also run `yarn load:descriptors:local` from the /Meadowlark-js/services/meadowlark-aws-lambda folder to load descriptors
+* In a second shell, cd into /Meadowlark/eng and the run Invoke-Bulkload.ps1
+  script
+  * Note: This requires building the [Bulk Load Client
+    Utility](https://techdocs.ed-fi.org/display/ODSAPIS3V53/Bulk+Load+Client+Utility)
+* If using AWS-lambda as your service layer, you can also run `yarn
+  load:descriptors:local` from the /Meadowlark-js/services/meadowlark-aws-lambda
+  folder to load descriptors
 
 ## Other Build Scripts
 

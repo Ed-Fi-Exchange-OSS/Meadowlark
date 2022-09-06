@@ -3,10 +3,10 @@
 :exclamation: This solution should only be used on localhost with proper firewalls around
 external network access to the workstation. Not appropriate for production use.
 
-This Docker Compose file provisions a single node of the OpenSearch search engine and [OpenSearch
-  Dashboard](http://localhost:5601/) (latest versions).
+This Docker Compose file provisions a single node of the OpenSearch search
+engine and [OpenSearch Dashboard](http://localhost:5601/) (latest versions).
 
-### Visualizations in OpenSearch Dashboards
+## Visualizations in OpenSearch Dashboards
 
 Once data starts flowing into OpenSearch, you can setup some basic
 visualizations with the OpenSearch Dashboards. Basic steps:
