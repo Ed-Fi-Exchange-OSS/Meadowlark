@@ -72,6 +72,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   Logger.debug(`Building query`, traceId);
 
   let documents: any = [];
+  let recordCount: number;
   try {
     let query = `SELECT info FROM ${indexFromResourceInfo(resourceInfo)}`;
     let whereClause: string = '';
@@ -99,6 +100,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     Logger.debug(`meadowlark-opensearch-backend: queryDocuments executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
+    recordCount = body.total;
     Logger.debug(`Result: ${JSON.stringify(body)}`, traceId);
     documents = body.datarows.map((datarow) => JSON.parse(datarow));
   } catch (e) {
@@ -118,5 +120,5 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     }
   }
 
-  return { response: 'QUERY_SUCCESS', documents };
+  return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };
 }

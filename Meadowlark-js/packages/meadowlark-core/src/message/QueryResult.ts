@@ -7,4 +7,5 @@ export type QueryResult = {
   response: 'QUERY_SUCCESS' | 'QUERY_FAILURE_INVALID_QUERY' | 'QUERY_FAILURE_AUTHORIZATION' | 'UNKNOWN_FAILURE';
   documents: Array<object>;
   failureMessage?: string;
+  totalCount?: number;
 };

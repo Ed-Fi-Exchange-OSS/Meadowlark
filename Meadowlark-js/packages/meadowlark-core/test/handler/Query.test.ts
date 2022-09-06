@@ -61,6 +61,7 @@ describe('given successful query result', () => {
   let response: FrontendResponse;
   let mockQueryHandler: any;
   const goodResult: object = { goodResult: 'result' };
+  const headers: object = [{ totalCount: '1' }];
 
   beforeAll(async () => {
     mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
@@ -69,6 +70,7 @@ describe('given successful query result', () => {
         Promise.resolve({
           response: 'QUERY_SUCCESS',
           documents: [goodResult],
+          Headers: headers,
         } as unknown as QueryResult),
     });
 
@@ -82,6 +84,10 @@ describe('given successful query result', () => {
 
   it('returns status 200', () => {
     expect(response.statusCode).toEqual(200);
+  });
+
+  it('returns total count of 1', () => {
+    expect(headers[0].totalCount).toEqual('1');
   });
 
   it('returns 1 result', () => {
