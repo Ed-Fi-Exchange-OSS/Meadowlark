@@ -6,7 +6,7 @@
 import querystring from 'querystring';
 import secureRandom from 'secure-random';
 import { Logger } from '../Logger';
-import { client1, client2, client3 } from '../security/HardcodedCredential';
+import { client1, client2, client3, client4 } from '../security/HardcodedCredential';
 import { createToken } from '../security/JwtAction';
 import { Jwt } from '../security/Jwt';
 import { validateJwt } from '../security/JwtValidator';
@@ -101,6 +101,12 @@ export async function postToken(frontendRequest: FrontendRequest): Promise<Front
     if (clientId === client3.key && clientSecret === client3.secret) {
       return {
         body: createTokenResponse(createToken(client3.key, client3.vendor, client3.role)),
+        statusCode: 200,
+      };
+    }
+    if (clientId === client4.key && clientSecret === client4.secret) {
+      return {
+        body: createTokenResponse(createToken(client4.key, client4.vendor, client4.role)),
         statusCode: 200,
       };
     }

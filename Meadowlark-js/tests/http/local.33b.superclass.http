@@ -18,6 +18,20 @@ content-type: application/json
 ###
 @auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
 
+### Authenticate client4 (this client has validation turned off, this is a replacement for reference-validation:false)
+# @name client4
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_4",
+    "client_secret": "meadowlark_secret_4"
+}
+###
+@auth_header4=Authorization: bearer {{client4.response.body.$.access_token}}
+###
+
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
 content-type: application/json
@@ -32,10 +46,10 @@ content-type: application/json
 
 ###
 # @name studentabc
+# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 { 
     "studentUniqueId": "abc",
@@ -107,10 +121,10 @@ content-type: application/json
 
 ### 
 # @name school122
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolId": 122,
@@ -189,11 +203,11 @@ content-type: application/json
 }
 
 ### 
+# reference-validation: false
 # @name lea12
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
-{{auth_header}}
-reference-validation: false
+{{auth_header4}}
 
 {
     "localEducationAgencyId": 12,
@@ -212,10 +226,10 @@ GET http://localhost:3000{{schoolDocumentLocation}}
 {{auth_header}}
 
 ### 
+# reference-validation: true
 PUT http://localhost:3000{{schoolDocumentLocation}}
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "localEducationAgencyId": 12,
@@ -239,10 +253,10 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools
 
 ### 
 # @name school250
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolId": 250,
@@ -276,10 +290,10 @@ content-type: application/json
 }
 
 ####
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "educationOrganizationReference": {
@@ -308,10 +322,10 @@ content-type: application/json
 }
 
 ####
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 { 
     "studentReference": {
@@ -331,10 +345,10 @@ DELETE http://localhost:3000{{school250Documentlocation}}
 
 ### 
 # Don't delete this! Used by tests in other files.
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolId": 123,
@@ -377,10 +391,10 @@ content-type: application/json
 }
 
 ### Create a LocalEducationAgency
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "localEducationAgencyId": 125,
@@ -394,10 +408,10 @@ reference-validation: true
 }
 
 ### Create a location with a LEA - should fail with 400 - Bad Request
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolReference":{
@@ -407,10 +421,10 @@ reference-validation: true
 }
 
 ### Create School
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolId": 124,
@@ -433,10 +447,10 @@ reference-validation: true
 }
 
 ### Atempt to assign School to location - Should succeed
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolReference":{

@@ -45,11 +45,11 @@ content-type: application/json
 }
 
 ### Create School
+# reference-validation: true
 # @name school124
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolId": 124,
@@ -72,10 +72,10 @@ reference-validation: true
 }
 
 ### Atempt to assign School to location - Should succeed
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "schoolReference":{
@@ -96,10 +96,10 @@ content-type: application/json
 }
 
 ####
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 {{auth_header}}
-reference-validation: true
 
 {
     "educationOrganizationReference": {

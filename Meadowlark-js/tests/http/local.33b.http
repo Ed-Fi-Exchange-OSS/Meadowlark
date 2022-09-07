@@ -16,6 +16,22 @@ content-type: application/json
 
 ###
 @authToken1 = {{client1.response.body.$.access_token}}
+###
+
+### Authenticate client4 (this client has validation turned off, this is a replacement for reference-validation:false)
+# @name client4
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_4",
+    "client_secret": "meadowlark_secret_4"
+}
+###
+@authToken4 = {{client4.response.body.$.access_token}}
+###
+
 
 GET http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
 authorization: bearer {{authToken1}}
@@ -82,7 +98,6 @@ authorization: bearer {{authToken1}}
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 content-type: application/json
 authorization: bearer {{authToken1}}
-reference-validation: true
 
 { 
     "studentUniqueId": "s0zf6d1123d3e",
@@ -95,8 +110,7 @@ reference-validation: true
 ### Strict validation is disabled
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 { 
     "studentUniqueId": "s0zf6d1123d3e",
@@ -127,7 +141,6 @@ content-type: application/json
 # @name student
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 { 
@@ -142,8 +155,7 @@ authorization: bearer {{authToken1}}
 ### Update this student
 PUT http://localhost:3000{{student.response.headers.location}}
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 { 
     "studentUniqueId": "s0zf6d1123d3e",
@@ -164,10 +176,9 @@ authorization: bearer {{authToken1}}
     "gradeLevels": []
 }
 
-### Fails - note reference-validation: true
+### Fails - note # reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 { 
@@ -180,11 +191,10 @@ authorization: bearer {{authToken1}}
     }
 }
 
-### Succeeds despite intervention code not existing - note reference-validation: false
+### Succeeds despite intervention code not existing - note uses client4 which has reference validation turned off
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 { 
     "studentReference": {
@@ -200,8 +210,7 @@ authorization: bearer {{authToken1}}
 #### Strict validation is off
 POST http://localhost:3000/local/v3.3b/ed-fi/sections
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 { 
     "sectionIdentifier": "c00v",
@@ -235,10 +244,10 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a location - school does not exist. Should return 400
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
-reference-validation: true
 
 {
   "classroomIdentificationCode": "string",
@@ -252,8 +261,7 @@ reference-validation: true
 ### Create school 123 without validation
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 {
     "schoolId": 123,
@@ -276,9 +284,9 @@ authorization: bearer {{authToken1}}
 }
 
 ### Now the school _does_ exist
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
@@ -322,9 +330,9 @@ descriptor-validation: true
 }
 
 ### Create a course
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
@@ -343,9 +351,9 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a school year
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
@@ -355,10 +363,10 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
+# reference-validation: true
 # @name courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
-reference-validation: true
 authorization: bearer {{authToken1}}
 
 {
@@ -426,9 +434,9 @@ GET http://localhost:3000/local/v3.3b/ed-fi/BehaviorDescriptors/41e20a8e3e29596a
 authorization: bearer {{authToken1}}
 
 ### Create an EducationOrganizationCategory descriptor
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
 authorization: bearer {{authToken1}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -439,9 +447,9 @@ content-type: application/json
 }
 
 ### Create an LocalEducationAgencyCategory descriptor
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencyCategoryDescriptors
 authorization: bearer {{authToken1}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -489,9 +497,9 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a Sex descriptor
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/sexDescriptors
 authorization: bearer {{authToken1}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -571,8 +579,7 @@ authorization: bearer {{authToken1}}
 ### This test covers the scenario previously seen in RND-149
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
 content-type: application/json
-reference-validation: false
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 {
     "educationOrganizationReference": {
