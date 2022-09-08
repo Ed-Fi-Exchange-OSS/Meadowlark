@@ -18,7 +18,7 @@ content-type: application/json
 ###
 @auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
 
-### Authenticate client4 (this client has validation turned off, this is a replacement for reference-validation:false)
+### Authenticate client4 (this client has validation turned off
 # @name client4
 POST http://localhost:3000/local/api/oauth/token
 content-type: application/json

@@ -29,7 +29,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     const request: DeleteRequest = {
       id: frontendRequest.middleware.pathComponents.resourceId,
       resourceInfo: frontendRequest.middleware.resourceInfo,
-      validate: frontendRequest.middleware.security.validateResources,
+      validate: frontendRequest.middleware.validateResources,
       security: frontendRequest.middleware.security,
       traceId: frontendRequest.traceId,
     };

@@ -40,7 +40,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
-      validate: frontendRequest.middleware.security.validateResources,
+      validate: frontendRequest.middleware.validateResources,
       security,
       traceId: frontendRequest.traceId,
     };

@@ -18,7 +18,7 @@ content-type: application/json
 @authToken1 = {{client1.response.body.$.access_token}}
 ###
 
-### Authenticate client4 (this client has validation turned off, this is a replacement for reference-validation:false)
+### Authenticate client4 (this client has validation turned off
 # @name client4
 POST http://localhost:3000/local/api/oauth/token
 content-type: application/json
@@ -153,6 +153,7 @@ authorization: bearer {{authToken1}}
 
 
 ### Update this student
+# reference-validation: false
 PUT http://localhost:3000{{student.response.headers.location}}
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -577,6 +578,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/GeneralStudentProgramAssociations
 authorization: bearer {{authToken1}}
 
 ### This test covers the scenario previously seen in RND-149
+# reference-validation: false
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
 content-type: application/json
 authorization: bearer {{authToken4}}

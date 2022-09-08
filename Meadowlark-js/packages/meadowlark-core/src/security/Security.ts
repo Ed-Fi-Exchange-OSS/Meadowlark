@@ -13,15 +13,12 @@ export type Security = {
   authorizationStrategy: AuthorizationStrategy;
   // Client Id string pulled from JWT client_id
   clientId: string;
-  // Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
-  validateResources: boolean;
 };
 
 export function newSecurity(): Security {
   return {
     authorizationStrategy: 'UNDEFINED',
     clientId: 'UNKNOWN',
-    validateResources: true,
   };
 }
 
