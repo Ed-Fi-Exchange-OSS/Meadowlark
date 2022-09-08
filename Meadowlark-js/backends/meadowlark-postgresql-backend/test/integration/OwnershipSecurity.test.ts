@@ -119,7 +119,8 @@ describe('given the getById of a document owned by the requestor', () => {
     middleware: {
       ...newFrontendRequestMiddleware(),
       pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientId, validateResources: true },
+      security: { authorizationStrategy, clientId },
+      validateResources: true,
     },
   };
 
@@ -176,7 +177,8 @@ describe('given the getById of a document not owned by the requestor', () => {
     middleware: {
       ...newFrontendRequestMiddleware(),
       pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner', validateResources: true },
+      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
+      validateResources: true,
     },
   };
 

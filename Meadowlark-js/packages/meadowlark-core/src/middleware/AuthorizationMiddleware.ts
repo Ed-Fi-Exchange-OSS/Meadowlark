@@ -31,7 +31,8 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
   frontendRequest.middleware.security = {
     authorizationStrategy: jwtStatus.authorizationStrategy as AuthorizationStrategy,
     clientId: jwtStatus.clientId ?? 'UNKNOWN',
-    validateResources: !jwtStatus.roles.includes('assessment'),
   };
+
+  frontendRequest.middleware.validateResources = !jwtStatus.roles.includes('assessment');
   return { frontendRequest, frontendResponse: null };
 }

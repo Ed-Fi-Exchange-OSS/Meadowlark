@@ -56,7 +56,7 @@ describe('when querying for students', () => {
     },
     queryStringParameters,
     paginationParameters,
-    security: { authorizationStrategy, clientId, validateResources: true },
+    security: { authorizationStrategy, clientId },
     traceId: 'tracer',
   });
 
