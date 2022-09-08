@@ -54,6 +54,6 @@ describe('given a PUT of a school', () => {
     `);
     expect(mock.headers.authorization).toBe('bearer 1234');
     expect(mock.path).toBe('/v3.3b/ed-fi/schools');
-    expect(mock.queryStringParameters).toEqual({});
+    expect(mock.queryParameters).toEqual({});
   });
 });

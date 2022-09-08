@@ -3,10 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as DocumentValidator from '../../src/validation/DocumentValidator';
-import { documentValidation } from '../../src/middleware/ValidateDocumentMiddleware';
+import * as DocumentInfoExtractor from '../../src/extraction/DocumentInfoExtractor';
+import { documentInfoExtraction } from '../../src/middleware/ExtractDocumentInfoMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
+import { DocumentInfo, newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
@@ -16,10 +17,10 @@ describe('given a previous middleware has created a response', () => {
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument');
+    mockDocumentValidator = jest.spyOn(DocumentInfoExtractor, 'extractDocumentInfo');
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -34,26 +35,25 @@ describe('given a previous middleware has created a response', () => {
     expect(resultChain.frontendResponse).toBe(frontendResponse);
   });
 
-  it('never calls validateDocument', () => {
+  it('never calls documentInfoExtraction', () => {
     expect(mockDocumentValidator).not.toHaveBeenCalled();
   });
 });
 
-describe('given an error response and document info from documentValidation', () => {
+describe('given a no document info response from extractDocumentInfo', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  const errorBody = 'An error occurred';
   let resultChain: MiddlewareModel;
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = errorBody;
+    const validationResult: DocumentInfo = NoDocumentInfo;
 
     mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
+      .spyOn(DocumentInfoExtractor, 'extractDocumentInfo')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -64,30 +64,31 @@ describe('given an error response and document info from documentValidation', ()
     expect(resultChain.frontendRequest).toBe(frontendRequest);
   });
 
-  it('returns status 400', () => {
-    expect(resultChain.frontendResponse?.statusCode).toEqual(400);
+  it('returns status 404', () => {
+    expect(resultChain.frontendResponse?.statusCode).toEqual(404);
   });
 
-  it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(errorBody);
+  it('returns an empty body', () => {
+    expect(resultChain.frontendResponse?.body).toEqual('');
   });
 });
 
-describe('given a valid response from documentValidation', () => {
+describe('given a document info response from extractDocumentInfo', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
+  const documentInfo = newDocumentInfo();
   const headerMetadata = {};
   let resultChain: MiddlewareModel;
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = '';
+    const validationResult = documentInfo;
 
     mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
+      .spyOn(DocumentInfoExtractor, 'extractDocumentInfo')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -96,6 +97,10 @@ describe('given a valid response from documentValidation', () => {
 
   it('returns the given request', () => {
     expect(resultChain.frontendRequest).toBe(frontendRequest);
+  });
+
+  it('adds documentInfo to frontendRequest', () => {
+    expect(resultChain.frontendRequest.middleware.documentInfo).toBe(documentInfo);
   });
 
   it('adds headerMetadata to frontendRequest', () => {

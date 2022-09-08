@@ -9,7 +9,7 @@ import { PaginationParameters } from './PaginationParameters';
 
 export type QueryRequest = {
   resourceInfo: ResourceInfo;
-  queryStringParameters: object;
+  queryParameters: object;
   paginationParameters: PaginationParameters;
   traceId: string;
   security: Security;

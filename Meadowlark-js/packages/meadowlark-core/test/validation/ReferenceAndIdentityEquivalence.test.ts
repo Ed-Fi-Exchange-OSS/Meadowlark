@@ -19,8 +19,8 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractDocumentReferences } from '../../src/validation/DocumentReferenceExtractor';
-import { extractDocumentIdentity } from '../../src/validation/DocumentIdentityExtractor';
+import { extractDocumentReferences } from '../../src/extraction/DocumentReferenceExtractor';
+import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
 import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
 

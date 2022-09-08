@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { documentIdForDocumentInfo, FrontendRequest, Logger } from '@edfi/meadowlark-core';
+import { documentIdForDocumentInfo, FrontendRequest, Logger, writeRequestToLog } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
 import { findOwnershipForDocumentSql } from './SqlHelper';
@@ -18,8 +18,10 @@ export async function rejectByOwnershipSecurity(
   frontendRequest: FrontendRequest,
   client: PoolClient,
 ): Promise<SecurityResult> {
-  const functionName = 'OwnershipSecurity.rejectByOwnershipSecurity';
-  Logger.info(functionName, frontendRequest.traceId, frontendRequest);
+  const moduleName = 'OwnershipSecurity';
+  const functionName = `${moduleName}.rejectByOwnershipSecurity`;
+
+  writeRequestToLog(moduleName, frontendRequest, 'rejectByOwnershipSecurity');
 
   // If it's a GET request and a descriptor, ignore ownership
   if (

@@ -38,8 +38,8 @@ function sanitize(input: string): string {
  * Convert query string parameters from http request to OpenSearch
  * SQL WHERE conditions. Returns empty string if there are none.
  */
-function whereConditionsFrom(queryStringParameters: object): string {
-  return Object.entries(queryStringParameters)
+function whereConditionsFrom(queryParameters: object): string {
+  return Object.entries(queryParameters)
     .map(([field, value]) => `${field} = '${sanitize(value)}'`)
     .join(' AND ');
 }
@@ -67,7 +67,7 @@ function appendedWhereClause(existingWhereClause: string, newWhereClause: string
  * Entry point for querying with OpenSearch
  */
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
-  const { resourceInfo, queryStringParameters, paginationParameters, traceId } = request;
+  const { resourceInfo, queryParameters, paginationParameters, traceId } = request;
 
   Logger.debug(`Building query`, traceId);
 
@@ -78,8 +78,8 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     let whereClause: string = '';
 
     // API client requested filters
-    if (Object.entries(queryStringParameters).length > 0) {
-      whereClause = whereConditionsFrom(queryStringParameters);
+    if (Object.entries(queryParameters).length > 0) {
+      whereClause = whereConditionsFrom(queryParameters);
     }
 
     // Ownership-based security filter - if the resource is a descriptor we will ignore security

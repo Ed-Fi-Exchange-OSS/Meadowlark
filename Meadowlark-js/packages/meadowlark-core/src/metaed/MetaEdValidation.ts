@@ -9,6 +9,7 @@ import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metae
 import R from 'ramda';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
+import { FrontendQueryParameters } from '../handler/FrontendRequest';
 
 /**
  * Creates a new empty ResourceMatchResult object
@@ -66,17 +67,20 @@ export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, bod
 }
 
 /**
- * Validates that those properties which are present actually belong in the body.
+ * Validates that those queryParameters which are present actually belong in the MetaEd entity.
  */
-export function validatePartialEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): string[] {
-  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(body, {
+export function validateQueryParametersAgainstSchema(
+  metaEdModel: TopLevelEntity,
+  queryParameters: FrontendQueryParameters,
+): string[] {
+  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(queryParameters, {
     abortEarly: false,
     stripUnknown: true,
   });
   if (validationResult != null) {
-    const onlyValidProperties = validationResult.value;
+    const onlyValidParameters = validationResult.value;
 
-    return R.without(Object.keys(onlyValidProperties), Object.keys(body));
+    return R.without(Object.keys(onlyValidParameters), Object.keys(queryParameters));
   }
 
   return [];

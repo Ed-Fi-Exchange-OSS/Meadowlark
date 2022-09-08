@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import winston from 'winston';
-import { FrontendRequest } from './handler/FrontendRequest';
+import { FrontendRequest, frontendRequestForLogging } from './handler/FrontendRequest';
 
 const timestampFormat: string = 'YYYY-MM-DD HH:mm:SS';
 
@@ -108,7 +108,7 @@ export const Logger = {
 };
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
-  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, request);
+  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, frontendRequestForLogging(request));
 }
 
 export function writeDebugStatusToLog(

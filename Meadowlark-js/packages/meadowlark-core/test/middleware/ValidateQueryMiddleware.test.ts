@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as DocumentValidator from '../../src/validation/DocumentValidator';
+import * as QueryStringValidator from '../../src/validation/QueryStringValidator';
 import * as PaginationValidator from '../../src/validation/PaginationValidator';
-import { validateQueryString } from '../../src/middleware/ValidateQueryStringMiddleware';
+import { queryValidation } from '../../src/middleware/ValidateQueryMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
@@ -14,19 +14,19 @@ describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockQueryStringValidator: any;
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'confirmThatPropertiesBelongToDocumentType');
+    mockQueryStringValidator = jest.spyOn(QueryStringValidator, 'validateQueryString');
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters');
 
     // Act
-    resultChain = await validateQueryString({ frontendRequest, frontendResponse });
+    resultChain = await queryValidation({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockQueryStringValidator.mockRestore();
     mockPaginationValidator.mockRestore();
   });
 
@@ -39,7 +39,7 @@ describe('given a previous middleware has created a response', () => {
   });
 
   it('never calls document validator', () => {
-    expect(mockDocumentValidator).not.toHaveBeenCalled();
+    expect(mockQueryStringValidator).not.toHaveBeenCalled();
   });
 
   it('never calls pagination validator', () => {
@@ -50,23 +50,23 @@ describe('given a previous middleware has created a response', () => {
 describe('given there are no query string parameters in the request', () => {
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
-    queryStringParameters: {},
+    queryParameters: {},
   };
 
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockQueryStringValidator: any;
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'confirmThatPropertiesBelongToDocumentType');
+    mockQueryStringValidator = jest.spyOn(QueryStringValidator, 'validateQueryString');
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters');
 
     // Act
-    resultChain = await validateQueryString({ frontendRequest, frontendResponse: null });
+    resultChain = await queryValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockQueryStringValidator.mockRestore();
     mockPaginationValidator.mockRestore();
   });
 
@@ -79,7 +79,7 @@ describe('given there are no query string parameters in the request', () => {
   });
 
   it('never calls document validator', () => {
-    expect(mockDocumentValidator).not.toHaveBeenCalled();
+    expect(mockQueryStringValidator).not.toHaveBeenCalled();
   });
 
   it('never calls pagination validator', () => {
@@ -91,23 +91,23 @@ describe('given an error response from validatePaginationParameters', () => {
   const errorBody = 'An error';
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
-    queryStringParameters: { key: 'value' },
+    queryParameters: { key: 'value' },
   };
 
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockQueryStringValidator: any;
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'confirmThatPropertiesBelongToDocumentType');
+    mockQueryStringValidator = jest.spyOn(QueryStringValidator, 'validateQueryString');
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters').mockReturnValue(errorBody);
 
     // Act
-    resultChain = await validateQueryString({ frontendRequest, frontendResponse: null });
+    resultChain = await queryValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockQueryStringValidator.mockRestore();
     mockPaginationValidator.mockRestore();
   });
 
@@ -121,33 +121,33 @@ describe('given an error response from validatePaginationParameters', () => {
   });
 
   it('never calls document validator', () => {
-    expect(mockDocumentValidator).not.toHaveBeenCalled();
+    expect(mockQueryStringValidator).not.toHaveBeenCalled();
   });
 });
 
-describe('given an error response from confirmThatPropertiesBelongToDocumentType', () => {
+describe('given an error response from validateQueryString', () => {
   const errorBody = 'An error';
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
-    queryStringParameters: { key: 'value' },
+    queryParameters: { key: 'value' },
   };
 
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockQueryStringValidator: any;
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'confirmThatPropertiesBelongToDocumentType')
+    mockQueryStringValidator = jest
+      .spyOn(QueryStringValidator, 'validateQueryString')
       .mockReturnValue(Promise.resolve({ errorBody }));
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters').mockReturnValue(undefined);
 
     // Act
-    resultChain = await validateQueryString({ frontendRequest, frontendResponse: null });
+    resultChain = await queryValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockQueryStringValidator.mockRestore();
     mockPaginationValidator.mockRestore();
   });
 
@@ -164,25 +164,25 @@ describe('given an error response from confirmThatPropertiesBelongToDocumentType
 describe('given valid responses', () => {
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
-    queryStringParameters: { key: 'value' },
+    queryParameters: { key: 'value' },
   };
 
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockQueryStringValidator: any;
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'confirmThatPropertiesBelongToDocumentType')
+    mockQueryStringValidator = jest
+      .spyOn(QueryStringValidator, 'validateQueryString')
       .mockReturnValue(Promise.resolve({ errorBody: undefined }));
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters').mockReturnValue(undefined);
 
     // Act
-    resultChain = await validateQueryString({ frontendRequest, frontendResponse: null });
+    resultChain = await queryValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockQueryStringValidator.mockRestore();
     mockPaginationValidator.mockRestore();
   });
 

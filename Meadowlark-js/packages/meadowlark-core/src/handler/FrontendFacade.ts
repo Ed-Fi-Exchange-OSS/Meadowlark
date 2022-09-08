@@ -19,7 +19,9 @@ import * as Delete from './Delete';
 import * as Query from './Query';
 import * as GetById from './GetById';
 import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
-import { validateQueryString } from '../middleware/ValidateQueryStringMiddleware';
+import { queryValidation } from '../middleware/ValidateQueryMiddleware';
+import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
+import { metaeEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -31,13 +33,15 @@ function postStack(): MiddlewareStack {
       R.andThen(parsePath),
       R.andThen(parseBody),
       R.andThen(resourceValidation),
+      R.andThen(metaeEdModelFinding),
       R.andThen(documentValidation),
+      R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
     ),
   );
 }
 
-// Middleware stack builder put, body and id
+// Middleware stack builder for put, body and id
 function putStack(): MiddlewareStack {
   return R.once(
     R.pipe(
@@ -46,7 +50,9 @@ function putStack(): MiddlewareStack {
       R.andThen(parseBody),
       R.andThen(resourceValidation),
       R.andThen(resourceIdValidation),
+      R.andThen(metaeEdModelFinding),
       R.andThen(documentValidation),
+      R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
     ),
   );
@@ -58,7 +64,6 @@ function deleteStack(): MiddlewareStack {
     R.pipe(
       authorize,
       R.andThen(parsePath),
-      R.andThen(resourceValidation),
       R.andThen(resourceValidation),
       R.andThen(resourceIdValidation),
       R.andThen(getDocumentStore().securityMiddleware),
@@ -80,7 +85,9 @@ function getByIdStack(): MiddlewareStack {
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
 function queryStack(): MiddlewareStack {
-  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(validateQueryString)));
+  return R.once(
+    R.pipe(authorize, R.andThen(resourceValidation), R.andThen(metaeEdModelFinding), R.andThen(queryValidation)),
+  );
 }
 
 /**

@@ -44,7 +44,7 @@ describe('when querying for students', () => {
 
   const setupQueryRequest = (
     authorizationStrategy: AuthorizationStrategy,
-    queryStringParameters: any,
+    queryParameters: any,
     paginationParameters: PaginationParameters,
     clientId = 'hi',
   ): QueryRequest => ({
@@ -54,7 +54,7 @@ describe('when querying for students', () => {
       isDescriptor: false,
       resourceVersion: '3.3.1-b',
     },
-    queryStringParameters,
+    queryParameters,
     paginationParameters,
     security: { authorizationStrategy, clientId },
     traceId: 'tracer',

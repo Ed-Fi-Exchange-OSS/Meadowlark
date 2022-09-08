@@ -25,12 +25,12 @@ const onlyPaginationParameters = R.pick(['offset', 'limit']);
  * Forwards query request to datastore backend
  */
 export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  const cleanQueryParameters: object = removeDisallowedQueryParameters(frontendRequest.queryStringParameters);
-  const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryStringParameters);
+  const cleanQueryParameters: object = removeDisallowedQueryParameters(frontendRequest.queryParameters);
+  const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryParameters);
 
   const request: QueryRequest = {
     resourceInfo: frontendRequest.middleware.resourceInfo,
-    queryStringParameters: cleanQueryParameters,
+    queryParameters: cleanQueryParameters,
     paginationParameters,
     traceId: frontendRequest.traceId,
     security: frontendRequest.middleware.security,

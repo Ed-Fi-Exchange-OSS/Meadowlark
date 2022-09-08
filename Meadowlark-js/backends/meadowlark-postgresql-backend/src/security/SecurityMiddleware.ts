@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Logger, MiddlewareModel } from '@edfi/meadowlark-core';
+import { Logger, MiddlewareModel, writeRequestToLog } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { rejectByOwnershipSecurity } from '../repository/OwnershipSecurity';
 import { SecurityResult } from './SecurityResponse';
@@ -15,19 +15,19 @@ export async function securityMiddleware(
   { frontendRequest, frontendResponse }: MiddlewareModel,
   client: PoolClient,
 ): Promise<MiddlewareModel> {
-  const functionName = 'PostgresSqlBackend.SecurityMiddleware.securityMiddleware';
+  const moduleName = 'PostgresSqlBackend.SecurityMiddleware';
 
   // if there is a response already posted, we are done
   if (frontendResponse != null) {
     return { frontendRequest, frontendResponse };
   }
 
-  Logger.info(functionName, frontendRequest.traceId, frontendRequest);
+  writeRequestToLog(moduleName, frontendRequest, 'securityMiddleware');
 
   // Ownership-based is the only one for now. When others are implemented, do as
   // a stack of security middlewares with this as entry point
   if (frontendRequest.middleware.security.authorizationStrategy !== 'OWNERSHIP_BASED') {
-    Logger.debug(`${functionName} - ownership based security does not apply`, frontendRequest.traceId);
+    Logger.debug(`${moduleName}.securityMiddleware - ownership based security does not apply`, frontendRequest.traceId);
     return { frontendRequest, frontendResponse };
   }
 

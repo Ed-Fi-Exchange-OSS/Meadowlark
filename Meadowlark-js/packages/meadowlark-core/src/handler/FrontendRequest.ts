@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import R, { Lens } from 'ramda';
+import { newTopLevelEntity, NoTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { PathComponents, NoPathComponents } from '../model/PathComponents';
 import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
@@ -13,7 +15,7 @@ export interface FrontendHeaders {
   [header: string]: string | undefined;
 }
 
-export interface FrontendQueryStringParameters {
+export interface FrontendQueryParameters {
   [name: string]: string | undefined;
 }
 
@@ -22,6 +24,8 @@ export interface FrontendRequestMiddleware {
   pathComponents: PathComponents;
   parsedBody: object;
   resourceInfo: ResourceInfo;
+  // Note that TopLevelEntities are usually not JSON serializable
+  matchingMetaEdModel: TopLevelEntity;
   documentInfo: DocumentInfo;
   headerMetadata: { [header: string]: string };
   // Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
@@ -46,7 +50,7 @@ export interface FrontendRequest {
    */
   body: string | null;
   headers: FrontendHeaders;
-  queryStringParameters: FrontendQueryStringParameters;
+  queryParameters: FrontendQueryParameters;
   stage: string; // For example, "local"
   middleware: FrontendRequestMiddleware;
 }
@@ -57,6 +61,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     pathComponents: NoPathComponents,
     parsedBody: {},
     resourceInfo: NoResourceInfo,
+    matchingMetaEdModel: NoTopLevelEntity,
     documentInfo: NoDocumentInfo,
     headerMetadata: {},
     validateResources: true,
@@ -70,8 +75,29 @@ export function newFrontendRequest(): FrontendRequest {
     traceId: '',
     body: null,
     headers: {},
-    queryStringParameters: {},
+    queryParameters: {},
     stage: '',
     middleware: newFrontendRequestMiddleware(),
   };
+}
+
+/**
+ * Type of function that returns a new FrontendRequest based on the given one, with some values set differently.
+ */
+type FrontendRequestSetter = (f: FrontendRequest) => FrontendRequest;
+
+/**
+ * Creates copy of a FrontendRequest suitable for logging, such as removing non-serializable fields
+ */
+export function frontendRequestForLogging(frontendRequest: FrontendRequest): FrontendRequest {
+  const serializableMatchingMetaEdModel = {
+    ...newTopLevelEntity(),
+    metaEdName: frontendRequest.middleware.matchingMetaEdModel.metaEdName,
+  };
+  const pathToMatchingMetaEdModel: Lens<any, any> = R.lensPath(['middleware', 'matchingMetaEdModel']);
+  const replaceMatchingMetaEdModel: FrontendRequestSetter = R.set(
+    pathToMatchingMetaEdModel,
+    serializableMatchingMetaEdModel,
+  );
+  return replaceMatchingMetaEdModel(frontendRequest);
 }

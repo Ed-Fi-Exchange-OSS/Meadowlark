@@ -3,15 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { newDomainEntity } from '@edfi/metaed-core';
-import { validateDocument, DocumentValidationResult } from '../../src/validation/DocumentValidator';
+import { newDomainEntity, newTopLevelEntity } from '@edfi/metaed-core';
+import { validateDocument } from '../../src/validation/DocumentValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
 import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';
 import * as ResourceNameMapping from '../../src/metaed/ResourceNameMapping';
-import { newResourceInfo } from '../../src/model/ResourceInfo';
 
 describe('given a valid resource name but body fails schema validation', () => {
-  let result: DocumentValidationResult;
+  let result: string;
   let mockValidateBodyAgainstSchema: any;
   let mockLoadMetaEdState: any;
   let mockMatchEndpointToMetaEd: any;
@@ -38,9 +37,7 @@ describe('given a valid resource name but body fails schema validation', () => {
     // Act
     result = await validateDocument(
       { version: 'a', namespace: 'b', endpointName: 'match', resourceId: null },
-      newResourceInfo(),
-      {},
-      '',
+      newTopLevelEntity(),
     );
   });
 
@@ -51,6 +48,6 @@ describe('given a valid resource name but body fails schema validation', () => {
   });
 
   it('returns an error message', () => {
-    expect(JSON.parse(result.errorBody ?? '').message).toEqual([failureMessage]);
+    expect(JSON.parse(result).message).toEqual([failureMessage]);
   });
 });
