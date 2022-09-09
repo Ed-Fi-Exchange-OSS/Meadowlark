@@ -101,8 +101,16 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
 
     const { body } = await performSqlQuery(client, query);
     recordCount = body.total;
-    Logger.debug(`Result: ${JSON.stringify(body)}`, traceId);
-    documents = body.datarows.map((datarow) => JSON.parse(datarow));
+
+    const idsReturned: string[] = [];
+    documents = body.datarows.map((datarow) => {
+      const parsedRow = JSON.parse(datarow);
+      // Get the id's of the documents we'll be returning for logging purposes
+      idsReturned.push(parsedRow.id);
+      return parsedRow;
+    });
+
+    Logger.debug(`Documents returned: ${JSON.stringify(idsReturned)}`, traceId);
   } catch (e) {
     const body = JSON.parse(e.meta.body);
 
