@@ -19,15 +19,19 @@ export async function metaeEdModelFinding({ frontendRequest, frontendResponse }:
 
   const matchingMetaEdModel = await findMetaEdModel(frontendRequest.middleware.pathComponents);
   if (matchingMetaEdModel == null) {
-    const errorMessage = 'FindMetaEdModelMiddleware.metaeEdModelFinding: Fatal error - matchingMetaEdModel not found';
+    const errorMessage = `${moduleName}.metaeEdModelFinding: Fatal error - matchingMetaEdModel not found`;
     Logger.error(errorMessage, frontendRequest.traceId);
-    const statusCode = 404;
+    const statusCode = 500;
     writeDebugStatusToLog(moduleName, frontendRequest, 'metaeEdModelFinding', statusCode, errorMessage);
     return {
       frontendRequest,
       frontendResponse: { body: '', statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
+  Logger.debug(
+    `${moduleName}: Found matching MetaEd model ${matchingMetaEdModel.namespace}.${matchingMetaEdModel.metaEdName}`,
+    frontendRequest.traceId,
+  );
 
   frontendRequest.middleware.matchingMetaEdModel = matchingMetaEdModel;
   return { frontendRequest, frontendResponse: null };

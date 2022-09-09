@@ -60,8 +60,8 @@ describe('given a no match response from findMetaEdModel', () => {
     expect(resultChain.frontendRequest).toBe(frontendRequest);
   });
 
-  it('returns status 404', () => {
-    expect(resultChain.frontendResponse?.statusCode).toEqual(404);
+  it('returns status 500', () => {
+    expect(resultChain.frontendResponse?.statusCode).toEqual(500);
   });
 
   it('returns an empty body', () => {
