@@ -32,5 +32,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     authorizationStrategy: jwtStatus.authorizationStrategy as AuthorizationStrategy,
     clientId: jwtStatus.clientId ?? 'UNKNOWN',
   };
+
+  frontendRequest.middleware.validateResources = !jwtStatus.roles.includes('assessment');
   return { frontendRequest, frontendResponse: null };
 }

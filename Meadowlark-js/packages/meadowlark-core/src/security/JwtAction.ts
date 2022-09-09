@@ -26,8 +26,8 @@ const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: [] as string
 /*
  * Creates a standard Meadowlark Jwt.
  */
-export function createToken(clientId: string, vendor: string, role: string): Jwt {
-  claims.roles = [role];
+export function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
+  claims.roles = roles;
   claims.client_id = clientId;
   const token: Jwt = create({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
 

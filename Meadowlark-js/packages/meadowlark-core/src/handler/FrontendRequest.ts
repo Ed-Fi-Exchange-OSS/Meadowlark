@@ -24,6 +24,8 @@ export interface FrontendRequestMiddleware {
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   headerMetadata: { [header: string]: string };
+  // Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
+  validateResources: boolean;
 }
 
 export interface FrontendRequest {
@@ -57,6 +59,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     resourceInfo: NoResourceInfo,
     documentInfo: NoDocumentInfo,
     headerMetadata: {},
+    validateResources: true,
   };
 }
 

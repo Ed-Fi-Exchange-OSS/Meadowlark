@@ -21,9 +21,9 @@ GET http://localhost:3000/metaed
 #################### School
 
 ### Create a GradeLevel descriptor
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/gradeLevelDescriptors
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -34,9 +34,9 @@ content-type: application/json
 }
 
 ### Create an EducationOrganizationCategory descriptor
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -48,9 +48,9 @@ content-type: application/json
 
 
 ### Create a School record
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -78,9 +78,9 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools/?nameOfInstitution=abc
 
 
 ### Update the created record
+# reference-validation: true
 PUT http://localhost:3000/local/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -107,9 +107,9 @@ DELETE http://localhost:3000/local/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlP
 
 
 ### Create an AcademicWeek record
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/academicWeeks
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -129,9 +129,9 @@ GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vdx8w7i
 
 
 ### Update the created record
+# reference-validation: true
 PUT http://localhost:3000/local/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {

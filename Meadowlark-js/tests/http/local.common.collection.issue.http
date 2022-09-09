@@ -34,9 +34,9 @@ content-type: application/json
 
 
 ### Demonstrate problem with common collections - telephones at top level, periods nested in scalar common
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/staffEducationOrganizationContactAssociations
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -83,9 +83,9 @@ content-type: application/json
 
 ### Demonstrate problem with common collections, choice in content standard, uri casing?
 ## When the original problem is fixed, should fail with simple reference validation errors
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/assessments
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -194,9 +194,9 @@ content-type: application/json
 
 ### Demonstrate problem with top level descriptors from original fix
 ## When the original problem is fixed, should fail with simple reference validation errors
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -260,9 +260,9 @@ content-type: application/json
 }
 
 ### Demonstrate problem with top level descriptors from original fix, school year
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {
@@ -318,9 +318,9 @@ content-type: application/json
 }
 
 ### Demonstrate problem with school year resource
+# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
 {{auth_header}}
-reference-validation: true
 content-type: application/json
 
 {

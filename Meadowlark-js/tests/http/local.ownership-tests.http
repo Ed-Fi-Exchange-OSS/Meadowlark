@@ -123,9 +123,9 @@ GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 {{auth_header_3}}
 
 ### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
+# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-reference-validation: true
 {{auth_header_3}}
 
 { 
@@ -137,9 +137,9 @@ reference-validation: true
 }
 
 ### Atempt to access the record with an incorrect authorization header - expect 403
+# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
-reference-validation: true
 {{auth_header_2}}
 
 { 
@@ -151,9 +151,9 @@ reference-validation: true
 }
 
 ### Delete Resource with HOST/FULL_ACCESS authorization - Expect success
+# reference-validation: true
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M801224CfZEcHrCmTjyLf11mBYrw
 content-type: application/json
-reference-validation: true
 {{auth_header_3}}
 
 

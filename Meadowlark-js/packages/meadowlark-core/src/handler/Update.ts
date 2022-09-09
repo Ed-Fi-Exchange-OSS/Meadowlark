@@ -41,7 +41,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
-      validate: frontendRequest.headers['reference-validation'] !== 'false',
+      validate: frontendRequest.middleware.validateResources,
       security,
       traceId: frontendRequest.traceId,
     };
