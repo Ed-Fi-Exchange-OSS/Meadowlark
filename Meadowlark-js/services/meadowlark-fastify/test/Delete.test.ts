@@ -40,6 +40,6 @@ describe('given a DELETE of a school by id', () => {
     expect(mock.body).toBeNull();
     expect(mock.headers.authorization).toBe('bearer 1234');
     expect(mock.path).toBe('/v3.3b/ed-fi/schools/1');
-    expect(mock.queryStringParameters).toEqual({});
+    expect(mock.queryParameters).toEqual({});
   });
 });

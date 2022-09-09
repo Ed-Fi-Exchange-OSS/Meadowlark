@@ -43,7 +43,7 @@ export function fromRequest(fastifyRequest: FastifyRequest): FrontendRequest {
     traceId: fastifyRequest.id ?? '',
     body: fastifyRequest.body as string,
     headers: getHeaders(fastifyRequest),
-    queryStringParameters: (fastifyRequest.query as CompatibleParameters) ?? {},
+    queryParameters: (fastifyRequest.query as CompatibleParameters) ?? {},
     stage: MEADOWLARK_STAGE,
   };
 }

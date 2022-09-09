@@ -20,7 +20,7 @@ import {
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { extractDocumentIdentity } from '../../src/validation/DocumentIdentityExtractor';
+import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {

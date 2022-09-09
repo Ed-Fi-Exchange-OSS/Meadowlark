@@ -3,8 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as DocumentValidator from '../../src/validation/DocumentValidator';
-import { documentValidation } from '../../src/middleware/ValidateDocumentMiddleware';
+import { newTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
+import * as MetaEdModelFinder from '../../src/metaed/MetaEdModelFinder';
+import { metaeEdModelFinding } from '../../src/middleware/FindMetaEdModelMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
@@ -16,10 +17,10 @@ describe('given a previous middleware has created a response', () => {
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument');
+    mockDocumentValidator = jest.spyOn(MetaEdModelFinder, 'findMetaEdModel');
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse });
+    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -34,26 +35,21 @@ describe('given a previous middleware has created a response', () => {
     expect(resultChain.frontendResponse).toBe(frontendResponse);
   });
 
-  it('never calls validateDocument', () => {
+  it('never calls metaeEdModelFinding', () => {
     expect(mockDocumentValidator).not.toHaveBeenCalled();
   });
 });
 
-describe('given an error response and document info from documentValidation', () => {
+describe('given a no match response from findMetaEdModel', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  const errorBody = 'An error occurred';
   let resultChain: MiddlewareModel;
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = errorBody;
-
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
-      .mockReturnValue(Promise.resolve(validationResult));
+    mockDocumentValidator = jest.spyOn(MetaEdModelFinder, 'findMetaEdModel').mockReturnValue(Promise.resolve(undefined));
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -64,30 +60,29 @@ describe('given an error response and document info from documentValidation', ()
     expect(resultChain.frontendRequest).toBe(frontendRequest);
   });
 
-  it('returns status 400', () => {
-    expect(resultChain.frontendResponse?.statusCode).toEqual(400);
+  it('returns status 500', () => {
+    expect(resultChain.frontendResponse?.statusCode).toEqual(500);
   });
 
-  it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(errorBody);
+  it('returns an empty body', () => {
+    expect(resultChain.frontendResponse?.body).toEqual('');
   });
 });
 
-describe('given a valid response from documentValidation', () => {
+describe('given a match response from findMetaEdModel', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
+  const topLevelEntity: TopLevelEntity = newTopLevelEntity();
   const headerMetadata = {};
   let resultChain: MiddlewareModel;
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = '';
-
     mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
-      .mockReturnValue(Promise.resolve(validationResult));
+      .spyOn(MetaEdModelFinder, 'findMetaEdModel')
+      .mockReturnValue(Promise.resolve(topLevelEntity));
 
     // Act
-    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -96,6 +91,10 @@ describe('given a valid response from documentValidation', () => {
 
   it('returns the given request', () => {
     expect(resultChain.frontendRequest).toBe(frontendRequest);
+  });
+
+  it('adds matchingMetaEdModel to frontendRequest', () => {
+    expect(resultChain.frontendRequest.middleware.matchingMetaEdModel).toBe(topLevelEntity);
   });
 
   it('adds headerMetadata to frontendRequest', () => {

@@ -5,50 +5,49 @@
 
 import { newTopLevelEntity, newEntityProperty } from '@edfi/metaed-core';
 import Joi from '@hapi/joi';
-import { validatePartialEntityBodyAgainstSchema } from '../../src/metaed/MetaEdValidation';
+import { validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdValidation';
 
-const createModel = () => {
-  const model = newTopLevelEntity();
-  model.baseEntityName = 'Student';
-  const property = newEntityProperty();
-  property.metaEdName = 'uniqueId';
-  model.properties.concat([property]);
-  model.data.meadowlark = {
-    joiSchema: Joi.object({
-      uniqueId: Joi.string(),
-    }),
-  };
-  return model;
-};
+const createModel = () => ({
+  ...newTopLevelEntity(),
+  baseEntityName: 'Student',
+  properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId' }],
+  data: {
+    meadowlark: {
+      joiSchema: Joi.object({
+        uniqueId: Joi.string(),
+      }),
+    },
+  },
+});
 
-describe('when validating a partial entity body', () => {
-  describe('given body has no properties', () => {
+describe('when validating query parameters', () => {
+  describe('given query parameters have no properties', () => {
     it('should not return an error', () => {
-      const body = {};
+      const queryParameters = {};
 
-      const validationResult = validatePartialEntityBodyAgainstSchema(createModel(), body);
+      const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
 
       expect(validationResult).toHaveLength(0);
     });
   });
 
-  describe('given body has a valid property', () => {
+  describe('given query parameters have a valid property', () => {
     it('should not return an error', () => {
-      const body = { uniqueId: 'a' };
+      const queryParameters = { uniqueId: 'a' };
 
-      const validationResult = validatePartialEntityBodyAgainstSchema(createModel(), body);
+      const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
 
       expect(validationResult).toHaveLength(0);
     });
   });
 
-  describe('given body has two invalid properties and a valid one', () => {
+  describe('given query parameters have two invalid properties and a valid one', () => {
     let validationResult: string[];
 
     beforeAll(() => {
-      const body = { uniqueId: 'a', one: 'one', two: 'two' };
+      const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
 
-      validationResult = validatePartialEntityBodyAgainstSchema(createModel(), body);
+      validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
     });
 
     it('should have two errors', () => {
