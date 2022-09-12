@@ -124,3 +124,7 @@ export function writeDebugStatusToLog(
 export function writeErrorToLog(moduleName: string, traceId: string, method: string, status: number, error?: any): void {
   Logger.error(`${moduleName}.${method} ${status}`, traceId, error);
 }
+
+export function isDebugEnabled(): boolean {
+  return logger.levels[logger.level] >= logger.levels.debug;
+}

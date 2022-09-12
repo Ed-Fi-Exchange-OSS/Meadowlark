@@ -82,16 +82,22 @@ export function newFrontendRequest(): FrontendRequest {
 }
 
 /**
- * matchingMetaEdModel deleter
+ * Returns a copy of a FrontendRequest with the non-serializable 'matchingMetaEdModel' field removed
  */
-const deleteMatchingMetaEdModel: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
+const removeMatchingMetaEdModel: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
   'middleware',
   'matchingMetaEdModel',
 ]);
 
 /**
- * Creates copy of a FrontendRequest suitable for logging, such as removing non-serializable fields
+ * Returns a copy of a FrontendRequest with the sensitive data 'body' field removed
  */
-export function frontendRequestForLogging(frontendRequest: FrontendRequest): FrontendRequest {
-  return deleteMatchingMetaEdModel(frontendRequest);
-}
+const removeBody: (f: FrontendRequest) => FrontendRequest = R.dissoc('body') as (f: FrontendRequest) => FrontendRequest;
+
+/**
+ * Returns a copy of a FrontendRequest suitable for logging, such as with non-serializable fields or sensitive data removed
+ */
+export const frontendRequestForLogging: (f: FrontendRequest) => FrontendRequest = R.compose(
+  removeBody,
+  removeMatchingMetaEdModel,
+);

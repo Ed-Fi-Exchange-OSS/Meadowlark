@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from '@opensearch-project/opensearch';
-import { QueryRequest, QueryResult, Logger, ResourceInfo } from '@edfi/meadowlark-core';
+import { QueryRequest, QueryResult, Logger, ResourceInfo, isDebugEnabled } from '@edfi/meadowlark-core';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 
 /**
@@ -102,15 +102,12 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     const { body } = await performSqlQuery(client, query);
     recordCount = body.total;
 
-    const idsReturned: string[] = [];
-    documents = body.datarows.map((datarow) => {
-      const parsedRow = JSON.parse(datarow);
-      // Get the id's of the documents we'll be returning for logging purposes
-      idsReturned.push(parsedRow.id);
-      return parsedRow;
-    });
+    documents = body.datarows.map((datarow) => JSON.parse(datarow));
 
-    Logger.debug(`Documents returned: ${JSON.stringify(idsReturned)}`, traceId);
+    if (isDebugEnabled()) {
+      const idsForLogging: string[] = documents.map((document) => document.id);
+      Logger.debug(`Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
+    }
   } catch (e) {
     const body = JSON.parse(e.meta.body);
 
