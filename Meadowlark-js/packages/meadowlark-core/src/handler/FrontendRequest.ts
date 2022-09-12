@@ -82,16 +82,51 @@ export function newFrontendRequest(): FrontendRequest {
 }
 
 /**
- * matchingMetaEdModel deleter
+ * Returns a copy of a FrontendRequest with the non-serializable 'matchingMetaEdModel' field removed
  */
-const deleteMatchingMetaEdModel: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
+const removeMatchingMetaEdModel: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
   'middleware',
   'matchingMetaEdModel',
 ]);
 
 /**
- * Creates copy of a FrontendRequest suitable for logging, such as removing non-serializable fields
+ * Returns a copy of a FrontendRequest with the sensitive data 'body' field removed
  */
-export function frontendRequestForLogging(frontendRequest: FrontendRequest): FrontendRequest {
-  return deleteMatchingMetaEdModel(frontendRequest);
-}
+const removeBody: (f: FrontendRequest) => FrontendRequest = R.dissoc('body') as (f: FrontendRequest) => FrontendRequest;
+
+/**
+ * Returns a copy of a FrontendRequest with the sensitive data 'parsedBody' field removed
+ */
+const removeParsedBody: (f: FrontendRequest) => FrontendRequest = R.dissocPath(['middleware', 'parsedBody']);
+
+/**
+ * Returns a copy of a FrontendRequest with the sensitive data 'documentIdentity' field removed
+ */
+const removeDocumentIdentity: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
+  'middleware',
+  'documentInfo',
+  'documentIdentity',
+]);
+
+/**
+ * Returns a copy of a FrontendRequest with the sensitive data 'documentIdentity' field in the document references removed
+ */
+const removeReferencesDocumentIdentity: (f: FrontendRequest) => FrontendRequest = (f: FrontendRequest) => {
+  const cloneOfFrontendRequest: FrontendRequest = R.clone(f);
+  const { documentReferences } = cloneOfFrontendRequest.middleware.documentInfo;
+  cloneOfFrontendRequest.middleware.documentInfo.documentReferences = documentReferences.map((reference) =>
+    (R.dissoc('documentIdentity') as any)(reference),
+  );
+  return cloneOfFrontendRequest;
+};
+
+/**
+ * Returns a copy of a FrontendRequest suitable for logging, such as with non-serializable fields or sensitive data removed
+ */
+export const frontendRequestForLogging: (f: FrontendRequest) => FrontendRequest = R.pipe(
+  removeMatchingMetaEdModel,
+  removeBody,
+  removeParsedBody,
+  removeDocumentIdentity,
+  removeReferencesDocumentIdentity,
+);
