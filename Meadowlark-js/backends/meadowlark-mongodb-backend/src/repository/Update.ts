@@ -58,13 +58,13 @@ export async function updateDocumentById(
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
       // Perform the document update
-      Logger.debug(`mongodb.repository.Upsert.updateDocumentById: Updating document id ${id}`, traceId);
+      Logger.debug(`mongodb.repository.Update.updateDocumentById: Updating document id ${id}`, traceId);
 
       const { matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
       updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
     });
   } catch (e) {
-    Logger.error('mongodb.repository.Upsert.updateDocumentById', traceId, e);
+    Logger.error('mongodb.repository.Update.updateDocumentById', traceId, e);
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

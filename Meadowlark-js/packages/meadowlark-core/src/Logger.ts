@@ -107,10 +107,6 @@ export const Logger = {
   child: () => Logger,
 };
 
-export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
-  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, frontendRequestForLogging(request));
-}
-
 export function writeDebugStatusToLog(
   moduleName: string,
   request: FrontendRequest,
@@ -127,4 +123,14 @@ export function writeErrorToLog(moduleName: string, traceId: string, method: str
 
 export function isDebugEnabled(): boolean {
   return logger.levels[logger.level] >= logger.levels.debug;
+}
+
+export function isInfoEnabled(): boolean {
+  return logger.levels[logger.level] >= logger.levels.info;
+}
+
+export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
+  if (isInfoEnabled()) {
+    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, frontendRequestForLogging(request));
+  }
 }
