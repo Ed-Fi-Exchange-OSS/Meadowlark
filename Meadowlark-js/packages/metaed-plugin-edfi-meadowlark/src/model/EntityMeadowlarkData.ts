@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import Joi from '@hapi/joi';
 import { MetaEdEnvironment, EnhancerResult, getAllEntitiesOfType, ModelBase } from '@edfi/metaed-core';
 import { ApiEntityMapping, NoApiEntityMapping } from './ApiEntityMapping';
-import { CollectedProperty } from './CollectedProperty';
+import type { CollectedProperty } from './CollectedProperty';
+import { SchemaRoot, NoSchemaRoot } from './JsonSchema';
 
 export type EntityMeadowlarkData = {
   /**
@@ -14,9 +14,9 @@ export type EntityMeadowlarkData = {
    */
   apiMapping: ApiEntityMapping;
   /**
-   * The API JSON document Joi schema that corresponds to this MetaEd entity.
+   * The API document JSON schema that corresponds to this MetaEd entity.
    */
-  joiSchema: Joi.AnySchema;
+  jsonSchema: SchemaRoot;
   /**
    * Properties that belong under this entity in the API body
    */
@@ -31,7 +31,7 @@ export function addEntityMeadowlarkDataTo(entity: ModelBase) {
 
   Object.assign(entity.data.meadowlark, {
     apiMapping: NoApiEntityMapping,
-    joiSchema: Joi.any(),
+    jsonSchema: NoSchemaRoot,
     collectedProperties: [],
   });
 }
