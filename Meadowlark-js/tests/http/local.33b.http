@@ -63,10 +63,10 @@ authorization: bearer {{authToken1}}
 
 {
     "contentIdentifier": "933zsd4350",
-    "namespace": "4321",
+    "namespace": "43210",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "21430"
 }
 
 ### Get all EducationContents records - use lower first letter
@@ -84,10 +84,10 @@ authorization: bearer {{authToken1}}
 
 {
     "contentIdentifier": "933zsd4350",
-    "namespace": "4321",
+    "namespace": "43210",
     "shortDescription": "abc+",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "21430"
 }
 
 ### Delete the created record

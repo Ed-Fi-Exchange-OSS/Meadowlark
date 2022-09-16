@@ -248,7 +248,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "optionalDecimalProperties": Object {
             "items": Object {
@@ -266,7 +266,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "optionalPercentProperties": Object {
             "items": Object {
@@ -284,7 +284,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "optionalShortProperties": Object {
             "items": Object {
@@ -302,7 +302,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "optionalYears": Object {
             "items": Object {
@@ -320,7 +320,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredCurrencyProperties": Object {
             "items": Object {
@@ -338,7 +338,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredDateProperties": Object {
             "items": Object {
@@ -357,7 +357,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredDatetimeProperties": Object {
             "items": Object {
@@ -376,7 +376,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredDurationProperties": Object {
             "items": Object {
@@ -394,7 +394,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredIntegerProperties": Object {
             "items": Object {
@@ -414,7 +414,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredStringProperties": Object {
             "items": Object {
@@ -434,7 +434,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "requiredTimeProperties": Object {
             "items": Object {
@@ -453,7 +453,7 @@ describe('when building simple domain entity with all the simple collections', (
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "schoolYearTypeReference": Object {
             "additionalProperties": false,
@@ -498,7 +498,6 @@ describe('when building simple domain entity with all the simple collections', (
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building simple domain entity referencing another referencing another with identity', () => {
@@ -589,7 +588,7 @@ describe('when building simple domain entity referencing another referencing ano
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "courseOfferingReference": Object {
             "additionalProperties": false,
@@ -632,7 +631,6 @@ describe('when building simple domain entity referencing another referencing ano
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity with nested choice and inline commons', () => {
@@ -724,7 +722,7 @@ describe('when building domain entity with nested choice and inline commons', ()
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "derivativeSourceURIs": Object {
             "items": Object {
@@ -743,7 +741,7 @@ describe('when building domain entity with nested choice and inline commons', ()
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "description": Object {
             "description": "doc",
@@ -772,7 +770,7 @@ describe('when building domain entity with nested choice and inline commons', ()
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -790,7 +788,6 @@ describe('when building domain entity with nested choice and inline commons', ()
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity with scalar collection named with prefix of parent entity', () => {
@@ -854,7 +851,7 @@ describe('when building domain entity with scalar collection named with prefix o
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -871,7 +868,6 @@ describe('when building domain entity with scalar collection named with prefix o
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity with Association/DomainEntity collection named with prefix of parent entity', () => {
@@ -949,7 +945,7 @@ describe('when building domain entity with Association/DomainEntity collection n
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -966,7 +962,6 @@ describe('when building domain entity with Association/DomainEntity collection n
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity with a simple common collection', () => {
@@ -1046,7 +1041,7 @@ describe('when building domain entity with a simple common collection', () => {
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -1062,7 +1057,6 @@ describe('when building domain entity with a simple common collection', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity subclass with common collection and descriptor identity in superclass', () => {
@@ -1153,7 +1147,7 @@ describe('when building domain entity subclass with common collection and descri
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -1169,7 +1163,6 @@ describe('when building domain entity subclass with common collection and descri
     const entity = namespace.entity.domainEntitySubclass.get(domainEntitySubclassName);
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building association with a common collection in a common collection', () => {
@@ -1247,7 +1240,7 @@ describe('when building association with a common collection in a common collect
                   },
                   "minItems": 1,
                   "type": "array",
-                  "uniqueItems": true,
+                  "uniqueItems": false,
                 },
                 "streetNumberName": Object {
                   "description": "doc",
@@ -1262,7 +1255,7 @@ describe('when building association with a common collection in a common collect
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "student": Object {
             "description": "doc",
@@ -1282,7 +1275,6 @@ describe('when building association with a common collection in a common collect
     const entity = namespace.entity.domainEntity.get('StudentEducationOrganizationAssociation');
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building domain entity with a descriptor with role name', () => {
@@ -1413,7 +1405,7 @@ describe('when building domain entity with a descriptor collection with role nam
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
           "assessmentIdentifier": Object {
             "description": "doc",
@@ -1523,7 +1515,6 @@ describe('when building domain entity with a common with a choice', () => {
     `);
   });
 
-
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     ajv.compile(entity.data.meadowlark.jsonSchema);
@@ -1612,7 +1603,7 @@ describe('when building domain entity with a common and a common collection with
             },
             "minItems": 1,
             "type": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
           },
         },
         "required": Array [
@@ -1624,7 +1615,6 @@ describe('when building domain entity with a common and a common collection with
       }
     `);
   });
-
 
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
@@ -1686,7 +1676,6 @@ describe('when building domain entity with an all-caps property', () => {
       }
     `);
   });
-
 
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
@@ -1782,7 +1771,6 @@ describe('when building domain entity with a common with a domain entity referen
       }
     `);
   });
-
 
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
@@ -1881,7 +1869,6 @@ describe('when building domain entity with two school year enumerations, one rol
     `);
   });
 
-
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
     ajv.compile(entity.data.meadowlark.jsonSchema);
@@ -1971,7 +1958,6 @@ describe('when building domain entity with reference to domain entity with schoo
     const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building a descriptor', () => {
@@ -2039,7 +2025,6 @@ describe('when building a descriptor', () => {
     const entity = namespace.entity.descriptor.get('GradeLevel');
     ajv.compile(entity.data.meadowlark.jsonSchema);
   });
-
 });
 
 describe('when building a school year enumeration', () => {

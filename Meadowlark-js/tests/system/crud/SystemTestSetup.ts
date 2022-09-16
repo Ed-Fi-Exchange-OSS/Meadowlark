@@ -128,7 +128,7 @@ export function academicWeekBodyClient1(): FrontendRequest {
       "schoolReference": {
           "schoolId": 123
       },
-      "weekIdentifier": "1st",
+      "weekIdentifier": "123456",
       "beginDate": "2022-12-01",
       "endDate": "2022-12-31",
       "totalInstructionalDays": 30

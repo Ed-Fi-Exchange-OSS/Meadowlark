@@ -97,7 +97,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
 
   it('should return put failure', async () => {
     expect(updateResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":[\\"schoolId is required\\",\\"gradeLevels is required\\",\\"nameOfInstitution is required\\",\\"educationOrganizationCategories is required\\"]}"`,
+      `"{\\"message\\":[\\" must have required property 'schoolId'\\",\\" must have required property 'gradeLevels'\\",\\" must have required property 'nameOfInstitution'\\",\\" must have required property 'educationOrganizationCategories'\\"]}"`,
     );
     expect(updateResult.statusCode).toBe(400);
   });

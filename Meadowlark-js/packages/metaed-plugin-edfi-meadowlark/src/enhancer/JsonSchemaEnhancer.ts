@@ -124,7 +124,7 @@ function schemaArrayFrom(schemaArrayElement: SchemaProperty): SchemaArray {
     type: 'array',
     items: schemaArrayElement,
     minItems: 1,
-    uniqueItems: true,
+    uniqueItems: false,
   };
 }
 
@@ -231,8 +231,8 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
     case 'sharedInteger': {
       const result: SchemaProperty = { type: 'integer', description };
       const integerProperty: IntegerProperty = property as IntegerProperty;
-      if (integerProperty.minValue != null) result.minimum = Number(integerProperty.minValue);
-      if (integerProperty.maxValue != null) result.maximum = Number(integerProperty.maxValue);
+      if (integerProperty.minValue) result.minimum = Number(integerProperty.minValue);
+      if (integerProperty.maxValue) result.maximum = Number(integerProperty.maxValue);
       return result;
     }
 
@@ -240,8 +240,8 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
     case 'sharedShort': {
       const result: SchemaProperty = { type: 'integer', description };
       const shortProperty: ShortProperty = property as ShortProperty;
-      if (shortProperty.minValue != null) result.minimum = Number(shortProperty.minValue);
-      if (shortProperty.maxValue != null) result.maximum = Number(shortProperty.maxValue);
+      if (shortProperty.minValue) result.minimum = Number(shortProperty.minValue);
+      if (shortProperty.maxValue) result.maximum = Number(shortProperty.maxValue);
       return result;
     }
 
@@ -249,8 +249,8 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
     case 'sharedString': {
       const result: SchemaProperty = { type: 'string', description };
       const stringProperty: StringProperty = property as StringProperty;
-      if (stringProperty.minLength != null) result.minLength = Number(stringProperty.minLength);
-      if (stringProperty.maxLength != null) result.maxLength = Number(stringProperty.maxLength);
+      if (stringProperty.minLength) result.minLength = Number(stringProperty.minLength);
+      if (stringProperty.maxLength) result.maxLength = Number(stringProperty.maxLength);
       return result;
     }
 

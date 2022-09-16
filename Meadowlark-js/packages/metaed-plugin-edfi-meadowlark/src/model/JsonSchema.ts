@@ -29,7 +29,7 @@ export type SchemaArray = {
   description?: string;
   items: SchemaProperty;
   minItems: number;
-  uniqueItems: true;
+  uniqueItems: false;
 };
 
 /**

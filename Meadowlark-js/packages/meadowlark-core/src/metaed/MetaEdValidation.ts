@@ -65,7 +65,7 @@ export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, bod
   const isValid: boolean = valid(body);
 
   if (isValid) return [];
-  return (valid.errors ?? []).map((error: ErrorObject) => error.message ?? '');
+  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
 }
 
 /**
@@ -81,5 +81,5 @@ export function validateQueryParametersAgainstSchema(
   const isValid: boolean = valid(queryParameters);
 
   if (isValid) return [];
-  return (valid.errors ?? []).map((error: ErrorObject) => error.message ?? '');
+  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
 }
