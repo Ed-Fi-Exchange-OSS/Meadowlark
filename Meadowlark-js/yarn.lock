@@ -688,6 +688,7 @@ __metadata:
     "@types/ramda": 0.27.64
     "@types/semver": ^7.3.10
     "@types/xml2js": ^0.4.11
+    ajv: ^8.11.0
     axios: ^0.25.0
     copyfiles: ^2.4.1
     didyoumean2: ^5.0.0
@@ -3016,7 +3017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.1.0":
+"ajv@npm:^8.1.0, ajv@npm:^8.11.0":
   version: 8.11.0
   resolution: "ajv@npm:8.11.0"
   dependencies:
