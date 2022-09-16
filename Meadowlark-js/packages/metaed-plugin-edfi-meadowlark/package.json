@@ -31,6 +31,8 @@
   },
   "devDependencies": {
     "@hapi/code": "^8.0.7",
+    "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1",
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2"
   },

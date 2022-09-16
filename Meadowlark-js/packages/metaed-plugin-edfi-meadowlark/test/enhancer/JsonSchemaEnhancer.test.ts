@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/* eslint-disable no-underscore-dangle */
+import Ajv from 'ajv/dist/2020';
+import addFormatsTo from 'ajv-formats';
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
@@ -35,6 +36,9 @@ import { enhance as subclassApiEntityMappingEnhancer } from '../../src/enhancer/
 import { enhance as propertyCollectingEnhancer } from '../../src/enhancer/PropertyCollectingEnhancer';
 import { enhance as subclassPropertyCollectingEnhancer } from '../../src/enhancer/SubclassPropertyCollectingEnhancer';
 import { enhance } from '../../src/enhancer/JsonSchemaEnhancer';
+
+const ajv = new Ajv({ allErrors: true });
+addFormatsTo(ajv);
 
 describe('when building simple domain entity with all the simple non-collections', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
@@ -170,6 +174,11 @@ describe('when building simple domain entity with all the simple non-collections
         "type": "object",
       }
     `);
+  });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -484,6 +493,12 @@ describe('when building simple domain entity with all the simple collections', (
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building simple domain entity referencing another referencing another with identity', () => {
@@ -612,6 +627,12 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity with nested choice and inline commons', () => {
@@ -764,6 +785,12 @@ describe('when building domain entity with nested choice and inline commons', ()
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity with scalar collection named with prefix of parent entity', () => {
@@ -839,6 +866,12 @@ describe('when building domain entity with scalar collection named with prefix o
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity with Association/DomainEntity collection named with prefix of parent entity', () => {
@@ -928,6 +961,12 @@ describe('when building domain entity with Association/DomainEntity collection n
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity with a simple common collection', () => {
@@ -1018,6 +1057,12 @@ describe('when building domain entity with a simple common collection', () => {
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity subclass with common collection and descriptor identity in superclass', () => {
@@ -1119,6 +1164,12 @@ describe('when building domain entity subclass with common collection and descri
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntitySubclass.get(domainEntitySubclassName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building association with a common collection in a common collection', () => {
@@ -1226,6 +1277,12 @@ describe('when building association with a common collection in a common collect
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('StudentEducationOrganizationAssociation');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building domain entity with a descriptor with role name', () => {
@@ -1288,6 +1345,11 @@ describe('when building domain entity with a descriptor with role name', () => {
         "type": "object",
       }
     `);
+  });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -1365,6 +1427,11 @@ describe('when building domain entity with a descriptor collection with role nam
         "type": "object",
       }
     `);
+  });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -1454,6 +1521,12 @@ describe('when building domain entity with a common with a choice', () => {
         "type": "object",
       }
     `);
+  });
+
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -1551,6 +1624,12 @@ describe('when building domain entity with a common and a common collection with
       }
     `);
   });
+
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
 });
 
 describe('when building domain entity with an all-caps property', () => {
@@ -1606,6 +1685,12 @@ describe('when building domain entity with an all-caps property', () => {
         "type": "object",
       }
     `);
+  });
+
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -1696,6 +1781,12 @@ describe('when building domain entity with a common with a domain entity referen
         "type": "object",
       }
     `);
+  });
+
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('Assessment');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });
 
@@ -1789,6 +1880,12 @@ describe('when building domain entity with two school year enumerations, one rol
       }
     `);
   });
+
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
 });
 
 describe('when building domain entity with reference to domain entity with school year enumeration as part of identity', () => {
@@ -1869,6 +1966,12 @@ describe('when building domain entity with reference to domain entity with schoo
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building a descriptor', () => {
@@ -1931,6 +2034,12 @@ describe('when building a descriptor', () => {
       }
     `);
   });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.descriptor.get('GradeLevel');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+
 });
 
 describe('when building a school year enumeration', () => {
@@ -1991,5 +2100,10 @@ describe('when building a school year enumeration', () => {
         "type": "object",
       }
     `);
+  });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.schoolYearEnumeration.get('SchoolYear');
+    ajv.compile(entity.data.meadowlark.jsonSchema);
   });
 });

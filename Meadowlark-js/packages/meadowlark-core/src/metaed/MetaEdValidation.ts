@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import Ajv from 'ajv/dist/2020';
+import addFormatsTo from 'ajv-formats';
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import didYouMean from 'didyoumean2';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
@@ -13,6 +14,7 @@ import { FrontendQueryParameters } from '../handler/FrontendRequest';
 
 // Ajv caches compiled schemas, so we'll cache it
 const ajv = new Ajv({ allErrors: true });
+addFormatsTo(ajv);
 
 /**
  * Creates a new empty ResourceMatchResult object
