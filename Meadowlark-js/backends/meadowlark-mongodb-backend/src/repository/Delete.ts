@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DeleteResult, Logger, DeleteRequest } from '@edfi/meadowlark-core';
+import { DeleteResult, Logger, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getCollection } from './Db';
@@ -19,7 +19,7 @@ export async function deleteDocumentById(
   const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
   const session: ClientSession = client.startSession();
 
-  let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE' };
+  let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
 
   try {
     await session.withTransaction(async () => {
@@ -46,19 +46,18 @@ export async function deleteDocumentById(
               traceId,
             );
 
-            // Get the DocumentIdentities of up to five referring documents for failure message purposes
+            // Get the DocumentIdentities of up to five blocking documents for failure message purposes
             const referringDocuments = await mongoCollection
               .find(onlyDocumentsReferencing(deleteCandidate.aliasIds), limitFive(session))
               .toArray();
 
-            const failures: string[] = referringDocuments.map(
-              (document) => `Resource ${document.resourceName} with identity '${JSON.stringify(document.documentIdentity)}'`,
-            );
+            const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+              resourceName: document.resourceName,
+              // eslint-disable-next-line no-underscore-dangle
+              documentId: document._id,
+            }));
 
-            deleteResult = {
-              response: 'DELETE_FAILURE_REFERENCE',
-              failureMessage: `Delete failed due to existing references to document: ${failures.join(',')}`,
-            };
+            deleteResult = { response: 'DELETE_FAILURE_REFERENCE', blockingDocuments };
 
             await session.abortTransaction();
             return;
@@ -70,7 +69,7 @@ export async function deleteDocumentById(
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
       const { deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
-      deleteResult.response = deletedCount === 0 ? 'DELETE_FAILURE_NOT_EXISTS' : 'DELETE_SUCCESS';
+      deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
     });
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, e);

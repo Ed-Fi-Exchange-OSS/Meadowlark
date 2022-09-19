@@ -33,7 +33,7 @@ export const NoDocumentStorePlugin: DocumentStorePlugin = {
 
   deleteDocumentById: async ({ traceId }: DeleteRequest): Promise<DeleteResult> => {
     Logger.warn('NoDocumentStorePlugin.deleteDocumentById(): No backend plugin has been configured', traceId);
-    return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+    return Promise.resolve({ response: 'UNKNOWN_FAILURE', failureMessage: '' });
   },
 
   securityMiddleware: async (middlewareModel: MiddlewareModel): Promise<MiddlewareModel> => {

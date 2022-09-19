@@ -3,12 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type DeleteResult = {
-  response:
-    | 'DELETE_SUCCESS'
-    | 'DELETE_FAILURE_REFERENCE'
-    | 'DELETE_FAILURE_NOT_EXISTS'
-    | 'DELETE_FAILURE_AUTHORIZATION'
-    | 'UNKNOWN_FAILURE';
-  failureMessage?: string;
+import { BlockingDocument } from './BlockingDocument';
+
+export type DeleteFailureReference = {
+  response: 'DELETE_FAILURE_REFERENCE';
+  blockingDocuments: BlockingDocument[];
 };
+
+export type DeleteResult =
+  | DeleteFailureReference
+  | { response: 'DELETE_SUCCESS' }
+  | { response: 'DELETE_FAILURE_NOT_EXISTS' }
+  | { response: 'DELETE_FAILURE_AUTHORIZATION'; failureMessage: string }
+  | { response: 'UNKNOWN_FAILURE'; failureMessage: string };

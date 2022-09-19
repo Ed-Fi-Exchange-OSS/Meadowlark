@@ -33,6 +33,9 @@ export interface FrontendRequestMiddleware {
 }
 
 export interface FrontendRequest {
+  /**
+   * The requested action from a Meadowlark frontend
+   */
   action: Action;
   /**
    * The URL path in the form /version/namespace/resource and optionally /resourceId
@@ -49,9 +52,20 @@ export interface FrontendRequest {
    * Unparsed request body provided by the frontend service as a string, or null if there is no body
    */
   body: string | null;
+
   headers: FrontendHeaders;
+
   queryParameters: FrontendQueryParameters;
-  stage: string; // For example, "local"
+
+  /**
+   * The stage, which is an optional prefix of the URL. Allows for multiple deployments on the same server
+   * e.g. "dev" or "staging". Does not include slash characters.
+   */
+  stage: string;
+
+  /**
+   * The location of data provided by middlewares. Managed by meadowlark-core.
+   */
   middleware: FrontendRequestMiddleware;
 }
 

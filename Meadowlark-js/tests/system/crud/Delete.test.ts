@@ -129,11 +129,9 @@ describe('given the DELETE of a school referenced by an academic week', () => {
   });
 
   it('should return delete failure due to a reference to the school', async () => {
-    expect(deleteResult.body).toMatch(
-      'Delete failed due to existing references to document: Resource AcademicWeek with identity',
+    expect(deleteResult.body).toMatchInlineSnapshot(
+      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/AcademicWeek/02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g\\"]}"`,
     );
-    expect(deleteResult.body).toMatch('\\"schoolReference.schoolId\\":123');
-    expect(deleteResult.body).toMatch('\\"weekIdentifier\\":\\"123456');
     expect(deleteResult.statusCode).toBe(409);
   });
 
@@ -166,7 +164,7 @@ describe('given the DELETE of a descriptor referenced by a school on an UPSERT',
 
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '{\\\\\\"schoolId\\\\\\":123}'\\"}"`,
+      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/School/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\"]}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });
@@ -206,7 +204,7 @@ describe('given the DELETE of a descriptor referenced by a school after an UPDAT
 
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource School with identity '{\\\\\\"schoolId\\\\\\":123}'\\"}"`,
+      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/School/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\"]}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });
@@ -259,7 +257,7 @@ describe('given the DELETE of a school referenced by a course', () => {
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult).not.toBeNull();
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Delete failed due to existing references to document: Resource Course with identity '{\\\\\\"courseCode\\\\\\":\\\\\\"1234\\\\\\",\\\\\\"educationOrganizationReference.educationOrganizationId\\\\\\":123}'\\"}"`,
+      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/Course/gVk6pvR7T3njmrMaEWSFVEEAk4Y1qu_SmnCY5g\\"]}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });
