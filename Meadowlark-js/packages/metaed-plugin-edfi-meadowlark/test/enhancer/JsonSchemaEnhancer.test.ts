@@ -500,7 +500,7 @@ describe('when building simple domain entity with all the simple collections', (
   });
 });
 
-describe('when building simple domain entity referencing another referencing another with identity', () => {
+describe('when building a domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   const namespaceName = 'EdFi';
   const domainEntityName = 'DomainEntityName';
@@ -620,6 +620,110 @@ describe('when building simple domain entity referencing another referencing ano
           "sectionIdentifier",
           "courseOfferingReference",
           "classPeriods",
+        ],
+        "title": "EdFi.DomainEntityName",
+        "type": "object",
+      }
+    `);
+  });
+
+  it('should be well-formed according to ajv', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+});
+
+describe('when building a domain entity referencing CourseOffering with an implicit merge between School and Session.School', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  const domainEntityName = 'DomainEntityName';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity(domainEntityName)
+      .withDocumentation('doc')
+      .withStringIdentity('SectionIdentifier', 'doc', '30')
+      .withDomainEntityIdentity('CourseOffering', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('CourseOffering')
+      .withDocumentation('doc')
+      .withStringIdentity('LocalCourseCode', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withDomainEntityIdentity('Session', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('School')
+      .withDocumentation('doc')
+      .withStringIdentity('SchoolId', 'doc', '30')
+      .withEndDomainEntity()
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    domainEntityReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get(domainEntityName);
+    expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
+      Object {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "description": "doc",
+        "properties": Object {
+          "courseOfferingReference": Object {
+            "additionalProperties": false,
+            "properties": Object {
+              "localCourseCode": Object {
+                "description": "doc",
+                "maxLength": 30,
+                "type": "string",
+              },
+              "schoolId": Object {
+                "description": "doc",
+                "maxLength": 30,
+                "type": "string",
+              },
+              "sessionName": Object {
+                "description": "doc",
+                "maxLength": 30,
+                "type": "string",
+              },
+            },
+            "required": Array [
+              "localCourseCode",
+              "schoolId",
+              "sessionName",
+            ],
+            "type": "object",
+          },
+          "sectionIdentifier": Object {
+            "description": "doc",
+            "maxLength": 30,
+            "type": "string",
+          },
+        },
+        "required": Array [
+          "sectionIdentifier",
+          "courseOfferingReference",
         ],
         "title": "EdFi.DomainEntityName",
         "type": "object",

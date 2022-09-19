@@ -147,7 +147,7 @@ function schemaObjectForReferentialProperty(
   propertyModifier: PropertyModifier,
 ): SchemaObject {
   const schemaProperties: SchemaProperties = {};
-  const required: string[] = [];
+  const required: Set<string> = new Set();
 
   const referencedEntityApiMapping = (property.referencedEntity.data.meadowlark as EntityMeadowlarkData).apiMapping;
 
@@ -157,14 +157,19 @@ function schemaObjectForReferentialProperty(
 
     const schemaProperty: SchemaProperty = schemaPropertyFor(identityProperty, propertyModifier);
 
+    // Note that this key/value usage of Object implictly merges by overwrite if there is more than one scalar property
+    // with the same name sourced from different identity reference properties. There is no need to check
+    // properties for merge directive annotations because MetaEd has already validated merges and any scalar identity
+    // property name duplication _must_ be a merge.
     schemaProperties[schemaPropertyName] = schemaProperty;
 
     if (isSchemaPropertyRequired(identityProperty, propertyModifier)) {
-      required.push(schemaPropertyName);
+      // As above, this usage of Set this implictly merges by overwrite
+      required.add(schemaPropertyName);
     }
   });
 
-  return schemaObjectFrom(schemaProperties, required);
+  return schemaObjectFrom(schemaProperties, Array.from(required.values()));
 }
 
 /**
