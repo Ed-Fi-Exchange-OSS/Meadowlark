@@ -1,0 +1,474 @@
+# These tests cover an edge case discovered in the course of working on RND-67;
+# namely, how are merge directives handled? This impacted the ability to upload
+# StudentGradeBookEntries, where Section and GradeBookEntry properties are
+# merged into a single object.
+
+
+# Assumes you have already loaded all descriptors from the default descriptor set.
+
+### Authenticate
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/students
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "studentUniqueId": "604822",
+  "birthDate": "2014-11-13",
+  "firstName": "Tyrone",
+  "lastSurname": "Dyer",
+  "personalTitlePrefix": "Mr"
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "schoolYear": 2022,
+  "currentSchoolYear": false
+}
+
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/educationServiceCenters
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "educationServiceCenterId": 255950,
+  "nameOfInstitution": "Region 99 Education Service Center",
+  "addresses": [
+    {
+      "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Mailing",
+      "city": "Dallas",
+      "postalCode": "75217",
+      "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+      "streetNumberName": "P.O. Box 898",
+      "nameOfCounty": "Dallas"
+    },
+    {
+      "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Physical",
+      "city": "Dallas",
+      "postalCode": "75217",
+      "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+      "streetNumberName": "898 Texas Education Blvd.",
+      "nameOfCounty": "Dallas"
+    }
+  ],
+  "categories": [
+    {
+      "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Education Service Center"
+    }
+  ],
+  "identificationCodes": [
+    {
+      "educationOrganizationIdentificationSystemDescriptor": "uri://ed-fi.org/EducationOrganizationIdentificationSystemDescriptor#NCES",
+      "identificationCode": "255950"
+    }
+  ],
+  "institutionTelephones": [
+    {
+      "institutionTelephoneNumberTypeDescriptor": "uri://ed-fi.org/InstitutionTelephoneNumberTypeDescriptor#Fax",
+      "telephoneNumber": "(214) 876-8921"
+    },
+    {
+      "institutionTelephoneNumberTypeDescriptor": "uri://ed-fi.org/InstitutionTelephoneNumberTypeDescriptor#Main",
+      "telephoneNumber": "(214) 876-8290"
+    }
+  ]
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+ {
+    "educationServiceCenterReference": {
+      "educationServiceCenterId": 255950
+    },
+    "localEducationAgencyId": 255901,
+    "nameOfInstitution": "Grand Bend ISD",
+    "shortNameOfInstitution": "GBISD",
+    "webSite": "http://www.GBISD.edu/",
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent",
+    "addresses": [
+      {
+        "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Mailing",
+        "city": "Grand Bend",
+        "postalCode": "73334-9376",
+        "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+        "streetNumberName": "P.O. Box 9376",
+        "nameOfCounty": "Williston"
+      },
+      {
+        "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Physical",
+        "city": "Grand Bend",
+        "postalCode": "73334",
+        "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+        "streetNumberName": "123 Main Street",
+        "nameOfCounty": "Williston"
+      }
+    ],
+    "categories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency"
+      }
+    ],
+    "identificationCodes": [
+      {
+        "educationOrganizationIdentificationSystemDescriptor": "uri://ed-fi.org/EducationOrganizationIdentificationSystemDescriptor#SEA",
+        "identificationCode": "255901"
+      }
+    ],
+    "institutionTelephones": [
+      {
+        "institutionTelephoneNumberTypeDescriptor": "uri://ed-fi.org/InstitutionTelephoneNumberTypeDescriptor#Fax",
+        "telephoneNumber": "(950) 366-2320"
+      },
+      {
+        "institutionTelephoneNumberTypeDescriptor": "uri://ed-fi.org/InstitutionTelephoneNumberTypeDescriptor#Main",
+        "telephoneNumber": "(950) 367-2013"
+      }
+    ]
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+    "localEducationAgencyReference": {
+      "localEducationAgencyId": 255901
+    },
+    "schoolId": 255901001,
+    "nameOfInstitution": "Grand Oaks High School",
+    "shortNameOfInstitution": "Grand Oaks High School",
+    "addresses": [
+      {
+        "addressTypeDescriptor": "uri://ed-fi.org/AddressTypeDescriptor#Physical",
+        "city": "Grand Oaks",
+        "postalCode": "73334",
+        "stateAbbreviationDescriptor": "uri://ed-fi.org/StateAbbreviationDescriptor#TX",
+        "streetNumberName": "456 Oaks Street"
+      }
+    ],
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#School"
+      }
+    ],
+    "gradeLevels": [
+      {
+        "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#Ninth grade"
+      },
+      {
+        "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#Eleventh grade"
+      },
+      {
+        "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#Tenth grade"
+      },
+      {
+        "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#Twelfth grade"
+      }
+    ]
+}
+
+
+
+### 
+POST http://localhost:3000/local/v3.3b/ed-fi/courses
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+    "educationOrganizationReference": {
+      "educationOrganizationId": 255901001
+    },
+    "courseCode": "03100500",
+    "academicSubjectDescriptor": "uri://ed-fi.org/AcademicSubjectDescriptor#Mathematics",
+    "courseDefinedByDescriptor": "uri://ed-fi.org/CourseDefinedByDescriptor#SEA",
+    "courseDescription": "Algebra I",
+    "courseGPAApplicabilityDescriptor": "uri://ed-fi.org/CourseGPAApplicabilityDescriptor#Applicable",
+    "courseTitle": "Algebra I",
+    "highSchoolCourseRequirement": true,
+    "numberOfParts": 1,
+    "identificationCodes": [
+      {
+        "courseIdentificationSystemDescriptor": "uri://ed-fi.org/CourseIdentificationSystemDescriptor#LEA course code",
+        "courseCatalogURL": "http://www.GBISD.edu/coursecatalog",
+        "identificationCode": "ALG-1"
+      },
+      {
+        "courseIdentificationSystemDescriptor": "uri://ed-fi.org/CourseIdentificationSystemDescriptor#State course code",
+        "identificationCode": "03100500"
+      }
+    ],
+    "learningStandards": [
+      {
+        "learningStandardReference": {
+          "learningStandardId": "111.32.NA.A.1.D"
+        }
+      }
+    ],
+    "levelCharacteristics": [
+      {
+        "courseLevelCharacteristicDescriptor": "uri://ed-fi.org/CourseLevelCharacteristicDescriptor#Core Subject"
+      }
+    ]
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "localCourseCode": "ALG-1",
+  "schoolReference": {    
+      "schoolId": 255901001
+  },
+  "courseReference": {
+     "courseCode": "03100500",
+     "educationOrganizationId": 255901001
+  },
+  "sessionReference": {
+    "schoolYear": 2022,
+    "sessionName": "2021-2022 Fall Semester",
+    "schoolId": 255901001
+  }
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/gradingPeriods
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "schoolReference": {
+    "schoolId": 255901001
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2022
+  },
+  "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#First Semester",
+  "periodSequence": 3,
+  "beginDate": "2021-08-23",
+  "endDate": "2021-12-15",
+  "totalInstructionalDays": 83
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/gradingPeriods
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "schoolReference": {
+    "schoolId": 255901001
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2022
+  },
+  "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#First Six Weeks",
+  "periodSequence": 1,
+  "beginDate": "2021-08-23",
+  "endDate": "2021-10-05",
+  "totalInstructionalDays": 32
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/gradingPeriods
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+ {
+  "schoolReference": {
+    "schoolId": 255901001
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2022
+  },
+  "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#Second Six Weeks",
+  "periodSequence": 2,
+  "beginDate": "2021-10-06",
+  "endDate": "2021-12-15",
+  "totalInstructionalDays": 51
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/gradingPeriods
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "schoolReference": {
+    "schoolId": 255901001
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2022
+  },
+  "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#End of Year",
+  "periodSequence": 4,
+  "beginDate": "2021-08-23",
+  "endDate": "2021-12-15",
+  "totalInstructionalDays": 83
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/sessions
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "schoolReference": {
+    "schoolId": 255901001
+  },
+  "schoolYearTypeReference": {
+    "schoolYear": 2022
+  },
+  "sessionName": "2021-2022 Fall Semester",
+  "beginDate": "2021-08-23",
+  "endDate": "2021-12-15",
+  "termDescriptor": "uri://ed-fi.org/TermDescriptor#Fall Semester",
+  "totalInstructionalDays": 83,
+  "gradingPeriods": [
+    {
+      "gradingPeriodReference": {
+        "schoolId": 255901001,
+        "schoolYear": 2022,
+        "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#First Semester",
+        "periodSequence": 3
+      }
+    },
+    {
+      "gradingPeriodReference": {
+        "schoolId": 255901001,
+        "schoolYear": 2022,
+        "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#First Six Weeks",
+        "periodSequence": 1
+      }
+    },
+    {
+      "gradingPeriodReference": {
+        "schoolId": 255901001,
+        "schoolYear": 2022,
+        "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#Second Six Weeks",
+        "periodSequence": 2
+      }
+    },
+    {
+      "gradingPeriodReference": {
+        "schoolId": 255901001,
+        "schoolYear": 2022,
+        "gradingPeriodDescriptor": "uri://ed-fi.org/GradingPeriodDescriptor#End of Year",
+        "periodSequence": 4
+      }
+    }
+  ]
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "courseOfferingReference": {
+    "localCourseCode": "ALG-1",
+    "schoolId": 255901001,
+    "schoolYear": 2022,
+    "sessionName": "2021-2022 Fall Semester"
+  },
+    "sectionIdentifier": "25590100102Trad220ALG112011"
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/gradebookEntries
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+    "dateAssigned": "2021-08-23",
+    "gradebookEntryTitle": "Assignment 1",
+    "sectionReference": {
+      "localCourseCode": "ALG-1",
+      "schoolId": 255901001,
+      "schoolYear": 2022,
+      "sectionIdentifier": "25590100102Trad220ALG112011",
+      "sessionName": "2021-2022 Fall Semester"
+    }
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/studentSectionAssociations
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "sectionReference": {
+    "localCourseCode": "ALG-1",
+    "schoolId": 255901001,
+    "schoolYear": 2022,
+    "sectionIdentifier": "25590100102Trad220ALG112011",
+    "sessionName": "2021-2022 Fall Semester"
+  },
+  "studentReference": {
+    "studentUniqueId": "604822"
+  },
+  "beginDate": "2021-08-23",
+  "endDate": "2021-12-17",
+  "homeroomIndicator": false
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/studentGradebookEntries
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "gradebookEntryReference": {
+    "dateAssigned": "2021-08-23",
+    "gradebookEntryTitle": "Assignment 1",
+    "localCourseCode": "ALG-1",
+    "schoolId": 255901001,
+    "schoolYear": 2022,
+    "sectionIdentifier": "25590100102Trad220ALG112011",
+    "sessionName": "2021-2022 Fall Semester"
+  },
+  "studentSectionAssociationReference": {
+    "beginDate": "2021-08-23",
+    "localCourseCode": "ALG-1",
+    "schoolId": 255901001,
+    "schoolYear": 2022,
+    "sectionIdentifier": "25590100102Trad220ALG112011",
+    "sessionName": "2021-2022 Fall Semester",
+    "studentUniqueId": "604822"
+  },
+  "numericGradeEarned": 74
+}
