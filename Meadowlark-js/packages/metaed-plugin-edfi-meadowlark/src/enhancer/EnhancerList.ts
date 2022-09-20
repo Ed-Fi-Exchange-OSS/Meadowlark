@@ -13,7 +13,7 @@ import { enhance as apiEntityMappingEnhancer } from './ApiEntityMappingEnhancer'
 import { enhance as subclassApiEntityMappingEnhancer } from './SubclassApiEntityMappingEnhancer';
 import { enhance as propertyCollectingEnhancer } from './PropertyCollectingEnhancer';
 import { enhance as subclassPropertyCollectingEnhancer } from './SubclassPropertyCollectingEnhancer';
-import { enhance as joiSchemaEnhancer } from './JoiSchemaEnhancer';
+import { enhance as jsonSchemaEnhancer } from './JsonSchemaEnhancer';
 
 export function enhancerList(): Enhancer[] {
   return [
@@ -26,6 +26,6 @@ export function enhancerList(): Enhancer[] {
     subclassPropertyCollectingEnhancer,
     apiEntityMappingEnhancer,
     subclassApiEntityMappingEnhancer,
-    joiSchemaEnhancer,
+    jsonSchemaEnhancer,
   ];
 }

@@ -71,7 +71,7 @@ const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
   documentIdentity: {
     schoolId: '123',
-    weekIdentifier: '1',
+    weekIdentifier: '123456',
   },
 
   documentReferences: [referenceToSchool],

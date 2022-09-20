@@ -25,12 +25,14 @@
   "dependencies": {
     "@edfi/metaed-core": "3.0.2-dev.10",
     "@edfi/metaed-plugin-edfi-unified": "3.0.2-dev.10",
-    "@hapi/joi": "^17.1.1",
     "deep-freeze": "^0.0.1",
-    "inflection": "^1.13.2"
+    "inflection": "^1.13.2",
+    "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
     "@hapi/code": "^8.0.7",
+    "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1",
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2"
   },

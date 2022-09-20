@@ -77,7 +77,7 @@ describe('given a POST of a school with an empty body', () => {
 
   it('should return insert failure', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":[\\"schoolId is required\\",\\"gradeLevels is required\\",\\"nameOfInstitution is required\\",\\"educationOrganizationCategories is required\\"]}"`,
+      `"{\\"message\\":[\\" must have required property 'schoolId'\\",\\" must have required property 'gradeLevels'\\",\\" must have required property 'nameOfInstitution'\\",\\" must have required property 'educationOrganizationCategories'\\"]}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
@@ -189,7 +189,7 @@ describe('given a POST of an academic week referencing a school that exists', ()
     expect(upsertResult.body).toEqual('');
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
-      `"/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g"`,
+      `"/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vMF1kvGV72yj2l2b8qNnnFg"`,
     );
   });
 });
@@ -206,7 +206,7 @@ describe('given a POST of an academic week referencing a school that exists foll
       "schoolReference": {
           "schoolId": 999
       },
-      "weekIdentifier": "1st",
+      "weekIdentifier": "1234567",
       "beginDate": "2022-12-01",
       "endDate": "2022-12-31",
       "totalInstructionalDays": 30

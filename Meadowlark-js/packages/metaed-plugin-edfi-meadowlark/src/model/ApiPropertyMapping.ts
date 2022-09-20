@@ -51,6 +51,16 @@ export type ApiPropertyMapping = {
    * Whether the property is a common collection.
    */
   isCommonCollection: boolean;
+
+  /**
+   * Whether the property is a scalar common.
+   */
+  isScalarCommon: boolean;
+
+  /**
+   * Whether the property is a scalar reference.
+   */
+  isScalarReference: boolean;
 };
 
 export function newApiPropertyMapping(): ApiPropertyMapping {
@@ -65,6 +75,8 @@ export function newApiPropertyMapping(): ApiPropertyMapping {
     isDescriptorCollection: false,
     descriptorCollectionName: '',
     isCommonCollection: false,
+    isScalarCommon: false,
+    isScalarReference: false,
   };
 }
 

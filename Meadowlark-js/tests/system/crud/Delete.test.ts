@@ -133,7 +133,7 @@ describe('given the DELETE of a school referenced by an academic week', () => {
       'Delete failed due to existing references to document: Resource AcademicWeek with identity',
     );
     expect(deleteResult.body).toMatch('\\"schoolReference.schoolId\\":123');
-    expect(deleteResult.body).toMatch('\\"weekIdentifier\\":\\"1st');
+    expect(deleteResult.body).toMatch('\\"weekIdentifier\\":\\"123456');
     expect(deleteResult.statusCode).toBe(409);
   });
 

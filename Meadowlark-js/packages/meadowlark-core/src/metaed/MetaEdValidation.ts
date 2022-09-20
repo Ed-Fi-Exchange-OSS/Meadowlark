@@ -3,13 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import Joi from '@hapi/joi';
+import Ajv from 'ajv/dist/2020';
+import addFormatsTo from 'ajv-formats';
+import type { ErrorObject, ValidateFunction } from 'ajv';
 import didYouMean from 'didyoumean2';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
-import R from 'ramda';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
 import { FrontendQueryParameters } from '../handler/FrontendRequest';
+
+// Ajv caches compiled schemas, so we'll cache it
+const ajv = new Ajv({ allErrors: true });
+addFormatsTo(ajv);
 
 /**
  * Creates a new empty ResourceMatchResult object
@@ -56,14 +61,11 @@ export function matchResourceNameToMetaEd(
  * to the API endpoint.
  */
 export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): string[] {
-  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(body, {
-    abortEarly: false,
-  });
-  if (validationResult.error != null) {
-    return validationResult.error.details.map((item) => item.message.replace(/"/g, ''));
-  }
+  const valid: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
+  const isValid: boolean = valid(body);
 
-  return [];
+  if (isValid) return [];
+  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
 }
 
 /**
@@ -73,15 +75,11 @@ export function validateQueryParametersAgainstSchema(
   metaEdModel: TopLevelEntity,
   queryParameters: FrontendQueryParameters,
 ): string[] {
-  const validationResult: Joi.ValidationResult = metaEdModel.data.meadowlark.joiSchema.validate(queryParameters, {
-    abortEarly: false,
-    stripUnknown: true,
-  });
-  if (validationResult != null) {
-    const onlyValidParameters = validationResult.value;
+  // TODO: RND-67 removed the Joi-specific code to report invalid query parameters
+  // RND-307 will restore as a part of understanding Ajv error metadata
+  const valid: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
+  const isValid: boolean = valid(queryParameters);
 
-    return R.without(Object.keys(onlyValidParameters), Object.keys(queryParameters));
-  }
-
-  return [];
+  if (isValid) return [];
+  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
 }

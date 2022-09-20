@@ -99,6 +99,14 @@ function apiReferenceCollection(property: EntityProperty): boolean {
 }
 
 /**
+ * Whether the given property will be represented as a reference scalar.
+ */
+function apiReferenceScalar(property: EntityProperty): boolean {
+  if (!isTopLevelReference(property)) return false;
+  return !(property.isRequiredCollection || property.isOptionalCollection);
+}
+
+/**
  * Whether the given property will be represented as a descriptor collection.
  */
 function apiDescriptorCollection(property: EntityProperty): boolean {
@@ -115,12 +123,23 @@ function apiCommonCollection(property: EntityProperty): boolean {
 }
 
 /**
+ * Whether the given property will be represented as a common scalar.
+ */
+function apiCommonScalar(property: EntityProperty): boolean {
+  if (property.type !== 'common') return false;
+  return !(property.isRequiredCollection || property.isOptionalCollection);
+}
+
+/**
  * Collects all of the API shape metadata for a MetaEd property.
  */
 function buildApiPropertyMapping(property: EntityProperty): ApiPropertyMapping {
   const isReferenceCollection: boolean = apiReferenceCollection(property);
   const isDescriptorCollection: boolean = apiDescriptorCollection(property);
   const isCommonCollection: boolean = apiCommonCollection(property);
+  const isScalarReference: boolean = apiReferenceScalar(property);
+  const isScalarCommon: boolean = apiCommonScalar(property);
+
   return {
     metaEdName: property.metaEdName,
     metaEdType: isReferentialProperty(property) ? (property as ReferentialProperty).referencedEntity.type : property.type,
@@ -132,6 +151,8 @@ function buildApiPropertyMapping(property: EntityProperty): ApiPropertyMapping {
     isDescriptorCollection,
     descriptorCollectionName: isDescriptorCollection ? apiDescriptorReferenceName(property as DescriptorProperty) : '',
     isCommonCollection,
+    isScalarCommon,
+    isScalarReference,
   };
 }
 
