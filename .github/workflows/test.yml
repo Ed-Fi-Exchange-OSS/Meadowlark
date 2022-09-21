@@ -43,6 +43,7 @@ jobs:
       with:
         name: code-coverage-report
         path: Meadowlark-js/coverage/lcov-report
+        retention-days: 10
 
     - name: Integration tests
       run: |
