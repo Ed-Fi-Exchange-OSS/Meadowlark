@@ -18,7 +18,7 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      endpointName: 'academicWeeks',
+      resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
       resourceId: 'TBD',
@@ -134,7 +134,7 @@ describe('given the resourceId of the update does not match the id derived from 
     middleware: {
       ...newFrontendRequestMiddleware(),
       pathComponents: {
-        endpointName: 'academicWeeks',
+        resourceName: 'academicWeeks',
         namespace: 'ed-fi',
         version: 'v3.3b',
         resourceId: 'Will not match',

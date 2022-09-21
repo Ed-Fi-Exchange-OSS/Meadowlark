@@ -33,7 +33,7 @@ describe('given the upsert where no document id is specified', () => {
     action: 'upsert',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: null },
+      pathComponents: { ...newPathComponents() },
     },
   };
 

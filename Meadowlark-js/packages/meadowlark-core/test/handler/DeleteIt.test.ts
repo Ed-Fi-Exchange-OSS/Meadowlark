@@ -8,13 +8,14 @@ import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
+import { BlockingDocument } from '../../src/message/BlockingDocument';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      endpointName: 'academicWeeks',
+      resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
       resourceId: 'TBD',
@@ -114,7 +115,12 @@ describe('given id does not exist', () => {
 
 describe('given the document to be deleted is referenced by other documents ', () => {
   let mockDocumentStore: any;
-  const expectedError = 'Error';
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
   let response: FrontendResponse;
 
   beforeAll(async () => {
@@ -123,7 +129,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       deleteDocumentById: async () =>
         Promise.resolve({
           response: 'DELETE_FAILURE_REFERENCE',
-          failureMessage: expectedError,
+          blockingDocuments: [expectedBlockingDocument],
         }),
     });
 
@@ -140,7 +146,15 @@ describe('given the document to be deleted is referenced by other documents ', (
   });
 
   it('returns the error message', () => {
-    expect(JSON.parse(response.body).message).toEqual(expectedError);
+    const responseBody = JSON.parse(response.body);
+    expect(responseBody.message).toMatchInlineSnapshot(
+      `"The resource cannot be deleted because it is a dependency of other documents"`,
+    );
+    expect(responseBody.blockingUris).toMatchInlineSnapshot(`
+      Array [
+        "/v3.3b/ed-fi/resourceName/documentId",
+      ]
+    `);
   });
 });
 

@@ -18,10 +18,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      endpointName: 'academicWeeks',
+      resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      resourceId: null,
     },
   },
 };

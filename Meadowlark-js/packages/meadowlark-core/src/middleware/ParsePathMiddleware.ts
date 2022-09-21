@@ -27,7 +27,7 @@ function pathComponentsFrom(path: string): PathComponents | null {
   return {
     version: match.groups.version,
     namespace: match.groups.namespace,
-    endpointName: match.groups.resource,
+    resourceName: match.groups.resource,
     resourceId,
   };
 }

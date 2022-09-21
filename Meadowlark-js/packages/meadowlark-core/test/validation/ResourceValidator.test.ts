@@ -32,7 +32,7 @@ describe('given an invalid resource name with a suggested matching name', () => 
     } as any);
 
     // Act
-    result = await validateResource({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null });
+    result = await validateResource({ version: 'a', namespace: 'b', resourceName: invalidName });
   });
 
   afterAll(() => {
@@ -73,7 +73,7 @@ describe('given an invalid resource name with no suggested matching name', () =>
     } as any);
 
     // Act
-    result = await validateResource({ version: 'a', namespace: 'b', endpointName: invalidName, resourceId: null });
+    result = await validateResource({ version: 'a', namespace: 'b', resourceName: invalidName });
   });
 
   afterAll(() => {

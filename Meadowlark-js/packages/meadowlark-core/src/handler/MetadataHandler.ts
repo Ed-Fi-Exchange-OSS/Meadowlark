@@ -39,7 +39,7 @@ function writeErrorToLog(frontendRequest: FrontendRequest, method: string, statu
  * project and returns MetaEd project metadata in the response header.
  */
 export async function metaed(_frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  const modelNpmPackage = modelPackageFor(Constants.version33b);
+  const modelNpmPackage = modelPackageFor(Constants.uriVersion33b);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 
   const { entity, projectName, projectVersion } = metaEd.namespace.get('EdFi') as Namespace;
@@ -80,7 +80,7 @@ function useTemplate(data: string, host: string, stage: string): string {
   // the schemes with quotation marks that won't be encoded, but when
   // we do so, handlebars ends up escaping every quotation mark.
   // Just use a straight string replacement without handlebars.
-  const basePath = `/${stage}/${Constants.version33b}/`;
+  const basePath = `/${stage}/${Constants.uriVersion33b}/`;
   const basePathToken = /{{ basePath }}/g;
 
   const tokenUrl = getValueFromEnvironment('TOKEN_URL');

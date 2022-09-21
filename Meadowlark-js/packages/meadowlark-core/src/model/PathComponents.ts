@@ -15,19 +15,18 @@ export type PathComponents = {
   /**
    * Endpoint name (resource)
    */
-  endpointName: string;
+  resourceName: string;
   /**
    * Resource identifier
    */
-  resourceId: string | null;
+  resourceId?: string;
 };
 
 export function newPathComponents() {
   return {
     version: '',
     namespace: '',
-    endpointName: '',
-    resourceId: null,
+    resourceName: '',
   };
 }
 

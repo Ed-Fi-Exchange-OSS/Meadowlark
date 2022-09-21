@@ -19,6 +19,7 @@ export type { DeleteRequest } from './message/DeleteRequest';
 export type { UpdateRequest } from './message/UpdateRequest';
 export type { UpsertRequest } from './message/UpsertRequest';
 export type { QueryRequest } from './message/QueryRequest';
+export type { BlockingDocument } from './message/BlockingDocument';
 export type { PaginationParameters } from './message/PaginationParameters';
 export type { Security } from './security/Security';
 export { newSecurity, AuthorizationStrategy } from './security/Security';

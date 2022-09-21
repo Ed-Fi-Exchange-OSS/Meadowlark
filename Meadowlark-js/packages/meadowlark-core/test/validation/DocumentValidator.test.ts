@@ -36,7 +36,7 @@ describe('given a valid resource name but body fails schema validation', () => {
 
     // Act
     result = await validateDocument(
-      { version: 'a', namespace: 'b', endpointName: 'match', resourceId: null },
+      { version: 'a', namespace: 'b', resourceName: 'match', resourceId: null },
       newTopLevelEntity(),
     );
   });
