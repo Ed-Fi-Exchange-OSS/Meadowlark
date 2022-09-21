@@ -130,7 +130,7 @@ describe('given the DELETE of a school referenced by an academic week', () => {
 
   it('should return delete failure due to a reference to the school', async () => {
     expect(deleteResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/AcademicWeek/02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g\\"]}"`,
+      `"{\\"message\\":\\"The resource cannot be deleted because it is a dependency of other documents\\",\\"blockingUris\\":[\\"/local/v3.3b/ed-fi/AcademicWeek/02pe_9hl1wM_jO1vMF1kvGV72yj2l2b8qNnnFg\\"]}"`,
     );
     expect(deleteResult.statusCode).toBe(409);
   });

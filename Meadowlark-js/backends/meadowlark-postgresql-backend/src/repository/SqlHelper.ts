@@ -88,11 +88,11 @@ export function validateReferenceExistenceSql(documentIds: string[]): string {
  * This is for error reporting when an attempt is made to delete the document.
  *
  * @param referringDocumentIds The referring documents
- * @returns SQL query string to retrieve the document_id, document_identity and resource_name of the referring documents
+ * @returns SQL query string to retrieve the document_id and resource_name of the referring documents
  */
 export function findReferringDocumentInfoForErrorReportingSql(referringDocumentIds: string[]): string {
   return format(
-    `SELECT resource_name, document_identity FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
+    `SELECT resource_name, document_id FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
     referringDocumentIds,
   );
 }
