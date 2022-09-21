@@ -11,6 +11,8 @@ import { DeleteResult } from '../message/DeleteResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { BlockingDocument } from '../message/BlockingDocument';
+import { resourceUriFrom } from './UriBuilder';
+import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
 
 const moduleName = 'Delete';
 
@@ -23,7 +25,14 @@ const DELETE_FAILURE_REFERENCE_MESSAGE: string =
 function blockingDocumentsToUris(frontendRequest: FrontendRequest, blockingDocuments: BlockingDocument[]): string[] {
   const result: string[] = [];
   blockingDocuments.forEach((document) => {
-    let uri = `/${frontendRequest.middleware.pathComponents.version}/${frontendRequest.middleware.pathComponents.namespace}/${document.resourceName}/${document.documentId}`;
+    let uri = resourceUriFrom(
+      {
+        version: versionAbbreviationFor(document.resourceVersion),
+        namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
+        resourceName: document.resourceName,
+      },
+      document.documentId,
+    );
     if (frontendRequest.stage !== '') uri = `/${frontendRequest.stage}${uri}`;
     result.push(uri);
   });

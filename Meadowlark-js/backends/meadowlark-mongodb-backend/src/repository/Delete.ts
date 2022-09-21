@@ -46,15 +46,17 @@ export async function deleteDocumentById(
               traceId,
             );
 
-            // Get the DocumentIdentities of up to five blocking documents for failure message purposes
+            // Get the information of up to five blocking documents for failure message purposes
             const referringDocuments = await mongoCollection
               .find(onlyDocumentsReferencing(deleteCandidate.aliasIds), limitFive(session))
               .toArray();
 
             const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-              resourceName: document.resourceName,
               // eslint-disable-next-line no-underscore-dangle
               documentId: document._id,
+              resourceName: document.resourceName,
+              projectName: document.projectName,
+              resourceVersion: document.resourceVersion,
             }));
 
             deleteResult = { response: 'DELETE_FAILURE_REFERENCE', blockingDocuments };

@@ -92,7 +92,7 @@ export function validateReferenceExistenceSql(documentIds: string[]): string {
  */
 export function findReferringDocumentInfoForErrorReportingSql(referringDocumentIds: string[]): string {
   return format(
-    `SELECT resource_name, document_id FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
+    `SELECT project_name, resource_name, resource_version, document_id FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
     referringDocumentIds,
   );
 }

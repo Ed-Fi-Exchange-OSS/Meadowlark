@@ -14,7 +14,7 @@ import { getMetaEdModelForResourceName } from './ResourceNameMapping';
  * Finds the MetaEd internal model that represents the given REST resource path.
  */
 export async function findMetaEdModel(pathComponents: PathComponents): Promise<TopLevelEntity | undefined> {
-  const lowerResourceName = decapitalize(pathComponents.endpointName);
+  const lowerResourceName = decapitalize(pathComponents.resourceName);
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd } = await loadMetaEdState(modelNpmPackage);
 

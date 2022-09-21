@@ -11,18 +11,11 @@ import type { UpsertRequest } from '../message/UpsertRequest';
 import type { UpsertResult } from '../message/UpsertResult';
 import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
-import type { PathComponents } from '../model/PathComponents';
+import { resourceUriFrom } from './UriBuilder';
 
 export const LOCATION_HEADER_NAME: string = 'Location';
 
 const moduleName = 'Upsert';
-
-/**
- * Derives the resource URI from the pathComponents and resourceId
- */
-function locationFrom(pathComponents: PathComponents, resourceId: string): string {
-  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.endpointName}/${resourceId}`;
-}
 
 /**
  * Entry point for API upsert requests
@@ -56,7 +49,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       return {
         body: '',
         statusCode: 201,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: locationFrom(pathComponents, resourceId) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
       };
     }
 
@@ -65,7 +58,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       return {
         body: '',
         statusCode: 200,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: locationFrom(pathComponents, resourceId) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
       };
     }
 

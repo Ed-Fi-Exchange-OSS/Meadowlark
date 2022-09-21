@@ -7,6 +7,8 @@
  * Information on a document that is blocking the delete of another document for referential integrity reasons
  */
 export type BlockingDocument = {
+  projectName: string;
+  resourceVersion: string;
   resourceName: string;
   documentId: string;
 };

@@ -14,7 +14,7 @@ export type ResourceValidationResult = {
   /**
    * The name of the validated endpoint, corresponding to the name of the resource requested
    */
-  endpointName: string;
+  resourceName: string;
   /**
    * Metadata for the MetaEd project loaded
    */
@@ -37,7 +37,7 @@ export type ResourceValidationResult = {
  */
 export async function validateResource(pathComponents: PathComponents): Promise<ResourceValidationResult> {
   // Equally supporting resources with either upper or lower case names
-  const lowerResourceName = decapitalize(pathComponents.endpointName);
+  const lowerResourceName = decapitalize(pathComponents.resourceName);
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 
@@ -53,11 +53,11 @@ export async function validateResource(pathComponents: PathComponents): Promise<
   };
 
   if (exact === false && suggestion === true) {
-    const invalidResourceMessage = `Invalid resource '${pathComponents.endpointName}'. The most similar resource is '${resourceName}'.`;
+    const invalidResourceMessage = `Invalid resource '${pathComponents.resourceName}'. The most similar resource is '${resourceName}'.`;
 
     return {
       headerMetadata,
-      endpointName: pathComponents.endpointName,
+      resourceName: pathComponents.resourceName,
       resourceInfo: NoResourceInfo,
       errorBody: JSON.stringify({
         message: invalidResourceMessage,
@@ -68,15 +68,15 @@ export async function validateResource(pathComponents: PathComponents): Promise<
   if (exact === false && suggestion === false) {
     return {
       headerMetadata,
-      endpointName: pathComponents.endpointName,
+      resourceName: pathComponents.resourceName,
       resourceInfo: NoResourceInfo,
-      errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.endpointName}'.` }),
+      errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.resourceName}'.` }),
     };
   }
 
   return {
     headerMetadata,
-    endpointName: pathComponents.endpointName,
+    resourceName: pathComponents.resourceName,
     resourceInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,
       resourceVersion: metaEdConfiguration.projects[0].projectVersion,

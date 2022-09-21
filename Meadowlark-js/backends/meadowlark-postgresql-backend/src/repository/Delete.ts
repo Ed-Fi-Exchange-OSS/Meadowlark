@@ -49,12 +49,14 @@ export async function deleteDocumentById(
           traceId,
         );
 
-        // Get the DocumentIdentities of up to five referring documents for failure message purposes
+        // Get the information of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref.parent_document_id);
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql(referenceIds));
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
           documentId: document.document_id,
+          projectName: document.project_name,
+          resourceVersion: document.resource_version,
         }));
 
         deleteResult = {

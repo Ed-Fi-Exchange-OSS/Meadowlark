@@ -8,8 +8,8 @@ import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResponse';
 import { findOwnershipForDocumentSql } from './SqlHelper';
 
-function extractIdIfUpsert(frontendRequest: FrontendRequest): string | null {
-  if (frontendRequest.action !== 'upsert') return null;
+function extractIdIfUpsert(frontendRequest: FrontendRequest): string | undefined {
+  if (frontendRequest.action !== 'upsert') return undefined;
 
   return documentIdForDocumentInfo(frontendRequest.middleware.resourceInfo, frontendRequest.middleware.documentInfo);
 }

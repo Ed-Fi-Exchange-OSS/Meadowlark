@@ -15,7 +15,7 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      endpointName: 'academicWeeks',
+      resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
       resourceId: 'TBD',
@@ -115,7 +115,12 @@ describe('given id does not exist', () => {
 
 describe('given the document to be deleted is referenced by other documents ', () => {
   let mockDocumentStore: any;
-  const expectedBlockingDocument: BlockingDocument = { resourceName: 'resourceName', documentId: 'documentId' };
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
   let response: FrontendResponse;
 
   beforeAll(async () => {

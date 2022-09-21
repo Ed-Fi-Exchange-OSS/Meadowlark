@@ -35,12 +35,21 @@ export interface MetaEdProjectMetadata {
 }
 
 /**
- * A hardcoded mapping of abbreviations to Ed-Fi Model npm package names
+ * A hardcoded mapping of URI version abbreviations to Ed-Fi Model npm package names
  */
-export function modelPackageFor(projectAbbreviation: string): string {
-  if (projectAbbreviation === Constants.version31) return '@edfi/ed-fi-model-3.1';
-  if (projectAbbreviation === Constants.version33b) return '@edfi/ed-fi-model-3.3b';
+export function modelPackageFor(versionAbbreviation: string): string {
+  if (versionAbbreviation === Constants.uriVersion31) return '@edfi/ed-fi-model-3.1';
+  if (versionAbbreviation === Constants.uriVersion33b) return '@edfi/ed-fi-model-3.3b';
   return 'ed-fi-model-undefined';
+}
+
+/**
+ * A hardcoded mapping of Ed-Fi Model project versions to URI abbreviations
+ */
+export function versionAbbreviationFor(projectVersion: string): string {
+  if (projectVersion === Constants.projectVersion31) return Constants.uriVersion31;
+  if (projectVersion === Constants.projectVersion33b) return Constants.uriVersion33b;
+  return 'v0.0';
 }
 
 /**

@@ -50,7 +50,7 @@ describe('given an error response and no document info from resourceValidation',
     const validationResult: ResourceValidator.ResourceValidationResult = {
       resourceInfo: NoResourceInfo,
       errorBody,
-      endpointName: '',
+      resourceName: '',
     };
 
     mockResourceValidator = jest
@@ -88,7 +88,7 @@ describe('given an error response and document info from resourceValidation', ()
     const validationResult: ResourceValidator.ResourceValidationResult = {
       resourceInfo: newResourceInfo(),
       errorBody,
-      endpointName: '',
+      resourceName: '',
     };
 
     mockResourceValidator = jest
@@ -126,7 +126,7 @@ describe('given a valid response from resourceValidation', () => {
   beforeAll(async () => {
     const validationResult: ResourceValidator.ResourceValidationResult = {
       resourceInfo,
-      endpointName: '',
+      resourceName: '',
       headerMetadata,
     };
 
@@ -170,7 +170,7 @@ describe('given requesting abstract domain entity', () => {
       middleware: {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
-          endpointName: 'educationOrganizations',
+          resourceName: 'educationOrganizations',
           namespace: 'ed-fi',
           version: 'v3.3b',
           resourceId: '0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb',
@@ -204,7 +204,7 @@ describe('given requesting abstract association', () => {
       middleware: {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
-          endpointName: 'generalStudentProgramAssociations',
+          resourceName: 'generalStudentProgramAssociations',
           namespace: 'ed-fi',
           version: 'v3.3b',
           resourceId: '0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb',
