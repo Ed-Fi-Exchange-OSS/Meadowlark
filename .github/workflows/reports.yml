@@ -13,25 +13,20 @@ on:
 jobs:
     report:
         runs-on: ubuntu-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            tests: [
+                { name: 'Unit Test Report', file: 'unit-tests/junit.xml' },
+                { name: 'Integration Test Report', file: 'integration-tests/junit.xml' },
+                { name: 'System Test Report', file: 'system-tests/junit.xml' }
+            ]
+
         steps:
-            - name: Unit Test Report
+            - name: ${{ matrix.name }}
               uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
               with:
-                name: Unit Test Report
+                name: ${{ matrix.tests.name }}
                 artifact: 'test-results'
-                path: 'unit-tests/junit.xml'
-                reporter: jest-junit
-            - name: Integration Test Report
-              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-              with:
-                name: Integration Test Report
-                artifact: 'test-results'
-                path: 'integration-tests/junit.xml'
-                reporter: jest-junit
-            - name: System Test Report
-              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-              with:
-                name: System Test Report
-                artifact: 'test-results'
-                path: 'system-tests/junit.xml'
+                path: ${{ matrix.tests.file }}
                 reporter: jest-junit
