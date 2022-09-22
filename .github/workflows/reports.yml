@@ -3,10 +3,10 @@
 # The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 # See the LICENSE and NOTICES files in the project root for more information.
 
-name: 'Generate Report'
+name: 'Reports'
 on:
   workflow_run:
-    workflows: [ 'Full testing process' ]
+    workflows: [ 'Test' ]
     types:
       - completed
 
@@ -17,18 +17,21 @@ jobs:
             - name: Unit Test Report
               uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
               with:
-                artifact: 'upload'
-                path: 'unit-tests.xml'
+                name: Unit Test Report
+                artifact: 'test-results'
+                path: 'unit-tests/junit.xml'
                 reporter: jest-junit
             - name: Integration Test Report
               uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
               with:
-                artifact: 'upload'
-                path: 'integration-tests.xml'
+                name: Integration Test Report
+                artifact: 'test-results'
+                path: 'integration-tests/junit.xml'
                 reporter: jest-junit
             - name: System Test Report
               uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
               with:
-                artifact: 'upload'
-                path: 'system-tests.xml'
+                name: System Test Report
+                artifact: 'test-results'
+                path: 'system-tests/junit.xml'
                 reporter: jest-junit
