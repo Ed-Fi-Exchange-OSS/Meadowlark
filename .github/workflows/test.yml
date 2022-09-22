@@ -13,6 +13,10 @@ jobs:
     name: Full testing process
     runs-on: ubuntu-latest
 
+    defaults:
+        run:
+            working-directory: Meadowlark-js
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
@@ -26,15 +30,13 @@ jobs:
 
     - name: Install dependencies
       run: yarn install
-      working-directory: Meadowlark-js
 
-    - name: Linter
-      run: yarn test:lint
-      working-directory: Meadowlark-js
+
+    # - name: Linter
+    #   run: yarn test:lint
 
     - name: Unit tests with code coverage
       run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
-      working-directory: Meadowlark-js
       env:
         JEST_JUNIT_OUTPUT_DIR: unit-tests
 
@@ -50,7 +52,6 @@ jobs:
         sudo systemctl start postgresql.service
         sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
         yarn test:integration --ci --config ./jest.ci-config.js
-      working-directory: Meadowlark-js
       env:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: 'abcdefgh1!'
@@ -58,7 +59,6 @@ jobs:
 
     - name: System tests
       run: yarn test:system --ci --config ./jest.ci-config.js
-      working-directory: Meadowlark-js
       env:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: 'abcdefgh1!'
@@ -69,7 +69,7 @@ jobs:
       with:
         name: test-results
         path: |
-            'Meadowlark-js/unit-tests/*.xml'
-            'Meadowlark-js/integration-tests/*.xml'
-            'Meadowlark-js/system-tests/*.xml'
+            Meadowlark-js/unit-tests/junit.xml
+            Meadowlark-js/integration-tests/junit.xml
+            Meadowlark-js/system-tests/junit.xml
         retention-days: 10
