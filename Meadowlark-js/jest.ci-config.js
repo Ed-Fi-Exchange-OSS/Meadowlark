@@ -7,13 +7,13 @@ module.exports = {
   preset: '@shelf/jest-mongodb',
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
-  collectCoverageFrom: ['packages/**/src/**/*.ts'],
+  collectCoverageFrom: ['packages/**/src/**/*.ts', 'backends/**/src/**/*.ts', 'services/**/src/**/*.ts'],
   coverageThreshold: {
     global: {
-      branches: 67,
-      functions: 73,
-      lines: 82,
-      statements: 81,
+      branches: 52,
+      functions: 58,
+      lines: 60,
+      statements: 60,
     },
   },
   modulePathIgnorePatterns: ['dist*', 'docs*'],
