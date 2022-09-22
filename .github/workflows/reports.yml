@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+name: 'Generate Report'
+on:
+  workflow_run:
+    workflows: [ 'Full testing process' ]
+    types:
+      - completed
+
+jobs:
+    report:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Unit Test Report
+              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+              with:
+                artifact: 'upload'
+                path: 'unit-tests.xml'
+                reporter: jest-junit
+            - name: Integration Test Report
+              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+              with:
+                artifact: 'upload'
+                path: 'integration-tests.xml'
+                reporter: jest-junit
+            - name: System Test Report
+              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+              with:
+                artifact: 'upload'
+                path: 'system-tests.xml'
+                reporter: jest-junit

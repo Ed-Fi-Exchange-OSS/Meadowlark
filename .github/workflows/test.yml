@@ -64,26 +64,12 @@ jobs:
         POSTGRES_PASSWORD: 'abcdefgh1!'
         JEST_JUNIT_OUTPUT_DIR: system-tests
 
-    - name: Unit Test Report
-      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-      if: success() || failure()
+    - name: Upload test results
+      uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
       with:
-        name: Unit Test Results
-        path: 'Meadowlark-js/unit-tests/*.xml'
-        reporter: jest-junit
-
-    - name: Integration Test Report
-      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-      if: success() || failure()
-      with:
-        name: Integration Test Results
-        path: 'Meadowlark-js/integration-tests/*.xml'
-        reporter: jest-junit
-
-    - name: System Test Report
-      uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-      if: success() || failure()
-      with:
-        name: System Test Results
-        path: 'Meadowlark-js/system-tests/*.xml'
-        reporter: jest-junit
+        name: test-results
+        path: |
+            'Meadowlark-js/unit-tests/*.xml'
+            'Meadowlark-js/integration-tests/*.xml'
+            'Meadowlark-js/system-tests/*.xml'
+        retention-days: 10
