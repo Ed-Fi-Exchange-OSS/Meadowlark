@@ -3,30 +3,34 @@
 # The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 # See the LICENSE and NOTICES files in the project root for more information.
 
-name: 'Reports'
+name: Reports
 on:
   workflow_run:
-    workflows: [ 'Test' ]
+    workflows: ["Test"]
     types:
       - completed
 
 jobs:
-    report:
-        runs-on: ubuntu-latest
-        strategy:
-          fail-fast: false
-          matrix:
-            tests: [
-                { name: 'Unit Test Report', file: 'unit-tests/junit.xml' },
-                { name: 'Integration Test Report', file: 'integration-tests/junit.xml' },
-                { name: 'System Test Report', file: 'system-tests/junit.xml' }
-            ]
+  report:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tests:
+          [
+            { name: "Unit Test Report", file: "unit-tests/junit.xml" },
+            {
+              name: "Integration Test Report",
+              file: "integration-tests/junit.xml",
+            },
+            { name: "System Test Report", file: "system-tests/junit.xml" },
+          ]
 
-        steps:
-            - name: ${{ matrix.name }}
-              uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
-              with:
-                name: ${{ matrix.tests.name }}
-                artifact: 'test-results'
-                path: ${{ matrix.tests.file }}
-                reporter: jest-junit
+    steps:
+      - name: ${{ matrix.name }}
+        uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1 #v1.5.0
+        with:
+          name: ${{ matrix.tests.name }}
+          artifact: "test-results"
+          path: ${{ matrix.tests.file }}
+          reporter: jest-junit
