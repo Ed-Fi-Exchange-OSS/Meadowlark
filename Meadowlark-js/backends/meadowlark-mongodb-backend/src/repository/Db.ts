@@ -33,12 +33,15 @@ export async function getNewClient(): Promise<MongoClient> {
   const mongoUrl = process.env.MONGO_URL ?? MONGO_URL_DEFAULT;
 
   try {
-    const newClient = new MongoClient(mongoUrl, { w: MONGO_WRITE_CONCERN, readConcernLevel: MONGO_READ_CONCERN });
+    const newClient: MongoClient = new MongoClient(mongoUrl, {
+      w: MONGO_WRITE_CONCERN,
+      readConcernLevel: MONGO_READ_CONCERN,
+    });
     await newClient.connect();
 
     MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
-    const collection = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
+    const collection: Collection<MeadowlarkDocument> = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
 
     // Note this does nothing if the index already exists (triggers an index build otherwise)
     await collection.createIndex({ outboundRefs: 1 });

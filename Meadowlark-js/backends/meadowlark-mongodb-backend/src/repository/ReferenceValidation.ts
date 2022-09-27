@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions } from 'mongodb';
+import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions, WithId } from 'mongodb';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 
@@ -22,8 +22,10 @@ async function findReferencedDocumentIdsById(
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocumentId[]> {
-  const findReferencedDocuments = mongoDocuments.find({ aliasIds: { $in: referenceIds } }, findOptions);
-  return (await findReferencedDocuments.toArray()) as unknown as MeadowlarkDocumentId[];
+  const referencedDocuments: WithId<MeadowlarkDocument>[] = await mongoDocuments
+    .find({ aliasIds: { $in: referenceIds } }, findOptions)
+    .toArray();
+  return referencedDocuments as MeadowlarkDocumentId[];
 }
 
 /**

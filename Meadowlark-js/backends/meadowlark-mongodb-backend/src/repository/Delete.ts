@@ -47,7 +47,7 @@ export async function deleteDocumentById(
             );
 
             // Get the information of up to five blocking documents for failure message purposes
-            const referringDocuments = await mongoCollection
+            const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
               .find(onlyDocumentsReferencing(deleteCandidate.aliasIds), limitFive(session))
               .toArray();
 
@@ -70,8 +70,10 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const { deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
-      deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
+      const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
+      if (acknowledged) {
+        deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
+      }
     });
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, e);
