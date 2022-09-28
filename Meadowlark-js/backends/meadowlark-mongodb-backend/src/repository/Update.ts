@@ -63,6 +63,10 @@ export async function updateDocumentById(
       const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
       if (acknowledged) {
         updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      } else {
+        const msg =
+          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error('mongodb.repository.Update.updateDocumentById', traceId, msg);
       }
     });
   } catch (e) {

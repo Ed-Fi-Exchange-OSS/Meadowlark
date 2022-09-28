@@ -73,6 +73,10 @@ export async function deleteDocumentById(
       const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
       if (acknowledged) {
         deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
+      } else {
+        const msg =
+          'mongoCollection.deleteOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, msg);
       }
     });
   } catch (e) {

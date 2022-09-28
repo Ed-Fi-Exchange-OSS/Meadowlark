@@ -88,6 +88,10 @@ export async function upsertDocument(
       const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
       if (acknowledged) {
         upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+      } else {
+        const msg =
+          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, msg);
       }
     });
   } catch (e) {
