@@ -64,7 +64,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
+      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abcdefghijklmnopqrstuvwxyz","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -97,7 +97,7 @@ describe('given a POST of a school followed by the PUT with an empty body', () =
 
   it('should return put failure', async () => {
     expect(updateResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":[\\" must have required property 'schoolId'\\",\\" must have required property 'gradeLevels'\\",\\" must have required property 'nameOfInstitution'\\",\\" must have required property 'educationOrganizationCategories'\\"]}"`,
+      `"{"message":[" must have required property 'schoolId'"," must have required property 'gradeLevels'"," must have required property 'nameOfInstitution'"," must have required property 'educationOrganizationCategories'"]}"`,
     );
     expect(updateResult.statusCode).toBe(400);
   });
@@ -143,7 +143,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
 
   it('should return put failure', async () => {
     expect(updateResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"The identity of the resource does not match the identity in the updated document.\\"}"`,
+      `"{"message":"The identity of the resource does not match the identity in the updated document."}"`,
     );
     expect(updateResult.statusCode).toBe(400);
   });
@@ -236,7 +236,7 @@ describe('given a POST of a school followed by a PUT adding a reference to an in
 
   it('should return failure due to missing descriptor', async () => {
     expect(updateResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource InternetAccessDescriptor is missing identity {\\\\\\"descriptor\\\\\\":\\\\\\"invalid\\\\\\"}\\"}"`,
+      `"{"message":"Reference validation failed: Resource InternetAccessDescriptor is missing identity {\\"descriptor\\":\\"invalid\\"}"}"`,
     );
     expect(updateResult.statusCode).toBe(400);
   });

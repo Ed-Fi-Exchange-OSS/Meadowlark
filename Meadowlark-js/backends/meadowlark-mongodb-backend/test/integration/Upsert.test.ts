@@ -361,7 +361,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('INSERT_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {\\"natural\\":\\"not a valid reference\\"}"`,
+      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
     );
   });
 
@@ -457,7 +457,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
@@ -615,7 +615,7 @@ describe('given an update of a document that references a non-existent document 
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('upsert4');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
     `);
@@ -707,7 +707,7 @@ describe('given an update of a document that references an existing document wit
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('upsert6');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
       ]
     `);
@@ -800,7 +800,7 @@ describe('given an update of a document with one existing and one non-existent r
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {\\"natural\\":\\"not a valid reference\\"}"`,
+      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
     );
   });
 
@@ -908,7 +908,7 @@ describe('given an update of a subclass document referenced by an existing docum
     const collection: Collection<MeadowlarkDocument> = getCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);

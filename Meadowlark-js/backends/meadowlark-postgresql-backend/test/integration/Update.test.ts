@@ -207,7 +207,7 @@ describe('given an update of a document that references a non-existent document 
     expect(docResult.rows[0].document_identity.natural).toBe('update4');
 
     expect(outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
     `);
@@ -302,7 +302,7 @@ describe('given an update of a document that references an existing document wit
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
     expect(docResult.rows[0].document_identity.natural).toBe('update6');
     expect(outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "Qw5FvPdKxAXWnGghsMh3I61yLFfls4Q949Fk2w",
       ]
     `);
@@ -396,7 +396,7 @@ describe('given an update of a document with one existing and one non-existent r
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(updateResult.response).toBe('UPDATE_FAILURE_REFERENCE');
     expect(updateResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {\\"natural\\":\\"not a valid reference\\"}"`,
+      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
     );
   });
 
@@ -503,7 +503,7 @@ describe('given an update of a subclass document referenced by an existing docum
     const result: any = await client.query(verifyAliasId(referencedDocumentId));
     const outboundRefs = result.rows.map((row) => row.alias_id);
     expect(outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);

@@ -47,7 +47,7 @@ describe('given a POST of a school', () => {
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abc\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
+      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abc","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -77,7 +77,7 @@ describe('given a POST of a school with an empty body', () => {
 
   it('should return insert failure', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":[\\" must have required property 'schoolId'\\",\\" must have required property 'gradeLevels'\\",\\" must have required property 'nameOfInstitution'\\",\\" must have required property 'educationOrganizationCategories'\\"]}"`,
+      `"{"message":[" must have required property 'schoolId'"," must have required property 'gradeLevels'"," must have required property 'nameOfInstitution'"," must have required property 'educationOrganizationCategories'"]}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
@@ -136,7 +136,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
     expect(getResult.body).toMatchInlineSnapshot(
-      `"{\\"id\\":\\"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ\\",\\"schoolId\\":123,\\"gradeLevels\\":[{\\"gradeLevelDescriptor\\":\\"uri://ed-fi.org/GradeLevelDescriptor#First Grade\\"}],\\"nameOfInstitution\\":\\"abcdefghijklmnopqrstuvwxyz\\",\\"educationOrganizationCategories\\":[{\\"educationOrganizationCategoryDescriptor\\":\\"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other\\"}]}"`,
+      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abcdefghijklmnopqrstuvwxyz","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
     );
     expect(getResult.statusCode).toBe(200);
   });
@@ -159,7 +159,7 @@ describe('given a POST of an academic week referencing a school that does not ex
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity {\\\\\\"schoolId\\\\\\":123}\\"}"`,
+      `"{"message":"Reference validation failed: Resource School is missing identity {\\"schoolId\\":123}"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
@@ -231,7 +231,7 @@ describe('given a POST of an academic week referencing a school that exists foll
 
   it('should return failure due to missing reference', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"Reference validation failed: Resource School is missing identity {\\\\\\"schoolId\\\\\\":999}\\"}"`,
+      `"{"message":"Reference validation failed: Resource School is missing identity {\\"schoolId\\":999}"}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });

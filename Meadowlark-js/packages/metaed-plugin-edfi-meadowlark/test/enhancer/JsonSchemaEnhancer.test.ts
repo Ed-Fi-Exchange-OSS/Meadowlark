@@ -84,84 +84,84 @@ describe('when building simple domain entity with all the simple non-collections
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "optionalBooleanProperty": Object {
+        "properties": {
+          "optionalBooleanProperty": {
             "description": "doc1",
             "type": "boolean",
           },
-          "optionalDecimalProperty": Object {
+          "optionalDecimalProperty": {
             "description": "doc3",
             "type": "number",
           },
-          "optionalPercentProperty": Object {
+          "optionalPercentProperty": {
             "description": "doc5",
             "type": "number",
           },
-          "optionalShortProperty": Object {
+          "optionalShortProperty": {
             "description": "doc9",
             "type": "integer",
           },
-          "optionalYear": Object {
+          "optionalYear": {
             "description": "doc13",
             "type": "integer",
           },
-          "requiredCurrencyProperty": Object {
+          "requiredCurrencyProperty": {
             "description": "doc2",
             "type": "number",
           },
-          "requiredDateProperty": Object {
+          "requiredDateProperty": {
             "description": "doc6",
             "format": "date",
             "type": "string",
           },
-          "requiredDatetimeProperty": Object {
+          "requiredDatetimeProperty": {
             "description": "doc7",
             "format": "date-time",
             "type": "string",
           },
-          "requiredDurationProperty": Object {
+          "requiredDurationProperty": {
             "description": "doc4",
             "type": "number",
           },
-          "requiredIntegerProperty": Object {
+          "requiredIntegerProperty": {
             "description": "doc8",
             "maximum": 10,
             "minimum": 5,
             "type": "integer",
           },
-          "requiredTimeProperty": Object {
+          "requiredTimeProperty": {
             "description": "doc11",
             "format": "time",
             "type": "string",
           },
-          "schoolYearTypeReference": Object {
+          "schoolYearTypeReference": {
             "additionalProperties": false,
             "description": "A school year reference",
-            "properties": Object {
-              "schoolYear": Object {
+            "properties": {
+              "schoolYear": {
                 "description": "A school year",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": Array [
+            "required": [
               "schoolYear",
             ],
             "type": "object",
           },
-          "stringIdentity": Object {
+          "stringIdentity": {
             "description": "doc10",
             "maxLength": 30,
             "minLength": 20,
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "requiredCurrencyProperty",
           "requiredDurationProperty",
           "requiredDateProperty",
@@ -227,21 +227,21 @@ describe('when building simple domain entity with all the simple collections', (
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "optionalBooleanProperties": Object {
-            "items": Object {
+        "properties": {
+          "optionalBooleanProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "optionalBooleanProperty": Object {
+              "properties": {
+                "optionalBooleanProperty": {
                   "description": "doc1",
                   "type": "boolean",
                 },
               },
-              "required": Array [
+              "required": [
                 "optionalBooleanProperty",
               ],
               "type": "object",
@@ -250,16 +250,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "optionalDecimalProperties": Object {
-            "items": Object {
+          "optionalDecimalProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "optionalDecimalProperty": Object {
+              "properties": {
+                "optionalDecimalProperty": {
                   "description": "doc3",
                   "type": "number",
                 },
               },
-              "required": Array [
+              "required": [
                 "optionalDecimalProperty",
               ],
               "type": "object",
@@ -268,16 +268,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "optionalPercentProperties": Object {
-            "items": Object {
+          "optionalPercentProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "optionalPercentProperty": Object {
+              "properties": {
+                "optionalPercentProperty": {
                   "description": "doc5",
                   "type": "number",
                 },
               },
-              "required": Array [
+              "required": [
                 "optionalPercentProperty",
               ],
               "type": "object",
@@ -286,16 +286,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "optionalShortProperties": Object {
-            "items": Object {
+          "optionalShortProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "optionalShortProperty": Object {
+              "properties": {
+                "optionalShortProperty": {
                   "description": "doc9",
                   "type": "integer",
                 },
               },
-              "required": Array [
+              "required": [
                 "optionalShortProperty",
               ],
               "type": "object",
@@ -304,16 +304,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "optionalYears": Object {
-            "items": Object {
+          "optionalYears": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "optionalYear": Object {
+              "properties": {
+                "optionalYear": {
                   "description": "doc14",
                   "type": "integer",
                 },
               },
-              "required": Array [
+              "required": [
                 "optionalYear",
               ],
               "type": "object",
@@ -322,16 +322,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredCurrencyProperties": Object {
-            "items": Object {
+          "requiredCurrencyProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredCurrencyProperty": Object {
+              "properties": {
+                "requiredCurrencyProperty": {
                   "description": "doc2",
                   "type": "number",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredCurrencyProperty",
               ],
               "type": "object",
@@ -340,17 +340,17 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredDateProperties": Object {
-            "items": Object {
+          "requiredDateProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredDateProperty": Object {
+              "properties": {
+                "requiredDateProperty": {
                   "description": "doc6",
                   "format": "date",
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredDateProperty",
               ],
               "type": "object",
@@ -359,17 +359,17 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredDatetimeProperties": Object {
-            "items": Object {
+          "requiredDatetimeProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredDatetimeProperty": Object {
+              "properties": {
+                "requiredDatetimeProperty": {
                   "description": "doc7",
                   "format": "date-time",
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredDatetimeProperty",
               ],
               "type": "object",
@@ -378,16 +378,16 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredDurationProperties": Object {
-            "items": Object {
+          "requiredDurationProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredDurationProperty": Object {
+              "properties": {
+                "requiredDurationProperty": {
                   "description": "doc4",
                   "type": "number",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredDurationProperty",
               ],
               "type": "object",
@@ -396,18 +396,18 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredIntegerProperties": Object {
-            "items": Object {
+          "requiredIntegerProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredIntegerProperty": Object {
+              "properties": {
+                "requiredIntegerProperty": {
                   "description": "doc8",
                   "maximum": 10,
                   "minimum": 5,
                   "type": "integer",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredIntegerProperty",
               ],
               "type": "object",
@@ -416,18 +416,18 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredStringProperties": Object {
-            "items": Object {
+          "requiredStringProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredStringProperty": Object {
+              "properties": {
+                "requiredStringProperty": {
                   "description": "doc11",
                   "maxLength": 31,
                   "minLength": 21,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredStringProperty",
               ],
               "type": "object",
@@ -436,17 +436,17 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "requiredTimeProperties": Object {
-            "items": Object {
+          "requiredTimeProperties": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredTimeProperty": Object {
+              "properties": {
+                "requiredTimeProperty": {
                   "description": "doc12",
                   "format": "time",
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredTimeProperty",
               ],
               "type": "object",
@@ -455,30 +455,30 @@ describe('when building simple domain entity with all the simple collections', (
             "type": "array",
             "uniqueItems": false,
           },
-          "schoolYearTypeReference": Object {
+          "schoolYearTypeReference": {
             "additionalProperties": false,
             "description": "A school year reference",
-            "properties": Object {
-              "schoolYear": Object {
+            "properties": {
+              "schoolYear": {
                 "description": "A school year",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": Array [
+            "required": [
               "schoolYear",
             ],
             "type": "object",
           },
-          "stringIdentity": Object {
+          "stringIdentity": {
             "description": "doc10",
             "maxLength": 30,
             "minLength": 20,
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "requiredCurrencyProperties",
           "requiredDurationProperties",
           "requiredDateProperties",
@@ -551,37 +551,37 @@ describe('when building a domain entity referencing another referencing another 
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "classPeriods": Object {
-            "items": Object {
+        "properties": {
+          "classPeriods": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "classPeriodReference": Object {
+              "properties": {
+                "classPeriodReference": {
                   "additionalProperties": false,
-                  "properties": Object {
-                    "classPeriodName": Object {
+                  "properties": {
+                    "classPeriodName": {
                       "description": "doc",
                       "maxLength": 30,
                       "type": "string",
                     },
-                    "schoolId": Object {
+                    "schoolId": {
                       "description": "doc",
                       "maxLength": 30,
                       "type": "string",
                     },
                   },
-                  "required": Array [
+                  "required": [
                     "classPeriodName",
                     "schoolId",
                   ],
                   "type": "object",
                 },
               },
-              "required": Array [
+              "required": [
                 "classPeriodReference",
               ],
               "type": "object",
@@ -590,33 +590,33 @@ describe('when building a domain entity referencing another referencing another 
             "type": "array",
             "uniqueItems": false,
           },
-          "courseOfferingReference": Object {
+          "courseOfferingReference": {
             "additionalProperties": false,
-            "properties": Object {
-              "localCourseCode": Object {
+            "properties": {
+              "localCourseCode": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
-              "schoolId": Object {
+              "schoolId": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
             },
-            "required": Array [
+            "required": [
               "localCourseCode",
               "schoolId",
             ],
             "type": "object",
           },
-          "sectionIdentifier": Object {
+          "sectionIdentifier": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "sectionIdentifier",
           "courseOfferingReference",
           "classPeriods",
@@ -684,44 +684,44 @@ describe('when building a domain entity referencing CourseOffering with an impli
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "courseOfferingReference": Object {
+        "properties": {
+          "courseOfferingReference": {
             "additionalProperties": false,
-            "properties": Object {
-              "localCourseCode": Object {
+            "properties": {
+              "localCourseCode": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
-              "schoolId": Object {
+              "schoolId": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
-              "sessionName": Object {
+              "sessionName": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
             },
-            "required": Array [
+            "required": [
               "localCourseCode",
               "schoolId",
               "sessionName",
             ],
             "type": "object",
           },
-          "sectionIdentifier": Object {
+          "sectionIdentifier": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "sectionIdentifier",
           "courseOfferingReference",
         ],
@@ -793,24 +793,24 @@ describe('when building domain entity with nested choice and inline commons', ()
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "contentIdentifier": Object {
+        "properties": {
+          "contentIdentifier": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
-          "derivativeSourceEducationContents": Object {
-            "items": Object {
+          "derivativeSourceEducationContents": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "derivativeSourceEducationContentReference": Object {
+              "properties": {
+                "derivativeSourceEducationContentReference": {
                   "additionalProperties": false,
-                  "properties": Object {
-                    "contentIdentifier": Object {
+                  "properties": {
+                    "contentIdentifier": {
                       "description": "doc",
                       "maxLength": 30,
                       "type": "string",
@@ -819,7 +819,7 @@ describe('when building domain entity with nested choice and inline commons', ()
                   "type": "object",
                 },
               },
-              "required": Array [
+              "required": [
                 "derivativeSourceEducationContentReference",
               ],
               "type": "object",
@@ -828,17 +828,17 @@ describe('when building domain entity with nested choice and inline commons', ()
             "type": "array",
             "uniqueItems": false,
           },
-          "derivativeSourceURIs": Object {
-            "items": Object {
+          "derivativeSourceURIs": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "derivativeSourceURI": Object {
+              "properties": {
+                "derivativeSourceURI": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "derivativeSourceURI",
               ],
               "type": "object",
@@ -847,27 +847,27 @@ describe('when building domain entity with nested choice and inline commons', ()
             "type": "array",
             "uniqueItems": false,
           },
-          "description": Object {
+          "description": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
-          "learningResourceMetadataURI": Object {
+          "learningResourceMetadataURI": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
-          "requiredURIs": Object {
-            "items": Object {
+          "requiredURIs": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "requiredURI": Object {
+              "properties": {
+                "requiredURI": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "requiredURI",
               ],
               "type": "object",
@@ -877,7 +877,7 @@ describe('when building domain entity with nested choice and inline commons', ()
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "contentIdentifier",
           "learningResourceMetadataURI",
           "requiredURIs",
@@ -928,27 +928,27 @@ describe('when building domain entity with scalar collection named with prefix o
   it('should be a correct schema - parent name prefix removed', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "contentIdentifier": Object {
+        "properties": {
+          "contentIdentifier": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
-          "suffixNames": Object {
-            "items": Object {
+          "suffixNames": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "suffixName": Object {
+              "properties": {
+                "suffixName": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "suffixName",
               ],
               "type": "object",
@@ -958,7 +958,7 @@ describe('when building domain entity with scalar collection named with prefix o
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "contentIdentifier",
           "suffixNames",
         ],
@@ -1013,36 +1013,36 @@ describe('when building domain entity with Association/DomainEntity collection n
   it('should be a correct schema - parent name prefix retained', () => {
     const entity = namespace.entity.domainEntity.get(domainEntityName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "contentIdentifier": Object {
+        "properties": {
+          "contentIdentifier": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
-          "educationContentSuffixNames": Object {
-            "items": Object {
+          "educationContentSuffixNames": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "educationContentSuffixNameReference": Object {
+              "properties": {
+                "educationContentSuffixNameReference": {
                   "additionalProperties": false,
-                  "properties": Object {
-                    "stringIdentity": Object {
+                  "properties": {
+                    "stringIdentity": {
                       "description": "doc",
                       "maxLength": 30,
                       "type": "string",
                     },
                   },
-                  "required": Array [
+                  "required": [
                     "stringIdentity",
                   ],
                   "type": "object",
                 },
               },
-              "required": Array [
+              "required": [
                 "educationContentSuffixNameReference",
               ],
               "type": "object",
@@ -1052,7 +1052,7 @@ describe('when building domain entity with Association/DomainEntity collection n
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "contentIdentifier",
           "educationContentSuffixNames",
         ],
@@ -1114,30 +1114,30 @@ describe('when building domain entity with a simple common collection', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessmentIdentifier": Object {
+        "properties": {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
-          "identificationCodes": Object {
-            "items": Object {
+          "identificationCodes": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "assessmentIdentificationSystemDescriptor": Object {
+              "properties": {
+                "assessmentIdentificationSystemDescriptor": {
                   "description": "doc",
                   "type": "string",
                 },
-                "identificationCode": Object {
+                "identificationCode": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "identificationCode",
                 "assessmentIdentificationSystemDescriptor",
               ],
@@ -1148,7 +1148,7 @@ describe('when building domain entity with a simple common collection', () => {
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1220,30 +1220,30 @@ describe('when building domain entity subclass with common collection and descri
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntitySubclass.get(domainEntitySubclassName);
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "communityOrganizationId": Object {
+        "properties": {
+          "communityOrganizationId": {
             "description": "doc",
             "type": "integer",
           },
-          "identificationCodes": Object {
-            "items": Object {
+          "identificationCodes": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "educationOrganizationIdentificationSystemDescriptor": Object {
+              "properties": {
+                "educationOrganizationIdentificationSystemDescriptor": {
                   "description": "doc",
                   "type": "string",
                 },
-                "identificationCode": Object {
+                "identificationCode": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "identificationCode",
                 "educationOrganizationIdentificationSystemDescriptor",
               ],
@@ -1254,7 +1254,7 @@ describe('when building domain entity subclass with common collection and descri
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "communityOrganizationId",
         ],
         "title": "EdFi.CommunityOrganization",
@@ -1315,29 +1315,29 @@ describe('when building association with a common collection in a common collect
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('StudentEducationOrganizationAssociation');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "addresses": Object {
-            "items": Object {
+        "properties": {
+          "addresses": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "periods": Object {
-                  "items": Object {
+              "properties": {
+                "periods": {
+                  "items": {
                     "additionalProperties": false,
-                    "properties": Object {
-                      "beginDate": Object {
+                    "properties": {
+                      "beginDate": {
                         "description": "doc",
                         "type": "integer",
                       },
-                      "endDate": Object {
+                      "endDate": {
                         "description": "doc",
                         "type": "integer",
                       },
                     },
-                    "required": Array [
+                    "required": [
                       "beginDate",
                     ],
                     "type": "object",
@@ -1346,13 +1346,13 @@ describe('when building association with a common collection in a common collect
                   "type": "array",
                   "uniqueItems": false,
                 },
-                "streetNumberName": Object {
+                "streetNumberName": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "streetNumberName",
               ],
               "type": "object",
@@ -1361,12 +1361,12 @@ describe('when building association with a common collection in a common collect
             "type": "array",
             "uniqueItems": false,
           },
-          "student": Object {
+          "student": {
             "description": "doc",
             "type": "integer",
           },
         },
-        "required": Array [
+        "required": [
           "student",
         ],
         "title": "EdFi.StudentEducationOrganizationAssociation",
@@ -1420,21 +1420,21 @@ describe('when building domain entity with a descriptor with role name', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessedGradeLevelDescriptor": Object {
+        "properties": {
+          "assessedGradeLevelDescriptor": {
             "description": "doc",
             "type": "string",
           },
-          "assessmentIdentifier": Object {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1488,21 +1488,21 @@ describe('when building domain entity with a descriptor collection with role nam
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessedGradeLevels": Object {
-            "items": Object {
+        "properties": {
+          "assessedGradeLevels": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "gradeLevelDescriptor": Object {
+              "properties": {
+                "gradeLevelDescriptor": {
                   "description": "An Ed-Fi Descriptor",
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "gradeLevelDescriptor",
               ],
               "type": "object",
@@ -1511,12 +1511,12 @@ describe('when building domain entity with a descriptor collection with role nam
             "type": "array",
             "uniqueItems": false,
           },
-          "assessmentIdentifier": Object {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1579,29 +1579,29 @@ describe('when building domain entity with a common with a choice', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessmentIdentifier": Object {
+        "properties": {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
-          "contentStandard": Object {
+          "contentStandard": {
             "additionalProperties": false,
-            "properties": Object {
-              "publicationDate": Object {
+            "properties": {
+              "publicationDate": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
-              "publicationYear": Object {
+              "publicationYear": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
               },
-              "title": Object {
+              "title": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
@@ -1610,7 +1610,7 @@ describe('when building domain entity with a common with a choice', () => {
             "type": "object",
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1670,19 +1670,19 @@ describe('when building domain entity with a common and a common collection with
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessmentIdentifier": Object {
+        "properties": {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
-          "period": Object {
+          "period": {
             "additionalProperties": false,
-            "properties": Object {
-              "beginDate": Object {
+            "properties": {
+              "beginDate": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
@@ -1690,17 +1690,17 @@ describe('when building domain entity with a common and a common collection with
             },
             "type": "object",
           },
-          "scores": Object {
-            "items": Object {
+          "scores": {
+            "items": {
               "additionalProperties": false,
-              "properties": Object {
-                "minimumScore": Object {
+              "properties": {
+                "minimumScore": {
                   "description": "doc",
                   "maxLength": 30,
                   "type": "string",
                 },
               },
-              "required": Array [
+              "required": [
                 "minimumScore",
               ],
               "type": "object",
@@ -1710,7 +1710,7 @@ describe('when building domain entity with a common and a common collection with
             "uniqueItems": false,
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
           "scores",
         ],
@@ -1757,22 +1757,22 @@ describe('when building domain entity with an all-caps property', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessmentIdentifier": Object {
+        "properties": {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
-          "uri": Object {
+          "uri": {
             "description": "doc",
             "maxLength": 30,
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1833,32 +1833,32 @@ describe('when building domain entity with a common with a domain entity referen
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('Assessment');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "assessmentIdentifier": Object {
+        "properties": {
+          "assessmentIdentifier": {
             "description": "doc",
             "type": "integer",
           },
-          "contentStandard": Object {
+          "contentStandard": {
             "additionalProperties": false,
-            "properties": Object {
-              "mandatingEducationOrganizationReference": Object {
+            "properties": {
+              "mandatingEducationOrganizationReference": {
                 "additionalProperties": false,
-                "properties": Object {
-                  "educationOrganizationId": Object {
+                "properties": {
+                  "educationOrganizationId": {
                     "description": "doc",
                     "type": "integer",
                   },
                 },
-                "required": Array [
+                "required": [
                   "educationOrganizationId",
                 ],
                 "type": "object",
               },
-              "title": Object {
+              "title": {
                 "description": "doc",
                 "maxLength": 30,
                 "type": "string",
@@ -1867,7 +1867,7 @@ describe('when building domain entity with a common with a domain entity referen
             "type": "object",
           },
         },
-        "required": Array [
+        "required": [
           "assessmentIdentifier",
         ],
         "title": "EdFi.Assessment",
@@ -1922,49 +1922,49 @@ describe('when building domain entity with two school year enumerations, one rol
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "classOfSchoolYearTypeReference": Object {
+        "properties": {
+          "classOfSchoolYearTypeReference": {
             "additionalProperties": false,
             "description": "A school year reference",
-            "properties": Object {
-              "schoolYear": Object {
+            "properties": {
+              "schoolYear": {
                 "description": "A school year",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": Array [
+            "required": [
               "schoolYear",
             ],
             "type": "object",
           },
-          "schoolId": Object {
+          "schoolId": {
             "description": "doc",
             "type": "integer",
           },
-          "schoolYearTypeReference": Object {
+          "schoolYearTypeReference": {
             "additionalProperties": false,
             "description": "A school year reference",
-            "properties": Object {
-              "schoolYear": Object {
+            "properties": {
+              "schoolYear": {
                 "description": "A school year",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": Array [
+            "required": [
               "schoolYear",
             ],
             "type": "object",
           },
         },
-        "required": Array [
+        "required": [
           "schoolId",
         ],
         "title": "EdFi.StudentSchoolAssociation",
@@ -2019,37 +2019,37 @@ describe('when building domain entity with reference to domain entity with schoo
   it('should be a correct schema', () => {
     const entity = namespace.entity.domainEntity.get('StudentSchoolAssociation');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "doc",
-        "properties": Object {
-          "calendarReference": Object {
+        "properties": {
+          "calendarReference": {
             "additionalProperties": false,
-            "properties": Object {
-              "schoolId": Object {
+            "properties": {
+              "schoolId": {
                 "description": "doc",
                 "type": "integer",
               },
-              "schoolYear": Object {
+              "schoolYear": {
                 "description": "doc",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "integer",
               },
             },
-            "required": Array [
+            "required": [
               "schoolId",
               "schoolYear",
             ],
             "type": "object",
           },
-          "schoolId": Object {
+          "schoolId": {
             "description": "doc",
             "type": "integer",
           },
         },
-        "required": Array [
+        "required": [
           "schoolId",
         ],
         "title": "EdFi.StudentSchoolAssociation",
@@ -2092,29 +2092,29 @@ describe('when building a descriptor', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.descriptor.get('GradeLevel');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "An Ed-Fi Descriptor",
-        "properties": Object {
-          "codeValue": Object {
+        "properties": {
+          "codeValue": {
             "description": "The descriptor code value",
             "type": "string",
           },
-          "description": Object {
+          "description": {
             "description": "The descriptor description",
             "type": "string",
           },
-          "namespace": Object {
+          "namespace": {
             "description": "The descriptor namespace as a URI",
             "type": "string",
           },
-          "shortDescription": Object {
+          "shortDescription": {
             "description": "The descriptor short description",
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "namespace",
           "codeValue",
           "shortDescription",
@@ -2161,27 +2161,27 @@ describe('when building a school year enumeration', () => {
   it('should be a correct schema', () => {
     const entity = namespace.entity.schoolYearEnumeration.get('SchoolYear');
     expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      Object {
+      {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "description": "A school year enumeration",
-        "properties": Object {
-          "currentSchoolYear": Object {
+        "properties": {
+          "currentSchoolYear": {
             "description": "Is this the current school year",
             "type": "boolean",
           },
-          "schoolYear": Object {
+          "schoolYear": {
             "description": "A school year between 1900 and 2100",
             "maximum": 2100,
             "minimum": 1900,
             "type": "number",
           },
-          "schoolYearDescription": Object {
+          "schoolYearDescription": {
             "description": "The school year description",
             "type": "string",
           },
         },
-        "required": Array [
+        "required": [
           "schoolYear",
           "currentSchoolYear",
         ],

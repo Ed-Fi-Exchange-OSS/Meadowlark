@@ -46,10 +46,10 @@ describe('given a PUT of a school', () => {
     expect(mock.action).toBe('updateById');
     expect(mock.body).toMatchInlineSnapshot(`
       "{
-          \\"schoolId\\": 123,
-          \\"gradeLevels\\": [],
-          \\"nameOfInstitution\\": \\"abc\\",
-          \\"educationOrganizationCategories\\": []
+          "schoolId": 123,
+          "gradeLevels": [],
+          "nameOfInstitution": "abc",
+          "educationOrganizationCategories": []
         }"
     `);
     expect(mock.headers.authorization).toBe('bearer 1234');

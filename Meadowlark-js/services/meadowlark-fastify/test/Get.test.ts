@@ -76,7 +76,7 @@ describe('given a GET of a school query without path ending slash', () => {
     expect(mock.headers.authorization).toBe('bearer 1234');
     expect(mock.path).toBe('/v3.3b/ed-fi/schools');
     expect(mock.queryParameters).toMatchInlineSnapshot(`
-      Object {
+      {
         "schoolId": "123",
       }
     `);
@@ -115,7 +115,7 @@ describe('given a GET of a school query with path ending slash', () => {
     expect(mock.headers.authorization).toBe('bearer 1234');
     expect(mock.path).toBe('/v3.3b/ed-fi/schools/');
     expect(mock.queryParameters).toMatchInlineSnapshot(`
-      Object {
+      {
         "schoolId": "123",
       }
     `);

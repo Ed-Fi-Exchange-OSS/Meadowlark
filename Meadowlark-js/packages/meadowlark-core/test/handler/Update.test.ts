@@ -165,7 +165,7 @@ describe('given the resourceId of the update does not match the id derived from 
 
   it('returns a failure message body', () => {
     expect(response.body).toMatchInlineSnapshot(
-      `"{\\"message\\":\\"The identity of the resource does not match the identity in the updated document.\\"}"`,
+      `"{"message":"The identity of the resource does not match the identity in the updated document."}"`,
     );
   });
 });
