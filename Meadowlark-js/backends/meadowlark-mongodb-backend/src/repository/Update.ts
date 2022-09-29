@@ -60,8 +60,14 @@ export async function updateDocumentById(
       // Perform the document update
       Logger.debug(`mongodb.repository.Update.updateDocumentById: Updating document id ${id}`, traceId);
 
-      const { matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
-      updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
+      if (acknowledged) {
+        updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      } else {
+        const msg =
+          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error('mongodb.repository.Update.updateDocumentById', traceId, msg);
+      }
     });
   } catch (e) {
     Logger.error('mongodb.repository.Update.updateDocumentById', traceId, e);

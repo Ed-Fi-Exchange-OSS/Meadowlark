@@ -85,8 +85,14 @@ export async function upsertDocument(
       // Perform the document upsert
       Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
 
-      const { upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
-      upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
+      if (acknowledged) {
+        upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+      } else {
+        const msg =
+          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, msg);
+      }
     });
   } catch (e) {
     Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, e);
