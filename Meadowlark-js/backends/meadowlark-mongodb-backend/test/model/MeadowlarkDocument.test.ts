@@ -34,20 +34,20 @@ describe('given non-superclass document info with no references', () => {
 
   it('should be a complete document, with no outbound refs and a single alias id', async () => {
     expect(meadowlarkDocument).toMatchInlineSnapshot(`
-      Object {
+      {
         "_id": "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
-        "aliasIds": Array [
+        "aliasIds": [
           "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
         ],
         "createdBy": "createdBy",
-        "documentIdentity": Object {
+        "documentIdentity": {
           "natural": "key",
         },
-        "edfiDoc": Object {
+        "edfiDoc": {
           "edfi": "doc",
         },
         "isDescriptor": false,
-        "outboundRefs": Array [],
+        "outboundRefs": [],
         "projectName": "",
         "resourceName": "School",
         "resourceVersion": "",
@@ -95,7 +95,7 @@ describe('given non-superclass document info with references', () => {
 
   it('should have outbound references', async () => {
     expect(meadowlarkDocument.outboundRefs).toMatchInlineSnapshot(`
-      Array [
+      [
         "dfR7WrhrnYMh8lF_mnIhAN2Ur2Ji2MmlGBcSUg",
         "t9LSXi1nFRmwyLTPkxiA9RG1ItGTlsxaGzTwKA",
       ]
@@ -126,7 +126,7 @@ describe('given superclass document info', () => {
 
   it('should have two alias ids', async () => {
     expect(meadowlarkDocument.aliasIds).toMatchInlineSnapshot(`
-      Array [
+      [
         "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
         "dfR7WrhrnYMh8lF_mnIhAN2Ur2Ji2MmlGBcSUg",
       ]

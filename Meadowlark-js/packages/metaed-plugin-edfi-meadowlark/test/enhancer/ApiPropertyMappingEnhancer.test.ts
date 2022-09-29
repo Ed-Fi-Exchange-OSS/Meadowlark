@@ -61,7 +61,7 @@ describe('when building simple domain entity referencing another referencing ano
   it('should be valid', () => {
     expect(metaEd.propertyIndex.string).toHaveLength(4);
     expect(metaEd.propertyIndex.string[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "sectionIdentifier",
         "descriptorCollectionName": "",
         "fullName": "sectionIdentifier",
@@ -77,7 +77,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.string[1].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "localCourseCode",
         "descriptorCollectionName": "",
         "fullName": "localCourseCode",
@@ -93,7 +93,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.string[2].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "classPeriodName",
         "descriptorCollectionName": "",
         "fullName": "classPeriodName",
@@ -109,7 +109,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.string[3].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolId",
         "descriptorCollectionName": "",
         "fullName": "schoolId",
@@ -127,7 +127,7 @@ describe('when building simple domain entity referencing another referencing ano
 
     expect(metaEd.propertyIndex.domainEntity).toHaveLength(4);
     expect(metaEd.propertyIndex.domainEntity[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "courseOfferingReference",
         "descriptorCollectionName": "",
         "fullName": "courseOffering",
@@ -143,7 +143,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[1].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "classPeriods",
         "descriptorCollectionName": "",
         "fullName": "classPeriods",
@@ -159,7 +159,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[2].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
@@ -175,7 +175,7 @@ describe('when building simple domain entity referencing another referencing ano
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[3].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
@@ -236,7 +236,7 @@ describe('when domain entity has a reference with same role name as entity name'
   it('should be valid', () => {
     expect(metaEd.propertyIndex.string).toHaveLength(4);
     expect(metaEd.propertyIndex.string[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "sectionIdentifier",
         "descriptorCollectionName": "",
         "fullName": "sectionIdentifier",
@@ -252,7 +252,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.string[1].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "localCourseCode",
         "descriptorCollectionName": "",
         "fullName": "localCourseCode",
@@ -268,7 +268,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.string[2].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "classPeriodName",
         "descriptorCollectionName": "",
         "fullName": "classPeriodName",
@@ -284,7 +284,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.string[3].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolId",
         "descriptorCollectionName": "",
         "fullName": "schoolId",
@@ -302,7 +302,7 @@ describe('when domain entity has a reference with same role name as entity name'
 
     expect(metaEd.propertyIndex.domainEntity).toHaveLength(4);
     expect(metaEd.propertyIndex.domainEntity[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "courseOfferingReference",
         "descriptorCollectionName": "",
         "fullName": "courseOffering",
@@ -318,7 +318,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[1].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "classPeriods",
         "descriptorCollectionName": "",
         "fullName": "classPeriods",
@@ -334,7 +334,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[2].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
@@ -350,7 +350,7 @@ describe('when domain entity has a reference with same role name as entity name'
       }
     `);
     expect(metaEd.propertyIndex.domainEntity[3].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "schoolReference",
         "descriptorCollectionName": "",
         "fullName": "school",
@@ -442,7 +442,7 @@ describe('when building simple domain entity with common collection', () => {
   it('should be valid', () => {
     expect(metaEd.propertyIndex.common).toHaveLength(1);
     expect(metaEd.propertyIndex.common[0].data.meadowlark.apiMapping).toMatchInlineSnapshot(`
-      Object {
+      {
         "decollisionedTopLevelName": "meetingTimes",
         "descriptorCollectionName": "",
         "fullName": "meetingTimes",

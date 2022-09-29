@@ -151,7 +151,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       `"The resource cannot be deleted because it is a dependency of other documents"`,
     );
     expect(responseBody.blockingUris).toMatchInlineSnapshot(`
-      Array [
+      [
         "/v3.3b/ed-fi/resourceName/documentId",
       ]
     `);

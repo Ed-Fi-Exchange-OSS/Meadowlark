@@ -84,7 +84,7 @@ describe('given a valid path without resourceId', () => {
 
   it('adds pathComponents to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
-      Object {
+      {
         "namespace": "2",
         "resourceId": undefined,
         "resourceName": "3",
@@ -115,7 +115,7 @@ describe('given a valid path with resourceId', () => {
 
   it('adds pathComponents to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
-      Object {
+      {
         "namespace": "2",
         "resourceId": "aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA",
         "resourceName": "3",

@@ -73,9 +73,9 @@ describe('when extracting single descriptor value from domain entity', () => {
 
   it('should have the descriptor value for a GradingPeriod', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/grade",
           },
           "isDescriptor": true,
@@ -133,9 +133,9 @@ describe('when extracting descriptor values from domain entity with the same nam
 
   it('should have the descriptor value for a GradingPeriod', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/grade",
           },
           "isDescriptor": true,
@@ -202,9 +202,9 @@ describe('when extracting array of descriptor values from domain entity', () => 
 
   it('should have the descriptor values for the GradingPeriods', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/grade1",
           },
           "isAssignableFrom": false,
@@ -213,8 +213,8 @@ describe('when extracting array of descriptor values from domain entity', () => 
           "resourceName": "GradingPeriod",
           "resourceVersion": "",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/grade2",
           },
           "isAssignableFrom": false,
@@ -223,8 +223,8 @@ describe('when extracting array of descriptor values from domain entity', () => 
           "resourceName": "GradingPeriod",
           "resourceVersion": "",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/grade3",
           },
           "isAssignableFrom": false,
@@ -303,9 +303,9 @@ describe('when extracting collection from domain entity subclass with naming col
 
   it('should have values for body without collection prefix removal', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/schoolValue",
           },
           "isAssignableFrom": false,
@@ -314,8 +314,8 @@ describe('when extracting collection from domain entity subclass with naming col
           "resourceName": "SchoolCategory",
           "resourceVersion": "",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/edOrgValue",
           },
           "isAssignableFrom": false,
@@ -390,17 +390,17 @@ describe('when extracting collection from domain entity subclass with no naming 
 
   it('should have values for body with collection prefix removal and without collection', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/schoolValue",
           },
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "SchoolCategoryDescriptor",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "descriptor": "uri://ed-fi.org/edOrgValue",
           },
           "isAssignableFrom": false,

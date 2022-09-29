@@ -99,9 +99,9 @@ describe('when extracting document references from domain entity referencing one
 
   it('should have references', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "classPeriodName": "z1",
             "schoolReference.schoolId": "24",
           },
@@ -109,8 +109,8 @@ describe('when extracting document references from domain entity referencing one
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "classPeriodName": "z2",
             "schoolReference.schoolId": "25",
           },
@@ -118,8 +118,8 @@ describe('when extracting document references from domain entity referencing one
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "localCourseCode": "abc",
             "schoolReference.schoolId": "23",
           },
@@ -178,9 +178,9 @@ describe('when extracting with optional reference in body', () => {
 
   it('should have references', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "localCourseCode": "abc",
           },
           "isDescriptor": false,
@@ -234,7 +234,7 @@ describe('when extracting with optional reference not in body', () => {
   });
 
   it('should have no references', () => {
-    expect(result).toMatchInlineSnapshot(`Array []`);
+    expect(result).toMatchInlineSnapshot(`[]`);
   });
 });
 
@@ -292,17 +292,17 @@ describe('when extracting optional collection in body', () => {
 
   it('should have references', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "classPeriodName": "z1",
           },
           "isDescriptor": false,
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "classPeriodName": "z2",
           },
           "isDescriptor": false,
@@ -355,7 +355,7 @@ describe('when extracting optional collection not in body', () => {
   });
 
   it('should have no references', () => {
-    expect(result).toMatchInlineSnapshot(`Array []`);
+    expect(result).toMatchInlineSnapshot(`[]`);
   });
 });
 
@@ -434,9 +434,9 @@ describe('when extracting document references with two levels of identities on a
 
   it('should have two references down to "schoolId"', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "classPeriodName": "c1",
             "schoolReference.schoolId": "24",
             "sessionReference.schoolId": "24",
@@ -446,8 +446,8 @@ describe('when extracting document references with two levels of identities on a
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "classPeriodName": "c2",
             "schoolReference.schoolId": "25",
             "sessionReference.schoolId": "25",
@@ -548,9 +548,9 @@ describe('when extracting document references with three levels of identities on
 
   it('should have ClassPeriod references down to "thirdLevelName"', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "classPeriodName": "c1",
             "schoolReference.schoolId": "24",
             "sessionReference.secondLevelName": "e1",
@@ -561,8 +561,8 @@ describe('when extracting document references with three levels of identities on
           "projectName": "EdFi",
           "resourceName": "ClassPeriod",
         },
-        Object {
-          "documentIdentity": Object {
+        {
+          "documentIdentity": {
             "classPeriodName": "c2",
             "schoolReference.schoolId": "25",
             "sessionReference.secondLevelName": "e2",
@@ -634,9 +634,9 @@ describe('when extracting with school year reference in body', () => {
 
   it('should have references', () => {
     expect(result).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "documentIdentity": Object {
+      [
+        {
+          "documentIdentity": {
             "schoolYearTypeReference.schoolYear": 2022,
             "sessionName": "def",
           },

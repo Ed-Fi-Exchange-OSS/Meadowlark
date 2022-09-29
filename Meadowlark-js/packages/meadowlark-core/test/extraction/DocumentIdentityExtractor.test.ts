@@ -88,7 +88,7 @@ describe('when extracting natural key from domain entity referencing another ref
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      Object {
+      {
         "classPeriodReference.classPeriodName": "z",
         "classPeriodReference.schoolId": "23",
         "courseOfferingReference.localCourseCode": "abc",
@@ -145,7 +145,7 @@ describe('when extracting natural key from domain entity with school year in ide
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      Object {
+      {
         "schoolYearTypeReference.schoolYear": 2022,
         "sessionName": "s",
       }
@@ -197,7 +197,7 @@ describe('when extracting natural key from domain entity with school year that h
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      Object {
+      {
         "graduationSchoolYearTypeReference.schoolYear": 2022,
       }
     `);
