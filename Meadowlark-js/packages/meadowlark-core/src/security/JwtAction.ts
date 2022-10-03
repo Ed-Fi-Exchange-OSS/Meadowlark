@@ -10,7 +10,7 @@ import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
 import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
-import { AuthorizationStrategy } from './Security';
+import { AuthorizationStrategy } from './AuthorizationStrategy';
 
 function signingKey(): Buffer {
   const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
@@ -47,7 +47,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
   // otherwise this is not a valid token
-  let authStrategyFromJWT: AuthorizationStrategy = 'UNDEFINED';
+  let authStrategyFromJWT: AuthorizationStrategy = { type: 'UNDEFINED', withAssessment: false };
 
   if ((jwt.body?.roles?.length ?? 0) > 0) {
     authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
@@ -55,7 +55,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT !== 'UNDEFINED',
+    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT.type !== 'UNDEFINED',
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
@@ -64,7 +64,7 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
     roles: jwt.body?.roles ?? [],
-    authorizationStrategy: authStrategyFromJWT as AuthorizationStrategy,
+    authorizationStrategy: authStrategyFromJWT,
   };
 }
 

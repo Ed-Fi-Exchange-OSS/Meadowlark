@@ -6,8 +6,8 @@
 import { documentIdForDocumentInfo, FrontendRequest, Logger, writeRequestToLog } from '@edfi/meadowlark-core';
 import { Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { SecurityResult } from '../security/SecurityResponse';
-import { getCollection } from './Db';
+import { SecurityResult } from '../security/SecurityResult';
+import { getDocumentCollection } from './Db';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): string | undefined {
   if (frontendRequest.action !== 'upsert') return undefined;
@@ -33,7 +33,7 @@ export async function rejectByOwnershipSecurity(
     return 'NOT_APPLICABLE';
   }
 
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   let id = frontendRequest.middleware.pathComponents.resourceId;
 
   if (id == null) id = extractIdIfUpsert(frontendRequest);

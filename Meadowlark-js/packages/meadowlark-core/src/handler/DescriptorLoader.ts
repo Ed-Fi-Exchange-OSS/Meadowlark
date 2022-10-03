@@ -130,7 +130,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
         documentInfo,
         edfiDoc: descriptorDocument,
         validate: true,
-        security: { ...newSecurity(), authorizationStrategy: 'FULL_ACCESS' },
+        security: { ...newSecurity(), authorizationStrategy: { type: 'FULL_ACCESS', withAssessment: false } },
         traceId: '-',
       };
 

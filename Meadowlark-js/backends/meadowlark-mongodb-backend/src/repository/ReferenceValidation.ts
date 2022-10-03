@@ -4,9 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { ClientSession, Collection, Filter, FindOptions, ReplaceOptions, WithId } from 'mongodb';
+import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
 import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
+import { onlyReturnId } from './Db';
 
 /**
  * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
@@ -59,9 +60,6 @@ export function findMissingReferences(
   );
 }
 
-// MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
-export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
-
 // MongoDB FindOption to return only the aliasIds field
 export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
   projection: { aliasIds: 1 },
@@ -72,9 +70,6 @@ export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
 export const onlyDocumentsReferencing = (aliasIds: string[]): Filter<MeadowlarkDocument> => ({
   outboundRefs: { $in: aliasIds },
 });
-
-// MongoDB ReplaceOption that enables upsert (insert if not exists)
-export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });
 
 /**
  * Validate document and descriptor references

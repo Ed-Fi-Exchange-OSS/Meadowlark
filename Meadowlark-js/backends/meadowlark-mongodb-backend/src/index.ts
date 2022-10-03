@@ -4,12 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentStorePlugin } from '@edfi/meadowlark-core';
+import { AuthorizationStorePlugin } from '@edfi/meadowlark-authz-server';
 import {
   upsertDocument,
   deleteDocumentById,
   getDocumentById,
   updateDocumentById,
   securityMiddleware,
+  createAuthorizationClient,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -22,6 +24,10 @@ export function initializeDocumentStore(): DocumentStorePlugin {
   };
 }
 
+export function initializeAuthorizationStore(): AuthorizationStorePlugin {
+  return { createAuthorizationClient };
+}
+
 // Accessible for system testing - this may turn into a generic setup/teardown datastore interface
-export { getNewClient, getCollection, resetSharedClient } from './repository/Db';
+export { getNewClient, getDocumentCollection, getAuthorizationCollection, resetSharedClient } from './repository/Db';
 export { systemTestSetup, systemTestTeardown } from './repository/SystemTestHelper';

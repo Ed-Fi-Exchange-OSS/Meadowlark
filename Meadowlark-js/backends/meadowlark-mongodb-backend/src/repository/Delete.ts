@@ -6,8 +6,8 @@
 import { DeleteResult, Logger, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getCollection } from './Db';
-import { onlyReturnId, onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
+import { getDocumentCollection, onlyReturnId } from './Db';
+import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
 
 // MongoDB FindOption to return at most 5 documents
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
@@ -16,7 +16,7 @@ export async function deleteDocumentById(
   { id, validate, traceId }: DeleteRequest,
   client: MongoClient,
 ): Promise<DeleteResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };

@@ -131,7 +131,7 @@ export async function createRandomSigningKey(): Promise<FrontendResponse> {
 export async function verify(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   Logger.debug(JSON.stringify(frontendRequest.headers), frontendRequest.traceId);
 
-  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
+  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest.headers));
 
   if (errorResponse == null) {
     return {

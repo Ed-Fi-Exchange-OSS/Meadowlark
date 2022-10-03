@@ -10,6 +10,7 @@ import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendR
 import { JwtStatus, newJwtStatus } from '../../src/security/JwtStatus';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { JwtValidation } from '../../src/security/JwtValidator';
+import { AuthorizationStrategy } from '../../src/security/AuthorizationStrategy';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -73,7 +74,7 @@ describe('given a valid response from authorize', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const clientId = 'ClientId';
   const roles = ['vendor'];
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
   const jwtStatus: JwtStatus = { ...newJwtStatus(), clientId, roles, authorizationStrategy };
   let resultChain: MiddlewareModel;
   let mockRequestValidator: any;
@@ -95,7 +96,12 @@ describe('given a valid response from authorize', () => {
   });
 
   it('adds security to frontendRequest', () => {
-    expect(resultChain.frontendRequest.middleware.security.authorizationStrategy).toBe('OWNERSHIP_BASED');
+    expect(resultChain.frontendRequest.middleware.security.authorizationStrategy).toMatchInlineSnapshot(`
+      {
+        "type": "OWNERSHIP_BASED",
+        "withAssessment": false,
+      }
+    `);
     expect(resultChain.frontendRequest.middleware.security.clientId).toBe(clientId);
   });
 

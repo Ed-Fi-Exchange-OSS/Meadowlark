@@ -7,7 +7,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { validateJwt } from '../security/JwtValidator';
 import { authorizationHeader } from '../security/AuthorizationHeader';
 import { MiddlewareModel } from './MiddlewareModel';
-import { AuthorizationStrategy } from '../security/Security';
+import { AuthorizationStrategy } from '../security/AuthorizationStrategy';
 
 const moduleName = 'AuthorizationMiddleware';
 
@@ -22,7 +22,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
   // for a real application. RND-286.
   writeRequestToLog(moduleName, frontendRequest, 'authorize');
 
-  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
+  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest.headers));
   if (errorResponse != null) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', errorResponse.statusCode, JSON.stringify(jwtStatus));
     return { frontendRequest, frontendResponse: errorResponse };

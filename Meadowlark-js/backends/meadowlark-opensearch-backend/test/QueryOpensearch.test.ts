@@ -64,7 +64,7 @@ describe('when querying for students', () => {
     it('should return an empty array', async () => {
       // Arrange
       const client = setupMockRequestHappyPath([]);
-      const request = setupQueryRequest('FULL_ACCESS', {}, {});
+      const request = setupQueryRequest({ type: 'FULL_ACCESS', withAssessment: false }, {}, {});
 
       // Act
       const result = await queryDocuments(request, client);
@@ -77,7 +77,7 @@ describe('when querying for students', () => {
   describe('given there are students', () => {
     describe('given full access authorization', () => {
       describe('given no query or pagination', () => {
-        const authorizationStrategy = 'FULL_ACCESS';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -103,7 +103,7 @@ describe('when querying for students', () => {
       });
 
       describe('given two query terms', () => {
-        const authorizationStrategy = 'FULL_ACCESS';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -150,7 +150,7 @@ describe('when querying for students', () => {
       });
 
       describe('given page limits', () => {
-        const authorizationStrategy = 'FULL_ACCESS';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -196,7 +196,7 @@ describe('when querying for students', () => {
       });
 
       describe('given both query terms and page limits', () => {
-        const authorizationStrategy = 'FULL_ACCESS';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -247,7 +247,7 @@ describe('when querying for students', () => {
 
     describe('given ownership access authorization', () => {
       describe('given a query term with SQL injection attack to bypass authorization', () => {
-        const authorizationStrategy = 'OWNERSHIP_BASED';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -294,7 +294,7 @@ describe('when querying for students', () => {
       });
 
       describe('given a query term with SQL injection using doubled apostrophes', () => {
-        const authorizationStrategy = 'OWNERSHIP_BASED';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
@@ -341,7 +341,7 @@ describe('when querying for students', () => {
       });
 
       describe('given a query term with SQL injection using an escaped apostrophe', () => {
-        const authorizationStrategy = 'OWNERSHIP_BASED';
+        const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
         let queryResult: QueryResult;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';

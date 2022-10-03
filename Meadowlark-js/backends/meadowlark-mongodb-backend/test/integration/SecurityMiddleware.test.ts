@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import {
+  AuthorizationStrategy,
   documentIdForDocumentInfo,
   DocumentInfo,
   FrontendRequest,
@@ -16,7 +17,7 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { MongoClient } from 'mongodb';
-import { getCollection, getNewClient } from '../../src/repository/Db';
+import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 
@@ -43,7 +44,7 @@ describe('given the upsert where no document id is specified', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -73,7 +74,7 @@ describe('given the getById of a non-existent document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -86,7 +87,7 @@ describe('given the getById of a document owned by the requestor', () => {
   let client;
   let result;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
   const clientId = 'ThisClient';
 
   const resourceInfo: ResourceInfo = {
@@ -131,7 +132,7 @@ describe('given the getById of a document owned by the requestor', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -144,7 +145,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   let client;
   let result;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -188,7 +189,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 

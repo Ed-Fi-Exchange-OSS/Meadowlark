@@ -19,7 +19,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
-import { getCollection, getNewClient } from '../../src/repository/Db';
+import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 
@@ -59,12 +59,12 @@ describe('given the update of a non-existent document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
   it('should not exist in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: id });
     expect(result).toBe(null);
   });
@@ -105,7 +105,7 @@ describe('given the update of an existing document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -114,7 +114,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: id });
     expect(result.documentIdentity.natural).toBe('update2');
     expect(result.edfiDoc.changeToDoc).toBe(true);
@@ -173,7 +173,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -182,7 +182,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('update4');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
@@ -265,7 +265,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -274,7 +274,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.documentIdentity.natural).toBe('update6');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
@@ -364,7 +364,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -376,7 +376,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outboundRefs).toHaveLength(0);
   });
@@ -467,7 +467,7 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
@@ -476,7 +476,7 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [

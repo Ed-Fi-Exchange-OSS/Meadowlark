@@ -6,14 +6,14 @@
 import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getCollection, writeLockReferencedDocuments } from './Db';
+import { getDocumentCollection, writeLockReferencedDocuments } from './Db';
 import { validateReferences } from './ReferenceValidation';
 
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
 
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };

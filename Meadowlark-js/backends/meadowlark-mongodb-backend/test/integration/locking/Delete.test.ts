@@ -17,13 +17,17 @@ import {
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
-import { getCollection, getNewClient, writeLockReferencedDocuments } from '../../../src/repository/Db';
+import {
+  asUpsert,
+  getDocumentCollection,
+  getNewClient,
+  onlyReturnId,
+  writeLockReferencedDocuments,
+} from '../../../src/repository/Db';
 import {
   validateReferences,
-  asUpsert,
   onlyReturnAliasIds,
   onlyDocumentsReferencing,
-  onlyReturnId,
 } from '../../../src/repository/ReferenceValidation';
 import { upsertDocument } from '../../../src/repository/Upsert';
 
@@ -87,7 +91,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
   beforeAll(async () => {
     client = (await getNewClient()) as MongoClient;
-    const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+    const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
     await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, client);
@@ -161,12 +165,12 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: schoolDocumentId });
     expect(result.documentIdentity.schoolId).toBe('123');
   });

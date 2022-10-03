@@ -12,13 +12,17 @@ import {
   W,
   ClientSession,
   ObjectId,
+  FindOptions,
+  ReplaceOptions,
 } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { AuthorizationClient } from '../model/AuthorizationClient';
 
 const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
 export const DATABASE_NAME = process.env.MEADOWLARK_DATABASE_NAME ?? 'meadowlark';
-export const COLLECTION_NAME = 'documents';
+export const DOCUMENT_COLLECTION_NAME = 'documents';
+export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
 
 let singletonClient: MongoClient | null = null;
 
@@ -41,7 +45,7 @@ export async function getNewClient(): Promise<MongoClient> {
 
     MongoLogger.setLevel(MONGO_LOG_LEVEL as LoggerLevel);
 
-    const collection: Collection<MeadowlarkDocument> = newClient.db(DATABASE_NAME).collection(COLLECTION_NAME);
+    const collection: Collection<MeadowlarkDocument> = newClient.db(DATABASE_NAME).collection(DOCUMENT_COLLECTION_NAME);
 
     // Note this does nothing if the index already exists (triggers an index build otherwise)
     await collection.createIndex({ outboundRefs: 1 });
@@ -76,8 +80,12 @@ export async function getSharedClient(): Promise<MongoClient> {
   return singletonClient;
 }
 
-export function getCollection(client: MongoClient): Collection<MeadowlarkDocument> {
-  return client.db(DATABASE_NAME).collection(COLLECTION_NAME);
+export function getDocumentCollection(client: MongoClient): Collection<MeadowlarkDocument> {
+  return client.db(DATABASE_NAME).collection(DOCUMENT_COLLECTION_NAME);
+}
+
+export function getAuthorizationCollection(client: MongoClient): Collection<AuthorizationClient> {
+  return client.db(DATABASE_NAME).collection(AUTHORIZATION_COLLECTION_NAME);
 }
 
 /**
@@ -96,3 +104,9 @@ export async function writeLockReferencedDocuments(
     { session },
   );
 }
+
+// MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
+export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
+
+// MongoDB ReplaceOption that enables upsert (insert if not exists)
+export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });

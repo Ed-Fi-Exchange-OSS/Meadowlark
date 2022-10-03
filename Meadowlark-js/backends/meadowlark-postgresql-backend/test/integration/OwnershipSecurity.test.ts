@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import {
+  AuthorizationStrategy,
   documentIdForDocumentInfo,
   DocumentInfo,
   FrontendRequest,
@@ -20,7 +21,7 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll } from './TestHelper';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { SecurityResult } from '../../src/security/SecurityResponse';
+import { SecurityResult } from '../../src/security/SecurityResult';
 
 jest.setTimeout(40000);
 
@@ -90,7 +91,7 @@ describe('given the getById of a document owned by the requestor', () => {
   let client: PoolClient;
   let result: SecurityResult;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
   const clientId = 'ThisClient';
 
   const resourceInfo: ResourceInfo = {
@@ -149,7 +150,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   let client: PoolClient;
   let result: SecurityResult;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),

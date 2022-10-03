@@ -17,7 +17,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
-import { getCollection, getNewClient } from '../../src/repository/Db';
+import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { getDocumentById } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
 
@@ -61,12 +61,12 @@ describe('given the get of a non-existent document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
   it('should not exist in the db', async () => {
-    const collection: Collection<MeadowlarkDocument> = getCollection(client);
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: id });
     expect(result).toBe(null);
   });
@@ -101,7 +101,7 @@ describe('given the get of an existing document', () => {
   });
 
   afterAll(async () => {
-    await getCollection(client).deleteMany({});
+    await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
