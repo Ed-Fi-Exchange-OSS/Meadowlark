@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { newTopLevelEntity, newEntityProperty } from '@edfi/metaed-core';
+import { newTopLevelEntity, newEntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import { validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdValidation';
 
-const createModel = () => ({
+const createModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
   metaEdName: 'Student',
   properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true }],

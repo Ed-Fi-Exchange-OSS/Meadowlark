@@ -33,7 +33,7 @@ authorization: bearer {{authToken1}}
 GET http://localhost:3000/local/v3.3b/ed-fi/students?Limit=1&Offset=2
 authorization: bearer {{authToken1}}
 
-### 400: limit without offset
+### 200: limit without offset
 GET http://localhost:3000/local/v3.3b/ed-fi/students?limit=1
 authorization: bearer {{authToken1}}
 
@@ -89,5 +89,37 @@ authorization: bearer {{authToken1}}
 ### 200: empty array (SQL injection attack is thwarted)
 # plain text: a\' or studentUniqueId is not null #
 # Attempting to escape the escape of apostrophes
-GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity=a%5C%27%20or%20studentUniqueId%20is%20not%20null%20%23
+GET http://localhost:3000/local/v3.3b/ed-fi/learningStandards?description=a%5C%27%20or%20studentUniqueId%20is%20not%20null%20%23
+authorization: bearer {{authToken1}}
+
+
+##
+### Special characters
+##
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birth'City=a
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalIn'structionalDays=30
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalInstructionalDays='30'
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=%2730%27
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalIn@structionalDays=30
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalIn(structionalDays=30 
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=(30
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity='a
+authorization: bearer {{authToken1}}
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/students?birthCity='a'
 authorization: bearer {{authToken1}}

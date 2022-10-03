@@ -77,7 +77,14 @@ export function validateQueryParametersAgainstSchema(
 ): string[] {
   // TODO: RND-67 removed the Joi-specific code to report invalid query parameters
   // RND-307 will restore as a part of understanding Ajv error metadata
-  const valid: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
+  const schema = {
+    ...metaEdModel.data.meadowlark.jsonSchema,
+    // Need to relax the validation such that no fields are "required"
+    required: [],
+  };
+
+  const valid: ValidateFunction = ajv.compile(schema);
+
   const isValid: boolean = valid(queryParameters);
 
   if (isValid) return [];
