@@ -28,7 +28,12 @@ const createModel = (): TopLevelEntity => ({
             maxLength: 50,
             type: 'string',
           },
+          age: {
+            description: 'doc',
+            type: 'integer',
+          },
         },
+        required: ['uniqueId'],
         title: 'EdFi.Student',
         type: 'object',
       },
@@ -45,6 +50,9 @@ describe('when validating a querystring', () => {
         uniqueId: 'a',
         name: 'b',
       }, // Two attributes
+      {
+        age: 13,
+      }, // "numeric" age; does not include the "required" uniqueId
     ])('accepts querystring %s', async (queryStrings: FrontendQueryParameters) => {
       const result = await validateQueryString(queryStrings, createModel());
       expect(result).toEqual({});
@@ -60,13 +68,18 @@ describe('when validating a querystring', () => {
   });
 
   describe('given there are special characters in the URL', () => {
-    it.each([{ "unique'Id": 'a' }, { 'unique@Id': 'a' }, { 'unique(Id': 'a' }])(
-      'responds to %s with an error',
-      async (queryStrings: FrontendQueryParameters) => {
-        const result = await validateQueryString(queryStrings, createModel());
-        // Don't confirm exact structure at this time.
-        expect(result).toHaveProperty('errorBody');
-      },
-    );
+    it.each([
+      { "unique'Id": 'a' },
+      { 'unique@Id': 'a' },
+      { 'unique(Id': 'a' },
+      { 'unique%27Id%27': 'a' },
+      { age: '(13' },
+      { age: "'13'" },
+      { age: '%2730%27' },
+    ])('responds to %s with an error', async (queryStrings: FrontendQueryParameters) => {
+      const result = await validateQueryString(queryStrings, createModel());
+      // Don't confirm exact structure at this time.
+      expect(result).toHaveProperty('errorBody');
+    });
   });
 });
