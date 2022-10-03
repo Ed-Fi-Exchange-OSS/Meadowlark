@@ -7,6 +7,6 @@
  * The special query parameters used to drive pagination
  */
 export type PaginationParameters = {
-  limit?: string;
-  offset?: string;
+  limit?: string | number;
+  offset?: string | number;
 };

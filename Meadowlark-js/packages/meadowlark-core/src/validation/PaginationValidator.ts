@@ -3,10 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import R from 'ramda';
 import { PaginationParameters } from '../message/PaginationParameters';
 import { createInvalidRequestResponse } from '../Utility';
 
-const isNotPositiveInteger = (value: string): Boolean => !Number(value) || Number.parseInt(value, 10) < 1;
+const isNotPositiveInteger = (value: string | number): Boolean =>
+  !Number(value) || (R.is(Number, value) ? value : Number.parseInt(value, 10)) < 1;
 
 /**
  * Validates the `limit` and `offset` parameters from a query string.
