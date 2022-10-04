@@ -11,6 +11,11 @@ export async function getDocumentById({ id }: GetRequest, client: PoolClient): P
   try {
     const queryResult: QueryResult = await client.query(findDocumentByIdSql(id));
 
+    // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
+    if (queryResult.rows == null) {
+      return { response: 'UNKNOWN_FAILURE', document: {} };
+    }
+
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 
     const response: GetResult = {

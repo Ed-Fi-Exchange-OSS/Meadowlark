@@ -29,7 +29,7 @@ export async function deleteDocumentById(
       const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(id));
 
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
-      if (documentAliasIdsResult?.rowCount === 0) {
+      if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
         await client.query('ROLLBACK');
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
@@ -40,7 +40,13 @@ export async function deleteDocumentById(
 
       // Find any documents that reference this document, either it's own id or an alias
       const referenceResult = await client.query(findReferencingDocumentIdsSql(documentAliasIds));
-      const references = referenceResult.rows.filter((ref) => ref.document_id !== id);
+
+      if (referenceResult.rows == null) {
+        await client.query('ROLLBACK');
+        return deleteResult;
+      }
+
+      const references = referenceResult?.rows.filter((ref) => ref.document_id !== id);
 
       // If this document is referenced, it's a validation failure
       if (references.length > 0) {
@@ -52,6 +58,12 @@ export async function deleteDocumentById(
         // Get the information of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref.parent_document_id);
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql(referenceIds));
+
+        if (referringDocuments.rows == null) {
+          await client.query('ROLLBACK');
+          return deleteResult;
+        }
+
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
           documentId: document.document_id,
@@ -71,6 +83,12 @@ export async function deleteDocumentById(
     // Perform the document delete
     Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
+
+    if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
+      await client.query('ROLLBACK');
+      return deleteResult;
+    }
+
     deleteResult =
       deleteQueryResult.rows[0].count === '0' ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
 

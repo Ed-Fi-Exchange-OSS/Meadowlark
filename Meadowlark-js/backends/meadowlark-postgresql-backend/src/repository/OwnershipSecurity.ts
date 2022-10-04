@@ -44,6 +44,10 @@ export async function rejectByOwnershipSecurity(
   try {
     const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
 
+    if (result.rows == null) {
+      return 'UNKNOWN_FAILURE';
+    }
+
     if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
