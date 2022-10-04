@@ -1,95 +1,364 @@
 {
-  "info": {
-    "_postman_id": "59231ad5-759a-480d-b357-cafc9fd4df5e",
-    "name": "Meadowlark E2E",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "15734759"
-  },
-  "item": [
-    {
-      "name": "Content Class Descriptor",
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
-          "host": [
-            "{{ApiBaseUrl}}"
-          ],
-          "path": [
-            "v3.3b",
-            "ed-fi",
-            "contentClassDescriptors"
-          ]
-        }
-      },
-      "response": []
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "if(pm.request.auth && pm.request.auth.type === \"noauth\") {",
-          "     return;",
-          "}",
-          "",
-          "let currentToken = pm.collectionVariables.get(\"TOKEN\");",
-          "if(currentToken) {",
-          "     return;",
-          "}",
-          "",
-          "pm.sendRequest({",
-          "     url: `${pm.variables.get(\"ApiBaseUrl\")}/api/oauth/token`,",
-          "     method: 'POST',",
-          "     header: {",
-          "         'Content-Type': 'application/x-www-form-urlencoded'",
-          "     },",
-          "     body: {",
-          "         mode: 'urlencoded',",
-          "         urlencoded: [",
-          "             {key: 'client_id', value: pm.variables.get(\"RegisteredClientId\")},",
-          "             {key: 'client_secret', value: pm.variables.get(\"RegisteredClientSecret\")},",
-          "             {key: 'grant_type', value: \"client_credentials\"}",
-          "         ]",
-          "     }",
-          " },",
-          "     (err, res) => {",
-          "         error = res.json().error",
-          "         if(error) {",
-          "             throw res.json().error_description",
-          "         }",
-          "         pm.collectionVariables.set(\"TOKEN\", res.json().access_token)",
-          " });"
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "TOKEN",
-      "value": ""
-    }
-  ]
+	"info": {
+		"_postman_id": "59231ad5-759a-480d-b357-cafc9fd4df5e",
+		"name": "Meadowlark E2E",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15734759"
+	},
+	"item": [
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response includes token\", function () {\r",
+									"    pm.expect(response).to.have.property(\"access_token\");\r",
+									"    pm.expect(response).to.have.property(\"token_type\");\r",
+									"    pm.expect(response).to.have.property(\"expires_in\");\r",
+									"\r",
+									"    pm.expect(response[\"token_type\"]).to.equal(\"Bearer\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{RegisteredClientId}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{RegisteredClientSecret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/api/oauth/token",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Content Class Descriptor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+					"host": [
+						"{{ApiBaseUrl}}"
+					],
+					"path": [
+						"v3.3b",
+						"ed-fi",
+						"contentClassDescriptors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Content Class Descriptor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has location in the header\", function() {\r",
+							"    pm.response.to.have.header('location');\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"codeValue\": \"Presentation\",\r\n  \"shortDescription\": \"Presentation\",\r\n  \"description\": \"Presentation\",\r\n  \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+					"host": [
+						"{{ApiBaseUrl}}"
+					],
+					"path": [
+						"v3.3b",
+						"ed-fi",
+						"contentClassDescriptors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Content Class Descriptor By Location",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.variables.set(\"descriptor\", \r",
+							"                {\r",
+							"                    \"codeValue\": \"Presentation\",\r",
+							"                    \"shortDescription\": \"Presentation\",\r",
+							"                    \"description\": \"Presentation\",\r",
+							"                    \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r",
+							"                });\r",
+							"\r",
+							"pm.sendRequest({\r",
+							"  url: `${pm.environment.get(\"ApiBaseUrl\").replace(\"{{ApiUrlRoot}}\",pm.environment.get(\"ApiUrlRoot\"))}/v3.3b/ed-fi/contentClassDescriptors`,\r",
+							"  method: 'POST',\r",
+							"  header: {\r",
+							"      \"Content-Type\": \"application/json\",\r",
+							"      \"Authorization\": `Bearer ${pm.collectionVariables.get(\"AccessToken\")}`\r",
+							"  },\r",
+							"  body: {\r",
+							"    mode: 'raw',\r",
+							"    raw:JSON.stringify(pm.variables.get(\"descriptor\")), \r",
+							"  }\r",
+							"},\r",
+							"function (responseErr, response) {\r",
+							"    if(responseErr) {\r",
+							"        console.error(\"Error in Pre-request:\", responseErr); \r",
+							"        throw responseErr.code;\r",
+							"    }\r",
+							"\r",
+							"    let jsonResponse;\r",
+							"    try {\r",
+							"        jsonResponse = response.json();\r",
+							"    } catch {/*Not doing anything since it's okay if there's no body*/}\r",
+							"    \r",
+							"    if(jsonResponse && jsonResponse.error) {\r",
+							"        throw jsonResponse.error_description;\r",
+							"    }\r",
+							"\r",
+							"    if(!response.headers) { \r",
+							"        console.error('Error in Pre-request: response headers not found. Response is:', response);\r",
+							"        throw response;\r",
+							"    }\r",
+							"\r",
+							"    const location = response.headers.get(\"location\");\r",
+							"    if(location) {\r",
+							"        pm.collectionVariables.set(\"contentClassDescriptorLocation\", location);\r",
+							"    } else {\r",
+							"        throw \"Location not found\";\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Response includes token\", function () {\r",
+							"    let descriptor = pm.variables.get(\"descriptor\");\r",
+							"    Object.keys(descriptor).forEach(resultKeys => {\r",
+							"        pm.expect(response[resultKeys]).to.eq(descriptor[resultKeys]);\r",
+							"    });\r",
+							"\r",
+							"    pm.expect(response[\"namespace\"]).to.equal(\"uri://ed-fi.org/ContentClassDescriptor\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{ApiUrlRoot}}{{contentClassDescriptorLocation}}",
+					"host": [
+						"{{ApiUrlRoot}}{{contentClassDescriptorLocation}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AccessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const tokenExpiration = pm.collectionVariables.get('TokenExpiry');",
+					"const currentToken = pm.collectionVariables.get('AccessToken');",
+					"let  getToken = true;",
+					"",
+					"if (!tokenExpiration || !currentToken) {",
+					"    console.info('Token or expiry date are missing, retrieving new token')",
+					"} else if (tokenExpiration <= (new Date()).getTime()) {",
+					"    console.info('Token is expired, retrieving new token')",
+					"} else {",
+					"    return;",
+					"}",
+					"",
+					"const tokenUrl = `${pm.environment.get(\"ApiBaseUrl\").replace(\"{{ApiUrlRoot}}\",pm.environment.get(\"ApiUrlRoot\"))}/api/oauth/token`;",
+					"const clientId = pm.variables.get(\"RegisteredClientId\");",
+					"const clientSecret = pm.variables.get(\"RegisteredClientSecret\");",
+					"const grantType = 'client_credentials';",
+					"",
+					"const getTokenRequest = {",
+					"    url: tokenUrl,",
+					"    method: 'POST',",
+					"    header: {",
+					"        'Content-Type': 'application/x-www-form-urlencoded'",
+					"    },",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: 'client_id', value: clientId},",
+					"            {key: 'client_secret', value: clientSecret},",
+					"            {key: 'grant_type', value: grantType}",
+					"        ]",
+					"    }",
+					"};",
+					"",
+					"pm.sendRequest(getTokenRequest, (err, response) => {",
+					"    if(err) {",
+					"        console.error(err);",
+					"    }",
+					"    let jsonResponse = response.json();",
+					"    let newAccessToken = jsonResponse.access_token;",
+					"",
+					"    pm.collectionVariables.set(\"AccessToken\", newAccessToken);",
+					"",
+					"    expiryDate = new Date((new Date()).getTime() + (jsonResponse.expires_in * 1000));    ",
+					"    pm.collectionVariables.set('TokenExpiry', expiryDate.getTime());",
+					"});",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "contentClassDescriptorLocation",
+			"value": ""
+		},
+		{
+			"key": "AccessToken",
+			"value": ""
+		},
+		{
+			"key": "TokenExpiry",
+			"value": ""
+		}
+	]
 }
