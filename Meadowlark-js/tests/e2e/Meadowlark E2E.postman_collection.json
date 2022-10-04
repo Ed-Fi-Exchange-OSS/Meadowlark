@@ -1,0 +1,95 @@
+{
+  "info": {
+    "_postman_id": "59231ad5-759a-480d-b357-cafc9fd4df5e",
+    "name": "Meadowlark E2E",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15734759"
+  },
+  "item": [
+    {
+      "name": "Content Class Descriptor",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+          "host": [
+            "{{ApiBaseUrl}}"
+          ],
+          "path": [
+            "v3.3b",
+            "ed-fi",
+            "contentClassDescriptors"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if(pm.request.auth && pm.request.auth.type === \"noauth\") {",
+          "     return;",
+          "}",
+          "",
+          "let currentToken = pm.collectionVariables.get(\"TOKEN\");",
+          "if(currentToken) {",
+          "     return;",
+          "}",
+          "",
+          "pm.sendRequest({",
+          "     url: `${pm.variables.get(\"ApiBaseUrl\")}/api/oauth/token`,",
+          "     method: 'POST',",
+          "     header: {",
+          "         'Content-Type': 'application/x-www-form-urlencoded'",
+          "     },",
+          "     body: {",
+          "         mode: 'urlencoded',",
+          "         urlencoded: [",
+          "             {key: 'client_id', value: pm.variables.get(\"RegisteredClientId\")},",
+          "             {key: 'client_secret', value: pm.variables.get(\"RegisteredClientSecret\")},",
+          "             {key: 'grant_type', value: \"client_credentials\"}",
+          "         ]",
+          "     }",
+          " },",
+          "     (err, res) => {",
+          "         error = res.json().error",
+          "         if(error) {",
+          "             throw res.json().error_description",
+          "         }",
+          "         pm.collectionVariables.set(\"TOKEN\", res.json().access_token)",
+          " });"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "TOKEN",
+      "value": ""
+    }
+  ]
+}
