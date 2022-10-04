@@ -61,6 +61,7 @@ export async function rejectByOwnershipSecurity(
     Logger.debug(`${functionName} - access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
     return 'ACCESS_DENIED';
   } catch (e) {
+    Logger.error(`${functionName} - Error determining access`, frontendRequest.traceId, e);
     return 'UNKNOWN_FAILURE';
   }
 }

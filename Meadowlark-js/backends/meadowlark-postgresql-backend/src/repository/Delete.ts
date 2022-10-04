@@ -43,6 +43,8 @@ export async function deleteDocumentById(
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
+        deleteResult.failureMessage = `deleteDocumentById: Error determining documents referenced by ${id},
+        a null result set was returned`;
         return deleteResult;
       }
 
@@ -61,6 +63,8 @@ export async function deleteDocumentById(
 
         if (referringDocuments.rows == null) {
           await client.query('ROLLBACK');
+          deleteResult.failureMessage = `deleteDocumentById: Error retrieving documents referenced by ${id},
+          a null result set was returned`;
           return deleteResult;
         }
 
@@ -86,6 +90,7 @@ export async function deleteDocumentById(
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
       await client.query('ROLLBACK');
+      deleteResult.failureMessage = `deleteDocumentById: Failure deleting document ${id}, a null result was returned`;
       return deleteResult;
     }
 
