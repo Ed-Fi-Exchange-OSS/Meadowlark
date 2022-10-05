@@ -101,175 +101,573 @@
 			]
 		},
 		{
-			"name": "Content Class Descriptor",
-			"event": [
+			"name": "Descriptors",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
-					"host": [
-						"{{ApiBaseUrl}}"
-					],
-					"path": [
-						"v3.3b",
-						"ed-fi",
-						"contentClassDescriptors"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Content Class Descriptor",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Has location in the header\", function() {\r",
-							"    pm.response.to.have.header('location');\r",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"codeValue\": \"Presentation\",\r\n  \"shortDescription\": \"Presentation\",\r\n  \"description\": \"Presentation\",\r\n  \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"name": "Content Class Descriptor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					}
-				},
-				"url": {
-					"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
-					"host": [
-						"{{ApiBaseUrl}}"
 					],
-					"path": [
-						"v3.3b",
-						"ed-fi",
-						"contentClassDescriptors"
-					]
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"contentClassDescriptors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Content Class Descriptor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Has location in the header\", function() {\r",
+									"    pm.response.to.have.header('location');\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codeValue\": \"Presentation\",\r\n  \"shortDescription\": \"Presentation\",\r\n  \"description\": \"Presentation\",\r\n  \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"contentClassDescriptors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Content Class Descriptor By Location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"descriptor\", \r",
+									"                {\r",
+									"                    \"codeValue\": \"Presentation\",\r",
+									"                    \"shortDescription\": \"Presentation\",\r",
+									"                    \"description\": \"Presentation\",\r",
+									"                    \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r",
+									"                });\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"  url: `${pm.environment.get(\"ApiBaseUrl\").replace(\"{{ApiUrlRoot}}\",pm.environment.get(\"ApiUrlRoot\"))}/v3.3b/ed-fi/contentClassDescriptors`,\r",
+									"  method: 'POST',\r",
+									"  header: {\r",
+									"      \"Content-Type\": \"application/json\",\r",
+									"      \"Authorization\": `Bearer ${pm.collectionVariables.get(\"AccessToken\")}`\r",
+									"  },\r",
+									"  body: {\r",
+									"    mode: 'raw',\r",
+									"    raw:JSON.stringify(pm.variables.get(\"descriptor\")), \r",
+									"  }\r",
+									"},\r",
+									"function (responseErr, response) {\r",
+									"    if(responseErr) {\r",
+									"        console.error(\"Error in Pre-request:\", responseErr); \r",
+									"        throw responseErr.code;\r",
+									"    }\r",
+									"\r",
+									"    let jsonResponse;\r",
+									"    try {\r",
+									"        jsonResponse = response.json();\r",
+									"    } catch {/*Not doing anything since it's okay if there's no body*/}\r",
+									"    \r",
+									"    if(jsonResponse && jsonResponse.error) {\r",
+									"        throw jsonResponse.error_description;\r",
+									"    }\r",
+									"\r",
+									"    if(!response.headers) { \r",
+									"        console.error('Error in Pre-request: response headers not found. Response is:', response);\r",
+									"        throw response;\r",
+									"    }\r",
+									"\r",
+									"    const location = response.headers.get(\"location\");\r",
+									"    if(location) {\r",
+									"        pm.collectionVariables.set(\"contentClassDescriptorLocation\", location);\r",
+									"    } else {\r",
+									"        throw \"Location not found\";\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response includes token\", function () {\r",
+									"    let descriptor = pm.variables.get(\"descriptor\");\r",
+									"    Object.keys(descriptor).forEach(resultKeys => {\r",
+									"        pm.expect(response[resultKeys]).to.eq(descriptor[resultKeys]);\r",
+									"    });\r",
+									"\r",
+									"    pm.expect(response[\"namespace\"]).to.equal(\"uri://ed-fi.org/ContentClassDescriptor\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiUrlRoot}}{{contentClassDescriptorLocation}}",
+							"host": [
+								"{{ApiUrlRoot}}{{contentClassDescriptorLocation}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Content Class Descriptor By Location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"descriptor\", \r",
+									"                {\r",
+									"                    \"codeValue\": \"Presentation\",\r",
+									"                    \"shortDescription\": \"Presentation\",\r",
+									"                    \"description\": \"Presentation\",\r",
+									"                    \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r",
+									"                });\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"  url: `${pm.environment.get(\"ApiBaseUrl\").replace(\"{{ApiUrlRoot}}\",pm.environment.get(\"ApiUrlRoot\"))}/v3.3b/ed-fi/contentClassDescriptors`,\r",
+									"  method: 'POST',\r",
+									"  header: {\r",
+									"      \"Content-Type\": \"application/json\",\r",
+									"      \"Authorization\": `Bearer ${pm.collectionVariables.get(\"AccessToken\")}`\r",
+									"  },\r",
+									"  body: {\r",
+									"    mode: 'raw',\r",
+									"    raw:JSON.stringify(pm.variables.get(\"descriptor\")), \r",
+									"  }\r",
+									"},\r",
+									"function (responseErr, response) {\r",
+									"    if(responseErr) {\r",
+									"        console.error(\"Error in Pre-request:\", responseErr); \r",
+									"        throw responseErr.code;\r",
+									"    }\r",
+									"\r",
+									"    let jsonResponse;\r",
+									"    try {\r",
+									"        jsonResponse = response.json();\r",
+									"    } catch {/*Not doing anything since it's okay if there's no body*/}\r",
+									"    \r",
+									"    if(jsonResponse && jsonResponse.error) {\r",
+									"        throw jsonResponse.error_description;\r",
+									"    }\r",
+									"\r",
+									"    if(!response.headers) { \r",
+									"        console.error('Error in Pre-request: response headers not found. Response is:', response);\r",
+									"        throw response;\r",
+									"    }\r",
+									"\r",
+									"    const location = response.headers.get(\"location\");\r",
+									"    if(location) {\r",
+									"        pm.collectionVariables.set(\"contentClassDescriptorLocation\", location);\r",
+									"    } else {\r",
+									"        throw \"Location not found\";\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response includes token\", function () {\r",
+									"    let descriptor = pm.variables.get(\"descriptor\");\r",
+									"    Object.keys(descriptor).forEach(resultKeys => {\r",
+									"        pm.expect(response[resultKeys]).to.eq(descriptor[resultKeys]);\r",
+									"    });\r",
+									"\r",
+									"    pm.expect(response[\"namespace\"]).to.equal(\"uri://ed-fi.org/ContentClassDescriptor\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ApiUrlRoot}}{{contentClassDescriptorLocation}}",
+							"host": [
+								"{{ApiUrlRoot}}{{contentClassDescriptorLocation}}"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Content Class Descriptor By Location",
-			"event": [
+			"name": "Education Content Management",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"pm.variables.set(\"descriptor\", \r",
-							"                {\r",
-							"                    \"codeValue\": \"Presentation\",\r",
-							"                    \"shortDescription\": \"Presentation\",\r",
-							"                    \"description\": \"Presentation\",\r",
-							"                    \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r",
-							"                });\r",
-							"\r",
-							"pm.sendRequest({\r",
-							"  url: `${pm.environment.get(\"ApiBaseUrl\").replace(\"{{ApiUrlRoot}}\",pm.environment.get(\"ApiUrlRoot\"))}/v3.3b/ed-fi/contentClassDescriptors`,\r",
-							"  method: 'POST',\r",
-							"  header: {\r",
-							"      \"Content-Type\": \"application/json\",\r",
-							"      \"Authorization\": `Bearer ${pm.collectionVariables.get(\"AccessToken\")}`\r",
-							"  },\r",
-							"  body: {\r",
-							"    mode: 'raw',\r",
-							"    raw:JSON.stringify(pm.variables.get(\"descriptor\")), \r",
-							"  }\r",
-							"},\r",
-							"function (responseErr, response) {\r",
-							"    if(responseErr) {\r",
-							"        console.error(\"Error in Pre-request:\", responseErr); \r",
-							"        throw responseErr.code;\r",
-							"    }\r",
-							"\r",
-							"    let jsonResponse;\r",
-							"    try {\r",
-							"        jsonResponse = response.json();\r",
-							"    } catch {/*Not doing anything since it's okay if there's no body*/}\r",
-							"    \r",
-							"    if(jsonResponse && jsonResponse.error) {\r",
-							"        throw jsonResponse.error_description;\r",
-							"    }\r",
-							"\r",
-							"    if(!response.headers) { \r",
-							"        console.error('Error in Pre-request: response headers not found. Response is:', response);\r",
-							"        throw response;\r",
-							"    }\r",
-							"\r",
-							"    const location = response.headers.get(\"location\");\r",
-							"    if(location) {\r",
-							"        pm.collectionVariables.set(\"contentClassDescriptorLocation\", location);\r",
-							"    } else {\r",
-							"        throw \"Location not found\";\r",
-							"    }\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
+					"name": "Create Content Class Descriptor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response location is saved\", function() {\r",
+									"    pm.response.to.have.header('location');\r",
+									"    let location = pm.response.headers.get('location');\r",
+									"    if(location) {\r",
+									"        pm.environment.set('created_locations_contentClassDescriptor', location);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let body = {\r",
+									"  \"codeValue\": \"Presentation\",\r",
+									"  \"shortDescription\": \"Presentation\",\r",
+									"  \"description\": \"Presentation\",\r",
+									"  \"namespace\": \"uri://ed-fi.org/ContentClassDescriptor\"\r",
+									"};\r",
+									"\r",
+									"pm.environment.set('provided_contentClassDescriptor', JSON.stringify(body));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{provided_contentClassDescriptor}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/contentClassDescriptors",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"contentClassDescriptors"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is OK\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
-							"const response = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Response includes token\", function () {\r",
-							"    let descriptor = pm.variables.get(\"descriptor\");\r",
-							"    Object.keys(descriptor).forEach(resultKeys => {\r",
-							"        pm.expect(response[resultKeys]).to.eq(descriptor[resultKeys]);\r",
-							"    });\r",
-							"\r",
-							"    pm.expect(response[\"namespace\"]).to.equal(\"uri://ed-fi.org/ContentClassDescriptor\");\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript"
-					}
+					"name": "Get Descriptor Location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response includes descriptor\", function () {\r",
+									"    const provided = pm.environment.get(\"provided_contentClassDescriptor\");\r",
+									"    if(!provided) {\r",
+									"        throw \"Verify required steps\";\r",
+									"    }\r",
+									"    const descriptor = JSON.parse(provided);\r",
+									"    Object.keys(descriptor).forEach(resultKeys => {\r",
+									"        pm.expect(response[resultKeys]).to.eq(descriptor[resultKeys]);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.environment.set('created_descriptors_contentClass', response[\"namespace\"]+\"#\"+response[\"description\"]);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiUrlRoot}}{{created_locations_contentClassDescriptor}}",
+							"host": [
+								"{{ApiUrlRoot}}{{created_locations_contentClassDescriptor}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Education Contents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Education Content is created\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response location is saved\", function() {\r",
+									"    pm.response.to.have.header('location');\r",
+									"    let location = pm.response.headers.get('location');\r",
+									"    if(location) {\r",
+									"        pm.environment.set('created_locations_educationContents', location);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let body = {\r",
+									"    \"contentIdentifier\": pm.variables.replaceIn('${{randomLoremWords}}'),\r",
+									"    \"namespace\": \"43210\",\r",
+									"    \"shortDescription\": \"Short Description\",\r",
+									"    \"contentClassDescriptor\": pm.environment.get(\"created_descriptors_contentClass\"),\r",
+									"    \"learningResourceMetadataURI\": \"uri://ed-fi.org/fake-uri\"\r",
+									"};\r",
+									"\r",
+									"pm.environment.set('provided_educationContent', JSON.stringify(body));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{provided_educationContent}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/educationContents",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"educationContents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Education Contents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Created education content appears on result\", function() {\r",
+									"    pm.expect(response).to.be.an(\"array\");\r",
+									"    pm.expect(response.length).to.be.greaterThan(0);\r",
+									"    const provided = pm.environment.get(\"provided_educationContent\");\r",
+									"    if(!provided) {\r",
+									"        throw \"Verify required steps\";\r",
+									"    }\r",
+									"    const edContent = JSON.parse(provided);\r",
+									"    pm.expect(response.findIndex(ele => ele[\"namespace\"] === edContent[\"namespace\"])).to.be.gte(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/educationContents",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"educationContents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Education Content By Location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Created education content appears on result\", function() {\r",
+									"    const provided = pm.environment.get(\"provided_educationContent\");\r",
+									"    if(!provided) {\r",
+									"        throw \"Verify required steps\";\r",
+									"    }\r",
+									"    const edContent = JSON.parse(provided);\r",
+									"    pm.expect(response[\"namespace\"] === edContent[\"namespace\"]).to.equal(true);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiUrlRoot}}{{created_locations_educationContents}}",
+							"host": [
+								"{{ApiUrlRoot}}{{created_locations_educationContents}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Education Contents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ApiUrlRoot}}{{created_locations_educationContents}}",
+							"host": [
+								"{{ApiUrlRoot}}{{created_locations_educationContents}}"
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{ApiUrlRoot}}{{contentClassDescriptorLocation}}",
-					"host": [
-						"{{ApiUrlRoot}}{{contentClassDescriptorLocation}}"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	],
 	"auth": {
@@ -294,7 +692,7 @@
 					"",
 					"if (!tokenExpiration || !currentToken) {",
 					"    console.info('Token or expiry date are missing, retrieving new token')",
-					"} else if (tokenExpiration <= (new Date()).getTime()) {",
+					"} else if (new Date(tokenExpiration * 1000 ) <= new Date()) {",
 					"    console.info('Token is expired, retrieving new token')",
 					"} else {",
 					"    return;",
@@ -329,9 +727,7 @@
 					"    let newAccessToken = jsonResponse.access_token;",
 					"",
 					"    pm.collectionVariables.set(\"AccessToken\", newAccessToken);",
-					"",
-					"    expiryDate = new Date((new Date()).getTime() + (jsonResponse.expires_in * 1000));    ",
-					"    pm.collectionVariables.set('TokenExpiry', expiryDate.getTime());",
+					"    pm.collectionVariables.set('TokenExpiry', jsonResponse.expires_in);",
 					"});",
 					""
 				]
@@ -348,10 +744,6 @@
 		}
 	],
 	"variable": [
-		{
-			"key": "contentClassDescriptorLocation",
-			"value": ""
-		},
 		{
 			"key": "AccessToken",
 			"value": ""
