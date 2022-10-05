@@ -31,6 +31,7 @@ export async function deleteDocumentById(
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
       if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
         await client.query('ROLLBACK');
+        Logger.debug(`postgres.repository.Delete.deleteDocumentById: Document id ${id} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
       }
@@ -43,8 +44,10 @@ export async function deleteDocumentById(
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
-        deleteResult.failureMessage = `deleteDocumentById: Error determining documents referenced by ${id},
+        const errorMessage = `deleteDocumentById: Error determining documents referenced by ${id},
         a null result set was returned`;
+        deleteResult.failureMessage = errorMessage;
+        Logger.error(errorMessage, traceId);
         return deleteResult;
       }
 
@@ -63,8 +66,10 @@ export async function deleteDocumentById(
 
         if (referringDocuments.rows == null) {
           await client.query('ROLLBACK');
-          deleteResult.failureMessage = `deleteDocumentById: Error retrieving documents referenced by ${id},
+          const errorMessage = `deleteDocumentById: Error retrieving documents referenced by ${id},
           a null result set was returned`;
+          deleteResult.failureMessage = errorMessage;
+          Logger.error(errorMessage, traceId);
           return deleteResult;
         }
 

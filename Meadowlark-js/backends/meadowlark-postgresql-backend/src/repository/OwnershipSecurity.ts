@@ -45,6 +45,7 @@ export async function rejectByOwnershipSecurity(
     const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
 
     if (result.rows == null) {
+      Logger.error(`${functionName} - Unknown Error determining access`, frontendRequest.traceId);
       return 'UNKNOWN_FAILURE';
     }
 

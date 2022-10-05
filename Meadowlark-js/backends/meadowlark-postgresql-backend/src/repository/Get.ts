@@ -13,11 +13,13 @@ export async function getDocumentById({ id, traceId }: GetRequest, client: PoolC
 
     // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
     if (queryResult.rows == null) {
+      const errorMessage = `Could not retrieve document ${id}
+      a null result set was returned, indicating system failure`;
+      Logger.error(errorMessage, traceId);
       return {
         response: 'UNKNOWN_FAILURE',
         document: {},
-        failureMessage: `Could not retrieve document ${id}
-      a null result set was returned, indicating system failure`,
+        failureMessage: errorMessage,
       };
     }
 
