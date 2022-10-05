@@ -28,6 +28,7 @@ export { authorizationHeader } from './security/AuthorizationHeader';
 export { validateJwt } from './security/JwtValidator';
 export { verifyJwt } from './security/JwtAction';
 export type { JwtStatus } from './security/JwtStatus';
+export { newJwtStatus } from './security/JwtStatus';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
 export type { FrontendRequest, Headers } from './handler/FrontendRequest';

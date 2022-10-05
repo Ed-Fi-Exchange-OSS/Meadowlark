@@ -13,13 +13,16 @@ export async function createAuthorizationClient(
   request: CreateClientRequest,
   client: MongoClient,
 ): Promise<CreateClientResult> {
-  const mongoCollection: Collection<AuthorizationClient> = getAuthorizationCollection(client);
-  const session: ClientSession = client.startSession();
-
+  let session: ClientSession | null = null;
   const createResult: CreateClientResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
+    const mongoCollection: Collection<AuthorizationClient> = getAuthorizationCollection(client);
+    session = client.startSession();
+
     await session.withTransaction(async () => {
+      if (session == null) return; // makes TypeScript happy
+
       const authorizationClient: AuthorizationClient = authorizationClientFrom(request);
 
       Logger.debug(
@@ -27,14 +30,14 @@ export async function createAuthorizationClient(
         request.traceId,
       );
 
-      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne(
+      const { acknowledged } = await mongoCollection.replaceOne(
         { _id: request.clientId },
         authorizationClient,
         asUpsert(session),
       );
 
       if (acknowledged) {
-        createResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+        createResult.response = 'CREATE_SUCCESS';
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
@@ -44,7 +47,7 @@ export async function createAuthorizationClient(
   } catch (e) {
     Logger.error('mongodb.repository.authorization.CreateClient', request.traceId, e);
   } finally {
-    await session.endSession();
+    if (session != null) await session.endSession();
   }
   return createResult;
 }

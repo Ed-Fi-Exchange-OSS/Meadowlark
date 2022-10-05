@@ -19,7 +19,7 @@ import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Get from './repository/Get';
 import * as Update from './repository/Update';
-import * as CreateClient from './repository/authorization/CreateClient';
+import * as CreateClient from './repository/authorization/CreateAuthorizationClient';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 import { getSharedClient } from './repository/Db';
 

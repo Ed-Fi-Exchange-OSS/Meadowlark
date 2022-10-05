@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import { randomBytes } from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
-import { authorizationHeader, Logger } from '@edfi/meadowlark-core';
+import { authorizationHeader, LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-core';
 import type { ErrorObject } from 'ajv';
 import { CreateClientRequest } from '../message/CreateClientRequest';
 import { CreateClientResult } from '../message/CreateClientResult';
@@ -14,55 +14,61 @@ import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 
-const moduleName = 'handler.credentials.Create';
+const moduleName = 'handler.CreateClient';
 
 /**
  * Handler for client creation
  */
-export async function createClient(credentialRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
+export async function createClient(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   const errorResponse: AuthorizationResponse | undefined = checkForAuthorizationErrors(
-    authorizationHeader(credentialRequest.headers),
+    authorizationHeader(authorizationRequest.headers),
   );
 
   if (errorResponse != null) {
     return errorResponse;
   }
 
-  if (credentialRequest.body == null) {
-    return { body: '', statusCode: 400 };
+  if (authorizationRequest.body == null) {
+    const message = 'Missing body';
+    return { body: JSON.stringify({ message }), statusCode: 400 };
   }
 
-  const isBodyValid: boolean = validateCreateClientBody(credentialRequest.body);
+  let parsedBody: any = {};
+  try {
+    parsedBody = JSON.parse(authorizationRequest.body);
+  } catch (error) {
+    const message = 'Malformed body';
+    return { body: JSON.stringify({ message }), statusCode: 400 };
+  }
+
+  const isBodyValid: boolean = validateCreateClientBody(parsedBody);
   if (!isBodyValid) {
+    const { errors } = validateCreateClientBody;
     return {
-      body: (validateCreateClientBody.errors ?? [])
-        .map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '')
-        .join(','),
+      body: (errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '').join(','),
       statusCode: 400,
     };
   }
 
-  const createClientBody: CreateClientBody = JSON.parse(credentialRequest.body) as CreateClientBody;
+  const createClientBody: CreateClientBody = parsedBody as CreateClientBody;
+  const clientId: string = uuidv4();
 
   const createClientRequest: CreateClientRequest = {
     ...createClientBody,
-    clientId: uuidv4(),
+    clientId,
     clientSecret: randomBytes(32).toString('hex'),
-    traceId: credentialRequest.traceId,
+    traceId: authorizationRequest.traceId,
   };
 
   const createResult: CreateClientResult = await getAuthorizationStore().createAuthorizationClient(createClientRequest);
 
   const { response } = createResult;
 
-  if (response === 'UNKNOWN_FAILURE') {
-    Logger.debug(`${moduleName}.createAuthorization 500`, credentialRequest.traceId);
-    return { body: '', statusCode: 500 };
+  if (response === 'CREATE_SUCCESS') {
+    Logger.debug(`${moduleName}.createAuthorization 201`, authorizationRequest.traceId);
+    return { body: '', statusCode: 201, headers: { [LOCATION_HEADER_NAME]: `${authorizationRequest.path}/${clientId}` } };
   }
 
-  Logger.debug(`${moduleName}.createAuthorization 201`, credentialRequest.traceId);
-  return {
-    body: '',
-    statusCode: 201,
-  };
+  Logger.debug(`${moduleName}.createAuthorization 500`, authorizationRequest.traceId);
+  return { body: '', statusCode: 500 };
 }

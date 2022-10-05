@@ -4,5 +4,5 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export type CreateClientResult = {
-  response: 'INSERT_SUCCESS' | 'UPDATE_SUCCESS' | 'UNKNOWN_FAILURE';
+  response: 'CREATE_SUCCESS' | 'UNKNOWN_FAILURE';
 };
