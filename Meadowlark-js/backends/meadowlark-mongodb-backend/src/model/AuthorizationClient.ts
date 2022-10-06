@@ -12,9 +12,9 @@ export interface AuthorizationClient {
   _id: string;
 
   /**
-   * The 256-bit hex client secret.
+   * A SHAKE-256 hex hash of the client secret.
    */
-  clientSecret: string;
+  clientSecretHashed: string;
 
   /**
    * The client name
@@ -30,7 +30,7 @@ export interface AuthorizationClient {
 export function authorizationClientFrom(request: CreateClientRequest): AuthorizationClient {
   return {
     _id: request.clientId,
-    clientSecret: request.clientSecret,
+    clientSecretHashed: request.clientSecretHashed,
     clientName: request.clientName,
     roles: request.roles,
   };

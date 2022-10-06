@@ -6,7 +6,7 @@
 import type { ClientRole } from './ClientRole';
 
 export type CreateClientBody = {
-  clientName: 'string';
+  clientName: string;
   roles: ClientRole[];
 };
 

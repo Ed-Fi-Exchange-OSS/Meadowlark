@@ -2,7 +2,7 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { randomBytes } from 'node:crypto';
+import crypto from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { authorizationHeader, LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-core';
 import { CreateClientRequest } from '../message/CreateClientRequest';
@@ -13,6 +13,7 @@ import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { BodyValidation, validateCreateClientBody } from '../validation/ValidateBody';
+import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 
 const moduleName = 'handler.CreateClient';
 
@@ -52,12 +53,15 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
   }
 
   const createClientBody: CreateClientBody = parsedBody as CreateClientBody;
+
   const clientId: string = uuidv4();
+  const clientSecretBytes: Buffer = crypto.randomBytes(32);
+  const clientSecretHashed: string = crypto.createHash('shake256').update(clientSecretBytes).digest('hex');
 
   const createClientRequest: CreateClientRequest = {
     ...createClientBody,
     clientId,
-    clientSecret: randomBytes(32).toString('hex'),
+    clientSecretHashed,
     traceId: authorizationRequest.traceId,
   };
 
@@ -67,7 +71,19 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
 
   if (response === 'CREATE_SUCCESS') {
     Logger.debug(`${moduleName}.createAuthorization 201`, authorizationRequest.traceId);
-    return { body: '', statusCode: 201, headers: { [LOCATION_HEADER_NAME]: `${authorizationRequest.path}/${clientId}` } };
+
+    const responseBody: CreateClientResponseBody = {
+      client_id: clientId,
+      client_secret: clientSecretBytes.toString('hex'),
+      clientName: createClientRequest.clientName,
+      roles: createClientRequest.roles,
+    };
+
+    return {
+      body: JSON.stringify(responseBody),
+      statusCode: 201,
+      headers: { [LOCATION_HEADER_NAME]: `${authorizationRequest.path}/${clientId}` },
+    };
   }
 
   Logger.debug(`${moduleName}.createAuthorization 500`, authorizationRequest.traceId);

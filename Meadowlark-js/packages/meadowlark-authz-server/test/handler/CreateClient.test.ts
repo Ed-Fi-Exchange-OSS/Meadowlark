@@ -97,8 +97,20 @@ describe('given authorization store succeeds on create', () => {
     expect(response.statusCode).toEqual(201);
   });
 
-  it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+  it('returns a message body with client name', () => {
+    expect(response.body).toMatch(`"clientName":"Hometown SIS"`);
+  });
+
+  it('returns a message body with roles', () => {
+    expect(response.body).toMatch(`"roles":["vendor","assessment"]`);
+  });
+
+  it('returns a message body with client id', () => {
+    expect(response.body).toMatch(`"client_id":`);
+  });
+
+  it('returns a message body with client secret', () => {
+    expect(response.body).toMatch(`"client_secret":`);
   });
 
   it('it returns location header', () => {

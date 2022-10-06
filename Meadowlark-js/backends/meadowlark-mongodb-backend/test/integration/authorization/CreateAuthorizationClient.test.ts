@@ -15,7 +15,7 @@ const clientId = 'clientId';
 
 const newCreateClientRequest = (): CreateClientRequest => ({
   clientId,
-  clientSecret: 'clientSecret',
+  clientSecretHashed: 'clientSecretHashed',
   clientName: 'clientName',
   roles: ['vendor'],
   traceId: 'traceId',
@@ -42,7 +42,7 @@ describe('given the create of a new authorization client', () => {
       {
         "_id": "clientId",
         "clientName": "clientName",
-        "clientSecret": "clientSecret",
+        "clientSecretHashed": "clientSecretHashed",
         "roles": [
           "vendor",
         ],
