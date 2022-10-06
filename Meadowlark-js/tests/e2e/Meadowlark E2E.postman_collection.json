@@ -101,7 +101,7 @@
 			]
 		},
 		{
-			"name": "Descriptors",
+			"name": "Descriptors (CB)",
 			"item": [
 				{
 					"name": "Content Class Descriptor",
@@ -662,6 +662,58 @@
 							"raw": "{{ApiUrlRoot}}{{created_locations_educationContents}}",
 							"host": [
 								"{{ApiUrlRoot}}{{created_locations_educationContents}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Strict validation test - Student with invalid country",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Error message appears\", function() {\r",
+									"    pm.expect(response.message).to.include(\"Resource CountryDescriptor is missing identity\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{ \r\n    \"studentUniqueId\": \"{{$randomPassword}}\",\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastSurname\": \"{{$randomLastName}}\",\r\n    \"birthDate\": \"2001-01-01\",\r\n    \"birthCountryDescriptor\": \"uri://ed-fi.org/CountryDescriptor#AD3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"students"
 							]
 						}
 					},
