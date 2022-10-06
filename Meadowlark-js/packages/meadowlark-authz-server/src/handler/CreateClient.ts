@@ -5,14 +5,14 @@
 import { randomBytes } from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { authorizationHeader, LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-core';
-import type { ErrorObject } from 'ajv';
 import { CreateClientRequest } from '../message/CreateClientRequest';
 import { CreateClientResult } from '../message/CreateClientResult';
-import { CreateClientBody, validateCreateClientBody } from '../model/CreateClientBody';
-import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
+import { CreateClientBody } from '../model/CreateClientBody';
+import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
+import { BodyValidation, validateCreateClientBody } from '../validation/ValidateBody';
 
 const moduleName = 'handler.CreateClient';
 
@@ -20,6 +20,8 @@ const moduleName = 'handler.CreateClient';
  * Handler for client creation
  */
 export async function createClient(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
+  await ensurePluginsLoaded();
+
   const errorResponse: AuthorizationResponse | undefined = checkForAuthorizationErrors(
     authorizationHeader(authorizationRequest.headers),
   );
@@ -41,11 +43,10 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     return { body: JSON.stringify({ message }), statusCode: 400 };
   }
 
-  const isBodyValid: boolean = validateCreateClientBody(parsedBody);
-  if (!isBodyValid) {
-    const { errors } = validateCreateClientBody;
+  const validation: BodyValidation = validateCreateClientBody(parsedBody);
+  if (!validation.isValid) {
     return {
-      body: (errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '').join(','),
+      body: validation.failureMessage,
       statusCode: 400,
     };
   }

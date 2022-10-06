@@ -3,8 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import Ajv from 'ajv/dist/2020';
-import type { ValidateFunction } from 'ajv';
 import type { ClientRole } from './ClientRole';
 
 export type CreateClientBody = {
@@ -12,7 +10,7 @@ export type CreateClientBody = {
   roles: ClientRole[];
 };
 
-const createClientBodySchema = {
+export const createClientBodySchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'Create body',
   description: 'The body of a POST to create a client',
@@ -42,8 +40,3 @@ const createClientBodySchema = {
   required: ['clientName', 'roles'],
   additionalProperties: false,
 };
-
-// Ajv caches compiled schemas, so we'll cache it
-const ajv: Ajv = new Ajv({ allErrors: true });
-
-export const validateCreateClientBody: ValidateFunction = ajv.compile(createClientBodySchema);
