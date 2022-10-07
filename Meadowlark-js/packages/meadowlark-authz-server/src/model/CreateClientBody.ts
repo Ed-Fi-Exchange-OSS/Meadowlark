@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { ClientRole } from './ClientRole';
+import type { AuthorizationClientRole } from './AuthorizationClientRole';
 
 export type CreateClientBody = {
   clientName: string;
-  roles: ClientRole[];
+  roles: AuthorizationClientRole[];
 };
 
 export const createClientBodySchema = {

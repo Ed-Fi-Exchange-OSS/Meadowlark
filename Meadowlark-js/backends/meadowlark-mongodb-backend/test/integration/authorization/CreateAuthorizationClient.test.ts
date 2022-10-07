@@ -3,17 +3,17 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { CreateClientRequest } from '@edfi/meadowlark-authz-server';
+import { CreateAuthorizationClientRequest } from '@edfi/meadowlark-authz-server';
 import { Collection, MongoClient } from 'mongodb';
-import { AuthorizationClient } from '../../../src/model/AuthorizationClient';
+import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
-import { createAuthorizationClient } from '../../../src/repository/authorization/CreateAuthorizationClient';
+import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 
 jest.setTimeout(40000);
 
 const clientId = 'clientId';
 
-const newCreateClientRequest = (): CreateClientRequest => ({
+const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest => ({
   clientId,
   clientSecretHashed: 'clientSecretHashed',
   clientName: 'clientName',
@@ -27,7 +27,7 @@ describe('given the create of a new authorization client', () => {
 
   beforeAll(async () => {
     mongoClient = (await getNewClient()) as MongoClient;
-    createClientRequest = await createAuthorizationClient(newCreateClientRequest(), mongoClient);
+    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
   });
 
   afterAll(async () => {
@@ -36,7 +36,7 @@ describe('given the create of a new authorization client', () => {
   });
 
   it('should exist in the db', async () => {
-    const collection: Collection<AuthorizationClient> = getAuthorizationCollection(mongoClient);
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
     const result: any = await collection.findOne({ _id: clientId });
     expect(result).toMatchInlineSnapshot(`
       {
@@ -67,7 +67,7 @@ describe('given a closed MongoDB connection', () => {
     mongoClient = (await getNewClient()) as MongoClient;
 
     mongoClient.close();
-    createClientRequest = await createAuthorizationClient(newCreateClientRequest(), mongoClient);
+    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
     mongoClient = (await getNewClient()) as MongoClient;
   });
 
@@ -77,7 +77,7 @@ describe('given a closed MongoDB connection', () => {
   });
 
   it('should not exist in the db', async () => {
-    const collection: Collection<AuthorizationClient> = getAuthorizationCollection(mongoClient);
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
     const result: any = await collection.findOne({ _id: clientId });
     expect(result).toBeNull();
   });

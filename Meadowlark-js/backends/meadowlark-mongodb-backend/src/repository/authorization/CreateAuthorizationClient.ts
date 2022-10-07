@@ -5,30 +5,29 @@
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { Logger } from '@edfi/meadowlark-core';
-import { CreateClientRequest, CreateClientResult } from '@edfi/meadowlark-authz-server';
-import { AuthorizationClient, authorizationClientFrom } from '../../model/AuthorizationClient';
+import { CreateAuthorizationClientRequest, CreateAuthorizationClientResult } from '@edfi/meadowlark-authz-server';
+import { AuthorizationDocument, authorizationDocumentFrom } from '../../model/AuthorizationDocument';
 import { asUpsert, getAuthorizationCollection } from '../Db';
 
-export async function createAuthorizationClient(
-  request: CreateClientRequest,
+const functionName = 'mongodb.repository.authorization.CreateCreateAuthorizationClientDocument';
+
+export async function createAuthorizationClientDocument(
+  request: CreateAuthorizationClientRequest,
   client: MongoClient,
-): Promise<CreateClientResult> {
+): Promise<CreateAuthorizationClientResult> {
   let session: ClientSession | null = null;
-  const createResult: CreateClientResult = { response: 'UNKNOWN_FAILURE' };
+  const createResult: CreateAuthorizationClientResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    const mongoCollection: Collection<AuthorizationClient> = getAuthorizationCollection(client);
+    const mongoCollection: Collection<AuthorizationDocument> = getAuthorizationCollection(client);
     session = client.startSession();
 
     await session.withTransaction(async () => {
       if (session == null) return; // makes TypeScript happy
 
-      const authorizationClient: AuthorizationClient = authorizationClientFrom(request);
+      const authorizationClient: AuthorizationDocument = authorizationDocumentFrom(request);
 
-      Logger.debug(
-        `mongodb.repository.authorization.CreateClient: Upserting client id ${request.clientId}`,
-        request.traceId,
-      );
+      Logger.debug(`${functionName}: Upserting client id ${request.clientId}`, request.traceId);
 
       const { acknowledged } = await mongoCollection.replaceOne(
         { _id: request.clientId },
@@ -41,11 +40,11 @@ export async function createAuthorizationClient(
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-        Logger.error('mongodb.repository.authorization.CreateClient', request.traceId, msg);
+        Logger.error(functionName, request.traceId, msg);
       }
     });
   } catch (e) {
-    Logger.error('mongodb.repository.authorization.CreateClient', request.traceId, e);
+    Logger.error(functionName, request.traceId, e);
   } finally {
     if (session != null) await session.endSession();
   }

@@ -4,12 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi/meadowlark-core';
-import { CreateClientRequest } from '../message/CreateClientRequest';
-import { CreateClientResult } from '../message/CreateClientResult';
+import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
+import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
-  createAuthorizationClient: async (_request: CreateClientRequest): Promise<CreateClientResult> => {
+  createAuthorizationClient: async (
+    _request: CreateAuthorizationClientRequest,
+  ): Promise<CreateAuthorizationClientResult> => {
     Logger.warn('NoAuthorizationStorePlugin.createClient(): No authorization store plugin has been configured', null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },

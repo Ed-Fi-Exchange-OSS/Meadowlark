@@ -3,4 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type ClientRole = 'vendor' | 'host' | 'admin' | 'assessment';
+import type { AuthorizationClientRole } from '../model/AuthorizationClientRole';
+
+export type CreateAuthorizationClientRequest = {
+  clientId: string;
+  clientSecretHashed: string;
+  clientName: string;
+  roles: AuthorizationClientRole[];
+  traceId: string;
+};

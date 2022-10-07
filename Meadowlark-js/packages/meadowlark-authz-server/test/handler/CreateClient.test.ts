@@ -6,7 +6,7 @@
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { newJwtStatus } from '@edfi/meadowlark-core';
 import { createClient } from '../../src/handler/CreateClient';
-import { CreateClientResult } from '../../src/message/CreateClientResult';
+import { CreateAuthorizationClientResult } from '../../src/message/CreateAuthorizationClientResult';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
@@ -75,7 +75,7 @@ describe('given authorization store succeeds on create', () => {
       createAuthorizationClient: async () =>
         Promise.resolve({
           response: 'CREATE_SUCCESS',
-        } as CreateClientResult),
+        } as CreateAuthorizationClientResult),
     });
 
     mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({

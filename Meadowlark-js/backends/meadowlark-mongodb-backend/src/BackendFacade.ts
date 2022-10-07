@@ -14,12 +14,12 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { CreateClientRequest, CreateClientResult } from '@edfi/meadowlark-authz-server';
+import { CreateAuthorizationClientRequest, CreateAuthorizationClientResult } from '@edfi/meadowlark-authz-server';
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Get from './repository/Get';
 import * as Update from './repository/Update';
-import * as CreateClient from './repository/authorization/CreateAuthorizationClient';
+import * as CreateAuthorizationClient from './repository/authorization/CreateAuthorizationClient';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 import { getSharedClient } from './repository/Db';
 
@@ -43,6 +43,8 @@ export async function securityMiddleware(middlewareModel: MiddlewareModel): Prom
   return SecurityMiddleware.securityMiddleware(middlewareModel, await getSharedClient());
 }
 
-export async function createAuthorizationClient(request: CreateClientRequest): Promise<CreateClientResult> {
-  return CreateClient.createAuthorizationClient(request, await getSharedClient());
+export async function createAuthorizationClientDocument(
+  request: CreateAuthorizationClientRequest,
+): Promise<CreateAuthorizationClientResult> {
+  return CreateAuthorizationClient.createAuthorizationClientDocument(request, await getSharedClient());
 }

@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { ClientRole, CreateClientRequest } from '@edfi/meadowlark-authz-server';
+import { AuthorizationClientRole, CreateAuthorizationClientRequest } from '@edfi/meadowlark-authz-server';
 
-export interface AuthorizationClient {
+export interface AuthorizationDocument {
   /**
    * The clientId GUID. This field replaces the built-in MongoDB _id.
    */
@@ -24,10 +24,10 @@ export interface AuthorizationClient {
   /**
    * A list of client roles
    */
-  roles: ClientRole[];
+  roles: AuthorizationClientRole[];
 }
 
-export function authorizationClientFrom(request: CreateClientRequest): AuthorizationClient {
+export function authorizationDocumentFrom(request: CreateAuthorizationClientRequest): AuthorizationDocument {
   return {
     _id: request.clientId,
     clientSecretHashed: request.clientSecretHashed,

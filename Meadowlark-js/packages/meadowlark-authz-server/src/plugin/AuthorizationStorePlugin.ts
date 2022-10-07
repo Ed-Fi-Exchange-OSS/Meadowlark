@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { CreateClientRequest } from '../message/CreateClientRequest';
-import { CreateClientResult } from '../message/CreateClientResult';
+import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
+import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 
 export interface AuthorizationStorePlugin {
-  createAuthorizationClient: (request: CreateClientRequest) => Promise<CreateClientResult>;
+  createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
 }

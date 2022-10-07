@@ -17,7 +17,7 @@ import {
 } from 'mongodb';
 import { Logger } from '@edfi//meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { AuthorizationClient } from '../model/AuthorizationClient';
+import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 const MONGO_URL_DEFAULT = 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
 export const DATABASE_NAME = process.env.MEADOWLARK_DATABASE_NAME ?? 'meadowlark';
@@ -53,7 +53,7 @@ export async function getNewClient(): Promise<MongoClient> {
     await documentCollection.createIndex({ aliasIds: 1 });
 
     // Create authorizations collection if not exists
-    const authorizationCollection: Collection<AuthorizationClient> = newClient
+    const authorizationCollection: Collection<AuthorizationDocument> = newClient
       .db(DATABASE_NAME)
       .collection(AUTHORIZATION_COLLECTION_NAME);
     await authorizationCollection.createIndex({ clientName: 1 });
@@ -91,7 +91,7 @@ export function getDocumentCollection(client: MongoClient): Collection<Meadowlar
   return client.db(DATABASE_NAME).collection(DOCUMENT_COLLECTION_NAME);
 }
 
-export function getAuthorizationCollection(client: MongoClient): Collection<AuthorizationClient> {
+export function getAuthorizationCollection(client: MongoClient): Collection<AuthorizationDocument> {
   return client.db(DATABASE_NAME).collection(AUTHORIZATION_COLLECTION_NAME);
 }
 
