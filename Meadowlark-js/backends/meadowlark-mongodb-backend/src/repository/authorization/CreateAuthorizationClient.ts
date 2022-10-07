@@ -6,7 +6,7 @@
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { Logger } from '@edfi/meadowlark-core';
 import { CreateAuthorizationClientRequest, CreateAuthorizationClientResult } from '@edfi/meadowlark-authz-server';
-import { AuthorizationDocument, authorizationDocumentFrom } from '../../model/AuthorizationDocument';
+import { AuthorizationDocument, authorizationDocumentFromCreate } from '../../model/AuthorizationDocument';
 import { asUpsert, getAuthorizationCollection } from '../Db';
 
 const functionName = 'mongodb.repository.authorization.CreateCreateAuthorizationClientDocument';
@@ -25,9 +25,9 @@ export async function createAuthorizationClientDocument(
     await session.withTransaction(async () => {
       if (session == null) return; // makes TypeScript happy
 
-      const authorizationClient: AuthorizationDocument = authorizationDocumentFrom(request);
+      const authorizationClient: AuthorizationDocument = authorizationDocumentFromCreate(request);
 
-      Logger.debug(`${functionName}: Upserting client id ${request.clientId}`, request.traceId);
+      Logger.debug(`${functionName}: Inserting client id ${request.clientId}`, request.traceId);
 
       const { acknowledged } = await mongoCollection.replaceOne(
         { _id: request.clientId },

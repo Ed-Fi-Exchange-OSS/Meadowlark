@@ -5,7 +5,10 @@
 
 import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
+import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
+import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
 
 export interface AuthorizationStorePlugin {
   createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
+  updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
 }

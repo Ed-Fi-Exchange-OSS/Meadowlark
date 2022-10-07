@@ -40,3 +40,6 @@ export const createClientBodySchema = {
   required: ['clientName', 'roles'],
   additionalProperties: false,
 };
+
+// Update body is the same as create body
+export type UpdateClientBody = CreateClientBody;

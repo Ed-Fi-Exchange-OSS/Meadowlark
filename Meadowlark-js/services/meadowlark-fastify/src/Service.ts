@@ -23,7 +23,10 @@ import {
 } from './handler/MetadataHandler';
 import { oauthHandler } from './handler/OAuthHandler';
 import { loadDescriptors } from './handler/DescriptorLoader';
-import { createClientHandler } from './handler/authorization/AuthorizationHandler';
+import {
+  createAuthorizationClientHandler,
+  updateAuthorizationClientHandler,
+} from './handler/authorization/AuthorizationHandler';
 
 export function buildService(): FastifyInstance {
   const service = createFastifyService();
@@ -123,6 +126,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
     // Authorization server handlers
-    fastify.post(`/${stage}/oauth/client`, createClientHandler);
+    fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
+    fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
   }
 }

@@ -27,7 +27,7 @@ export interface AuthorizationDocument {
   roles: AuthorizationClientRole[];
 }
 
-export function authorizationDocumentFrom(request: CreateAuthorizationClientRequest): AuthorizationDocument {
+export function authorizationDocumentFromCreate(request: CreateAuthorizationClientRequest): AuthorizationDocument {
   return {
     _id: request.clientId,
     clientSecretHashed: request.clientSecretHashed,
