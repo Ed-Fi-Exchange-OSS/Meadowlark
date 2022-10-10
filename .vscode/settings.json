@@ -81,5 +81,8 @@
             "markdown",
             "batch"
         ]
+    },
+    "jest.autoRun": {
+      "watch": false
     }
 }
