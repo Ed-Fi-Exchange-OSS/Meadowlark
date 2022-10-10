@@ -4,9 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export { createClient } from './handler/CreateClient';
+export { updateClient } from './handler/UpdateClient';
 export { AuthorizationRequest, newAuthorizationRequest } from './handler/AuthorizationRequest';
 export { AuthorizationResponse } from './handler/AuthorizationResponse';
 export { AuthorizationStorePlugin } from './plugin/AuthorizationStorePlugin';
 export { CreateAuthorizationClientRequest } from './message/CreateAuthorizationClientRequest';
 export { CreateAuthorizationClientResult } from './message/CreateAuthorizationClientResult';
+export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';
+export { UpdateAuthorizationClientResult } from './message/UpdateAuthorizationClientResult';
 export { AuthorizationClientRole } from './model/AuthorizationClientRole';

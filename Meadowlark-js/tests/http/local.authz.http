@@ -13,6 +13,9 @@ content-type: application/json
 @auth_header_client_1=Authorization: bearer {{client1.response.body.$.access_token}}
 
 
+#################### POST
+
+
 ### Try creating client as a non-admin, should 403 Forbidden
 POST http://localhost:3000/local/oauth/client
 content-type: application/json
@@ -56,6 +59,7 @@ content-type: application/json
 
 
 ### Create client as an admin, should succeed
+# @name client1
 POST http://localhost:3000/local/oauth/client
 content-type: application/json
 {{auth_header_admin_1}}
@@ -134,3 +138,98 @@ content-type: application/json
 }
 
 
+#################### PUT
+###
+@created_client_id_1={{client1.response.body.$.client_id}}
+
+### Update client as an admin, should succeed
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+
+### Update with non-existent client id, should 404
+PUT http://localhost:3000/local/oauth/client/11111111-1111-1111-1111-111111111111
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+
+### Update client with additional assessment role, should succeed
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+### Send request body with empty body, should fail with 400 Bad Request
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{}
+
+### Send request body without roles, should fail with 400 Bad Request
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS"
+}
+
+### Send request body with invalid role, should fail with 400 Bad Request
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "not vendor"
+    ]
+}
+
+### Create client with one valid, one invalid role, should fail with 400 Bad Request
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "not assessment"
+    ]
+}
+
+### Send request body with only assessment role, should fail with 400 Bad Request
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "assessment"
+    ]
+}

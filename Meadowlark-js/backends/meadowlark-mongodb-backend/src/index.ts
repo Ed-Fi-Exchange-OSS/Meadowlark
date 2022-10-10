@@ -12,6 +12,7 @@ import {
   updateDocumentById,
   securityMiddleware,
   createAuthorizationClientDocument,
+  updateAuthorizationClientDocument,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -25,7 +26,10 @@ export function initializeDocumentStore(): DocumentStorePlugin {
 }
 
 export function initializeAuthorizationStore(): AuthorizationStorePlugin {
-  return { createAuthorizationClient: createAuthorizationClientDocument };
+  return {
+    createAuthorizationClient: createAuthorizationClientDocument,
+    updateAuthorizationClient: updateAuthorizationClientDocument,
+  };
 }
 
 // Accessible for system testing - this may turn into a generic setup/teardown datastore interface

@@ -30,3 +30,8 @@ export function validateCreateClientBody(body: object): BodyValidation {
     ),
   };
 }
+
+export function validateUpdateClientBody(body: object): BodyValidation {
+  // Update body is the same as create body
+  return validateCreateClientBody(body);
+}

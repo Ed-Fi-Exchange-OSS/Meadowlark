@@ -7,6 +7,10 @@ import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { respondWith, fromRequest } from './AuthorizationConverter';
 
-export async function createClientHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function createAuthorizationClientHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   respondWith(await AuthorizationServer.createClient(fromRequest(request)), reply);
+}
+
+export async function updateAuthorizationClientHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  respondWith(await AuthorizationServer.updateClient(fromRequest(request)), reply);
 }

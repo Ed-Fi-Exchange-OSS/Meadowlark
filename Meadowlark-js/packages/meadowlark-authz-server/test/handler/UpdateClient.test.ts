@@ -5,8 +5,8 @@
 
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { newJwtStatus } from '@edfi/meadowlark-core';
-import { createClient } from '../../src/handler/CreateClient';
-import { CreateAuthorizationClientResult } from '../../src/message/CreateAuthorizationClientResult';
+import { updateClient } from '../../src/handler/UpdateClient';
+import { UpdateAuthorizationClientResult } from '../../src/message/UpdateAuthorizationClientResult';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
@@ -16,7 +16,7 @@ process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
-  path: '/oauth/client',
+  path: '/oauth/client/11111111-1111-1111-1111111111111111',
   body: `{
     "clientName": "Hometown SIS",
     "roles": [
@@ -34,7 +34,7 @@ describe('given valid admin user but authorization store is going to fail', () =
   beforeAll(async () => {
     mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
-      createAuthorizationClient: async () =>
+      updateAuthorizationClient: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
         }),
@@ -47,7 +47,7 @@ describe('given valid admin user but authorization store is going to fail', () =
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -64,7 +64,7 @@ describe('given valid admin user but authorization store is going to fail', () =
   });
 });
 
-describe('given authorization store succeeds on create', () => {
+describe('given authorization store succeeds on update', () => {
   let response: AuthorizationResponse;
   let mockAuthorizationStore: any;
   let mockMeadowlarkCore: any;
@@ -72,10 +72,10 @@ describe('given authorization store succeeds on create', () => {
   beforeAll(async () => {
     mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
-      createAuthorizationClient: async () =>
+      updateAuthorizationClient: async () =>
         Promise.resolve({
-          response: 'CREATE_SUCCESS',
-        } as CreateAuthorizationClientResult),
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
     });
 
     mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
@@ -85,7 +85,7 @@ describe('given authorization store succeeds on create', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -93,28 +93,50 @@ describe('given authorization store succeeds on create', () => {
     mockMeadowlarkCore.mockRestore();
   });
 
-  it('returns status 201', () => {
-    expect(response.statusCode).toEqual(201);
+  it('returns status 204', () => {
+    expect(response.statusCode).toEqual(204);
   });
 
-  it('returns a message body with client name', () => {
-    expect(response.body).toMatch(`"clientName":"Hometown SIS"`);
+  it('does not return a message body', () => {
+    expect(response.body).toEqual('');
+  });
+});
+
+describe('given authorization store fails update with client id not found', () => {
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILED_NOT_EXISTS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(authorizationRequest);
   });
 
-  it('returns a message body with roles', () => {
-    expect(response.body).toMatch(`"roles":["vendor","assessment"]`);
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
   });
 
-  it('returns a message body with client id', () => {
-    expect(response.body).toMatch(`"client_id":`);
+  it('returns status 404', () => {
+    expect(response.statusCode).toEqual(404);
   });
 
-  it('returns a message body with client secret', () => {
-    expect(response.body).toMatch(`"client_secret":`);
-  });
-
-  it('it returns location header', () => {
-    expect((response.headers as any).Location.startsWith('/oauth/client/')).toBe(true);
+  it('does not return a message body', () => {
+    expect(response.body).toEqual('');
   });
 });
 
@@ -129,7 +151,7 @@ describe('given missing authorization token', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -161,7 +183,7 @@ describe('given expired authorization token', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -194,7 +216,7 @@ describe('given non-admin authorization token', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -220,7 +242,7 @@ describe('given invalid authorization token', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {
@@ -234,7 +256,7 @@ describe('given invalid authorization token', () => {
   });
 });
 
-describe('given create has missing body', () => {
+describe('given update has missing client id', () => {
   const missingBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
     path: '/oauth/client',
@@ -247,10 +269,10 @@ describe('given create has missing body', () => {
   beforeAll(async () => {
     mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
-      createAuthorizationClient: async () =>
+      updateAuthorizationClient: async () =>
         Promise.resolve({
-          response: 'CREATE_SUCCESS',
-        } as CreateAuthorizationClientResult),
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
     });
 
     mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
@@ -260,7 +282,50 @@ describe('given create has missing body', () => {
     });
 
     // Act
-    response = await createClient(missingBodyRequest);
+    response = await updateClient(missingBodyRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('returns error response', () => {
+    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing client id"}"`);
+  });
+});
+
+describe('given update has missing body', () => {
+  const missingBodyRequest: AuthorizationRequest = {
+    ...newAuthorizationRequest(),
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+  };
+
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(missingBodyRequest);
   });
 
   afterAll(() => {
@@ -277,10 +342,10 @@ describe('given create has missing body', () => {
   });
 });
 
-describe('given create has malformed json body', () => {
+describe('given update has malformed json body', () => {
   const malformedBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
     body: '{ bad',
   };
 
@@ -291,10 +356,10 @@ describe('given create has malformed json body', () => {
   beforeAll(async () => {
     mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
-      createAuthorizationClient: async () =>
+      updateAuthorizationClient: async () =>
         Promise.resolve({
-          response: 'CREATE_SUCCESS',
-        } as CreateAuthorizationClientResult),
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
     });
 
     mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
@@ -304,7 +369,7 @@ describe('given create has malformed json body', () => {
     });
 
     // Act
-    response = await createClient(malformedBodyRequest);
+    response = await updateClient(malformedBodyRequest);
   });
 
   afterAll(() => {
@@ -321,10 +386,10 @@ describe('given create has malformed json body', () => {
   });
 });
 
-describe('given create has well-formed but invalid json body', () => {
+describe('given update has well-formed but invalid json body', () => {
   const invalidBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
     body: '{}',
   };
 
@@ -335,10 +400,10 @@ describe('given create has well-formed but invalid json body', () => {
   beforeAll(async () => {
     mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
-      createAuthorizationClient: async () =>
+      updateAuthorizationClient: async () =>
         Promise.resolve({
-          response: 'CREATE_SUCCESS',
-        } as CreateAuthorizationClientResult),
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
     });
 
     mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
@@ -348,7 +413,7 @@ describe('given create has well-formed but invalid json body', () => {
     });
 
     // Act
-    response = await createClient(invalidBodyRequest);
+    response = await updateClient(invalidBodyRequest);
   });
 
   afterAll(() => {
@@ -367,7 +432,7 @@ describe('given create has well-formed but invalid json body', () => {
   });
 });
 
-describe('given create throws internal error', () => {
+describe('given update throws internal error', () => {
   let response: AuthorizationResponse;
   let mockAuthorizationStore: any;
   let mockMeadowlarkCore: any;
@@ -384,7 +449,7 @@ describe('given create throws internal error', () => {
     });
 
     // Act
-    response = await createClient(authorizationRequest);
+    response = await updateClient(authorizationRequest);
   });
 
   afterAll(() => {

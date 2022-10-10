@@ -6,6 +6,8 @@
 import { Logger } from '@edfi/meadowlark-core';
 import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
+import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
+import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
@@ -13,6 +15,15 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
     _request: CreateAuthorizationClientRequest,
   ): Promise<CreateAuthorizationClientResult> => {
     Logger.error('NoAuthorizationStorePlugin.createClient(): An authorization store plugin has not been configured', null);
+    return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+  },
+  updateAuthorizationClient: async (
+    _request: UpdateAuthorizationClientRequest,
+  ): Promise<UpdateAuthorizationClientResult> => {
+    Logger.warn(
+      'NoAuthorizationStorePlugin.updateAuthorizationClient(): No authorization store plugin has been configured',
+      null,
+    );
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 };
