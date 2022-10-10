@@ -12,7 +12,7 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
   createAuthorizationClient: async (
     _request: CreateAuthorizationClientRequest,
   ): Promise<CreateAuthorizationClientResult> => {
-    Logger.warn('NoAuthorizationStorePlugin.createClient(): No authorization store plugin has been configured', null);
+    Logger.error('NoAuthorizationStorePlugin.createClient(): An authorization store plugin has not been configured', null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 };
