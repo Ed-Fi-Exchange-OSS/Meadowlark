@@ -16,7 +16,7 @@ process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
-  path: '/oauth/client',
+  path: '/oauth/client/11111111-1111-1111-1111111111111111',
   body: `{
     "clientName": "Hometown SIS",
     "roles": [
@@ -253,5 +253,215 @@ describe('given invalid authorization token', () => {
     expect(response.body).toMatchInlineSnapshot(
       `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
     );
+  });
+});
+
+describe('given update has missing client id', () => {
+  const missingBodyRequest: AuthorizationRequest = {
+    ...newAuthorizationRequest(),
+    path: '/oauth/client',
+  };
+
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(missingBodyRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('returns error response', () => {
+    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing client id"}"`);
+  });
+});
+
+describe('given update has missing body', () => {
+  const missingBodyRequest: AuthorizationRequest = {
+    ...newAuthorizationRequest(),
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+  };
+
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(missingBodyRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('returns error response', () => {
+    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing body"}"`);
+  });
+});
+
+describe('given update has malformed json body', () => {
+  const malformedBodyRequest: AuthorizationRequest = {
+    ...newAuthorizationRequest(),
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+    body: '{ bad',
+  };
+
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(malformedBodyRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('returns error response', () => {
+    expect(response.body).toMatchInlineSnapshot(`"{"message":"Malformed body"}"`);
+  });
+});
+
+describe('given update has well-formed but invalid json body', () => {
+  const invalidBodyRequest: AuthorizationRequest = {
+    ...newAuthorizationRequest(),
+    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+    body: '{}',
+  };
+
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      updateAuthorizationClient: async () =>
+        Promise.resolve({
+          response: 'UPDATE_SUCCESS',
+        } as UpdateAuthorizationClientResult),
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(invalidBodyRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('returns error response', () => {
+    expect(response.body).toMatchInlineSnapshot(
+      `"[{"message":"{requestBody} must have required property 'clientName'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'roles'","path":"{requestBody}","context":{"errorType":"required"}}]"`,
+    );
+  });
+});
+
+describe('given update throws internal error', () => {
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+  let mockMeadowlarkCore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockImplementation(() => {
+      throw new Error();
+    });
+
+    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+      ...newJwtStatus(),
+      isValid: true,
+      roles: ['admin'],
+    });
+
+    // Act
+    response = await updateClient(authorizationRequest);
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+    mockMeadowlarkCore.mockRestore();
+  });
+
+  it('returns status 500', () => {
+    expect(response.statusCode).toEqual(500);
+  });
+
+  it('does not return a message body', () => {
+    expect(response.body).toEqual('');
   });
 });

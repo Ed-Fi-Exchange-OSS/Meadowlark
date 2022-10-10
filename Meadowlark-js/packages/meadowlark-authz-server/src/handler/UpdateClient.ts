@@ -16,7 +16,15 @@ import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Lo
 const moduleName = 'handler.UpdateClient';
 
 function clientIdFrom(path: string): string {
-  return path.split('/').pop()?.split('?')[0] ?? '';
+  // Assumes client id is at the 3rd position:
+  // /oauth/client/11111111-1111-1111-1111111111111111
+  const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*$))?/gm;
+  const match = pathExpression.exec(path);
+
+  if (match?.groups == null) return '';
+
+  const { clientId } = match.groups ?? '';
+  return clientId;
 }
 
 /**
