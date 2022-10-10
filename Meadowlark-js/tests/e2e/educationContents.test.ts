@@ -14,7 +14,7 @@ describe('Create education content', () => {
 
     const contentClassDescriptorLocation = await baseURLRequest
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
-      .set("Authorization", `Bearer ${token}`)
+      .auth(token, {type: 'bearer'})
       .send({
         "codeValue": "Presentation",
         "shortDescription": "Presentation",
@@ -29,7 +29,7 @@ describe('Create education content', () => {
 
     contentClassDescriptor = await rootURLRequest
       .get(contentClassDescriptorLocation)
-      .set("Authorization", `Bearer ${token}`)
+      .auth(token, {type: 'bearer'})
       .expect(200)
       .then(response => {
         expect(response.body).not.toBe(null);
@@ -41,7 +41,7 @@ describe('Create education content', () => {
 
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
-      .set("Authorization", `Bearer ${token}`)
+      .auth(token, {type: 'bearer'})
       .send({
         "contentIdentifier": `1fae${Math.floor(Math.random() * 100)}`,
         "namespace": "43210",
@@ -57,7 +57,7 @@ describe('Create education content', () => {
 
     rootURLRequest
       .get(educationContentLocation)
-      .set("Authorization", `Bearer ${token}`)
+      .auth(token, {type: 'bearer'})
       .expect(200)
       .end((error, _) => {
         if (error) {
@@ -73,7 +73,7 @@ describe('Create education content', () => {
 
 function deleteByLocation(location: string) {
   rootURLRequest.delete(location)
-    .set("Authorization", `Bearer ${token}`)
+    .auth(token, {type: 'bearer'})
     .expect(204)
     .end((error, _) => {
       if (error) {
