@@ -112,7 +112,7 @@ export async function deleteDocumentById(
   } catch (e) {
     Logger.error('postgresql.repository.Delete.deleteDocumentById', traceId, e);
     await client.query('ROLLBACK');
-    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
+    return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   }
   return deleteResult;
 }
