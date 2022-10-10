@@ -1,33 +1,18 @@
-import path from 'path';
-import dotenv from 'dotenv';
-import request from 'supertest';
-
-dotenv.config({path: path.join(__dirname, "./.env")});
+import {baseURLRequest, getAccessToken, rootURLRequest} from './SharedFunctions';
 
 let token: string;
 let educationContentLocation: string;
 let contentClassDescriptor: string;
 
-const rootURL = request(process.env.ROOT_URL);
-const baseURL = request(process.env.BASE_URL);
-
 describe('Create education content', () => {
 
   beforeAll(async () => {
-    const response = await baseURL
-      .post('/api/oauth/token')
-      .send({
-        "grant_type": "client_credentials",
-        "client_id": process.env.CLIENT_ID,
-        "client_secret": process.env.CLIENT_SECRET
-      });
-
-    token = response.body.access_token;
+    token = await getAccessToken();
   });
 
   beforeEach(async () => {
 
-    const contentClassDescriptorLocation = await baseURL
+    const contentClassDescriptorLocation = await baseURLRequest
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -42,7 +27,7 @@ describe('Create education content', () => {
         return response.headers[ 'location' ];
       });
 
-    contentClassDescriptor = await rootURL
+    contentClassDescriptor = await rootURLRequest
       .get(contentClassDescriptorLocation)
       .set("Authorization", `Bearer ${token}`)
       .expect(200)
@@ -54,7 +39,7 @@ describe('Create education content', () => {
 
   it('should create an education content', async () => {
 
-    educationContentLocation = await baseURL
+    educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -70,7 +55,7 @@ describe('Create education content', () => {
         return response.headers[ 'location' ];
       });
 
-    rootURL
+    rootURLRequest
       .get(educationContentLocation)
       .set("Authorization", `Bearer ${token}`)
       .expect(200)
@@ -87,7 +72,7 @@ describe('Create education content', () => {
 });
 
 function deleteByLocation(location: string) {
-  rootURL.delete(location)
+  rootURLRequest.delete(location)
     .set("Authorization", `Bearer ${token}`)
     .expect(204)
     .end((error, _) => {
