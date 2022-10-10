@@ -6,7 +6,6 @@ let contentClassDescriptor: string;
 describe('Create education content', () => {
 
   beforeEach(async () => {
-
     const contentClassDescriptorLocation = await baseURLRequest
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
       .auth(accessToken, {type: 'bearer'})
