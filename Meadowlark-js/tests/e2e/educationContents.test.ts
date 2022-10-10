@@ -1,20 +1,15 @@
-import {baseURLRequest, getAccessToken, rootURLRequest} from './SharedFunctions';
+import {baseURLRequest, accessToken, rootURLRequest} from './SharedFunctions';
 
-let token: string;
 let educationContentLocation: string;
 let contentClassDescriptor: string;
 
 describe('Create education content', () => {
 
-  beforeAll(async () => {
-    token = await getAccessToken();
-  });
-
   beforeEach(async () => {
 
     const contentClassDescriptorLocation = await baseURLRequest
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
-      .auth(token, {type: 'bearer'})
+      .auth(accessToken, {type: 'bearer'})
       .send({
         "codeValue": "Presentation",
         "shortDescription": "Presentation",
@@ -29,7 +24,7 @@ describe('Create education content', () => {
 
     contentClassDescriptor = await rootURLRequest
       .get(contentClassDescriptorLocation)
-      .auth(token, {type: 'bearer'})
+      .auth(accessToken, {type: 'bearer'})
       .expect(200)
       .then(response => {
         expect(response.body).not.toBe(null);
@@ -41,7 +36,7 @@ describe('Create education content', () => {
 
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
-      .auth(token, {type: 'bearer'})
+      .auth(accessToken, {type: 'bearer'})
       .send({
         "contentIdentifier": `1fae${Math.floor(Math.random() * 100)}`,
         "namespace": "43210",
@@ -57,7 +52,7 @@ describe('Create education content', () => {
 
     rootURLRequest
       .get(educationContentLocation)
-      .auth(token, {type: 'bearer'})
+      .auth(accessToken, {type: 'bearer'})
       .expect(200)
       .end((error, _) => {
         if (error) {
@@ -67,17 +62,13 @@ describe('Create education content', () => {
   })
 
   afterAll(() => {
-    deleteByLocation(educationContentLocation);
+    rootURLRequest.delete(educationContentLocation)
+      .auth(accessToken, {type: 'bearer'})
+      .expect(204)
+      .end((error, _) => {
+        if (error) {
+          console.error(error);
+        }
+      });
   });
 });
-
-function deleteByLocation(location: string) {
-  rootURLRequest.delete(location)
-    .auth(token, {type: 'bearer'})
-    .expect(204)
-    .end((error, _) => {
-      if (error) {
-        console.error(error);
-      }
-    });
-}

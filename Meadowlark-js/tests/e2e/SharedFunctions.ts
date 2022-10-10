@@ -11,9 +11,13 @@ dotenv.config({path: path.join(__dirname, "./.env")});
 export const baseURLRequest = request(process.env.BASE_URL);
 export const rootURLRequest = request(process.env.ROOT_URL);
 
-let accessToken: string;
+export let accessToken: string;
 
-export async function getAccessToken(): Promise<string> {
+beforeAll(async () => {
+  accessToken = await getAccessToken();
+});
+
+async function getAccessToken(): Promise<string> {
   if (!accessToken) {
     accessToken = await baseURLRequest
       .post('/api/oauth/token')
