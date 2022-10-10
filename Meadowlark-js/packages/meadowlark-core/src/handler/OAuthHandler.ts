@@ -6,7 +6,7 @@
 import querystring from 'querystring';
 import secureRandom from 'secure-random';
 import { Logger } from '../Logger';
-import { client1, client2, client3, client4 } from '../security/HardcodedCredential';
+import { admin1, client1, client2, client3, client4 } from '../security/HardcodedCredential';
 import { createToken } from '../security/JwtAction';
 import { Jwt } from '../security/Jwt';
 import { validateJwt } from '../security/JwtValidator';
@@ -110,6 +110,12 @@ export async function postToken(frontendRequest: FrontendRequest): Promise<Front
         statusCode: 200,
       };
     }
+    if (clientId === admin1.key && clientSecret === admin1.secret) {
+      return {
+        body: createTokenResponse(createToken(admin1.key, admin1.vendor, admin1.role)),
+        statusCode: 200,
+      };
+    }
   }
 
   return {
@@ -131,7 +137,7 @@ export async function createRandomSigningKey(): Promise<FrontendResponse> {
 export async function verify(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   Logger.debug(JSON.stringify(frontendRequest.headers), frontendRequest.traceId);
 
-  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest));
+  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest.headers));
 
   if (errorResponse == null) {
     return {

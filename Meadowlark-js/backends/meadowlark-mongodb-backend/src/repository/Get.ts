@@ -6,10 +6,10 @@
 import { Collection, MongoClient, WithId } from 'mongodb';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getCollection } from './Db';
+import { getDocumentCollection } from './Db';
 
 export async function getDocumentById({ id }: GetRequest, client: MongoClient): Promise<GetResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 
   try {
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ _id: id });

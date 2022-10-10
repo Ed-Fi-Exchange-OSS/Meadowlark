@@ -6,7 +6,7 @@
 import { Logger, MiddlewareModel, writeRequestToLog } from '@edfi/meadowlark-core';
 import { MongoClient } from 'mongodb';
 import { rejectByOwnershipSecurity } from '../repository/OwnershipSecurity';
-import { SecurityResult } from './SecurityResponse';
+import { SecurityResult } from './SecurityResult';
 
 /**
  * Enforces document store authorization for this backend
@@ -23,7 +23,7 @@ export async function securityMiddleware(
 
   // Ownership-based is the only one for now. When others are implemented, do as
   // a stack of security middlewares with this as entry point
-  if (frontendRequest.middleware.security.authorizationStrategy !== 'OWNERSHIP_BASED') {
+  if (frontendRequest.middleware.security.authorizationStrategy.type !== 'OWNERSHIP_BASED') {
     Logger.debug(`${moduleName}.securityMiddleware - ownership based security does not apply`, frontendRequest.traceId);
     return { frontendRequest, frontendResponse };
   }

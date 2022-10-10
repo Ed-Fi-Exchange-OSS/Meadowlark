@@ -5,7 +5,7 @@
 
 import { documentIdForDocumentInfo, FrontendRequest, Logger, writeRequestToLog } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
-import { SecurityResult } from '../security/SecurityResponse';
+import { SecurityResult } from '../security/SecurityResult';
 import { findOwnershipForDocumentSql } from './SqlHelper';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): string | undefined {

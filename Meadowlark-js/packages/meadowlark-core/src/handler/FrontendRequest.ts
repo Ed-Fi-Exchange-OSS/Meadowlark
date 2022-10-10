@@ -11,7 +11,7 @@ import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 import { Security, UndefinedSecurity } from '../security/Security';
 import type { Action } from './Action';
 
-export interface FrontendHeaders {
+export interface Headers {
   [header: string]: string | undefined;
 }
 
@@ -53,7 +53,7 @@ export interface FrontendRequest {
    */
   body: string | null;
 
-  headers: FrontendHeaders;
+  headers: Headers;
 
   queryParameters: FrontendQueryParameters;
 

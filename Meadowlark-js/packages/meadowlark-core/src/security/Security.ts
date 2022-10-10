@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type AuthorizationStrategy = 'OWNERSHIP_BASED' | 'FULL_ACCESS' | 'UNDEFINED';
+import { AuthorizationStrategy } from './AuthorizationStrategy';
 
 /**
  * The security information associated with a frontend request
@@ -17,7 +17,7 @@ export type Security = {
 
 export function newSecurity(): Security {
   return {
-    authorizationStrategy: 'UNDEFINED',
+    authorizationStrategy: { type: 'UNDEFINED', withAssessment: false },
     clientId: 'UNKNOWN',
   };
 }

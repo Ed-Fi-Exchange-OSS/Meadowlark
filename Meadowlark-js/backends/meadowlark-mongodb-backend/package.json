@@ -19,6 +19,7 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
+    "@edfi/meadowlark-authz-server": "0.2.0-dev.0",
     "@edfi/meadowlark-core": "0.2.0-dev.0",
     "mongodb": "^4.5.0",
     "ramda": "^0.28.0",

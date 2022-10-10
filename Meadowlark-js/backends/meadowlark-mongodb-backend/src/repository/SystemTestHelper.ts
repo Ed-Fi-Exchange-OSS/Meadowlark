@@ -4,16 +4,16 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MongoClient } from 'mongodb';
-import { getCollection, getNewClient, resetSharedClient } from './Db';
+import { getDocumentCollection, getNewClient, resetSharedClient } from './Db';
 
 export async function systemTestSetup(): Promise<MongoClient> {
   const client = (await getNewClient()) as MongoClient;
-  await getCollection(client).deleteMany({});
+  await getDocumentCollection(client).deleteMany({});
   return client;
 }
 
 export async function systemTestTeardown(client: MongoClient): Promise<void> {
-  await getCollection(client).deleteMany({});
+  await getDocumentCollection(client).deleteMany({});
   await client.close();
   await resetSharedClient();
 }

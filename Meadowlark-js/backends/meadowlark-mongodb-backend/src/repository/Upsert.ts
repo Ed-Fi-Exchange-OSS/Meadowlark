@@ -6,14 +6,14 @@
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { UpsertResult, Logger, UpsertRequest, documentIdForSuperclassInfo } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getCollection, writeLockReferencedDocuments } from './Db';
-import { asUpsert, onlyReturnId, validateReferences } from './ReferenceValidation';
+import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
+import { validateReferences } from './ReferenceValidation';
 
 export async function upsertDocument(
   { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
-  const mongoCollection: Collection<MeadowlarkDocument> = getCollection(client);
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
 
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };

@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import {
+  AuthorizationStrategy,
   documentIdForDocumentInfo,
   DocumentInfo,
   FrontendRequest,
@@ -90,7 +91,7 @@ describe('given the getById of a document owned by the requestor', () => {
   let client: PoolClient;
   let result: MiddlewareModel;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
   const clientId = 'ThisClient';
 
   const resourceInfo: ResourceInfo = {
@@ -149,7 +150,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   let client: PoolClient;
   let result: MiddlewareModel;
 
-  const authorizationStrategy = 'OWNERSHIP_BASED';
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),

@@ -37,3 +37,10 @@ export const client4: HardcodedCredential = {
   vendor: 'the-one-sis',
   role: ['assessment', 'vendor'],
 };
+
+export const admin1: HardcodedCredential = {
+  key: 'meadowlark_admin_key_1',
+  secret: 'meadowlark_admin_secret_1',
+  vendor: '',
+  role: ['admin'],
+};

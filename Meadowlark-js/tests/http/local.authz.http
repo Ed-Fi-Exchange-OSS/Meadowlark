@@ -1,0 +1,136 @@
+### Authenticate as a non-admin
+# @name client1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_key_1",
+    "client_secret": "meadowlark_secret_1"
+}
+
+###
+@auth_header_client_1=Authorization: bearer {{client1.response.body.$.access_token}}
+
+
+### Try creating client as a non-admin, should 403 Forbidden
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_client_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+### Try creating client with a bad token, should 403 Forbidden
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+Authorization: bearer Not-A-Token
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+
+### Authenticate as an admin
+# @name admin1
+POST http://localhost:3000/local/api/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "meadowlark_admin_key_1",
+    "client_secret": "meadowlark_admin_secret_1"
+}
+
+###
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client as an admin, should succeed
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+### Create client with additional assessment role, should succeed
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+### Send request body with empty body, should fail with 400 Bad Request
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{}
+
+### Send request body without roles, should fail with 400 Bad Request
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS"
+}
+
+### Send request body with invalid role, should fail with 400 Bad Request
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "not vendor"
+    ]
+}
+
+### Create client with one valid, one invalid role, should fail with 400 Bad Request
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor",
+        "not assessment"
+    ]
+}
+
+### Send request body with only assessment role, should fail with 400 Bad Request
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "assessment"
+    ]
+}
+
+

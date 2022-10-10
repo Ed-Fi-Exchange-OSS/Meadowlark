@@ -1,0 +1,37 @@
+{
+  "name": "@edfi/meadowlark-authz-server",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark authorization server",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "dependencies": {
+    "@apideck/better-ajv-errors": "^0.3.6",
+    "@edfi/meadowlark-core": "0.2.0-dev.0",
+    "ajv": "^8.11.0",
+    "dotenv": "^16.0.1",
+    "njwt": "^1.2.0",
+    "ramda": "^0.27.2",
+    "uuid": "^9.0.0",
+    "winston": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "14.14.31",
+    "@types/uuid": "^8.3.4",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2"
+  },
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  }
+}
