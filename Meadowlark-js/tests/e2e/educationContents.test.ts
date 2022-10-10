@@ -26,7 +26,8 @@ describe('Create education content', () => {
   });
 
   beforeEach(async () => {
-    const response = await baseURL
+
+    const contentClassDescriptorLocation = await baseURL
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -35,25 +36,25 @@ describe('Create education content', () => {
         "description": "Presentation",
         "namespace": "uri://ed-fi.org/ContentClassDescriptor"
       })
-      .expect(200);
+      .expect(200)
+      .then(response => {
+        expect(response.headers[ 'location' ]).not.toBe(null);
+        return response.headers[ 'location' ];
+      });
 
-    const contentClassLocation = response.headers[ 'location' ];
-
-    if (!contentClassLocation) {
-      throw "Location not found";
-    }
-
-    const locatorByDescriptor = await rootURL
-      .get(contentClassLocation)
+    contentClassDescriptor = await rootURL
+      .get(contentClassDescriptorLocation)
       .set("Authorization", `Bearer ${token}`)
-      .expect(200);
-
-    contentClassDescriptor = locatorByDescriptor.body.namespace + "#" + locatorByDescriptor.body.description;
+      .expect(200)
+      .then(response => {
+        expect(response.body).not.toBe(null);
+        return response.body.namespace + "#" + response.body.description;
+      });
   });
 
   it('should create an education content', async () => {
 
-    const educationContent = await baseURL
+    educationContentLocation = await baseURL
       .post('/v3.3b/ed-fi/educationContents')
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -63,24 +64,35 @@ describe('Create education content', () => {
         "contentClassDescriptor": contentClassDescriptor,
         "learningResourceMetadataURI": "uri://ed-fi.org/fake-uri"
       })
-      .expect(201);
+      .expect(201)
+      .then(response => {
+        expect(response.headers[ 'location' ]).not.toBe(null);
+        return response.headers[ 'location' ];
+      });
 
-    educationContentLocation = educationContent.headers[ 'location' ];
-
-    if (!educationContentLocation) {
-      throw "Location not found";
-    }
-
-    rootURL.get(educationContentLocation).set("Authorization", `Bearer ${token}`).expect(200);
+    rootURL
+      .get(educationContentLocation)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200)
+      .end((error, _) => {
+        if (error) {
+          console.error(error);
+        }
+      });
   })
 
-  afterAll(async () => {
-    await deleteByLocation(educationContentLocation);
+  afterAll(() => {
+    deleteByLocation(educationContentLocation);
   });
 });
 
-async function deleteByLocation(location: string) {
-  await rootURL.delete(location)
+function deleteByLocation(location: string) {
+  rootURL.delete(location)
     .set("Authorization", `Bearer ${token}`)
-    .expect(204);
+    .expect(204)
+    .end((error, _) => {
+      if (error) {
+        console.error(error);
+      }
+    });
 }
