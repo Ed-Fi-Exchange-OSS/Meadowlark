@@ -44,8 +44,7 @@ export async function deleteDocumentById(
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
-        const errorMessage = `deleteDocumentById: Error determining documents referenced by ${id},
-        a null result set was returned`;
+        const errorMessage = `deleteDocumentById: Error determining documents referenced by ${id}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
         Logger.error(errorMessage, traceId);
         return deleteResult;
@@ -66,8 +65,7 @@ export async function deleteDocumentById(
 
         if (referringDocuments.rows == null) {
           await client.query('ROLLBACK');
-          const errorMessage = `deleteDocumentById: Error retrieving documents referenced by ${id},
-          a null result set was returned`;
+          const errorMessage = `deleteDocumentById: Error retrieving documents referenced by ${id}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
           Logger.error(errorMessage, traceId);
           return deleteResult;
