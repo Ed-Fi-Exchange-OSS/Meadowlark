@@ -1,32 +1,33 @@
+import path from 'path';
+import dotenv from 'dotenv';
 import request from 'supertest';
+
+dotenv.config({path: path.join(__dirname, "./.env")});
 
 let token: string;
 let educationContentLocation: string;
 let contentClassDescriptor: string;
 
-const req = request("http://localhost:3000");
+const rootURL = request(process.env.ROOT_URL);
+const baseURL = request(process.env.BASE_URL);
 
 describe('Create education content', () => {
 
   beforeAll(async () => {
-    const clientId = "meadowlark_key_1";
-    const clientSecret = "meadowlark_secret_1";
-
-    const response = await req
-      .post('/local/api/oauth/token')
+    const response = await baseURL
+      .post('/api/oauth/token')
       .send({
         "grant_type": "client_credentials",
-        "client_id": clientId,
-        "client_secret": clientSecret
+        "client_id": process.env.CLIENT_ID,
+        "client_secret": process.env.CLIENT_SECRET
       });
 
     token = response.body.access_token;
-
   });
 
   beforeEach(async () => {
-    const response = await req
-      .post(`/local/v3.3b/ed-fi/contentClassDescriptors`)
+    const response = await baseURL
+      .post(`/v3.3b/ed-fi/contentClassDescriptors`)
       .set("Authorization", `Bearer ${token}`)
       .send({
         "codeValue": "Presentation",
@@ -42,7 +43,7 @@ describe('Create education content', () => {
       throw "Location not found";
     }
 
-    const locatorByDescriptor = await req
+    const locatorByDescriptor = await rootURL
       .get(contentClassLocation)
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
@@ -52,8 +53,8 @@ describe('Create education content', () => {
 
   it('should create an education content', async () => {
 
-    const educationContent = await req
-      .post('/local/v3.3b/ed-fi/educationContents')
+    const educationContent = await baseURL
+      .post('/v3.3b/ed-fi/educationContents')
       .set("Authorization", `Bearer ${token}`)
       .send({
         "contentIdentifier": `1fae${Math.floor(Math.random() * 100)}`,
@@ -70,17 +71,16 @@ describe('Create education content', () => {
       throw "Location not found";
     }
 
-    req.get(educationContentLocation).set("Authorization", `Bearer ${token}`).expect(200);
+    rootURL.get(educationContentLocation).set("Authorization", `Bearer ${token}`).expect(200);
   })
 
   afterAll(async () => {
     await deleteByLocation(educationContentLocation);
   });
-
 });
 
 async function deleteByLocation(location: string) {
-  await req.delete(location)
+  await rootURL.delete(location)
     .set("Authorization", `Bearer ${token}`)
     .expect(204);
 }
