@@ -44,6 +44,11 @@ export async function rejectByOwnershipSecurity(
   try {
     const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
 
+    if (result.rows == null) {
+      Logger.error(`${functionName} - Unknown Error determining access`, frontendRequest.traceId);
+      return 'UNKNOWN_FAILURE';
+    }
+
     if (result.rowCount === 0) {
       Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
@@ -57,6 +62,7 @@ export async function rejectByOwnershipSecurity(
     Logger.debug(`${functionName} - access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
     return 'ACCESS_DENIED';
   } catch (e) {
+    Logger.error(`${functionName} - Error determining access`, frontendRequest.traceId, e);
     return 'UNKNOWN_FAILURE';
   }
 }

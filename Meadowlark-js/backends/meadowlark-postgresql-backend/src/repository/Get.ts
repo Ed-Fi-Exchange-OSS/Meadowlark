@@ -4,12 +4,24 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { PoolClient, QueryResult } from 'pg';
-import { GetResult, GetRequest } from '@edfi/meadowlark-core';
+import { GetResult, GetRequest, Logger } from '@edfi/meadowlark-core';
 import { findDocumentByIdSql } from './SqlHelper';
 
-export async function getDocumentById({ id }: GetRequest, client: PoolClient): Promise<GetResult> {
+export async function getDocumentById({ id, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {
   try {
     const queryResult: QueryResult = await client.query(findDocumentByIdSql(id));
+
+    // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
+    if (queryResult.rows == null) {
+      const errorMessage = `Could not retrieve document ${id}
+      a null result set was returned, indicating system failure`;
+      Logger.error(errorMessage, traceId);
+      return {
+        response: 'UNKNOWN_FAILURE',
+        document: {},
+        failureMessage: errorMessage,
+      };
+    }
 
     if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 
@@ -19,6 +31,7 @@ export async function getDocumentById({ id }: GetRequest, client: PoolClient): P
     };
     return response;
   } catch (e) {
+    Logger.error(`postgresql.repository.Get.getDocumentById - Error retrieving document ${id}`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', document: [] };
   }
 }

@@ -21,6 +21,17 @@ async function findReferencedDocumentIdsById(referenceIds: string[], client: Poo
   }
 
   const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds));
+
+  if (referenceExistenceResult.rows == null) {
+    Logger.error(
+      'postgresql.repository.referencevalidation.findReferencedDocumentIdsById: Database error parsing references',
+      null,
+    );
+    throw new Error(
+      'postgresql.repository.referencevalidation.findReferencedDocumentIdsById: Database error parsing references',
+    );
+  }
+
   return referenceExistenceResult.rows.map((val) => val.alias_id);
 }
 
