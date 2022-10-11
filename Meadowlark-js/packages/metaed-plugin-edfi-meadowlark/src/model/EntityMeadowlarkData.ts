@@ -21,6 +21,10 @@ export type EntityMeadowlarkData = {
    * Properties that belong under this entity in the API body
    */
   collectedProperties: CollectedProperty[];
+  /**
+   * The entity contains a schoolYears somewhere in its schema.
+   */
+  hasSchoolYear: boolean;
 };
 
 /**
@@ -33,6 +37,7 @@ export function addEntityMeadowlarkDataTo(entity: ModelBase) {
     apiMapping: NoApiEntityMapping,
     jsonSchema: NoSchemaRoot,
     collectedProperties: [],
+    hasSchoolYear: false,
   });
 }
 

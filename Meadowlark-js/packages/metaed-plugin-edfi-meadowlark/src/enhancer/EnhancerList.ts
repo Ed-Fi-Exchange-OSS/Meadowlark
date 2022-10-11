@@ -14,6 +14,7 @@ import { enhance as subclassApiEntityMappingEnhancer } from './SubclassApiEntity
 import { enhance as propertyCollectingEnhancer } from './PropertyCollectingEnhancer';
 import { enhance as subclassPropertyCollectingEnhancer } from './SubclassPropertyCollectingEnhancer';
 import { enhance as jsonSchemaEnhancer } from './JsonSchemaEnhancer';
+import { enhance as hasSchoolYearEnhancer } from './HasSchoolYearEnhancer';
 
 export function enhancerList(): Enhancer[] {
   return [
@@ -24,6 +25,7 @@ export function enhancerList(): Enhancer[] {
     apiPropertyMappingEnhancer,
     propertyCollectingEnhancer,
     subclassPropertyCollectingEnhancer,
+    hasSchoolYearEnhancer,
     apiEntityMappingEnhancer,
     subclassApiEntityMappingEnhancer,
     jsonSchemaEnhancer,

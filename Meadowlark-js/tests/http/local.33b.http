@@ -310,7 +310,7 @@ authorization: bearer {{authToken1}}
   "namespace": "uri://ed-fi.org/TermDescriptor"
 }
 
-### Create a Session
+### Create a Session with year 2022 - should be accepted if env var has 2022
 POST http://localhost:3000/local/v3.3b/ed-fi/sessions
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -319,7 +319,47 @@ descriptor-validation: true
 {
   "sessionName": "d",
   "schoolYearTypeReference": {
-    "schoolYear": 2034
+    "schoolYear": 2022
+  },
+  "beginDate": "2021-01-01",
+  "endDate": "2021-06-01",
+  "termDescriptor": "uri://ed-fi.org/TermDescriptor#Spring Semester",
+  "totalInstructionalDays": 90,
+  "schoolReference": {
+    "schoolId": 123
+  }
+}
+
+### Create a Session with negative school year - expect 400
+POST http://localhost:3000/local/v3.3b/ed-fi/sessions
+content-type: application/json
+authorization: bearer {{authToken1}}
+descriptor-validation: true
+
+{
+  "sessionName": "d",
+  "schoolYearTypeReference": {
+    "schoolYear": -1
+  },
+  "beginDate": "2021-01-01",
+  "endDate": "2021-06-01",
+  "termDescriptor": "uri://ed-fi.org/TermDescriptor#Spring Semester",
+  "totalInstructionalDays": 90,
+  "schoolReference": {
+    "schoolId": 123
+  }
+}
+
+### Create a Session with school year not in allowed list - expect 400
+POST http://localhost:3000/local/v3.3b/ed-fi/sessions
+content-type: application/json
+authorization: bearer {{authToken1}}
+descriptor-validation: true
+
+{
+  "sessionName": "d",
+  "schoolYearTypeReference": {
+    "schoolYear": 1901
   },
   "beginDate": "2021-01-01",
   "endDate": "2021-06-01",

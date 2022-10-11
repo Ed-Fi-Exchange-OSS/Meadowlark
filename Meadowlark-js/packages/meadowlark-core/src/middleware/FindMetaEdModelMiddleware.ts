@@ -12,7 +12,7 @@ const moduleName = 'FindMetaEdModelMiddleware';
 /**
  * Finds the matching MetaEd model from the path components
  */
-export async function metaeEdModelFinding({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
+export async function metaEdModelFinding({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'metaeEdModelFinding');
