@@ -1,9 +1,14 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
 import {baseURLRequest, rootURLRequest, generateRandomId, getAccessToken} from './SharedFunctions';
 
-let educationContentLocation: string;
-let contentClassDescriptor: string;
-
 describe('Create education content', () => {
+
+  let educationContentLocation: string;
+  let contentClassDescriptor: string;
 
   beforeEach(async () => {
     const contentClassDescriptorLocation = await baseURLRequest
@@ -49,25 +54,18 @@ describe('Create education content', () => {
         return response.headers[ 'location' ];
       });
 
-    rootURLRequest
+    await rootURLRequest
       .get(educationContentLocation)
       .auth(await getAccessToken(), {type: 'bearer'})
-      .expect(200)
-      .end((error, _) => {
-        if (error) {
-          console.error(error);
-        }
-      });
+      .expect(200);
   })
 
   afterAll(async () => {
-    rootURLRequest.delete(educationContentLocation)
-      .auth(await getAccessToken(), {type: 'bearer'})
-      .expect(204)
-      .end((error, _) => {
-        if (error) {
-          console.error(error);
-        }
-      });
+    if (educationContentLocation) {
+      await rootURLRequest
+        .delete(educationContentLocation)
+        .auth(await getAccessToken(), {type: 'bearer'})
+        .expect(204);
+    }
   });
 });
