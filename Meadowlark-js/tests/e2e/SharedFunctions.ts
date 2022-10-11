@@ -48,8 +48,6 @@ export async function getAccessToken(client = "client1"): Promise<string> {
 
   let token: string = accessTokens.find(t => t.client === client)?.token ?? "";
   if (!token) {
-    console.log("No token. Generating");
-
     token = await baseURLRequest
       .post('/api/oauth/token')
       .send({
