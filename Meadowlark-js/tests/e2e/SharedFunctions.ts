@@ -5,28 +5,66 @@
 import path from 'path';
 import dotenv from 'dotenv';
 import request from "supertest";
+import Chance from "chance";
 
+// Setup
+const chance = new Chance() as Chance.Chance;
 dotenv.config({path: path.join(__dirname, "./.env")});
+
+interface Credentials {
+  key: string | undefined;
+  secret: string | undefined;
+}
 
 export const baseURLRequest = request(process.env.BASE_URL);
 export const rootURLRequest = request(process.env.ROOT_URL);
 
-export let accessToken: string;
+export let accessTokens: Array<{client: string; token: string;}> = [];
 
-beforeAll(async () => {
-  accessToken = await getAccessToken();
-});
+function getCredentials(client: string) {
+  let credentials: Credentials;
+  switch (client) {
+    case "client4":
+      credentials = {
+        key: process.env.CLIENT_KEY_4,
+        secret: process.env.CLIENT_SECRET_4
+      }
+      break;
 
-async function getAccessToken(): Promise<string> {
-  if (!accessToken) {
-    accessToken = await baseURLRequest
+    case "client1":
+    default:
+      credentials = {
+        key: process.env.CLIENT_KEY_1,
+        secret: process.env.CLIENT_SECRET_1
+      }
+      break;
+  }
+
+  return credentials;
+}
+
+export async function getAccessToken(client = "client1"): Promise<string> {
+  let credentials = getCredentials(client);
+
+  let token: string = accessTokens.find(t => t.client === client)?.token ?? "";
+  if (!token) {
+    console.log("No token. Generating");
+
+    token = await baseURLRequest
       .post('/api/oauth/token')
       .send({
         "grant_type": "client_credentials",
-        "client_id": process.env.CLIENT_ID,
-        "client_secret": process.env.CLIENT_SECRET
+        "client_id": credentials.key,
+        "client_secret": credentials.secret
       })
       .then(response => response.body.access_token);
+
+    accessTokens.push({client, token});
   }
-  return accessToken;
+
+  return token;
+}
+
+export function generateRandomId(length = 12): string {
+  return chance.hash({length});
 }

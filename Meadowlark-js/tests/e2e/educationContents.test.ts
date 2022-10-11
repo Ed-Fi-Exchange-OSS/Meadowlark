@@ -1,4 +1,4 @@
-import {baseURLRequest, accessToken, rootURLRequest} from './SharedFunctions';
+import {baseURLRequest, rootURLRequest, generateRandomId, getAccessToken} from './SharedFunctions';
 
 let educationContentLocation: string;
 let contentClassDescriptor: string;
@@ -8,7 +8,7 @@ describe('Create education content', () => {
   beforeEach(async () => {
     const contentClassDescriptorLocation = await baseURLRequest
       .post(`/v3.3b/ed-fi/contentClassDescriptors`)
-      .auth(accessToken, {type: 'bearer'})
+      .auth(await getAccessToken(), {type: 'bearer'})
       .send({
         "codeValue": "Presentation",
         "shortDescription": "Presentation",
@@ -23,7 +23,7 @@ describe('Create education content', () => {
 
     contentClassDescriptor = await rootURLRequest
       .get(contentClassDescriptorLocation)
-      .auth(accessToken, {type: 'bearer'})
+      .auth(await getAccessToken(), {type: 'bearer'})
       .expect(200)
       .then(response => {
         expect(response.body).not.toBe(null);
@@ -35,9 +35,9 @@ describe('Create education content', () => {
 
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
-      .auth(accessToken, {type: 'bearer'})
+      .auth(await getAccessToken(), {type: 'bearer'})
       .send({
-        "contentIdentifier": `1fae${Math.floor(Math.random() * 100)}`,
+        "contentIdentifier": generateRandomId(),
         "namespace": "43210",
         "shortDescription": "ShortDesc",
         "contentClassDescriptor": contentClassDescriptor,
@@ -51,7 +51,7 @@ describe('Create education content', () => {
 
     rootURLRequest
       .get(educationContentLocation)
-      .auth(accessToken, {type: 'bearer'})
+      .auth(await getAccessToken(), {type: 'bearer'})
       .expect(200)
       .end((error, _) => {
         if (error) {
@@ -60,9 +60,9 @@ describe('Create education content', () => {
       });
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     rootURLRequest.delete(educationContentLocation)
-      .auth(accessToken, {type: 'bearer'})
+      .auth(await getAccessToken(), {type: 'bearer'})
       .expect(204)
       .end((error, _) => {
         if (error) {
