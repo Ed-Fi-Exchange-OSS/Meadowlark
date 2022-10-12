@@ -24,14 +24,12 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
     (entity: ModelBase) => {
       const meadowlarkEntity = entity.data.meadowlark as EntityMeadowlarkData;
 
-      const hasSchoolYearEnumeration = (property: EntityProperty) => property.type === 'schoolYearEnumeration';
+      const hasSchoolYearEnumeration = (property: EntityProperty) =>
+        property.type === 'schoolYearEnumeration' ||
+        (property as ReferentialProperty)?.referencedEntity?.properties?.some(hasSchoolYearEnumeration);
 
-      meadowlarkEntity.hasSchoolYear = meadowlarkEntity.collectedProperties.some(
-        (collectedProperty: CollectedProperty) =>
-          hasSchoolYearEnumeration(collectedProperty.property) ||
-          // Look for any commons that contain a SchoolYear Enumeration
-          (collectedProperty.property.type === 'common' &&
-            (collectedProperty.property as ReferentialProperty).referencedEntity.properties.some(hasSchoolYearEnumeration)),
+      meadowlarkEntity.hasSchoolYear = meadowlarkEntity.collectedProperties.some((collectedProperty: CollectedProperty) =>
+        hasSchoolYearEnumeration(collectedProperty.property),
       );
     },
   );

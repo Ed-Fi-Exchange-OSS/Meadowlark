@@ -23,6 +23,7 @@ import {
   associationReferenceEnhancer,
   associationSubclassBaseClassEnhancer,
   commonReferenceEnhancer,
+  inlineCommonReferenceEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer, EntityMeadowlarkData } from '../../src/model/EntityMeadowlarkData';
@@ -451,6 +452,120 @@ describe('given a domain entity using a common with school year', () => {
 
     domainEntityReferenceEnhancer(metaEd);
     commonReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+
+    propertyCollectingEnhancer(metaEd);
+
+    enhancerResult = enhance(metaEd);
+  });
+
+  it('returns successful', () => {
+    expect(enhancerResult.success).toBeTruthy();
+  });
+
+  it('sets hasSchoolYear to true', () => {
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get('DomainEntityWithSchoolYear');
+    expect(entity).not.toBeUndefined();
+
+    const meadowlarkEntity = entity?.data.meadowlark as EntityMeadowlarkData;
+    expect(meadowlarkEntity.hasSchoolYear).toBeTruthy();
+  });
+});
+
+describe('given a domain entity using a common with an inline common that contains a school year', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+  let enhancerResult: EnhancerResult;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+
+      .withStartInlineCommon('InlineCommonSchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationIdentity('SchoolYear', '')
+
+      .withStartCommon('CommonSchoolYear')
+      .withDocumentation('doc')
+      .withInlineCommonProperty('InlineCommonSchoolYear', '', false, false)
+      .withEndCommon()
+
+      .withStartDomainEntity('DomainEntityWithSchoolYear')
+      .withDocumentation('doc')
+      .withStringIdentity('DomainEntityWithSchoolYearIdentifier', 'doc', '30')
+      .withCommonProperty('CommonSchoolYear', '', false, false)
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+    inlineCommonReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+
+    propertyCollectingEnhancer(metaEd);
+
+    enhancerResult = enhance(metaEd);
+  });
+
+  it('returns successful', () => {
+    expect(enhancerResult.success).toBeTruthy();
+  });
+
+  it('sets hasSchoolYear to true', () => {
+    const entity = metaEd.namespace.get(namespace)?.entity.domainEntity.get('DomainEntityWithSchoolYear');
+    expect(entity).not.toBeUndefined();
+
+    const meadowlarkEntity = entity?.data.meadowlark as EntityMeadowlarkData;
+    expect(meadowlarkEntity.hasSchoolYear).toBeTruthy();
+  });
+});
+
+describe('given a domain entity using a common with a common with an inline common that contains a school year', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespace = 'EdFi';
+  let enhancerResult: EnhancerResult;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespace)
+
+      .withStartInlineCommon('InlineCommonSchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationIdentity('SchoolYear', '')
+
+      .withStartCommon('InnerCommonSchoolYear')
+      .withDocumentation('doc')
+      .withInlineCommonProperty('InlineCommonSchoolYear', '', false, false)
+
+      .withStartCommon('OuterCommonSchoolYear')
+      .withDocumentation('doc')
+      .withCommonProperty('InnerCommonSchoolYear', '', false, false)
+      .withEndCommon()
+
+      .withStartDomainEntity('DomainEntityWithSchoolYear')
+      .withDocumentation('doc')
+      .withStringIdentity('DomainEntityWithSchoolYearIdentifier', 'doc', '30')
+      .withCommonProperty('OuterCommonSchoolYear', '', false, false)
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+    inlineCommonReferenceEnhancer(metaEd);
+
     entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
     entityMeadowlarkDataSetupEnhancer(metaEd);
 
