@@ -49,11 +49,11 @@
     "test:lint:ts": "tsc -p . --noEmit",
     "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest --testPathIgnorePatterns=\"system|integration|e2e\"",
     "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration --runInBand",
+    "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest e2e",
     "test:system": "yarn test:system:mongodb && yarn test:system:postgresql",
     "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend LOG_LEVEL=warn yarn jest system --runInBand",
     "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend LOG_LEVEL=warn yarn jest system --runInBand",
     "test:unit:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
-    "test:e2e": "yarn jest e2e",
     "prepare": "cd .. && husky install"
   },
   "husky": {
