@@ -184,7 +184,7 @@ content-type: application/json
       "sectionReference": {
         "localCourseCode": "string",
         "schoolId": 0,
-        "schoolYear": 2000,
+        "schoolYear": 2022,
         "sectionIdentifier": "string",
         "sessionName": "string"
       }
@@ -270,21 +270,21 @@ content-type: application/json
   "calendarReference": {
     "calendarCode": "string",
     "schoolId": 0,
-    "schoolYear": 2000
+    "schoolYear": 2022
   },
   "classOfSchoolYearTypeReference": {
-    "schoolYear": 2000
+    "schoolYear": 2022
   },
   "graduationPlanReference": {
     "educationOrganizationId": 0,
     "graduationPlanTypeDescriptor": "string",
-    "graduationSchoolYear": 2000
+    "graduationSchoolYear": 2022
   },
   "schoolReference": {
     "schoolId": 0
   },
   "schoolYearTypeReference": {
-    "schoolYear": 2000
+    "schoolYear": 2022
   },
   "studentReference": {
     "studentUniqueId": "string"
@@ -294,7 +294,7 @@ content-type: application/json
       "alternativeGraduationPlanReference": {
         "educationOrganizationId": 0,
         "graduationPlanTypeDescriptor": "string",
-        "graduationSchoolYear": 2000
+        "graduationSchoolYear": 2022
       }
     }
   ],
@@ -315,16 +315,4 @@ content-type: application/json
   "residencyStatusDescriptor": "string",
   "schoolChoiceTransfer": true,
   "termCompletionIndicator": true
-}
-
-### Demonstrate problem with school year resource
-# reference-validation: true
-POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
-{{auth_header}}
-content-type: application/json
-
-{
-  "schoolYear": 2100,
-  "currentSchoolYear": true,
-  "schoolYearDescription": "string"
 }

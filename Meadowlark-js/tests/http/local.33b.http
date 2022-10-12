@@ -219,7 +219,7 @@ authorization: bearer {{authToken4}}
         "localCourseCode": "abc",
         "schoolId": 666,
         "sessionName": "d",
-        "schoolYear": 2034
+        "schoolYear": 2022
     },
     "locationReference": {
       "classroomIdentificationCode": "1",
@@ -391,17 +391,6 @@ authorization: bearer {{authToken1}}
     ]
 }
 
-### Create a school year
-# reference-validation: true
-POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
-content-type: application/json
-authorization: bearer {{authToken1}}
-
-{
-  "schoolYear": 2034,
-  "currentSchoolYear": false
-}
-
 
 ### Create a courseOffering
 # reference-validation: true
@@ -418,7 +407,7 @@ authorization: bearer {{authToken1}}
   "sessionReference": {
     "sessionName": "d",
     "schoolId": 123,
-    "schoolYear": 2034
+    "schoolYear": 2022
   },
   "courseReference": {
     "courseCode": "span-101",
@@ -437,7 +426,7 @@ authorization: bearer {{authToken1}}
     "courseOfferingReference": {
       "localCourseCode": "abfdddcde",
       "schoolId": 123,
-      "schoolYear": 2034,
+      "schoolYear": 2022,
       "sessionName": "d"
     },
     "locationReference": {

@@ -40,7 +40,7 @@ content-type: application/json
     "educationOrganizationId": 123
   },
   "graduationSchoolYearTypeReference": {
-    "schoolYear": 2035
+    "schoolYear": 2022
   },
   "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Recommended",
   "totalRequiredCredits": 28
