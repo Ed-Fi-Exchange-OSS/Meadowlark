@@ -13,6 +13,7 @@ import {
   securityMiddleware,
   createAuthorizationClientDocument,
   updateAuthorizationClientDocument,
+  updateAuthorizationClientSecret,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -29,6 +30,7 @@ export function initializeAuthorizationStore(): AuthorizationStorePlugin {
   return {
     createAuthorizationClient: createAuthorizationClientDocument,
     updateAuthorizationClient: updateAuthorizationClientDocument,
+    updateAuthorizationClientSecret,
   };
 }
 

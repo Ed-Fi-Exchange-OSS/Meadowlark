@@ -7,8 +7,11 @@ import { CreateAuthorizationClientRequest } from '../message/CreateAuthorization
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
+import { UpdateAuthorizationClientSecretResult } from '../message/UpdateAuthorizationClientSecretResult';
+import { UpdateAuthorizationClientSecretRequest } from '../message/UpdateClientSecretRequest';
 
 export interface AuthorizationStorePlugin {
   createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
   updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
+  updateAuthorizationClientSecret: (request: UpdateAuthorizationClientSecretRequest) => Promise<UpdateAuthorizationClientSecretResult>;
 }

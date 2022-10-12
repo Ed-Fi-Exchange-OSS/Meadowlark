@@ -8,6 +8,8 @@ import { CreateAuthorizationClientRequest } from '../message/CreateAuthorization
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
+import { UpdateAuthorizationClientSecretResult } from '../message/UpdateAuthorizationClientSecretResult';
+import { UpdateAuthorizationClientSecretRequest } from '../message/UpdateClientSecretRequest';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
@@ -24,6 +26,12 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
       'NoAuthorizationStorePlugin.updateAuthorizationClient(): No authorization store plugin has been configured',
       null,
     );
+    return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+  },
+  updateAuthorizationClientSecret: async (
+    _request: UpdateAuthorizationClientSecretRequest,
+  ): Promise<UpdateAuthorizationClientSecretResult> => {
+    Logger.warn('NoAuthorizationStorePlugin.updateClientSecret(): No authorization store plugin has been configured', null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 };
