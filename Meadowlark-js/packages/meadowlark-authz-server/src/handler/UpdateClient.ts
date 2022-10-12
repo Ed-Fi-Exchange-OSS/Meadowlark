@@ -13,20 +13,9 @@ import { AuthorizationResponse } from './AuthorizationResponse';
 import { validateUpdateClientBody } from '../validation/ValidateClientBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { BodyValidation } from '../validation/BodyValidation';
+import { clientIdFrom } from '../Utility';
 
 const moduleName = 'handler.UpdateClient';
-
-function clientIdFrom(path: string): string {
-  // Assumes client id is at the 3rd position:
-  // /oauth/client/11111111-1111-1111-1111111111111111
-  const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*$))?/gm;
-  const match = pathExpression.exec(path);
-
-  if (match?.groups == null) return '';
-
-  const { clientId } = match.groups ?? '';
-  return clientId;
-}
 
 /**
  * Handler for client update

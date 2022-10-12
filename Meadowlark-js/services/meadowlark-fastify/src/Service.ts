@@ -126,6 +126,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
     // Authorization server handlers
+    fastify.post(`/${stage}/oauth/client/:clientId/reset`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
     fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);
