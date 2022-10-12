@@ -22,6 +22,7 @@ export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
     'common',
   ).forEach((entity: ModelBase) => {
     const meadowlarkEntity = entity.data.meadowlark as EntityMeadowlarkData;
+
     meadowlarkEntity.hasSchoolYear = meadowlarkEntity.collectedProperties.some(
       (property: CollectedProperty) => property.property.type === 'schoolYearEnumeration',
     );
