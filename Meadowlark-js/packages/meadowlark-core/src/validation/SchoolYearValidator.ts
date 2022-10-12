@@ -36,7 +36,7 @@ export function getAllowedSchoolYears(): number[] {
  *
  * Validates the request body for the resource. If invalid, returns an error message.
  */
-export function validateDocument(body: SchoolYearReferenceDocument): string {
+export function validateDocument(body: object): string {
   const { schoolYear } = (body as SchoolYearReferenceDocument).schoolYearTypeReference as SchoolYearEnumerationDocument;
 
   const isAllowedYear = getAllowedSchoolYears().some((y: number) => y === schoolYear);

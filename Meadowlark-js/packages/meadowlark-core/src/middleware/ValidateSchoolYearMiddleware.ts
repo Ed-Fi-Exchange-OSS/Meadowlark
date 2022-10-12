@@ -25,10 +25,7 @@ export async function schoolYearValidation({
     .meadowlark as EntityMeadowlarkData;
 
   if (meadowlarkEntity.hasSchoolYear) {
-    const errorBody = validateDocument(
-      frontendRequest.middleware.parsedBody,
-      frontendRequest.middleware.matchingMetaEdModel,
-    );
+    const errorBody = validateDocument(frontendRequest.middleware.parsedBody);
 
     if (errorBody !== '') {
       const statusCode = 400;
