@@ -391,6 +391,15 @@ authorization: bearer {{authToken1}}
     ]
 }
 
+### School Year Types is no longer supported - expect 404
+POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+  "schoolYear": 2034,
+  "currentSchoolYear": false
+}
 
 ### Create a courseOffering
 # reference-validation: true

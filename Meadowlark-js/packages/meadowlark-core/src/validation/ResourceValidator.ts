@@ -38,6 +38,20 @@ export type ResourceValidationResult = {
 export async function validateResource(pathComponents: PathComponents): Promise<ResourceValidationResult> {
   // Equally supporting resources with either upper or lower case names
   const lowerResourceName = decapitalize(pathComponents.resourceName);
+
+  // Manually exclude schoolYearTypes as a valid endpoint
+  if (lowerResourceName === 'schoolYearTypes') {
+    const invalidResourceMessage = 'This Ed-Fi API instance does not support managing schoolYearType as a resource.';
+    return {
+      headerMetadata: {},
+      resourceName: pathComponents.resourceName,
+      resourceInfo: NoResourceInfo,
+      errorBody: JSON.stringify({
+        message: invalidResourceMessage,
+      }),
+    };
+  }
+
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 
