@@ -3,7 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, generateRandomId, getAccessToken, rootURLRequest } from './SharedFunctions';
+import {
+  baseURLRequest,
+  createCountry,
+  deleteByLocation,
+  generateRandomId,
+  getAccessToken,
+  getDescriptorByLocation,
+  rootURLRequest,
+} from './SharedFunctions';
 
 describe('Students', () => {
   describe('with strict validation', () => {
@@ -12,35 +20,14 @@ describe('Students', () => {
     let studentLocation: string;
 
     beforeAll(async () => {
-      countryLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/countryDescriptors')
-        .auth(await getAccessToken(), { type: 'bearer' })
-        .send({
-          codeValue: 'US',
-          shortDescription: 'US',
-          description: 'US',
-          namespace: 'uri://ed-fi.org/CountryDescriptor',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
-
-      countryDescriptor = await rootURLRequest
-        .get(countryLocation)
-        .auth(await getAccessToken(), { type: 'bearer' })
-        .expect(200)
-        .then((response) => {
-          expect(response.body).not.toBe(null);
-          return `${response.body.namespace}#${response.body.description}`;
-        });
+      countryLocation = await createCountry();
+      countryDescriptor = await getDescriptorByLocation(countryLocation);
     });
 
     it('should fail with invalid country descriptor', async () => {
       await baseURLRequest
         .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(), { type: 'bearer' })
+        .auth(await getAccessToken('client1'), { type: 'bearer' })
         .send({
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -57,7 +44,7 @@ describe('Students', () => {
     it('should allow valid country descriptor', async () => {
       studentLocation = await baseURLRequest
         .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(), { type: 'bearer' })
+        .auth(await getAccessToken('client1'), { type: 'bearer' })
         .send({
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -73,23 +60,17 @@ describe('Students', () => {
 
       await rootURLRequest
         .get(studentLocation)
-        .auth(await getAccessToken(), { type: 'bearer' })
+        .auth(await getAccessToken('client1'), { type: 'bearer' })
         .expect(200);
     });
 
     afterAll(async () => {
       if (studentLocation) {
-        await rootURLRequest
-          .delete(studentLocation)
-          .auth(await getAccessToken(), { type: 'bearer' })
-          .expect(204);
+        await deleteByLocation(studentLocation);
       }
 
       if (countryLocation) {
-        await rootURLRequest
-          .delete(countryLocation)
-          .auth(await getAccessToken(), { type: 'bearer' })
-          .expect(204);
+        await deleteByLocation(countryLocation);
       }
     });
   });
@@ -123,10 +104,7 @@ describe('Students', () => {
 
     afterAll(async () => {
       if (studentLocation) {
-        await rootURLRequest
-          .delete(studentLocation)
-          .auth(await getAccessToken(client), { type: 'bearer' })
-          .expect(204);
+        await deleteByLocation(studentLocation, client);
       }
     });
   });

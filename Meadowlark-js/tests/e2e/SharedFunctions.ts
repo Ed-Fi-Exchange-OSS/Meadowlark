@@ -21,7 +21,8 @@ export const rootURLRequest = request(process.env.ROOT_URL);
 
 export const accessTokens: Array<{ client: string; token: string }> = [];
 
-function getCredentials(client: string) {
+// TBD: Find a better way to handle credentials. This will change with RND-93
+function getCredentials(client: string): Credentials {
   let credentials: Credentials;
   switch (client) {
     case 'client4':
@@ -30,20 +31,26 @@ function getCredentials(client: string) {
         secret: process.env.CLIENT_SECRET_4,
       };
       break;
-
+    case 'admin1':
+      credentials = {
+        key: process.env.ADMIN_KEY_1,
+        secret: process.env.ADMIN_SECRET_1,
+      };
+      break;
     case 'client1':
-    default:
       credentials = {
         key: process.env.CLIENT_KEY_1,
         secret: process.env.CLIENT_SECRET_1,
       };
       break;
+    default:
+      throw new Error('Specify desired client');
   }
 
   return credentials;
 }
 
-export async function getAccessToken(client = 'client1'): Promise<string> {
+export async function getAccessToken(client: string): Promise<string> {
   const credentials = getCredentials(client);
 
   let token: string = accessTokens.find((t) => t.client === client)?.token ?? '';
@@ -66,3 +73,58 @@ export async function getAccessToken(client = 'client1'): Promise<string> {
 export function generateRandomId(length = 12): string {
   return chance.hash({ length });
 }
+
+/* TEMPORAL LOCATION */
+export async function createContentClassDescriptor(): Promise<string> {
+  return baseURLRequest
+    .post(`/v3.3b/ed-fi/contentClassDescriptors`)
+    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .send({
+      codeValue: 'Presentation',
+      shortDescription: 'Presentation',
+      description: 'Presentation',
+      namespace: 'uri://ed-fi.org/ContentClassDescriptor',
+    })
+    .expect(200)
+    .then((response) => {
+      expect(response.headers.location).not.toBe(null);
+      return response.headers.location;
+    });
+}
+
+export async function createCountry(): Promise<string> {
+  return baseURLRequest
+    .post('/v3.3b/ed-fi/countryDescriptors')
+    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .send({
+      codeValue: 'US',
+      shortDescription: 'US',
+      description: 'US',
+      namespace: 'uri://ed-fi.org/CountryDescriptor',
+    })
+    .expect(201)
+    .then((response) => {
+      expect(response.headers.location).not.toBe(null);
+      return response.headers.location;
+    });
+}
+
+export async function getDescriptorByLocation(location: string): Promise<string> {
+  return rootURLRequest
+    .get(location)
+    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .expect(200)
+    .then((response) => {
+      expect(response.body).not.toBe(null);
+      return `${response.body.namespace}#${response.body.description}`;
+    });
+}
+
+export async function deleteByLocation(location: string, client = 'client1'): Promise<void> {
+  // Should be admin
+  await rootURLRequest
+    .delete(location)
+    .auth(await getAccessToken(client), { type: 'bearer' })
+    .expect(204);
+}
+/* TEMPORAL LOCATION */
