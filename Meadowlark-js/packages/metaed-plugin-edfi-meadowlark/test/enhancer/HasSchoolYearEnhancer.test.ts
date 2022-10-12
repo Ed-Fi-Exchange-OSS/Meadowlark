@@ -6,8 +6,6 @@
 import {
   AssociationBuilder,
   AssociationSubclassBuilder,
-  AssociationExtensionBuilder,
-  CommonBuilder,
   DomainEntityBuilder,
   DomainEntitySubclassBuilder,
   EnhancerResult,
@@ -23,10 +21,6 @@ import {
   domainEntityExtensionBaseClassEnhancer,
   associationReferenceEnhancer,
   associationSubclassBaseClassEnhancer,
-  associationExtensionBaseClassEnhancer,
-  commonReferenceEnhancer,
-  commonSubclassBaseClassEnhancer,
-  commonExtensionBaseClassEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer, EntityMeadowlarkData } from '../../src/model/EntityMeadowlarkData';
@@ -57,20 +51,23 @@ describe('when detecting presence of a school year', () => {
 
       .withStartAssociation('AssociationWithSchoolYear')
       .withDocumentation('doc')
-      .withStringIdentity('ClassPeriodName', 'doc', '30')
-      .withEnumerationProperty('SchoolYear', 'doc', false, false)
       .withAssociationDomainEntityProperty('DomainEntityWithSchoolYear', '', null)
       .withAssociationDomainEntityProperty('DomainEntityWithoutSchoolYear', '', null)
+      .withStringIdentity('ClassPeriodName', 'doc', '30')
+      .withEnumerationProperty('SchoolYear', 'doc', false, false)
       .withEndAssociation()
 
       .withStartAssociation('AssociationWithoutSchoolYear')
       .withDocumentation('doc')
+      .withAssociationDomainEntityProperty('DomainEntityWithSchoolYear', '', null)
+      .withAssociationDomainEntityProperty('DomainEntityWithoutSchoolYear', '', null)
       .withStringIdentity('ClassPeriodName', 'doc', '30')
       .withEndAssociation()
 
-      .withStartDomainEntitySubclass('DomainEntitySubclassWithSchoolYear', 'DomainEntityWithSchoolYear')
+      .withStartDomainEntitySubclass('DomainEntitySubclassWithSchoolYear', 'DomainEntityWithoutSchoolYear')
       .withDocumentation('doc')
       .withStringIdentity('SchoolId', 'doc', '30')
+      .withEnumerationProperty('SchoolYear', 'doc', false, false)
       .withEndDomainEntitySubclass()
 
       .withStartDomainEntitySubclass('DomainEntitySubclassWithoutSchoolYear', 'DomainEntityWithoutSchoolYear')
@@ -78,11 +75,10 @@ describe('when detecting presence of a school year', () => {
       .withStringIdentity('SchoolId', 'doc', '30')
       .withEndDomainEntitySubclass()
 
-      .withStartAssociationSubclass('AssociationSubclassWithSchoolYear', 'AssociationWithSchoolYear')
+      .withStartAssociationSubclass('AssociationSubclassWithSchoolYear', 'AssociationWithoutSchoolYear')
       .withDocumentation('doc')
       .withStringIdentity('hello', 'doc', '30')
-      .withAssociationDomainEntityProperty('DomainEntityWithSchoolYear', '', null)
-      .withAssociationDomainEntityProperty('DomainEntityWithoutSchoolYear', '', null)
+      .withEnumerationProperty('SchoolYear', 'doc', false, false)
       .withEndAssociationSubclass()
 
       .withStartAssociationSubclass('AssociationSubclassWithoutSchoolYear', 'AssociationWithoutSchoolYear')
@@ -90,23 +86,13 @@ describe('when detecting presence of a school year', () => {
       .withStringIdentity('hello', 'doc', '30')
       .withEndAssociationSubclass()
 
-      .withStartCommon('CommonWithSchoolYear')
-      .withEnumerationProperty('SchoolYear', 'doc', false, false)
-      .withEndCommon()
-
-      .withStartCommon('CommonWithoutSchoolYear')
-      .withStringProperty('world', 'doc', false, false, '30')
-      .withEndCommon()
-
       .withEndNamespace()
 
       .sendToListener(new NamespaceBuilder(metaEd, []))
       .sendToListener(new DomainEntityBuilder(metaEd, []))
       .sendToListener(new DomainEntitySubclassBuilder(metaEd, []))
       .sendToListener(new AssociationBuilder(metaEd, []))
-      .sendToListener(new AssociationSubclassBuilder(metaEd, []))
-      .sendToListener(new AssociationExtensionBuilder(metaEd, []))
-      .sendToListener(new CommonBuilder(metaEd, []));
+      .sendToListener(new AssociationSubclassBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
     domainEntitySubclassBaseClassEnhancer(metaEd);
@@ -115,11 +101,6 @@ describe('when detecting presence of a school year', () => {
 
     associationReferenceEnhancer(metaEd);
     associationSubclassBaseClassEnhancer(metaEd);
-    associationExtensionBaseClassEnhancer(metaEd);
-
-    commonReferenceEnhancer(metaEd);
-    commonSubclassBaseClassEnhancer(metaEd);
-    commonExtensionBaseClassEnhancer(metaEd);
 
     entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
     entityMeadowlarkDataSetupEnhancer(metaEd);
@@ -192,22 +173,6 @@ describe('when detecting presence of a school year', () => {
 
   it('sets hasSchoolYear to false for a association subclass that does not have a school year', () => {
     const entity = metaEd.namespace.get(namespace)?.entity.associationSubclass.get('AssociationSubclassWithoutSchoolYear');
-    expect(entity).not.toBeUndefined();
-
-    const meadowlarkEntity = entity?.data.meadowlark as EntityMeadowlarkData;
-    expect(meadowlarkEntity.hasSchoolYear).toBeFalsy();
-  });
-
-  it('sets hasSchoolYear to true for a common that does have a school year', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.common.get('CommonWithSchoolYear');
-    expect(entity).not.toBeUndefined();
-
-    const meadowlarkEntity = entity?.data.meadowlark as EntityMeadowlarkData;
-    expect(meadowlarkEntity.hasSchoolYear).toBeTruthy();
-  });
-
-  it('sets hasSchoolYear to false for a common that does not have a school year', () => {
-    const entity = metaEd.namespace.get(namespace)?.entity.common.get('CommonWithoutSchoolYear');
     expect(entity).not.toBeUndefined();
 
     const meadowlarkEntity = entity?.data.meadowlark as EntityMeadowlarkData;

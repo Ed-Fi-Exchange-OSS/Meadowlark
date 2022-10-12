@@ -10,23 +10,18 @@ import { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 const enhancerName = 'HasSchoolYearEnhancer';
 
 /**
- * This enhancer  pre-determines if a given entity type contains a schoolYearEnumeration.
+ * This enhancer pre-determines if a given entity type contains a schoolYearEnumeration.
  */
 export function enhance(metaEd: MetaEdEnvironment): EnhancerResult {
-  getAllEntitiesOfType(
-    metaEd,
-    'domainEntity',
-    'association',
-    'domainEntitySubclass',
-    'associationSubclass',
-    'common',
-  ).forEach((entity: ModelBase) => {
-    const meadowlarkEntity = entity.data.meadowlark as EntityMeadowlarkData;
+  getAllEntitiesOfType(metaEd, 'domainEntity', 'association', 'domainEntitySubclass', 'associationSubclass').forEach(
+    (entity: ModelBase) => {
+      const meadowlarkEntity = entity.data.meadowlark as EntityMeadowlarkData;
 
-    meadowlarkEntity.hasSchoolYear = meadowlarkEntity.collectedProperties.some(
-      (property: CollectedProperty) => property.property.type === 'schoolYearEnumeration',
-    );
-  });
+      meadowlarkEntity.hasSchoolYear = meadowlarkEntity.collectedProperties.some(
+        (property: CollectedProperty) => property.property.type === 'schoolYearEnumeration',
+      );
+    },
+  );
 
   return {
     enhancerName,

@@ -22,7 +22,7 @@ export type EntityMeadowlarkData = {
    */
   collectedProperties: CollectedProperty[];
   /**
-   * The entity contains a schoolYears somewhere in its schema.
+   * The entity contains a schoolYear somewhere in its schema.
    */
   hasSchoolYear: boolean;
 };
