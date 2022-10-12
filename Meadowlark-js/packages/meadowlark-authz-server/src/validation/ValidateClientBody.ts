@@ -3,15 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import Ajv from 'ajv/dist/2020';
 import type { ValidateFunction } from 'ajv';
 import { betterAjvErrors } from '@apideck/better-ajv-errors';
+import { ajv } from './SharedAjv';
 import { createClientBodySchema } from '../model/CreateClientBody';
-
-// Ajv caches compiled schemas, so we'll cache it
-const ajv: Ajv = new Ajv({ allErrors: true });
-
-export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: string };
+import { BodyValidation } from './BodyValidation';
 
 const createClientBodyValidator: ValidateFunction = ajv.compile(createClientBodySchema);
 

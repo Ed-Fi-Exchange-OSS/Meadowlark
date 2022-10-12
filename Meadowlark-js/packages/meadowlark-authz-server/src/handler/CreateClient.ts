@@ -12,9 +12,11 @@ import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/Authorizat
 import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { BodyValidation, validateCreateClientBody } from '../validation/ValidateBody';
+import { validateCreateClientBody } from '../validation/ValidateClientBody';
 import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
+import { BodyValidation } from '../validation/BodyValidation';
+import { hashClientSecretBuffer } from '../security/HashClentSecret';
 
 const moduleName = 'handler.CreateClient';
 
@@ -62,8 +64,8 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     const createClientBody: CreateClientBody = parsedBody as CreateClientBody;
 
     const clientId: string = uuidv4();
-    const clientSecretBytes: Buffer = crypto.randomBytes(32);
-    const clientSecretHashed: string = crypto.createHash('shake256').update(clientSecretBytes).digest('hex');
+    const clientSecretBuffer: Buffer = crypto.randomBytes(32);
+    const clientSecretHashed: string = hashClientSecretBuffer(clientSecretBuffer);
 
     const createRequest: CreateAuthorizationClientRequest = {
       ...createClientBody,
@@ -81,7 +83,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     if (response === 'CREATE_SUCCESS') {
       const responseBody: CreateClientResponseBody = {
         client_id: clientId,
-        client_secret: clientSecretBytes.toString('hex'),
+        client_secret: clientSecretBuffer.toString('hex'),
         clientName: createRequest.clientName,
         roles: createRequest.roles,
       };

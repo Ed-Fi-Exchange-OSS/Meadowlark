@@ -5,11 +5,14 @@
 
 export { createClient } from './handler/CreateClient';
 export { updateClient } from './handler/UpdateClient';
+export { requestToken } from './handler/RequestToken';
 export { AuthorizationRequest, newAuthorizationRequest } from './handler/AuthorizationRequest';
 export { AuthorizationResponse } from './handler/AuthorizationResponse';
 export { AuthorizationStorePlugin } from './plugin/AuthorizationStorePlugin';
 export { CreateAuthorizationClientRequest } from './message/CreateAuthorizationClientRequest';
 export { CreateAuthorizationClientResult } from './message/CreateAuthorizationClientResult';
+export { GetAuthorizationClientRequest } from './message/GetAuthorizationClientRequest';
+export { GetAuthorizationClientResult } from './message/GetAuthorizationClientResult';
 export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';
 export { UpdateAuthorizationClientResult } from './message/UpdateAuthorizationClientResult';
 export { AuthorizationClientRole } from './model/AuthorizationClientRole';

@@ -10,8 +10,9 @@ import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/Authorizat
 import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { BodyValidation, validateUpdateClientBody } from '../validation/ValidateBody';
+import { validateUpdateClientBody } from '../validation/ValidateClientBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
+import { BodyValidation } from '../validation/BodyValidation';
 
 const moduleName = 'handler.UpdateClient';
 

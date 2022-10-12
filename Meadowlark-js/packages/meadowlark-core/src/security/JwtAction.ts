@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Jwt as nJwt, create, verify } from 'njwt';
+import { Jwt as nJwt, verify } from 'njwt';
 import memoize from 'fast-memoize';
 import { getValueFromEnvironment } from '../Environment';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
@@ -20,20 +20,6 @@ function signingKey(): Buffer {
   return Buffer.from(signingKeyEncoded, 'base64');
 }
 const cachedSigningKey = memoize(signingKey);
-
-const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles: [] as string[], client_id: '' };
-
-/*
- * Creates a standard Meadowlark Jwt.
- */
-export function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
-  claims.roles = roles;
-  claims.client_id = clientId;
-  const token: Jwt = create({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
-
-  token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
-  return token;
-}
 
 /**
  * Converts a Jwt object to a Meadowlark JwtStatus
