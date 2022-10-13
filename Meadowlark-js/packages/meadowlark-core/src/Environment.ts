@@ -6,9 +6,9 @@
 export type EnvironmentVariable = 'SIGNING_KEY' | 'TOKEN_URL' | 'ALLOWED_SCHOOL_YEARS';
 
 // Local cache to be used for storing parsed environment variables.
-const cache: { [key: string]: any } = {};
+let cache: { [key: string]: any } = {};
 
-/*
+/**
  * Gets a value from the environment variables, throwing an error if not found.
  */
 export function getValueFromEnvironment(key: EnvironmentVariable): string {
@@ -21,14 +21,14 @@ export function getValueFromEnvironment(key: EnvironmentVariable): string {
   throw new Error(`Environment variable '${key}' has not been setup properly.`);
 }
 
-/*
+/**
  * Insert or replace a value in the environment cache by key name.
  */
 export function updateCache(key: EnvironmentVariable, value: any): void {
   cache[key] = value;
 }
 
-/*
+/**
  * Retrieve a value from the environment cache by key name.
  */
 export function getFromCache<T>(key: EnvironmentVariable): T | undefined {
@@ -39,16 +39,16 @@ export function getFromCache<T>(key: EnvironmentVariable): T | undefined {
   return undefined;
 }
 
-/*
+/**
  * Remove a key from the environment cache.
  */
 export function removeFromCache(key: EnvironmentVariable): void {
   delete cache[key];
 }
 
-/*
+/**
  * Remove all keys from the environment cache.
  */
 export function clearCache(): void {
-  cache.clear();
+  cache = {};
 }
