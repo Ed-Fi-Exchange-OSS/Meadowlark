@@ -28,7 +28,6 @@ export const rootURLRequest = request(process.env.ROOT_URL);
 
 export const accessTokens: Array<{ client: Clients; token: string }> = [];
 
-// TBD: Find a better way to handle credentials. This will change with RND-93
 function getCredentials(client: Clients): Credentials {
   let credentials: Credentials;
   switch (client) {
@@ -135,14 +134,9 @@ export async function getDescriptorByLocation(location: string): Promise<string>
 }
 
 export async function deleteByLocation(location: string): Promise<void> {
-  console.log(location);
-
   await rootURLRequest
     .delete(location)
     .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    // .expect(204)
-    .then((e) => {
-      console.log(e.body);
-    });
+    .expect(204);
 }
 /* TEMPORARY LOCATION */

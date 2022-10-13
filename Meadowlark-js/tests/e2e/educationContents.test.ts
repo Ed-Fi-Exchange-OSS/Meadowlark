@@ -25,11 +25,12 @@ describe('Create education content', () => {
   });
 
   it('should create an education content', async () => {
+    const contentIdentifier = generateRandomId();
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
       .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
       .send({
-        contentIdentifier: generateRandomId(),
+        contentIdentifier,
         namespace: '43210',
         shortDescription: 'ShortDesc',
         contentClassDescriptor,
@@ -39,6 +40,15 @@ describe('Create education content', () => {
       .then((response) => {
         expect(response.headers.location).not.toBe(null);
         return response.headers.location;
+      });
+
+    await baseURLRequest
+      .get('/v3.3b/ed-fi/educationContents')
+      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+      .expect(200)
+      .then((response) => {
+        const edContents = response.body;
+        expect(edContents).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
       });
 
     await rootURLRequest
