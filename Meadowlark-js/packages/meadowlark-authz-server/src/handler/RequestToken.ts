@@ -9,14 +9,14 @@ import { create as createJwt } from 'njwt';
 import { Logger } from '@edfi/meadowlark-core';
 import { admin1, client1, client2, client3, client4 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
-import { AuthorizationResponse } from './AuthorizationResponse';
-import { AuthorizationRequest } from './AuthorizationRequest';
-import { RequestTokenBody } from '../model/RequestTokenBody';
-import { BodyValidation } from '../validation/BodyValidation';
+import type { AuthorizationResponse } from './AuthorizationResponse';
+import type { AuthorizationRequest } from './AuthorizationRequest';
+import type { RequestTokenBody } from '../model/RequestTokenBody';
+import type { BodyValidation } from '../validation/BodyValidation';
 import { validateRequestTokenBody } from '../validation/ValidateRequestTokenBody';
-import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
+import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
-import { hashClientSecretHexString } from '../security/HashClentSecret';
+import { hashClientSecretHexString } from '../security/HashClientSecret';
 
 const moduleName = 'RequestToken';
 
@@ -105,10 +105,8 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
   const { headers } = authorizationRequest;
 
   if (!('authorization' in headers) || 'Authorization' in headers) {
-    if (!bodyValidation.isValid) {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Missing authorization header`, authorizationRequest.traceId);
-      return { isValid: false, failureMessage: 'Missing authorization header' };
-    }
+    Logger.debug(`${moduleName}.parseRequestTokenBody: Missing authorization header`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: 'Missing authorization header' };
   }
 
   // Extract from "Basic <encoded>" where encoded is the Base64 form of "client_id:client_secret"
@@ -128,87 +126,89 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
  * Endpoint that generates a JWT.
  */
 export async function requestToken(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
-  Logger.info(`${moduleName}.requestToken`, authorizationRequest.traceId);
-  await ensurePluginsLoaded();
+  try {
+    Logger.info(`${moduleName}.requestToken`, authorizationRequest.traceId);
+    await ensurePluginsLoaded();
 
-  const parsedRequest: ParsedRequestTokenBody = parseRequestTokenBody(authorizationRequest);
-  if (!parsedRequest.isValid) {
-    return {
-      body: JSON.stringify({ error: parsedRequest.failureMessage }),
-      statusCode: 400,
-    };
+    const parsedRequest: ParsedRequestTokenBody = parseRequestTokenBody(authorizationRequest);
+    if (!parsedRequest.isValid) {
+      return {
+        body: JSON.stringify({ error: parsedRequest.failureMessage }),
+        statusCode: 400,
+      };
+    }
+
+    const { requestTokenBody } = parsedRequest;
+
+    Logger.debug(maskClientSecret(requestTokenBody), authorizationRequest.traceId);
+
+    if (requestTokenBody.grant_type === 'client_credentials') {
+      // Check hardcoded credentials first
+      const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
+
+      if (clientId === client1.key && clientSecret === client1.secret) {
+        return {
+          body: tokenResponseFrom(createToken(client1.key, client1.vendor, client1.role)),
+          statusCode: 200,
+        };
+      }
+      if (clientId === client2.key && clientSecret === client2.secret) {
+        return {
+          body: tokenResponseFrom(createToken(client2.key, client2.vendor, client1.role)),
+          statusCode: 200,
+        };
+      }
+      if (clientId === client3.key && clientSecret === client3.secret) {
+        return {
+          body: tokenResponseFrom(createToken(client3.key, client3.vendor, client3.role)),
+          statusCode: 200,
+        };
+      }
+      if (clientId === client4.key && clientSecret === client4.secret) {
+        return {
+          body: tokenResponseFrom(createToken(client4.key, client4.vendor, client4.role)),
+          statusCode: 200,
+        };
+      }
+      if (clientId === admin1.key && clientSecret === admin1.secret) {
+        return {
+          body: tokenResponseFrom(createToken(admin1.key, admin1.vendor, admin1.role)),
+          statusCode: 200,
+        };
+      }
+
+      // Go to authentication datastore
+      const result: GetAuthorizationClientResult = await getAuthorizationStore().getAuthorizationClient({
+        clientId,
+        traceId: authorizationRequest.traceId,
+      });
+
+      if (result.response === 'UNKNOWN_FAILURE') {
+        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`, authorizationRequest.traceId);
+        return { body: '', statusCode: 500 };
+      }
+
+      if (result.response === 'GET_FAILURE_NOT_EXISTS') {
+        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 404`, authorizationRequest.traceId);
+        return { body: '', statusCode: 404 };
+      }
+
+      if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
+        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`, authorizationRequest.traceId);
+        return { body: '', statusCode: 401 };
+      }
+
+      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 200`, authorizationRequest.traceId);
+
+      return {
+        body: tokenResponseFrom(createToken(clientId, result.clientName, result.roles)),
+        statusCode: 200,
+      };
+    }
+
+    return { body: '', statusCode: 401 };
+  } catch (e) {
+    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId);
+    return { body: '', statusCode: 500 };
   }
-
-  const { requestTokenBody } = parsedRequest;
-
-  Logger.debug(maskClientSecret(requestTokenBody), authorizationRequest.traceId);
-
-  if (requestTokenBody.grant_type === 'client_credentials') {
-    // Check hardcoded credentials first
-    const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
-
-    if (clientId === client1.key && clientSecret === client1.secret) {
-      return {
-        body: tokenResponseFrom(createToken(client1.key, client1.vendor, client1.role)),
-        statusCode: 200,
-      };
-    }
-    if (clientId === client2.key && clientSecret === client2.secret) {
-      return {
-        body: tokenResponseFrom(createToken(client2.key, client2.vendor, client1.role)),
-        statusCode: 200,
-      };
-    }
-    if (clientId === client3.key && clientSecret === client3.secret) {
-      return {
-        body: tokenResponseFrom(createToken(client3.key, client3.vendor, client3.role)),
-        statusCode: 200,
-      };
-    }
-    if (clientId === client4.key && clientSecret === client4.secret) {
-      return {
-        body: tokenResponseFrom(createToken(client4.key, client4.vendor, client4.role)),
-        statusCode: 200,
-      };
-    }
-    if (clientId === admin1.key && clientSecret === admin1.secret) {
-      return {
-        body: tokenResponseFrom(createToken(admin1.key, admin1.vendor, admin1.role)),
-        statusCode: 200,
-      };
-    }
-
-    // Go to authentication datastore
-    const result: GetAuthorizationClientResult = await getAuthorizationStore().getAuthorizationClient({
-      clientId,
-      traceId: authorizationRequest.traceId,
-    });
-
-    if (result.response === 'UNKNOWN_FAILURE') {
-      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`, authorizationRequest.traceId);
-      return { body: '', statusCode: 500 };
-    }
-
-    if (result.response === 'GET_FAILURE_NOT_EXISTS') {
-      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 404`, authorizationRequest.traceId);
-      return { body: '', statusCode: 404 };
-    }
-
-    if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
-      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`, authorizationRequest.traceId);
-      return { body: '', statusCode: 401 };
-    }
-
-    Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 200`, authorizationRequest.traceId);
-
-    return {
-      body: tokenResponseFrom(createToken(clientId, result.clientName, result.roles)),
-      statusCode: 200,
-    };
-  }
-
-  return {
-    body: '',
-    statusCode: 401,
-  };
 }

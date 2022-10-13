@@ -25,6 +25,7 @@ import { oauthHandler } from './handler/OAuthHandler';
 import { loadDescriptors } from './handler/DescriptorLoader';
 import {
   createAuthorizationClientHandler,
+  requestTokenAuthorizationHandler,
   updateAuthorizationClientHandler,
 } from './handler/authorization/AuthorizationHandler';
 
@@ -118,7 +119,6 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
 
     // OAuth handlers
-    fastify.post(`/${stage}/api/oauth/token`, oauthHandler);
     fastify.get(`/${stage}/createKey`, oauthHandler);
     fastify.get(`/${stage}/verify`, oauthHandler);
 
@@ -128,5 +128,6 @@ export function buildService(): FastifyInstance {
     // Authorization server handlers
     fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
     fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
+    fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);
   }
 }

@@ -16,7 +16,7 @@ import { validateCreateClientBody } from '../validation/ValidateClientBody';
 import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { BodyValidation } from '../validation/BodyValidation';
-import { hashClientSecretBuffer } from '../security/HashClentSecret';
+import { hashClientSecretBuffer } from '../security/HashClientSecret';
 
 const moduleName = 'handler.CreateClient';
 
