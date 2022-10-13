@@ -589,7 +589,18 @@ authorization: bearer {{authToken1}}
         "schoolId": 123
     },
     "entryDate": "2020-01-01",
-    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10"
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10",
+    "classOfSchoolYearTypeReference": {
+      "schoolYear": 2022
+    },
+    "schoolYearTypeReference": {
+      "schoolYear": 2022
+    },
+    "graduationPlanReference": {
+      "educationOrganizationId": 255901001,
+      "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
+      "graduationSchoolYear": 2022
+    }
 }
 
 ######## GET by ID
