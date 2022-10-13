@@ -25,51 +25,106 @@ describe('Students', () => {
       countryDescriptor = await getDescriptorByLocation(countryLocation);
     });
 
-    it('should fail with invalid country descriptor', async () => {
-      await baseURLRequest
-        .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
-          studentUniqueId: generateRandomId(),
-          firstName: 'First',
-          lastSurname: 'Last',
-          birthDate: '2001-01-01',
-          birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
-        })
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toContain('Resource CountryDescriptor is missing identity');
-        });
+    describe('Add', () => {
+      it('should fail with invalid country descriptor', async () => {
+        await baseURLRequest
+          .post('/v3.3b/ed-fi/students')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            studentUniqueId: generateRandomId(),
+            firstName: 'First',
+            lastSurname: 'Last',
+            birthDate: '2001-01-01',
+            birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
+          })
+          .expect(400)
+          .then((response) => {
+            expect(response.body.message).toContain('Resource CountryDescriptor is missing identity');
+          });
+      });
+
+      it('should allow valid country descriptor', async () => {
+        studentLocation = await baseURLRequest
+          .post('/v3.3b/ed-fi/students')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            studentUniqueId: generateRandomId(),
+            firstName: 'First',
+            lastSurname: 'Last',
+            birthDate: '2001-01-01',
+            birthCountryDescriptor: countryDescriptor,
+          })
+          .expect(201)
+          .then((response) => {
+            expect(response.headers.location).not.toBe(null);
+            return response.headers.location;
+          });
+
+        await rootURLRequest
+          .get(studentLocation)
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .expect(200);
+      });
     });
 
-    it('should allow valid country descriptor', async () => {
-      studentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
-          studentUniqueId: generateRandomId(),
-          firstName: 'First',
-          lastSurname: 'Last',
-          birthDate: '2001-01-01',
-          birthCountryDescriptor: countryDescriptor,
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+    describe('Edit', () => {
+      const studentUniqueId = generateRandomId();
+      beforeAll(async () => {
+        studentLocation = await baseURLRequest
+          .post('/v3.3b/ed-fi/students')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            studentUniqueId,
+            firstName: 'First',
+            lastSurname: 'Last',
+            birthDate: '2001-01-01',
+            birthCountryDescriptor: countryDescriptor,
+          })
+          .expect(201)
+          .then((response) => {
+            expect(response.headers.location).not.toBe(null);
+            return response.headers.location;
+          });
+      });
 
-      await rootURLRequest
-        .get(studentLocation)
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .expect(200);
+      it('should edit an education content', async () => {
+        await rootURLRequest
+          .put(studentLocation)
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            studentUniqueId,
+            firstName: 'First',
+            lastSurname: 'Last',
+            birthDate: '2000-01-01',
+            birthCountryDescriptor: countryDescriptor,
+          })
+          .expect(204);
+
+        await baseURLRequest
+          .get('/v3.3b/ed-fi/students')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ studentUniqueId })]));
+          });
+
+        await rootURLRequest
+          .get(studentLocation)
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual(expect.objectContaining({ birthDate: '2000-01-01' }));
+          });
+      });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       if (studentLocation) {
         await deleteByLocation(studentLocation);
       }
+    });
 
+    afterAll(async () => {
       if (countryLocation) {
         await deleteByLocation(countryLocation);
       }
@@ -108,6 +163,4 @@ describe('Students', () => {
       }
     });
   });
-
-  // TBD: Create test for student created with one credential accessed by another
 });

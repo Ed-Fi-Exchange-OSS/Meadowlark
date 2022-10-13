@@ -27,6 +27,7 @@ describe('Education content', () => {
   describe('Create', () => {
     it('should create an education content', async () => {
       const contentIdentifier = generateRandomId();
+      // Decide: Move to a common class to reuse?
       educationContentLocation = await baseURLRequest
         .post('/v3.3b/ed-fi/educationContents')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -42,6 +43,7 @@ describe('Education content', () => {
           expect(response.headers.location).not.toBe(null);
           return response.headers.location;
         });
+
       await baseURLRequest
         .get('/v3.3b/ed-fi/educationContents')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -49,6 +51,7 @@ describe('Education content', () => {
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
         });
+
       await rootURLRequest
         .get(educationContentLocation)
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
