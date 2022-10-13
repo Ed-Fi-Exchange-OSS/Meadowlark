@@ -54,6 +54,7 @@ function putStack(): MiddlewareStack {
       R.andThen(resourceIdValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
+      R.andThen(schoolYearValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
     ),
