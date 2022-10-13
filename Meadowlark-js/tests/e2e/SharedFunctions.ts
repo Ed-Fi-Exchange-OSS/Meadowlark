@@ -99,7 +99,7 @@ export async function createContentClassDescriptor(): Promise<string> {
       description: 'Presentation',
       namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     })
-    .expect(200)
+    .expect(201)
     .then((response) => {
       expect(response.headers.location).not.toBe(null);
       return response.headers.location;
@@ -135,10 +135,14 @@ export async function getDescriptorByLocation(location: string): Promise<string>
 }
 
 export async function deleteByLocation(location: string): Promise<void> {
-  // Should be admin
+  console.log(location);
+
   await rootURLRequest
     .delete(location)
     .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    .expect(204);
+    // .expect(204)
+    .then((e) => {
+      console.log(e.body);
+    });
 }
 /* TEMPORARY LOCATION */

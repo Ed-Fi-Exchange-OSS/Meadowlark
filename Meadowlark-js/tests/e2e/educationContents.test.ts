@@ -16,14 +16,14 @@ import {
 
 describe('Create education content', () => {
   let educationContentLocation: string;
+  let contentClassDescriptorLocation: string;
   let contentClassDescriptor: string;
 
   beforeEach(async () => {
-    const contentClassDescriptorLocation = await createContentClassDescriptor();
+    contentClassDescriptorLocation = await createContentClassDescriptor();
     contentClassDescriptor = await getDescriptorByLocation(contentClassDescriptorLocation);
   });
 
-  // This is failing intermittently
   it('should create an education content', async () => {
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
@@ -50,6 +50,10 @@ describe('Create education content', () => {
   afterAll(async () => {
     if (educationContentLocation) {
       await deleteByLocation(educationContentLocation);
+    }
+
+    if (contentClassDescriptorLocation) {
+      await deleteByLocation(contentClassDescriptorLocation);
     }
   });
 });
