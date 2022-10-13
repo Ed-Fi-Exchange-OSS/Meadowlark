@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { removeFromCache, updateCache } from '../../src/Environment';
-import { getAllowedSchoolYears } from '../../src/validation/SchoolYearValidator';
+import { getAllowedSchoolYears, validateDocument } from '../../src/validation/SchoolYearValidator';
 
 describe('when reading school years from the environment', () => {
   const { env } = process;
@@ -99,6 +99,344 @@ describe('when reading school years from the environment', () => {
 
     it('should return a list with no items', () => {
       expect(result).toHaveLength(0);
+    });
+  });
+});
+
+describe('when validating a document', () => {
+  const VALID_YEAR_1 = 2007;
+  const VALID_YEAR_2 = 1902;
+  const INVALID_YEAR = 3332;
+
+  beforeAll(() => {
+    updateCache('ALLOWED_SCHOOL_YEARS', [VALID_YEAR_1, VALID_YEAR_2]);
+  });
+
+  afterAll(() => {
+    removeFromCache('ALLOWED_SCHOOL_YEARS');
+  });
+
+  describe('given the document does not contain anything like a school year', () => {
+    // In theory this shouldn't be called in this circumstance, but we don't want it
+    // to encounter any problems if it _is_ called.
+    const body = {
+      codeValue: 'Presentation',
+      shortDescription: 'Presentation',
+      description: 'Presentation',
+      namespace: 'uri://ed-fi.org/ContentClassDescriptor',
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a field called `schoolYear` that is not a schoolYearTypeReference', () => {
+    const body = {
+      schoolYear: INVALID_YEAR,
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a plain schoolYearTypeReference with valid year', () => {
+    const body = {
+      schoolYearTypeReference: {
+        schoolYear: VALID_YEAR_1,
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a plain schoolYearTypeReference with invalid year', () => {
+    const body = {
+      schoolYearTypeReference: {
+        schoolYear: INVALID_YEAR,
+      },
+    };
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty(['schoolYearTypeReference.schoolYear']);
+    });
+  });
+
+  describe('given a role-named schoolYearTypeReference with valid year', () => {
+    const body = {
+      roleNamedSchoolYearTypeReference: {
+        schoolYear: VALID_YEAR_2,
+      },
+    };
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a role-named schoolYearTypeReference with invalid year', () => {
+    const body = {
+      roleNamedSchoolYearTypeReference: {
+        schoolYear: INVALID_YEAR,
+      },
+    };
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty(['roleNamedSchoolYearTypeReference.schoolYear']);
+    });
+  });
+
+  describe('given a schoolYear with valid value inside a common type', () => {
+    const body = {
+      cohortYear: {
+        cohortYearTypeDescriptor: 'string',
+        termDescriptor: 'string',
+        schoolYearTypeReference: {
+          schoolYear: VALID_YEAR_1,
+        },
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a schoolYear with invalid value inside a common type', () => {
+    const body = {
+      cohortYear: {
+        cohortYearTypeDescriptor: 'string',
+        termDescriptor: 'string',
+        schoolYearTypeReference: {
+          schoolYear: INVALID_YEAR,
+        },
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty(['cohortYear.schoolYearTypeReference.schoolYear']);
+    });
+  });
+
+  describe('given a schoolYear with valid value inside a common type with a role name', () => {
+    const body = {
+      cohortYear: {
+        cohortYearTypeDescriptor: 'string',
+        termDescriptor: 'string',
+        cohortSchoolYearTypeReference: {
+          schoolYear: VALID_YEAR_1,
+        },
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a schoolYear with invalid value inside a common type with a role name', () => {
+    const body = {
+      cohortYear: {
+        cohortYearTypeDescriptor: 'string',
+        termDescriptor: 'string',
+        cohortSchoolYearTypeReference: {
+          schoolYear: INVALID_YEAR,
+        },
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty(['cohortYear.cohortSchoolYearTypeReference.schoolYear']);
+    });
+  });
+
+  describe('given a schoolYear collection with valid values', () => {
+    const body = {
+      schoolYears: [
+        {
+          schoolYearTypeReference: {
+            schoolYear: VALID_YEAR_1,
+          },
+        },
+        {
+          schoolYearTypeReference: {
+            schoolYear: VALID_YEAR_2,
+          },
+        },
+      ],
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should be accepted', () => {
+      expect(result).toBe('');
+    });
+  });
+
+  describe('given a schoolYear collection with an invalid value', () => {
+    const body = {
+      schoolYears: [
+        {
+          schoolYearTypeReference: {
+            schoolYear: VALID_YEAR_1,
+          },
+        },
+        {
+          schoolYearTypeReference: {
+            schoolYear: INVALID_YEAR,
+          },
+        },
+      ],
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty(['schoolYears.1.schoolYearTypeReference.schoolYear']);
+    });
+  });
+
+  describe('given a common with a common with a role-named collection of school years, one of which is invalid', () => {
+    const body = {
+      outerCommon: {
+        innerCommon: {
+          schoolYears: [
+            {
+              cohortSchoolYearTypeReference: {
+                schoolYear: INVALID_YEAR,
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    let result: string;
+
+    beforeAll(() => {
+      result = validateDocument(body);
+    });
+
+    it('should have an error message', () => {
+      expect(result).not.toBe('');
+    });
+
+    it('should have a `message`', () => {
+      expect(JSON.parse(result).message).not.toBe('');
+    });
+
+    it('should have a modelState', () => {
+      expect(JSON.parse(result).modelState).toHaveProperty([
+        'outerCommon.innerCommon.schoolYears.0.cohortSchoolYearTypeReference.schoolYear',
+      ]);
     });
   });
 });
