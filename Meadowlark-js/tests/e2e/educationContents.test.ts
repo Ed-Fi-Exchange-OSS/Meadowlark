@@ -14,54 +14,99 @@ import {
   Clients,
 } from './SharedFunctions';
 
-describe('Create education content', () => {
+describe('Education content', () => {
   let educationContentLocation: string;
   let contentClassDescriptorLocation: string;
   let contentClassDescriptor: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     contentClassDescriptorLocation = await createContentClassDescriptor();
     contentClassDescriptor = await getDescriptorByLocation(contentClassDescriptorLocation);
   });
 
-  it('should create an education content', async () => {
-    const contentIdentifier = generateRandomId();
-    educationContentLocation = await baseURLRequest
-      .post('/v3.3b/ed-fi/educationContents')
-      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-      .send({
-        contentIdentifier,
-        namespace: '43210',
-        shortDescription: 'ShortDesc',
-        contentClassDescriptor,
-        learningResourceMetadataURI: 'uri://ed-fi.org/fake-uri',
-      })
-      .expect(201)
-      .then((response) => {
-        expect(response.headers.location).not.toBe(null);
-        return response.headers.location;
-      });
-
-    await baseURLRequest
-      .get('/v3.3b/ed-fi/educationContents')
-      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-      .expect(200)
-      .then((response) => {
-        const edContents = response.body;
-        expect(edContents).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
-      });
-
-    await rootURLRequest
-      .get(educationContentLocation)
-      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-      .expect(200);
+  describe('Create', () => {
+    it('should create an education content', async () => {
+      const contentIdentifier = generateRandomId();
+      educationContentLocation = await baseURLRequest
+        .post('/v3.3b/ed-fi/educationContents')
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .send({
+          contentIdentifier,
+          namespace: '43210',
+          shortDescription: 'ShortDesc',
+          contentClassDescriptor,
+          learningResourceMetadataURI: 'uri://ed-fi.org/fake-uri',
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.headers.location).not.toBe(null);
+          return response.headers.location;
+        });
+      await baseURLRequest
+        .get('/v3.3b/ed-fi/educationContents')
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
+        });
+      await rootURLRequest
+        .get(educationContentLocation)
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .expect(200);
+    });
   });
 
-  afterAll(async () => {
+  describe('Edit', () => {
+    const contentIdentifier = generateRandomId();
+    beforeAll(async () => {
+      educationContentLocation = await baseURLRequest
+        .post('/v3.3b/ed-fi/educationContents')
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .send({
+          contentIdentifier,
+          namespace: '43210',
+          shortDescription: 'ShortDesc',
+          contentClassDescriptor,
+          learningResourceMetadataURI: 'uri://ed-fi.org/fake-uri',
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.headers.location).not.toBe(null);
+          return response.headers.location;
+        });
+    });
+
+    it('should edit an education content', async () => {
+      const uri = 'uri://ed-fi.org/fake-updated-uri';
+      await rootURLRequest
+        .put(educationContentLocation)
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .send({
+          contentIdentifier,
+          namespace: '43210',
+          shortDescription: 'ShortDesc',
+          contentClassDescriptor,
+          learningResourceMetadataURI: uri,
+        })
+        .expect(204);
+
+      await rootURLRequest
+        .get(educationContentLocation)
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.objectContaining({ learningResourceMetadataURI: uri }));
+        });
+    });
+  });
+
+  afterEach(async () => {
     if (educationContentLocation) {
       await deleteByLocation(educationContentLocation);
     }
+  });
 
+  afterAll(async () => {
     if (contentClassDescriptorLocation) {
       await deleteByLocation(contentClassDescriptorLocation);
     }
