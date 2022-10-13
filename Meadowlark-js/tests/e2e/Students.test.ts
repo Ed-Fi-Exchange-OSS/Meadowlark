@@ -5,6 +5,7 @@
 
 import {
   baseURLRequest,
+  Clients,
   createCountry,
   deleteByLocation,
   generateRandomId,
@@ -27,7 +28,7 @@ describe('Students', () => {
     it('should fail with invalid country descriptor', async () => {
       await baseURLRequest
         .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken('client1'), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
         .send({
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -44,7 +45,7 @@ describe('Students', () => {
     it('should allow valid country descriptor', async () => {
       studentLocation = await baseURLRequest
         .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken('client1'), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
         .send({
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -60,7 +61,7 @@ describe('Students', () => {
 
       await rootURLRequest
         .get(studentLocation)
-        .auth(await getAccessToken('client1'), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
         .expect(200);
     });
 
@@ -77,12 +78,11 @@ describe('Students', () => {
 
   describe('without strict validation', () => {
     let studentLocation: string;
-    const client = 'client4';
 
     it('should allow invalid country', async () => {
       studentLocation = await baseURLRequest
         .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(client), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
         .send({
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -98,13 +98,13 @@ describe('Students', () => {
 
       await rootURLRequest
         .get(studentLocation)
-        .auth(await getAccessToken(client), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
         .expect(200);
     });
 
     afterAll(async () => {
       if (studentLocation) {
-        await deleteByLocation(studentLocation, client);
+        await deleteByLocation(studentLocation);
       }
     });
   });

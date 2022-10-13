@@ -16,33 +16,47 @@ interface Credentials {
   secret: string | undefined;
 }
 
+export enum Clients {
+  Vendor1,
+  Vendor2,
+  Host1,
+  Assessment1,
+}
+
 export const baseURLRequest = request(process.env.BASE_URL);
 export const rootURLRequest = request(process.env.ROOT_URL);
 
-export const accessTokens: Array<{ client: string; token: string }> = [];
+export const accessTokens: Array<{ client: Clients; token: string }> = [];
 
 // TBD: Find a better way to handle credentials. This will change with RND-93
-function getCredentials(client: string): Credentials {
+function getCredentials(client: Clients): Credentials {
   let credentials: Credentials;
   switch (client) {
-    case 'client4':
+    case Clients.Vendor1:
       credentials = {
-        key: process.env.CLIENT_KEY_4,
-        secret: process.env.CLIENT_SECRET_4,
+        key: process.env.VENDOR_KEY_1,
+        secret: process.env.VENDOR_SECRET_1,
       };
       break;
-    case 'admin1':
+    case Clients.Vendor2:
       credentials = {
-        key: process.env.ADMIN_KEY_1,
-        secret: process.env.ADMIN_SECRET_1,
+        key: process.env.VENDOR_KEY_2,
+        secret: process.env.VENDOR_SECRET_2,
       };
       break;
-    case 'client1':
+    case Clients.Host1:
       credentials = {
-        key: process.env.CLIENT_KEY_1,
-        secret: process.env.CLIENT_SECRET_1,
+        key: process.env.HOST_KEY_1,
+        secret: process.env.HOST_SECRET_1,
       };
       break;
+    case Clients.Assessment1:
+      credentials = {
+        key: process.env.ASSESSMENT_KEY_1,
+        secret: process.env.ASSESSMENT_SECRET_1,
+      };
+      break;
+
     default:
       throw new Error('Specify desired client');
   }
@@ -50,7 +64,7 @@ function getCredentials(client: string): Credentials {
   return credentials;
 }
 
-export async function getAccessToken(client: string): Promise<string> {
+export async function getAccessToken(client: Clients): Promise<string> {
   const credentials = getCredentials(client);
 
   let token: string = accessTokens.find((t) => t.client === client)?.token ?? '';
@@ -74,11 +88,11 @@ export function generateRandomId(length = 12): string {
   return chance.hash({ length });
 }
 
-/* TEMPORAL LOCATION */
+/* TEMPORARY LOCATION */
 export async function createContentClassDescriptor(): Promise<string> {
   return baseURLRequest
     .post(`/v3.3b/ed-fi/contentClassDescriptors`)
-    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
     .send({
       codeValue: 'Presentation',
       shortDescription: 'Presentation',
@@ -95,7 +109,7 @@ export async function createContentClassDescriptor(): Promise<string> {
 export async function createCountry(): Promise<string> {
   return baseURLRequest
     .post('/v3.3b/ed-fi/countryDescriptors')
-    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
     .send({
       codeValue: 'US',
       shortDescription: 'US',
@@ -112,7 +126,7 @@ export async function createCountry(): Promise<string> {
 export async function getDescriptorByLocation(location: string): Promise<string> {
   return rootURLRequest
     .get(location)
-    .auth(await getAccessToken('client1'), { type: 'bearer' })
+    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
     .expect(200)
     .then((response) => {
       expect(response.body).not.toBe(null);
@@ -120,11 +134,11 @@ export async function getDescriptorByLocation(location: string): Promise<string>
     });
 }
 
-export async function deleteByLocation(location: string, client = 'client1'): Promise<void> {
+export async function deleteByLocation(location: string): Promise<void> {
   // Should be admin
   await rootURLRequest
     .delete(location)
-    .auth(await getAccessToken(client), { type: 'bearer' })
+    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
     .expect(204);
 }
-/* TEMPORAL LOCATION */
+/* TEMPORARY LOCATION */

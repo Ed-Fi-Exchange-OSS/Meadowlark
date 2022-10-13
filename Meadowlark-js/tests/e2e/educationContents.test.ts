@@ -11,6 +11,7 @@ import {
   deleteByLocation,
   createContentClassDescriptor,
   getDescriptorByLocation,
+  Clients,
 } from './SharedFunctions';
 
 describe('Create education content', () => {
@@ -26,7 +27,7 @@ describe('Create education content', () => {
   it('should create an education content', async () => {
     educationContentLocation = await baseURLRequest
       .post('/v3.3b/ed-fi/educationContents')
-      .auth(await getAccessToken('client1'), { type: 'bearer' })
+      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
       .send({
         contentIdentifier: generateRandomId(),
         namespace: '43210',
@@ -42,7 +43,7 @@ describe('Create education content', () => {
 
     await rootURLRequest
       .get(educationContentLocation)
-      .auth(await getAccessToken('client1'), { type: 'bearer' })
+      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
       .expect(200);
   });
 
