@@ -15,14 +15,14 @@ const moduleName = 'FindMetaEdModelMiddleware';
 export async function metaEdModelFinding({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
-  writeRequestToLog(moduleName, frontendRequest, 'metaeEdModelFinding');
+  writeRequestToLog(moduleName, frontendRequest, 'metaEdModelFinding');
 
   const matchingMetaEdModel = await findMetaEdModel(frontendRequest.middleware.pathComponents);
   if (matchingMetaEdModel == null) {
-    const errorMessage = `${moduleName}.metaeEdModelFinding: Fatal error - matchingMetaEdModel not found`;
+    const errorMessage = `${moduleName}.metaEdModelFinding: Fatal error - matchingMetaEdModel not found`;
     Logger.error(errorMessage, frontendRequest.traceId);
     const statusCode = 500;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'metaeEdModelFinding', statusCode, errorMessage);
+    writeDebugStatusToLog(moduleName, frontendRequest, 'metaEdModelFinding', statusCode, errorMessage);
     return {
       frontendRequest,
       frontendResponse: { body: '', statusCode, headers: frontendRequest.middleware.headerMetadata },
