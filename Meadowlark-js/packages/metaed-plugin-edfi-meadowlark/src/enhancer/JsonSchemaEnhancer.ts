@@ -17,6 +17,7 @@ import {
   IntegerProperty,
   ShortProperty,
 } from '@edfi/metaed-core';
+import { getIntegerFromEnvironment } from '@edfi/meadowlark-utilities';
 import { invariant } from 'ts-invariant';
 import type { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 import type { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
@@ -63,8 +64,8 @@ const descriptorSchema: SchemaRoot = {
 };
 
 // SchoolYearEnumeration is a hardcoded exception in the ODS/API
-const beginYear = Number.parseInt(process.env.BEGIN_ALLOWED_SCHOOL_YEAR || '1900', 10);
-const endYear = Number.parseInt(process.env.END_ALLOWED_SCHOOL_YEAR || '2100', 10);
+const beginYear = getIntegerFromEnvironment('BEGIN_ALLOWED_SCHOOL_YEAR', 1900);
+const endYear = getIntegerFromEnvironment('END_ALLOWED_SCHOOL_YEAR', 2100);
 
 const schoolYearEnumerationSchema: SchemaRoot = {
   ...newSchemaRoot(),
