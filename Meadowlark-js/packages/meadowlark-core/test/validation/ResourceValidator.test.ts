@@ -89,3 +89,21 @@ describe('given an invalid resource name with no suggested matching name', () =>
     expect(result.resourceInfo).toBe(NoResourceInfo);
   });
 });
+
+describe('given resource `schoolYearTypes`', () => {
+  let result: ResourceValidationResult;
+  const invalidName = 'schoolYearTypes';
+
+  beforeAll(async () => {
+    // Act
+    result = await validateResource({ version: 'a', namespace: 'b', resourceName: invalidName });
+  });
+
+  it('returns an error message', () => {
+    expect(JSON.parse(result.errorBody ?? '').message.length).toBeGreaterThan(0);
+  });
+
+  it('returns no entity info', () => {
+    expect(result.resourceInfo).toBe(NoResourceInfo);
+  });
+});
