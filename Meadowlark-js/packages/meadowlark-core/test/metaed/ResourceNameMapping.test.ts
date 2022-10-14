@@ -13,7 +13,6 @@ import {
   AssociationBuilder,
   AssociationSubclassBuilder,
   DescriptorBuilder,
-  EnumerationBuilder,
 } from '@edfi/metaed-core';
 import { getMetaEdModelForResourceName, resetCache } from '../../src/metaed/ResourceNameMapping';
 
