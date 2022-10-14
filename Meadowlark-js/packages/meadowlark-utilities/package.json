@@ -1,0 +1,24 @@
+{
+  "name": "@edfi/meadowlark-utilities",
+  "main": "dist/index.js",
+  "version": "0.2.0-dev.0",
+  "description": "Meadowlark shared utilities",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://www.myget.org/F/ed-fi/npm/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "scripts": {
+    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  },
+  "devDependencies": {
+    "@types/node": "^18.8.5"
+  }
+}

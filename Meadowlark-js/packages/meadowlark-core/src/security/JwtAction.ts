@@ -5,7 +5,7 @@
 
 import { Jwt as nJwt, verify } from 'njwt';
 import memoize from 'fast-memoize';
-import { getValueFromEnvironment } from '../Environment';
+import { getStringFromEnvironment } from '@edfi/meadowlark-utilities';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { Logger } from '../Logger';
@@ -13,7 +13,7 @@ import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
 import { AuthorizationStrategy } from './AuthorizationStrategy';
 
 function signingKey(): Buffer {
-  const signingKeyEncoded = getValueFromEnvironment('SIGNING_KEY');
+  const signingKeyEncoded = getStringFromEnvironment('SIGNING_KEY');
   if (signingKeyEncoded == null) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `yarn createKey`');
   }
