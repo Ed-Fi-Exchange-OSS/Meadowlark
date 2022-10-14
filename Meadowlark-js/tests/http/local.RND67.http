@@ -34,19 +34,6 @@ content-type: application/json
   "personalTitlePrefix": "Mr"
 }
 
-
-###
-POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
-authorization: bearer {{authToken1}}
-content-type: application/json
-
-{
-  "schoolYear": 2022,
-  "currentSchoolYear": false
-}
-
-
-
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/educationServiceCenters
 authorization: bearer {{authToken1}}

@@ -351,8 +351,7 @@ authorization: bearer {{authToken1}}
     ]
 }
 
-### Create a school year
-# reference-validation: true
+### School year is not supported - expected 404
 POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -570,7 +569,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
 content-type: application/json
 authorization: bearer {{authToken1}}
 
-#### Contains three different school years
+#### Contains two different school years
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -589,6 +588,28 @@ authorization: bearer {{authToken1}}
     },
     "schoolYearTypeReference": {
       "schoolYear": 2023
+    }
+}
+
+#### Contains two INVALID school years
+PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "s0zf6d1123d3e"
+    },
+    "schoolReference": {
+        "schoolId": 123
+    },
+    "entryDate": "2020-01-01",
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10",
+    "classOfSchoolYearTypeReference": {
+      "schoolYear": 202
+    },
+    "schoolYearTypeReference": {
+      "schoolYear": 203
     }
 }
 
