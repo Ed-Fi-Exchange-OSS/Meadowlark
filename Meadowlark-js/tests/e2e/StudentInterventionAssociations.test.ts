@@ -7,7 +7,7 @@ import { baseURLRequest, getAccessToken, Clients, deleteByLocation, rootURLReque
 
 describe('Student Intervention Association', () => {
   describe('with strict validation', () => {
-    it('should fail when missing student and intervention', async () => {
+    it('should fail when missing data', async () => {
       await baseURLRequest
         .post('/v3.3b/ed-fi/StudentInterventionAssociations')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -31,7 +31,7 @@ describe('Student Intervention Association', () => {
   describe('without strict validation', () => {
     let interventionLocation: string;
 
-    it('should fail when missing student and intervention', async () => {
+    it('should add the association', async () => {
       interventionLocation = await baseURLRequest
         .post('/v3.3b/ed-fi/StudentInterventionAssociations')
         .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
