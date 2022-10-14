@@ -23,6 +23,7 @@
     ]
   },
   "dependencies": {
+    "@edfi/meadowlark-utilities": "0.2.0-dev.0",
     "@edfi/metaed-core": "3.1.0",
     "@edfi/metaed-plugin-edfi-unified": "3.1.0",
     "deep-freeze": "^0.0.1",

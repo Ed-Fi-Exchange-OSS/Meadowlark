@@ -13,7 +13,6 @@ import {
   AssociationBuilder,
   AssociationSubclassBuilder,
   DescriptorBuilder,
-  EnumerationBuilder,
 } from '@edfi/metaed-core';
 import { getMetaEdModelForResourceName, resetCache } from '../../src/metaed/ResourceNameMapping';
 
@@ -252,54 +251,6 @@ describe('when looking for a descriptor model matching a resource name', () => {
   describe('and given non-pluralized resource name', () => {
     it('returns false', () => {
       expect(getMetaEdModelForResourceName('gradeLevelDescriptor', metaEd, namespace)).not.toBeDefined();
-    });
-  });
-});
-
-describe('when looking for the SchoolYear model matching a resource name', () => {
-  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const namespace = 'EdFi';
-
-  beforeAll(() => {
-    resetCache();
-    MetaEdTextBuilder.build()
-      .withBeginNamespace(namespace)
-      .withStartEnumeration('SchoolYear')
-      .withDocumentation('doc')
-      .withEnumerationItem('2022')
-      .withEndEnumeration()
-
-      .sendToListener(new NamespaceBuilder(metaEd, []))
-      .sendToListener(new EnumerationBuilder(metaEd, []));
-  });
-
-  describe('and given upper case resource name without "Type" suffix', () => {
-    it('returns false', () => {
-      expect(getMetaEdModelForResourceName('SchoolYears', metaEd, namespace)).not.toBeDefined();
-    });
-  });
-
-  describe('and given lower case resource name without "Type" suffix', () => {
-    it('returns false', () => {
-      expect(getMetaEdModelForResourceName('schoolYears', metaEd, namespace)).not.toBeDefined();
-    });
-  });
-
-  describe('and given upper case resource name with "Type" suffix', () => {
-    it('returns false', () => {
-      expect(getMetaEdModelForResourceName('SchoolYearTypes', metaEd, namespace)).not.toBeDefined();
-    });
-  });
-
-  describe('and given lower case resource name with "Type" suffix', () => {
-    it('returns true', () => {
-      expect(getMetaEdModelForResourceName('schoolYearTypes', metaEd, namespace)).toBeDefined();
-    });
-  });
-
-  describe('and given non-pluralized resource name', () => {
-    it('returns false', () => {
-      expect(getMetaEdModelForResourceName('schoolYearType', metaEd, namespace)).not.toBeDefined();
     });
   });
 });

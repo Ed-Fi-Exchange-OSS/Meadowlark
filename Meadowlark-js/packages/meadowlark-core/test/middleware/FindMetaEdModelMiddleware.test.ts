@@ -5,7 +5,7 @@
 
 import { newTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
 import * as MetaEdModelFinder from '../../src/metaed/MetaEdModelFinder';
-import { metaeEdModelFinding } from '../../src/middleware/FindMetaEdModelMiddleware';
+import { metaEdModelFinding } from '../../src/middleware/FindMetaEdModelMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
@@ -20,7 +20,7 @@ describe('given a previous middleware has created a response', () => {
     mockDocumentValidator = jest.spyOn(MetaEdModelFinder, 'findMetaEdModel');
 
     // Act
-    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse });
+    resultChain = await metaEdModelFinding({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -35,7 +35,7 @@ describe('given a previous middleware has created a response', () => {
     expect(resultChain.frontendResponse).toBe(frontendResponse);
   });
 
-  it('never calls metaeEdModelFinding', () => {
+  it('never calls metaEdModelFinding', () => {
     expect(mockDocumentValidator).not.toHaveBeenCalled();
   });
 });
@@ -49,7 +49,7 @@ describe('given a no match response from findMetaEdModel', () => {
     mockDocumentValidator = jest.spyOn(MetaEdModelFinder, 'findMetaEdModel').mockReturnValue(Promise.resolve(undefined));
 
     // Act
-    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse: null });
+    resultChain = await metaEdModelFinding({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -82,7 +82,7 @@ describe('given a match response from findMetaEdModel', () => {
       .mockReturnValue(Promise.resolve(topLevelEntity));
 
     // Act
-    resultChain = await metaeEdModelFinding({ frontendRequest, frontendResponse: null });
+    resultChain = await metaEdModelFinding({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {

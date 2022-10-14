@@ -6,12 +6,12 @@
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
 
+import { getStringFromEnvironment } from '@edfi/meadowlark-utilities';
 import { Logger } from '../Logger';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
-import { getValueFromEnvironment } from '../Environment';
 import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
@@ -83,7 +83,7 @@ function useTemplate(data: string, host: string, stage: string): string {
   const basePath = `/${stage}/${Constants.uriVersion33b}/`;
   const basePathToken = /{{ basePath }}/g;
 
-  const tokenUrl = getValueFromEnvironment('TOKEN_URL');
+  const tokenUrl = getStringFromEnvironment('TOKEN_URL');
   const tokenUrlToken = /{{ tokenUrl }}/g;
 
   const hostToken = /{{ host }}/g;

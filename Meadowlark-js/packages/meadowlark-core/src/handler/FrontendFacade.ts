@@ -21,7 +21,7 @@ import * as GetById from './GetById';
 import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
-import { metaeEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
+import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -33,7 +33,7 @@ function postStack(): MiddlewareStack {
       R.andThen(parsePath),
       R.andThen(parseBody),
       R.andThen(resourceValidation),
-      R.andThen(metaeEdModelFinding),
+      R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
@@ -50,7 +50,7 @@ function putStack(): MiddlewareStack {
       R.andThen(parseBody),
       R.andThen(resourceValidation),
       R.andThen(resourceIdValidation),
-      R.andThen(metaeEdModelFinding),
+      R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
@@ -85,9 +85,7 @@ function getByIdStack(): MiddlewareStack {
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
 function queryStack(): MiddlewareStack {
-  return R.once(
-    R.pipe(authorize, R.andThen(resourceValidation), R.andThen(metaeEdModelFinding), R.andThen(queryValidation)),
-  );
+  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(metaEdModelFinding), R.andThen(queryValidation)));
 }
 
 /**

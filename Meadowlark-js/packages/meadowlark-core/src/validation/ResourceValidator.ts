@@ -38,6 +38,7 @@ export type ResourceValidationResult = {
 export async function validateResource(pathComponents: PathComponents): Promise<ResourceValidationResult> {
   // Equally supporting resources with either upper or lower case names
   const lowerResourceName = decapitalize(pathComponents.resourceName);
+
   const modelNpmPackage = modelPackageFor(pathComponents.version);
   const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
 

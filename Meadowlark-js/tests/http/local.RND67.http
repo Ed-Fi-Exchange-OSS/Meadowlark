@@ -8,7 +8,7 @@
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -33,19 +33,6 @@ content-type: application/json
   "lastSurname": "Dyer",
   "personalTitlePrefix": "Mr"
 }
-
-
-###
-POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
-authorization: bearer {{authToken1}}
-content-type: application/json
-
-{
-  "schoolYear": 2022,
-  "currentSchoolYear": false
-}
-
-
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/educationServiceCenters

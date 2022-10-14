@@ -3,7 +3,7 @@
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -15,7 +15,7 @@ content-type: application/json
 @auth_header_1=Authorization: bearer {{client1.response.body.$.access_token}}
 ###
 # @name client2
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -27,7 +27,7 @@ content-type: application/json
 @auth_header_2=Authorization: bearer {{client2.response.body.$.access_token}}
 ###
 # @name client3
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -45,10 +45,10 @@ content-type: application/json
 
 {
     "contentIdentifier": "first",
-    "namespace": "4321",
+    "namespace": "43216",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "21436"
 }
 
 ### Re-POST with different authorization header - expect 403.
@@ -58,10 +58,10 @@ content-type: application/json
 
 {
     "contentIdentifier": "first",
-    "namespace": "4321",
+    "namespace": "43216",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "21436"
 }
 
 ### Try getting that resource without authorization header - expect 401.
@@ -82,10 +82,10 @@ content-type: application/json
 
 {
     "contentIdentifier": "first",
-    "namespace": "4321",
+    "namespace": "432122",
     "shortDescription": "abcdefghijklmnopqrstuvwxyz",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "214333"
 }
 
 ### Try updating the resource with wrong authorization header - expect 403
@@ -95,10 +95,10 @@ content-type: application/json
 
 {
     "contentIdentifier": "first",
-    "namespace": "4321",
+    "namespace": "432122",
     "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "2143"
+    "learningResourceMetadataURI": "214333"
 }
 
 ### Creating a 2nd resource with 2nd authorization header - expect success.
@@ -108,10 +108,10 @@ content-type: application/json
 
 {
     "contentIdentifier": "second",
-    "namespace": "43210",
+    "namespace": "432102",
     "shortDescription": "abcd",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "21433"
+    "learningResourceMetadataURI": "214332"
 }
 
 ### Get this using the host / FULL_ACCESS authorization - expect success
@@ -123,7 +123,6 @@ GET http://localhost:3000/local/v3.3b/ed-fi/EducationContents
 {{auth_header_3}}
 
 ### Create Resource from token with HOST/FULL_ACCESS authorization - Expect success
-# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header_3}}
@@ -137,7 +136,6 @@ content-type: application/json
 }
 
 ### Atempt to access the record with an incorrect authorization header - expect 403
-# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header_2}}
@@ -151,7 +149,6 @@ content-type: application/json
 }
 
 ### Delete Resource with HOST/FULL_ACCESS authorization - Expect success
-# reference-validation: true
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M801224CfZEcHrCmTjyLf11mBYrw
 content-type: application/json
 {{auth_header_3}}
