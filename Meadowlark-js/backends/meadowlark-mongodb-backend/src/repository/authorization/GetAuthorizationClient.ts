@@ -4,12 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, MongoClient, WithId } from 'mongodb';
+import { Logger } from '@edfi/meadowlark-core';
 import { GetAuthorizationClientRequest, GetAuthorizationClientResult } from '@edfi/meadowlark-authz-server';
 import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 import { getAuthorizationCollection } from '../Db';
 
 export async function getAuthorizationClientDocument(
-  { clientId }: GetAuthorizationClientRequest,
+  { clientId, traceId }: GetAuthorizationClientRequest,
   client: MongoClient,
 ): Promise<GetAuthorizationClientResult> {
   const mongoCollection: Collection<AuthorizationDocument> = getAuthorizationCollection(client);
@@ -25,6 +26,7 @@ export async function getAuthorizationClientDocument(
       clientSecretHashed: result.clientSecretHashed,
     };
   } catch (e) {
+    Logger.error('GetAuthorizationClient.getAuthorizationClientDocument', traceId, e);
     return { response: 'UNKNOWN_FAILURE' };
   }
 }
