@@ -1,6 +1,6 @@
 ### Authenticate as a non-admin
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -13,7 +13,7 @@ content-type: application/json
 @auth_header_client_1=Authorization: bearer {{client1.response.body.$.access_token}}
 
 
-#################### POST
+#################### POST authorization client
 
 
 ### Try creating client as a non-admin, should 403 Forbidden
@@ -45,7 +45,7 @@ Authorization: bearer Not-A-Token
 
 ### Authenticate as an admin
 # @name admin1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -138,7 +138,8 @@ content-type: application/json
 }
 
 
-#################### PUT
+#################### PUT authorization client
+
 ###
 @created_client_id_1={{client1.response.body.$.client_id}}
 
@@ -233,3 +234,37 @@ content-type: application/json
         "assessment"
     ]
 }
+
+#################### Request bearer token
+
+
+### Authenticate as a hardcoded non-admin, form url encoded, should succeed
+POST http://localhost:3000/local/oauth/token
+content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=meadowlark_key_1&client_secret=meadowlark_secret_1
+
+###
+
+@created_client_secret_1={{client1.response.body.$.client_secret}}
+
+### Authenticate as a previously created client, form url encoded, should succeed
+# @name newClient
+POST http://localhost:3000/local/oauth/token
+content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{created_client_id_1}}&client_secret={{created_client_secret_1}}
+
+###
+@newClientToken = {{newClient.response.body.$.access_token}}
+
+### Use the new client's token
+GET http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{newClientToken}}
+
+### Authenticate as a previously created client with wrong secret, form url encoded, should 401
+POST http://localhost:3000/local/oauth/token
+content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{created_client_id_1}}&client_secret=bad_secret
+

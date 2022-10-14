@@ -745,6 +745,7 @@ __metadata:
     ajv: ^8.11.0
     copyfiles: ^2.4.1
     dotenv: ^16.0.1
+    fast-memoize: ^2.5.2
     njwt: ^1.2.0
     ramda: ^0.27.2
     rimraf: ^3.0.2
