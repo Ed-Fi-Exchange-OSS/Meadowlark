@@ -3,7 +3,7 @@
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -15,7 +15,7 @@ content-type: application/json
 @auth_header_1=Authorization: bearer {{client1.response.body.$.access_token}}
 ###
 # @name client2
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -27,7 +27,7 @@ content-type: application/json
 @auth_header_2=Authorization: bearer {{client2.response.body.$.access_token}}
 ###
 # @name client3
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {

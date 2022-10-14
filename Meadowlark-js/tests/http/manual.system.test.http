@@ -1,6 +1,6 @@
 #### These are the manual components of the automated system tests
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {

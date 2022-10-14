@@ -6,7 +6,7 @@
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -20,7 +20,7 @@ content-type: application/json
 
 ### Authenticate client4 (this client has validation turned off
 # @name client4
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {

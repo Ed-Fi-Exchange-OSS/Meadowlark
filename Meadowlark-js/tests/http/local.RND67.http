@@ -8,7 +8,7 @@
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {

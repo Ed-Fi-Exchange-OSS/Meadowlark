@@ -11,7 +11,7 @@ GET http://localhost:3000/local/createKey
 #
 
 ### should succeed, vendor 1 (JSON)
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -21,7 +21,7 @@ content-type: application/json
 }
 
 ### should succeed, vendor 1 (form encoded)
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
@@ -30,7 +30,7 @@ grant_type=client_credentials
 
 ### should succeed, vendor 1 (form encoded, alternate using basic auth)
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 authorization: Basic bWVhZG93bGFya19rZXlfMTptZWFkb3dsYXJrX3NlY3JldF8x
 
@@ -39,7 +39,7 @@ grant_type=client_credentials
 
 ### should succeed, vendor 2
 # @name client2
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
@@ -47,7 +47,7 @@ grant_type=client_credentials
 &client_secret=meadowlark_secret_2
 
 ### mix & match - should fail - expect 401
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
@@ -55,7 +55,7 @@ grant_type=client_credentials
 &client_secret=meadowlark_secret_2
 
 ### completely bogus - should fail - expect 401
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
@@ -65,7 +65,7 @@ grant_type=client_credentials
 
 ### should succeed, client 3 with host access
 # @name host_client
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
