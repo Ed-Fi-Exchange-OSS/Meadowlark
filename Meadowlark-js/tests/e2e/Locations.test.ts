@@ -3,27 +3,25 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, getAccessToken, Clients, deleteByLocation, rootURLRequest } from './SharedFunctions';
+import { baseURLRequest, getAccessToken, Clients, rootURLRequest, deleteByLocation } from './SharedFunctions';
 
-describe('Student Intervention Association', () => {
+describe('Locations', () => {
   describe('with strict validation', () => {
     it('should fail when missing data', async () => {
       await baseURLRequest
-        .post('/v3.3b/ed-fi/StudentInterventionAssociations')
+        .post('/v3.3b/ed-fi/locations')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
         .send({
-          studentReference: {
-            studentUniqueId: 's0zf6d1123d3e',
+          classroomIdentificationCode: 'string',
+          schoolReference: {
+            schoolId: 99,
           },
-          interventionReference: {
-            interventionIdentificationCode: '111',
-            educationOrganizationId: 123,
-          },
+          maximumNumberOfSeats: 20,
+          optimalNumberOfSeats: 10,
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toContain('Resource Intervention is missing identity');
-          expect(response.body.message).toContain('Resource Student is missing identity');
+          expect(response.body.message).toContain('Resource School is missing identity');
         });
     });
   });
@@ -33,16 +31,15 @@ describe('Student Intervention Association', () => {
 
     it('should add the association', async () => {
       location = await baseURLRequest
-        .post('/v3.3b/ed-fi/StudentInterventionAssociations')
+        .post('/v3.3b/ed-fi/locations')
         .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
         .send({
-          studentReference: {
-            studentUniqueId: 's0zf6d1123d3e',
+          classroomIdentificationCode: 'string',
+          schoolReference: {
+            schoolId: 99,
           },
-          interventionReference: {
-            interventionIdentificationCode: '111',
-            educationOrganizationId: 123,
-          },
+          maximumNumberOfSeats: 20,
+          optimalNumberOfSeats: 10,
         })
         .expect(201)
         .then((response) => {
@@ -57,8 +54,8 @@ describe('Student Intervention Association', () => {
         .then((response) => {
           expect(response.body).toEqual(
             expect.objectContaining({
-              studentReference: {
-                studentUniqueId: 's0zf6d1123d3e',
+              schoolReference: {
+                schoolId: 99,
               },
             }),
           );
