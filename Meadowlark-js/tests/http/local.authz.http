@@ -249,11 +249,18 @@ grant_type=client_credentials&client_id=meadowlark_key_1&client_secret=meadowlar
 @created_client_secret_1={{client1.response.body.$.client_secret}}
 
 ### Authenticate as a previously created client, form url encoded, should succeed
+# @name newClient
 POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id={{created_client_id_1}}&client_secret={{created_client_secret_1}}
 
+###
+@newClientToken = {{newClient.response.body.$.access_token}}
+
+### Use the new client's token
+GET http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{newClientToken}}
 
 ### Authenticate as a previously created client with wrong secret, form url encoded, should 401
 POST http://localhost:3000/local/oauth/token
