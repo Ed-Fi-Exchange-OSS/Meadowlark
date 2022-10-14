@@ -12,7 +12,6 @@ import {
   DomainEntitySubclass,
   MetaEdEnvironment,
   normalizeDescriptorSuffix,
-  SchoolYearEnumeration,
   TopLevelEntity,
 } from '@edfi/metaed-core';
 import { pluralize } from '@edfi/metaed-plugin-edfi-meadowlark';
@@ -108,18 +107,6 @@ function getResourceNameMappingForNamespace(metaEd: MetaEdEnvironment, projectNa
   if (descriptors != null) {
     for (const descriptor of descriptors) {
       resourceNameMapping.set(pluralize(normalizeDescriptorSuffix(decapitalize(descriptor.metaEdName))), descriptor);
-    }
-  }
-
-  // SchoolYearEnumeration is its own model type. Though there is only one of them, it is stored in a collection
-  // like all other model types for consistency.
-  const schoolYearEnumerations: IterableIterator<SchoolYearEnumeration> | undefined = metaEd.namespace
-    .get(projectName)
-    ?.entity.schoolYearEnumeration.values();
-  if (schoolYearEnumerations != null) {
-    const schoolYearEnumeration: SchoolYearEnumeration = Array.from(schoolYearEnumerations)[0];
-    if (schoolYearEnumeration != null) {
-      resourceNameMapping.set(resourceNameFrom(`${schoolYearEnumeration.metaEdName}Type`), schoolYearEnumeration);
     }
   }
 
