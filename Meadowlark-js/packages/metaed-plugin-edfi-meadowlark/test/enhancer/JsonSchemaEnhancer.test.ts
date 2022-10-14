@@ -139,19 +139,18 @@ describe('when building simple domain entity with all the simple non-collections
             "type": "string",
           },
           "schoolYearTypeReference": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "additionalProperties": false,
-            "description": "A school year reference",
+            "description": "A school year enumeration",
             "properties": {
               "schoolYear": {
-                "description": "A school year",
+                "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": [
-              "schoolYear",
-            ],
+            "title": "EdFi.SchoolYearType",
             "type": "object",
           },
           "stringIdentity": {
@@ -456,19 +455,18 @@ describe('when building simple domain entity with all the simple collections', (
             "uniqueItems": false,
           },
           "schoolYearTypeReference": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "additionalProperties": false,
-            "description": "A school year reference",
+            "description": "A school year enumeration",
             "properties": {
               "schoolYear": {
-                "description": "A school year",
+                "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": [
-              "schoolYear",
-            ],
+            "title": "EdFi.SchoolYearType",
             "type": "object",
           },
           "stringIdentity": {
@@ -1928,19 +1926,18 @@ describe('when building domain entity with two school year enumerations, one rol
         "description": "doc",
         "properties": {
           "classOfSchoolYearTypeReference": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "additionalProperties": false,
-            "description": "A school year reference",
+            "description": "A school year enumeration",
             "properties": {
               "schoolYear": {
-                "description": "A school year",
+                "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": [
-              "schoolYear",
-            ],
+            "title": "EdFi.SchoolYearType",
             "type": "object",
           },
           "schoolId": {
@@ -1948,19 +1945,18 @@ describe('when building domain entity with two school year enumerations, one rol
             "type": "integer",
           },
           "schoolYearTypeReference": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "additionalProperties": false,
-            "description": "A school year reference",
+            "description": "A school year enumeration",
             "properties": {
               "schoolYear": {
-                "description": "A school year",
+                "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
                 "type": "number",
               },
             },
-            "required": [
-              "schoolYear",
-            ],
+            "title": "EdFi.SchoolYearType",
             "type": "object",
           },
         },
@@ -2166,25 +2162,13 @@ describe('when building a school year enumeration', () => {
         "additionalProperties": false,
         "description": "A school year enumeration",
         "properties": {
-          "currentSchoolYear": {
-            "description": "Is this the current school year",
-            "type": "boolean",
-          },
           "schoolYear": {
             "description": "A school year between 1900 and 2100",
             "maximum": 2100,
             "minimum": 1900,
             "type": "number",
           },
-          "schoolYearDescription": {
-            "description": "The school year description",
-            "type": "string",
-          },
         },
-        "required": [
-          "schoolYear",
-          "currentSchoolYear",
-        ],
         "title": "EdFi.SchoolYearType",
         "type": "object",
       }
