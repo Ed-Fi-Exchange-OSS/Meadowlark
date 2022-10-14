@@ -63,6 +63,9 @@ const descriptorSchema: SchemaRoot = {
 };
 
 // SchoolYearEnumeration is a hardcoded exception in the ODS/API
+const beginYear = Number.parseInt(process.env.BEGIN_ALLOWED_SCHOOL_YEAR || '1900', 10);
+const endYear = Number.parseInt(process.env.END_ALLOWED_SCHOOL_YEAR || '2100', 10);
+
 const schoolYearEnumerationSchema: SchemaRoot = {
   ...newSchemaRoot(),
   type: 'object',
@@ -71,21 +74,12 @@ const schoolYearEnumerationSchema: SchemaRoot = {
   properties: {
     schoolYear: {
       type: 'number',
-      description: 'A school year between 1900 and 2100',
-      minimum: 1900,
-      maximum: 2100,
-    },
-    currentSchoolYear: {
-      type: 'boolean',
-      description: 'Is this the current school year',
-    },
-    schoolYearDescription: {
-      type: 'string',
-      description: 'The school year description',
+      description: `A school year between ${beginYear} and ${endYear}`,
+      minimum: beginYear,
+      maximum: endYear,
     },
   },
   additionalProperties: false,
-  required: ['schoolYear', 'currentSchoolYear'],
 };
 
 /**
@@ -263,7 +257,7 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
       return { type: 'string', format: 'time', description };
 
     case 'schoolYearEnumeration':
-      return { type: 'integer', description, minimum: 1900, maximum: 2100 };
+      return { type: 'integer', description, minimum: beginYear, maximum: endYear };
 
     case 'year':
       return { type: 'integer', description };
@@ -329,20 +323,7 @@ function schemaArrayForNonReferenceCollection(property: EntityProperty, property
 function schemaPropertyForSchoolYearEnumeration(property: EntityProperty): SchemaProperty {
   invariant(property.type === 'schoolYearEnumeration');
   // Assume not a collection, the shape of a school year collection is currently undefined by the ODS/API
-  return {
-    type: 'object',
-    description: 'A school year reference',
-    properties: {
-      schoolYear: {
-        type: 'number',
-        description: 'A school year',
-        minimum: 1900,
-        maximum: 2100,
-      },
-    },
-    additionalProperties: false,
-    required: ['schoolYear'],
-  };
+  return schoolYearEnumerationSchema;
 }
 
 /**
