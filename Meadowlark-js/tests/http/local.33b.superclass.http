@@ -46,7 +46,6 @@ content-type: application/json
 
 ###
 # @name studentabc
-# reference-validation: true
 POST  http://localhost:3000/local/v3.3b/ed-fi/students/
 content-type: application/json
 {{auth_header}}
@@ -121,7 +120,6 @@ content-type: application/json
 
 ### 
 # @name school122
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -226,7 +224,6 @@ GET http://localhost:3000{{schoolDocumentLocation}}
 {{auth_header}}
 
 ### 
-# reference-validation: true
 PUT http://localhost:3000{{schoolDocumentLocation}}
 content-type: application/json
 {{auth_header}}
@@ -253,7 +250,6 @@ GET http://localhost:3000/local/v3.3b/ed-fi/schools
 
 ### 
 # @name school250
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -290,7 +286,6 @@ content-type: application/json
 }
 
 ####
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 {{auth_header}}
@@ -322,7 +317,6 @@ content-type: application/json
 }
 
 ####
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
 content-type: application/json
 {{auth_header}}
@@ -345,7 +339,6 @@ DELETE http://localhost:3000{{school250Documentlocation}}
 
 ### 
 # Don't delete this! Used by tests in other files.
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -391,7 +384,6 @@ content-type: application/json
 }
 
 ### Create a LocalEducationAgency
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
 content-type: application/json
 {{auth_header}}
@@ -408,7 +400,6 @@ content-type: application/json
 }
 
 ### Create a location with a LEA - should fail with 400 - Bad Request
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}
@@ -421,7 +412,6 @@ content-type: application/json
 }
 
 ### Create School
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 {{auth_header}}
@@ -447,7 +437,6 @@ content-type: application/json
 }
 
 ### Atempt to assign School to location - Should succeed
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 {{auth_header}}

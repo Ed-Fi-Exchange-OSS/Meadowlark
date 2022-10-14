@@ -177,8 +177,7 @@ authorization: bearer {{authToken1}}
     "gradeLevels": []
 }
 
-### Fails - note # reference-validation: true
-POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
+### Fails - note POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -245,7 +244,6 @@ authorization: bearer {{authToken4}}
 }
 
 ### Create a location - school does not exist. Should return 400
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -285,7 +283,6 @@ authorization: bearer {{authToken4}}
 }
 
 ### Now the school _does_ exist
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -319,7 +316,7 @@ descriptor-validation: true
 {
   "sessionName": "d",
   "schoolYearTypeReference": {
-    "schoolYear": 20345
+    "schoolYear": 2034
   },
   "beginDate": "2021-01-01",
   "endDate": "2021-06-01",
@@ -331,7 +328,6 @@ descriptor-validation: true
 }
 
 ### Create a course
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -363,7 +359,6 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
-# reference-validation: true
 # @name courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
@@ -430,11 +425,10 @@ GET http://localhost:3000/local/v3.3b/ed-fi/behaviorDescriptors
 authorization: bearer {{authToken1}}
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/BehaviorDescriptors/41e20a8e3e29596a206ab2eec7118910c7f190ada37148f007357a64
+GET http://localhost:3000/local/v3.3b/ed-fi/behaviorDescriptors/fCqNHqFd1j9tNzZ6lDcSxuwX2ZvS2IcCnyU-hg
 authorization: bearer {{authToken1}}
 
 ### Create an EducationOrganizationCategory descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -447,7 +441,6 @@ content-type: application/json
 }
 
 ### Create an LocalEducationAgencyCategory descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencyCategoryDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -497,7 +490,6 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a Sex descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/sexDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
