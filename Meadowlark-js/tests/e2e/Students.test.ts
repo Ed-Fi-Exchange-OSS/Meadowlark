@@ -119,15 +119,11 @@ describe('Students', () => {
     });
 
     afterEach(async () => {
-      if (studentLocation) {
-        await deleteByLocation(studentLocation);
-      }
+      await deleteByLocation(studentLocation);
     });
 
     afterAll(async () => {
-      if (countryLocation) {
-        await deleteByLocation(countryLocation);
-      }
+      await deleteByLocation(countryLocation);
     });
   });
 
@@ -158,9 +154,7 @@ describe('Students', () => {
     });
 
     afterAll(async () => {
-      if (studentLocation) {
-        await deleteByLocation(studentLocation);
-      }
+      await deleteByLocation(studentLocation);
     });
   });
 });

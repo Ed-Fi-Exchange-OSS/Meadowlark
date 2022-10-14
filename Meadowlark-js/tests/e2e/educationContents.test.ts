@@ -104,14 +104,10 @@ describe('Education content', () => {
   });
 
   afterEach(async () => {
-    if (educationContentLocation) {
-      await deleteByLocation(educationContentLocation);
-    }
+    await deleteByLocation(educationContentLocation);
   });
 
   afterAll(async () => {
-    if (contentClassDescriptorLocation) {
-      await deleteByLocation(contentClassDescriptorLocation);
-    }
+    await deleteByLocation(contentClassDescriptorLocation);
   });
 });

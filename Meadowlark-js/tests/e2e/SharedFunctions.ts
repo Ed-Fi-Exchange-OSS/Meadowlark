@@ -134,9 +134,13 @@ export async function getDescriptorByLocation(location: string): Promise<string>
 }
 
 export async function deleteByLocation(location: string): Promise<void> {
-  await rootURLRequest
-    .delete(location)
-    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    .expect(204);
+  if (location) {
+    await rootURLRequest
+      .delete(location)
+      .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
+      .expect(204);
+  } else {
+    throw new Error(`Location: ${location} not found.`);
+  }
 }
 /* TEMPORARY LOCATION */
