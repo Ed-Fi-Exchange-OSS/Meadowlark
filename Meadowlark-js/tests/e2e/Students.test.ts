@@ -16,6 +16,56 @@ import {
 
 describe('Students', () => {
   describe('with strict validation', () => {
+    it('should fail with invalid country descriptor', async () => {
+      await baseURLRequest
+        .post('/v3.3b/ed-fi/students')
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .send({
+          studentUniqueId: generateRandomId(),
+          firstName: 'First',
+          lastSurname: 'Last',
+          birthDate: '2001-01-01',
+          birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toContain('Resource CountryDescriptor is missing identity');
+        });
+    });
+  });
+
+  describe('without strict validation', () => {
+    let studentLocation: string;
+
+    it('should allow invalid country', async () => {
+      studentLocation = await baseURLRequest
+        .post('/v3.3b/ed-fi/students')
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .send({
+          studentUniqueId: generateRandomId(),
+          firstName: 'First',
+          lastSurname: 'Last',
+          birthDate: '2001-01-01',
+          birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.headers.location).not.toBe(null);
+          return response.headers.location;
+        });
+
+      await rootURLRequest
+        .get(studentLocation)
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .expect(200);
+    });
+
+    afterAll(async () => {
+      await deleteByLocation(studentLocation);
+    });
+  });
+
+  describe('when country is added', () => {
     let countryLocation: string;
     let countryDescriptor: string;
     let studentLocation: string;
@@ -25,49 +75,30 @@ describe('Students', () => {
       countryDescriptor = await getDescriptorByLocation(countryLocation);
     });
 
-    describe('Add', () => {
-      it('should fail with invalid country descriptor', async () => {
-        await baseURLRequest
-          .post('/v3.3b/ed-fi/students')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .send({
-            studentUniqueId: generateRandomId(),
-            firstName: 'First',
-            lastSurname: 'Last',
-            birthDate: '2001-01-01',
-            birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
-          })
-          .expect(400)
-          .then((response) => {
-            expect(response.body.message).toContain('Resource CountryDescriptor is missing identity');
-          });
-      });
+    it('should allow adding student', async () => {
+      studentLocation = await baseURLRequest
+        .post('/v3.3b/ed-fi/students')
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .send({
+          studentUniqueId: generateRandomId(),
+          firstName: 'First',
+          lastSurname: 'Last',
+          birthDate: '2001-01-01',
+          birthCountryDescriptor: countryDescriptor,
+        })
+        .expect(201)
+        .then((response) => {
+          expect(response.headers.location).not.toBe(null);
+          return response.headers.location;
+        });
 
-      it('should allow valid country descriptor', async () => {
-        studentLocation = await baseURLRequest
-          .post('/v3.3b/ed-fi/students')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .send({
-            studentUniqueId: generateRandomId(),
-            firstName: 'First',
-            lastSurname: 'Last',
-            birthDate: '2001-01-01',
-            birthCountryDescriptor: countryDescriptor,
-          })
-          .expect(201)
-          .then((response) => {
-            expect(response.headers.location).not.toBe(null);
-            return response.headers.location;
-          });
-
-        await rootURLRequest
-          .get(studentLocation)
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .expect(200);
-      });
+      await rootURLRequest
+        .get(studentLocation)
+        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .expect(200);
     });
 
-    describe('Edit', () => {
+    describe('when editing a student', () => {
       const studentUniqueId = generateRandomId();
       beforeAll(async () => {
         studentLocation = await baseURLRequest
@@ -87,7 +118,7 @@ describe('Students', () => {
           });
       });
 
-      it('should edit an education content', async () => {
+      it('should allow to edit', async () => {
         await rootURLRequest
           .put(studentLocation)
           .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -124,37 +155,6 @@ describe('Students', () => {
 
     afterAll(async () => {
       await deleteByLocation(countryLocation);
-    });
-  });
-
-  describe('without strict validation', () => {
-    let studentLocation: string;
-
-    it('should allow invalid country', async () => {
-      studentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-        .send({
-          studentUniqueId: generateRandomId(),
-          firstName: 'First',
-          lastSurname: 'Last',
-          birthDate: '2001-01-01',
-          birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
-
-      await rootURLRequest
-        .get(studentLocation)
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-        .expect(200);
-    });
-
-    afterAll(async () => {
-      await deleteByLocation(studentLocation);
     });
   });
 });

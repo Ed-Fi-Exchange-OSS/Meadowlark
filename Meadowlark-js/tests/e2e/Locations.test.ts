@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, getAccessToken, Clients, rootURLRequest, deleteByLocation } from './SharedFunctions';
+import { baseURLRequest, Clients, createSchool, deleteByLocation, getAccessToken, rootURLRequest } from './SharedFunctions';
 
 describe('Locations', () => {
   describe('with strict validation', () => {
-    it('should fail when missing data', async () => {
+    it('should fail when missing required properties', async () => {
       await baseURLRequest
         .post('/v3.3b/ed-fi/locations')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -24,12 +24,52 @@ describe('Locations', () => {
           expect(response.body.message).toContain('Resource School is missing identity');
         });
     });
+
+    describe('when school is added', () => {
+      let schoolId: number;
+      let schoolLocation: string;
+      let location: string;
+
+      beforeAll(async () => {
+        schoolId = 100;
+        schoolLocation = await createSchool(schoolId);
+      });
+
+      it('should add location with valid school', async () => {
+        location = await baseURLRequest
+          .post('/v3.3b/ed-fi/locations')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            classroomIdentificationCode: 'string',
+            schoolReference: {
+              schoolId,
+            },
+            maximumNumberOfSeats: 20,
+            optimalNumberOfSeats: 10,
+          })
+          .expect(201)
+          .then((response) => {
+            expect(response.headers.location).not.toBe(null);
+            return response.headers.location;
+          });
+        await rootURLRequest
+          .get(location)
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .expect(200);
+      });
+
+      afterAll(async () => {
+        await deleteByLocation(location);
+
+        await deleteByLocation(schoolLocation);
+      });
+    });
   });
 
   describe('without strict validation', () => {
     let location: string;
 
-    it('should add the association', async () => {
+    it('should add the location', async () => {
       location = await baseURLRequest
         .post('/v3.3b/ed-fi/locations')
         .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })

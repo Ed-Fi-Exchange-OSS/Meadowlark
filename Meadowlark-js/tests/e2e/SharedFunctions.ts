@@ -122,6 +122,37 @@ export async function createCountry(): Promise<string> {
     });
 }
 
+export async function createSchool(schoolId: number): Promise<string> {
+  // Using assessment credentials to bypass strict validation
+  return baseURLRequest
+    .post('/v3.3b/ed-fi/schools')
+    .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+    .send({
+      schoolId,
+      nameOfInstitution: 'New School',
+      educationOrganizationCategories: [
+        {
+          educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+        },
+      ],
+      schoolCategories: [
+        {
+          schoolCategoryDescriptor: 'uri://ed-fi.org/SchoolCategoryDescriptor#All Levels',
+        },
+      ],
+      gradeLevels: [
+        {
+          gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
+        },
+      ],
+    })
+    .expect(201)
+    .then((response) => {
+      expect(response.headers.location).not.toBe(null);
+      return response.headers.location;
+    });
+}
+
 export async function getDescriptorByLocation(location: string): Promise<string> {
   return rootURLRequest
     .get(location)
@@ -139,8 +170,6 @@ export async function deleteByLocation(location: string): Promise<void> {
       .delete(location)
       .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
       .expect(204);
-  } else {
-    throw new Error(`Location: ${location} not found.`);
   }
 }
 /* TEMPORARY LOCATION */
