@@ -14,7 +14,7 @@ import {
   Clients,
 } from './SharedFunctions';
 
-describe('Education content', () => {
+describe('Education contents', () => {
   let educationContentLocation: string;
   let contentClassDescriptorLocation: string;
   let contentClassDescriptor: string;

@@ -43,7 +43,7 @@
     "build": "lerna run build --stream",
     "build:clean": "lerna run build:clean --stream",
     "test:all": "yarn test && yarn test:integration",
-    "test": "yarn test:lint && yarn test:unit && yarn test:integration && yarn test:system",
+    "test": "yarn test:lint && yarn test:unit && yarn test:integration && yarn test:system && yarn test:e2e",
     "test:lint": "yarn test:lint:ts && yarn test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",
