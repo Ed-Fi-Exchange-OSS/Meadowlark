@@ -13,6 +13,8 @@ import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument'
 jest.setTimeout(40000);
 
 const clientId = 'clientId';
+const clientIdDifferent = 'clientIdDifferent';
+const clientIdSame = 'clientIdSame';
 
 const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest => ({
   clientId,
@@ -30,15 +32,14 @@ const newResetAuthorizationClientSecretRequest = (): ResetAuthorizationClientSec
 
 describe('given the get of an existing authorization client', () => {
   let mongoClient;
-  let createClientRequest;
-  let updateClientSecretResponse;
+  let resetClientSecretResponse;
 
   beforeAll(async () => {
     mongoClient = (await getNewClient()) as MongoClient;
 
-    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
+    await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
 
-    updateClientSecretResponse = await resetAuthorizationClientSecret(
+    resetClientSecretResponse = await resetAuthorizationClientSecret(
       newResetAuthorizationClientSecretRequest(),
       mongoClient,
     );
@@ -47,6 +48,14 @@ describe('given the get of an existing authorization client', () => {
   afterAll(async () => {
     await getAuthorizationCollection(mongoClient).deleteMany({});
     await mongoClient.close();
+  });
+
+  it('should return a successful response', async () => {
+    expect(resetClientSecretResponse).toMatchInlineSnapshot(`
+    {
+      "response": "RESET_SUCCESS",
+    }
+  `);
   });
 
   it('should exist in the db', async () => {
@@ -63,5 +72,75 @@ describe('given the get of an existing authorization client', () => {
       ],
     }
   `);
+  });
+});
+
+describe('given the attempted reset of a secret for an authorization client that does not exist', () => {
+  let mongoClient;
+  let resetClientSecretResponse;
+
+  beforeAll(async () => {
+    mongoClient = (await getNewClient()) as MongoClient;
+
+    resetClientSecretResponse = await resetAuthorizationClientSecret(
+      newResetAuthorizationClientSecretRequest(),
+      mongoClient,
+    );
+  });
+
+  afterAll(async () => {
+    await getAuthorizationCollection(mongoClient).deleteMany({});
+    await mongoClient.close();
+  });
+
+  it('should not exist in the db', async () => {
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
+    const result: any = await collection.findOne({ _id: clientIdDifferent });
+    expect(result).toBeNull();
+  });
+
+  it('should return update failed not exists', async () => {
+    expect(resetClientSecretResponse).toMatchInlineSnapshot(`
+      {
+        "response": "RESET_FAILED_NOT_EXISTS",
+      }
+    `);
+  });
+});
+
+describe('given a closed MongoDB connection', () => {
+  let mongoClient;
+  let resetClientSecretResponse;
+
+  beforeAll(async () => {
+    mongoClient = (await getNewClient()) as MongoClient;
+
+    mongoClient.close();
+
+    resetClientSecretResponse = await resetAuthorizationClientSecret(
+      newResetAuthorizationClientSecretRequest(),
+      mongoClient,
+    );
+
+    mongoClient = (await getNewClient()) as MongoClient;
+  });
+
+  afterAll(async () => {
+    await getAuthorizationCollection(mongoClient).deleteMany({});
+    await mongoClient.close();
+  });
+
+  it('should not exist in the db', async () => {
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
+    const result: any = await collection.findOne({ _id: clientIdSame });
+    expect(result).toBeNull();
+  });
+
+  it('should return failure', async () => {
+    expect(resetClientSecretResponse).toMatchInlineSnapshot(`
+      {
+        "response": "UNKNOWN_FAILURE",
+      }
+    `);
   });
 });
