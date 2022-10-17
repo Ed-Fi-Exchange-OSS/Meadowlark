@@ -4,9 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, MongoClient } from 'mongodb';
-import { CreateAuthorizationClientRequest, UpdateAuthorizationClientSecretRequest } from '@edfi/meadowlark-authz-server';
+import { CreateAuthorizationClientRequest, ResetAuthorizationClientSecretRequest } from '@edfi/meadowlark-authz-server';
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
-import { updateAuthorizationClientSecret } from '../../../src/repository/authorization/UpdateAuthorizationClientSecret';
+import { resetAuthorizationClientSecret } from '../../../src/repository/authorization/ResetAuthorizationClientSecret';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
@@ -22,7 +22,7 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   traceId: 'traceId',
 });
 
-const newUpdateAuthorizationClientSecretRequest = (): UpdateAuthorizationClientSecretRequest => ({
+const newResetAuthorizationClientSecretRequest = (): ResetAuthorizationClientSecretRequest => ({
   clientId,
   clientSecretHashed: 'updatedClientSecretHashed',
   traceId: 'traceId',
@@ -38,7 +38,10 @@ describe('given the get of an existing authorization client', () => {
 
     createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
 
-    updateClientSecretResponse = await updateAuthorizationClientSecret(newCreateAuthorizationClientRequest(), mongoClient);
+    updateClientSecretResponse = await resetAuthorizationClientSecret(
+      newResetAuthorizationClientSecretRequest(),
+      mongoClient,
+    );
   });
 
   afterAll(async () => {

@@ -16,7 +16,7 @@ export interface AuthorizationStorePlugin {
   createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
   getAuthorizationClient: (request: GetAuthorizationClientRequest) => Promise<GetAuthorizationClientResult>;
   updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
-  updateAuthorizationClientSecret: (
+  resetAuthorizationClientSecret: (
     request: ResetAuthorizationClientSecretRequest,
   ) => Promise<ResetAuthorizationClientSecretResult>;
 }

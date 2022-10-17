@@ -40,7 +40,7 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
     );
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
-  updateAuthorizationClientSecret: async (
+  resetAuthorizationClientSecret: async (
     _request: ResetAuthorizationClientSecretRequest,
   ): Promise<ResetAuthorizationClientSecretResult> => {
     Logger.warn('NoAuthorizationStorePlugin.updateClientSecret(): No authorization store plugin has been configured', null);

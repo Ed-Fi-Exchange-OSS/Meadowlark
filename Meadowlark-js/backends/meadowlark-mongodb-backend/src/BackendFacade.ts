@@ -31,7 +31,7 @@ import * as Update from './repository/Update';
 import * as CreateAuthorizationClient from './repository/authorization/CreateAuthorizationClient';
 import * as GetAuthorizationClient from './repository/authorization/GetAuthorizationClient';
 import * as UpdateAuthorizationClient from './repository/authorization/UpdateAuthorizationClient';
-import * as UpdateAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
+import * as ResetAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 import { getSharedClient } from './repository/Db';
 
@@ -75,8 +75,8 @@ export async function updateAuthorizationClientDocument(
   return UpdateAuthorizationClient.updateAuthorizationClientDocument(request, await getSharedClient());
 }
 
-export async function updateAuthorizationClientSecret(
+export async function resetAuthorizationClientSecret(
   request: ResetAuthorizationClientSecretRequest,
 ): Promise<ResetAuthorizationClientSecretResult> {
-  return UpdateAuthorizationClientSecret.resetAuthorizationClientSecret(request, await getSharedClient());
+  return ResetAuthorizationClientSecret.resetAuthorizationClientSecret(request, await getSharedClient());
 }

@@ -14,7 +14,7 @@ import {
   createAuthorizationClientDocument,
   updateAuthorizationClientDocument,
   getAuthorizationClientDocument,
-  updateAuthorizationClientSecret,
+  resetAuthorizationClientSecret,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -32,7 +32,7 @@ export function initializeAuthorizationStore(): AuthorizationStorePlugin {
     createAuthorizationClient: createAuthorizationClientDocument,
     updateAuthorizationClient: updateAuthorizationClientDocument,
     getAuthorizationClient: getAuthorizationClientDocument,
-    updateAuthorizationClientSecret,
+    resetAuthorizationClientSecret,
   };
 }
 
