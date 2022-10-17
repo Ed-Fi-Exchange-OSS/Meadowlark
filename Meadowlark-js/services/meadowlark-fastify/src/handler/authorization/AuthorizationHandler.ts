@@ -19,6 +19,6 @@ export async function requestTokenAuthorizationHandler(request: FastifyRequest, 
   respondWith(await AuthorizationServer.requestToken(fromRequest(request)), reply);
 }
 
-export async function updateAuthorizationClientSecretHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.updateAuthorizationClientSecret(fromRequest(request)), reply);
+export async function resetAuthorizationClientSecretHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  respondWith(await AuthorizationServer.resetAuthorizationClientSecret(fromRequest(request)), reply);
 }

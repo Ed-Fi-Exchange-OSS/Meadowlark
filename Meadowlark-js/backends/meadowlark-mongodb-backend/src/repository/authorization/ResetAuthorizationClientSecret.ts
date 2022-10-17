@@ -5,18 +5,18 @@
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { Logger } from '@edfi/meadowlark-core';
-import { UpdateAuthorizationClientResult, UpdateAuthorizationClientSecretRequest } from '@edfi/meadowlark-authz-server';
+import { ResetAuthorizationClientSecretRequest, ResetAuthorizationClientSecretResult } from '@edfi/meadowlark-authz-server';
 import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 import { getAuthorizationCollection } from '../Db';
 
-const functionName = 'mongodb.repository.authorization.UpdateAuthorizationClientDocument';
+const functionName = 'mongodb.repository.authorization.ResetAuthorizationClientDocument';
 
-export async function updateAuthorizationClientSecret(
-  request: UpdateAuthorizationClientSecretRequest,
+export async function resetAuthorizationClientSecret(
+  request: ResetAuthorizationClientSecretRequest,
   client: MongoClient,
-): Promise<UpdateAuthorizationClientResult> {
+): Promise<ResetAuthorizationClientSecretResult> {
   let session: ClientSession | null = null;
-  const updateResult: UpdateAuthorizationClientResult = { response: 'UNKNOWN_FAILURE' };
+  const resetResult: ResetAuthorizationClientSecretResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
     const mongoCollection: Collection<AuthorizationDocument> = getAuthorizationCollection(client);
@@ -29,15 +29,15 @@ export async function updateAuthorizationClientSecret(
 
       const { acknowledged, matchedCount } = await mongoCollection.updateOne(
         { _id: request.clientId },
-        { $set: { clientSecretHashed: request.clientSecret } },
+        { $set: { clientSecretHashed: request.clientSecretHashed } },
         { session },
       );
 
       if (acknowledged && matchedCount === 0) {
         Logger.debug(`${functionName}: client id ${request.clientId} does not exist`, request.traceId);
-        updateResult.response = 'UPDATE_FAILED_NOT_EXISTS';
+        resetResult.response = 'RESET_FAILED_NOT_EXISTS';
       } else if (acknowledged && matchedCount > 0) {
-        updateResult.response = 'UPDATE_SUCCESS';
+        resetResult.response = 'RESET_SUCCESS';
       } else {
         const msg =
           'mongoCollection.updateOne returned acknowledged: false, indicating a problem with write concern configuration';
@@ -49,5 +49,5 @@ export async function updateAuthorizationClientSecret(
   } finally {
     if (session != null) await session.endSession();
   }
-  return updateResult;
+  return resetResult;
 }

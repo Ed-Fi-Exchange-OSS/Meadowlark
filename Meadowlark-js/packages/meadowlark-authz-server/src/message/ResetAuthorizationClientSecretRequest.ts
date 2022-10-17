@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type UpdateAuthorizationClientSecretResult = {
-  response: 'UPDATE_SUCCESS' | 'UPDATE_FAILED_NOT_EXISTS' | 'UNKNOWN_FAILURE';
+export type ResetAuthorizationClientSecretRequest = {
+  clientId: string;
+  clientSecretHashed: string;
+  traceId: string;
 };

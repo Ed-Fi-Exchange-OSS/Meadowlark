@@ -6,17 +6,18 @@
 import crypto from 'node:crypto';
 import { authorizationHeader, writeErrorToLog } from '@edfi/meadowlark-core';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { UpdateAuthorizationClientSecretRequest } from '../message/UpdateClientSecretRequest';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { checkForAuthorizationErrors } from '../security/JwtValidator';
 import { clientIdFrom } from '../Utility';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
+import { ResetClientSecretResponseBody } from '../model/ResetClientSecretResponseBody';
+import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
+import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
 
 const moduleName = 'handler.UpdateClientSecret';
 
-export async function updateAuthorizationClientSecret(
+export async function resetAuthorizationClientSecret(
   authorizationRequest: AuthorizationRequest,
 ): Promise<AuthorizationResponse> {
   try {
@@ -35,7 +36,8 @@ export async function updateAuthorizationClientSecret(
     const clientSecretBytes: Buffer = crypto.randomBytes(32);
     const clientSecretHashed: string = crypto.createHash('shake256').update(clientSecretBytes).digest('hex');
 
-    const clientId = clientIdFrom(authorizationRequest.path);
+    const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*))?\/((?<reset>[^/]*$))?/gm;
+    const clientId = clientIdFrom(pathExpression, authorizationRequest.path);
 
     if (clientId === '') {
       const message = 'Missing client id';
@@ -43,32 +45,37 @@ export async function updateAuthorizationClientSecret(
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }
 
-    const updateSecretRequest: UpdateAuthorizationClientSecretRequest = {
+    const updateSecretRequest: ResetAuthorizationClientSecretRequest = {
       clientId,
-      clientSecret: clientSecretHashed,
+      clientSecretHashed,
       traceId: authorizationRequest.traceId,
     };
 
-    const updateResult: UpdateAuthorizationClientResult = await getAuthorizationStore().updateAuthorizationClientSecret(
+    const updateResult: ResetAuthorizationClientSecretResult = await getAuthorizationStore().updateAuthorizationClientSecret(
       updateSecretRequest,
     );
 
     const { response } = updateResult;
 
-    if (response === 'UPDATE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 204);
-      return { body: '', statusCode: 204 };
+    if (response === 'RESET_SUCCESS') {
+      const responseBody: ResetClientSecretResponseBody = {
+        client_id: clientId,
+        client_secret: clientSecretHashed,
+      };
+
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'resetAuthorizationClientSecret', 201);
+      return { body: JSON.stringify(responseBody), statusCode: 201 };
     }
 
-    if (response === 'UPDATE_FAILED_NOT_EXISTS') {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 404);
+    if (response === 'RESET_FAILED_NOT_EXISTS') {
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'resetAuthorizationClientSecret', 404);
       return { body: '', statusCode: 404 };
     }
 
-    writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClientSecret', 500);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'resetAuthorizationClientSecret', 500);
     return { body: '', statusCode: 500 };
   } catch (e) {
-    writeErrorToLog(moduleName, authorizationRequest.traceId, 'updateClient', 500, e);
+    writeErrorToLog(moduleName, authorizationRequest.traceId, 'resetAuthorizationClientSecret', 500, e);
     return { body: '', statusCode: 500 };
   }
 }

@@ -34,7 +34,8 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
       return errorResponse;
     }
 
-    const clientId: string = clientIdFrom(authorizationRequest.path);
+    const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*$))?/gm;
+    const clientId: string = clientIdFrom(pathExpression, authorizationRequest.path);
     if (clientId === '') {
       const message = 'Missing client id';
       writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, message);
