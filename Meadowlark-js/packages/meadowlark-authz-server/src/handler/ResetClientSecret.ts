@@ -14,6 +14,7 @@ import { AuthorizationResponse } from './AuthorizationResponse';
 import { ResetClientSecretResponseBody } from '../model/ResetClientSecretResponseBody';
 import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
 import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
+import { hashClientSecretBuffer } from '../security/HashClientSecret';
 
 const moduleName = 'handler.UpdateClientSecret';
 
@@ -33,8 +34,8 @@ export async function resetAuthorizationClientSecret(
       return errorResponse;
     }
 
-    const clientSecretBytes: Buffer = crypto.randomBytes(32);
-    const clientSecretHashed: string = crypto.createHash('shake256').update(clientSecretBytes).digest('hex');
+    const clientSecretBuffer: Buffer = crypto.randomBytes(32);
+    const clientSecretHashed: string = hashClientSecretBuffer(clientSecretBuffer);
 
     const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*))?\/((?<reset>[^/]*$))?/gm;
     const clientId = clientIdFrom(pathExpression, authorizationRequest.path);
