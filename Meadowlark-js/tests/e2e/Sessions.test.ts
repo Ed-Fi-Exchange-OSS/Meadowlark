@@ -6,6 +6,7 @@
 import {
   baseURLRequest,
   Clients,
+  createResource,
   createSchool,
   deleteByLocation,
   getAccessToken,
@@ -48,30 +49,25 @@ describe('Sessions', () => {
     let sessionLocation: string;
 
     beforeEach(async () => {
-      termDescriptorLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/termDescriptors')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
+      termDescriptorLocation = await createResource({
+        endpoint: 'termDescriptors',
+        body: {
           codeValue: 'Spring Semester',
           description: 'Spring Semester',
           shortDescription: 'Spring Semester',
           namespace: 'uri://ed-fi.org/TermDescriptor',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
+
       termDescriptor = await getDescriptorByLocation(termDescriptorLocation);
       schoolId = 100;
       schoolLocation = await createSchool(schoolId);
     });
 
     it('should create a session', async () => {
-      sessionLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/sessions')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
+      sessionLocation = await createResource({
+        endpoint: 'sessions',
+        body: {
           sessionName: 'd',
           schoolYearTypeReference: {
             schoolYear: 2034,
@@ -83,12 +79,8 @@ describe('Sessions', () => {
           schoolReference: {
             schoolId,
           },
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await baseURLRequest
         .get('/v3.3b/ed-fi/sessions')

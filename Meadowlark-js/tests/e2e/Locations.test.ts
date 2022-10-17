@@ -3,7 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, Clients, createSchool, deleteByLocation, getAccessToken, rootURLRequest } from './SharedFunctions';
+import {
+  baseURLRequest,
+  Clients,
+  createResource,
+  createSchool,
+  deleteByLocation,
+  getAccessToken,
+  rootURLRequest,
+} from './SharedFunctions';
 
 describe('Locations', () => {
   describe('with strict validation', () => {
@@ -36,22 +44,18 @@ describe('Locations', () => {
       });
 
       it('should add location with valid school', async () => {
-        location = await baseURLRequest
-          .post('/v3.3b/ed-fi/locations')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .send({
+        location = await createResource({
+          endpoint: 'locations',
+          body: {
             classroomIdentificationCode: 'string',
             schoolReference: {
               schoolId,
             },
             maximumNumberOfSeats: 20,
             optimalNumberOfSeats: 10,
-          })
-          .expect(201)
-          .then((response) => {
-            expect(response.headers.location).not.toBe(null);
-            return response.headers.location;
-          });
+          },
+        });
+
         await rootURLRequest
           .get(location)
           .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
@@ -70,22 +74,18 @@ describe('Locations', () => {
     let location: string;
 
     it('should add the location', async () => {
-      location = await baseURLRequest
-        .post('/v3.3b/ed-fi/locations')
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-        .send({
+      location = await createResource({
+        endpoint: 'locations',
+        credentials: Clients.Assessment1,
+        body: {
           classroomIdentificationCode: 'string',
           schoolReference: {
             schoolId: 99,
           },
           maximumNumberOfSeats: 20,
           optimalNumberOfSeats: 10,
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await rootURLRequest
         .get(location)

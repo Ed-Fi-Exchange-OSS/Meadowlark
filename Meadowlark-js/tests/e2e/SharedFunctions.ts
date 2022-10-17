@@ -88,46 +88,58 @@ export function generateRandomId(length = 12): string {
 }
 
 /* TEMPORARY LOCATION */
-export async function createContentClassDescriptor(): Promise<string> {
+export async function createResource({
+  endpoint,
+  body,
+  credentials = Clients.Vendor1,
+}: {
+  endpoint: string;
+  body: Object;
+  credentials?: Clients;
+}): Promise<string> {
   return baseURLRequest
-    .post(`/v3.3b/ed-fi/contentClassDescriptors`)
-    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    .send({
+    .post(`/v3.3b/ed-fi/${endpoint}`)
+    .auth(await getAccessToken(credentials), { type: 'bearer' })
+    .send(body)
+    .expect(201)
+    .then((response) => {
+      expect(response.headers.location).not.toBe(null);
+      return response.headers.location;
+    });
+}
+
+export async function createContentClassDescriptor(): Promise<string> {
+  return createResource({
+    endpoint: 'contentClassDescriptors',
+    credentials: Clients.Host1,
+    body: {
       codeValue: 'Presentation',
       shortDescription: 'Presentation',
       description: 'Presentation',
       namespace: 'uri://ed-fi.org/ContentClassDescriptor',
-    })
-    .expect(201)
-    .then((response) => {
-      expect(response.headers.location).not.toBe(null);
-      return response.headers.location;
-    });
+    },
+  });
 }
 
 export async function createCountry(): Promise<string> {
-  return baseURLRequest
-    .post('/v3.3b/ed-fi/countryDescriptors')
-    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    .send({
+  return createResource({
+    endpoint: 'countryDescriptors',
+    credentials: Clients.Host1,
+    body: {
       codeValue: 'US',
       shortDescription: 'US',
       description: 'US',
       namespace: 'uri://ed-fi.org/CountryDescriptor',
-    })
-    .expect(201)
-    .then((response) => {
-      expect(response.headers.location).not.toBe(null);
-      return response.headers.location;
-    });
+    },
+  });
 }
 
 export async function createSchool(schoolId: number): Promise<string> {
   // Using assessment credentials to bypass strict validation
-  return baseURLRequest
-    .post('/v3.3b/ed-fi/schools')
-    .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-    .send({
+  return createResource({
+    endpoint: 'schools',
+    credentials: Clients.Assessment1,
+    body: {
       schoolId,
       nameOfInstitution: 'New School',
       educationOrganizationCategories: [
@@ -145,12 +157,8 @@ export async function createSchool(schoolId: number): Promise<string> {
           gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
         },
       ],
-    })
-    .expect(201)
-    .then((response) => {
-      expect(response.headers.location).not.toBe(null);
-      return response.headers.location;
-    });
+    },
+  });
 }
 
 export async function getDescriptorByLocation(location: string): Promise<string> {

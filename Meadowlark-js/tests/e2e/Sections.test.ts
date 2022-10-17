@@ -3,7 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, getAccessToken, Clients, deleteByLocation, rootURLRequest } from './SharedFunctions';
+import {
+  baseURLRequest,
+  getAccessToken,
+  Clients,
+  deleteByLocation,
+  rootURLRequest,
+  createResource,
+} from './SharedFunctions';
 
 describe('Sections', () => {
   describe('with strict validation', () => {
@@ -53,10 +60,10 @@ describe('Sections', () => {
     let location: string;
 
     it('should add the section', async () => {
-      location = await baseURLRequest
-        .post('/v3.3b/ed-fi/sections')
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-        .send({
+      location = await createResource({
+        endpoint: 'sections',
+        credentials: Clients.Assessment1,
+        body: {
           sectionIdentifier: 'c00v',
           courseOfferingReference: {
             localCourseCode: 'abc',
@@ -83,12 +90,8 @@ describe('Sections', () => {
               },
             },
           ],
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await rootURLRequest
         .get(location)

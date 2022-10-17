@@ -12,6 +12,7 @@ import {
   createContentClassDescriptor,
   getDescriptorByLocation,
   Clients,
+  createResource,
 } from './SharedFunctions';
 
 describe('Education contents', () => {
@@ -27,22 +28,16 @@ describe('Education contents', () => {
   describe('Create', () => {
     it('should create an education content', async () => {
       const contentIdentifier = generateRandomId();
-      // Decide: Move to a common class to reuse?
-      educationContentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
+      educationContentLocation = await createResource({
+        endpoint: 'educationContents',
+        body: {
           contentIdentifier,
           namespace: '43210',
           shortDescription: 'ShortDesc',
           contentClassDescriptor,
           learningResourceMetadataURI: 'uri://ed-fi.org/fake-uri',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await baseURLRequest
         .get('/v3.3b/ed-fi/educationContents')
@@ -62,21 +57,16 @@ describe('Education contents', () => {
   describe('Edit', () => {
     const contentIdentifier = generateRandomId();
     beforeAll(async () => {
-      educationContentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
+      educationContentLocation = await createResource({
+        endpoint: 'educationContents',
+        body: {
           contentIdentifier,
           namespace: '43210',
           shortDescription: 'ShortDesc',
           contentClassDescriptor,
           learningResourceMetadataURI: 'uri://ed-fi.org/fake-uri',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
     });
 
     it('should edit an education content', async () => {

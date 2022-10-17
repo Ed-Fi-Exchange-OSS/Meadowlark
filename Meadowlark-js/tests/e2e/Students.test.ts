@@ -7,6 +7,7 @@ import {
   baseURLRequest,
   Clients,
   createCountry,
+  createResource,
   deleteByLocation,
   generateRandomId,
   getAccessToken,
@@ -38,21 +39,17 @@ describe('Students', () => {
     let studentLocation: string;
 
     it('should allow invalid country', async () => {
-      studentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
-        .send({
+      studentLocation = await createResource({
+        endpoint: 'students',
+        credentials: Clients.Assessment1,
+        body: {
           studentUniqueId: generateRandomId(),
           firstName: 'First',
           lastSurname: 'Last',
           birthDate: '2001-01-01',
           birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await rootURLRequest
         .get(studentLocation)
@@ -76,21 +73,16 @@ describe('Students', () => {
     });
 
     it('should allow adding student', async () => {
-      studentLocation = await baseURLRequest
-        .post('/v3.3b/ed-fi/students')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
+      studentLocation = await createResource({
+        endpoint: 'students',
+        body: {
           studentUniqueId: generateRandomId(),
           firstName: 'First',
           lastSurname: 'Last',
           birthDate: '2001-01-01',
           birthCountryDescriptor: countryDescriptor,
-        })
-        .expect(201)
-        .then((response) => {
-          expect(response.headers.location).not.toBe(null);
-          return response.headers.location;
-        });
+        },
+      });
 
       await rootURLRequest
         .get(studentLocation)
@@ -101,21 +93,16 @@ describe('Students', () => {
     describe('when editing a student', () => {
       const studentUniqueId = generateRandomId();
       beforeAll(async () => {
-        studentLocation = await baseURLRequest
-          .post('/v3.3b/ed-fi/students')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .send({
+        studentLocation = await createResource({
+          endpoint: 'students',
+          body: {
             studentUniqueId,
             firstName: 'First',
             lastSurname: 'Last',
             birthDate: '2001-01-01',
             birthCountryDescriptor: countryDescriptor,
-          })
-          .expect(201)
-          .then((response) => {
-            expect(response.headers.location).not.toBe(null);
-            return response.headers.location;
-          });
+          },
+        });
       });
 
       it('should allow to edit', async () => {
