@@ -3,17 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import {
-  baseURLRequest,
-  Clients,
-  createCountry,
-  createResource,
-  deleteByLocation,
-  generateRandomId,
-  getAccessToken,
-  getDescriptorByLocation,
-  rootURLRequest,
-} from './SharedFunctions';
+import { getAccessToken, Clients } from './functions/Credentials';
+import { createResource, deleteResourceByLocation } from './functions/Resources';
+import { generateRandomId, createCountry, getDescriptorByLocation } from './functions/Shared';
+import { baseURLRequest, rootURLRequest } from './Setup';
 
 describe('Students', () => {
   describe('with strict validation', () => {
@@ -58,7 +51,7 @@ describe('Students', () => {
     });
 
     afterAll(async () => {
-      await deleteByLocation(studentLocation);
+      await deleteResourceByLocation(studentLocation);
     });
   });
 
@@ -137,11 +130,11 @@ describe('Students', () => {
     });
 
     afterEach(async () => {
-      await deleteByLocation(studentLocation);
+      await deleteResourceByLocation(studentLocation);
     });
 
     afterAll(async () => {
-      await deleteByLocation(countryLocation);
+      await deleteResourceByLocation(countryLocation);
     });
   });
 });

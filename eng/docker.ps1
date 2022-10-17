@@ -15,7 +15,7 @@ param(
 )
 
 @(
-    "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-mongodb-backend",
+    # "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-mongodb-backend",
     "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-opensearch-backend",
     "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-postgresql-backend"
 ) | ForEach-Object {
