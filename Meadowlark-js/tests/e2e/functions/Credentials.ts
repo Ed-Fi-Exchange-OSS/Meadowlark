@@ -5,6 +5,7 @@
 
 import { baseURLRequest } from '../Setup';
 
+// eslint-disable-next-line no-shadow
 export enum Clients {
   Vendor1,
   Vendor2,
