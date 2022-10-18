@@ -1,11 +1,11 @@
 #
-# Some of the tests in this file assume that the user has already run throuhg
+# Some of the tests in this file assume that the user has already run through
 # the tests in `local.33b.superclass.http`.
 #
 
 ### Authenticate
 # @name client1
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -20,7 +20,7 @@ content-type: application/json
 
 ### Authenticate client4 (this client has validation turned off
 # @name client4
-POST http://localhost:3000/local/api/oauth/token
+POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
@@ -177,8 +177,7 @@ authorization: bearer {{authToken1}}
     "gradeLevels": []
 }
 
-### Fails - note # reference-validation: true
-POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
+### Fails - note POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -245,7 +244,6 @@ authorization: bearer {{authToken4}}
 }
 
 ### Create a location - school does not exist. Should return 400
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -285,7 +283,6 @@ authorization: bearer {{authToken4}}
 }
 
 ### Now the school _does_ exist
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/locations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -331,7 +328,6 @@ descriptor-validation: true
 }
 
 ### Create a course
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/courses
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -351,8 +347,7 @@ authorization: bearer {{authToken1}}
     ]
 }
 
-### Create a school year
-# reference-validation: true
+### School year is not supported - expected 404
 POST http://localhost:3000/local/v3.3b/ed-fi/schoolYearTypes
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -364,7 +359,6 @@ authorization: bearer {{authToken1}}
 
 
 ### Create a courseOffering
-# reference-validation: true
 # @name courseOffering
 POST http://localhost:3000/local/v3.3b/ed-fi/courseOfferings
 content-type: application/json
@@ -431,11 +425,10 @@ GET http://localhost:3000/local/v3.3b/ed-fi/behaviorDescriptors
 authorization: bearer {{authToken1}}
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/BehaviorDescriptors/41e20a8e3e29596a206ab2eec7118910c7f190ada37148f007357a64
+GET http://localhost:3000/local/v3.3b/ed-fi/behaviorDescriptors/fCqNHqFd1j9tNzZ6lDcSxuwX2ZvS2IcCnyU-hg
 authorization: bearer {{authToken1}}
 
 ### Create an EducationOrganizationCategory descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -448,7 +441,6 @@ content-type: application/json
 }
 
 ### Create an LocalEducationAgencyCategory descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencyCategoryDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -498,7 +490,6 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create a Sex descriptor
-# reference-validation: true
 POST http://localhost:3000/local/v3.3b/ed-fi/sexDescriptors
 authorization: bearer {{authToken1}}
 content-type: application/json
@@ -537,8 +528,40 @@ authorization: bearer {{authToken1}}
   "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
 }
 
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/GraduationPlanTypeDescriptors
+content-type: application/application/json
+authorization: bearer {{authToken1}}
 
-####
+{
+  "codeValue": "Minimum",
+  "shortDescription": "Minimum",
+  "description": "Minimum",
+  "namespace": "uri://ed-fi.org/GraduationPlanTypeDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{ 
+  "educationOrganizationReference": {
+    "educationOrganizationId": 123
+  },
+  "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
+  "graduationSchoolYearTypeReference": {
+    "schoolYear": 2024
+  },
+  "totalRequiredCredits": 100
+}
+
+###
+GET http://localhost:3000/local/v3.3b/ed-fi/graduationPlans
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+#### Contains two different school years
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -551,8 +574,64 @@ authorization: bearer {{authToken1}}
         "schoolId": 123
     },
     "entryDate": "2020-01-01",
-    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10"
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10",
+    "classOfSchoolYearTypeReference": {
+      "schoolYear": 2022
+    },
+    "schoolYearTypeReference": {
+      "schoolYear": 2023
+    }
 }
+
+#### Contains two INVALID school years
+PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "s0zf6d1123d3e"
+    },
+    "schoolReference": {
+        "schoolId": 123
+    },
+    "entryDate": "2020-01-01",
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10",
+    "classOfSchoolYearTypeReference": {
+      "schoolYear": 202
+    },
+    "schoolYearTypeReference": {
+      "schoolYear": 203
+    }
+}
+
+### This fails, documented in RND-426
+PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations/uJ8Rk-JjLZuoSnnSQUUuG2-LY9kz5QrrD0_UyQ
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "s0zf6d1123d3e"
+    },
+    "schoolReference": {
+        "schoolId": 123
+    },
+    "entryDate": "2020-01-01",
+    "entryGradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#10",
+    "classOfSchoolYearTypeReference": {
+      "schoolYear": 2022
+    },
+    "schoolYearTypeReference": {
+      "schoolYear": 2023
+    },
+    "graduationPlanReference": {
+      "educationOrganizationId": 123,
+      "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
+      "graduationSchoolYear": 2024
+    }
+}
+
 
 ######## GET by ID
 GET http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations/KbK3nYKOeuNj1aASuMm2IlM3nTtcvlVfDLTSeg
