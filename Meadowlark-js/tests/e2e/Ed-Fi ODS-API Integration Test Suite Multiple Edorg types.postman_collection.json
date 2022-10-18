@@ -1,0 +1,2997 @@
+{
+	"info": {
+		"_postman_id": "fc91ae2d-98b9-4a47-b4a5-b59876c499e2",
+		"name": "Ed-Fi ODS/API Integration Test Suite Multiple Edorg types",
+		"description": "Localhost integration testing using Postman Scripts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15734759"
+	},
+	"item": [
+		{
+			"name": "Initial Setup",
+			"item": [
+				{
+					"name": "Initialize Education Organization Ids",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set('known:schoolId',255901001);\r",
+									"pm.environment.set('known:schoolId2',255901044);\r",
+									"pm.environment.set('known:communityProviderId',5001);\r",
+									"pm.environment.set('known:communityProviderId2',5002);\r",
+									"pm.environment.set('known:postSecondaryInstitutionId',51);\r",
+									"pm.environment.set('known:schoolId3',255901999);\r",
+									"pm.environment.set('known:localEducationAgencyId',255901);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ApiBaseUrl}}",
+							"host": [
+								"{{ApiBaseUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initialize communityProvider Data for Request",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const uuid = require('uuid');",
+									"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+									"function createScenarioId() { return newGuid().substring(0,5); }",
+									"pm.environment.set('scenarioId', createScenarioId());",
+									"const scenarioId = pm.environment.get('scenarioId');",
+									"pm.environment.set('supplied:'+scenarioId+':nameOfInstitution', 'LEA-2002');",
+									"pm.environment.set('supplied:'+scenarioId+':educationOrganizationCategoryDescriptor', \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency\");",
+									"pm.environment.set('supplied:'+scenarioId+':localEducationAgencyCategoryDescriptor', \"uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Charter\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 201\", () => {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"categories\": [\r\n    {\r\n      \"educationOrganizationCategoryDescriptor\": \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Education Service Center\"\r\n    }\r\n  ],\r\n  \"communityProviderId\": \"{{known:communityProviderId}}\",\r\n  \"nameOfInstitution\": \"District Company\",\r\n  \"providerCategoryDescriptor\": \"uri://ed-fi.org/ProviderCategoryDescriptor#Center-EC\",\r\n  \"providerProfitabilityDescriptor\": \"uri://ed-fi.org/ProviderProfitabilityDescriptor#ForProfit\",\r\n  \"providerStatusDescriptor\": \"uri://ed-fi.org/ProviderStatusDescriptor#Active\"\r\n}"
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/communityProviders",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"communityProviders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initialize postSecondaryInstitutions  Data",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 201\", () => {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postSecondaryInstitutionId\": \"{{known:postSecondaryInstitutionId}}\",\r\n    \"nameOfInstitution\": \"The University of Texas at Austin\",\r\n    \"postSecondaryInstitutionLevelDescriptor\": \"uri://ed-fi.org/PostSecondaryInstitutionLevelDescriptor#Four or more years\",\r\n    \"categories\": [\r\n      {\r\n        \"educationOrganizationCategoryDescriptor\": \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Post Secondary Institution\"\r\n      }\r\n    ]\r\n  }\r\n"
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/postSecondaryInstitutions",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"postSecondaryInstitutions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initialize School Data for Request",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const scenarioId = pm.environment.get('scenarioId');",
+									"pm.environment.set('supplied:'+scenarioId+':nameOfInstitution', 'SCH-200101');",
+									"pm.environment.set('supplied:'+scenarioId+':educationOrganizationCategoryDescriptor', \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency\");",
+									"pm.environment.set('supplied:'+scenarioId+':gradeLevelDescriptor', \"uri://ed-fi.org/GradeLevelDescriptor#Adult Education\");",
+									"pm.environment.set('supplied:'+scenarioId+':schoolCategoryDescriptor', \"uri://ed-fi.org/SchoolCategoryDescriptor#Adult School\");",
+									"pm.environment.set('supplied:'+scenarioId+':schoolTypeDescriptor', \"uri://ed-fi.org/SchoolTypeDescriptor#Regular\");",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 or 201\", () => {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"educationOrganizationCategories\": [\r\n    {\r\n      \"educationOrganizationCategoryDescriptor\":  \"{{supplied:{{scenarioId}}:educationOrganizationCategoryDescriptor}}\"\r\n    }\r\n  ],\r\n   \"gradeLevels\": [\r\n    {\r\n      \"gradeLevelDescriptor\":  \"{{supplied:{{scenarioId}}:gradeLevelDescriptor}}\"\r\n    }\r\n  ],\r\n  \"schoolId\":  \"{{known:schoolId3}}\",\r\n  \"localEducationAgencyReference\": {\r\n    \"localEducationAgencyId\": \"{{known:localEducationAgencyId}}\"\r\n  },\r\n  \"nameOfInstitution\":  \"{{supplied:{{scenarioId}}:nameOfInstitution}}\",\r\n  \"schoolCategories\": [\r\n    {\r\n      \"schoolCategoryDescriptor\": \"{{supplied:{{scenarioId}}:schoolCategoryDescriptor}}\"\r\n    }\r\n  ],\r\n  \"schoolTypeDescriptor\": \"{{supplied:{{scenarioId}}:schoolTypeDescriptor}}\",\r\n  \"shortNameOfInstitution\":  \"{{supplied:{{scenarioId}}:nameOfInstitution}}\"\r\n\r\n}"
+						},
+						"url": {
+							"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/schools",
+							"host": [
+								"{{ApiBaseUrl}}"
+							],
+							"path": [
+								"v3.3b",
+								"ed-fi",
+								"schools"
+							]
+						},
+						"description": "This api post method adds new academicWeeks for particular school .\nThis test method will throw WeekIdentifier is required error when WeekIdentifier is not passed"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Multiple Edorg types",
+			"item": [
+				{
+					"name": "Scenario 1 Create a StudentProgramAssociation  for a associated each EducationOrganization",
+					"item": [
+						{
+							"name": "Create Student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"        pm.expect(pm.response.code).to.equal(201);",
+											"    });   ",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('known:'+scenarioId+':studentGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"function createScenarioId() { return newGuid().substring(0,5); }",
+											"pm.environment.set('scenarioId', createScenarioId());",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':StudentUniqueId', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':LastSurname',newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':FirstName',newGuid());",
+											"",
+											"const moment = require('moment');",
+											"let birthDate=new Date();",
+											"birthDate = birthDate.addYears(-20);",
+											"birthDate= moment(birthDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':BirthDate',birthDate);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"studentUniqueId\": \"{{supplied:{{scenarioId}}:StudentUniqueId}}\",\r\n  \"birthDate\":\"{{supplied:{{scenarioId}}:BirthDate}}\",\r\n  \"firstName\": \"{{supplied:{{scenarioId}}:FirstName}}\",\r\n  \"lastSurname\": \"{{supplied:{{scenarioId}}:LastSurname}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Initialize StudentSchoolAssociations Data",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n   \"schoolReference\":{ \r\n      \"schoolId\":\"{{known:schoolId}}\"\r\n   },\r\n   \"studentReference\":{ \r\n      \"studentUniqueId\":\"{{supplied:{{scenarioId}}:StudentUniqueId}}\"\r\n   },\r\n   \"entryDate\":\"{{supplied:{{scenarioId}}:entryDate}}\",\r\n   \"entryGradeLevelDescriptor\":\"{{supplied:{{scenarioId}}:entryGradeLevelDescriptor}}\"\r\n }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/StudentSchoolAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"StudentSchoolAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Program",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':programName', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':programId', uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\").substring(0, 20));",
+											"pm.environment.set('supplied:'+scenarioId+':programTypeDescriptor', \"uri://ed-fi.org/ProgramTypeDescriptor#Athletics\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n     \"educationOrganizationReference\":{ \r\n      \"educationOrganizationId\":\"{{known:schoolId}}\"\r\n   },\r\n   \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n   \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\",\r\n   \"programId\":\"{{supplied:{{scenarioId}}:programId}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/programs",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"programs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Initialize studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.environment.set('known:studentProgramAssociationGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:schoolId}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:schoolId}}\",\r\n       \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n      \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{supplied:{{scenarioId}}:StudentUniqueId}}\"\r\n    },\r\n    \"beginDate\": \"2010-08-30\",\r\n    \"endDate\": \"2010-12-17\",\r\n    \"reasonExitedDescriptor\": \"uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state\"\r\n  }\r\n"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get  studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"",
+											"pm.test(\"Should match with studentProgramAssociation Response \", () => {    ",
+											"        pm.expect(responseItems.programReference.programName).to.equal(pm.environment.get('supplied:'+scenarioId+':programName').toString());",
+											"        pm.expect(responseItems.programReference.programTypeDescriptor).to.equal(pm.environment.get('supplied:'+scenarioId+':programTypeDescriptor'));",
+											"        pm.expect(responseItems.studentReference.studentUniqueId).to.equal(pm.environment.get('supplied:'+scenarioId+':StudentUniqueId'));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations/{{known:studentProgramAssociationGuid}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations",
+										"{{known:studentProgramAssociationGuid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Scenario 2 Update  a StudentProgramAssociation  for a associated each EducationOrganization ",
+					"item": [
+						{
+							"name": "Get Student by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:studentUniqueId', __.first(responseItems).studentUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students?schoolId={{known:schoolId}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 204\", () => {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:schoolId}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{known:studentUniqueId}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:schoolId2}}\",\r\n       \"programName\":\"{{known:programName}}\",\r\n      \"programTypeDescriptor\":\"{{known:programTypeDescriptor}}\"\r\n    }\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations/{{known:studentProgramAssociationGuid}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations",
+										"{{known:studentProgramAssociationGuid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 3 Cannot Create a StudentProgramAssociation for a non-associated EducationOrganizationId value",
+					"item": [
+						{
+							"name": "Get Student by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:secondstudentUniqueId', __.first(responseItems).studentUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students?schoolId={{known:schoolId2}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get  Program by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:programName', __.first(responseItems).programName);",
+											"pm.environment.set('known:programTypeDescriptor', __.first(responseItems).programTypeDescriptor);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/programs?schoolId={{known:schoolId2}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"programs"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Initialize studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", () => {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});",
+											"",
+											"const responseItem = pm.response.json();",
+											"",
+											"pm.test(`Error message of '${responseItem.message}' should match expected`, () => {",
+											"    pm.expect(responseItem.message).to.equal(\"Authorization denied. No relationships have been established between the caller's education organization id claims (5001, 255901001) and one or more of the following properties of the resource item: 'EducationOrganizationId', 'StudentUniqueId'.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:schoolId2}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:schoolId2}}\",\r\n       \"programName\":\"{{known:programName}}\",\r\n      \"programTypeDescriptor\":\"{{known:programTypeDescriptor}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{known:secondstudentUniqueId}}\"\r\n    },\r\n    \"beginDate\": \"2010-08-30\",\r\n    \"endDate\": \"2010-12-17\",\r\n    \"reasonExitedDescriptor\": \"uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state\"\r\n  }\r\n"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 4  Create a DisciplineIncident (associated with the SchoolId)",
+					"item": [
+						{
+							"name": "Get Staff by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:staffUniqueId', __.first(responseItems).staffUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/staffs?schoolId={{known:schoolId}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"staffs"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create disciplineIncident",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});",
+											"pm.environment.set('known:disciplineIncidentsGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"schoolReference\": {\r\n      \"schoolId\": \"{{known:schoolId}}\"\r\n    },\r\n    \"staffReference\": {\r\n      \"staffUniqueId\": \"{{known:staffUniqueId}}\"\r\n    },\r\n    \"incidentIdentifier\": \"1\",\r\n    \"incidentDate\": \"2011-02-09\",\r\n    \"incidentLocationDescriptor\": \"uri://ed-fi.org/IncidentLocationDescriptor#Auditorium\"\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/disciplineIncidents",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"disciplineIncidents"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get disciplineIncident",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/disciplineIncidents/{{known:disciplineIncidentsGuid}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"disciplineIncidents",
+										"{{known:disciplineIncidentsGuid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 5  Create a CommunityProviderLicense (associated with the CommunityProviderId)",
+					"item": [
+						{
+							"name": "Create CommunityProviderLicense",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});",
+											"pm.environment.set('known:CommunityProviderLicenseGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"licenseIdentifier\": \"ABC123\",\r\n  \"licensingOrganization\": \"State\",\r\n  \"communityProviderReference\": {\r\n    \"communityProviderId\": \"{{known:communityProviderId}}\"\r\n  },\r\n  \"licenseEffectiveDate\": \"2020-05-29\",\r\n  \"licenseTypeDescriptor\": \"uri://ed-fi.org/LicenseTypeDescriptor#Child Care Center\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/CommunityProviderLicenses",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"CommunityProviderLicenses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get CommunityProviderLicense",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/CommunityProviderLicenses/{{known:CommunityProviderLicenseGuid}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"CommunityProviderLicenses",
+										"{{known:CommunityProviderLicenseGuid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 6  Cannot Create a DisciplineIncident (associated with the different SchoolId) ",
+					"item": [
+						{
+							"name": "Get Staff by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:secondstaffUniqueId', __.first(responseItems).studentUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/staffs?schoolId={{known:schoolId2}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"staffs"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create disciplineIncidents",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", () => {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});",
+											"",
+											"const responseItem = pm.response.json();",
+											"",
+											"pm.test(`Error message of '${responseItem.message}' should match expected`, () => {",
+											"    pm.expect(responseItem.message).to.equal(\"Authorization denied. No relationships have been established between the caller's education organization id claims (5001, 255901001) and the resource item's 'SchoolId' value.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"schoolReference\": {\r\n      \"schoolId\": \"{{known:schoolId2}}\"\r\n    },\r\n    \"staffReference\": {\r\n      \"staffUniqueId\": \"{{known:secondstaffUniqueId}}\"\r\n    },\r\n    \"incidentIdentifier\": \"1\",\r\n    \"incidentDate\": \"2011-02-09\",\r\n    \"incidentLocationDescriptor\": \"uri://ed-fi.org/IncidentLocationDescriptor#Auditorium\"\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/disciplineIncidents",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"disciplineIncidents"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 7  Cannot Create a CommunityProviderLicense (associated with the different CommunityProviderId) ",
+					"item": [
+						{
+							"name": "Initialize communityProvider Data",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"function createScenarioId() { return newGuid().substring(0,5); }",
+											"pm.environment.set('scenarioId', createScenarioId());",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':nameOfInstitution', 'LEA-2002');",
+											"pm.environment.set('supplied:'+scenarioId+':educationOrganizationCategoryDescriptor', \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Local Education Agency\");",
+											"pm.environment.set('supplied:'+scenarioId+':localEducationAgencyCategoryDescriptor', \"uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Charter\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"categories\": [\r\n    {\r\n      \"educationOrganizationCategoryDescriptor\": \"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Education Service Center\"\r\n    }\r\n  ],\r\n  \"communityProviderId\": \"{{known:communityProviderId2}}\",\r\n  \"nameOfInstitution\": \"District Company\",\r\n  \"providerCategoryDescriptor\": \"uri://ed-fi.org/ProviderCategoryDescriptor#Center-EC\",\r\n  \"providerProfitabilityDescriptor\": \"uri://ed-fi.org/ProviderProfitabilityDescriptor#ForProfit\",\r\n  \"providerStatusDescriptor\": \"uri://ed-fi.org/ProviderStatusDescriptor#Active\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/communityProviders",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"communityProviders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create CommunityProviderLicense",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", () => {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});",
+											"",
+											"const responseItem = pm.response.json();",
+											"",
+											"pm.test(`Error message of '${responseItem.message}' should match expected`, () => {",
+											"    pm.expect(responseItem.message).to.equal(\"Authorization denied. No relationships have been established between the caller's education organization id claims (5001, 255901001) and the resource item's 'CommunityProviderId' value.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901001_5001}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"licenseIdentifier\": \"ABC123\",\r\n  \"licensingOrganization\": \"State\",\r\n  \"communityProviderReference\": {\r\n    \"communityProviderId\": \"{{known:communityProviderId2}}\"\r\n  },\r\n  \"licenseEffectiveDate\": \"2020-05-29\",\r\n  \"licenseTypeDescriptor\": \"uri://ed-fi.org/LicenseTypeDescriptor#Child Care Center\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/CommunityProviderLicenses",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"CommunityProviderLicenses"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 8  Cannot Create a StudentProgramAssociation for either associated EdOrgId ( CommunityProviderId and PostSecondaryInstitutionId)",
+					"item": [
+						{
+							"name": "Get Student by SchoolId ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:secondstudentUniqueId', __.first(responseItems).studentUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students?schoolId={{known:schoolId2}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get  Program by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:programName', __.first(responseItems).programName);",
+											"pm.environment.set('known:programTypeDescriptor', __.first(responseItems).programTypeDescriptor);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/programs?schoolId={{known:schoolId2}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"programs"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Initialize studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", () => {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});",
+											"",
+											"const responseItem = pm.response.json();",
+											"",
+											"pm.test(`Error message of '${responseItem.message}' should match expected`, () => {",
+											"    pm.expect(responseItem.message).to.equal(\"Authorization denied. No relationships have been established between the caller's education organization id claims (51, 5001) and one or more of the following properties of the resource item: 'EducationOrganizationId', 'StudentUniqueId'.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:schoolId2}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:schoolId2}}\",\r\n       \"programName\":\"{{known:programName}}\",\r\n      \"programTypeDescriptor\":\"{{known:programTypeDescriptor}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{known:secondstudentUniqueId}}\"\r\n    },\r\n    \"beginDate\": \"2010-08-30\",\r\n    \"endDate\": \"2010-12-17\",\r\n    \"reasonExitedDescriptor\": \"uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state\"\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 9 GET request for StudentProgramAssociations should return all 3 records (SchoolId, a CommunityProviderId, and a PostSecondaryInstitutionId)",
+					"item": [
+						{
+							"name": "Cleanup  studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"const responseItems = pm.response.json();",
+											"",
+											"pm.test('Delete all studentProgramAssociations', () => {",
+											"",
+											"           responseItems.forEach(responseItem => {",
+											"            ",
+											"            if(isNaN(responseItem.programId))",
+											"            {",
+											"                let StudentProgramAssociationDeleteRequest = {",
+											"                        url: pm.environment.get(\"ApiBaseUrl\") + \"/v3.3b/ed-fi/studentProgramAssociations/\" + responseItem.id,",
+											"                        method: 'DELETE',",
+											"                        header: 'Authorization:bearer ' + pm.environment.get(\"AccessToken_MultipleEdorg_255901999_5001_51\"),",
+											"                        body: {}",
+											"                };",
+											"    ",
+											"                pm.sendRequest(StudentProgramAssociationDeleteRequest, function (err, ProgramDelete) {",
+											"                        if (err) {",
+											"                            console.log(err);",
+											"                        } else {}",
+											"                    });",
+											"           }",
+											"        });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations/",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"        pm.expect(pm.response.code).to.equal(201);",
+											"    });   ",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('known:'+scenarioId+':studentGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"function createScenarioId() { return newGuid().substring(0,5); }",
+											"pm.environment.set('scenarioId', createScenarioId());",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':StudentUniqueId', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':LastSurname',newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':FirstName',newGuid());",
+											"",
+											"const moment = require('moment');",
+											"let birthDate=new Date();",
+											"birthDate = birthDate.addYears(-20);",
+											"birthDate= moment(birthDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':BirthDate',birthDate);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"studentUniqueId\": \"{{supplied:{{scenarioId}}:StudentUniqueId}}\",\r\n  \"birthDate\":\"{{supplied:{{scenarioId}}:BirthDate}}\",\r\n  \"firstName\": \"{{supplied:{{scenarioId}}:FirstName}}\",\r\n  \"lastSurname\": \"{{supplied:{{scenarioId}}:LastSurname}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Initialize StudentSchoolAssociations Data",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n   \"schoolReference\":{ \r\n      \"schoolId\":\"{{known:schoolId3}}\"\r\n   },\r\n   \"studentReference\":{ \r\n      \"studentUniqueId\":\"{{supplied:{{scenarioId}}:StudentUniqueId}}\"\r\n   },\r\n   \"entryDate\":\"{{supplied:{{scenarioId}}:entryDate}}\",\r\n   \"entryGradeLevelDescriptor\":\"{{supplied:{{scenarioId}}:entryGradeLevelDescriptor}}\"\r\n }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/StudentSchoolAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"StudentSchoolAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Program with SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':programName', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':programId', uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\").substring(0, 20));",
+											"pm.environment.set('supplied:'+scenarioId+':programTypeDescriptor', \"uri://ed-fi.org/ProgramTypeDescriptor#Athletics\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n     \"educationOrganizationReference\":{ \r\n      \"educationOrganizationId\":\"{{known:schoolId3}}\"\r\n   },\r\n   \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n   \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\",\r\n   \"programId\":\"{{supplied:{{scenarioId}}:programId}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/programs",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"programs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create  studentProgramAssociations for SchoolId",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:schoolId3}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:schoolId3}}\",\r\n       \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n      \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{supplied:{{scenarioId}}:StudentUniqueId}}\"\r\n    },\r\n    \"beginDate\": \"2010-08-30\",\r\n    \"endDate\": \"2010-12-17\",\r\n    \"reasonExitedDescriptor\": \"uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state\"\r\n  }\r\n"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Program with postSecondaryInstitutionId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':programName', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':programId', uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\").substring(0, 20));",
+											"pm.environment.set('supplied:'+scenarioId+':programTypeDescriptor', \"uri://ed-fi.org/ProgramTypeDescriptor#Athletics\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n     \"educationOrganizationReference\":{ \r\n      \"educationOrganizationId\":\"{{known:postSecondaryInstitutionId}}\"\r\n   },\r\n   \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n   \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\",\r\n   \"programId\":\"{{supplied:{{scenarioId}}:programId}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/programs",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"programs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create  studentProgramAssociations for postSecondaryInstitutionId",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"const moment = require('moment');",
+											"let entryDate=new Date();",
+											"entryDate = entryDate.addMonths(-10);",
+											"entryDate= moment(entryDate).format(\"YYYY-MM-DD\");",
+											"pm.environment.set('supplied:'+scenarioId+':entryDate',entryDate);",
+											"pm.environment.set('supplied:'+scenarioId+':entryGradeLevelDescriptor',\"uri://ed-fi.org/GradeLevelDescriptor#Fourth grade\"); "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"educationOrganizationReference\": {\r\n     \"educationOrganizationId\": \"{{known:postSecondaryInstitutionId}}\"\r\n    },\r\n    \"programReference\": {\r\n      \"educationOrganizationId\": \"{{known:postSecondaryInstitutionId}}\",\r\n       \"programName\":\"{{supplied:{{scenarioId}}:programName}}\",\r\n      \"programTypeDescriptor\":\"{{supplied:{{scenarioId}}:programTypeDescriptor}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{supplied:{{scenarioId}}:StudentUniqueId}}\"\r\n    },\r\n    \"beginDate\": \"2010-08-30\",\r\n    \"endDate\": \"2010-12-17\",\r\n    \"reasonExitedDescriptor\": \"uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state\"\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get  studentProgramAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"",
+											"pm.test(\"Should return the 2 items in response\", () => {",
+											"     pm.expect(responseItems).to.have.lengthOf(2);",
+											"});",
+											"",
+											"",
+											"let educationOrganizationIds = [''];",
+											"educationOrganizationIds.push(pm.environment.get('known:schoolId3'));",
+											"educationOrganizationIds.push(pm.environment.get('known:postSecondaryInstitutionId'));",
+											"pm.test(\"Should return the 2 ed org types with studentProgramAssociation Response \", () => {          ",
+											"      __.each(responseItems, (responseItem) => {                ",
+											"       pm.expect(educationOrganizationIds.includes(responseItem.educationOrganizationReference.educationOrganizationId)).to.equal(true);",
+											"     });",
+											"});",
+											"",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"",
+											"pm.test(\"Should return only associated student (through the school) in studentProgramAssociation Response \", () => {          ",
+											"      __.each(responseItems, (responseItem) => {                ",
+											"       pm.expect(responseItem.studentReference.studentUniqueId).to.equal(pm.environment.get('supplied:'+scenarioId+':StudentUniqueId'));",
+											"     });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_255901999_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/studentProgramAssociations/",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"studentProgramAssociations",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Ensure that resources with EdOrg Id are accessible for each associated EdOrg type\r\nConfigure an API client with a SchoolId, a CommunityProviderId, and a PostSecondaryInstitutionId.\r\n\r\nCreate StudentProgramAssociations for each with an associated Student (through the School). (NOTE: Suggest creating a new School, Student and StudentSchoolAssociation for this scenario)\r\n\r\nGET request for StudentProgramAssociations should return all 3 records just created.\r\nGET request for StudentProgramAssociations should not return any pre-existing records for other EdOrgs.\r\nEnsure that resources with concrete EdOrg Ids are accessible\r\nGET request for StudentSchoolAssociations should return the associated Student.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 10  GET request to CommunityProviderLicenses should not generate an error",
+					"item": [
+						{
+							"name": "Create CommunityProviderLicense",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"licenseIdentifier\": \"ABC123\",\r\n  \"licensingOrganization\": \"State\",\r\n  \"communityProviderReference\": {\r\n    \"communityProviderId\": \"{{known:communityProviderId}}\"\r\n  },\r\n  \"licenseEffectiveDate\": \"2020-05-29\",\r\n  \"licenseTypeDescriptor\": \"uri://ed-fi.org/LicenseTypeDescriptor#Child Care Center\"\r\n}"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/CommunityProviderLicenses",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"CommunityProviderLicenses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get CommunityProviderLicense",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.test(\"Should return some data for verification\", () => {",
+											"     pm.expect(responseItems.length).to.be.at.least(1);",
+											"});",
+											"",
+											"pm.test(\"Should return only associated communityProvider in CommunityProviderLicenses Response \", () => {          ",
+											"      __.each(responseItems, (responseItem) => {                ",
+											"       pm.expect(responseItem.communityProviderReference.communityProviderId).to.equal(pm.environment.get('known:communityProviderId'));",
+											"     });",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/CommunityProviderLicenses/",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"CommunityProviderLicenses",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Configure an API client with a CommunityProviderId and PostSecondaryInstitutionId.\r\n\r\nGET request to CommunityProviderLicenses should not generate an error.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Scenario 11  GET request to StudentDisciplineIncidentAssociations should return 200 with empty array even though there is no way the request could ever be authorized with the types of EdOrg claims",
+					"item": [
+						{
+							"name": "Create Staff",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('known:staffUniqueId',pm.environment.get('supplied:'+scenarioId+':staffUniqueId'));    "
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const uuid = require('uuid');",
+											"function newGuid() { return uuid.v4().toString().replace(/[^a-zA-Z0-9 ]/g,\"\"); }",
+											"function createScenarioId() { return newGuid().substring(0,5); }",
+											"pm.environment.set('scenarioId', createScenarioId());",
+											"const scenarioId = pm.environment.get('scenarioId');",
+											"pm.environment.set('supplied:'+scenarioId+':staffUniqueId', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':lastSurname', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':firstName', newGuid());",
+											"pm.environment.set('supplied:'+scenarioId+':sexDescriptor', \"uri://ed-fi.org/SexDescriptor#Female\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \r\n  \"staffUniqueId\": \"{{supplied:{{scenarioId}}:staffUniqueId}}\",\r\n  \"firstName\": \"{{supplied:{{scenarioId}}:firstName}}\",\r\n  \"lastSurname\": \"{{supplied:{{scenarioId}}:lastSurname}}\",\r\n  \"sexDescriptor\":\"uri://ed-fi.org/SexDescriptor#Female\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/staffs",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"staffs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create disciplineIncident",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});",
+											"pm.environment.set('known:disciplineIncidentsGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"schoolReference\": {\r\n      \"schoolId\": \"{{known:schoolId3}}\"\r\n    },\r\n    \"staffReference\": {\r\n      \"staffUniqueId\": \"{{known:staffUniqueId}}\"\r\n    },\r\n    \"incidentIdentifier\": \"1\",\r\n    \"incidentDate\": \"2011-02-09\",\r\n    \"incidentLocationDescriptor\": \"uri://ed-fi.org/IncidentLocationDescriptor#Auditorium\"\r\n  }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/disciplineIncidents",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"disciplineIncidents"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Student by SchoolId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"const __ = require('lodash');",
+											"const responseItems = pm.response.json();",
+											"pm.environment.set('known:studentUniqueId', __.first(responseItems).studentUniqueId);"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/students?schoolId={{known:schoolId3}}",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"students"
+									],
+									"query": [
+										{
+											"key": "schoolId",
+											"value": "{{known:schoolId3}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create StudentDisciplineIncidentAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 201\", () => {",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+											"});",
+											"pm.environment.set('known:studentDisciplineIncidentAssociationGuid',pm.response.headers.one('Location').value.split(\"/\").pop());"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"disciplineIncidentReference\": {\r\n      \"incidentIdentifier\": \"1\",\r\n      \"schoolId\": \"{{known:schoolId3}}\"\r\n    },\r\n    \"studentReference\": {\r\n      \"studentUniqueId\": \"{{known:studentUniqueId}}\"\r\n    },\r\n    \"studentParticipationCodeDescriptor\": \"uri://ed-fi.org/StudentParticipationCodeDescriptor#Perpetrator\"\r\n   }"
+								},
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/StudentDisciplineIncidentAssociations",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"StudentDisciplineIncidentAssociations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get StudentDisciplineIncidentAssociations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"const responseItems = pm.response.json();",
+											"",
+											"pm.test(`Should return an empty array`, () => {",
+											"    pm.expect(responseItems).to.have.lengthOf(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{AccessToken_MultipleEdorg_5001_51}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{ApiBaseUrl}}/v3.3b/ed-fi/StudentDisciplineIncidentAssociations/",
+									"host": [
+										"{{ApiBaseUrl}}"
+									],
+									"path": [
+										"v3.3b",
+										"ed-fi",
+										"StudentDisciplineIncidentAssociations",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Configure an API client with a CommunityProviderId and PostSecondaryInstitutionId.\r\nGET request to StudentDisciplineIncidentAssociations should return 403 indicating there's no way to authorize the request (exact message TBD).",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AccessToken_255901}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"CreateAccessToken(\"TokenExpiry_255901\",",
+					"                  \"AccessToken_255901\",",
+					"                  \"ApiKey_255901\", ",
+					"                  \"ApiSecret_255901\")",
+					"                  ",
+					"CreateAccessToken(\"TokenExpiry_MultipleEdorg_255901001_5001\",",
+					"                  \"AccessToken_MultipleEdorg_255901001_5001\",",
+					"                  \"ApiKey_MultipleEdorg_255901001_5001\", ",
+					"                  \"ApiSecret_MultipleEdorg_255901001_5001\")   ",
+					"",
+					"CreateAccessToken(\"TokenExpiry_MultipleEdorg_5001_51\",",
+					"                  \"AccessToken_MultipleEdorg_5001_51\",",
+					"                  \"ApiKey_MultipleEdorg_5001_51\", ",
+					"                  \"ApiSecret_MultipleEdorg_5001_51\")             ",
+					"CreateAccessToken(\"TokenExpiry_MultipleEdorg_255901999_5001_51\",",
+					"                  \"AccessToken_MultipleEdorg_255901999_5001_51\",",
+					"                  \"ApiKey_MultipleEdorg_255901999_5001_51\", ",
+					"                  \"ApiSecret_MultipleEdorg_255901999_5001_51\") ",
+					"",
+					"// Adapted from: https://marcin-chwedczuk.github.io/automatically-generate-new-oauth2-tokens-when-using-postman",
+					"// Assumes Environment with Environment Variables: ApiBaseUrl, ApiKey, ApiSecret",
+					"// See https://gist.github.com/blmeyers/21138bbe6f80b8c35701a8754bfe59d5 for an environment sample for Local (NOTE: environment variable names have been changed from the gist -- you must adjust accordingly)",
+					"// Handles auto refreshing based on provided expiration, but doesn't handle the token being revoked early",
+					"// If stuck with \"Bad Token\" or \"Not Authenticated\", just delete the Token or TokenExpiry variables to force a new token",
+					"function CreateAccessToken(TokenExpiry,AccessToken,ApiKey, ApiSecret)",
+					"                  {",
+					"let tokenExpiration = pm.environment.get(TokenExpiry);",
+					"let currentToken = pm.environment.get(AccessToken);",
+					"let  getToken = true;",
+					"if (!tokenExpiration || ",
+					"    !currentToken) {",
+					"    console.log('Token or expiry date are missing, retrieving new token')",
+					"} else if (tokenExpiration <= (new Date()).getTime()) {",
+					"    console.log('Token is expired, retrieving new token')",
+					"} else {",
+					"    getToken = false;",
+					"}",
+					"if (getToken === true) {",
+					"    const tokenUrl = `${pm.variables.get(\"ApiBaseUrl\")}/api/oauth/token`;",
+					"    const clientId = pm.variables.get(\"RegisteredClientId\");",
+					"    const clientSecret = pm.variables.get(\"RegisteredClientSecret\");",
+					"    const grantType = 'client_credentials';",
+					"    ",
+					"    const getTokenRequest = {",
+					"        url: tokenUrl,",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Content-Type': 'application/x-www-form-urlencoded'",
+					"        },",
+					"        body: {",
+					"            mode: 'urlencoded',",
+					"            urlencoded: [",
+					"                {key: 'client_id', value: clientId},",
+					"                {key: 'client_secret', value: clientSecret},",
+					"                {key: 'grant_type', value: grantType}",
+					"            ]",
+					"        }",
+					"    };",
+					"    ",
+					"    pm.sendRequest(getTokenRequest, (err, response) => {",
+					"        let jsonResponse = response.json(),",
+					"            newAccessToken = jsonResponse.access_token;",
+					"    ",
+					"        // console.log({ err, jsonResponse, newAccessToken })",
+					"    ",
+					"        pm.environment.set(AccessToken, newAccessToken);",
+					"    ",
+					"        let expiryDate = new Date();",
+					"        expiryDate.setSeconds(expiryDate.getSeconds() + jsonResponse.expires_in);",
+					"        pm.environment.set(TokenExpiry, expiryDate.getTime());",
+					"    });",
+					"}",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
