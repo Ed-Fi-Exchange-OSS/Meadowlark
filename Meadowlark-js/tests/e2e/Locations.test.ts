@@ -8,8 +8,8 @@ import { createResource, deleteResourceByLocation } from './functions/Resources'
 import { createSchool } from './functions/Shared';
 import { baseURLRequest, rootURLRequest } from './Setup';
 
-describe('Locations', () => {
-  describe('with strict validation', () => {
+describe('When creating a resource that has a reference to another resource', () => {
+  describe('given a token with strict validation', () => {
     it('should fail when missing required properties', async () => {
       await baseURLRequest
         .post('/v3.3b/ed-fi/locations')
@@ -28,7 +28,7 @@ describe('Locations', () => {
         });
     });
 
-    describe('when school is added', () => {
+    describe('given the reference does exist', () => {
       let schoolId: number;
       let schoolLocation: string;
       let location: string;
@@ -38,7 +38,7 @@ describe('Locations', () => {
         schoolLocation = await createSchool(schoolId);
       });
 
-      it('should add location with valid school', async () => {
+      it('accepts the request', async () => {
         location = await createResource({
           endpoint: 'locations',
           body: {
@@ -65,7 +65,7 @@ describe('Locations', () => {
     });
   });
 
-  describe('without strict validation', () => {
+  describe('given a token with relaxed validation', () => {
     let location: string;
 
     it('should add the location', async () => {
