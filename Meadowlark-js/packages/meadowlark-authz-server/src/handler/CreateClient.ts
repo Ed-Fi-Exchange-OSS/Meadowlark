@@ -9,13 +9,12 @@ import { CreateAuthorizationClientRequest } from '../message/CreateAuthorization
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 import { CreateClientBody } from '../model/CreateClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
-import { checkForAuthorizationErrors } from '../security/JwtValidator';
+import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { validateCreateClientBody } from '../validation/ValidateClientBody';
 import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { BodyValidation } from '../validation/BodyValidation';
+import { BodyValidation, validateCreateClientBody } from '../validation/BodyValidation';
 import { hashClientSecretBuffer } from '../security/HashClientSecret';
 
 const moduleName = 'handler.CreateClient';
@@ -28,7 +27,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     writeRequestToLog(moduleName, authorizationRequest, 'createClient');
     await ensurePluginsLoaded();
 
-    const errorResponse: AuthorizationResponse | undefined = checkForAuthorizationErrors(
+    const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       authorizationHeader(authorizationRequest.headers),
     );
 

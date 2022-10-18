@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { authorizationHeader, writeErrorToLog } from '@edfi/meadowlark-core';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
-import { checkForAuthorizationErrors } from '../security/JwtValidator';
+import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { clientIdFrom } from '../Utility';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
@@ -25,7 +25,7 @@ export async function resetAuthorizationClientSecret(
     writeRequestToLog(moduleName, authorizationRequest, 'createClient');
     await ensurePluginsLoaded();
 
-    const errorResponse: AuthorizationResponse | undefined = checkForAuthorizationErrors(
+    const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       authorizationHeader(authorizationRequest.headers),
     );
 

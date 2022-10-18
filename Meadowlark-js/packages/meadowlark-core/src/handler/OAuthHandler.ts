@@ -4,9 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import secureRandom from 'secure-random';
-import { Logger } from '../Logger';
-import { validateJwt } from '../security/JwtValidator';
-import { authorizationHeader } from '../security/AuthorizationHeader';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
@@ -20,25 +17,9 @@ export async function createRandomSigningKey(): Promise<FrontendResponse> {
   };
 }
 
-export async function verify(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  Logger.debug(JSON.stringify(frontendRequest.headers), frontendRequest.traceId);
-
-  const { jwtStatus, errorResponse } = validateJwt(authorizationHeader(frontendRequest.headers));
-
-  if (errorResponse == null) {
-    return {
-      statusCode: 200,
-      body: JSON.stringify(jwtStatus),
-    };
-  }
-
-  return errorResponse;
-}
-
 /*
  * Single point of entry for both functions.
  */
-export async function handler(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  if (frontendRequest.path.endsWith('createKey')) return createRandomSigningKey();
-  return verify(frontendRequest);
+export async function handler(_frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  return createRandomSigningKey();
 }

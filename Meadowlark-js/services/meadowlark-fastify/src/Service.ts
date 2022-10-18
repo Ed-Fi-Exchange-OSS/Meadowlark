@@ -28,6 +28,7 @@ import {
   requestTokenAuthorizationHandler,
   resetAuthorizationClientSecretHandler,
   updateAuthorizationClientHandler,
+  verifyTokenAuthorizationHandler,
 } from './handler/authorization/AuthorizationHandler';
 
 export function buildService(): FastifyInstance {
@@ -119,9 +120,8 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
     fastify.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
 
-    // OAuth handlers
+    // Old OAuth handlers
     fastify.get(`/${stage}/createKey`, oauthHandler);
-    fastify.get(`/${stage}/verify`, oauthHandler);
 
     // Descriptor loader
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
@@ -131,5 +131,6 @@ export function buildService(): FastifyInstance {
     fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
     fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);
+    fastify.post(`/${stage}/oauth/verify`, verifyTokenAuthorizationHandler);
   }
 }

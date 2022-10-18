@@ -4,19 +4,20 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import querystring from 'node:querystring';
-import memoize from 'fast-memoize';
 import { create as createJwt } from 'njwt';
 import { Logger } from '@edfi/meadowlark-core';
+import { signingKey } from '../model/SigningKey';
 import { admin1, client1, client2, client3, client4 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import type { AuthorizationRequest } from './AuthorizationRequest';
 import type { RequestTokenBody } from '../model/RequestTokenBody';
-import type { BodyValidation } from '../validation/BodyValidation';
-import { validateRequestTokenBody } from '../validation/ValidateRequestTokenBody';
+import { BodyValidation, validateRequestTokenBody } from '../validation/BodyValidation';
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
+import { extractAuthorizationHeader } from './AuthorizationHeader';
+import { TOKEN_ISSUER } from '../security/TokenIssuer';
 
 const moduleName = 'RequestToken';
 
@@ -24,22 +25,13 @@ type ParsedRequestTokenBody =
   | { isValid: true; requestTokenBody: RequestTokenBody }
   | { isValid: false; failureMessage: string };
 
-function signingKey(): Buffer {
-  const signingKeyEncoded = process.env.SIGNING_KEY;
-  if (signingKeyEncoded == null) {
-    throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `yarn createKey`');
-  }
-  return Buffer.from(signingKeyEncoded, 'base64');
-}
-const cachedSigningKey = memoize(signingKey);
-
 /*
  * Creates a standard Meadowlark Jwt.
  */
 function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
-  const claims = { iss: 'ed-fi-meadowlark', aud: 'meadowlark', roles, client_id: clientId };
+  const claims = { iss: TOKEN_ISSUER, aud: TOKEN_ISSUER, roles, client_id: clientId };
 
-  const token: Jwt = createJwt({ ...claims, sub: vendor }, cachedSigningKey()) as Jwt;
+  const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey()) as Jwt;
 
   token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
   return token;
@@ -102,15 +94,19 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
     return { isValid: true, requestTokenBody: validatedBody };
   }
 
-  const { headers } = authorizationRequest;
+  const authorizationHeader: string | undefined = extractAuthorizationHeader(authorizationRequest);
 
-  if (!('authorization' in headers) || 'Authorization' in headers) {
+  if (authorizationHeader == null) {
     Logger.debug(`${moduleName}.parseRequestTokenBody: Missing authorization header`, authorizationRequest.traceId);
     return { isValid: false, failureMessage: 'Missing authorization header' };
   }
 
+  if (!authorizationHeader.startsWith('Basic ')) {
+    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: 'Invalid authorization header' };
+  }
+
   // Extract from "Basic <encoded>" where encoded is the Base64 form of "client_id:client_secret"
-  const authorizationHeader: string = headers.authorization ?? headers.Authorization ?? '';
   const split = Buffer.from(authorizationHeader.slice(6), 'base64').toString('binary').split(':');
   if (split.length !== 2) {
     Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);

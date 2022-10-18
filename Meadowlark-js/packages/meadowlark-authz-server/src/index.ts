@@ -6,6 +6,7 @@
 export { createClient } from './handler/CreateClient';
 export { updateClient } from './handler/UpdateClient';
 export { requestToken } from './handler/RequestToken';
+export { verifyToken } from './handler/VerifyToken';
 export { resetAuthorizationClientSecret } from './handler/ResetClientSecret';
 export { AuthorizationRequest, newAuthorizationRequest } from './handler/AuthorizationRequest';
 export { AuthorizationResponse } from './handler/AuthorizationResponse';
