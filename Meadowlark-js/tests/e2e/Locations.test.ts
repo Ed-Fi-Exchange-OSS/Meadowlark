@@ -10,22 +10,24 @@ import { baseURLRequest, rootURLRequest } from './Setup';
 
 describe('When creating a resource that has a reference to another resource', () => {
   describe('given a token with strict validation', () => {
-    it('should fail when missing required properties', async () => {
-      await baseURLRequest
-        .post('/v3.3b/ed-fi/locations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-        .send({
-          classroomIdentificationCode: 'string',
-          schoolReference: {
-            schoolId: 99,
-          },
-          maximumNumberOfSeats: 20,
-          optimalNumberOfSeats: 10,
-        })
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toContain('Resource School is missing identity');
-        });
+    describe('given reference does not exist', () => {
+      it('should fail with code 400 and a message', async () => {
+        await baseURLRequest
+          .post('/v3.3b/ed-fi/locations')
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            classroomIdentificationCode: 'string',
+            schoolReference: {
+              schoolId: 99,
+            },
+            maximumNumberOfSeats: 20,
+            optimalNumberOfSeats: 10,
+          })
+          .expect(400)
+          .then((response) => {
+            expect(response.body.message).toContain('Resource School is missing identity');
+          });
+      });
     });
 
     describe('given the reference does exist', () => {
