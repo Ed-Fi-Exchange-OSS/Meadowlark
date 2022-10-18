@@ -281,10 +281,26 @@ content-type: application/json
     ]
 }
 ###
-
 @created_client_id_2={{client2.response.body.$.client_id}}
-#fastify.post(`/${stage}/oauth/client/:clientId/reset`, updateAuthorizationClientHandler);
-### 
+###
+@created_client_secret_2={{client2.response.body.$.client_secret}}
+###
+POST http://localhost:3000/local/oauth/token
+content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{created_client_id_2}}&client_secret={{created_client_secret_2}}
+### Reset secret for client 2
+# @name reset
 POST http://localhost:3000/local/oauth/client/{{created_client_id_2}}/reset
 content-type: application/json
 {{auth_header_admin_1}}
+###
+@reset_secret={{reset.response.body.$.client_secret}}
+### Login with reset secret
+POST http://localhost:3000/local/oauth/token
+content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{created_client_id_2}}&client_secret={{reset_secret}}
+###
+
+

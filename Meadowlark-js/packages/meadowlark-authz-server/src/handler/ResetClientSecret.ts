@@ -61,7 +61,7 @@ export async function resetAuthorizationClientSecret(
     if (response === 'RESET_SUCCESS') {
       const responseBody: ResetClientSecretResponseBody = {
         client_id: clientId,
-        client_secret: clientSecretHashed,
+        client_secret: clientSecretBuffer.toString('hex'),
       };
 
       writeDebugStatusToLog(moduleName, authorizationRequest, 'resetAuthorizationClientSecret', 201);
