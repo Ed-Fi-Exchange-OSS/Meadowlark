@@ -26,6 +26,7 @@ import { loadDescriptors } from './handler/DescriptorLoader';
 import {
   createAuthorizationClientHandler,
   requestTokenAuthorizationHandler,
+  resetAuthorizationClientSecretHandler,
   updateAuthorizationClientHandler,
 } from './handler/authorization/AuthorizationHandler';
 
@@ -126,6 +127,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
     // Authorization server handlers
+    fastify.post(`/${stage}/oauth/client/:clientId/reset`, resetAuthorizationClientSecretHandler);
     fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
     fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);

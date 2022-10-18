@@ -21,6 +21,8 @@ import {
   GetAuthorizationClientResult,
   UpdateAuthorizationClientRequest,
   UpdateAuthorizationClientResult,
+  ResetAuthorizationClientSecretResult,
+  ResetAuthorizationClientSecretRequest,
 } from '@edfi/meadowlark-authz-server';
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
@@ -29,6 +31,7 @@ import * as Update from './repository/Update';
 import * as CreateAuthorizationClient from './repository/authorization/CreateAuthorizationClient';
 import * as GetAuthorizationClient from './repository/authorization/GetAuthorizationClient';
 import * as UpdateAuthorizationClient from './repository/authorization/UpdateAuthorizationClient';
+import * as ResetAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 import { getSharedClient } from './repository/Db';
 
@@ -70,4 +73,10 @@ export async function updateAuthorizationClientDocument(
   request: UpdateAuthorizationClientRequest,
 ): Promise<UpdateAuthorizationClientResult> {
   return UpdateAuthorizationClient.updateAuthorizationClientDocument(request, await getSharedClient());
+}
+
+export async function resetAuthorizationClientSecret(
+  request: ResetAuthorizationClientSecretRequest,
+): Promise<ResetAuthorizationClientSecretResult> {
+  return ResetAuthorizationClientSecret.resetAuthorizationClientSecret(request, await getSharedClient());
 }

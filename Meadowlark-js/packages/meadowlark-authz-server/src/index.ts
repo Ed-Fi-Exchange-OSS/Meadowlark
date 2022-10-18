@@ -6,6 +6,7 @@
 export { createClient } from './handler/CreateClient';
 export { updateClient } from './handler/UpdateClient';
 export { requestToken } from './handler/RequestToken';
+export { resetAuthorizationClientSecret } from './handler/ResetClientSecret';
 export { AuthorizationRequest, newAuthorizationRequest } from './handler/AuthorizationRequest';
 export { AuthorizationResponse } from './handler/AuthorizationResponse';
 export { AuthorizationStorePlugin } from './plugin/AuthorizationStorePlugin';
@@ -15,4 +16,6 @@ export { GetAuthorizationClientRequest } from './message/GetAuthorizationClientR
 export { GetAuthorizationClientResult } from './message/GetAuthorizationClientResult';
 export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';
 export { UpdateAuthorizationClientResult } from './message/UpdateAuthorizationClientResult';
+export { ResetAuthorizationClientSecretRequest } from './message/ResetAuthorizationClientSecretRequest';
+export { ResetAuthorizationClientSecretResult } from './message/ResetAuthorizationClientSecretResult';
 export { AuthorizationClientRole } from './model/AuthorizationClientRole';

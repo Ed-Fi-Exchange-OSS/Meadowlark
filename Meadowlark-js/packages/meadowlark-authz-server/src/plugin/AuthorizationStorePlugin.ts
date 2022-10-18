@@ -9,9 +9,14 @@ import { GetAuthorizationClientRequest } from '../message/GetAuthorizationClient
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
+import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
+import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
 
 export interface AuthorizationStorePlugin {
   createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
   getAuthorizationClient: (request: GetAuthorizationClientRequest) => Promise<GetAuthorizationClientResult>;
   updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
+  resetAuthorizationClientSecret: (
+    request: ResetAuthorizationClientSecretRequest,
+  ) => Promise<ResetAuthorizationClientSecretResult>;
 }
