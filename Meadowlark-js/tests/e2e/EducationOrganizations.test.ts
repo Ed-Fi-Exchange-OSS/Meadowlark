@@ -7,7 +7,7 @@ import { getAccessToken, Clients } from './functions/Credentials';
 import { baseURLRequest } from './Setup';
 
 describe('Education Organizations', () => {
-  it("shouldn't allow to post to abstract entity", async () => {
+  it("does not allow a post request", async () => {
     await baseURLRequest
       .post('/v3.3b/ed-fi/educationOrganizations')
       .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
