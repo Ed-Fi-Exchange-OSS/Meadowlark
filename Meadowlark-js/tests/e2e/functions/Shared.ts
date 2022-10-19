@@ -11,8 +11,6 @@ export function generateRandomId(length = 12): string {
   return chance.hash({ length });
 }
 
-/* TEMPORARY LOCATION */
-
 export async function createContentClassDescriptor(): Promise<string> {
   return createResource({
     endpoint: 'contentClassDescriptors',
@@ -76,5 +74,3 @@ export async function getDescriptorByLocation(location: string): Promise<string>
       return `${response.body.namespace}#${response.body.description}`;
     });
 }
-
-/* TEMPORARY LOCATION */
