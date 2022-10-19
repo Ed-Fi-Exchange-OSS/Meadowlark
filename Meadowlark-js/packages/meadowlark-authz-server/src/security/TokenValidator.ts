@@ -107,12 +107,14 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
 
     const nJwtErrorMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
 
+    // Check for error response from nJwt
     if (jwt == null || nJwtErrorMessages.includes(jwt.message)) return { isValid: false };
 
-    const isNotExpired: boolean = jwt.message !== 'Jwt is expired';
-    const isMeadowlarkToken: boolean = jwt.body?.iss === TOKEN_ISSUER && jwt.body?.aud === TOKEN_ISSUER;
+    // Check for correct issuer
+    if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };
 
-    const active: boolean = isNotExpired && isMeadowlarkToken && (await isValidClientId(jwt.body?.client_id, traceId));
+    const isNotExpired: boolean = jwt.message !== 'Jwt is expired';
+    const active: boolean = isNotExpired && (await isValidClientId(jwt.body?.client_id, traceId));
 
     return {
       isValid: true,
