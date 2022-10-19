@@ -47,8 +47,9 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
   try {
     unvalidatedBody = querystring.parse(authorizationRequest.body);
   } catch (error) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: 'Malformed body' };
+    const message = `Malformed body: ${error.message}`;
+    Logger.debug(`${moduleName}.parseRequestTokenBody: ${message}`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: message };
   }
 
   const bodyValidation: BodyValidation = validateVerifyTokenBody(unvalidatedBody);
@@ -129,7 +130,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
       statusCode: 200,
     };
   } catch (e) {
-    Logger.debug(`${moduleName}.verifyToken: 500`, authorizationRequest.traceId);
+    Logger.error(`${moduleName}.verifyToken: 500`, authorizationRequest.traceId, e);
     return { body: '', statusCode: 500 };
   }
 }

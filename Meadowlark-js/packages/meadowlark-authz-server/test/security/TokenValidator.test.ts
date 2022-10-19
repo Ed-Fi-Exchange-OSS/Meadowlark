@@ -167,23 +167,13 @@ describe('given introspection of expired token', () => {
   });
 
   it('returns expired', () => {
-    expect(result).toMatchInlineSnapshot(`
-      {
-        "introspectedToken": {
-          "active": false,
-          "aud": "ed-fi-meadowlark",
-          "client_id": "clientId",
-          "exp": 1666195391,
-          "iat": 1666198991,
-          "iss": "ed-fi-meadowlark",
-          "roles": [
-            "vendor",
-          ],
-          "sub": "",
-        },
-        "isValid": true,
-      }
-    `);
+    expect(result.isValid).toBe(true);
+    expect((result as any).introspectedToken.active).toBe(false);
+    expect((result as any).introspectedToken.aud).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.client_id).toBe('clientId');
+    expect((result as any).introspectedToken.iss).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.roles).toHaveLength(1);
+    expect((result as any).introspectedToken.roles[0]).toBe('vendor');
   });
 });
 
