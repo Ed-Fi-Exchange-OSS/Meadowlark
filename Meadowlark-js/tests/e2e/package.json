@@ -3,7 +3,6 @@
   "main": "dist/index.js",
   "version": "0.2.0-dev.0",
   "description": "Meadowlark Ed-Fi API end to end tests",
-  
   "license": "Apache-2.0",
   "private": true,
   "publishConfig": {
