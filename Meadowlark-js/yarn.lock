@@ -477,7 +477,6 @@ __metadata:
   dependencies:
     "@apideck/better-ajv-errors": ^0.3.6
     "@edfi/meadowlark-core": 0.2.0-dev.0
-    "@types/node": 14.14.31
     "@types/uuid": ^8.3.4
     ajv: ^8.11.0
     copyfiles: ^2.4.1
@@ -504,7 +503,6 @@ __metadata:
     "@types/fs-extra": ^8.1.2
     "@types/inflection": ^1.13.0
     "@types/js-yaml": ^4.0.5
-    "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
     "@types/ramda": 0.27.64
     "@types/semver": ^7.3.10
@@ -613,8 +611,6 @@ __metadata:
 "@edfi/meadowlark-utilities@0.2.0-dev.0, @edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities"
-  dependencies:
-    "@types/node": ^18.8.5
   languageName: unknown
   linkType: soft
 
@@ -2430,17 +2426,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:^18.8.5":
+"@types/node@npm:*, @types/node@npm:>= 8":
   version: 18.11.2
   resolution: "@types/node@npm:18.11.2::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-18.11.2.tgz"
   checksum: 0ff5c90fb9ab653e018b858479aea4d2f763b07b31f9502383d408936f525ca37cac82ea27774a0dd0356ff9badba2792a6a3fff94f79fd7c82ee2a892c43ed5
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:14.14.31":
-  version: 14.14.31
-  resolution: "@types/node@npm:14.14.31::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-14.14.31.tgz"
-  checksum: 5b9ab3660ee63abc57affc836c0d50b2941a862c5b6c241c02762d8e1ad610f6b0d350d7426218dc401b5abc7d6294ee1b475da7c331e486d59a5608d1a0b777
   languageName: node
   linkType: hard
 
