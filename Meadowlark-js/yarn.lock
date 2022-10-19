@@ -740,7 +740,6 @@ __metadata:
   dependencies:
     "@apideck/better-ajv-errors": ^0.3.6
     "@edfi/meadowlark-core": 0.2.0-dev.0
-    "@types/node": 14.14.31
     "@types/uuid": ^8.3.4
     ajv: ^8.11.0
     copyfiles: ^2.4.1
@@ -767,7 +766,6 @@ __metadata:
     "@types/fs-extra": ^8.1.2
     "@types/inflection": ^1.13.0
     "@types/js-yaml": ^4.0.5
-    "@types/node": 14.14.31
     "@types/pluralize": ^0.0.29
     "@types/ramda": 0.27.64
     "@types/semver": ^7.3.10
@@ -876,8 +874,6 @@ __metadata:
 "@edfi/meadowlark-utilities@0.2.0-dev.0, @edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities"
-  dependencies:
-    "@types/node": ^18.8.5
   languageName: unknown
   linkType: soft
 
@@ -2715,13 +2711,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:14.14.31":
-  version: 14.14.31
-  resolution: "@types/node@npm:14.14.31::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-14.14.31.tgz"
-  checksum: 5b9ab3660ee63abc57affc836c0d50b2941a862c5b6c241c02762d8e1ad610f6b0d350d7426218dc401b5abc7d6294ee1b475da7c331e486d59a5608d1a0b777
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:16.11.64":
   version: 16.11.64
   resolution: "@types/node@npm:16.11.64::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-16.11.64.tgz"
@@ -2740,13 +2729,6 @@ __metadata:
   version: 15.14.9
   resolution: "@types/node@npm:15.14.9::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-15.14.9.tgz"
   checksum: 49f7f0522a3af4b8389aee660e88426490cd54b86356672a1fedb49919a8797c00d090ec2dcc4a5df34edc2099d57fc2203d796c4e7fbd382f2022ccd789eee7
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^18.8.5":
-  version: 18.8.5
-  resolution: "@types/node@npm:18.8.5::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40types%2Fnode%2F-%2F%40types%2Fnode-18.8.5.tgz"
-  checksum: f7d896f54743178e64c534c6da16f582505acf18904ecd0ee8541cb4bc1d429ba514e7ecfd5145221b71adbd6ae1ff72df082f667e56d056fcd1a719df948e08
   languageName: node
   linkType: hard
 
