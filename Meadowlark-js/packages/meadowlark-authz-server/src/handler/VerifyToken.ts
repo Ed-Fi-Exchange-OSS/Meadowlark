@@ -39,11 +39,9 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (!authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
-    Logger.debug(
-      `${moduleName}.parseVerifyTokenBody: Requires application/x-www-form-urlencoded content type`,
-      authorizationRequest.traceId,
-    );
-    return { isValid: false, failureMessage: 'Malformed body' };
+    const message = 'Requires application/x-www-form-urlencoded content type';
+    Logger.debug(`${moduleName}.parseVerifyTokenBody: ${message}`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: message };
   }
 
   try {
@@ -55,7 +53,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
 
   const bodyValidation: BodyValidation = validateVerifyTokenBody(unvalidatedBody);
   if (!bodyValidation.isValid) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid verify body`, authorizationRequest.traceId);
+    Logger.debug(`${moduleName}.parseRequestTokenBody: ${bodyValidation.failureMessage}`, authorizationRequest.traceId);
     return { isValid: false, failureMessage: bodyValidation.failureMessage };
   }
 

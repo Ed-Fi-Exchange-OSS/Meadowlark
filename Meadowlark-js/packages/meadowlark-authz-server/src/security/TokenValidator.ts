@@ -100,37 +100,53 @@ export type IntrospectionResponse = { isValid: false } | { isValid: true; intros
 export async function introspectBearerToken(bearerToken: string, traceId: string): Promise<IntrospectionResponse> {
   Logger.debug('TokenValidator.introspectBearerToken token', traceId, bearerToken);
 
+  let verified: nJwt | undefined;
   try {
-    const verified: nJwt | undefined = verify(bearerToken, signingKey());
-    if (verified == null) return { isValid: false };
-    const jwt: Jwt = verified as Jwt;
-
-    const nJwtErrorMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
-
-    // Check for error response from nJwt
-    if (jwt == null || nJwtErrorMessages.includes(jwt.message)) return { isValid: false };
-
-    // Check for correct issuer
-    if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };
-
-    const isNotExpired: boolean = jwt.message !== 'Jwt is expired';
-    const active: boolean = isNotExpired && (await isValidClientId(jwt.body?.client_id, traceId));
-
+    verified = verify(bearerToken, signingKey());
+  } catch (err) {
+    Logger.debug('TokenValidator.introspectBearerToken nJwt responded with exception', traceId, err);
+    if (err.message !== 'Jwt is expired') return { isValid: false };
     return {
       isValid: true,
       introspectedToken: {
-        active,
-        client_id: jwt.body?.client_id ?? '',
-        sub: jwt.body?.sub ?? '',
-        aud: jwt.body?.aud ?? '',
-        iss: jwt.body?.iss ?? '',
-        exp: jwt.body?.exp ?? 0,
-        iat: jwt.body?.iat ?? 0,
-        roles: jwt.body?.roles ?? [],
+        active: false,
+        client_id: err.parsedBody?.client_id ?? '',
+        sub: err.parsedBody?.sub ?? '',
+        aud: err.parsedBody?.aud ?? '',
+        iss: err.parsedBody?.iss ?? '',
+        exp: err.parsedBody?.exp ?? 0,
+        iat: err.parsedBody?.iat ?? 0,
+        roles: err.parsedBody?.roles ?? [],
       },
     };
-  } catch (err) {
-    Logger.debug('TokenValidator.introspectBearerToken user-submitted token error', traceId, err);
-    return { isValid: false };
   }
+
+  if (verified == null) return { isValid: false };
+  const jwt: Jwt = verified as Jwt;
+
+  const nJwtErrorMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
+
+  // Check for error response from nJwt in message
+  if (nJwtErrorMessages.includes(jwt.message)) return { isValid: false };
+
+  // Check for correct issuer
+  if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };
+
+  // Checked for expired in catch, but just in case
+  const isNotExpired: boolean = jwt.message !== 'Jwt is expired';
+  const active: boolean = isNotExpired && (await isValidClientId(jwt.body?.client_id, traceId));
+
+  return {
+    isValid: true,
+    introspectedToken: {
+      active,
+      client_id: jwt.body?.client_id ?? '',
+      sub: jwt.body?.sub ?? '',
+      aud: jwt.body?.aud ?? '',
+      iss: jwt.body?.iss ?? '',
+      exp: jwt.body?.exp ?? 0,
+      iat: jwt.body?.iat ?? 0,
+      roles: jwt.body?.roles ?? [],
+    },
+  };
 }
