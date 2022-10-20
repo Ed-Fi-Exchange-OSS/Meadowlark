@@ -18,8 +18,8 @@ export const verifyTokenBodySchema = {
       description: 'The token to verify',
       type: 'string',
     },
-    token_type: {
-      description: 'Optional token_type. Unused.',
+    token_type_hint: {
+      description: 'Optional token_type_hint. Unused.',
       type: 'string',
     },
   },
