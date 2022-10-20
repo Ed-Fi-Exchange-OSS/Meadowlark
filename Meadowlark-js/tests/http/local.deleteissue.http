@@ -115,16 +115,21 @@ content-type: application/json
         }
     ]
 }
-### This delete will fail because the school is referenced by the location and the ed-org is referenced 
-# by the course
+### This delete will fail because the school is referenced by the location and the course
 @schoolDocumentlocation = {{school124.response.headers.location}}
+# @name schoolDelete
 DELETE http://localhost:3000{{schoolDocumentlocation}}
 {{auth_header}}
 
+### Blocking uri's were returning an incorrect path, fixed with RND-424
+@locationPath = {{schoolDelete.response.body.blockingUris[0]}}
+###
+@coursePath = {{schoolDelete.response.body.blockingUris[1]}}
+
 ### Delete location
-DELETE http://localhost:3000/local/v3.3b/ed-fi/locations/2_wmVcaVb7e8wDIW6zrsXyt9oMDFGnSa4I71pg
+DELETE http://localhost:3000{{locationPath}}
 {{auth_header}}
 
 ### Delete course, if you re-run school delete above it will succeed
-DELETE http://localhost:3000/local/v3.3b/ed-fi/courses/gVk6pvR7T3njmrMaLWyeGs6QcSz4Nh39LNeueA
+DELETE http://localhost:3000{{coursePath}}
 {{auth_header}}

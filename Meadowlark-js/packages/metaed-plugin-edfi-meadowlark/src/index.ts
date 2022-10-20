@@ -16,7 +16,7 @@ export { EntityMeadowlarkData } from './model/EntityMeadowlarkData';
 export { EntityPropertyMeadowlarkData } from './model/EntityPropertyMeadowlarkData';
 export { prefixedName } from './model/PropertyModifier';
 export { ReferenceComponent, ReferenceGroup, isReferenceElement } from './model/ReferenceComponent';
-export { topLevelNameOnEntity, pluralize } from './Utility';
+export { topLevelNameOnEntity, pluralize, uncapitalize } from './Utility';
 export { ApiPropertyMapping } from './model/ApiPropertyMapping';
 
 export function initialize(): MetaEdPlugin {
