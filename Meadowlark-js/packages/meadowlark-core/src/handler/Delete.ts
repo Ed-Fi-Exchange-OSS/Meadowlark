@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { isDebugEnabled, writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { beforeDeleteDocumentById, afterDeleteDocumentById } from '../plugin/listener/Publish';
@@ -29,7 +30,7 @@ function blockingDocumentsToUris(frontendRequest: FrontendRequest, blockingDocum
       {
         version: versionAbbreviationFor(document.resourceVersion),
         namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
-        resourceName: document.resourceName,
+        resourceName: uncapitalize(pluralize(document.resourceName)),
       },
       document.documentId,
     );

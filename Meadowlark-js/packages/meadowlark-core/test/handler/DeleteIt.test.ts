@@ -152,7 +152,7 @@ describe('given the document to be deleted is referenced by other documents ', (
     );
     expect(responseBody.blockingUris).toMatchInlineSnapshot(`
       [
-        "/v3.3b/ed-fi/resourceName/documentId",
+        "/v3.3b/ed-fi/resourceNames/documentId",
       ]
     `);
   });
