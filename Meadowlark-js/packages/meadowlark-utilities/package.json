@@ -17,8 +17,5 @@
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
-  },
-  "devDependencies": {
-    "@types/node": "^18.8.5"
   }
 }

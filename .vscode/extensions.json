@@ -15,6 +15,7 @@
         "humao.rest-client",
         "davidanson.vscode-markdownlint",
         "stkb.rewrap",
-        "bierner.markdown-emoji"
+        "bierner.markdown-emoji",
+        "Orta.vscode-jest"
     ]
 }
