@@ -190,6 +190,7 @@ describe('given non-admin authorization token', () => {
       ...newJwtStatus(),
       isMissing: false,
       isExpired: false,
+      isValid: true,
       roles: ['vendor'],
     });
 

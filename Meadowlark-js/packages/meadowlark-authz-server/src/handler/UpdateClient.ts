@@ -7,12 +7,11 @@ import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorization
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
 import { UpdateClientBody } from '../model/CreateClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
-import { checkForAuthorizationErrors } from '../security/JwtValidator';
+import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { validateUpdateClientBody } from '../validation/ValidateClientBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { BodyValidation } from '../validation/BodyValidation';
+import { BodyValidation, validateUpdateClientBody } from '../validation/BodyValidation';
 import { clientIdFrom } from '../Utility';
 
 const moduleName = 'handler.UpdateClient';
@@ -25,7 +24,7 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
     writeRequestToLog(moduleName, authorizationRequest, 'updateClient');
     await ensurePluginsLoaded();
 
-    const errorResponse: AuthorizationResponse | undefined = checkForAuthorizationErrors(
+    const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       authorizationHeader(authorizationRequest.headers),
     );
 

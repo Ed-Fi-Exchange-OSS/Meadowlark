@@ -9,48 +9,39 @@ import { buildService } from '../../src/Service';
 
 jest.setTimeout(40000);
 
-const requestTokenRequest: InjectOptions = {
+const verifyTokenRequest: InjectOptions = {
   method: 'POST',
-  url: '/local/oauth/token',
-  headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
-  payload: `{
-    "grant_type": "client_credentials",
-    "client_id": "Hometown SIS",
-    "client_secret": "123456"
-  }`,
+  url: '/local/oauth/verify',
+  headers: { authorization: 'bearer 1234', 'content-type': 'application/x-www-form-urlencoded' },
+  payload: 'token=1234',
 };
 
-describe('given a POST to request a new token', () => {
-  let mockUpsert: any;
+describe('given a POST to verify a token', () => {
+  let mockVerify: any;
   let service: FastifyInstance;
 
   beforeAll(async () => {
-    mockUpsert = jest.spyOn(AuthorizationServer, 'requestToken');
+    mockVerify = jest.spyOn(AuthorizationServer, 'verifyToken');
     service = buildService();
     await service.ready();
 
     // Act
-    await service.inject(requestTokenRequest);
+    await service.inject(verifyTokenRequest);
   });
 
   afterAll(async () => {
     await service.close();
-    mockUpsert.mockRestore();
+    mockVerify.mockRestore();
   });
 
   it('should send the expected AuthorizationRequest to Authorization Server', async () => {
-    expect(mockUpsert.mock.calls).toHaveLength(1);
-    const mock = mockUpsert.mock.calls[0][0];
+    expect(mockVerify.mock.calls).toHaveLength(1);
+    const mock = mockVerify.mock.calls[0][0];
 
-    expect(mock.body).toMatchInlineSnapshot(`
-      "{
-          "grant_type": "client_credentials",
-          "client_id": "Hometown SIS",
-          "client_secret": "123456"
-        }"
-    `);
+    expect(mock.body).toMatchInlineSnapshot(`"token=1234"`);
     expect(mock.headers.authorization).toBe('bearer 1234');
-    expect(mock.path).toBe('/oauth/token');
+    expect(mock.headers['content-type']).toBe('application/x-www-form-urlencoded');
+    expect(mock.path).toBe('/oauth/verify');
     expect(mock.queryParameters).toEqual({});
   });
 });
