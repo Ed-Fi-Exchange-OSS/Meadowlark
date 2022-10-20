@@ -61,7 +61,7 @@ export async function getAccessToken(client: Clients): Promise<string> {
   let token: string = accessTokens.find((t) => t.client === client)?.token ?? '';
   if (!token) {
     token = await baseURLRequest
-      .post('/api/oauth/token')
+      .post('/oauth/token')
       .send({
         grant_type: 'client_credentials',
         client_id: credentials.key,
