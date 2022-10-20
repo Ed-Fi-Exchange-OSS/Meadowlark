@@ -55,6 +55,7 @@ content-type: application/json
 }
 
 ###
+@admin_token={{admin1.response.body.$.access_token}}
 @auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
 
 
@@ -289,18 +290,106 @@ POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id={{created_client_id_2}}&client_secret={{created_client_secret_2}}
+
 ### Reset secret for client 2
 # @name reset
 POST http://localhost:3000/local/oauth/client/{{created_client_id_2}}/reset
 content-type: application/json
 {{auth_header_admin_1}}
+
 ###
 @reset_secret={{reset.response.body.$.client_secret}}
 ### Login with reset secret
+# @name reset
 POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id={{created_client_id_2}}&client_secret={{reset_secret}}
+
 ###
+@reset_token={{reset.response.body.$.access_token}}
 
+##
+### TOKEN INTROSPECTION
+##
 
+### 200: Accept a current token created above
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
+
+token={{reset_token}}
+
+### 200: Ignore the token_type hint
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
+
+token={{reset_token}}&token_type_hint=not_a_real_hint
+
+### 400: JSON payload is not acceptable, per the specification
+POST http://localhost:3000/local/oauth/verify
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "token": "{{reset_token}}"
+}
+
+### 200 (active: false): An expired token is not accepted
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
+
+token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImNsaWVudF9pZCI6ImMzVndaWEl0WjNKbFlYUXRVMGxUIiwianRpIjoiZjQ2OTYyYjQtMzg4NS00Y2JiLWE4YjktMmY5NTY5OGNkM2U1IiwiaWF0IjoxNjU1MjQ0OTE3LCJleHAiOjE3MTg0MDF9.iuIAVDeszM_f-yzqylY65zim87WJtau-0HQUj30x66U
+
+### 400: A modified token is not accepted 
+# (invalid signature after modifying middle portion of JWT)
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
+
+token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJlZC1maS1tZWFkb3dsYXJrIiwiYXVkIjoibWVhZG93bGFyayIsInN1YiI6InN1cGVyLWdyZWF0LVNJUyIsImp0aSI6IjgyNWQ0NGI4LWE4MTEtNGNmZi1iZWY4LWNjOGE2NjE2OWJlMCIsImNsaWVudF9pZCI6ImMzVndaWEl0WjNKbFlYUXRVMGxUIiwiaWF0IjoxNjU4NTI0MjM1LCJleHAiOjI2NTg1Mjc4MzV9.nj2ajxWjv0Vfqrx9200xVOds_hiOMPXcf6I0dYTkw_M
+
+### 200: Non-admin can inspect own token
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+authorization: bearer {{reset_token}}
+
+token={{reset_token}}
+
+### 401: Non-admin can inspect someone else's token
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+authorization: bearer {{reset_token}}
+
+token={{admin_token}}
+
+### 400: Can't validate some other random token
+# (cribbed from https://jwt.io)
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
+
+token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxOTE2MjM5MDIyfQ.DGme0_qbXW79j7VftKA1L1b6qugxEJ6-nqcmnvmi7DA
+
+#### WON'T WORK UNTIL AFTER RND-354
+
+# ### Delete the "reset" client
+# DELETE http://localhost:3000/local/oauth/client/{{created_client_id_2}}
+# content-type: application/x-www-form-urlencoded
+# {{auth_header_admin_1}}
+
+# ### Now verification of the "reset" client should fail
+# POST http://localhost:3000/local/oauth/verify
+# content-type: application/x-www-form-urlencoded
+# {{auth_header_admin_1}}
+
+# token={{reset_token}}
+
+# ### And the "reset" client shouldn't be able to verify own token
+# POST http://localhost:3000/local/oauth/verify
+# content-type: application/x-www-form-urlencoded
+# authorization: bearer {{reset_token}}
+
+# token={{reset_token}}
