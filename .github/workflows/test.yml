@@ -28,7 +28,7 @@ jobs:
           cache-dependency-path: "**/yarn.lock"
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Linter
         run: yarn test:lint
@@ -62,6 +62,31 @@ jobs:
           POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: system-tests
 
+      - name: Start Containers
+        run: ../eng/docker.ps1
+        shell: pwsh
+
+      - name: Build
+        run: yarn build
+
+      - name: Start Fastify against Postgres
+        run: |
+          cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
+          yarn start:local &
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abcdefgh1!
+          OPENSEARCH_USERNAME: admin
+          OPENSEARCH_PASSWORD: admin
+          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
+
+      - name: End to End tests for Postgres
+        run: |
+          cp ./tests/e2e/.env.example ./tests/e2e/.env
+          yarn test:e2e --ci --config ./jest.ci-config.js
+        env:
+          JEST_JUNIT_OUTPUT_DIR: pg-e2e-tests
+
       - name: Upload test results
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
@@ -70,4 +95,5 @@ jobs:
             Meadowlark-js/unit-tests/junit.xml
             Meadowlark-js/integration-tests/junit.xml
             Meadowlark-js/system-tests/junit.xml
+            Meadowlark-js/pg-e2e-tests/junit.xml
           retention-days: 1
