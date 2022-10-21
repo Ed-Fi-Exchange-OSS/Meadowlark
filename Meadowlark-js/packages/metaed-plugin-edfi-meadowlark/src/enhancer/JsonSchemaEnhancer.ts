@@ -118,7 +118,7 @@ function schemaArrayFrom(schemaArrayElement: SchemaProperty): SchemaArray {
   return {
     type: 'array',
     items: schemaArrayElement,
-    minItems: 1,
+    minItems: 0,
     uniqueItems: false,
   };
 }
@@ -284,7 +284,11 @@ function schemaArrayForReferenceCollection(property: EntityProperty, propertyMod
   });
 
   const referenceArrayElement: SchemaObject = schemaObjectFrom({ [referenceName]: referenceSchemaObject }, [referenceName]);
-  return schemaArrayFrom(referenceArrayElement);
+
+  return {
+    ...schemaArrayFrom(referenceArrayElement),
+    minItems: isSchemaPropertyRequired(property, propertyModifier) ? 1 : 0,
+  };
 }
 
 /**
@@ -299,7 +303,10 @@ function schemaArrayForDescriptorCollection(property: EntityProperty, propertyMo
     [descriptorName]: { type: 'string', description: 'An Ed-Fi Descriptor' },
   };
 
-  return schemaArrayFrom(schemaObjectFrom(descriptorSchemaProperty, [descriptorName]));
+  return {
+    ...schemaArrayFrom(schemaObjectFrom(descriptorSchemaProperty, [descriptorName])),
+    minItems: isSchemaPropertyRequired(property, propertyModifier) ? 1 : 0,
+  };
 }
 
 /**
@@ -314,7 +321,10 @@ function schemaArrayForNonReferenceCollection(property: EntityProperty, property
     [propertyName]: schemaPropertyForNonReference(property),
   };
 
-  return schemaArrayFrom(schemaObjectFrom(schemaProperty, [propertyName]));
+  return {
+    ...schemaArrayFrom(schemaObjectFrom(schemaProperty, [propertyName])),
+    minItems: isSchemaPropertyRequired(property, propertyModifier) ? 1 : 0,
+  };
 }
 
 /**
