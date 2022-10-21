@@ -8,6 +8,7 @@ export { updateClient } from './handler/UpdateClient';
 export { requestToken } from './handler/RequestToken';
 export { verifyToken } from './handler/VerifyToken';
 export { resetAuthorizationClientSecret } from './handler/ResetClientSecret';
+export { createSigningKey } from './handler/CreateSigningKey';
 export { AuthorizationRequest, newAuthorizationRequest } from './handler/AuthorizationRequest';
 export { AuthorizationResponse } from './handler/AuthorizationResponse';
 export { AuthorizationStorePlugin } from './plugin/AuthorizationStorePlugin';

@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { PoolClient, QueryResult } from 'pg';
-import { GetResult, GetRequest, Logger } from '@edfi/meadowlark-core';
+import { GetResult, GetRequest } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByIdSql } from './SqlHelper';
 
 export async function getDocumentById({ id, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {

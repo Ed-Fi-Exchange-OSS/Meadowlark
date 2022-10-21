@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DeleteResult, Logger, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
+import { DeleteResult, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId } from './Db';

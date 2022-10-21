@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { UpsertResult, Logger, UpsertRequest, documentIdForSuperclassInfo } from '@edfi/meadowlark-core';
+import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
 import { validateReferences } from './ReferenceValidation';

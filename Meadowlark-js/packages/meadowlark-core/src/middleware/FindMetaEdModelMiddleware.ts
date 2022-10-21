@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Logger, writeDebugStatusToLog, writeRequestToLog } from '../Logger';
+import { Logger } from '@edfi/meadowlark-utilities';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { findMetaEdModel } from '../metaed/MetaEdModelFinder';
 

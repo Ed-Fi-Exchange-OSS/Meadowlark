@@ -607,6 +607,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.15.4":
+  version: 7.19.4
+  resolution: "@babel/runtime@npm:7.19.4::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40babel%2Fruntime%2F-%2F%40babel%2Fruntime-7.19.4.tgz"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 66b7e3c13e9ee1d2c9397ea89144f29a875edee266a0eb2d9971be51b32fdbafc85808c7a45e011e6681899bb804b4e2ee2aed6dc07108dbbd6b11b6cc2afba6
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.16.0, @babel/template@npm:^7.3.3":
   version: 7.16.0
   resolution: "@babel/template@npm:7.16.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40babel%2Ftemplate%2F-%2F%40babel%2Ftemplate-7.16.0.tgz"
@@ -739,7 +748,7 @@ __metadata:
   resolution: "@edfi/meadowlark-authz-server@workspace:packages/meadowlark-authz-server"
   dependencies:
     "@apideck/better-ajv-errors": ^0.3.6
-    "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     "@types/uuid": ^8.3.4
     ajv: ^8.11.0
     copyfiles: ^2.4.1
@@ -749,7 +758,6 @@ __metadata:
     ramda: ^0.27.2
     rimraf: ^3.0.2
     uuid: ^9.0.0
-    winston: ^3.7.2
   languageName: unknown
   linkType: soft
 
@@ -763,6 +771,7 @@ __metadata:
     "@edfi/metaed-core": 3.1.0
     "@edfi/metaed-plugin-edfi-meadowlark": 0.2.0-dev.0
     "@edfi/metaed-plugin-edfi-unified": 3.1.0
+    "@isaacs/ttlcache": ^1.2.1
     "@types/fs-extra": ^8.1.2
     "@types/inflection": ^1.13.0
     "@types/js-yaml": ^4.0.5
@@ -773,6 +782,7 @@ __metadata:
     ajv: ^8.11.0
     ajv-formats: ^2.1.1
     axios: ^0.25.0
+    axios-retry: ^3.3.1
     copyfiles: ^2.4.1
     didyoumean2: ^5.0.0
     dotenv: ^16.0.1
@@ -785,10 +795,9 @@ __metadata:
     ramda: ^0.27.2
     regenerator-runtime: ^0.13.9
     rimraf: ^3.0.2
-    secure-random: ^1.1.2
     semver: ^7.3.7
     ts-invariant: ^0.9.4
-    winston: ^3.7.2
+    winston: ^3.8.2
     xml2js: ^0.4.23
   languageName: unknown
   linkType: soft
@@ -811,6 +820,7 @@ __metadata:
   dependencies:
     "@edfi/meadowlark-authz-server": 0.2.0-dev.0
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     "@fastify/rate-limit": ^6.0.1
     copyfiles: ^2.4.1
     dotenv: ^16.0.1
@@ -826,6 +836,7 @@ __metadata:
   dependencies:
     "@edfi/meadowlark-authz-server": 0.2.0-dev.0
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     copyfiles: ^2.4.1
     mongodb: ^4.5.0
     ramda: ^0.28.0
@@ -839,6 +850,7 @@ __metadata:
   resolution: "@edfi/meadowlark-opensearch-backend@workspace:backends/meadowlark-opensearch-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     "@edfi/metaed-core": 3.1.0
     "@opensearch-project/opensearch": ^1.1.0
     "@short.io/opensearch-mock": ^0.3.1
@@ -852,6 +864,7 @@ __metadata:
   resolution: "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     "@types/pg": ^8.6.5
     "@types/pg-format": ^1.0.2
     copyfiles: ^2.4.1
@@ -868,12 +881,15 @@ __metadata:
   resolution: "@edfi/meadowlark-system-tests@workspace:tests/system"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": 0.2.0-dev.0
   languageName: unknown
   linkType: soft
 
 "@edfi/meadowlark-utilities@0.2.0-dev.0, @edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities"
+  dependencies:
+    winston: ^3.8.2
   languageName: unknown
   linkType: soft
 
@@ -1093,6 +1109,13 @@ __metadata:
   version: 1.2.1
   resolution: "@humanwhocodes/object-schema@npm:1.2.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40humanwhocodes%2Fobject-schema%2F-%2F%40humanwhocodes%2Fobject-schema-1.2.1.tgz"
   checksum: a824a1ec31591231e4bad5787641f59e9633827d0a2eaae131a288d33c9ef0290bd16fda8da6f7c0fcb014147865d12118df10db57f27f41e20da92369fcb3f1
+  languageName: node
+  linkType: hard
+
+"@isaacs/ttlcache@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@isaacs/ttlcache@npm:1.2.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40isaacs%2Fttlcache%2F-%2F%40isaacs%2Fttlcache-1.2.1.tgz"
+  checksum: 3e50e590f9eb776e6d4f1df28081527ef195a02aa1bfe4cb99a2738ab565eb4e0c8969b644c98c26cebb886302ff5a241d5a17234159a881376e4799ee314f22
   languageName: node
   linkType: hard
 
@@ -3512,6 +3535,16 @@ __metadata:
   version: 1.11.0
   resolution: "aws4@npm:1.11.0"
   checksum: 5a00d045fd0385926d20ebebcfba5ec79d4482fe706f63c27b324d489a04c68edb0db99ed991e19eda09cb8c97dc2452059a34d97545cebf591d7a2b5a10999f
+  languageName: node
+  linkType: hard
+
+"axios-retry@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "axios-retry@npm:3.3.1"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    is-retry-allowed: ^2.2.0
+  checksum: 125c75e08048a28de5d0dfa9de9a1924185d863a4323a71472646a1d5a326f727ff59e75e1b557220da1aad7cba01222c47c26194c5940f295378668dd3b9163
   languageName: node
   linkType: hard
 
@@ -7454,6 +7487,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-retry-allowed@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "is-retry-allowed@npm:2.2.0"
+  checksum: 3d1103a9290b5d03626756a41054844633eac78bc5d3e3a95b13afeae94fa3cfbcf7f0b5520d83f75f48a25ce7b142fdbac4217dc4b0630f3ea55e866ec3a029
+  languageName: node
+  linkType: hard
+
 "is-shared-array-buffer@npm:^1.0.1":
   version: 1.0.1
   resolution: "is-shared-array-buffer@npm:1.0.1"
@@ -11337,13 +11377,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"secure-random@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "secure-random@npm:1.1.2"
-  checksum: 44744464a2cb41dd812d482aff1a01b05842359480f2b0cbd6466d1da8cab8ebb2a84f070b0ddee34ab3867f1f775b2bc34ef3e860f27dc8177791595d6debc9
-  languageName: node
-  linkType: hard
-
 "semver-store@npm:^0.3.0":
   version: 0.3.0
   resolution: "semver-store@npm:0.3.0"
@@ -13220,7 +13253,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:3.7.2, winston@npm:^3.7.2":
+"winston@npm:3.7.2":
   version: 3.7.2
   resolution: "winston@npm:3.7.2"
   dependencies:
@@ -13235,6 +13268,25 @@ __metadata:
     triple-beam: ^1.3.0
     winston-transport: ^4.5.0
   checksum: f1f1a860d2fa228b50880b20aaa6cc121085907791fe0d814ff9c062640f6b65da321726322094e7667eb63088b3bb67e7b4e219d998f29efcc6f583185a1cd3
+  languageName: node
+  linkType: hard
+
+"winston@npm:^3.8.2":
+  version: 3.8.2
+  resolution: "winston@npm:3.8.2"
+  dependencies:
+    "@colors/colors": 1.5.0
+    "@dabh/diagnostics": ^2.0.2
+    async: ^3.2.3
+    is-stream: ^2.0.0
+    logform: ^2.4.0
+    one-time: ^1.0.0
+    readable-stream: ^3.4.0
+    safe-stable-stringify: ^2.3.1
+    stack-trace: 0.0.x
+    triple-beam: ^1.3.0
+    winston-transport: ^4.5.0
+  checksum: f7b901798b92ab9e93c850110bf6e98500e9a0e762b62dab410cf928b2a4145533dfa6d3d2b24f7bf0dc94b53808d5bd28aaaeff9a4b43b89ea4c798cce308ea
   languageName: node
   linkType: hard
 

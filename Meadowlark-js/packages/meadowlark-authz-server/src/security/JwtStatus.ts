@@ -3,8 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { AuthorizationStrategy } from './AuthorizationStrategy';
-
 /**
  * Information extracted from a JWT token
  */
@@ -19,7 +17,6 @@ export interface JwtStatus {
   issuedAt: number;
   expiresAt: number;
   roles: string[];
-  authorizationStrategy: AuthorizationStrategy;
 }
 
 export function newJwtStatus(): JwtStatus {
@@ -34,7 +31,6 @@ export function newJwtStatus(): JwtStatus {
     issuedAt: 0,
     expiresAt: 0,
     roles: [],
-    authorizationStrategy: { type: 'UNDEFINED', withAssessment: false },
   };
 }
 

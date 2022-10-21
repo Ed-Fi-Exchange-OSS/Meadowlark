@@ -6,7 +6,8 @@
 // Disable no-floating-promises because Fastify has a multi-async style and we aren't using the one eslint is flagging
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import { newFrontendRequest, LOCATION_HEADER_NAME } from '@edfi/meadowlark-core';
+import { LOCATION_HEADER_NAME } from '@edfi/meadowlark-utilities';
+import { newFrontendRequest } from '@edfi/meadowlark-core';
 import type { FrontendRequest, FrontendResponse } from '@edfi/meadowlark-core';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { extractPath, MEADOWLARK_STAGE, getHeaders, CompatibleParameters } from './FastifyUtility';

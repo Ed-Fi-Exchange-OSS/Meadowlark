@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { JwtStatus, verifyJwt, Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
@@ -12,9 +12,15 @@ import { IntrospectedToken } from './IntrospectedToken';
 import { TOKEN_ISSUER } from './TokenIssuer';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
+import { JwtStatus } from './JwtStatus';
+import { verifyJwt } from './JwtAction';
 
 export function hasAdminRole(roles: string[]): boolean {
   return roles.some((role) => role.toLocaleLowerCase() === 'admin');
+}
+
+export function hasAdminOrVerifyOnlyRole(roles: string[]): boolean {
+  return roles.some((role) => role.toLocaleLowerCase() === 'verify-only' || role.toLocaleLowerCase() === 'admin');
 }
 
 export type ValidateTokenResult =
@@ -123,11 +129,6 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
 
   if (verified == null) return { isValid: false };
   const jwt: Jwt = verified as Jwt;
-
-  const nJwtErrorMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
-
-  // Check for error response from nJwt in message
-  if (nJwtErrorMessages.includes(jwt.message)) return { isValid: false };
 
   // Check for correct issuer
   if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };

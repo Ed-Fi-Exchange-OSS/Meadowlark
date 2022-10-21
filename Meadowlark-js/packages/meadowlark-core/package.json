@@ -19,9 +19,11 @@
     "@edfi/metaed-core": "3.1.0",
     "@edfi/metaed-plugin-edfi-meadowlark": "0.2.0-dev.0",
     "@edfi/metaed-plugin-edfi-unified": "3.1.0",
+    "@isaacs/ttlcache": "^1.2.1",
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",
     "axios": "^0.25.0",
+    "axios-retry": "^3.3.1",
     "didyoumean2": "^5.0.0",
     "dotenv": "^16.0.1",
     "emittery": "^0.11.0",
@@ -30,14 +32,11 @@
     "inquirer": "^8.2.4",
     "njwt": "^1.2.0",
     "ramda": "^0.27.2",
-    "secure-random": "^1.1.2",
     "semver": "^7.3.7",
     "ts-invariant": "^0.9.4",
-    "winston": "^3.7.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@edfi/metaed-plugin-edfi-meadowlark": "0.2.0-dev.0",
     "@types/fs-extra": "^8.1.2",
     "@types/inflection": "^1.13.0",
     "@types/js-yaml": "^4.0.5",
@@ -48,7 +47,8 @@
     "copyfiles": "^2.4.1",
     "jsinspect": "^0.12.7",
     "regenerator-runtime": "^0.13.9",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "winston": "^3.8.2"
   },
   "scripts": {
     "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",

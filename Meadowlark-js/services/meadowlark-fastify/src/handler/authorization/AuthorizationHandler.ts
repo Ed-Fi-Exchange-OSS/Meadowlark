@@ -3,26 +3,37 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
+import {
+  createClient,
+  createSigningKey,
+  requestToken,
+  resetAuthorizationClientSecret,
+  updateClient,
+  verifyToken,
+} from '@edfi/meadowlark-authz-server';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { respondWith, fromRequest } from './AuthorizationConverter';
 
 export async function createAuthorizationClientHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.createClient(fromRequest(request)), reply);
+  respondWith(await createClient(fromRequest(request)), reply);
 }
 
 export async function updateAuthorizationClientHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.updateClient(fromRequest(request)), reply);
+  respondWith(await updateClient(fromRequest(request)), reply);
 }
 
 export async function requestTokenAuthorizationHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.requestToken(fromRequest(request)), reply);
+  respondWith(await requestToken(fromRequest(request)), reply);
 }
 
 export async function verifyTokenAuthorizationHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.verifyToken(fromRequest(request)), reply);
+  respondWith(await verifyToken(fromRequest(request)), reply);
 }
 
 export async function resetAuthorizationClientSecretHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await AuthorizationServer.resetAuthorizationClientSecret(fromRequest(request)), reply);
+  respondWith(await resetAuthorizationClientSecret(fromRequest(request)), reply);
+}
+
+export async function createSigningKeyHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  respondWith(await createSigningKey(fromRequest(request)), reply);
 }

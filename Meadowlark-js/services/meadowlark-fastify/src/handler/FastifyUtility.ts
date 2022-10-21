@@ -14,10 +14,13 @@ export type CompatibleParameters = { [header: string]: string | undefined };
 
 export const MEADOWLARK_STAGE = process.env.MEADOWLARK_STAGE || 'local';
 
+// Returns header names lowercased
 export function getHeaders(fastifyRequest: FastifyRequest): Headers {
   const headers = (fastifyRequest.headers as CompatibleParameters) ?? {};
   headers.Host = fastifyRequest.hostname;
-  return headers;
+
+  // ensure all header names are lowercased
+  return Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
 }
 
 export function extractPath(fastifyRequest: FastifyRequest, stage: string): string {

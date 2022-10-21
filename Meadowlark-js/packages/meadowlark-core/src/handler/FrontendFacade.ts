@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 import R from 'ramda';
-import { writeErrorToLog } from '../Logger';
+import { writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { authorize } from '../middleware/AuthorizationMiddleware';
 import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';

@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { Logger, writeErrorToLog } from '@edfi/meadowlark-core';
+import { Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { AuthorizationStoreInitializer } from './AuthorizationStoreInitializer';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 import { NoAuthorizationStorePlugin } from './NoAuthorizationStorePlugin';

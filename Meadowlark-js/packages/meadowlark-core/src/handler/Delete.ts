@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-meadowlark';
-import { isDebugEnabled, writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
+import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { beforeDeleteDocumentById, afterDeleteDocumentById } from '../plugin/listener/Publish';
 import { DeleteRequest } from '../message/DeleteRequest';

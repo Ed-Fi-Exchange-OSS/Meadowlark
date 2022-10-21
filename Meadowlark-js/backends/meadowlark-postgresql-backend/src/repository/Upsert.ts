@@ -7,12 +7,11 @@ import type { PoolClient, QueryResult } from 'pg';
 import {
   UpsertResult,
   UpsertRequest,
-  Logger,
   DocumentReference,
   documentIdForDocumentReference,
   documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
-
+import { Logger } from '@edfi/meadowlark-utilities';
 import {
   deleteOutboundReferencesOfDocumentSql,
   documentInsertOrUpdateSql,

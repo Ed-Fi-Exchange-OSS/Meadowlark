@@ -5,7 +5,7 @@
 
 import dotenv from 'dotenv';
 import type { FastifyInstance } from 'fastify';
-import { Logger, initializeLogging } from '@edfi/meadowlark-core';
+import { Logger, initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from './Service';
 
 dotenv.config();

@@ -5,12 +5,9 @@
 
 import { Jwt as nJwt, verify } from 'njwt';
 import memoize from 'fast-memoize';
-import { getStringFromEnvironment } from '@edfi/meadowlark-utilities';
+import { getStringFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
-import { Logger } from '../Logger';
-import { determineAuthStrategyFromRoles } from '../middleware/ParseUserRole';
-import { AuthorizationStrategy } from './AuthorizationStrategy';
 
 function signingKey(): Buffer {
   const signingKeyEncoded = getStringFromEnvironment('SIGNING_KEY');
@@ -31,17 +28,9 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 
   const failureMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
 
-  // Check that roles exist on the JWT and that there we can map a role to an authorization strategy
-  // otherwise this is not a valid token
-  let authStrategyFromJWT: AuthorizationStrategy = { type: 'UNDEFINED', withAssessment: false };
-
-  if ((jwt.body?.roles?.length ?? 0) > 0) {
-    authStrategyFromJWT = determineAuthStrategyFromRoles(jwt.body.roles as string[]);
-  }
-
   return {
     isMissing: false,
-    isValid: jwt != null && !failureMessages.includes(jwt.message) && authStrategyFromJWT.type !== 'UNDEFINED',
+    isValid: jwt != null && !failureMessages.includes(jwt.message),
     isExpired: jwt.message === 'Jwt is expired',
     issuer: jwt.body?.iss ?? '',
     audience: jwt.body?.aud ?? '',
@@ -50,7 +39,6 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
     issuedAt: jwt.body?.iat ?? 0,
     expiresAt: jwt.body?.exp ?? 0,
     roles: jwt.body?.roles ?? [],
-    authorizationStrategy: authStrategyFromJWT,
   };
 }
 

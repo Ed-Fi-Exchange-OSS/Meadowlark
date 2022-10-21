@@ -24,11 +24,6 @@ export type { PaginationParameters } from './message/PaginationParameters';
 export type { Security } from './security/Security';
 export { newSecurity } from './security/Security';
 export { AuthorizationStrategy } from './security/AuthorizationStrategy';
-export { authorizationHeader } from './security/AuthorizationHeader';
-export { validateJwt } from './security/JwtValidator';
-export { verifyJwt } from './security/JwtAction';
-export type { JwtStatus } from './security/JwtStatus';
-export { newJwtStatus } from './security/JwtStatus';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
 export type { FrontendRequest, Headers } from './handler/FrontendRequest';
@@ -43,10 +38,10 @@ export type { ResourceInfo } from './model/ResourceInfo';
 export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
 export type { SuperclassInfo } from './model/SuperclassInfo';
 export { newSuperclassInfo, documentIdForSuperclassInfo } from './model/SuperclassInfo';
-export { Logger, initializeLogging, writeRequestToLog, writeErrorToLog, isDebugEnabled } from './Logger';
 export * as PluginLoader from './plugin/PluginLoader';
 export type { MiddlewareModel } from './middleware/MiddlewareModel';
 export { doNothingMiddleware } from './middleware/DoNothingMiddleware';
+export { writeRequestToLog } from './Logger';
 
 // Handlers
 export { upsert, deleteIt, get, update } from './handler/FrontendFacade';
@@ -59,5 +54,3 @@ export {
   swaggerForResourcesAPI,
   dependencies,
 } from './handler/MetadataHandler';
-export { handler as oauthHandler } from './handler/OAuthHandler';
-export { LOCATION_HEADER_NAME } from './handler/Upsert';

@@ -5,9 +5,7 @@
 
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
-
-import { getStringFromEnvironment } from '@edfi/meadowlark-utilities';
-import { Logger } from '../Logger';
+import { getStringFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';

@@ -3,7 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, SystemTestClient, Logger } from '@edfi/meadowlark-core';
+import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, SystemTestClient } from '@edfi/meadowlark-core';
+import { Logger, initializeLogging } from '@edfi/meadowlark-utilities';
+
+initializeLogging();
 
 // Environment setup
 const TEST_SIGNING_KEY =
@@ -11,7 +14,8 @@ const TEST_SIGNING_KEY =
 process.env.SIGNING_KEY = TEST_SIGNING_KEY;
 process.env.MEADOWLARK_DATABASE_NAME = 'meadowlark_system_tests';
 
-if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-postgresql-backend';
+if (process.env.DOCUMENT_STORE_PLUGIN == null) process.env.DOCUMENT_STORE_PLUGIN = '@edfi/meadowlark-mongodb-backend';
+if (process.env.AUTHORIZATION_STORE_PLUGIN == null) process.env.AUTHORIZATION_STORE_PLUGIN = '@edfi/meadowlark-authz-server';
 
 // eslint-disable-next-line import/no-mutable-exports
 let backend: SystemTestablePlugin;
