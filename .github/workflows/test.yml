@@ -8,69 +8,69 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Full testing process
-    runs-on: ubuntu-latest
+  # test:
+  #   name: Full testing process
+  #   runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: Meadowlark-js
+  #   defaults:
+  #     run:
+  #       working-directory: Meadowlark-js
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
-      - name: NPM caching
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
-        with:
-          node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+  #     - name: NPM caching
+  #       uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+  #       with:
+  #         node-version: "16"
+  #         cache: "yarn"
+  #         cache-dependency-path: "**/yarn.lock"
 
-      - name: Install dependencies
-        run: yarn install
+  #     - name: Install dependencies
+  #       run: yarn install
 
-      - name: Linter
-        run: yarn test:lint
+  #     - name: Linter
+  #       run: yarn test:lint
 
-      - name: Unit tests with code coverage
-        run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
-        env:
-          JEST_JUNIT_OUTPUT_DIR: unit-tests
+  #     - name: Unit tests with code coverage
+  #       run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
+  #       env:
+  #         JEST_JUNIT_OUTPUT_DIR: unit-tests
 
-      - name: Archive coverage results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-        with:
-          name: code-coverage-report
-          path: Meadowlark-js/coverage/lcov-report
-          retention-days: 10
+  #     - name: Archive coverage results
+  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+  #       with:
+  #         name: code-coverage-report
+  #         path: Meadowlark-js/coverage/lcov-report
+  #         retention-days: 10
 
-      - name: Integration tests
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
-          yarn test:integration --ci --config ./jest.ci-config.js
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
-          JEST_JUNIT_OUTPUT_DIR: integration-tests
+  #     - name: Integration tests
+  #       run: |
+  #         sudo systemctl start postgresql.service
+  #         sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
+  #         yarn test:integration --ci --config ./jest.ci-config.js
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: "abcdefgh1!"
+  #         JEST_JUNIT_OUTPUT_DIR: integration-tests
 
-      - name: System tests
-        run: yarn test:system --ci --config ./jest.ci-config.js
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
-          JEST_JUNIT_OUTPUT_DIR: system-tests
+  #     - name: System tests
+  #       run: yarn test:system --ci --config ./jest.ci-config.js
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: "abcdefgh1!"
+  #         JEST_JUNIT_OUTPUT_DIR: system-tests
 
-      - name: Upload test results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-        with:
-          name: test-results
-          path: |
-            Meadowlark-js/unit-tests/junit.xml
-            Meadowlark-js/integration-tests/junit.xml
-            Meadowlark-js/system-tests/junit.xml
-          retention-days: 1
+  #     - name: Upload test results
+  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+  #       with:
+  #         name: test-results
+  #         path: |
+  #           Meadowlark-js/unit-tests/junit.xml
+  #           Meadowlark-js/integration-tests/junit.xml
+  #           Meadowlark-js/system-tests/junit.xml
+  #         retention-days: 1
 
   end-to-end:
     name: End to End tests
@@ -94,15 +94,17 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Start Containers
-        run: ../eng/docker.ps1
-        shell: pwsh
+      # - name: Start Containers
+      #   run: ../eng/docker.ps1
+      #   shell: pwsh
 
       - name: Build
         run: yarn build
 
       - name: Start Fastify against Postgres
         run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
           cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local &
         env:
