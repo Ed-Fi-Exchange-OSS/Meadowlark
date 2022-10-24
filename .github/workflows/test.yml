@@ -152,7 +152,7 @@ jobs:
 
       - name: Setup Mongo
         run: |
-          chmod +x ./scripts/mongo-key-file-setup.sh
+          chmod -R +x ./scripts
           docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
           docker exec mongo-temp mkdir /scripts
           docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
@@ -164,9 +164,7 @@ jobs:
         run: docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
 
       - name: Setup Replica Set
-        run: |
-          chmod +x ./scripts/mongo-rs-setup.sh
-          docker exec mongo1 /scripts/mongo-rs-setup.sh
+        run: docker exec mongo1 /scripts/mongo-rs-setup.sh
         working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
       - name: Setup Users
