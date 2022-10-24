@@ -28,7 +28,7 @@ jobs:
           cache-dependency-path: "**/yarn.lock"
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: Linter
         run: yarn test:lint
@@ -62,6 +62,38 @@ jobs:
           POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: system-tests
 
+      - name: Upload test results
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        with:
+          name: test-results
+          path: |
+            Meadowlark-js/unit-tests/junit.xml
+            Meadowlark-js/integration-tests/junit.xml
+            Meadowlark-js/system-tests/junit.xml
+          retention-days: 1
+
+  end-to-end:
+    name: End to End tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Meadowlark-js
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+      - name: NPM caching
+        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Install dependencies
+        run: yarn install
+
       - name: Start Containers
         run: ../eng/docker.ps1
         shell: pwsh
@@ -92,8 +124,5 @@ jobs:
         with:
           name: test-results
           path: |
-            Meadowlark-js/unit-tests/junit.xml
-            Meadowlark-js/integration-tests/junit.xml
-            Meadowlark-js/system-tests/junit.xml
             Meadowlark-js/pg-e2e-tests/junit.xml
           retention-days: 1
