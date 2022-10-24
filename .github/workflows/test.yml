@@ -8,8 +8,128 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Full testing process
+  # test:
+  #   name: Full testing process
+  #   runs-on: ubuntu-latest
+
+  #   defaults:
+  #     run:
+  #       working-directory: Meadowlark-js
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+  #     - name: NPM caching
+  #       uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+  #       with:
+  #         node-version: "16"
+  #         cache: "yarn"
+  #         cache-dependency-path: "**/yarn.lock"
+
+  #     - name: Install dependencies
+  #       run: yarn install
+
+  #     - name: Linter
+  #       run: yarn test:lint
+
+  #     - name: Unit tests with code coverage
+  #       run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
+  #       env:
+  #         JEST_JUNIT_OUTPUT_DIR: unit-tests
+
+  #     - name: Archive coverage results
+  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+  #       with:
+  #         name: code-coverage-report
+  #         path: Meadowlark-js/coverage/lcov-report
+  #         retention-days: 10
+
+  #     - name: Integration tests
+  #       run: |
+  #         sudo systemctl start postgresql.service
+  #         sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
+  #         yarn test:integration --ci --config ./jest.ci-config.js
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: "abcdefgh1!"
+  #         JEST_JUNIT_OUTPUT_DIR: integration-tests
+
+  #     - name: System tests
+  #       run: yarn test:system --ci --config ./jest.ci-config.js
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: "abcdefgh1!"
+  #         JEST_JUNIT_OUTPUT_DIR: system-tests
+
+  #     - name: Upload test results
+  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+  #       with:
+  #         name: test-results
+  #         path: |
+  #           Meadowlark-js/unit-tests/junit.xml
+  #           Meadowlark-js/integration-tests/junit.xml
+  #           Meadowlark-js/system-tests/junit.xml
+  #         retention-days: 1
+
+  # end-to-end-pg:
+  #   name: Postgres End to End tests
+  #   runs-on: ubuntu-latest
+
+  #   defaults:
+  #     run:
+  #       working-directory: Meadowlark-js
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+  #     - name: NPM caching
+  #       uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+  #       with:
+  #         node-version: "16"
+  #         cache: "yarn"
+  #         cache-dependency-path: "**/yarn.lock"
+
+  #     - name: Install dependencies
+  #       run: yarn install
+
+  #     - name: Start Containers
+  #       run: |
+  #         docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
+  #         docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
+
+  #     - name: Build
+  #       run: yarn build
+
+  #     - name: Start Fastify against Postgres
+  #       run: |
+  #         cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
+  #         yarn start:local &
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: abcdefgh1!
+  #         OPENSEARCH_USERNAME: admin
+  #         OPENSEARCH_PASSWORD: admin
+  #         DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
+
+  #     - name: End to End tests for Postgres
+  #       run: |
+  #         cp ./tests/e2e/.env.example ./tests/e2e/.env
+  #         yarn test:e2e --ci --config ./jest.ci-config.js
+  #       env:
+  #         JEST_JUNIT_OUTPUT_DIR: pg-e2e-tests
+
+  #     - name: Upload test results
+  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+  #       with:
+  #         name: test-results
+  #         path: |
+  #           Meadowlark-js/pg-e2e-tests/junit.xml
+  #         retention-days: 1
+
+  end-to-end-mongo:
+    name: MongoDB End to End tests
     runs-on: ubuntu-latest
 
     defaults:
@@ -30,88 +150,41 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Linter
-        run: yarn test:lint
-
-      - name: Unit tests with code coverage
-        run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
-        env:
-          JEST_JUNIT_OUTPUT_DIR: unit-tests
-
-      - name: Archive coverage results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-        with:
-          name: code-coverage-report
-          path: Meadowlark-js/coverage/lcov-report
-          retention-days: 10
-
-      - name: Integration tests
+      - name: Setup Mongo
         run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
-          yarn test:integration --ci --config ./jest.ci-config.js
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
-          JEST_JUNIT_OUTPUT_DIR: integration-tests
+          chmod +x ./scripts/mongo-key-file-setup.sh
+          docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
+          docker exec mongo-temp mkdir /scripts
+          docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
+          docker exec mongo-temp /scripts/mongo-key-file-setup.sh
+          docker compose up -d
+        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
-      - name: System tests
-        run: yarn test:system --ci --config ./jest.ci-config.js
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
-          JEST_JUNIT_OUTPUT_DIR: system-tests
+      - name: Start OpenSearch
+        run: docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
 
-      - name: Upload test results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-        with:
-          name: test-results
-          path: |
-            Meadowlark-js/unit-tests/junit.xml
-            Meadowlark-js/integration-tests/junit.xml
-            Meadowlark-js/system-tests/junit.xml
-          retention-days: 1
-
-  end-to-end:
-    name: End to End tests
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: Meadowlark-js
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
-
-      - name: NPM caching
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
-        with:
-          node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Start Containers
+      - name: Setup Replica Set
         run: |
-          docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
-          docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
+          chmod +x ./scripts/mongo-rs-setup.sh
+          docker exec mongo1 /scripts/mongo-rs-setup.sh
+        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
+
+      - name: Setup Users
+        run: docker exec -e ADMIN_USERNAME=mongo -e ADMIN_PASSWORD=abcdefgh1! mongo1 /scripts/mongo-user-setup.sh
+        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
       - name: Build
         run: yarn build
 
-      - name: Start Fastify against Postgres
+      - name: Start Fastify
         run: |
           cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local &
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: abcdefgh1!
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
-          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
+          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
+          MONGO_URL: mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
 
       - name: End to End tests for Postgres
         run: |
