@@ -158,6 +158,7 @@ jobs:
           docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
           docker exec mongo-temp /scripts/mongo-key-file-setup.sh
           docker compose up -d
+          echo '127.0.0.1 mongo1 mongo2 mongo3' | sudo tee -a /etc/hosts
         working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
       - name: Start OpenSearch
