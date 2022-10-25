@@ -14,3 +14,5 @@ else
     echo "--- Operation timed out. Review container status ---"
     exit 1
 fi
+
+sleep 2m;
