@@ -34,6 +34,12 @@ const MONGO_READ_CONCERN: ReadConcernLevel = (process.env.MONGO_READ_CONCERN as 
  * Return a brand new client - which is a connection pool.
  */
 export async function getNewClient(): Promise<MongoClient> {
+  console.log("---------------------BACKEND-------------------");
+
+  console.log(process.env.MONGO_URL);
+
+  console.log("---------------------BACKEND-------------------");
+
   const mongoUrl = process.env.MONGO_URL ?? MONGO_URL_DEFAULT;
 
   try {

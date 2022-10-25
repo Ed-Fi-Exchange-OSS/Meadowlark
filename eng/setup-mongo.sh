@@ -15,4 +15,4 @@ else
     exit 1
 fi
 
-sleep 2m;
+sleep 30;

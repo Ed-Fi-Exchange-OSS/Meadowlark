@@ -27,6 +27,14 @@ describe('given a POST to create a new client', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+
+    console.log("---------------------------Unit Test------------------------------");
+
+    console.log(process.env.MONGO_URL);
+
+    console.log("---------------------------Unit Test------------------------------");
+
+
     mockUpsert = jest.spyOn(AuthorizationServer, 'createClient');
     service = buildService();
     await service.ready();

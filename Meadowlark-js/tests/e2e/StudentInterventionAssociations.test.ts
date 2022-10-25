@@ -7,9 +7,19 @@ import { getAccessToken, Clients } from './functions/Credentials';
 import { createResource, deleteResourceByLocation } from './functions/Resources';
 import { baseURLRequest, rootURLRequest } from './Setup';
 
+jest.setTimeout(40000);
+
 describe('Student Intervention Association', () => {
   describe('with strict validation', () => {
     it('should fail when missing data', async () => {
+
+      console.log("---------------------E2E-------------------");
+
+      console.log(process.env.MONGO_URL);
+
+      console.log("---------------------E2E-------------------");
+
+
       await baseURLRequest
         .post('/v3.3b/ed-fi/StudentInterventionAssociations')
         .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
