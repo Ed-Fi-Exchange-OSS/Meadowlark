@@ -168,6 +168,11 @@ jobs:
         run: docker exec mongo1 /scripts/mongo-rs-setup.sh
         working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
+      - name: Wait for container
+        run: |
+          chmod +x ../eng/setup-mongo.sh
+          ../eng/setup-mongo.sh
+
       - name: Setup Users
         run: docker exec -e ADMIN_USERNAME=mongo -e ADMIN_PASSWORD=abcdefgh1! mongo1 /scripts/mongo-user-setup.sh
         working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
