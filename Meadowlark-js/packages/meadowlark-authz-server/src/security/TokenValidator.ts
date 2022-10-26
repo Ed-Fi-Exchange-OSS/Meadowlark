@@ -7,13 +7,14 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
-import { signingKey } from '../model/SigningKey';
 import { IntrospectedToken } from './IntrospectedToken';
 import { TOKEN_ISSUER } from './TokenIssuer';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { JwtStatus } from './JwtStatus';
 import { verifyJwt } from './JwtAction';
+import { signingKey } from '../model/SigningKey';
+import { admin1, client1, client2, client3, client4, verifyOnly1 } from './HardcodedCredential';
 
 export function hasAdminRole(roles: string[]): boolean {
   return roles.some((role) => role.toLocaleLowerCase() === 'admin');
@@ -88,13 +89,20 @@ export function validateAdminTokenForAccess(authorizationHeader: string | undefi
 async function isValidClientId(clientId: string | undefined, traceId: string): Promise<boolean> {
   if (clientId == null) return false;
 
+  // Check hardcoded credentials first
+  if ([client1.key, client2.key, client3.key, client4.key, admin1.key, verifyOnly1.key].includes(clientId)) {
+    return true;
+  }
+
   // Go to authentication datastore
   const result: GetAuthorizationClientResult = await getAuthorizationStore().getAuthorizationClient({
     clientId,
     traceId,
   });
 
-  return result.response === 'GET_SUCCESS';
+  if (result.response === 'GET_SUCCESS') return true;
+  Logger.debug(`TokenValidator.isValidClientId clientId ${clientId} not found in datastore`, traceId);
+  return false;
 }
 
 export type IntrospectionResponse = { isValid: false } | { isValid: true; introspectedToken: IntrospectedToken };
@@ -108,7 +116,7 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
 
   let verified: nJwt | undefined;
   try {
-    verified = verify(bearerToken, signingKey());
+    verified = verify(bearerToken, signingKey);
   } catch (err) {
     Logger.debug('TokenValidator.introspectBearerToken nJwt responded with exception', traceId, err);
     if (err.message !== 'Jwt is expired') return { isValid: false };

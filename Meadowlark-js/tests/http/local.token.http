@@ -4,7 +4,7 @@
 
 ### Generate a signing key. Save to .env as 
 # SIGNING_KEY=<paste here>
-GET http://localhost:3000/local/ouath/createSigningKey
+GET http://localhost:3000/local/oauth/createSigningKey
 
 #
 # AUTHENTICATE

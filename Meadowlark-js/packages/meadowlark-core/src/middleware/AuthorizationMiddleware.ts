@@ -41,7 +41,7 @@ function extractClientBearerTokenFrom(frontendRequest: FrontendRequest): string 
     frontendRequest.headers.authorization ?? frontendRequest.headers.Authorization;
   if (authorizationHeader == null) return undefined;
   if (!authorizationHeader.toLowerCase().startsWith('bearer ')) return undefined;
-  return authorizationHeader.substring(6);
+  return authorizationHeader.substring(7);
 }
 
 async function requestOwnAccessToken(traceId: string): Promise<RequestOwnAccessTokenResult> {
@@ -141,39 +141,49 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     );
 
     if (verificationResponse.status === 401) {
+      Logger.debug(`${moduleName}.authorize verification response returned 401`, frontendRequest.traceId);
       // TODO: do requestOwnAccessToken and try one more time before giving up with 500 - not configured correctly
     }
 
     if (verificationResponse.status === 400) {
-      // Client-provided token is not a JWT
+      Logger.debug(
+        `${moduleName}.authorize verification response returned 400 - Client-provided token is not a JWT`,
+        frontendRequest.traceId,
+      );
       const errorResponse: FrontendResponse = { body: '', statusCode: 401 };
       return { frontendRequest, frontendResponse: errorResponse };
     }
 
     if (verificationResponse.status === 200) {
-      if (!verificationResponse.data?.isValid || !verificationResponse.data?.introspectedToken?.active) {
-        // Client token was a JWT, but invalid/inactive for some reason
+      if (!verificationResponse.data?.active) {
+        Logger.debug(`${moduleName}.authorize Client-provided token is inactive`, frontendRequest.traceId);
         const errorResponse: FrontendResponse = { body: '', statusCode: 401 };
         return { frontendRequest, frontendResponse: errorResponse };
       }
 
-      const roles: string[] = verificationResponse.data?.introspectedToken?.roles || [];
+      const roles: string[] = verificationResponse.data?.roles || [];
       const clientInfo: VerifiedClientInfo = {
         security: {
-          clientId: verificationResponse.data?.introspectedToken?.client_id ?? 'UNKNOWN',
+          clientId: verificationResponse.data?.client_id ?? 'UNKNOWN',
           authorizationStrategy: determineAuthStrategyFromRoles(roles),
         },
         validateResources: !roles.includes('assessment'),
       };
 
       cachedTokensForClients.set(clientBearerToken, clientInfo);
+      return { frontendRequest, frontendResponse: null };
     }
+
+    Logger.debug(
+      `${moduleName}.authorize verification response returned ${verificationResponse.status} unexpectedly - returning 502`,
+      frontendRequest.traceId,
+    );
+    const errorResponse: FrontendResponse = { body: '', statusCode: 502 };
+    return { frontendRequest, frontendResponse: errorResponse };
   } catch (e) {
-    // TODO: More accurate "verify client access token" failure indication
+    // TODO: More accurate "verify client access token failure" indication
+    Logger.debug(`${moduleName}.authorize verify client access token failure`, frontendRequest.traceId, e);
     const errorResponse: FrontendResponse = { body: '', statusCode: 502 };
     return { frontendRequest, frontendResponse: errorResponse };
   }
-
-  const errorResponse: FrontendResponse = { body: '', statusCode: 502 };
-  return { frontendRequest, frontendResponse: errorResponse };
 }

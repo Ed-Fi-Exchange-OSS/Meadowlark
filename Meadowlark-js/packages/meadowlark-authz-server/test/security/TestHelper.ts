@@ -17,7 +17,7 @@ export function createTokenString(
   expirationMillis: number = ONE_HOUR_FROM_NOW,
   tokenIssuer: string = TOKEN_ISSUER,
 ): string {
-  const token: Jwt = createJwt({ iss: tokenIssuer, aud: tokenIssuer, roles, client_id: clientId }, signingKey()) as Jwt;
+  const token: Jwt = createJwt({ iss: tokenIssuer, aud: tokenIssuer, roles, client_id: clientId }, signingKey) as Jwt;
   token.setExpiration(expirationMillis);
   return token.compact();
 }
