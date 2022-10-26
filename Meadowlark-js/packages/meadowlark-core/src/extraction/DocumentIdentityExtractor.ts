@@ -20,6 +20,7 @@ import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo';
 import { SchoolYearEnumerationDocument } from '../model/SchoolYearEnumerationDocument';
 import { schoolYearEnumerationDocumentIdentityFrom } from '../model/SchoolYearEnumerationDocumentInfo';
+import { schoolYearPathHandler } from './schoolYearPathHandler';
 
 type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
 
@@ -72,12 +73,7 @@ function documentIdentitiesFrom(
   if (isReferenceElement(identityReferenceComponent)) {
     // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
     if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
-      const { roleName } = identityReferenceComponent.sourceProperty;
-      if (roleName !== '') {
-        documentPath.push(`${decapitalize(roleName)}SchoolYearTypeReference`);
-      } else {
-        documentPath.push('schoolYearTypeReference');
-      }
+      documentPath.push(schoolYearPathHandler(identityReferenceComponent));
     }
     return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
   }

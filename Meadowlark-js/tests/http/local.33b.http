@@ -605,7 +605,7 @@ authorization: bearer {{authToken1}}
     }
 }
 
-### This fails, documented in RND-426
+###
 PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations/uJ8Rk-JjLZuoSnnSQUUuG2-LY9kz5QrrD0_UyQ
 content-type: application/json
 authorization: bearer {{authToken1}}
