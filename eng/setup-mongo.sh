@@ -11,12 +11,12 @@ echo "Adding URL to hosts"
 echo '127.0.0.1 mongo1 mongo2 mongo3' | sudo tee -a /etc/hosts
 
 # Wait for environment
-sleep 20;
+sleep 30;
 
 echo "Setting replica set"
 docker exec mongo1 ./scripts/mongo-rs-setup.sh
 
 # Wait for environment
-sleep 60;
+sleep 30;
 
 docker exec -e ADMIN_USERNAME=mongo -e ADMIN_PASSWORD=abcdefgh1! mongo1 ./scripts/mongo-user-setup.sh

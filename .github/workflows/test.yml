@@ -99,7 +99,18 @@ jobs:
           docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
           docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
 
-      - name: Build
+      - name: Cache Build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/dist/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Build
         run: yarn build
 
       - name: Start Fastify against Postgres
@@ -160,7 +171,18 @@ jobs:
           chmod +x ../eng/setup-mongo.sh
           ../eng/setup-mongo.sh
 
-      - name: Build
+      - name: Cache Build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-build
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/dist/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Build
         run: yarn build
 
       - name: Start Fastify
