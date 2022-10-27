@@ -1,18 +1,22 @@
-#! /bin/bash
-end=$((SECONDS+ 5 * 60))
+cd ../Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
 
-until [[ `docker inspect -f {{.State.Running}} mongo1` == true || $SECONDS -gt $end ]]; do
-    sleep 2;
-done;
+chmod -R +x ./scripts
+docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
+docker exec mongo-temp mkdir /scripts
+docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
+docker exec mongo-temp ./scripts/mongo-key-file-setup.sh
+docker compose up -d
 
-if [ `docker inspect -f {{.State.Running}} mongo1` == true ]
-then
-    echo "--- Container is healthy ---"
-else
-    docker ps
-    docker logs mongo1 --tail 50
-    echo "--- Operation timed out. Review container status ---"
-    exit 1
-fi
+echo "Adding URL to hosts"
+echo '127.0.0.1 mongo1 mongo2 mongo3' | sudo tee -a /etc/hosts
 
-sleep 30;
+# Wait for environment
+sleep 20;
+
+echo "Setting replica set"
+docker exec mongo1 ./scripts/mongo-rs-setup.sh
+
+# Wait for environment
+sleep 60;
+
+docker exec -e ADMIN_USERNAME=mongo -e ADMIN_PASSWORD=abcdefgh1! mongo1 ./scripts/mongo-user-setup.sh

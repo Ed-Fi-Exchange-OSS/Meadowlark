@@ -72,65 +72,8 @@ jobs:
             Meadowlark-js/system-tests/junit.xml
           retention-days: 1
 
-  # This should be disabled if desired to keep in separate jobs
-  # end-to-end-pg:
-  #   name: Postgres End to End tests
-  #   runs-on: ubuntu-latest
-
-  #   defaults:
-  #     run:
-  #       working-directory: Meadowlark-js
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
-
-  #     - name: NPM caching
-  #       uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
-  #       with:
-  #         node-version: "16"
-  #         cache: "yarn"
-  #         cache-dependency-path: "**/yarn.lock"
-
-  #     - name: Install dependencies
-  #       run: yarn install
-
-  #     - name: Start Containers
-  #       run: |
-  #         docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
-  #         docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
-
-  #     - name: Build
-  #       run: yarn build
-
-  #     - name: Start Fastify against Postgres
-  #       run: |
-  #         cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
-  #         yarn start:local &
-  #       env:
-  #         POSTGRES_USER: postgres
-  #         POSTGRES_PASSWORD: abcdefgh1!
-  #         OPENSEARCH_USERNAME: admin
-  #         OPENSEARCH_PASSWORD: admin
-  #         DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
-
-  #     - name: End to End tests for Postgres
-  #       run: |
-  #         cp ./tests/e2e/.env.example ./tests/e2e/.env
-  #         yarn test:e2e --ci --config ./jest.ci-config.js
-  #       env:
-  #         JEST_JUNIT_OUTPUT_DIR: pg-e2e-tests
-
-  #     - name: Upload test results
-  #       uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
-  #       with:
-  #         name: test-results
-  #         path: |
-  #           Meadowlark-js/pg-e2e-tests/junit.xml
-  #         retention-days: 1
-
-  end-to-end:
-    name: End to End tests for Mongo and Postgres
+  end-to-end-pg:
+    name: Postgres End to End tests
     runs-on: ubuntu-latest
 
     defaults:
@@ -151,59 +94,13 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Setup Mongo
-        run: |
-          chmod -R +x ./scripts
-          docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
-          docker exec mongo-temp mkdir /scripts
-          docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
-          docker exec mongo-temp /scripts/mongo-key-file-setup.sh
-          docker compose up -d
-          echo '127.0.0.1 mongo1 mongo2 mongo3' | sudo tee -a /etc/hosts
-        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
-
       - name: Start Containers
         run: |
           docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
           docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
 
-      - name: Setup Replica Set
-        run: docker exec mongo1 /scripts/mongo-rs-setup.sh
-        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
-
-      - name: Wait for container
-        run: |
-          chmod +x ../eng/setup-mongo.sh
-          ../eng/setup-mongo.sh
-
-      - name: Setup Users
-        run: docker exec -e ADMIN_USERNAME=mongo -e ADMIN_PASSWORD=abcdefgh1! mongo1 /scripts/mongo-user-setup.sh
-        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend/docker/
-
       - name: Build
         run: yarn build
-
-      - name: Start Fastify
-        run: |
-          cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
-          yarn start:local &
-        env:
-          OPENSEARCH_USERNAME: admin
-          OPENSEARCH_PASSWORD: admin
-          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
-          MONGO_LOG_LEVEL: INFO
-
-      - name: End to End tests for Mongo
-        run: |
-          cp ./tests/e2e/.env.example ./tests/e2e/.env
-          yarn test:e2e --ci --config ./jest.ci-config.js
-        env:
-          JEST_JUNIT_OUTPUT_DIR: mongo-e2e-tests
-
-      # Remove if want mongo only
-      - name: Stop Fastify
-        run: |
-          pkill -9 node
 
       - name: Start Fastify against Postgres
         run: |
@@ -215,7 +112,7 @@ jobs:
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
           DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
-      # Remove if want mongo only
+          MONGO_URL: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
 
       - name: End to End tests for Postgres
         run: |
@@ -229,7 +126,65 @@ jobs:
         with:
           name: test-results
           path: |
-            # Remove if want mongo only
             Meadowlark-js/pg-e2e-tests/junit.xml
+          retention-days: 1
+
+  end-to-end-mongo:
+    name: End to End tests for Mongo
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Meadowlark-js
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+      - name: NPM caching
+        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Start Containers
+        run: |
+          docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
+
+      - name: Setup Mongo
+        run: |
+          chmod +x ../eng/setup-mongo.sh
+          ../eng/setup-mongo.sh
+
+      - name: Build
+        run: yarn build
+
+      - name: Start Fastify
+        run: |
+          cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
+          yarn start:local &
+        env:
+          OPENSEARCH_USERNAME: admin
+          OPENSEARCH_PASSWORD: admin
+          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
+          MONGO_URL: mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+          MONGO_LOG_LEVEL: INFO
+
+      - name: End to End tests for Mongo
+        run: |
+          cp ./tests/e2e/.env.example ./tests/e2e/.env
+          yarn test:e2e --ci --config ./jest.ci-config.js
+        env:
+          JEST_JUNIT_OUTPUT_DIR: mongo-e2e-tests
+
+      - name: Upload test results
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        with:
+          name: test-results
+          path: |
             Meadowlark-js/mongo-e2e-tests/junit.xml
           retention-days: 1
