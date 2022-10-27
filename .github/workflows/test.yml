@@ -73,7 +73,7 @@ jobs:
           retention-days: 1
 
   end-to-end-pg:
-    name: Postgres End to End tests
+    name: End to End tests for Postgres
     runs-on: ubuntu-latest
 
     defaults:
@@ -113,7 +113,7 @@ jobs:
         name: Build
         run: yarn build
 
-      - name: Start Fastify against Postgres
+      - name: Run Fastify in background
         run: |
           cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local &
@@ -183,9 +183,11 @@ jobs:
 
       - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
         name: Build
-        run: yarn build
+        run: |
+          echo ${{ steps.cache-build.outputs.cache-hit }}
+          yarn build
 
-      - name: Start Fastify
+      - name: Run Fastify in background
         run: |
           cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local &
@@ -194,7 +196,6 @@ jobs:
           OPENSEARCH_PASSWORD: admin
           DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
           MONGO_URL: mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-          MONGO_LOG_LEVEL: INFO
 
       - name: End to End tests for Mongo
         run: |
