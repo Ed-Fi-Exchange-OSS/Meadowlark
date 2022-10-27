@@ -51,7 +51,7 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
     try {
       parsedBody = JSON.parse(authorizationRequest.body);
     } catch (error) {
-      const message = 'Malformed body';
+      const message = `Malformed body: ${error.message}`;
       writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, message);
       return { body: JSON.stringify({ message }), statusCode: 400 };
     }

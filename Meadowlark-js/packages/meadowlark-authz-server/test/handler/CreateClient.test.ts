@@ -318,7 +318,7 @@ describe('given create has malformed json body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Malformed body"}"`);
+    expect(response.body).toMatchInlineSnapshot(`"{"message":"Malformed body: Unexpected token b in JSON at position 2"}"`);
   });
 });
 

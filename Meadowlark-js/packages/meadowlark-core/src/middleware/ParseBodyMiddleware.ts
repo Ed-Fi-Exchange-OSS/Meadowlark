@@ -26,7 +26,7 @@ export async function parseBody({ frontendRequest, frontendResponse }: Middlewar
   try {
     body = JSON.parse(frontendRequest.body);
   } catch (error) {
-    const message = 'Malformed body';
+    const message = `Malformed body: ${error.message}`;
     writeDebugStatusToLog(moduleName, frontendRequest, 'parseBody', 400, message);
     return { frontendRequest, frontendResponse: { body: JSON.stringify({ message }), statusCode: 400 } };
   }

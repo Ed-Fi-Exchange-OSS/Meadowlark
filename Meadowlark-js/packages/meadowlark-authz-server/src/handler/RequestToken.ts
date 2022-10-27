@@ -68,14 +68,14 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
     try {
       unvalidatedBody = querystring.parse(authorizationRequest.body);
     } catch (error) {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body`, authorizationRequest.traceId);
+      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
       return { isValid: false, failureMessage: 'Malformed body' };
     }
   } else {
     try {
       unvalidatedBody = JSON.parse(authorizationRequest.body);
     } catch (error) {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body`, authorizationRequest.traceId);
+      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
       return { isValid: false, failureMessage: 'Malformed body' };
     }
   }
