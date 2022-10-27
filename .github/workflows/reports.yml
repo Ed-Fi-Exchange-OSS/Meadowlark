@@ -26,11 +26,11 @@ jobs:
             { name: "System Test Report", file: "system-tests/junit.xml" },
             {
               name: "Mongo End To End Tests",
-              file: "mongo-e2e-tests/junit.xml",
+              file: "Mongo-e2e-tests/junit.xml",
             },
             {
               name: "PostgreSQL End To End Tests",
-              file: "pg-e2e-tests/junit.xml",
+              file: "PGSQL-e2e-tests/junit.xml",
             },
           ]
 
