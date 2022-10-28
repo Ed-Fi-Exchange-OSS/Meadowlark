@@ -80,8 +80,8 @@ jobs:
       matrix:
         config:
           [
-            { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
             { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" },
+            { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
           ]
 
     defaults:
@@ -156,9 +156,12 @@ jobs:
           path: "**/fastify.log"
           retention-days: 10
 
+      # Workaround for issue https://github.com/actions/upload-artifact/issues/174
       - name: Upload test results
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
           name: test-results
-          path: Meadowlark-js/${{matrix.config.db}}-e2e-tests/*.xml
+          path: |
+            Meadowlark-js/${{matrix.config.db}}-e2e-tests/junit.xml
+            Meadowlark-js/.prettierrc
           retention-days: 1
