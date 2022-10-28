@@ -538,7 +538,7 @@ describe('given request body is invalid json', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Malformed body"}"`);
+    expect(response.body).toMatchInlineSnapshot(`"{"error":"Malformed body: Unexpected token N in JSON at position 0"}"`);
   });
 });
 
