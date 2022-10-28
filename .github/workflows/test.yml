@@ -73,8 +73,16 @@ jobs:
           retention-days: 1
 
   end-to-end:
-    name: End to End tests
+    name: End to End tests for ${{ matrix.config.db }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          [
+            { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" },
+            { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
+          ]
 
     defaults:
       run:
@@ -94,36 +102,66 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Start Containers
-        run: |
-          docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
-          docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
+      - name: Start OpenSearch Container
+        run: docker compose -f ./backends/meadowlark-opensearch-backend/docker/docker-compose.yml up -d
 
-      - name: Build
+      - if: ${{ matrix.config.db == 'PGSQL' }}
+        name: Start Postgres Container
+        run: docker compose -f ./backends/meadowlark-postgresql-backend/docker/docker-compose.yml up -d
+
+      - if: ${{ matrix.config.db == 'Mongo' }}
+        name: Setup Mongo
+        run: |
+          chmod +x ../eng/setup-mongo.sh
+          ../eng/setup-mongo.sh
+
+      - name: Cache Build
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        env:
+          cache-name: cache-build
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/dist/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Build
         run: yarn build
 
-      - name: Start Fastify against Postgres
+      - name: Run Fastify in background
         run: |
           cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
-          yarn start:local &
+          yarn start:local > fastify.log &
         env:
+          DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: abcdefgh1!
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
-          DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-postgresql-backend"
+          MONGO_URL: "mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0"
 
-      - name: End to End tests for Postgres
+      - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/.env.example ./tests/e2e/.env
           yarn test:e2e --ci --config ./jest.ci-config.js
         env:
-          JEST_JUNIT_OUTPUT_DIR: pg-e2e-tests
+          JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
 
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        with:
+          name: fastify-logs
+          path: "**/fastify.log"
+          retention-days: 10
+
+      # Workaround for issue https://github.com/actions/upload-artifact/issues/174
       - name: Upload test results
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
           name: test-results
           path: |
-            Meadowlark-js/pg-e2e-tests/junit.xml
+            Meadowlark-js/${{matrix.config.db}}-e2e-tests/junit.xml
+            Meadowlark-js/.prettierrc
           retention-days: 1

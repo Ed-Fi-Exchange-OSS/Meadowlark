@@ -24,6 +24,14 @@ jobs:
               file: "integration-tests/junit.xml",
             },
             { name: "System Test Report", file: "system-tests/junit.xml" },
+            {
+              name: "Mongo End To End Tests",
+              file: "Mongo-e2e-tests/junit.xml",
+            },
+            {
+              name: "PostgreSQL End To End Tests",
+              file: "PGSQL-e2e-tests/junit.xml",
+            },
           ]
 
     steps:
