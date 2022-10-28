@@ -27,7 +27,7 @@ export { AuthorizationStrategy } from './security/AuthorizationStrategy';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
 export type { FrontendRequest, Headers } from './handler/FrontendRequest';
-export { newFrontendRequest } from './handler/FrontendRequest';
+export { newFrontendRequest, newFrontendRequestMiddleware } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
 export { newFrontendResponse } from './handler/FrontendResponse';
 export { documentIdForDocumentIdentity } from './model/DocumentIdentity';

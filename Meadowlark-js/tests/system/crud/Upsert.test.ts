@@ -8,7 +8,7 @@ import {
   backendToTest,
   CLIENT1_HEADERS,
   schoolBodyClient1,
-  newFrontendRequestTemplate,
+  newFrontendRequestTemplateClient1,
   schoolGetClient1,
   academicWeekBodyClient1,
   schoolBodyClient2,
@@ -58,7 +58,7 @@ describe('given a POST of a school with an empty body', () => {
   let upsertResult: FrontendResponse;
 
   const schoolEmptyBody: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schools',
     headers: CLIENT1_HEADERS,
     body: '{}',
@@ -89,7 +89,7 @@ describe('given a POST of a school followed by a second POST of the school with 
   let secondUpsertResult: FrontendResponse;
 
   const schoolChangeNameOfInstitutionClient1: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schools',
     headers: CLIENT1_HEADERS,
     body: `{
@@ -199,7 +199,7 @@ describe('given a POST of an academic week referencing a school that exists foll
   let upsertResult: FrontendResponse;
 
   const academicWeekWithMissingSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/academicWeeks',
     headers: CLIENT1_HEADERS,
     body: `{

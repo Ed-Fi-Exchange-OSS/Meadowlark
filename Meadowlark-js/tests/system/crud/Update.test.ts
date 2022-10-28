@@ -8,7 +8,7 @@ import {
   backendToTest,
   CLIENT1_HEADERS,
   schoolBodyClient1,
-  newFrontendRequestTemplate,
+  newFrontendRequestTemplateClient1,
   schoolGetClient1,
   // CLIENT2_HEADERS,
   educationOrganizationCategoryDescriptorBody,
@@ -22,7 +22,7 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   let updateResult: FrontendResponse;
 
   const putSchoolChangeNameOfInstitution: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
     headers: CLIENT1_HEADERS,
     body: `{

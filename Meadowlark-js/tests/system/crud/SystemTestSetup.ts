@@ -3,7 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, newFrontendRequest, SystemTestablePlugin, SystemTestClient } from '@edfi/meadowlark-core';
+import {
+  FrontendRequest,
+  newFrontendRequest,
+  newFrontendRequestMiddleware,
+  SystemTestablePlugin,
+  SystemTestClient,
+} from '@edfi/meadowlark-core';
 import { Logger, initializeLogging } from '@edfi/meadowlark-utilities';
 
 initializeLogging();
@@ -53,16 +59,39 @@ export const JSON_HEADER = {
   'content-type': 'application/json',
 };
 
-export function newFrontendRequestTemplate(): FrontendRequest {
+export function newFrontendRequestTemplateClient1(): FrontendRequest {
   return {
     ...newFrontendRequest(),
     stage: 'local',
+    middleware: {
+      ...newFrontendRequestMiddleware(),
+      security: {
+        authorizationStrategy: { type: 'OWNERSHIP_BASED', withAssessment: false },
+        clientId: 'client1',
+      },
+      validateResources: true,
+    },
+  };
+}
+
+export function newFrontendRequestTemplateClient2(): FrontendRequest {
+  return {
+    ...newFrontendRequest(),
+    stage: 'local',
+    middleware: {
+      ...newFrontendRequestMiddleware(),
+      security: {
+        authorizationStrategy: { type: 'OWNERSHIP_BASED', withAssessment: false },
+        clientId: 'client2',
+      },
+      validateResources: true,
+    },
   };
 }
 
 export function schoolBodyClient1(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schools',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -84,7 +113,7 @@ export function schoolBodyClient1(): FrontendRequest {
 
 export function schoolBodyClient2(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient2(),
     path: '/v3.3b/ed-fi/schools',
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
     body: `{
@@ -106,7 +135,7 @@ export function schoolBodyClient2(): FrontendRequest {
 
 export function schoolGetClient1(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
@@ -114,7 +143,7 @@ export function schoolGetClient1(): FrontendRequest {
 
 export function schoolGetClient2(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient2(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
     path: '/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ',
   };
@@ -125,7 +154,7 @@ export const schoolDeleteClient2 = schoolGetClient2;
 
 export function academicWeekBodyClient1(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/academicWeeks',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -142,7 +171,7 @@ export function academicWeekBodyClient1(): FrontendRequest {
 
 export function descriptorBodyClient1(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -156,7 +185,7 @@ export function descriptorBodyClient1(): FrontendRequest {
 
 export function descriptorGetClient1(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
@@ -164,7 +193,7 @@ export function descriptorGetClient1(): FrontendRequest {
 
 export function descriptorGetClient2(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient2(),
     headers: { ...JSON_HEADER, ...CLIENT2_HEADERS },
     path: '/v3.3b/ed-fi/absenceEventCategoryDescriptors/y0MjzEODRvlXBthuHA_XOiF52Vjb8d64VQy9qA',
   };
@@ -172,7 +201,7 @@ export function descriptorGetClient2(): FrontendRequest {
 
 export function schoolCategoryDescriptorBody(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schoolCategoryDescriptors',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -186,7 +215,7 @@ export function schoolCategoryDescriptorBody(): FrontendRequest {
 
 export function schoolBodyWithDescriptorReference(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/schools',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -213,7 +242,7 @@ export function schoolBodyWithDescriptorReference(): FrontendRequest {
 
 export function schoolCategoryDelete(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     path: '/v3.3b/ed-fi/schoolCategoryDescriptors/2ch5Vfdy8AARhPR3h-69z6l1y2mrsIEa1wvxIQ',
   };
@@ -221,7 +250,7 @@ export function schoolCategoryDelete(): FrontendRequest {
 
 export function gradeLevelDescriptorBody(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/gradeLevelDescriptors',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
@@ -235,7 +264,7 @@ export function gradeLevelDescriptorBody(): FrontendRequest {
 
 export function educationOrganizationCategoryDescriptorBody(): FrontendRequest {
   return {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/educationOrganizationCategoryDescriptors',
     headers: { ...JSON_HEADER, ...CLIENT1_HEADERS },
     body: `{
