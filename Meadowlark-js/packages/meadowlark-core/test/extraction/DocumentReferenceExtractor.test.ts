@@ -648,3 +648,105 @@ describe('when extracting with school year reference in body', () => {
     `);
   });
 });
+
+describe('when extracting with a school year in a reference document', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentReference[] = [];
+
+  const body = {
+    studentReference: {
+      studentUniqueId: 's0zf6d1123d3e',
+    },
+    schoolReference: {
+      schoolId: 123,
+    },
+    entryDate: '2020-01-01',
+    entryGradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#10',
+    graduationPlanReference: {
+      educationOrganizationId: 123,
+      graduationPlanTypeDescriptor: 'uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum',
+      graduationSchoolYear: 2024,
+    },
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDomainEntity('StudentSchoolAssociation')
+      .withDocumentation('doc')
+      .withDomainEntityIdentity('Student', 'doc')
+      .withDomainEntityIdentity('School', 'doc')
+      .withDateIdentity('EntryDate', 'doc')
+      .withDescriptorIdentity('EntryGradeLevelDescriptor', 'doc')
+      .withDomainEntityProperty('GraduationPlan', 'doc', false, false)
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('School')
+      .withDocumentation('doc')
+      .withStringIdentity('SchoolId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Student')
+      .withDocumentation('doc')
+      .withStringIdentity('StudentUniqueId', 'doc', '60')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('GraduationPlan')
+      .withDocumentation('doc')
+      .withDescriptorIdentity('GraduationPlanType', 'doc')
+      .withDomainEntityIdentity('EducationOrganization', 'doc')
+      .withEnumerationIdentity('SchoolYear', 'doc', 'Graduation')
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    enumerationReferenceEnhancer(metaEd);
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const studentSchoolAssociation = namespace.entity.domainEntity.get('StudentSchoolAssociation');
+    result = extractDocumentReferences(studentSchoolAssociation, body);
+  });
+
+  it('should have references and then schoolYear reference should respect the role name', () => {
+    expect(result).toMatchInlineSnapshot(`
+      [
+        {
+          "documentIdentity": {
+            "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
+            "graduationSchoolYearTypeReference.schoolYear": 2024,
+          },
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "GraduationPlan",
+        },
+        {
+          "documentIdentity": {
+            "schoolId": 123,
+          },
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "School",
+        },
+        {
+          "documentIdentity": {
+            "studentUniqueId": "s0zf6d1123d3e",
+          },
+          "isDescriptor": false,
+          "projectName": "EdFi",
+          "resourceName": "Student",
+        },
+      ]
+    `);
+  });
+});
