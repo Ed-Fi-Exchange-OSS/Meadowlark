@@ -16,6 +16,7 @@ import {
 } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { DocumentReference } from '../model/DocumentReference';
 import { DocumentIdentity } from '../model/DocumentIdentity';
+import { decapitalize } from '../Utility';
 
 /**
  * A DocumentElement is a name/value pair taken from an Ed-Fi document that expresses part of
@@ -131,7 +132,12 @@ function documentPathsFromReferenceComponents(referenceComponents: ReferenceComp
   referenceComponents.forEach((referenceComponent) => {
     if (isReferenceElement(referenceComponent)) {
       if (referenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
-        result.push('schoolYearTypeReference.schoolYear');
+        const { roleName } = referenceComponent.sourceProperty;
+        if (roleName !== '') {
+          result.push(`${decapitalize(roleName)}SchoolYearTypeReference.schoolYear`);
+        } else {
+          result.push('schoolYearTypeReference.schoolYear');
+        }
       } else {
         const propertyMeadowlarkData: EntityPropertyMeadowlarkData = referenceComponent.sourceProperty.data.meadowlark;
         result.push(propertyMeadowlarkData.apiMapping.fullName);
