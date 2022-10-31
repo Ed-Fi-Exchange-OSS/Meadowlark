@@ -718,7 +718,7 @@ describe('when extracting with a school year in a reference document', () => {
     result = extractDocumentReferences(studentSchoolAssociation, body);
   });
 
-  it('should have references and then schoolYear reference should respect the role name', () => {
+  it('should have references and schoolYear reference should respect the role name', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
