@@ -16,8 +16,6 @@ import { fetchOwnAccessToken, fetchClientTokenVerification } from './OAuthFetch'
 
 const moduleName = 'AuthorizationMiddleware';
 
-type VerifiedClientInfo = { security: Security; validateResources: boolean };
-
 const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL: number = process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL
   ? parseInt(process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL, 10)
   : 1000 * 60 * 5;
@@ -28,12 +26,24 @@ const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES: number = process.env.OAUTH_
 // Cache of own access token used for client token validation
 let cachedOwnAccessTokenForClientAuth: string | null = null;
 
-// Client token cache, automatically evicts after TTL expires
-const cachedTokensForClients: TTLCache<string, VerifiedClientInfo> = new TTLCache({
+// Info from a client token, after being parsed by the configured OAuth server
+type ClientTokenInfo = { security: Security; validateResources: boolean };
+
+// Client token info cache, automatically evicts after TTL expires
+const cachedClientsTokenInfo: TTLCache<string, ClientTokenInfo> = new TTLCache({
   ttl: OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL,
   max: OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES,
 });
 
+// For testing
+export function clearCaches() {
+  cachedOwnAccessTokenForClientAuth = null;
+  cachedClientsTokenInfo.clear();
+}
+
+/**
+ * Extracts the bearer token from an authorization header in the front end request, or returns undefined if not found
+ */
 function extractClientBearerTokenFrom(frontendRequest: FrontendRequest): string | undefined {
   const authorizationHeader: string | undefined =
     frontendRequest.headers.authorization ?? frontendRequest.headers.Authorization;
@@ -63,6 +73,14 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
         `${moduleName}.requestOwnAccessToken OAuth server responded that configuration of Meadowlark client_id or client_secret is not valid`,
         frontendRequest.traceId,
       );
+
+      return {
+        success: false,
+        errorResponse: {
+          body: JSON.stringify({ message: 'Invalid Meadowlark to OAuth server configuration' }),
+          statusCode: 500,
+        },
+      };
     }
 
     Logger.error(
@@ -86,9 +104,9 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
 }
 
 /**
- * Middleware entrypoint to handle authorization of client requests. Checks client-provided access token
- * with configured OAuth server. This process requires Meadowlark to have its own valid access token on
- * the OAuth server to be allowed to perform the client token checks.
+ * Middleware entrypoint to handle authorization of client requests. Verifies the client-provided access token
+ * with the configured OAuth server. This process requires Meadowlark to have its own valid access token on
+ * the OAuth server to be allowed to perform client token verification.
  */
 export async function authorize({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
@@ -121,19 +139,19 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
   }
 
   // See if we've authenticated client token recently - within last TTL timeframe
-  const cachedClientToken: VerifiedClientInfo | undefined = cachedTokensForClients.get(clientBearerToken);
+  const cachedClientTokenInfo: ClientTokenInfo | undefined = cachedClientsTokenInfo.get(clientBearerToken);
 
-  if (cachedClientToken != null) {
+  if (cachedClientTokenInfo != null) {
     if (isDebugEnabled()) {
       Logger.debug(
-        `${moduleName}.authorize Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${cachedTokensForClients.getRemainingTTL(
+        `${moduleName}.authorize Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${cachedClientsTokenInfo.getRemainingTTL(
           clientBearerToken,
         )}`,
         frontendRequest.traceId,
       );
     }
-    frontendRequest.middleware.security = { ...cachedClientToken.security };
-    frontendRequest.middleware.validateResources = cachedClientToken.validateResources;
+    frontendRequest.middleware.security = { ...cachedClientTokenInfo.security };
+    frontendRequest.middleware.validateResources = cachedClientTokenInfo.validateResources;
     return { frontendRequest, frontendResponse: null };
   }
 
@@ -176,20 +194,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
       // Second try at validation of client-provided token from configured OAuth server
       verificationResponse = await fetchClientTokenVerification(clientBearerToken, cachedOwnAccessTokenForClientAuth);
-
-      if (verificationResponse.status === 401) {
-        // Something is wrong with the Meadowlark token - still not authorized to perform client-provided
-        // token validation
-        Logger.error(
-          `${moduleName}.authorize OAuth server responded that Meadowlark own token is not valid even after token refresh. Check Meadowlark OAuth configuration.`,
-          frontendRequest.traceId,
-        );
-
-        const errorResponse: FrontendResponse = { body: '', statusCode: 500 };
-        return { frontendRequest, frontendResponse: errorResponse };
-      }
     }
-    //
 
     if (verificationResponse.status === 400) {
       // Client-provided token is not a well-formed JWT
@@ -197,21 +202,19 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
         `${moduleName}.authorize verification response returned 400 - Client-provided token is not a JWT`,
         frontendRequest.traceId,
       );
-      const errorResponse: FrontendResponse = { body: '', statusCode: 401 };
-      return { frontendRequest, frontendResponse: errorResponse };
+      return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
     }
 
     if (verificationResponse.status === 200) {
       if (!verificationResponse.data?.active) {
         // Client-provided token accepted by OAuth server but not active
         Logger.debug(`${moduleName}.authorize Client-provided token is inactive`, frontendRequest.traceId);
-        const errorResponse: FrontendResponse = { body: '', statusCode: 401 };
-        return { frontendRequest, frontendResponse: errorResponse };
+        return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
       }
 
       // Return client id and Meadowlark authorization strategy (via roles in JWT) to middleware stack
       const roles: string[] = verificationResponse.data?.roles || [];
-      const clientInfo: VerifiedClientInfo = {
+      const clientTokenInfo: ClientTokenInfo = {
         security: {
           clientId: verificationResponse.data?.client_id ?? 'UNKNOWN',
           authorizationStrategy: determineAuthStrategyFromRoles(roles),
@@ -219,7 +222,10 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
         validateResources: !roles.includes('assessment'),
       };
 
-      cachedTokensForClients.set(clientBearerToken, clientInfo);
+      cachedClientsTokenInfo.set(clientBearerToken, clientTokenInfo);
+
+      frontendRequest.middleware.security = { ...clientTokenInfo.security };
+      frontendRequest.middleware.validateResources = clientTokenInfo.validateResources;
       return { frontendRequest, frontendResponse: null };
     }
 
@@ -228,8 +234,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
       `${moduleName}.authorize verification response returned ${verificationResponse.status} unexpectedly - returning 502`,
       frontendRequest.traceId,
     );
-    const errorResponse: FrontendResponse = { body: '', statusCode: 502 };
-    return { frontendRequest, frontendResponse: errorResponse };
+    return { frontendRequest, frontendResponse: { body: '', statusCode: 502 } };
   } catch (e) {
     // Unexpected failure communicating with OAuth server
     Logger.error(
@@ -237,7 +242,6 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
       frontendRequest.traceId,
       e,
     );
-    const errorResponse: FrontendResponse = { body: '', statusCode: 500 };
-    return { frontendRequest, frontendResponse: errorResponse };
+    return { frontendRequest, frontendResponse: { body: '', statusCode: 500 } };
   }
 }
