@@ -649,7 +649,7 @@ describe('when extracting with school year reference in body', () => {
   });
 });
 
-describe('when extracting with a school year in a reference document', () => {
+describe('when extracting with school year in a reference document', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
   let result: DocumentReference[] = [];
