@@ -963,8 +963,7 @@ describe('given two calls for verification with the same client id', () => {
           status: 200,
           data: { active: true, roles: ['vendor'], client_id: 'clientId' },
         }),
-      )
-
+      );
 
     // Act
     resultChain1 = await authorize({ frontendRequest: frontendRequest1, frontendResponse: null });

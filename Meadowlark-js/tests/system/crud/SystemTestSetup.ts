@@ -10,9 +10,7 @@ import {
   SystemTestablePlugin,
   SystemTestClient,
 } from '@edfi/meadowlark-core';
-import { Logger, initializeLogging } from '@edfi/meadowlark-utilities';
-
-initializeLogging();
+import { Logger } from '@edfi/meadowlark-utilities';
 
 // Environment setup
 const TEST_SIGNING_KEY =
