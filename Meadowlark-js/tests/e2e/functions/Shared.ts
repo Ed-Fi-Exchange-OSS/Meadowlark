@@ -5,63 +5,9 @@
 
 import { chance, rootURLRequest } from '../Setup';
 import { Clients, getAccessToken } from './Credentials';
-import { createResource } from './Resources';
 
 export function generateRandomId(length = 12): string {
   return chance.hash({ length });
-}
-
-export async function createContentClassDescriptor(): Promise<string> {
-  return createResource({
-    endpoint: 'contentClassDescriptors',
-    credentials: Clients.Host1,
-    body: {
-      codeValue: 'Presentation',
-      shortDescription: 'Presentation',
-      description: 'Presentation',
-      namespace: 'uri://ed-fi.org/ContentClassDescriptor',
-    },
-  });
-}
-
-export async function createCountry(): Promise<string> {
-  return createResource({
-    endpoint: 'countryDescriptors',
-    credentials: Clients.Host1,
-    body: {
-      codeValue: 'US',
-      shortDescription: 'US',
-      description: 'US',
-      namespace: 'uri://ed-fi.org/CountryDescriptor',
-    },
-  });
-}
-
-export async function createSchool(schoolId: number): Promise<string> {
-  // Using assessment credentials to bypass strict validation
-  return createResource({
-    endpoint: 'schools',
-    credentials: Clients.Assessment1,
-    body: {
-      schoolId,
-      nameOfInstitution: 'New School',
-      educationOrganizationCategories: [
-        {
-          educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
-        },
-      ],
-      schoolCategories: [
-        {
-          schoolCategoryDescriptor: 'uri://ed-fi.org/SchoolCategoryDescriptor#All Levels',
-        },
-      ],
-      gradeLevels: [
-        {
-          gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
-        },
-      ],
-    },
-  });
 }
 
 export async function getDescriptorByLocation(location: string): Promise<string> {

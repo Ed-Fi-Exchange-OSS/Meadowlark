@@ -4,8 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from './functions/Credentials';
+import { createSchool } from './functions/DataCreation';
 import { createResource, deleteResourceByLocation } from './functions/Resources';
-import { getDescriptorByLocation, createSchool } from './functions/Shared';
+import { getDescriptorByLocation } from './functions/Shared';
 import { baseURLRequest, rootURLRequest } from './Setup';
 
 describe('Sessions', () => {

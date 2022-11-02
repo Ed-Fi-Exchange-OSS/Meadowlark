@@ -4,8 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from './functions/Credentials';
+import { createContentClassDescriptor } from './functions/DataCreation';
 import { createResource, deleteResourceByLocation } from './functions/Resources';
-import { createContentClassDescriptor, getDescriptorByLocation, generateRandomId } from './functions/Shared';
+import { getDescriptorByLocation, generateRandomId } from './functions/Shared';
 import { baseURLRequest, rootURLRequest } from './Setup';
 
 describe('Education contents', () => {

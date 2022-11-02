@@ -4,8 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from './functions/Credentials';
+import { createCountry } from './functions/DataCreation';
 import { createResource, deleteResourceByLocation } from './functions/Resources';
-import { generateRandomId, createCountry, getDescriptorByLocation } from './functions/Shared';
+import { generateRandomId, getDescriptorByLocation } from './functions/Shared';
 import { baseURLRequest, rootURLRequest } from './Setup';
 
 describe('When creating a resource that has a reference to a descriptor', () => {
