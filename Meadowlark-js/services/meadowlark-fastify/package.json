@@ -30,7 +30,8 @@
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
     "start:local": "yarn node dist/index.js",
-    "start:local-ts": "yarn ts-node src/index.ts"
+    "start:local-ts": "yarn ts-node src/index.ts",
+    "createKey": "openssl rand -base64 256"
   },
   "husky": {
     "hooks": {
