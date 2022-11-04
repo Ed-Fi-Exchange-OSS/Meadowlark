@@ -4,6 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from './functions/Credentials';
+import { createSchool } from './functions/DataCreation';
+import { deleteResourceByLocation } from './functions/Resources';
 import { baseURLRequest } from './Setup';
 
 describe('When posting a resource', () => {
@@ -129,13 +131,11 @@ describe('When posting a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `
+          expect(response.body.message).toMatchInlineSnapshot(`
             [
               "/shortNameOfInstitution must NOT have fewer than 1 characters",
             ]
-          `,
-          );
+          `);
         });
     });
   });
@@ -167,13 +167,11 @@ describe('When posting a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `
+          expect(response.body.message).toMatchInlineSnapshot(`
             [
               " must have required property 'communityOrganizationId'",
             ]
-          `,
-          );
+          `);
         });
     });
   });
@@ -210,6 +208,45 @@ describe('When posting a resource', () => {
             `"Reference validation failed: Resource EducationOrganizationCategory is missing identity {"descriptor":"abc"}"`,
           );
         });
+    });
+  });
+
+  describe('when entering dates', () => {
+    const schoolId = 100;
+    let schoolLocation: string;
+
+    beforeAll(async () => {
+      schoolLocation = await createSchool(schoolId);
+    });
+
+    describe('given wrong date format', () => {
+      it('should return error message', async () => {
+        await baseURLRequest
+          .post(`/v3.3b/ed-fi/academicWeeks`)
+          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .send({
+            weekIdentifier: '123456',
+            schoolReference: {
+              schoolId,
+            },
+            beginDate: 'January 1st, 2020',
+            endDate: '2020/12/01',
+            totalInstructionalDays: 50,
+          })
+          .expect(400)
+          .then((response) => {
+            expect(response.body.message).toMatchInlineSnapshot(`
+              [
+                "/beginDate must match format "date"",
+                "/endDate must match format "date"",
+              ]
+            `);
+          });
+      });
+    });
+
+    afterAll(async () => {
+      await deleteResourceByLocation(schoolLocation);
     });
   });
 });
