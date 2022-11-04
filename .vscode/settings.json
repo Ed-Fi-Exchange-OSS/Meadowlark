@@ -84,5 +84,6 @@
     },
     "jest.autoRun": {
       "watch": false
-    }
+    },
+    "sarif-viewer.connectToGithubCodeScanning": "off"
 }
