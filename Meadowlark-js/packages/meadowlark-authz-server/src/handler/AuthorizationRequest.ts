@@ -54,3 +54,7 @@ export function newAuthorizationRequest(): AuthorizationRequest {
     stage: '',
   };
 }
+
+export function extractAuthorizationHeader(authorizationRequest: AuthorizationRequest): string | undefined {
+  return authorizationRequest.headers.authorization ?? authorizationRequest.headers.Authorization;
+}

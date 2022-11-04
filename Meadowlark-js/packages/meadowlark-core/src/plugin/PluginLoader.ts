@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { Logger, writeErrorToLog } from '../Logger';
+import { Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { DocumentStoreInitializer } from './backend/DocumentStoreInitializer';
 import { DocumentStorePlugin } from './backend/DocumentStorePlugin';
 import { ListenerInitializer } from './backend/ListenerInitializer';

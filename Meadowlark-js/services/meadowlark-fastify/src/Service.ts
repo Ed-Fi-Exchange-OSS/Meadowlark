@@ -11,7 +11,7 @@ import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
-import { Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
 import {
   metaed,
@@ -21,7 +21,6 @@ import {
   openApiUrlList,
   dependencies,
 } from './handler/MetadataHandler';
-import { oauthHandler } from './handler/OAuthHandler';
 import { loadDescriptors } from './handler/DescriptorLoader';
 import {
   createAuthorizationClientHandler,
@@ -29,6 +28,7 @@ import {
   resetAuthorizationClientSecretHandler,
   updateAuthorizationClientHandler,
   verifyTokenAuthorizationHandler,
+  createSigningKeyHandler,
 } from './handler/authorization/AuthorizationHandler';
 
 export function buildService(): FastifyInstance {
@@ -120,9 +120,6 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
     fastify.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
 
-    // Old OAuth handlers
-    fastify.get(`/${stage}/createKey`, oauthHandler);
-
     // Descriptor loader
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
@@ -132,5 +129,6 @@ export function buildService(): FastifyInstance {
     fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);
     fastify.post(`/${stage}/oauth/verify`, verifyTokenAuthorizationHandler);
+    fastify.get(`/${stage}/oauth/createSigningKey`, createSigningKeyHandler);
   }
 }

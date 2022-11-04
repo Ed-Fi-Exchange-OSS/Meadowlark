@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client } from '@opensearch-project/opensearch';
-import { QueryRequest, QueryResult, Logger, ResourceInfo, isDebugEnabled } from '@edfi/meadowlark-core';
+import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
+import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 
 /**

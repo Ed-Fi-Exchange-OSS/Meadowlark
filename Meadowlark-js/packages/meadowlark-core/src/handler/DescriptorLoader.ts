@@ -5,12 +5,11 @@
 
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
-/* eslint-disable no-prototype-builtins */
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { ensurePluginsLoaded, getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
-import { Logger } from '../Logger';
 import { documentIdForDocumentInfo, DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
@@ -74,6 +73,7 @@ async function readDescriptors(directoryPath: string): Promise<XmlDescriptorData
     const interchangeDescriptorsElement = parsedContents.InterchangeDescriptors;
 
     // remove any XML metadata '$' property
+    // eslint-disable-next-line no-prototype-builtins
     if (interchangeDescriptorsElement.hasOwnProperty('$')) {
       delete interchangeDescriptorsElement.$;
     }

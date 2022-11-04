@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client, ClientOptions } from '@opensearch-project/opensearch';
-import { Logger } from '@edfi//meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 
 let singletonClient: Client | null = null;
 

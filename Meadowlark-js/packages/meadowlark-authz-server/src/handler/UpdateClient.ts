@@ -2,13 +2,13 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { authorizationHeader, Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
 import { UpdateClientBody } from '../model/CreateClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
-import { AuthorizationRequest } from './AuthorizationRequest';
+import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { BodyValidation, validateUpdateClientBody } from '../validation/BodyValidation';
@@ -25,7 +25,7 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
     await ensurePluginsLoaded();
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
-      authorizationHeader(authorizationRequest.headers),
+      extractAuthorizationHeader(authorizationRequest),
     );
 
     if (errorResponse != null) {

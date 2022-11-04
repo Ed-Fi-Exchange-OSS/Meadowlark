@@ -3,14 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as MeadowlarkCore from '@edfi/meadowlark-core';
-import { newJwtStatus } from '@edfi/meadowlark-core';
 import { updateClient } from '../../src/handler/UpdateClient';
 import { UpdateAuthorizationClientResult } from '../../src/message/UpdateAuthorizationClientResult';
+import * as JwtAction from '../../src/security/JwtAction';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
+import { newJwtStatus } from '../../src/security/JwtStatus';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -40,7 +40,7 @@ describe('given valid admin user but authorization store is going to fail', () =
         }),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -78,7 +78,7 @@ describe('given authorization store succeeds on update', () => {
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -116,7 +116,7 @@ describe('given authorization store fails update with client id not found', () =
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -145,7 +145,7 @@ describe('given missing authorization token', () => {
   let mockMeadowlarkCore: any;
 
   beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isMissing: true,
     });
@@ -176,7 +176,7 @@ describe('given expired authorization token', () => {
   let mockMeadowlarkCore: any;
 
   beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isMissing: false,
       isExpired: true,
@@ -208,7 +208,7 @@ describe('given non-admin authorization token', () => {
   let mockMeadowlarkCore: any;
 
   beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isMissing: false,
       isExpired: false,
@@ -234,7 +234,7 @@ describe('given invalid authorization token', () => {
   let mockMeadowlarkCore: any;
 
   beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isMissing: false,
       isExpired: false,
@@ -276,7 +276,7 @@ describe('given update has missing client id', () => {
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -319,7 +319,7 @@ describe('given update has missing body', () => {
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -363,7 +363,7 @@ describe('given update has malformed json body', () => {
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -407,7 +407,7 @@ describe('given update has well-formed but invalid json body', () => {
         } as UpdateAuthorizationClientResult),
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],
@@ -443,7 +443,7 @@ describe('given update throws internal error', () => {
       throw new Error();
     });
 
-    mockMeadowlarkCore = jest.spyOn(MeadowlarkCore, 'verifyJwt').mockReturnValue({
+    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
       ...newJwtStatus(),
       isValid: true,
       roles: ['admin'],

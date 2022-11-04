@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { UpdateResult, Logger, UpdateRequest } from '@edfi/meadowlark-core';
+import { UpdateResult, UpdateRequest } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, writeLockReferencedDocuments } from './Db';

@@ -14,7 +14,7 @@ import {
   schoolCategoryDescriptorBody,
   schoolBodyWithDescriptorReference,
   schoolCategoryDelete,
-  newFrontendRequestTemplate,
+  newFrontendRequestTemplateClient1,
   CLIENT1_HEADERS,
   gradeLevelDescriptorBody,
   educationOrganizationCategoryDescriptorBody,
@@ -219,7 +219,7 @@ describe('given the DELETE of a school referenced by a course', () => {
   let deleteResult: FrontendResponse;
 
   const courseThatReferencesSchool: FrontendRequest = {
-    ...newFrontendRequestTemplate(),
+    ...newFrontendRequestTemplateClient1(),
     path: '/v3.3b/ed-fi/courses',
     headers: CLIENT1_HEADERS,
     body: `{

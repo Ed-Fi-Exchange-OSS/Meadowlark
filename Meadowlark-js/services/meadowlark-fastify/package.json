@@ -14,6 +14,7 @@
   "dependencies": {
     "@edfi/meadowlark-authz-server": "0.2.0-dev.0",
     "@edfi/meadowlark-core": "0.2.0-dev.0",
+    "@edfi/meadowlark-utilities": "0.2.0-dev.0",
     "@fastify/rate-limit": "^6.0.1",
     "dotenv": "^16.0.1",
     "fastify": "^3.29.0"
@@ -28,8 +29,9 @@
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
-    "start:local": "yarn node dist/index.js",
-    "start:local-ts": "yarn ts-node src/index.ts"
+    "start:local": "yarn node --require=dotenv/config dist/index.js",
+    "start:local-ts": "yarn ts-node --require=dotenv/config src/index.ts",
+    "createKey": "openssl rand -base64 256"
   },
   "husky": {
     "hooks": {

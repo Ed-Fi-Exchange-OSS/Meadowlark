@@ -5,9 +5,12 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
 
 jest.setTimeout(40000);
+
+initializeLogging();
 
 describe('given a GET of a school by id', () => {
   const schoolGetByIdRequest: InjectOptions = {

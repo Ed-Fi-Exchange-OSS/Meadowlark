@@ -61,7 +61,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: system-tests
-
       - name: Upload test results
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:

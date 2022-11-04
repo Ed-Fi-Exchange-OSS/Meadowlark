@@ -25,14 +25,14 @@ export const createClientBodySchema = {
       items: {
         description: 'List of roles',
         type: 'string',
-        enum: ['vendor', 'host', 'admin', 'assessment'],
+        enum: ['vendor', 'host', 'admin', 'assessment', 'verify-only'],
       },
       uniqueItems: true,
       minItems: 1,
       maxItems: 2,
       contains: {
         type: 'string',
-        enum: ['vendor', 'host', 'admin'],
+        enum: ['vendor', 'host', 'admin', 'verify-only'],
       },
       maxContains: 1,
     },

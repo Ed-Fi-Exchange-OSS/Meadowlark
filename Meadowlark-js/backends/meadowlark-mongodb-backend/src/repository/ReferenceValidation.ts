@@ -5,7 +5,8 @@
 
 import R from 'ramda';
 import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
-import { documentIdForDocumentReference, DocumentReference, Logger } from '@edfi/meadowlark-core';
+import { documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 import { onlyReturnId } from './Db';
 

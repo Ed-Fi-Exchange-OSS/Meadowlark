@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { ResetAuthorizationClientSecretRequest, ResetAuthorizationClientSecretResult } from '@edfi/meadowlark-authz-server';
 import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 import { getAuthorizationCollection } from '../Db';

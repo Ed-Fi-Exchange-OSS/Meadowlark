@@ -4,12 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import crypto from 'node:crypto';
-import { authorizationHeader, writeErrorToLog } from '@edfi/meadowlark-core';
+import { writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { clientIdFrom } from '../Utility';
-import { AuthorizationRequest } from './AuthorizationRequest';
+import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { ResetClientSecretResponseBody } from '../model/ResetClientSecretResponseBody';
 import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
@@ -26,7 +26,7 @@ export async function resetAuthorizationClientSecret(
     await ensurePluginsLoaded();
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
-      authorizationHeader(authorizationRequest.headers),
+      extractAuthorizationHeader(authorizationRequest),
     );
 
     if (errorResponse != null) {

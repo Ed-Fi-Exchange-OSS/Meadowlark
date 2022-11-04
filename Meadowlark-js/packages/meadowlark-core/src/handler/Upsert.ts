@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
+import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
@@ -12,8 +13,6 @@ import type { UpsertResult } from '../message/UpsertResult';
 import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
 import { resourceUriFrom } from './UriBuilder';
-
-export const LOCATION_HEADER_NAME: string = 'Location';
 
 const moduleName = 'Upsert';
 

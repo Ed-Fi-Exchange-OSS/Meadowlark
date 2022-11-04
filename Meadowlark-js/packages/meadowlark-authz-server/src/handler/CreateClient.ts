@@ -4,13 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import crypto from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
-import { authorizationHeader, LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-core';
+import { LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-utilities';
 import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
 import { CreateClientBody } from '../model/CreateClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
-import { AuthorizationRequest } from './AuthorizationRequest';
+import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
@@ -28,7 +28,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     await ensurePluginsLoaded();
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
-      authorizationHeader(authorizationRequest.headers),
+      extractAuthorizationHeader(authorizationRequest),
     );
 
     if (errorResponse != null) {

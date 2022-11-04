@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import memoize from 'fast-memoize';
 
-function getSigningKey(): Buffer {
+function getSigningKeyFromEnvironment(): Buffer {
   const signingKeyEncoded = process.env.SIGNING_KEY;
   if (signingKeyEncoded == null) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `yarn createKey`');
@@ -12,4 +12,4 @@ function getSigningKey(): Buffer {
   return Buffer.from(signingKeyEncoded, 'base64');
 }
 
-export const signingKey = memoize(getSigningKey);
+export const signingKey: () => Buffer = memoize(getSigningKeyFromEnvironment);

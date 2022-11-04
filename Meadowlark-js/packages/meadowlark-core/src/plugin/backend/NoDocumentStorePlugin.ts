@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Logger } from '@edfi/meadowlark-utilities';
 import { GetRequest } from '../../message/GetRequest';
 import { GetResult } from '../../message/GetResult';
 import { DeleteRequest } from '../../message/DeleteRequest';
@@ -11,7 +12,6 @@ import { UpdateRequest } from '../../message/UpdateRequest';
 import { UpdateResult } from '../../message/UpdateResult';
 import { UpsertRequest } from '../../message/UpsertRequest';
 import { UpsertResult } from '../../message/UpsertResult';
-import { Logger } from '../../Logger';
 import { DocumentStorePlugin } from './DocumentStorePlugin';
 import { MiddlewareModel } from '../../middleware/MiddlewareModel';
 

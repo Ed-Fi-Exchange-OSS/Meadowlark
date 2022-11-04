@@ -5,12 +5,12 @@
 
 import {
   UpdateResult,
-  Logger,
   UpdateRequest,
   DocumentReference,
   documentIdForDocumentReference,
   documentIdForSuperclassInfo,
 } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   documentInsertOrUpdateSql,

@@ -14,14 +14,13 @@
   ],
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
-    "@edfi/meadowlark-core": "0.2.0-dev.0",
+    "@edfi/meadowlark-utilities": "0.2.0-dev.0",
     "ajv": "^8.11.0",
     "dotenv": "^16.0.1",
     "fast-memoize": "^2.5.2",
     "njwt": "^1.2.0",
     "ramda": "^0.27.2",
-    "uuid": "^9.0.0",
-    "winston": "^3.7.2"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/uuid": "^8.3.4",

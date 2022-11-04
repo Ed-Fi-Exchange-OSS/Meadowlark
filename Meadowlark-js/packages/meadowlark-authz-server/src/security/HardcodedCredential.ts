@@ -44,3 +44,10 @@ export const admin1: HardcodedCredential = {
   vendor: '',
   role: ['admin'],
 };
+
+export const verifyOnly1: HardcodedCredential = {
+  key: 'meadowlark_verify-only_key_1',
+  secret: 'meadowlark_verify-only_secret_1',
+  vendor: '',
+  role: ['verify-only'],
+};

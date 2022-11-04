@@ -4,15 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import querystring from 'node:querystring';
-import { Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import type { AuthorizationResponse } from './AuthorizationResponse';
-import type { AuthorizationRequest } from './AuthorizationRequest';
+import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { VerifyTokenBody } from '../model/VerifyTokenBody';
 import { BodyValidation, validateVerifyTokenBody } from '../validation/BodyValidation';
 import { ensurePluginsLoaded } from '../plugin/AuthorizationPluginLoader';
-import { extractAuthorizationHeader } from './AuthorizationHeader';
 import {
-  hasAdminRole,
+  hasAdminOrVerifyOnlyRole,
   introspectBearerToken,
   IntrospectionResponse,
   validateTokenForAccess,
@@ -110,8 +109,11 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
 
     const { introspectedToken } = introspectionResponse;
 
-    // Ensure authorization for introspection result - either requester has same client id or is admin
-    if (requesterTokenResult.clientId !== introspectedToken.client_id && !hasAdminRole(requesterTokenResult.roles)) {
+    // Ensure authorization for introspection result - either requester has same client id, is admin, or is verify
+    if (
+      requesterTokenResult.clientId !== introspectedToken.client_id &&
+      !hasAdminOrVerifyOnlyRole(requesterTokenResult.roles)
+    ) {
       Logger.debug(`${moduleName}.verifyToken: 401`, authorizationRequest.traceId);
       return { body: '', statusCode: 401 };
     }

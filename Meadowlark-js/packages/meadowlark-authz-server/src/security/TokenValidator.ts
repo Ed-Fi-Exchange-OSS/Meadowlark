@@ -3,18 +3,25 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { JwtStatus, verifyJwt, Logger } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
-import { signingKey } from '../model/SigningKey';
 import { IntrospectedToken } from './IntrospectedToken';
 import { TOKEN_ISSUER } from './TokenIssuer';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
+import { JwtStatus } from './JwtStatus';
+import { verifyJwt } from './JwtAction';
+import { signingKey } from '../model/SigningKey';
+import { admin1, client1, client2, client3, client4, verifyOnly1 } from './HardcodedCredential';
 
 export function hasAdminRole(roles: string[]): boolean {
   return roles.some((role) => role.toLocaleLowerCase() === 'admin');
+}
+
+export function hasAdminOrVerifyOnlyRole(roles: string[]): boolean {
+  return roles.some((role) => role.toLocaleLowerCase() === 'verify-only' || role.toLocaleLowerCase() === 'admin');
 }
 
 export type ValidateTokenResult =
@@ -82,13 +89,20 @@ export function validateAdminTokenForAccess(authorizationHeader: string | undefi
 async function isValidClientId(clientId: string | undefined, traceId: string): Promise<boolean> {
   if (clientId == null) return false;
 
+  // Check hardcoded credentials first
+  if ([client1.key, client2.key, client3.key, client4.key, admin1.key, verifyOnly1.key].includes(clientId)) {
+    return true;
+  }
+
   // Go to authentication datastore
   const result: GetAuthorizationClientResult = await getAuthorizationStore().getAuthorizationClient({
     clientId,
     traceId,
   });
 
-  return result.response === 'GET_SUCCESS';
+  if (result.response === 'GET_SUCCESS') return true;
+  Logger.debug(`TokenValidator.isValidClientId clientId ${clientId} not found in datastore`, traceId);
+  return false;
 }
 
 export type IntrospectionResponse = { isValid: false } | { isValid: true; introspectedToken: IntrospectedToken };
@@ -123,11 +137,6 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
 
   if (verified == null) return { isValid: false };
   const jwt: Jwt = verified as Jwt;
-
-  const nJwtErrorMessages = ['Signature verification failed', 'Jwt cannot be parsed'];
-
-  // Check for error response from nJwt in message
-  if (nJwtErrorMessages.includes(jwt.message)) return { isValid: false };
 
   // Check for correct issuer
   if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };

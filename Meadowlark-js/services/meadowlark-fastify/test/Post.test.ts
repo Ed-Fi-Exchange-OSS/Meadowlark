@@ -5,9 +5,12 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
 
 jest.setTimeout(40000);
+
+initializeLogging();
 
 const schoolPostRequest: InjectOptions = {
   method: 'POST',

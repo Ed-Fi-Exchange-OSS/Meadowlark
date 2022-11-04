@@ -7,12 +7,12 @@ import { Client } from '@opensearch-project/opensearch';
 import {
   DeleteRequest,
   DeleteResult,
-  Logger,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QueryOpensearch';
 
 /**

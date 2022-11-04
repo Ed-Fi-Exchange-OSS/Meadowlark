@@ -15,7 +15,7 @@ import {
   FindOptions,
   ReplaceOptions,
 } from 'mongodb';
-import { Logger } from '@edfi//meadowlark-core';
+import { Logger } from '@edfi//meadowlark-utilities';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
