@@ -3,12 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from './functions/Credentials';
-import { createSchool } from './functions/DataCreation';
-import { deleteResourceByLocation } from './functions/Resources';
-import { baseURLRequest } from './Setup';
+import { getAccessToken, Clients } from '../functions/Credentials';
+import { createSchool } from '../functions/DataCreation';
+import { deleteResourceByLocation } from '../functions/Resources';
+import { baseURLRequest } from '../Setup';
 
-describe('When posting a resource', () => {
+describe('When creating a resource', () => {
   describe('given a missing property on a required collection', () => {
     it('should fail with message about the missing property', async () => {
       // This is entirely missing the "categories" collection
@@ -104,7 +104,7 @@ describe('When posting a resource', () => {
   });
 
   describe('given an empty required string value', () => {
-    it('should fail with a message about the descriptor', async () => {
+    it('should fail with a message about the property', async () => {
       // shortNameOfInstitution: '',
       await baseURLRequest
         .post('/v3.3b/ed-fi/communityOrganizations')
@@ -141,7 +141,7 @@ describe('When posting a resource', () => {
   });
 
   describe('given a missing number property', () => {
-    it('should fail with a message about the descriptor', async () => {
+    it('should fail with a message about the property', async () => {
       // communityOrganizationId
       await baseURLRequest
         .post('/v3.3b/ed-fi/communityOrganizations')
@@ -219,7 +219,7 @@ describe('When posting a resource', () => {
       schoolLocation = await createSchool(schoolId);
     });
 
-    describe('given wrong date format', () => {
+    describe('given incorrect date format', () => {
       it('should return error message', async () => {
         await baseURLRequest
           .post(`/v3.3b/ed-fi/academicWeeks`)

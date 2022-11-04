@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from './functions/Credentials';
-import { createSchool } from './functions/DataCreation';
-import { createResource, deleteResourceByLocation } from './functions/Resources';
-import { baseURLRequest, rootURLRequest } from './Setup';
+import { getAccessToken, Clients } from '../functions/Credentials';
+import { createSchool } from '../functions/DataCreation';
+import { createResource, deleteResourceByLocation } from '../functions/Resources';
+import { baseURLRequest, rootURLRequest } from '../Setup';
 
 describe('When creating a resource that has a reference to another resource', () => {
   describe('given a token with strict validation', () => {

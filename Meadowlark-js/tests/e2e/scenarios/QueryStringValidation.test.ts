@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { createSchoolsInBulk, deleteListOfResources } from './functions/BulkCreation';
-import { Clients, getAccessToken } from './functions/Credentials';
-import { baseURLRequest } from './Setup';
+import { createSchoolsInBulk, deleteListOfResources } from '../functions/BulkCreation';
+import { Clients, getAccessToken } from '../functions/Credentials';
+import { baseURLRequest } from '../Setup';
 
 describe('When retrieving information', () => {
   describe("when there's no data", () => {
@@ -84,7 +84,7 @@ describe('When retrieving information', () => {
         });
       });
 
-      describe('when using an offset bigger than the total', () => {
+      describe('when using an offset greater than the total', () => {
         it('should return empty list', async () => {
           const offset = total + 1;
           await baseURLRequest
@@ -93,7 +93,6 @@ describe('When retrieving information', () => {
             .expect(200)
             .then((response) => {
               expect(+response.headers['total-count']).toEqual(total);
-              // Confirm correctness
               expect(response.body.length).toEqual(0);
               expect(response.body).toMatchInlineSnapshot(`[]`);
             });
