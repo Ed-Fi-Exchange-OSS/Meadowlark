@@ -16,7 +16,7 @@ import { FrontendResponse } from './FrontendResponse';
 
 interface ExternalResource {
   body: string;
-  etag: string;
+  etag: string | undefined;
 }
 export const resourceCache: { [key: string]: ExternalResource } = {};
 
@@ -106,7 +106,7 @@ async function getFileFromBlobStorage(
   frontendRequest: FrontendRequest,
   transformer: Transformer,
 ): Promise<FrontendResponse> {
-  const resource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
+  const resource: ExternalResource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
     writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', `getting ${url}`);
