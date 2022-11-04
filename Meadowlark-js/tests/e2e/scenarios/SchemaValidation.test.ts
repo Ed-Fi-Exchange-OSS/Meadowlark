@@ -4,8 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from '../functions/Credentials';
-import { createSchool } from '../functions/DataCreation';
-import { deleteResourceByLocation } from '../functions/Resources';
 import { baseURLRequest } from '../Setup';
 
 describe('When creating a resource', () => {
@@ -211,42 +209,29 @@ describe('When creating a resource', () => {
     });
   });
 
-  describe('when entering dates', () => {
-    const schoolId = 100;
-    let schoolLocation: string;
-
-    beforeAll(async () => {
-      schoolLocation = await createSchool(schoolId);
-    });
-
-    describe('given incorrect date format', () => {
-      it('should return error message', async () => {
-        await baseURLRequest
-          .post(`/v3.3b/ed-fi/academicWeeks`)
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
-          .send({
-            weekIdentifier: '123456',
-            schoolReference: {
-              schoolId,
-            },
-            beginDate: 'January 1st, 2020',
-            endDate: '2020/12/01',
-            totalInstructionalDays: 50,
-          })
-          .expect(400)
-          .then((response) => {
-            expect(response.body.message).toMatchInlineSnapshot(`
+  describe('given an incorrect date format', () => {
+    it('should return error message', async () => {
+      await baseURLRequest
+        .post(`/v3.3b/ed-fi/academicWeeks`)
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .send({
+          weekIdentifier: '123456',
+          schoolReference: {
+            schoolId: 100,
+          },
+          beginDate: 'January 1st, 2020',
+          endDate: '2020/12/01',
+          totalInstructionalDays: 50,
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toMatchInlineSnapshot(`
               [
                 "/beginDate must match format "date"",
                 "/endDate must match format "date"",
               ]
             `);
-          });
-      });
-    });
-
-    afterAll(async () => {
-      await deleteResourceByLocation(schoolLocation);
+        });
     });
   });
 });
