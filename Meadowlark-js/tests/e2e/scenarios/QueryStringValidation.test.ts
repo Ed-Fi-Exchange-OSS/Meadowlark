@@ -5,10 +5,11 @@
 
 import { createSchoolsInBulk, deleteListOfResources } from '../functions/BulkCreation';
 import { Clients, getAccessToken } from '../functions/Credentials';
+import { createResource, deleteResourceByLocation } from '../functions/Resources';
 import { baseURLRequest } from '../Setup';
 
 describe('When retrieving information', () => {
-  describe("when there's no data", () => {
+  describe("given there's no data", () => {
     it('should return the total count', async () => {
       await baseURLRequest
         .get('/v3.3b/ed-fi/schools')
@@ -21,7 +22,7 @@ describe('When retrieving information', () => {
     });
   });
 
-  describe('when data is present', () => {
+  describe('given data is present', () => {
     const total = 10;
     let schools: Array<string>;
 
@@ -29,7 +30,7 @@ describe('When retrieving information', () => {
       schools = await createSchoolsInBulk(total);
     });
 
-    describe('when using limit', () => {
+    describe('when querying with limit', () => {
       describe('when getting less than total', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return the total and a subset of the results', async () => {
@@ -68,7 +69,7 @@ describe('When retrieving information', () => {
       });
     });
 
-    describe('when using limit with offset', () => {
+    describe('when  querying with limit and offset', () => {
       describe('when getting a valid offset', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return the total and a subset of the results', async () => {
@@ -147,6 +148,93 @@ describe('When retrieving information', () => {
       afterAll(async () => {
         await deleteListOfResources(schools);
       });
+    });
+  });
+
+  describe('when querying by data types', () => {
+    let resourceLocation: string;
+
+    describe('when searching by date', () => {
+      const beginDate = '2020-01-01';
+      const endDate = '2021-01-01';
+
+      beforeAll(async () => {
+        resourceLocation = await createResource({
+          endpoint: 'academicWeeks',
+          credentials: Clients.Assessment1,
+          body: {
+            weekIdentifier: '123456',
+            schoolReference: {
+              schoolId: 100,
+            },
+            beginDate,
+            endDate,
+            totalInstructionalDays: 50,
+          },
+        });
+      });
+
+      describe('when date is valid', () => {
+        it('should return valid data', async () => {
+          await baseURLRequest
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${beginDate}`)
+            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .expect(200)
+            .then((response) => {
+              expect(response.body.length).toBeGreaterThan(0);
+              expect(response.body[0].beginDate).toEqual(beginDate);
+            });
+        });
+      });
+
+      describe('when date is invalid', () => {
+        const wrongDate = '2020/01/01';
+        it('should return error message', async () => {
+          await baseURLRequest
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${wrongDate}`)
+            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .expect(400)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot(`
+                {
+                  "message": "The request is invalid.",
+                  "modelState": {
+                    "/beginDate must match format "date"": "Invalid property",
+                  },
+                }
+              `);
+            });
+        });
+      });
+
+      describe('when date is different', () => {
+        const oldDate = beginDate.replace('2020', '2010');
+        it('should return empty array', async () => {
+          await baseURLRequest
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${oldDate}`)
+            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .expect(200)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot(`[]`);
+            });
+        });
+      });
+
+      describe('when begin date specified is end date', () => {
+        it('should return empty array', async () => {
+          await baseURLRequest
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${endDate}`)
+            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .expect(200)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot(`[]`);
+            });
+        });
+      });
+    });
+
+    afterAll(async () => {
+      await deleteResourceByLocation(resourceLocation);
     });
   });
 });
