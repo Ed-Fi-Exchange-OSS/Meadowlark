@@ -20,8 +20,7 @@
   },
   "dependencies": {
     "@edfi/meadowlark-core": "0.2.0-dev.0",
-    "@edfi/meadowlark-utilities": "0.2.0-dev.0",
-    "pg": "^8.7.3",
+    "pg": "^8.8.0",
     "pg-format": "^1.0.4",
     "ramda": "^0.28.0",
     "ts-invariant": "^0.9.4"
