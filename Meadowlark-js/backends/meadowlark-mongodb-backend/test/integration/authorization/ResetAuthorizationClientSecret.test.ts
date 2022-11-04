@@ -52,10 +52,10 @@ describe('given the get of an existing authorization client', () => {
 
   it('should return a successful response', async () => {
     expect(resetClientSecretResponse).toMatchInlineSnapshot(`
-    {
-      "response": "RESET_SUCCESS",
-    }
-  `);
+          {
+            "response": "RESET_SUCCESS",
+          }
+      `);
   });
 
   it('should exist in the db', async () => {
@@ -63,15 +63,15 @@ describe('given the get of an existing authorization client', () => {
     const result: any = await collection.findOne({ _id: clientId });
 
     expect(result).toMatchInlineSnapshot(`
-    {
-      "_id": "clientId",
-      "clientName": "clientName",
-      "clientSecretHashed": "updatedClientSecretHashed",
-      "roles": [
-        "vendor",
-      ],
-    }
-  `);
+      {
+        "_id": "clientId",
+        "clientName": "clientName",
+        "clientSecretHashed": "updatedClientSecretHashed",
+        "roles": [
+          "vendor",
+        ],
+      }
+    `);
   });
 });
 
