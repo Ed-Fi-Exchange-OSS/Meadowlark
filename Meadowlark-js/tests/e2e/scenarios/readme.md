@@ -21,11 +21,11 @@
 - [Request with Offset. Invalid values](./QueryStringValidation.test.ts#L104)
 - [Limit without Offset validation](./QueryStringValidation.test.ts#L126)
 
-## Resource Reference Validation
+## Resources Reference Validation
 
-- [Reference does not exist when creating with strict validation](./ResourceReferenceValidation.test.ts#L14) *Duplicated*
-- [Creating resource with existing reference](./ResourceReferenceValidation.test.ts#L43) *Duplicated*
-- [Allows adding when reference exists](./ResourceReferenceValidation.test.ts#L73) *Duplicated*  
+- [Reference does not exist when creating with strict validation](./ResourcesReferenceValidation.test.ts#L14) *Duplicated*
+- [Creating resource with existing reference](./ResourcesReferenceValidation.test.ts#L43) *Duplicated*
+- [Allows adding when reference exists](./ResourcesReferenceValidation.test.ts#L73) *Duplicated*  
   
 ## Schema Validation
 

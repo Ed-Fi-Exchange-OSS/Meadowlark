@@ -31,6 +31,11 @@ export async function deleteResourceByLocation(location: string): Promise<void> 
     await rootURLRequest
       .delete(location)
       .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-      .expect(204);
+      .then((response) => {
+        if (response.body) {
+          console.log(response.body);
+        }
+        expect(response.status).toEqual(204);
+      });
   }
 }
