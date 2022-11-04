@@ -116,7 +116,7 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
 
   let verified: nJwt | undefined;
   try {
-    verified = verify(bearerToken, signingKey);
+    verified = verify(bearerToken, signingKey());
   } catch (err) {
     Logger.debug('TokenValidator.introspectBearerToken nJwt responded with exception', traceId, err);
     if (err.message !== 'Jwt is expired') return { isValid: false };

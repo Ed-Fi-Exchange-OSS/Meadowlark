@@ -46,7 +46,7 @@ export function verifyJwt(authorization?: string): JwtStatus {
   const token = authorization.split(' ')[1];
 
   try {
-    const verified: nJwt | undefined = verify(token, signingKey);
+    const verified: nJwt | undefined = verify(token, signingKey());
     return toJwtStatus(verified as Jwt);
   } catch (err) {
     Logger.debug('Jwt.verifyPromise user-submitted token error', null, err);

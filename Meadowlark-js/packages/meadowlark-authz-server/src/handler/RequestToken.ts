@@ -30,7 +30,7 @@ type ParsedRequestTokenBody =
 function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
   const claims = { iss: TOKEN_ISSUER, aud: TOKEN_ISSUER, roles, client_id: clientId };
 
-  const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey) as Jwt;
+  const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey()) as Jwt;
 
   token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
   return token;
