@@ -22,7 +22,7 @@
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.8.1"
+    "ts-node": "^10.9.1"
   },
   "scripts": {
     "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",

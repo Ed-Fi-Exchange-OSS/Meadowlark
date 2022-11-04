@@ -33,7 +33,7 @@
     "ramda": "^0.27.2",
     "secure-random": "^1.1.2",
     "semver": "^7.3.8",
-    "ts-invariant": "^0.9.4",
+    "ts-invariant": "^0.10.3",
     "winston": "^3.8.2",
     "xml2js": "^0.4.23"
   },
@@ -43,7 +43,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/pluralize": "^0.0.29",
     "@types/ramda": "0.27.64",
-    "@types/semver": "^7.3.10",
+    "@types/semver": "^7.3.13",
     "@types/xml2js": "^0.4.11",
     "copyfiles": "^2.4.1",
     "jsinspect": "^0.12.7",
