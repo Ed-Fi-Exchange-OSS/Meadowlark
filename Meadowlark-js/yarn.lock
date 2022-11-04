@@ -1430,15 +1430,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.15.4":
-  version: 7.19.4
-  resolution: "@babel/runtime@npm:7.19.4::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40babel%2Fruntime%2F-%2F%40babel%2Fruntime-7.19.4.tgz"
-  dependencies:
-    regenerator-runtime: ^0.13.4
-  checksum: 66b7e3c13e9ee1d2c9397ea89144f29a875edee266a0eb2d9971be51b32fdbafc85808c7a45e011e6681899bb804b4e2ee2aed6dc07108dbbd6b11b6cc2afba6
-  languageName: node
-  linkType: hard
-
 "@babel/template@npm:^7.16.0, @babel/template@npm:^7.3.3":
   version: 7.16.0
   resolution: "@babel/template@npm:7.16.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40babel%2Ftemplate%2F-%2F%40babel%2Ftemplate-7.16.0.tgz"
@@ -1660,7 +1651,6 @@ __metadata:
   dependencies:
     "@edfi/meadowlark-authz-server": 0.2.0-dev.0
     "@edfi/meadowlark-core": 0.2.0-dev.0
-    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     copyfiles: ^2.4.1
     mongodb: ^4.11.0
     ramda: ^0.28.0
@@ -1688,7 +1678,6 @@ __metadata:
   resolution: "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
-    "@edfi/meadowlark-utilities": 0.2.0-dev.0
     "@types/pg": ^8.6.5
     "@types/pg-format": ^1.0.2
     copyfiles: ^2.4.1
@@ -1879,6 +1868,13 @@ __metadata:
   version: 1.1.0
   resolution: "@isaacs/string-locale-compare@npm:1.1.0::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40isaacs%2Fstring-locale-compare%2F-%2F%40isaacs%2Fstring-locale-compare-1.1.0.tgz"
   checksum: 7287da5d11497b82c542d3c2abe534808015be4f4883e71c26853277b5456f6bbe4108535db847a29f385ad6dc9318ffb0f55ee79bb5f39993233d7dccf8751d
+  languageName: node
+  linkType: hard
+
+"@isaacs/ttlcache@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@isaacs/ttlcache@npm:1.2.1::__archiveUrl=https%3A%2F%2Fwww.myget.org%2FF%2Fed-fi%2Fnpm%2F%40isaacs%2Fttlcache%2F-%2F%40isaacs%2Fttlcache-1.2.1.tgz"
+  checksum: 3e50e590f9eb776e6d4f1df28081527ef195a02aa1bfe4cb99a2738ab565eb4e0c8969b644c98c26cebb886302ff5a241d5a17234159a881376e4799ee314f22
   languageName: node
   linkType: hard
 
@@ -7843,13 +7839,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-retry-allowed@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "is-retry-allowed@npm:2.2.0"
-  checksum: 3d1103a9290b5d03626756a41054844633eac78bc5d3e3a95b13afeae94fa3cfbcf7f0b5520d83f75f48a25ce7b142fdbac4217dc4b0630f3ea55e866ec3a029
-  languageName: node
-  linkType: hard
-
 "is-shared-array-buffer@npm:^1.0.1":
   version: 1.0.1
   resolution: "is-shared-array-buffer@npm:1.0.1"
@@ -11318,6 +11307,13 @@ __metadata:
   version: 2.4.0
   resolution: "secure-json-parse@npm:2.4.0"
   checksum: efaafcaa08a4646ca829b29168474f57fb289a0ca7a1d77b66b55a0292785bc6eb9143b21cfc50b37dd12a823c25b12aa1771f18314ed5a616a1f8f12a318533
+  languageName: node
+  linkType: hard
+
+"secure-random@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "secure-random@npm:1.1.2"
+  checksum: 44744464a2cb41dd812d482aff1a01b05842359480f2b0cbd6466d1da8cab8ebb2a84f070b0ddee34ab3867f1f775b2bc34ef3e860f27dc8177791595d6debc9
   languageName: node
   linkType: hard
 
