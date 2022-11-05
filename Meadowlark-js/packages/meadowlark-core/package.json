@@ -43,7 +43,7 @@
     "@types/inflection": "^1.13.0",
     "@types/js-yaml": "^4.0.5",
     "@types/pluralize": "^0.0.29",
-    "@types/ramda": "0.27.66",
+    "@types/ramda": "0.28.18",
     "@types/semver": "^7.3.13",
     "@types/xml2js": "^0.4.11",
     "copyfiles": "^2.4.1",
