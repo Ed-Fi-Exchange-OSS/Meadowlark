@@ -1661,6 +1661,7 @@ __metadata:
   dependencies:
     "@edfi/meadowlark-authz-server": 0.2.0-dev.0
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": "workspace:^"
     copyfiles: ^2.4.1
     mongodb: ^4.11.0
     ramda: ^0.28.0
@@ -1688,6 +1689,7 @@ __metadata:
   resolution: "@edfi/meadowlark-postgresql-backend@workspace:backends/meadowlark-postgresql-backend"
   dependencies:
     "@edfi/meadowlark-core": 0.2.0-dev.0
+    "@edfi/meadowlark-utilities": "workspace:^"
     "@types/pg": ^8.6.5
     "@types/pg-format": ^1.0.2
     copyfiles: ^2.4.1
@@ -1708,7 +1710,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@edfi/meadowlark-utilities@0.2.0-dev.0, @edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities":
+"@edfi/meadowlark-utilities@0.2.0-dev.0, @edfi/meadowlark-utilities@workspace:^, @edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities":
   version: 0.0.0-use.local
   resolution: "@edfi/meadowlark-utilities@workspace:packages/meadowlark-utilities"
   dependencies:
