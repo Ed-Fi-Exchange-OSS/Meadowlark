@@ -153,36 +153,34 @@ describe('When retrieving information', () => {
 
   describe('when querying by data types', () => {
     let resourceLocation: string;
+    const data = {
+      weekIdentifier: '12d3e5$',
+      schoolReference: {
+        schoolId: 100,
+      },
+      beginDate: '2020-01-01',
+      endDate: '2021-01-01',
+      totalInstructionalDays: 50,
+    };
 
-    describe('when searching by date', () => {
-      const beginDate = '2020-01-01';
-      const endDate = '2021-01-01';
-
-      beforeAll(async () => {
-        resourceLocation = await createResource({
-          endpoint: 'academicWeeks',
-          credentials: Clients.Assessment1,
-          body: {
-            weekIdentifier: '123456',
-            schoolReference: {
-              schoolId: 100,
-            },
-            beginDate,
-            endDate,
-            totalInstructionalDays: 50,
-          },
-        });
+    beforeAll(async () => {
+      resourceLocation = await createResource({
+        endpoint: 'academicWeeks',
+        credentials: Clients.Assessment1,
+        body: data,
       });
+    });
 
+    describe('when querying by date', () => {
       describe('when date is valid', () => {
         it('should return valid data', async () => {
           await baseURLRequest
-            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${beginDate}`)
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.beginDate}`)
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body.length).toBeGreaterThan(0);
-              expect(response.body[0].beginDate).toEqual(beginDate);
+              expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(data)]));
             });
         });
       });
@@ -207,8 +205,8 @@ describe('When retrieving information', () => {
         });
       });
 
-      describe('when date is different', () => {
-        const oldDate = beginDate.replace('2020', '2010');
+      describe('when date is out of specified dates', () => {
+        const oldDate = data.beginDate.replace('2020', '2010');
         it('should return empty array', async () => {
           await baseURLRequest
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${oldDate}`)
@@ -223,13 +221,40 @@ describe('When retrieving information', () => {
       describe('when begin date specified is end date', () => {
         it('should return empty array', async () => {
           await baseURLRequest
-            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${endDate}`)
+            .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.endDate}`)
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`[]`);
             });
         });
+      });
+    });
+
+    describe('when querying by string identifier', () => {
+      it('should return valid data', async () => {
+        await baseURLRequest
+          .get(`/v3.3b/ed-fi/academicWeeks?weekIdentifier=${data.weekIdentifier}`)
+          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body.length).toBeGreaterThan(0);
+            expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(data)]));
+          });
+      });
+    });
+
+    describe('when querying by integer', () => {
+      // Should be included after RND-427 is done
+      it.skip('should return valid data', async () => {
+        await baseURLRequest
+          .get(`/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=${data.totalInstructionalDays}`)
+          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body.length).toBeGreaterThan(0);
+            expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(data)]));
+          });
       });
     });
 
