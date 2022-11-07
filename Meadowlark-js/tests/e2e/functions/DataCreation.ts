@@ -39,7 +39,7 @@ export async function createSchool(schoolId: number): Promise<string> {
     credentials: Clients.Assessment1,
     body: {
       schoolId,
-      nameOfInstitution: 'New School',
+      nameOfInstitution: `New School ${schoolId}`,
       educationOrganizationCategories: [
         {
           educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',

@@ -22,12 +22,16 @@ describe('When retrieving information', () => {
     });
   });
 
-  describe('given data is present', () => {
+  describe('when querying with filters', () => {
     const total = 10;
     let schools: Array<string>;
 
     beforeAll(async () => {
-      schools = await createSchoolsInBulk(total);
+      const bulkCreation = await createSchoolsInBulk(total);
+      if (bulkCreation.errors) {
+        throw new Error('Error creating schools');
+      }
+      schools = bulkCreation.resources;
     });
 
     describe('when querying with limit', () => {
@@ -69,7 +73,7 @@ describe('When retrieving information', () => {
       });
     });
 
-    describe('when  querying with limit and offset', () => {
+    describe('when querying with limit and offset', () => {
       describe('when getting a valid offset', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return the total and a subset of the results', async () => {
@@ -144,10 +148,29 @@ describe('When retrieving information', () => {
             });
         });
       });
+    });
 
-      afterAll(async () => {
-        await deleteListOfResources(schools);
+    describe('when querying with limit and including property', () => {
+      it('should return the total and a subset of the results', async () => {
+        const limit = total - 5;
+        const schoolName = 'New School 0';
+        await baseURLRequest
+          .get(`/v3.3b/ed-fi/schools?limit=${limit}&nameOfInstitution=${schoolName}`)
+          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            // Should Total count be total without filters?
+            expect(+response.headers['total-count']).toEqual(1);
+            expect(response.body.length).toEqual(1);
+            expect(response.body).toEqual(
+              expect.arrayContaining([expect.objectContaining({ nameOfInstitution: schoolName })]),
+            );
+          });
       });
+    });
+
+    afterAll(async () => {
+      await deleteListOfResources(schools);
     });
   });
 

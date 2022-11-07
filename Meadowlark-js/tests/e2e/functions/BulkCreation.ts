@@ -6,14 +6,29 @@
 import { createSchool } from './DataCreation';
 import { deleteResourceByLocation } from './Resources';
 
-export async function createSchoolsInBulk(total: number): Promise<Array<string>> {
+class Resources {
+  resources: Array<string>;
+
+  errors: boolean;
+}
+
+export async function createSchoolsInBulk(total: number): Promise<Resources> {
   const schools: Array<string> = [];
+  let errorCreating = false;
   // eslint-disable-next-line no-plusplus
   for (let current = 0; current < total; current++) {
-    schools.push(await createSchool(current));
+    try {
+      schools.push(await createSchool(current));
+    } catch (error) {
+      console.error(error);
+      errorCreating = true;
+    }
   }
 
-  return schools;
+  return {
+    resources: schools,
+    errors: errorCreating,
+  } as Resources;
 }
 
 export async function deleteListOfResources(locations: Array<string>): Promise<void> {
