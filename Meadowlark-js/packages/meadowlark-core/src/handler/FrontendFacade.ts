@@ -23,9 +23,17 @@ import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
 import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 
-initializeLogging();
-
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
+
+const moduleName = 'FrontendFacade';
+
+/**
+ * Initialization - anything here should be runnable more than once without impact
+ */
+async function initialize(): Promise<void> {
+  initializeLogging();
+  await ensurePluginsLoaded();
+}
 
 // Middleware stack builder for post - body, no id
 function postStack(): MiddlewareStack {
@@ -97,7 +105,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
   try {
     frontendRequest.action = 'query';
 
-    await ensurePluginsLoaded();
+    await initialize();
     const stack: MiddlewareStack = queryStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
@@ -106,7 +114,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
 
     return await Query.query(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.query', frontendRequest.traceId, 'create', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'query', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
@@ -118,7 +126,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   try {
     frontendRequest.action = 'getById';
 
-    await ensurePluginsLoaded();
+    await initialize();
     const stack: MiddlewareStack = getByIdStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
@@ -127,7 +135,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
 
     return await GetById.getById(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.getById', frontendRequest.traceId, 'create', 500, e);
+    writeErrorToLog('FrontendFacade', frontendRequest.traceId, 'getById', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
@@ -148,7 +156,7 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
 
     return await getById(frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.get', frontendRequest.traceId, 'deleteIt', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'get', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
@@ -160,7 +168,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
   try {
     frontendRequest.action = 'updateById';
 
-    await ensurePluginsLoaded();
+    await initialize();
     const stack: MiddlewareStack = putStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
@@ -169,7 +177,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     return await Update.update(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.update', frontendRequest.traceId, 'create', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
@@ -181,7 +189,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
   try {
     frontendRequest.action = 'upsert';
 
-    await ensurePluginsLoaded();
+    await initialize();
     const stack: MiddlewareStack = postStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
@@ -190,7 +198,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     return await Upsert.upsert(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.upsert', frontendRequest.traceId, 'create', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
@@ -202,7 +210,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
   try {
     frontendRequest.action = 'deleteById';
 
-    await ensurePluginsLoaded();
+    await initialize();
     const stack: MiddlewareStack = deleteStack();
     const model: MiddlewareModel = await stack({ frontendRequest, frontendResponse: null });
 
@@ -211,7 +219,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
 
     return await Delete.deleteIt(model.frontendRequest);
   } catch (e) {
-    writeErrorToLog('FrontendFacade.deleteIt', frontendRequest.traceId, 'deleteIt', 500, e);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, e);
     return { body: '', statusCode: 500 };
   }
 }
