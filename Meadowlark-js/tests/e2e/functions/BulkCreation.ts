@@ -15,13 +15,11 @@ class Resources {
 export async function createSchoolsInBulk(total: number): Promise<Resources> {
   const schools: Array<string> = [];
   let errorCreating = false;
-  // eslint-disable-next-line no-plusplus
-  for (let current = 0; current < total; current++) {
+
+  for (let current = 0; current < total; current += 1) {
     try {
       schools.push(await createSchool(current));
     } catch (error) {
-      // This should be handled with a custom logger
-      // eslint-disable-next-line no-console
       console.error(error);
       errorCreating = true;
     }
