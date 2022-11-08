@@ -9,7 +9,7 @@ import { UpdateAuthorizationClientRequest, UpdateAuthorizationClientResult } fro
 import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 import { getAuthorizationCollection } from '../Db';
 
-const functionName = 'mongodb.repository.authorization.UpdateAuthorizationClientDocument';
+const functionName = 'mongodb.repository.authorization.updateAuthorizationClientDocument';
 
 export async function updateAuthorizationClientDocument(
   request: UpdateAuthorizationClientRequest,

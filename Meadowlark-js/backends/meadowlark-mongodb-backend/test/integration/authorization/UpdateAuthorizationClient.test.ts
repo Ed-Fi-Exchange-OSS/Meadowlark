@@ -56,6 +56,7 @@ describe('given the update of an authorization client', () => {
         "_id": "clientIdSame",
         "clientName": "clientNameChanged",
         "clientSecretHashed": "clientSecretHashed",
+        "isBootstrapAdmin": false,
         "roles": [
           "host",
         ],

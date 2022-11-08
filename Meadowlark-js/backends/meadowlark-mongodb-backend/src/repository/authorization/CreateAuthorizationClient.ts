@@ -9,7 +9,7 @@ import { CreateAuthorizationClientRequest, CreateAuthorizationClientResult } fro
 import { AuthorizationDocument, authorizationDocumentFromCreate } from '../../model/AuthorizationDocument';
 import { asUpsert, getAuthorizationCollection } from '../Db';
 
-const functionName = 'mongodb.repository.authorization.CreateCreateAuthorizationClientDocument';
+const functionName = 'mongodb.repository.authorization.createAuthorizationClientDocument';
 
 export async function createAuthorizationClientDocument(
   request: CreateAuthorizationClientRequest,

@@ -67,6 +67,7 @@ describe('given the get of an existing authorization client', () => {
         "_id": "clientId",
         "clientName": "clientName",
         "clientSecretHashed": "updatedClientSecretHashed",
+        "isBootstrapAdmin": false,
         "roles": [
           "vendor",
         ],
