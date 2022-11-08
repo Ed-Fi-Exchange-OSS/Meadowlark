@@ -4,30 +4,104 @@
 # - When a request comes in with a document that references an Education Organization, can we validate the
 #   educationOrganizationId properly even though there is no "educationOrganization" entity?
 
-### Authenticate
+##### START AUTHENTICATION SETUP
+
+### Bootstrap an admin
+# @name created_admin
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+
+{
+    "clientName": "Bootstrapped Admin",
+    "roles": [
+        "admin"
+    ]
+}
+
+###
+@admin_client_id={{created_admin.response.body.$.client_id}}
+@admin_client_secret={{created_admin.response.body.$.client_secret}}
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
 # @name client1
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_1",
-    "client_secret": "meadowlark_secret_1"
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
 }
 
 ###
-@auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
 
-### Authenticate client4 (this client has validation turned off
+### Create client4
+# @name created_client4
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+###
+@client4_client_id={{created_client4.response.body.$.client_id}}
+@client4_client_secret={{created_client4.response.body.$.client_secret}}
+
+##### END AUTHENTICATION SETUP
+
+### Authenticate client4
 # @name client4
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_4",
-    "client_secret": "meadowlark_secret_4"
+    "client_id": "{{client4_client_id}}",
+    "client_secret": "{{client4_client_secret}}"
 }
+
+###
+@auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
+
 ###
 @auth_header4=Authorization: bearer {{client4.response.body.$.access_token}}
 ###
