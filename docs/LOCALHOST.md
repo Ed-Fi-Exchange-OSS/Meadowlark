@@ -28,3 +28,41 @@ Instructions for running a local "developer" environment on localhost:
         and comment out any others.
       * `QUERY_HANDLER_PLUGIN` and `LISTENER1_PLUGIN` - Uncomment these two for
         GET query support using OpenSearch.
+
+## Clearing Out Local Databases
+
+Sometimes it is useful to reset your local environment to a fresh state, with no
+records. It is important to do this in all running backend data stores: MongoDB,
+PostgreSQL, and OpenSearch. One mechanism is to stop the Docker containers and
+then delete the volumes they were using, then restart Docker. If you do not want
+to delete the volumes, then you can manually delete records. Examples:
+
+### OpenSearch
+
+Open the [DevTools console](http://localhost:5601/app/dev_tools#/console) in a
+browser and run this dangerous command:
+
+```none
+POST */_delete_by_query
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+### MongoDB
+
+```none
+db.getCollection('authorizations').deleteMany({});
+db.getCollection('documents').deleteMany({});
+```
+
+### PostgreSQL
+
+```sql
+delete from meadowlark.documents;
+delete from meadowlark.references;
+delete from meadowlark.aliases;
+delete from meadowlark.authorization;
+```

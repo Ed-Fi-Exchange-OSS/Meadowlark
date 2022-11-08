@@ -125,10 +125,10 @@ describe('given a closed MongoDB connection', () => {
     expect(result).toBeNull();
   });
 
-  it('should return failure', async () => {
+  it('should return not found', async () => {
     expect(getClientRequest).toMatchInlineSnapshot(`
       {
-        "response": "UNKNOWN_FAILURE",
+        "response": "GET_FAILURE_NOT_EXISTS",
       }
     `);
   });
