@@ -20,6 +20,8 @@ export async function createSchoolsInBulk(total: number): Promise<Resources> {
     try {
       schools.push(await createSchool(current));
     } catch (error) {
+      // This should be handled with a custom logger
+      // eslint-disable-next-line no-console
       console.error(error);
       errorCreating = true;
     }
