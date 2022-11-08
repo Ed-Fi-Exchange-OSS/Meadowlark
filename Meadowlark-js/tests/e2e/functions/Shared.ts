@@ -10,6 +10,10 @@ export function generateRandomId(length = 12): string {
   return chance.hash({ length });
 }
 
+export function generateGuid(): string {
+  return chance.guid();
+}
+
 export async function getDescriptorByLocation(location: string): Promise<string> {
   return rootURLRequest
     .get(location)

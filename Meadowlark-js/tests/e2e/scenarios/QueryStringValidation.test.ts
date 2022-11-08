@@ -159,7 +159,6 @@ describe('When retrieving information', () => {
           .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
           .expect(200)
           .then((response) => {
-            // Should Total count be total without filters?
             expect(+response.headers['total-count']).toEqual(1);
             expect(response.body.length).toEqual(1);
             expect(response.body).toEqual(

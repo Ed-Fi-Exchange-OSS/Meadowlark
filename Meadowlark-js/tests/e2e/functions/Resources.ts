@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable no-console */
 import { baseURLRequest, rootURLRequest } from '../Setup';
 import { getAccessToken, Clients } from './Credentials';
 
@@ -19,8 +20,12 @@ export async function createResource({
     .post(`/v3.3b/ed-fi/${endpoint}`)
     .auth(await getAccessToken(credentials), { type: 'bearer' })
     .send(body)
-    .expect(201)
     .then((response) => {
+      if (response.body) {
+        console.error(response.body);
+      }
+      expect(response.status).toEqual(201);
+
       expect(response.headers.location).not.toBe(null);
       return response.headers.location;
     });
@@ -33,7 +38,7 @@ export async function deleteResourceByLocation(location: string): Promise<void> 
       .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
       .then((response) => {
         if (response.body) {
-          console.log(response.body);
+          console.error(response.body);
         }
         expect(response.status).toEqual(204);
       });

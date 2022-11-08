@@ -12,8 +12,8 @@ export async function createContentClassDescriptor(): Promise<string> {
     credentials: Clients.Host1,
     body: {
       codeValue: 'Presentation',
-      shortDescription: 'Presentation',
       description: 'Presentation',
+      shortDescription: 'Presentation',
       namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     },
   });
