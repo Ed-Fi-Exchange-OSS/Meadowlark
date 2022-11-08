@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../functions/Credentials';
-import { createCountry } from '../functions/DataCreation';
-import { createResource, deleteResourceByLocation } from '../functions/Resources';
-import { generateRandomId, getDescriptorByLocation } from '../functions/Shared';
+import { getAccessToken, Clients } from '../helpers/Credentials';
+import { createCountry } from '../helpers/DataCreation';
+import { createResource, deleteResourceByLocation } from '../helpers/Resources';
+import { generateRandomId, getDescriptorByLocation } from '../helpers/Shared';
 import { baseURLRequest, rootURLRequest } from '../Setup';
 
 describe('When creating a resource that has a reference to a descriptor', () => {

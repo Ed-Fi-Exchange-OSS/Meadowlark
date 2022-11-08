@@ -3,9 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { createSchoolsInBulk, deleteListOfResources } from '../functions/BulkCreation';
-import { Clients, getAccessToken } from '../functions/Credentials';
-import { createResource, deleteResourceByLocation } from '../functions/Resources';
+import { createSchoolsInBulk, deleteListOfResources } from '../helpers/BulkCreation';
+import { Clients, getAccessToken } from '../helpers/Credentials';
+import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest } from '../Setup';
 
 describe('When retrieving information', () => {
@@ -44,7 +44,7 @@ describe('When retrieving information', () => {
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
             .expect(200)
             .then((response) => {
-              expect(+response.headers['total-count']).toEqual(total);
+              expect(response.headers['total-count']).toEqual(`${total}`);
               expect(response.body.length).toEqual(limit);
             });
         });
@@ -52,7 +52,7 @@ describe('When retrieving information', () => {
 
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
-        it.each([0, 'zero'])('limit = %s', async (limit) => {
+        it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('limit = %s', async (limit) => {
           await baseURLRequest
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
@@ -83,7 +83,7 @@ describe('When retrieving information', () => {
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
             .expect(200)
             .then((response) => {
-              expect(+response.headers['total-count']).toEqual(total);
+              expect(response.headers['total-count']).toEqual(`${total}`);
               expect(response.body.length).toEqual(total - offset);
             });
         });
@@ -97,7 +97,7 @@ describe('When retrieving information', () => {
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
             .expect(200)
             .then((response) => {
-              expect(+response.headers['total-count']).toEqual(total);
+              expect(response.headers['total-count']).toEqual(`${total}`);
               expect(response.body.length).toEqual(0);
               expect(response.body).toMatchInlineSnapshot(`[]`);
             });
@@ -106,7 +106,7 @@ describe('When retrieving information', () => {
 
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
-        it.each([0, 'zero'])('offset = %s', async (offset) => {
+        it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('offset = %s', async (offset) => {
           await baseURLRequest
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
             .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
@@ -159,7 +159,7 @@ describe('When retrieving information', () => {
           .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
           .expect(200)
           .then((response) => {
-            expect(+response.headers['total-count']).toEqual(1);
+            expect(response.headers['total-count']).toEqual(`${1}`);
             expect(response.body.length).toEqual(1);
             expect(response.body).toEqual(
               expect.arrayContaining([expect.objectContaining({ nameOfInstitution: schoolName })]),

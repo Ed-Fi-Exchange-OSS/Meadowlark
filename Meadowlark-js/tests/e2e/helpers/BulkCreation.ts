@@ -6,11 +6,11 @@
 import { createSchool } from './DataCreation';
 import { deleteResourceByLocation } from './Resources';
 
-class Resources {
+type Resources = {
   resources: Array<string>;
 
   errors: boolean;
-}
+};
 
 export async function createSchoolsInBulk(total: number): Promise<Resources> {
   const schools: Array<string> = [];

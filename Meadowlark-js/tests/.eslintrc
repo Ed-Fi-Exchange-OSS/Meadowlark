@@ -3,7 +3,6 @@
     "jest": true
   },
   "rules": {
-    "no-console": "off",
     "no-unused-expressions": "off",
     "import/no-extraneous-dependencies": [
       "error",

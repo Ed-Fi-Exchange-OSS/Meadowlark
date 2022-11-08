@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../functions/Credentials';
-import { createContentClassDescriptor } from '../functions/DataCreation';
-import { createResource, deleteResourceByLocation } from '../functions/Resources';
-import { getDescriptorByLocation, generateRandomId } from '../functions/Shared';
+import { getAccessToken, Clients } from '../helpers/Credentials';
+import { createContentClassDescriptor } from '../helpers/DataCreation';
+import { createResource, deleteResourceByLocation } from '../helpers/Resources';
+import { getDescriptorByLocation, generateRandomId } from '../helpers/Shared';
 import { baseURLRequest, rootURLRequest } from '../Setup';
 
 describe('Education contents', () => {

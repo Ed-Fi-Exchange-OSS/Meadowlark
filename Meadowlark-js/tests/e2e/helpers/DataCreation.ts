@@ -58,10 +58,3 @@ export async function createSchool(schoolId: number): Promise<string> {
     },
   });
 }
-
-export async function createSchoolsInBulk(total: number): Promise<void> {
-  // eslint-disable-next-line no-plusplus
-  for (let current = 0; current < total; current++) {
-    await createSchool(current);
-  }
-}
