@@ -3,13 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { chance, rootURLRequest } from '../Setup';
-import { Clients, getAccessToken } from './Credentials';
+import { Clients } from './Credentials';
 import { createResource } from './Resources';
-
-export function generateRandomId(length = 12): string {
-  return chance.hash({ length });
-}
 
 export async function createContentClassDescriptor(): Promise<string> {
   return createResource({
@@ -17,8 +12,8 @@ export async function createContentClassDescriptor(): Promise<string> {
     credentials: Clients.Host1,
     body: {
       codeValue: 'Presentation',
-      shortDescription: 'Presentation',
       description: 'Presentation',
+      shortDescription: 'Presentation',
       namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     },
   });
@@ -44,7 +39,7 @@ export async function createSchool(schoolId: number): Promise<string> {
     credentials: Clients.Assessment1,
     body: {
       schoolId,
-      nameOfInstitution: 'New School',
+      nameOfInstitution: `New School ${schoolId}`,
       educationOrganizationCategories: [
         {
           educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
@@ -62,15 +57,4 @@ export async function createSchool(schoolId: number): Promise<string> {
       ],
     },
   });
-}
-
-export async function getDescriptorByLocation(location: string): Promise<string> {
-  return rootURLRequest
-    .get(location)
-    .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
-    .expect(200)
-    .then((response) => {
-      expect(response.body).not.toBe(null);
-      return `${response.body.namespace}#${response.body.description}`;
-    });
 }

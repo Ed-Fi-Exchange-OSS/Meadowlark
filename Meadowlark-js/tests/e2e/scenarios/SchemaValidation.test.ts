@@ -3,10 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from './functions/Credentials';
-import { baseURLRequest } from './Setup';
+import { getAccessToken, Clients } from '../helpers/Credentials';
+import { baseURLRequest } from '../Setup';
 
-describe('When posting a resource', () => {
+describe('When creating a resource', () => {
   describe('given a missing property on a required collection', () => {
     it('should fail with message about the missing property', async () => {
       // This is entirely missing the "categories" collection
@@ -102,7 +102,7 @@ describe('When posting a resource', () => {
   });
 
   describe('given an empty required string value', () => {
-    it('should fail with a message about the descriptor', async () => {
+    it('should fail with a message about the property', async () => {
       // shortNameOfInstitution: '',
       await baseURLRequest
         .post('/v3.3b/ed-fi/communityOrganizations')
@@ -129,19 +129,17 @@ describe('When posting a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `
+          expect(response.body.message).toMatchInlineSnapshot(`
             [
               "/shortNameOfInstitution must NOT have fewer than 1 characters",
             ]
-          `,
-          );
+          `);
         });
     });
   });
 
   describe('given a missing number property', () => {
-    it('should fail with a message about the descriptor', async () => {
+    it('should fail with a message about the property', async () => {
       // communityOrganizationId
       await baseURLRequest
         .post('/v3.3b/ed-fi/communityOrganizations')
@@ -167,13 +165,11 @@ describe('When posting a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `
+          expect(response.body.message).toMatchInlineSnapshot(`
             [
               " must have required property 'communityOrganizationId'",
             ]
-          `,
-          );
+          `);
         });
     });
   });
@@ -209,6 +205,32 @@ describe('When posting a resource', () => {
           expect(response.body.message).toMatchInlineSnapshot(
             `"Reference validation failed: Resource EducationOrganizationCategory is missing identity {"descriptor":"abc"}"`,
           );
+        });
+    });
+  });
+
+  describe('given an incorrect date format', () => {
+    it('should return error message', async () => {
+      await baseURLRequest
+        .post(`/v3.3b/ed-fi/academicWeeks`)
+        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .send({
+          weekIdentifier: '123456',
+          schoolReference: {
+            schoolId: 100,
+          },
+          beginDate: 'January 1st, 2020',
+          endDate: '2020/12/01',
+          totalInstructionalDays: 50,
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toMatchInlineSnapshot(`
+              [
+                "/beginDate must match format "date"",
+                "/endDate must match format "date"",
+              ]
+            `);
         });
     });
   });

@@ -789,15 +789,6 @@ authorization: bearer {{authToken4}}
 DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/maSXphjSRux6PX3WbbQKovXlVJEmso06cecAZw
 authorization: bearer {{authToken1}}
 
-
-###
-# Limit/Offset/TotalCount Testing: ODS/API supports query parameters "limit", "offset", and "totalcount" for special
-# purposes. Meadowlark does not yet support these values. The following queries should all return 200,
-# thus indicating that the three terms are ignored.
-GET http://localhost:3000/local/v3.3b/ed-fi/students/?limit=1&offset=2&totalCount=true
-authorization: bearer {{authToken1}}
-
-
 ###
 DELETE http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
 authorization: bearer {{authToken1}}
