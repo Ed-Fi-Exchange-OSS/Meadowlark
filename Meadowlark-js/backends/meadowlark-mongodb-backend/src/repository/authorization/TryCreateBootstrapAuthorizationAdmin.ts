@@ -44,7 +44,14 @@ export async function tryCreateBootstrapAuthorizationAdminDocument(
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
         Logger.error(functionName, request.traceId, msg);
       } else {
-        Logger.debug(`${functionName}: Inserted ${upsertedCount} documents`, request.traceId);
+        if (upsertedCount == 1) {
+          Logger.debug(`${functionName}: Inserted admin client`, request.traceId);
+        } else {
+          Logger.info(
+            `${functionName}: An attempt was made to create a boostrap Admin ID when one already exists.`,
+            request.traceId,
+          );
+        }
         createResult.response = upsertedCount === 1 ? 'CREATE_SUCCESS' : 'CREATE_FAILURE_ALREADY_EXISTS';
       }
     });
