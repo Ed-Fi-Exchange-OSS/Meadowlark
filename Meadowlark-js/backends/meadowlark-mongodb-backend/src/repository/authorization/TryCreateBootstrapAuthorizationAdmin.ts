@@ -44,7 +44,7 @@ export async function tryCreateBootstrapAuthorizationAdminDocument(
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
         Logger.error(functionName, request.traceId, msg);
       } else {
-        if (upsertedCount == 1) {
+        if (upsertedCount === 1) {
           Logger.debug(`${functionName}: Inserted admin client`, request.traceId);
         } else {
           Logger.info(
