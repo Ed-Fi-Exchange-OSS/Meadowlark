@@ -9,7 +9,7 @@ import { ResetAuthorizationClientSecretRequest, ResetAuthorizationClientSecretRe
 import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 import { getAuthorizationCollection } from '../Db';
 
-const functionName = 'mongodb.repository.authorization.ResetAuthorizationClientDocument';
+const functionName = 'mongodb.repository.authorization.resetAuthorizationClientSecret';
 
 export async function resetAuthorizationClientSecret(
   request: ResetAuthorizationClientSecretRequest,

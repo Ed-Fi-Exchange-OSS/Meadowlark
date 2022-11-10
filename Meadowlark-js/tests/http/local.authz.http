@@ -1,3 +1,68 @@
+# This test suite requires first clearing/dropping any existing "authorizations" collection in the
+# "meadowlark" database in MongoDB
+
+
+### Bootstrap an admin
+# @name created_admin
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+
+{
+    "clientName": "Bootstrapped Admin",
+    "roles": [
+        "admin"
+    ]
+}
+
+###
+@admin_client_id={{created_admin.response.body.$.client_id}}
+@admin_client_secret={{created_admin.response.body.$.client_secret}}
+
+
+### Try bootstrapping another admin, should fail 401 no token provided
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+
+{
+    "clientName": "Bootstrapped Admin 2",
+    "roles": [
+        "admin"
+    ]
+}
+
+### Authenticate as an admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client as an admin, should succeed
+# @name created_client1
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
 ### Authenticate as a non-admin
 # @name client1
 POST http://localhost:3000/local/oauth/token
@@ -5,8 +70,8 @@ content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_1",
-    "client_secret": "meadowlark_secret_1"
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
 }
 
 ###
@@ -29,7 +94,7 @@ content-type: application/json
     ]
 }
 
-### Try creating client with a bad token, should 403 Forbidden
+### Try creating client with a bad token, should 401
 POST http://localhost:3000/local/oauth/client
 content-type: application/json
 Authorization: bearer Not-A-Token
@@ -43,34 +108,7 @@ Authorization: bearer Not-A-Token
 }
 
 
-### Authenticate as an admin
-# @name admin1
-POST http://localhost:3000/local/oauth/token
-content-type: application/json
 
-{
-    "grant_type": "client_credentials",
-    "client_id": "meadowlark_admin_key_1",
-    "client_secret": "meadowlark_admin_secret_1"
-}
-
-###
-@admin_token={{admin1.response.body.$.access_token}}
-@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
-
-
-### Create client as an admin, should succeed
-# @name client1
-POST http://localhost:3000/local/oauth/client
-content-type: application/json
-{{auth_header_admin_1}}
-
-{
-    "clientName": "Hometown SIS",
-    "roles": [
-        "vendor"
-    ]
-}
 
 ### Create client with additional assessment role, should succeed
 POST http://localhost:3000/local/oauth/client
@@ -141,11 +179,8 @@ content-type: application/json
 
 #################### PUT authorization client
 
-###
-@created_client_id_1={{client1.response.body.$.client_id}}
-
 ### Update client as an admin, should succeed
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -171,7 +206,7 @@ content-type: application/json
 
 
 ### Update client with additional assessment role, should succeed
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -184,14 +219,14 @@ content-type: application/json
 }
 
 ### Send request body with empty body, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
 {}
 
 ### Send request body without roles, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -200,7 +235,7 @@ content-type: application/json
 }
 
 ### Send request body with invalid role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -212,7 +247,7 @@ content-type: application/json
 }
 
 ### Create client with one valid, one invalid role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -225,7 +260,7 @@ content-type: application/json
 }
 
 ### Send request body with only assessment role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_1}}
+PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -238,23 +273,12 @@ content-type: application/json
 
 #################### Request bearer token
 
-
-### Authenticate as a hardcoded non-admin, form url encoded, should succeed
-POST http://localhost:3000/local/oauth/token
-content-type: application/x-www-form-urlencoded
-
-grant_type=client_credentials&client_id=meadowlark_key_1&client_secret=meadowlark_secret_1
-
-###
-
-@created_client_secret_1={{client1.response.body.$.client_secret}}
-
 ### Authenticate as a previously created client, form url encoded, should succeed
 # @name newClient
 POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&client_id={{created_client_id_1}}&client_secret={{created_client_secret_1}}
+grant_type=client_credentials&client_id={{client1_client_id}}&client_secret={{client1_client_secret}}
 
 ###
 @newClientToken = {{newClient.response.body.$.access_token}}
@@ -267,7 +291,7 @@ authorization: bearer {{newClientToken}}
 POST http://localhost:3000/local/oauth/token
 content-type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&client_id={{created_client_id_1}}&client_secret=bad_secret
+grant_type=client_credentials&client_id={{client1_client_id}}&client_secret=bad_secret
 
 ### Create client as an admin, should succeed
 # @name client2
@@ -358,7 +382,7 @@ authorization: bearer {{reset_token}}
 
 token={{reset_token}}
 
-### 401: Non-admin can inspect someone else's token
+### 401: Non-admin can't inspect someone else's token
 POST http://localhost:3000/local/oauth/verify
 content-type: application/x-www-form-urlencoded
 authorization: bearer {{reset_token}}

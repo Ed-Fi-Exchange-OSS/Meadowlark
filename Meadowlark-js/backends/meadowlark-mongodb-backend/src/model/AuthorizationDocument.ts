@@ -25,13 +25,26 @@ export interface AuthorizationDocument {
    * A list of client roles
    */
   roles: AuthorizationClientRole[];
+
+  /**
+   * Whether this is the initial admin account created by bootstrapping
+   */
+  isBootstrapAdmin: boolean;
 }
 
-export function authorizationDocumentFromCreate(request: CreateAuthorizationClientRequest): AuthorizationDocument {
+export function authorizationDocumentFromCreate(
+  request: CreateAuthorizationClientRequest,
+  isBootstrapAdmin: boolean = false,
+): AuthorizationDocument {
   return {
     _id: request.clientId,
     clientSecretHashed: request.clientSecretHashed,
     clientName: request.clientName,
     roles: request.roles,
+    isBootstrapAdmin,
   };
+}
+
+export function bootstrapAdminDocumentFromCreate(request: CreateAuthorizationClientRequest): AuthorizationDocument {
+  return authorizationDocumentFromCreate(request, true);
 }

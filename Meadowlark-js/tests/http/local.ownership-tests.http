@@ -1,42 +1,135 @@
-### Set `ACCESS_TOKEN_REQUIRED=true` environment variable before `yarn start:local`
 # Be sure to load all descriptors into the database first.
 
-### Authenticate
+##### START AUTHENTICATION SETUP
+
+### Bootstrap an admin
+# @name created_admin
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+
+{
+    "clientName": "Bootstrapped Admin",
+    "roles": [
+        "admin"
+    ]
+}
+
+###
+@admin_client_id={{created_admin.response.body.$.client_id}}
+@admin_client_secret={{created_admin.response.body.$.client_secret}}
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
 # @name client1
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_1",
-    "client_secret": "meadowlark_secret_1"
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
 }
+
+
+### Create client2
+# @name created_client2
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
 ###
-@auth_header_1=Authorization: bearer {{client1.response.body.$.access_token}}
-###
+@client2_client_id={{created_client2.response.body.$.client_id}}
+@client2_client_secret={{created_client2.response.body.$.client_secret}}
+
+### Authenticate client2
 # @name client2
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_2",
-    "client_secret": "meadowlark_secret_2"
+    "client_id": "{{client2_client_id}}",
+    "client_secret": "{{client2_client_secret}}"
 }
+
+### Create client3
+# @name created_client3
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
 ###
-@auth_header_2=Authorization: bearer {{client2.response.body.$.access_token}}
-###
+@client3_client_id={{created_client3.response.body.$.client_id}}
+@client3_client_secret={{created_client3.response.body.$.client_secret}}
+
+### Authenticate client3
 # @name client3
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_3",
-    "client_secret": "meadowlark_secret_3"
+    "client_id": "{{client3_client_id}}",
+    "client_secret": "{{client3_client_secret}}"
 }
+
+###
+@auth_header_1=Authorization: bearer {{client1.response.body.$.access_token}}
+###
+@auth_header_2=Authorization: bearer {{client2.response.body.$.access_token}}
 ###
 @auth_header_3=Authorization: bearer {{client3.response.body.$.access_token}}
+
+
+##### END AUTHENTICATION SETUP
 
 ### Try creating a new resource with authorization header - expect success.
 POST http://localhost:3000/local/v3.3b/ed-fi/EducationContents

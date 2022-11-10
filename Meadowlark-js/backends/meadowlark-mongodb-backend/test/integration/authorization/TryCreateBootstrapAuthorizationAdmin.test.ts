@@ -7,7 +7,7 @@ import { CreateAuthorizationClientRequest } from '@edfi/meadowlark-authz-server'
 import { Collection, MongoClient } from 'mongodb';
 import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
-import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
+import { tryCreateBootstrapAuthorizationAdminDocument } from '../../../src/repository/authorization/TryCreateBootstrapAuthorizationAdmin';
 
 jest.setTimeout(40000);
 
@@ -17,17 +17,20 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   clientId,
   clientSecretHashed: 'clientSecretHashed',
   clientName: 'clientName',
-  roles: ['vendor'],
+  roles: ['admin'],
   traceId: 'traceId',
 });
 
-describe('given the create of a new authorization client', () => {
+describe('given the first time create of a bootstrap admin client', () => {
   let mongoClient;
   let createClientRequest;
 
   beforeAll(async () => {
     mongoClient = (await getNewClient()) as MongoClient;
-    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
+    createClientRequest = await tryCreateBootstrapAuthorizationAdminDocument(
+      newCreateAuthorizationClientRequest(),
+      mongoClient,
+    );
   });
 
   afterAll(async () => {
@@ -43,9 +46,9 @@ describe('given the create of a new authorization client', () => {
         "_id": "clientId",
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
-        "isBootstrapAdmin": false,
+        "isBootstrapAdmin": true,
         "roles": [
-          "vendor",
+          "admin",
         ],
       }
     `);
@@ -68,7 +71,10 @@ describe('given a closed MongoDB connection', () => {
     mongoClient = (await getNewClient()) as MongoClient;
 
     mongoClient.close();
-    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
+    createClientRequest = await tryCreateBootstrapAuthorizationAdminDocument(
+      newCreateAuthorizationClientRequest(),
+      mongoClient,
+    );
     mongoClient = (await getNewClient()) as MongoClient;
   });
 
@@ -87,6 +93,67 @@ describe('given a closed MongoDB connection', () => {
     expect(createClientRequest).toMatchInlineSnapshot(`
       {
         "response": "UNKNOWN_FAILURE",
+      }
+    `);
+  });
+});
+
+describe('given two attempts at the create of a bootstrap admin client', () => {
+  let mongoClient;
+  let createClientRequest1;
+  let createClientRequest2;
+
+  beforeAll(async () => {
+    mongoClient = (await getNewClient()) as MongoClient;
+    createClientRequest1 = await tryCreateBootstrapAuthorizationAdminDocument(
+      newCreateAuthorizationClientRequest(),
+      mongoClient,
+    );
+    createClientRequest2 = await tryCreateBootstrapAuthorizationAdminDocument(
+      { ...newCreateAuthorizationClientRequest(), clientId: 'clientId2' },
+      mongoClient,
+    );
+  });
+
+  afterAll(async () => {
+    await getAuthorizationCollection(mongoClient).deleteMany({});
+    await mongoClient.close();
+  });
+
+  it('should have client 1 in the db', async () => {
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
+    const result: any = await collection.findOne({ _id: clientId });
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "_id": "clientId",
+        "clientName": "clientName",
+        "clientSecretHashed": "clientSecretHashed",
+        "isBootstrapAdmin": true,
+        "roles": [
+          "admin",
+        ],
+      }
+    `);
+  });
+
+  it('should return insert success on first attempt', async () => {
+    expect(createClientRequest1).toMatchInlineSnapshot(`
+      {
+        "response": "CREATE_SUCCESS",
+      }
+    `);
+  });
+
+  it('should not have client 2 in the db', async () => {
+    const collection: Collection<AuthorizationDocument> = getAuthorizationCollection(mongoClient);
+    const result: any = await collection.findOne({ _id: 'clientId2' });
+    expect(result).toBeNull();
+  });
+
+  it('should return already exists failure on second attempt', async () => {
+    expect(createClientRequest2).toMatchInlineSnapshot(`
+      {
+        "response": "CREATE_FAILURE_ALREADY_EXISTS",
       }
     `);
   });

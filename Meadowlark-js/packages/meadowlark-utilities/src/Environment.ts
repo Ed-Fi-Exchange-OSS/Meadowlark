@@ -76,7 +76,7 @@ export function getValueFromEnvironment<T>(
 }
 
 /*
- * Gets a  string value from the environment variables, throwing an error if not found.
+ * Gets a string value from the environment variables, throwing an error if not found.
  */
 export function getStringFromEnvironment(key: EnvironmentVariable, defaultValue: string | undefined = undefined): string {
   return getValueFromEnvironment<string>(key, 'string', (value: string) => value, defaultValue);
