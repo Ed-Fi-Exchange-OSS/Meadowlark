@@ -16,8 +16,61 @@ import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { BodyValidation, validateCreateClientBody } from '../validation/BodyValidation';
 import { hashClientSecretBuffer } from '../security/HashClientSecret';
+import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
 
 const moduleName = 'handler.CreateClient';
+
+async function tryCreateBootstrapAdmin(
+  request: CreateAuthorizationClientRequest,
+  clientSecretAsHex: string,
+  httpRequestPath: string,
+): Promise<AuthorizationResponse> {
+  try {
+    // Must be a create request for admin role only
+    if (request.roles.length !== 1 || request.roles[0] !== 'admin') {
+      Logger.debug(`${moduleName}.tryCreateBootstrapAdmin 401 not requesting admin only`, request.traceId);
+      return {
+        statusCode: 401,
+        body: '{ "error": "invalid_client", "error_description": "Authorization token not provided" }',
+      };
+    }
+
+    const tryCreateResult: TryCreateBootstrapAuthorizationAdminResult =
+      await getAuthorizationStore().tryCreateBootstrapAuthorizationAdmin(request);
+
+    const { response } = tryCreateResult;
+
+    if (response === 'CREATE_FAILURE_ALREADY_EXISTS') {
+      Logger.debug(`${moduleName}.tryCreateBootstrapAdmin 401 already exists`, request.traceId);
+      return {
+        statusCode: 401,
+        body: '{ "error": "invalid_client", "error_description": "Authorization token not provided" }',
+      };
+    }
+
+    if (response === 'CREATE_SUCCESS') {
+      const responseBody: CreateClientResponseBody = {
+        client_id: request.clientId,
+        client_secret: clientSecretAsHex,
+        clientName: request.clientName,
+        roles: request.roles,
+      };
+
+      Logger.debug(`${moduleName}.tryCreateBootstrapAdmin 201`, request.traceId);
+      return {
+        body: JSON.stringify(responseBody),
+        statusCode: 201,
+        headers: { [LOCATION_HEADER_NAME]: `${httpRequestPath}/${request.clientId}` },
+      };
+    }
+
+    Logger.debug(`${moduleName}.tryCreateBootstrapAdmin 500`, request.traceId);
+    return { body: '', statusCode: 500 };
+  } catch (e) {
+    writeErrorToLog(moduleName, request.traceId, 'tryCreateBootstrapAdmin', 500, e);
+    return { body: '', statusCode: 500 };
+  }
+}
 
 /**
  * Handler for client creation
@@ -27,13 +80,28 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     writeRequestToLog(moduleName, authorizationRequest, 'createClient');
     await ensurePluginsLoaded();
 
-    const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
-      extractAuthorizationHeader(authorizationRequest),
-    );
+    const authorizationHeader = extractAuthorizationHeader(authorizationRequest);
 
-    if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'createClient', errorResponse.statusCode, errorResponse.body);
-      return errorResponse;
+    let tokenValidationErrorResponse: AuthorizationResponse | undefined;
+    let bootstrapAdminRequest: boolean = false;
+
+    // If no authorization header for creating an admin client, this might be an attempt to create a bootstrap admin
+    if (authorizationHeader == null || authorizationHeader === '') {
+      Logger.debug(`${moduleName}.createClient: No authorization header`, authorizationRequest.traceId);
+      bootstrapAdminRequest = true;
+    } else {
+      tokenValidationErrorResponse = validateAdminTokenForAccess(authorizationHeader);
+    }
+
+    if (tokenValidationErrorResponse != null) {
+      writeDebugStatusToLog(
+        moduleName,
+        authorizationRequest,
+        'createClient',
+        tokenValidationErrorResponse.statusCode,
+        tokenValidationErrorResponse.body,
+      );
+      return tokenValidationErrorResponse;
     }
 
     if (authorizationRequest.body == null) {
@@ -72,6 +140,11 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
       clientSecretHashed,
       traceId: authorizationRequest.traceId,
     };
+
+    if (bootstrapAdminRequest) {
+      Logger.debug(`${moduleName}.createClient: Will try to create bootstrap admin`, authorizationRequest.traceId);
+      return tryCreateBootstrapAdmin(createRequest, clientSecretBuffer.toString('hex'), authorizationRequest.path);
+    }
 
     const createResult: CreateAuthorizationClientResult = await getAuthorizationStore().createAuthorizationClient(
       createRequest,

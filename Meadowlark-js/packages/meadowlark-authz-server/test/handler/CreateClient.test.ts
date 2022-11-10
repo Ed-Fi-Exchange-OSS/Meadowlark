@@ -11,6 +11,7 @@ import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { newJwtStatus } from '../../src/security/JwtStatus';
+import { TryCreateBootstrapAuthorizationAdminResult } from '../../src/message/TryCreateBootstrapAuthorizationAdminResult';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -24,6 +25,7 @@ const authorizationRequest: AuthorizationRequest = {
       "assessment"
     ]
   }`,
+  headers: { Authorization: 'abcdef' },
 };
 
 describe('given valid admin user but authorization store is going to fail', () => {
@@ -399,5 +401,123 @@ describe('given create throws internal error', () => {
 
   it('does not return a message body', () => {
     expect(response.body).toEqual('');
+  });
+});
+
+describe('given authorization store success on try create bootstrap admin', () => {
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      tryCreateBootstrapAuthorizationAdmin: async () =>
+        Promise.resolve({
+          response: 'CREATE_SUCCESS',
+        } as TryCreateBootstrapAuthorizationAdminResult),
+    });
+
+    // Act
+    response = await createClient({
+      ...authorizationRequest,
+      headers: {},
+      body: `{
+        "clientName": "Admin Bootstrap",
+        "roles": ["admin"]
+      }`,
+    });
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+  });
+
+  it('returns status 201', () => {
+    expect(response.statusCode).toEqual(201);
+  });
+
+  it('returns a message body with client name', () => {
+    expect(response.body).toMatch(`"clientName":"Admin Bootstrap"`);
+  });
+
+  it('returns a message body with roles', () => {
+    expect(response.body).toMatch(`"roles":["admin"]`);
+  });
+
+  it('returns a message body with client id', () => {
+    expect(response.body).toMatch(`"client_id":`);
+  });
+
+  it('returns a message body with client secret', () => {
+    expect(response.body).toMatch(`"client_secret":`);
+  });
+
+  it('it returns location header', () => {
+    expect((response.headers as any).Location.startsWith('/oauth/client/')).toBe(true);
+  });
+});
+
+describe('given try create bootstrap admin for non-admin role', () => {
+  let response: AuthorizationResponse;
+
+  beforeAll(async () => {
+    // Act
+    response = await createClient({
+      ...authorizationRequest,
+      headers: {},
+      body: `{
+        "clientName": "Admin Bootstrap",
+        "roles": ["vendor"]
+      }`,
+    });
+  });
+
+  it('returns status 401', () => {
+    expect(response.statusCode).toEqual(401);
+  });
+
+  it('returns an error message', () => {
+    expect(response.body).toMatchInlineSnapshot(
+      `"{ "error": "invalid_client", "error_description": "Authorization token not provided" }"`,
+    );
+  });
+});
+
+describe('given already exists on try create bootstrap admin', () => {
+  let response: AuthorizationResponse;
+  let mockAuthorizationStore: any;
+
+  beforeAll(async () => {
+    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      ...NoAuthorizationStorePlugin,
+      tryCreateBootstrapAuthorizationAdmin: async () =>
+        Promise.resolve({
+          response: 'CREATE_FAILURE_ALREADY_EXISTS',
+        } as TryCreateBootstrapAuthorizationAdminResult),
+    });
+
+    // Act
+    response = await createClient({
+      ...authorizationRequest,
+      headers: {},
+      body: `{
+        "clientName": "Admin Bootstrap",
+        "roles": ["admin"]
+      }`,
+    });
+  });
+
+  afterAll(() => {
+    mockAuthorizationStore.mockRestore();
+  });
+
+  it('returns status 401', () => {
+    expect(response.statusCode).toEqual(401);
+  });
+
+  it('returns an error message', () => {
+    expect(response.body).toMatchInlineSnapshot(
+      `"{ "error": "invalid_client", "error_description": "Authorization token not provided" }"`,
+    );
   });
 });

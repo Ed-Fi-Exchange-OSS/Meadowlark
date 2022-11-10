@@ -14,6 +14,7 @@ export { AuthorizationResponse } from './handler/AuthorizationResponse';
 export { AuthorizationStorePlugin } from './plugin/AuthorizationStorePlugin';
 export { CreateAuthorizationClientRequest } from './message/CreateAuthorizationClientRequest';
 export { CreateAuthorizationClientResult } from './message/CreateAuthorizationClientResult';
+export { TryCreateBootstrapAuthorizationAdminResult } from './message/TryCreateBootstrapAuthorizationAdminResult';
 export { GetAuthorizationClientRequest } from './message/GetAuthorizationClientRequest';
 export { GetAuthorizationClientResult } from './message/GetAuthorizationClientResult';
 export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';

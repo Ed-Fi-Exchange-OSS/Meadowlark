@@ -13,6 +13,7 @@ import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationC
 import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
+import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
 
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
   createAuthorizationClient: async (
@@ -20,6 +21,15 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
   ): Promise<CreateAuthorizationClientResult> => {
     Logger.error(
       'NoAuthorizationStorePlugin.createAuthorizationClient(): An authorization store plugin has not been configured',
+      null,
+    );
+    return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+  },
+  tryCreateBootstrapAuthorizationAdmin: async (
+    _request: CreateAuthorizationClientRequest,
+  ): Promise<TryCreateBootstrapAuthorizationAdminResult> => {
+    Logger.error(
+      'NoAuthorizationStorePlugin.tryCreateBootstrapAuthorizationAdmin(): An authorization store plugin has not been configured',
       null,
     );
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });

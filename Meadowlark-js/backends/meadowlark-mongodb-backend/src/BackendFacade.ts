@@ -23,12 +23,14 @@ import {
   UpdateAuthorizationClientResult,
   ResetAuthorizationClientSecretResult,
   ResetAuthorizationClientSecretRequest,
+  TryCreateBootstrapAuthorizationAdminResult,
 } from '@edfi/meadowlark-authz-server';
 import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Get from './repository/Get';
 import * as Update from './repository/Update';
 import * as CreateAuthorizationClient from './repository/authorization/CreateAuthorizationClient';
+import * as TryCreateBootstrapAuthorizationAdmin from './repository/authorization/TryCreateBootstrapAuthorizationAdmin';
 import * as GetAuthorizationClient from './repository/authorization/GetAuthorizationClient';
 import * as UpdateAuthorizationClient from './repository/authorization/UpdateAuthorizationClient';
 import * as ResetAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
@@ -61,6 +63,12 @@ export async function createAuthorizationClientDocument(
   request: CreateAuthorizationClientRequest,
 ): Promise<CreateAuthorizationClientResult> {
   return CreateAuthorizationClient.createAuthorizationClientDocument(request, await getSharedClient());
+}
+
+export async function tryCreateBootstrapAuthorizationAdminDocument(
+  request: CreateAuthorizationClientRequest,
+): Promise<TryCreateBootstrapAuthorizationAdminResult> {
+  return TryCreateBootstrapAuthorizationAdmin.tryCreateBootstrapAuthorizationAdminDocument(request, await getSharedClient());
 }
 
 export async function getAuthorizationClientDocument(

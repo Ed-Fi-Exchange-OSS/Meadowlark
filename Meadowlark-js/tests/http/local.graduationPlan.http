@@ -3,19 +3,73 @@
 ## local.33b.superclass.http has been run.
 ## 
 
-### Authenticate
+##### START AUTHENTICATION SETUP
+
+### Bootstrap an admin
+# @name created_admin
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+
+{
+    "clientName": "Bootstrapped Admin",
+    "roles": [
+        "admin"
+    ]
+}
+
+###
+@admin_client_id={{created_admin.response.body.$.client_id}}
+@admin_client_secret={{created_admin.response.body.$.client_secret}}
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/client
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
 # @name client1
 POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
     "grant_type": "client_credentials",
-    "client_id": "meadowlark_key_1",
-    "client_secret": "meadowlark_secret_1"
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
 }
 
 ###
 @authToken1 = {{client1.response.body.$.access_token}}
+
+
+##### END AUTHENTICATION SETUP
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/graduationPlanTypeDescriptors
