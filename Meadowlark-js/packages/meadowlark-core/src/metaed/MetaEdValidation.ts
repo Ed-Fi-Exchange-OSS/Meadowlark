@@ -77,16 +77,57 @@ export function validateQueryParametersAgainstSchema(
 ): string[] {
   // TODO: RND-67 removed the Joi-specific code to report invalid query parameters
   // RND-307 will restore as a part of understanding Ajv error metadata
+
+  let errors: string[] = [];
+
   const schema = {
     ...metaEdModel.data.meadowlark.jsonSchema,
     // Need to relax the validation such that no fields are "required"
     required: [],
   };
 
+  const parameterKeys = Object.keys(queryParameters);
+
+  /**
+   * Number and boolean are come through as strings, which causes ajv to fail validation of parameters
+   * This loops through all query parameters and checks the type against the schema, if the type is numeric or boolean
+   * it will attempt convert the value. If the conversion is good, we set the value back and ajv will validate the schema
+   * If the value can't be converted (i.e. a word is provided for a numeric value, we leave it and let ajv invalidate
+   * the schema).
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  for (const keyValue of parameterKeys) {
+    const property = schema.properties[keyValue];
+
+    if (property != null && property.type != null) {
+      if ((property && property?.type === 'integer') || property.type === 'number') {
+        const value = Number(queryParameters[keyValue]);
+        if (!Number.isNaN(value)) {
+          queryParameters[keyValue] = value;
+        }
+      }
+      if (property.type === 'boolean' && (queryParameters[keyValue] === 'true' || queryParameters[keyValue] === 'false')) {
+        queryParameters[keyValue] = Boolean(queryParameters[keyValue]);
+      }
+    }
+  }
+
   const valid: ValidateFunction = ajv.compile(schema);
 
-  const isValid: boolean = valid(queryParameters);
+  valid(queryParameters);
 
-  if (isValid) return [];
-  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
+  if (valid.errors) {
+    const ajvErrors = valid.errors.map((error: ErrorObject) => {
+      // When a parameter name is invalid instancePath is null thus only
+      // shows the error message which looks like the following: ' must NOT have additional properties'
+      if (error.instancePath === '' && error.keyword === 'additionalProperties') {
+        return `${metaEdModel.metaEdName} does not include property '${error.params.additionalProperty}'`;
+      }
+      return `${error.instancePath} ${error.message}` ?? '';
+    });
+
+    errors = [...errors, ...ajvErrors];
+  }
+
+  return errors;
 }

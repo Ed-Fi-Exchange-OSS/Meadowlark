@@ -16,7 +16,7 @@ export interface Headers {
 }
 
 export interface FrontendQueryParameters {
-  [name: string]: string | undefined | number;
+  [name: string]: string | undefined | number | boolean;
 }
 
 export interface FrontendRequestMiddleware {

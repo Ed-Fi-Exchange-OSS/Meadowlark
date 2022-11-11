@@ -9,7 +9,12 @@ import { validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdVal
 const createModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
   metaEdName: 'Student',
-  properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true }],
+  properties: [
+    { ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true },
+    { ...newEntityProperty(), metaEdName: 'someBooleanParameter', isPartOfIdentity: false },
+    { ...newEntityProperty(), metaEdName: 'someIntegerParameter', isPartOfIdentity: false },
+    { ...newEntityProperty(), metaEdName: 'someDecimalParameter', isPartOfIdentity: false },
+  ],
   data: {
     meadowlark: {
       jsonSchema: {
@@ -22,6 +27,18 @@ const createModel = (): TopLevelEntity => ({
             maxLength: 30,
             type: 'string',
           },
+          someBooleanParameter: {
+            description: 'doc',
+            type: 'boolean',
+          },
+          someIntegerParameter: {
+            description: 'doc',
+            type: 'integer',
+          },
+          someDecimalParameter: {
+            description: 'doc',
+            type: 'number',
+          },
         },
         required: ['uniqueId'],
         title: 'EdFi.Student',
@@ -31,47 +48,230 @@ const createModel = (): TopLevelEntity => ({
   },
 });
 
-// TODO: RND-307 will restore these tests
-describe.skip('when validating query parameters', () => {
-  describe('given query parameters have no properties', () => {
-    it('should not return an error', () => {
-      const queryParameters = {};
+// const createModelForBooleanQueryStringParam = (): TopLevelEntity => ({
+//   ...newTopLevelEntity(),
+//   metaEdName: 'StudentEducationOrganizationAssociation',
+//   properties: [
+//     // { ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true },
+//     // { ...newEntityProperty(), metaEdName: 'educationOrganizationId', isPartOfIdentity: true },
+//     { ...newEntityProperty(), metaEdName: 'hispanicLatinoEthnicity', isPartOfIdentity: false },
+//   ],
+//   data: {
+//     meadowlark: {
+//       jsonSchema: {
+//         $schema: 'https://json-schema.org/draft/2020-12/schema',
+//         additionalProperties: false,
+//         description: 'doc',
+//         properties: {
+//           hispanicLatinoEthnicity: {
+//             description: 'doc',
+//             type: 'bool',
+//           },
+//         },
+//         required: [],
+//         title: 'EdFi.StudentEducationOrganizationAssociation',
+//         type: 'object',
+//       },
+//     },
+//   },
+// });
 
-      const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+describe('given query parameters have no properties', () => {
+  it('should not return an error', () => {
+    const queryParameters = {};
 
-      expect(validationResult).toHaveLength(0);
-    });
+    const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given query parameters have a valid property', () => {
+  it('should not return an error', () => {
+    const queryParameters = { uniqueId: 'a' };
+
+    const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given query parameters have two invalid properties and a valid one', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
   });
 
-  describe('given query parameters have a valid property', () => {
-    it('should not return an error', () => {
-      const queryParameters = { uniqueId: 'a' };
-
-      const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
-
-      expect(validationResult).toHaveLength(0);
-    });
+  it('should have two errors', () => {
+    expect(validationResult).toHaveLength(2);
   });
 
-  describe('given query parameters have two invalid properties and a valid one', () => {
-    let validationResult: string[];
+  it('should contain property `one`', () => {
+    expect(validationResult).toContain("Student does not include property 'one'");
+  });
 
-    beforeAll(() => {
-      const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+  it('should contain property `two`', () => {
+    expect(validationResult).toContain("Student does not include property 'two'");
+  });
+});
 
-      validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
-    });
+describe('given a boolean query parameter value of true', () => {
+  let validationResult: string[];
 
-    it('should have two errors', () => {
-      expect(validationResult).toHaveLength(2);
-    });
+  beforeAll(() => {
+    const queryParameters = { someBooleanParameter: 'true' };
 
-    it('should contain property `one`', () => {
-      expect(validationResult).toContain('one');
-    });
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
 
-    it('should contain property `two`', () => {
-      expect(validationResult).toContain('two');
-    });
+  it('should have no errors', () => {
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given a boolean query parameter value of false', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someBooleanParameter: 'false' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have no errors', () => {
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given a non boolean query parameter value for a boolean query parameter', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someBooleanParameter: 'yes' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have one error', () => {
+    expect(validationResult).toHaveLength(1);
+  });
+
+  it('should provide error message', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+      [
+        "/someBooleanParameter must be boolean",
+      ]
+    `);
+  });
+});
+
+describe('given a valid integer query parameter value', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someIntegerParameter: '100' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have no errors', () => {
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given a decimal value for an integer query parameter', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someIntegerParameter: '100.10' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have one error', () => {
+    expect(validationResult).toHaveLength(1);
+  });
+
+  it('should provide error message', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+      [
+        "/someIntegerParameter must be integer",
+      ]
+    `);
+  });
+});
+
+describe('given a bad integer query parameter value', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someIntegerParameter: 'adsf' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have one error', () => {
+    expect(validationResult).toHaveLength(1);
+  });
+
+  it('should provide error message', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+      [
+        "/someIntegerParameter must be integer",
+      ]
+    `);
+  });
+});
+
+describe('given a valid decimal query parameter value', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someDecimalParameter: '100.10' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have no errors', () => {
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given an integer value for a decimal query parameter value', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someDecimalParameter: '100' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have no errors', () => {
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given a bad decimal query parameter value', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { someDecimalParameter: 'adsf' };
+
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  it('should have one error', () => {
+    expect(validationResult).toHaveLength(1);
+  });
+
+  it('should provide error message', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+      [
+        "/someDecimalParameter must be number",
+      ]
+    `);
   });
 });
