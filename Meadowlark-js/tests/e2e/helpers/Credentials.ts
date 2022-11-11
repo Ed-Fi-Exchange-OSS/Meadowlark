@@ -11,14 +11,15 @@ export enum Clients {
   Vendor2,
   Host1,
   Assessment1,
+  Admin,
 }
 
 export const accessTokens: Array<{ client: Clients; token: string }> = [];
 
-interface Credentials {
+type Credentials = {
   key: string | undefined;
   secret: string | undefined;
-}
+};
 
 function getCredentials(client: Clients): Credentials {
   let credentials: Credentials;
@@ -47,6 +48,12 @@ function getCredentials(client: Clients): Credentials {
         secret: process.env.ASSESSMENT_SECRET_1,
       };
       break;
+    case Clients.Admin:
+      credentials = {
+        key: process.env.ADMIN_KEY,
+        secret: process.env.ADMIN_SECRET,
+      };
+      break;
 
     default:
       throw new Error('Specify desired client');
@@ -55,7 +62,7 @@ function getCredentials(client: Clients): Credentials {
   return credentials;
 }
 
-export async function getAccessToken(client: Clients): Promise<string> {
+export async function getAccessToken(client: Clients = Clients.Admin): Promise<string> {
   const credentials = getCredentials(client);
 
   let token: string = accessTokens.find((t) => t.client === client)?.token ?? '';
@@ -73,4 +80,9 @@ export async function getAccessToken(client: Clients): Promise<string> {
   }
 
   return token;
+}
+
+export async function setCredentials(credentials: Credentials) {
+  process.env.ADMIN_KEY = credentials.key;
+  process.env.ADMIN_SECRET = credentials.secret;
 }
