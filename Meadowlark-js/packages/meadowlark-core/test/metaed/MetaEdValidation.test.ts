@@ -48,34 +48,6 @@ const createModel = (): TopLevelEntity => ({
   },
 });
 
-// const createModelForBooleanQueryStringParam = (): TopLevelEntity => ({
-//   ...newTopLevelEntity(),
-//   metaEdName: 'StudentEducationOrganizationAssociation',
-//   properties: [
-//     // { ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true },
-//     // { ...newEntityProperty(), metaEdName: 'educationOrganizationId', isPartOfIdentity: true },
-//     { ...newEntityProperty(), metaEdName: 'hispanicLatinoEthnicity', isPartOfIdentity: false },
-//   ],
-//   data: {
-//     meadowlark: {
-//       jsonSchema: {
-//         $schema: 'https://json-schema.org/draft/2020-12/schema',
-//         additionalProperties: false,
-//         description: 'doc',
-//         properties: {
-//           hispanicLatinoEthnicity: {
-//             description: 'doc',
-//             type: 'bool',
-//           },
-//         },
-//         required: [],
-//         title: 'EdFi.StudentEducationOrganizationAssociation',
-//         type: 'object',
-//       },
-//     },
-//   },
-// });
-
 describe('given query parameters have no properties', () => {
   it('should not return an error', () => {
     const queryParameters = {};

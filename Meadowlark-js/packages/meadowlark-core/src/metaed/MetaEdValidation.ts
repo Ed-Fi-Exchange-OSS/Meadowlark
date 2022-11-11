@@ -95,8 +95,8 @@ export function validateQueryParametersAgainstSchema(
    * If the value can't be converted (i.e. a word is provided for a numeric value, we leave it and let ajv invalidate
    * the schema).
    */
-  // eslint-disable-next-line no-restricted-syntax
-  for (const keyValue of parameterKeys) {
+
+  parameterKeys.forEach((keyValue) => {
     const property = schema.properties[keyValue];
 
     if (property != null && property.type != null) {
@@ -110,11 +110,13 @@ export function validateQueryParametersAgainstSchema(
         queryParameters[keyValue] = Boolean(queryParameters[keyValue]);
       }
     }
-  }
+  });
 
   const valid: ValidateFunction = ajv.compile(schema);
 
-  valid(queryParameters);
+  const isValid: boolean = valid(queryParameters);
+
+  if (isValid) return [];
 
   if (valid.errors) {
     const ajvErrors = valid.errors.map((error: ErrorObject) => {
