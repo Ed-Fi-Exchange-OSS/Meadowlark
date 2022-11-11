@@ -8,6 +8,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { validatePaginationParameters } from '../validation/PaginationValidator';
 import { validateQueryString } from '../validation/QueryStringValidator';
+import { PaginationParameters } from '../message/PaginationParameters';
 
 const moduleName = 'ValidateQueryMiddleware';
 
@@ -25,7 +26,7 @@ export async function queryValidation({ frontendRequest, frontendResponse }: Mid
     return { frontendRequest, frontendResponse: null };
   }
 
-  const { limit, offset } = frontendRequest.queryParameters;
+  const { limit, offset }: PaginationParameters = frontendRequest.queryParameters;
   const paginationValidationResult = validatePaginationParameters({ limit, offset });
 
   if (paginationValidationResult != null) {
