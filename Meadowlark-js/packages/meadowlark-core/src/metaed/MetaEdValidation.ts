@@ -6,6 +6,7 @@
 import Ajv from 'ajv/dist/2020';
 import addFormatsTo from 'ajv-formats';
 import type { ErrorObject, ValidateFunction } from 'ajv';
+import { betterAjvErrors, ValidationError } from '@apideck/better-ajv-errors';
 import didYouMean from 'didyoumean2';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
@@ -60,12 +61,18 @@ export function matchResourceNameToMetaEd(
  * Validate the JSON body of the request against the Joi schema for the MetaEd entity corresponding
  * to the API endpoint.
  */
-export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): string[] {
-  const valid: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
-  const isValid: boolean = valid(body);
+export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): ValidationError[] | null {
+  const validateFunction: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
+  const isValid: boolean = validateFunction(body);
 
-  if (isValid) return [];
-  return (valid.errors ?? []).map((error: ErrorObject) => `${error.instancePath} ${error.message}` ?? '');
+  if (isValid) return null;
+
+  return betterAjvErrors({
+    data: body,
+    schema: metaEdModel.data.meadowlark.jsonSchema,
+    errors: validateFunction.errors,
+    basePath: '{requestBody}',
+  });
 }
 
 /**

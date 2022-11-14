@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { ValidationError } from '@apideck/better-ajv-errors';
 import { newDomainEntity, newTopLevelEntity } from '@edfi/metaed-core';
 import { validateDocument } from '../../src/validation/DocumentValidator';
 import * as LoadMetaEd from '../../src/metaed/LoadMetaEd';
@@ -14,12 +15,16 @@ describe('given a valid resource name but body fails schema validation', () => {
   let mockValidateBodyAgainstSchema: any;
   let mockLoadMetaEdState: any;
   let mockMatchEndpointToMetaEd: any;
-  const failureMessage = 'failed';
+  const validationError: ValidationError = {
+    message: 'message',
+    path: 'path',
+    context: { errorType: 'required' },
+  };
 
   beforeAll(async () => {
     mockValidateBodyAgainstSchema = jest
       .spyOn(MetaEdValidation, 'validateEntityBodyAgainstSchema')
-      .mockReturnValue([failureMessage]);
+      .mockReturnValue([validationError]);
 
     mockLoadMetaEdState = jest.spyOn(LoadMetaEd, 'loadMetaEdState').mockReturnValue(
       Promise.resolve({
@@ -48,6 +53,6 @@ describe('given a valid resource name but body fails schema validation', () => {
   });
 
   it('returns an error message', () => {
-    expect(JSON.parse(result).message).toEqual([failureMessage]);
+    expect(result).toMatchInlineSnapshot(`"[{"message":"message","path":"path","context":{"errorType":"required"}}]"`);
   });
 });
