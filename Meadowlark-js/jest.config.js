@@ -17,8 +17,5 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
-  setupFiles: ['dotenv/config'],
-  projects: [
-    '<rootDir>/tests/e2e/jest-e2e.config.js'
-  ]
+  setupFiles: ['dotenv/config']
 };

@@ -161,7 +161,7 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/.env.example ./tests/e2e/.env
-          yarn test:e2e --ci --config ./jest.ci-config.js
+          yarn test:e2e --ci
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
 
