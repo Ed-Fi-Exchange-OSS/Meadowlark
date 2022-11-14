@@ -13,5 +13,5 @@ import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
  */
 export async function validateDocument(body: object, matchingMetaEdModel: TopLevelEntity): Promise<string> {
   const validationErrors: ValidationError[] | null = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
-  return validationErrors == null ? '' : JSON.stringify(validationErrors);
+  return validationErrors == null ? '' : JSON.stringify({ message: validationErrors });
 }
