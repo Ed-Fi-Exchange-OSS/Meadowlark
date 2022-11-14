@@ -16,5 +16,10 @@ Instructions for running a local "developer" environment:
        * If your PostgreSQL instance is not running on the default port (5432), you can set `POSTGRES_PORT` to
          the port PostgreSQL is using
    * `QUERY_HANDLER_PLUGIN` and `LISTENER1_PLUGIN` - Uncomment these two for GET query support using OpenSearch
-3. Open a command prompt and navigate to the `/Meadowlark-js/services/meadowlark-fastify` folder
-4. Run `yarn start:local` to start the Fastify service
+   * `AUTHORIZATION_STORE_PLUGIN` This is the plugin for the authorization store, it should be set to a NPM package name
+     * To use the Meadowlark-js provided Authorization plugin, this should be set to `@edfi/meadowlark-mongodb-backend`
+3. If you have already built the Meadowlark-js project, you can skip to step 4, otherwise:
+   * Open a command prompt and navigate to the `/Meadowlark-js` folder
+   * Run `yarn build`
+4. Open a command prompt and navigate to the `/Meadowlark-js/services/meadowlark-fastify` folder
+5. Run `yarn start:local` to start the Fastify service
