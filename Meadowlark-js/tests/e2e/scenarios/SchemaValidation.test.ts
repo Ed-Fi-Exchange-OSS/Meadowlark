@@ -29,7 +29,13 @@ describe('When creating a resource', () => {
         .then((response) => {
           expect(response.body.message).toMatchInlineSnapshot(`
             [
-              " must have required property 'categories'",
+              {
+                "context": {
+                  "errorType": "required",
+                },
+                "message": "{requestBody} must have required property 'categories'",
+                "path": "{requestBody}",
+              },
             ]
           `);
         });
@@ -59,7 +65,13 @@ describe('When creating a resource', () => {
         .then((response) => {
           expect(response.body.message).toMatchInlineSnapshot(`
             [
-              "/categories must NOT have fewer than 1 items",
+              {
+                "context": {
+                  "errorType": "minItems",
+                },
+                "message": "property 'categories' must not have fewer than 1 items",
+                "path": "{requestBody}.categories",
+              },
             ]
           `);
         });
@@ -131,7 +143,13 @@ describe('When creating a resource', () => {
         .then((response) => {
           expect(response.body.message).toMatchInlineSnapshot(`
             [
-              "/shortNameOfInstitution must NOT have fewer than 1 characters",
+              {
+                "context": {
+                  "errorType": "minLength",
+                },
+                "message": "property 'shortNameOfInstitution' must not have fewer than 1 characters",
+                "path": "{requestBody}.shortNameOfInstitution",
+              },
             ]
           `);
         });
@@ -167,7 +185,13 @@ describe('When creating a resource', () => {
         .then((response) => {
           expect(response.body.message).toMatchInlineSnapshot(`
             [
-              " must have required property 'communityOrganizationId'",
+              {
+                "context": {
+                  "errorType": "required",
+                },
+                "message": "{requestBody} must have required property 'communityOrganizationId'",
+                "path": "{requestBody}",
+              },
             ]
           `);
         });
@@ -226,11 +250,23 @@ describe('When creating a resource', () => {
         .expect(400)
         .then((response) => {
           expect(response.body.message).toMatchInlineSnapshot(`
-              [
-                "/beginDate must match format "date"",
-                "/endDate must match format "date"",
-              ]
-            `);
+            [
+              {
+                "context": {
+                  "errorType": "format",
+                },
+                "message": "property 'beginDate' must match format 'date'",
+                "path": "{requestBody}.beginDate",
+              },
+              {
+                "context": {
+                  "errorType": "format",
+                },
+                "message": "property 'endDate' must match format 'date'",
+                "path": "{requestBody}.endDate",
+              },
+            ]
+          `);
         });
     });
   });
