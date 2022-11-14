@@ -123,8 +123,7 @@ jobs:
           sudo systemctl start postgresql.service
           sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password '${{ env.POSTGRES_PASSWORD }}';"
 
-      - if: ${{ matrix.config.db == 'Mongo' }}
-        name: Start MongoDB
+      - name: Start MongoDB
         uses: supercharge/mongodb-github-action@538a4d2a1041920c47630172445cb688592d6e51 #v1.8.0
         with:
           mongodb-version: "4.0.28"
