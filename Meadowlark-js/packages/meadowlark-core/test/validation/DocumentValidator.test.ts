@@ -53,6 +53,8 @@ describe('given a valid resource name but body fails schema validation', () => {
   });
 
   it('returns an error message', () => {
-    expect(result).toMatchInlineSnapshot(`"[{"message":"message","path":"path","context":{"errorType":"required"}}]"`);
+    expect(result).toMatchInlineSnapshot(
+      `"{"message":[{"message":"message","path":"path","context":{"errorType":"required"}}]}"`,
+    );
   });
 });
