@@ -4,13 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from '../helpers/Credentials';
-import { baseURLRequest } from '../Setup';
+import { baseURLRequest } from '../helpers/Shared';
 
 describe('given an abstract entity', () => {
   it('does not allow a post request', async () => {
-    await baseURLRequest
+    await baseURLRequest()
       .post('/v3.3b/ed-fi/educationOrganizations')
-      .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+      .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
       .send({
         schoolId: 123,
         categories: [],

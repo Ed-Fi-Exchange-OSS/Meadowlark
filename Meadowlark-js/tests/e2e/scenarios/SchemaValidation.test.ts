@@ -4,15 +4,15 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken, Clients } from '../helpers/Credentials';
-import { baseURLRequest } from '../Setup';
+import { baseURLRequest } from '../helpers/Shared';
 
 describe('When creating a resource', () => {
   describe('given a missing property on a required collection', () => {
     it('should fail with message about the missing property', async () => {
       // This is entirely missing the "categories" collection
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -39,9 +39,9 @@ describe('When creating a resource', () => {
   describe('given an empty array on a required collection', () => {
     it('should fail with message about the missing property', async () => {
       // This is has a "categories" array, but it is empty
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           categories: [],
           communityOrganizationId: 19,
@@ -69,9 +69,9 @@ describe('When creating a resource', () => {
   describe('given an empty descriptor value', () => {
     it('should fail with a message about the descriptor', async () => {
       // educationOrganizationIdentificationSystemDescriptor: '',
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -104,9 +104,9 @@ describe('When creating a resource', () => {
   describe('given an empty required string value', () => {
     it('should fail with a message about the property', async () => {
       // shortNameOfInstitution: '',
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -141,9 +141,9 @@ describe('When creating a resource', () => {
   describe('given a missing number property', () => {
     it('should fail with a message about the property', async () => {
       // communityOrganizationId
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           nameOfInstitution: 'Communities in Schools',
           shortNameOfInstitution: 'CIS',
@@ -177,9 +177,9 @@ describe('When creating a resource', () => {
   describe('given empty arrays on optional collections', () => {
     it('should fail on reference validation instead of schema validation', async () => {
       // In other words, empty arrays are acceptable!
-      await baseURLRequest
+      await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -211,9 +211,9 @@ describe('When creating a resource', () => {
 
   describe('given an incorrect date format', () => {
     it('should return error message', async () => {
-      await baseURLRequest
+      await baseURLRequest()
         .post(`/v3.3b/ed-fi/academicWeeks`)
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
         .send({
           weekIdentifier: '123456',
           schoolReference: {
