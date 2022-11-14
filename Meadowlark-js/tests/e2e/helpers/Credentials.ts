@@ -25,8 +25,6 @@ const clients = new Map<Clients, Credentials>();
 let adminAccessToken: string;
 
 async function getAdminAccessToken(): Promise<string> {
-  console.log('Loading access token');
-
   if (!adminAccessToken) {
     const key = process.env.ADMIN_KEY;
     const secret = process.env.ADMIN_SECRET;
@@ -117,8 +115,6 @@ export async function getAccessToken(requestedClient: Clients): Promise<string> 
 }
 
 async function createAdminClient() {
-  console.log('About to create client');
-
   return baseURLRequest()
     .post(`/oauth/client`)
     .send({
@@ -126,8 +122,6 @@ async function createAdminClient() {
       roles: ['admin'],
     })
     .then((response) => {
-      console.log(response);
-
       if (response.status !== 201) {
         return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
       }
@@ -140,8 +134,6 @@ async function createAdminClient() {
 }
 
 async function setCredentials({ key, secret }: { key: string; secret: string }) {
-  console.log('Setting credentials');
-
   process.env.ADMIN_KEY = key;
   process.env.ADMIN_SECRET = secret;
 }
