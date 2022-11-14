@@ -6,15 +6,15 @@
 import { getAccessToken, Clients } from '../helpers/Credentials';
 import { createSchool } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
-import { baseURLRequest, rootURLRequest } from '../Setup';
+import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('When creating a resource that has a reference to another resource', () => {
   describe('given a token with strict validation', () => {
     describe('given reference does not exist', () => {
       it('should fail with code 400 and a message', async () => {
-        await baseURLRequest
+        await baseURLRequest()
           .post('/v3.3b/ed-fi/locations')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
           .send({
             classroomIdentificationCode: 'string',
             schoolReference: {
@@ -53,9 +53,9 @@ describe('When creating a resource that has a reference to another resource', ()
           },
         });
 
-        await rootURLRequest
+        await rootURLRequest()
           .get(location)
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
           .expect(200);
       });
 
@@ -73,7 +73,7 @@ describe('When creating a resource that has a reference to another resource', ()
     it('should add the location', async () => {
       location = await createResource({
         endpoint: 'locations',
-        credentials: Clients.Assessment1,
+        credentials: Clients.Host,
         body: {
           classroomIdentificationCode: 'string',
           schoolReference: {
@@ -84,9 +84,9 @@ describe('When creating a resource that has a reference to another resource', ()
         },
       });
 
-      await rootURLRequest
+      await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(

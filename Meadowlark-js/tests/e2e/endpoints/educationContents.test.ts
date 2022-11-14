@@ -6,8 +6,7 @@
 import { getAccessToken, Clients } from '../helpers/Credentials';
 import { createContentClassDescriptor } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
-import { getDescriptorByLocation, generateRandomId } from '../helpers/Shared';
-import { baseURLRequest, rootURLRequest } from '../Setup';
+import { getDescriptorByLocation, generateRandomId, baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('Education contents', () => {
   let educationContentLocation: string;
@@ -33,17 +32,17 @@ describe('Education contents', () => {
         },
       });
 
-      await baseURLRequest
+      await baseURLRequest()
         .get('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
         });
 
-      await rootURLRequest
+      await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .expect(200);
     });
   });
@@ -65,9 +64,9 @@ describe('Education contents', () => {
 
     it('should edit an education content', async () => {
       const uri = 'uri://ed-fi.org/fake-updated-uri';
-      await rootURLRequest
+      await rootURLRequest()
         .put(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .send({
           contentIdentifier,
           namespace: '43210',
@@ -77,9 +76,9 @@ describe('Education contents', () => {
         })
         .expect(204);
 
-      await rootURLRequest
+      await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.objectContaining({ learningResourceMetadataURI: uri }));

@@ -9,7 +9,7 @@ import { createResource } from './Resources';
 export async function createContentClassDescriptor(): Promise<string> {
   return createResource({
     endpoint: 'contentClassDescriptors',
-    credentials: Clients.Host1,
+    credentials: Clients.Host,
     body: {
       codeValue: 'Presentation',
       description: 'Presentation',
@@ -22,7 +22,7 @@ export async function createContentClassDescriptor(): Promise<string> {
 export async function createCountry(): Promise<string> {
   return createResource({
     endpoint: 'countryDescriptors',
-    credentials: Clients.Host1,
+    credentials: Clients.Host,
     body: {
       codeValue: 'US',
       shortDescription: 'US',
@@ -36,7 +36,7 @@ export async function createSchool(schoolId: number): Promise<string> {
   // Using assessment credentials to bypass strict validation
   return createResource({
     endpoint: 'schools',
-    credentials: Clients.Assessment1,
+    credentials: Clients.Host,
     body: {
       schoolId,
       nameOfInstitution: `New School ${schoolId}`,
