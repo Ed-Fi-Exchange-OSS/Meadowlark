@@ -202,7 +202,11 @@ These environment variables are on the Meadowlark client side; when we get to
 the point of having third party OAuth providers, these settings will still be
 relevant, whereas the settings above will not be needed.
 
-| Variable                                      | Default Value     | Purpose                                               |
-| --------------------------------------------- | ----------------- | ----------------------------------------------------- |
-| OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL         | 300000 ms (5 min) | Length of time to accept a token without revalidating |
-| OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES | 1000              | Max number of validated tokens to cache               |
+| Variable                                      | Default Value                   | Purpose                                                         |
+| --------------------------------------------- | ------------------------------- | --------------------------------------------------------------- |
+| OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL         | 300000 ms (5 min)               | Length of time to accept a token without revalidating           |
+| OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES | 1000                            | Max number of validated tokens to cache                         |
+| OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH           | meadowlark_verify-only_key_1    | Meadowlark API's client ID for accessing the OAuth2 service     |
+| OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH       | meadowlark_verify-only_secret_1 | Meadowlark API's client secret for accessing the OAuth2 service |
+| OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST   | {empty}                         | URL for OAuth2 token requests                                   |
+| OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION  | {empty}                         | URL for OAuth2 token introspection                              |
