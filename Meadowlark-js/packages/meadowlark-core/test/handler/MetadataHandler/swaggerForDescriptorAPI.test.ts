@@ -14,7 +14,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('when getting Swagger resources', () => {
   // eslint-disable-next-line no-return-assign
-  beforeAll(() => (process.env.TOKEN_URL = 'https://a/b/c'));
+  beforeAll(() => (process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST = 'https://a/b/oauth/token'));
 
   afterAll(() => {
     delete process.env.TOKEN_URL;
@@ -96,7 +96,6 @@ describe('when getting Swagger resources', () => {
       const NEW_ETAG = 'metaed';
       const RAW_FILE = '{ "basePath": "{{ basePath }}", "tokenUrl": "{{ tokenUrl }}", "host": "{{ host }}" }';
       const CACHED_OUTPUT = '{n  "https://a/b/c"n    }';
-      const EXPECTED_OUTPUT = '{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/c", "host": "localhost:3000" }';
 
       beforeAll(async () => {
         const event: FrontendRequest = {
@@ -121,10 +120,14 @@ describe('when getting Swagger resources', () => {
         expect(response.statusCode).toEqual(200);
       });
       it('returns the expected JSON output', () => {
-        expect(response.body).toEqual(EXPECTED_OUTPUT);
+        expect(response.body).toMatchInlineSnapshot(
+          `"{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/oauth/token", "host": "localhost:3000" }"`,
+        );
       });
       it('updates the cache', () => {
-        expect(resourceCache[Constants.swaggerDescriptorUrl].body).toEqual(EXPECTED_OUTPUT);
+        expect(resourceCache[Constants.swaggerDescriptorUrl].body).toMatchInlineSnapshot(
+          `"{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/oauth/token", "host": "localhost:3000" }"`,
+        );
         expect(resourceCache[Constants.swaggerDescriptorUrl].etag).toEqual(NEW_ETAG);
       });
       it('retrieves the correct resource from AWS', () => {
@@ -137,7 +140,6 @@ describe('when getting Swagger resources', () => {
 
       const ETAG = 'metaed';
       const RAW_FILE = '{ "basePath": "{{ basePath }}", "tokenUrl": "{{ tokenUrl }}", "host": "{{ host }}" }';
-      const EXPECTED_OUTPUT = '{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/c", "host": "localhost:3000" }';
 
       beforeAll(async () => {
         const event: FrontendRequest = {
@@ -159,10 +161,14 @@ describe('when getting Swagger resources', () => {
         expect(response.statusCode).toEqual(200);
       });
       it('returns the expected JSON output', () => {
-        expect(response.body).toEqual(EXPECTED_OUTPUT);
+        expect(response.body).toMatchInlineSnapshot(
+          `"{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/oauth/token", "host": "localhost:3000" }"`,
+        );
       });
       it('updates the cache', () => {
-        expect(resourceCache[Constants.swaggerDescriptorUrl].body).toEqual(EXPECTED_OUTPUT);
+        expect(resourceCache[Constants.swaggerDescriptorUrl].body).toMatchInlineSnapshot(
+          `"{ "basePath": "/outside/v3.3b/", "tokenUrl": "https://a/b/oauth/token", "host": "localhost:3000" }"`,
+        );
         expect(resourceCache[Constants.swaggerDescriptorUrl].etag).toEqual(ETAG);
       });
       it('retrieves the correct resource from AWS', () => {

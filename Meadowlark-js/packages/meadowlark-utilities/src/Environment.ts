@@ -5,7 +5,6 @@
 
 export type EnvironmentVariable =
   | 'OAUTH_SIGNING_KEY'
-  | 'TOKEN_URL'
   | 'BEGIN_ALLOWED_SCHOOL_YEAR'
   | 'END_ALLOWED_SCHOOL_YEAR'
   | 'OAUTH_EXPIRATION_MINUTES'
