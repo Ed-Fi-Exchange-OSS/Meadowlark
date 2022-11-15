@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getStringFromEnvironment } from '@edfi/meadowlark-utilities';
+import { getIntegerFromEnvironment, getStringFromEnvironment } from '@edfi/meadowlark-utilities';
 
 const DEFAULT_TOKEN_ISSUER = 'ed-fi-meadowlark';
 const DEFAULT_TOKEN_AUDIENCE = 'ed-fi-meadowlark';
@@ -14,4 +14,8 @@ export function getTokenIssuer(): string {
 
 export function getTokenAudience(): string {
   return getStringFromEnvironment('OAUTH_TOKEN_AUDIENCE', DEFAULT_TOKEN_AUDIENCE);
+}
+
+export function getTokenExpiration(): number {
+  return getIntegerFromEnvironment('OAUTH_EXPIRATION_MINUTES', 60);
 }
