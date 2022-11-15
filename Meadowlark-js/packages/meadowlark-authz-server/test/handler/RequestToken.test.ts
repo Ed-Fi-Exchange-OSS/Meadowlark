@@ -11,7 +11,7 @@ import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStor
 import { admin1 } from '../../src/security/HardcodedCredential';
 import { hashClientSecretHexString } from '../../src/security/HashClientSecret';
 
-process.env.SIGNING_KEY =
+process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
 
 const validJsonBody = `{
