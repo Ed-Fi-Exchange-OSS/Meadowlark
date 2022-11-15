@@ -8,7 +8,7 @@ import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
 import { IntrospectedToken } from './IntrospectedToken';
-import { TOKEN_ISSUER } from './TokenIssuer';
+import { getTokenAudience, getTokenIssuer } from './TokenIssuer';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { JwtStatus } from './JwtStatus';
@@ -139,7 +139,7 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
   const jwt: Jwt = verified as Jwt;
 
   // Check for correct issuer
-  if (jwt.body?.iss !== TOKEN_ISSUER || jwt.body?.aud !== TOKEN_ISSUER) return { isValid: false };
+  if (jwt.body?.iss !== getTokenIssuer() || jwt.body?.aud !== getTokenAudience()) return { isValid: false };
 
   // Checked for expired in catch, but just in case
   const isNotExpired: boolean = jwt.message !== 'Jwt is expired';

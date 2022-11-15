@@ -5,7 +5,7 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { getIntegerFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { signingKey } from '../model/SigningKey';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
@@ -16,7 +16,7 @@ import { BodyValidation, validateRequestTokenBody } from '../validation/BodyVali
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
-import { TOKEN_ISSUER } from '../security/TokenIssuer';
+import { getTokenIssuer } from '../security/TokenIssuer';
 
 const moduleName = 'RequestToken';
 
@@ -28,11 +28,13 @@ type ParsedRequestTokenBody =
  * Creates a standard Meadowlark Jwt.
  */
 function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
-  const claims = { iss: TOKEN_ISSUER, aud: TOKEN_ISSUER, roles, client_id: clientId };
+  const issuer = getTokenIssuer()
+  const claims = { iss: issuer, aud: issuer, roles, client_id: clientId };
 
   const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey()) as Jwt;
 
-  token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
+  const expirationMinutes = getIntegerFromEnvironment('OAUTH_EXPIRATION_MINUTES',  60);
+  token.setExpiration(new Date().getTime() + expirationMinutes * 60 * 1000);
   return token;
 }
 
