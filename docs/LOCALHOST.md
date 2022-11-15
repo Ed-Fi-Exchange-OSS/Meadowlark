@@ -18,16 +18,13 @@ Instructions for running a local "developer" environment on localhost:
    * [MongoDB](../Meadowlark-js/backends/meadowlark-mongodb-backend/docker)
    * [PostgreSQL](../Meadowlark-js/backends/meadowlark-postgresql-backend/docker)
    * [OpenSearch](../Meadowlark-js/backends/meadowlark-opensearch-backend/docker)
-6. Setup environment variables for running
-   [meadowlark-fastify](../Meadowlark-js/services/meadowlark-fastify/) service.
-   The folder has an `example.env` file with all settings needed to run the
-   service; the easiest way to set your environment variables is to duplicate
-   this file in the folder and rename the file to `.env`. Review the settings in
-   the `.env` file to see what values, if any, to change. In particular:
-      * `DOCUMENT_STORE_PLUGIN` - Make sure your chosen backend is uncommented
-        and comment out any others.
-      * `QUERY_HANDLER_PLUGIN` and `LISTENER1_PLUGIN` - Uncomment these two for
-        GET query support using OpenSearch.
+6. Open a command prompt and navigate to the `/Meadowlark-js` folder
+7. Run `yarn build`
+8. Setup environment variables for running
+   [meadowlark-fastify](../Meadowlark-js/services/meadowlark-fastify/readme.md) service.
+9. In your command prompt navigate to `/Meadowlark-js/services/fastify`
+10. Run `yarn start:local` to start the fastify service
+
 
 ## Clearing Out Local Databases
 
