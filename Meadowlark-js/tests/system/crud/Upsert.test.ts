@@ -77,7 +77,7 @@ describe('given a POST of a school with an empty body', () => {
 
   it('should return insert failure', async () => {
     expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{"message":[" must have required property 'schoolId'"," must have required property 'gradeLevels'"," must have required property 'nameOfInstitution'"," must have required property 'educationOrganizationCategories'"]}"`,
+      `"{"message":[{"message":"{requestBody} must have required property 'schoolId'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'gradeLevels'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'nameOfInstitution'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'educationOrganizationCategories'","path":"{requestBody}","context":{"errorType":"required"}}]}"`,
     );
     expect(upsertResult.statusCode).toBe(400);
   });
