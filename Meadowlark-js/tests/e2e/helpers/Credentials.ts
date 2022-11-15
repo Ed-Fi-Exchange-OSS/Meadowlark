@@ -24,8 +24,6 @@ type Credentials = {
 const clients = new Map<Clients, Credentials>();
 
 async function getAdminAccessToken(): Promise<string> {
-  console.log(`Getting token ${process.env.ADMIN_AT}`);
-
   let adminAccessToken = process.env.ADMIN_AT;
   if (adminAccessToken == null) {
     adminAccessToken = await baseURLRequest()
@@ -41,12 +39,8 @@ async function getAdminAccessToken(): Promise<string> {
       throw new Error('Admin Access Token not found');
     }
 
-    console.log(`Generated token ${adminAccessToken}`);
-
     process.env.ADMIN_AT = adminAccessToken;
   }
-
-  console.log(`Final token${adminAccessToken}`);
 
   return adminAccessToken;
 }
@@ -121,7 +115,7 @@ export async function getAccessToken(requestedClient: Clients): Promise<string> 
   return client.token ? client.token : '';
 }
 
-async function createAdminClient() {
+async function createAdminClient(): Promise<{ key: string; secret: string }> {
   return baseURLRequest()
     .post(`/oauth/client`)
     .send({
@@ -129,12 +123,12 @@ async function createAdminClient() {
       roles: ['admin'],
     })
     .then((response) => {
-      if (response.status === 500) {
-        return Promise.reject(new Error(response.body));
+      if (response.status === 401) {
+        return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
       }
 
       if (response.status !== 201) {
-        return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
+        return Promise.reject(new Error('Unexpected error creating admin client'));
       }
 
       return {
@@ -144,20 +138,15 @@ async function createAdminClient() {
     });
 }
 
-async function setCredentials({ key, secret }: { key: string; secret: string }) {
+function setCredentials({ key, secret }: { key: string; secret: string }) {
   process.env.ADMIN_KEY = key;
   process.env.ADMIN_SECRET = secret;
 }
 
 export async function authenticateAdmin(): Promise<void> {
-  if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET && !process.env.ADMIN_AT) {
+  if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
     const credentials = await createAdminClient();
-    await setCredentials(credentials);
-  }
 
-  try {
-    await adminAccessToken();
-  } catch (error) {
-    throw new Error(`Unable to generate token for admin user. ${error}`);
+    setCredentials(credentials);
   }
 }

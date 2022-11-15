@@ -4,5 +4,6 @@ const defaultConfig = require('./jest.config.js');
 module.exports = {
   displayName: "e2e",
   ...defaultConfig,
-	setupFiles: ['dotenv/config', './tests/e2e/Setup.ts']
+	setupFiles: ['dotenv/config'],
+  globalSetup: './tests/e2e/Setup.ts'
 }
