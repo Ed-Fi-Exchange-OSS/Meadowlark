@@ -89,8 +89,9 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
     );
   } catch (e) {
     Logger.error(
-      `${moduleName}.requestOwnAccessToken Unknown failure on request from Meadowlark to OAuth server for Meadowlark own token`,
+      `${moduleName}.requestOwnAccessToken Unexpected failure on request from Meadowlark to OAuth server for Meadowlark own token`,
       frontendRequest.traceId,
+      e,
     );
   }
 
