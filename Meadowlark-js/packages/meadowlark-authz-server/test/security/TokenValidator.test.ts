@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { TOKEN_ISSUER } from '../../src/security/TokenIssuer';
 import {
   ValidateTokenResult,
   validateTokenForAccess,
@@ -15,6 +14,7 @@ import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { createAuthorizationHeader, createTokenString, ONE_HOUR_AGO, ONE_HOUR_FROM_NOW } from './TestHelper';
+import { getTokenAudience, getTokenIssuer } from '../../src/security/TokenSettings';
 
 process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
@@ -169,9 +169,9 @@ describe('given introspection of expired token', () => {
   it('returns expired', () => {
     expect(result.isValid).toBe(true);
     expect((result as any).introspectedToken.active).toBe(false);
-    expect((result as any).introspectedToken.aud).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.aud).toBe(getTokenAudience());
     expect((result as any).introspectedToken.client_id).toBe('clientId');
-    expect((result as any).introspectedToken.iss).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.iss).toBe(getTokenIssuer());
     expect((result as any).introspectedToken.roles).toHaveLength(1);
     expect((result as any).introspectedToken.roles[0]).toBe('vendor');
   });
@@ -241,9 +241,9 @@ describe('given validation of valid token with clientId no longer in datastore',
   it('returns valid with inactive token information', () => {
     expect(result.isValid).toBe(true);
     expect((result as any).introspectedToken.active).toBe(false);
-    expect((result as any).introspectedToken.aud).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.aud).toBe(getTokenAudience());
     expect((result as any).introspectedToken.client_id).toBe('clientId');
-    expect((result as any).introspectedToken.iss).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.iss).toBe(getTokenIssuer());
     expect((result as any).introspectedToken.roles).toHaveLength(1);
     expect((result as any).introspectedToken.roles[0]).toBe('vendor');
   });
@@ -278,9 +278,9 @@ describe('given validation of valid token with clientId in datastore', () => {
   it('returns valid with active token information', () => {
     expect(result.isValid).toBe(true);
     expect((result as any).introspectedToken.active).toBe(true);
-    expect((result as any).introspectedToken.aud).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.aud).toBe(getTokenAudience());
     expect((result as any).introspectedToken.client_id).toBe('clientId');
-    expect((result as any).introspectedToken.iss).toBe(TOKEN_ISSUER);
+    expect((result as any).introspectedToken.iss).toBe(getTokenIssuer());
     expect((result as any).introspectedToken.roles).toHaveLength(1);
     expect((result as any).introspectedToken.roles[0]).toBe('vendor');
   });

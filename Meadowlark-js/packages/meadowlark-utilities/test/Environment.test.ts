@@ -108,7 +108,7 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
         result = getFloatFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
@@ -162,7 +162,7 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
         result = getIntegerFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
@@ -216,7 +216,7 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
         result = getBooleanFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
