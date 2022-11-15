@@ -5,7 +5,7 @@
 
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
-import { getStringFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';
@@ -13,6 +13,7 @@ import { Constants } from '../Constants';
 import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
+import { getOAuthTokenURL } from '../AuthenticationSettings';
 
 interface ExternalResource {
   body: string;
@@ -81,7 +82,6 @@ function useTemplate(data: string, host: string, stage: string): string {
   const basePath = `/${stage}/${Constants.uriVersion33b}/`;
   const basePathToken = /{{ basePath }}/g;
 
-  const tokenUrl = getStringFromEnvironment('TOKEN_URL');
   const tokenUrlToken = /{{ tokenUrl }}/g;
 
   const hostToken = /{{ host }}/g;
@@ -91,7 +91,7 @@ function useTemplate(data: string, host: string, stage: string): string {
 
   return data
     .replace(basePathToken, basePath)
-    .replace(tokenUrlToken, tokenUrl)
+    .replace(tokenUrlToken, getOAuthTokenURL())
     .replace(hostToken, host)
     .replace(schemesToken, schemes);
 }

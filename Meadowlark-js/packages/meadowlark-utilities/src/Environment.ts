@@ -10,7 +10,11 @@ export type EnvironmentVariable =
   | 'END_ALLOWED_SCHOOL_YEAR'
   | 'OAUTH_EXPIRATION_MINUTES'
   | 'OAUTH_TOKEN_ISSUER'
-  | 'OAUTH_TOKEN_AUDIENCE';
+  | 'OAUTH_TOKEN_AUDIENCE'
+  | 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'
+  | 'OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'
+  | 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'
+  | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};
