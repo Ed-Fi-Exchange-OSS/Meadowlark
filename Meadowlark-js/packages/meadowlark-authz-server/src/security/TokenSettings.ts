@@ -19,3 +19,7 @@ export function getTokenAudience(): string {
 export function getTokenExpiration(): number {
   return getIntegerFromEnvironment('OAUTH_EXPIRATION_MINUTES', 60);
 }
+
+export function getSigningKey(): string {
+  return getStringFromEnvironment('OAUTH_SIGNING_KEY', undefined);
+}
