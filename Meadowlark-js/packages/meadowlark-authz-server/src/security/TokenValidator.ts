@@ -8,7 +8,7 @@ import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
 import { IntrospectedToken } from './IntrospectedToken';
-import { getTokenAudience, getTokenIssuer } from './TokenIssuer';
+import { getTokenAudience, getTokenIssuer } from './TokenSettings';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { JwtStatus } from './JwtStatus';

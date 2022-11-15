@@ -16,7 +16,7 @@ import { BodyValidation, validateRequestTokenBody } from '../validation/BodyVali
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
-import { getTokenIssuer } from '../security/TokenIssuer';
+import { getTokenIssuer } from '../security/TokenSettings';
 
 const moduleName = 'RequestToken';
 
