@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import memoize from 'fast-memoize';
 import { baseURLRequest } from './Shared';
 
 // eslint-disable-next-line no-shadow
@@ -22,35 +23,41 @@ type Credentials = {
 
 const clients = new Map<Clients, Credentials>();
 
-let adminAccessToken: string;
-
 async function getAdminAccessToken(): Promise<string> {
-  if (!adminAccessToken) {
-    const key = process.env.ADMIN_KEY;
-    const secret = process.env.ADMIN_SECRET;
+  console.log(`Getting token ${process.env.ADMIN_AT}`);
 
-    if (!key || !secret) {
-      throw new Error('Admin credentials not found');
-    }
-
+  let adminAccessToken = process.env.ADMIN_AT;
+  if (adminAccessToken == null) {
     adminAccessToken = await baseURLRequest()
       .post('/oauth/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: key,
-        client_secret: secret,
+        client_id: process.env.ADMIN_KEY,
+        client_secret: process.env.ADMIN_SECRET,
       })
       .then((response) => response.body.access_token);
+
+    if (!adminAccessToken) {
+      throw new Error('Admin Access Token not found');
+    }
+
+    console.log(`Generated token ${adminAccessToken}`);
+
+    process.env.ADMIN_AT = adminAccessToken;
   }
+
+  console.log(`Final token${adminAccessToken}`);
 
   return adminAccessToken;
 }
+
+export const adminAccessToken: () => Promise<string> = memoize(getAdminAccessToken);
 
 async function createClient(client: Credentials): Promise<Credentials> {
   return baseURLRequest()
     .post(`/oauth/client`)
     .send(client)
-    .auth(await getAdminAccessToken(), { type: 'bearer' })
+    .auth(await adminAccessToken(), { type: 'bearer' })
     .then((response) => {
       if (response.status !== 200 && response.status !== 201) {
         return Promise.reject(new Error(`Error creating client: ${response.body.message}`));
@@ -98,7 +105,7 @@ export async function getAccessToken(requestedClient: Clients): Promise<string> 
   if (!client.token) {
     const token = await baseURLRequest()
       .post('/oauth/token')
-      .auth(await getAdminAccessToken(), { type: 'bearer' })
+      .auth(await adminAccessToken(), { type: 'bearer' })
       .send({
         grant_type: 'client_credentials',
         client_id: client.key,
@@ -143,13 +150,13 @@ async function setCredentials({ key, secret }: { key: string; secret: string }) 
 }
 
 export async function authenticateAdmin(): Promise<void> {
-  if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
+  if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET && !process.env.ADMIN_AT) {
     const credentials = await createAdminClient();
     await setCredentials(credentials);
   }
 
   try {
-    await getAdminAccessToken();
+    await adminAccessToken();
   } catch (error) {
     throw new Error(`Unable to generate token for admin user. ${error}`);
   }
