@@ -70,16 +70,34 @@ async function getClient(requestedClient: Clients): Promise<Credentials> {
   if (!client) {
     switch (requestedClient) {
       case Clients.Vendor:
-        client = await createClient({
-          clientName: 'Automated Vendor',
-          roles: ['vendor'],
-        });
+        if (process.env.VENDOR_KEY && process.env.VENDOR_SECRET) {
+          client = {
+            clientName: 'Automated Vendor',
+            key: process.env.VENDOR_KEY,
+            secret: process.env.VENDOR_SECRET,
+            roles: ['vendor'],
+          };
+        } else {
+          client = await createClient({
+            clientName: 'Automated Vendor',
+            roles: ['vendor'],
+          });
+        }
         break;
       case Clients.Host:
-        client = await createClient({
-          clientName: 'Automated Host',
-          roles: ['host', 'assessment'],
-        });
+        if (process.env.HOST_KEY && process.env.HOST_SECRET) {
+          client = {
+            clientName: 'Automated Host',
+            key: process.env.HOST_KEY,
+            secret: process.env.HOST_SECRET,
+            roles: ['host', 'assessment'],
+          };
+        } else {
+          client = await createClient({
+            clientName: 'Automated Host',
+            roles: ['host', 'assessment'],
+          });
+        }
         break;
       case Clients.Admin:
         throw new Error('Admin client should be generated before execution');
