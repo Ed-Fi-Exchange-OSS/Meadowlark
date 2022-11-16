@@ -18,7 +18,8 @@ type Credentials = {
 
 async function getAdminAccessToken(): Promise<string> {
   let adminAccessToken = process.env.ADMIN_AT;
-  if (adminAccessToken == null) {
+
+  if (!adminAccessToken) {
     adminAccessToken = await baseURLRequest()
       .post('/oauth/token')
       .send({
@@ -26,7 +27,12 @@ async function getAdminAccessToken(): Promise<string> {
         client_id: process.env.ADMIN_KEY,
         client_secret: process.env.ADMIN_SECRET,
       })
-      .then((response) => response.body.access_token);
+      .then((response) => {
+        if (response.status !== 200) {
+          return Promise.reject(new Error(`Error getting admin token: ${JSON.stringify(response.body)}`));
+        }
+        return response.body.access_token;
+      });
 
     if (!adminAccessToken) {
       throw new Error('Admin Access Token not found');
@@ -47,7 +53,7 @@ async function createClient(client: Credentials): Promise<Credentials> {
     .auth(await adminAccessToken(), { type: 'bearer' })
     .then((response) => {
       if (response.status !== 200 && response.status !== 201) {
-        return Promise.reject(new Error(`Error creating client: ${response.body.message}`));
+        return Promise.reject(new Error(`Error creating client: ${JSON.stringify(response.body)}`));
       }
 
       client.key = response.body.client_id;
@@ -139,7 +145,7 @@ async function createAdminClient(): Promise<{ key: string; secret: string }> {
       }
 
       if (response.status !== 201) {
-        return Promise.reject(new Error('Unexpected error creating admin client'));
+        return Promise.reject(new Error(`Unexpected error creating admin client ${JSON.stringify(response.body)}`));
       }
 
       return {
@@ -160,9 +166,15 @@ export async function createAutomationUsers(): Promise<void> {
 }
 
 export async function authenticateAdmin(): Promise<void> {
-  if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
-    const credentials = await createAdminClient();
-
-    setCredentials(credentials);
+  try {
+    if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
+      const credentials = await createAdminClient();
+      setCredentials(credentials);
+    } else {
+      await getAdminAccessToken();
+    }
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
   }
 }
