@@ -6,12 +6,7 @@
 import memoize from 'fast-memoize';
 import { baseURLRequest } from './Shared';
 
-// eslint-disable-next-line no-shadow
-export enum Clients {
-  Vendor,
-  Host,
-  Admin,
-}
+export type Clients = 'Vendor' | 'Host' | 'Admin';
 
 type Credentials = {
   clientName: string;
@@ -69,7 +64,7 @@ async function getClient(requestedClient: Clients): Promise<Credentials> {
 
   if (!client) {
     switch (requestedClient) {
-      case Clients.Vendor:
+      case 'Vendor':
         if (process.env.VENDOR_KEY && process.env.VENDOR_SECRET) {
           client = {
             clientName: 'Automated Vendor',
@@ -84,7 +79,7 @@ async function getClient(requestedClient: Clients): Promise<Credentials> {
           });
         }
         break;
-      case Clients.Host:
+      case 'Host':
         if (process.env.HOST_KEY && process.env.HOST_SECRET) {
           client = {
             clientName: 'Automated Host',
@@ -99,7 +94,7 @@ async function getClient(requestedClient: Clients): Promise<Credentials> {
           });
         }
         break;
-      case Clients.Admin:
+      case 'Admin':
         throw new Error('Admin client should be generated before execution');
       default:
         throw new Error('Specify desired client');

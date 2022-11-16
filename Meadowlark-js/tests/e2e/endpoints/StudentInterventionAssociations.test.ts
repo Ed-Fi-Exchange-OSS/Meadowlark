@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
@@ -12,7 +12,7 @@ describe('Student Intervention Association', () => {
     it('should fail when missing data', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/StudentInterventionAssociations')
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .send({
           studentReference: {
             studentUniqueId: 's0zf6d1123d3e',
@@ -36,7 +36,7 @@ describe('Student Intervention Association', () => {
     it('should add the association', async () => {
       location = await createResource({
         endpoint: 'StudentInterventionAssociations',
-        credentials: Clients.Host,
+        credentials: 'Host',
         body: {
           studentReference: {
             studentUniqueId: 's0zf6d1123d3e',
@@ -50,7 +50,7 @@ describe('Student Intervention Association', () => {
 
       await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
+        .auth(await getAccessToken('Host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(

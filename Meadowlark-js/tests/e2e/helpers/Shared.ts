@@ -6,7 +6,7 @@
 import Chance from 'chance';
 import memoize from 'fast-memoize';
 import request, { SuperTest, Test } from 'supertest';
-import { Clients, getAccessToken } from './Credentials';
+import { getAccessToken } from './Credentials';
 
 const chance = new Chance() as Chance.Chance;
 
@@ -32,7 +32,7 @@ export function generateGuid(): string {
 export async function getDescriptorByLocation(location: string): Promise<string> {
   return rootURLRequest()
     .get(location)
-    .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
+    .auth(await getAccessToken('Host'), { type: 'bearer' })
     .expect(200)
     .then((response) => {
       expect(response.body).not.toBe(null);

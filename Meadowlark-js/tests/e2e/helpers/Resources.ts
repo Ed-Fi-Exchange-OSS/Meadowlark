@@ -3,13 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from './Credentials';
+import { Clients, getAccessToken } from './Credentials';
 import { baseURLRequest, rootURLRequest } from './Shared';
 
 export async function createResource({
   endpoint,
   body,
-  credentials = Clients.Vendor,
+  credentials = 'Vendor',
 }: {
   endpoint: string;
   body: Object;
@@ -34,7 +34,7 @@ export async function deleteResourceByLocation(location: string): Promise<void> 
   if (location) {
     await rootURLRequest()
       .delete(location)
-      .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
+      .auth(await getAccessToken('Host'), { type: 'bearer' })
       .then((response) => {
         if (response.body) {
           console.error(response.body);

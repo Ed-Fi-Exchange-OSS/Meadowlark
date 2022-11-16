@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createContentClassDescriptor } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { getDescriptorByLocation, generateRandomId, baseURLRequest, rootURLRequest } from '../helpers/Shared';
@@ -34,7 +34,7 @@ describe('Education contents', () => {
 
       await baseURLRequest()
         .get('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
@@ -42,7 +42,7 @@ describe('Education contents', () => {
 
       await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200);
     });
   });
@@ -66,7 +66,7 @@ describe('Education contents', () => {
       const uri = 'uri://ed-fi.org/fake-updated-uri';
       await rootURLRequest()
         .put(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .send({
           contentIdentifier,
           namespace: '43210',
@@ -78,7 +78,7 @@ describe('Education contents', () => {
 
       await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.objectContaining({ learningResourceMetadataURI: uri }));

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createSchool } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
@@ -14,7 +14,7 @@ describe('When creating a resource that has a reference to another resource', ()
       it('should fail with code 400 and a message', async () => {
         await baseURLRequest()
           .post('/v3.3b/ed-fi/locations')
-          .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
           .send({
             classroomIdentificationCode: 'string',
             schoolReference: {
@@ -55,7 +55,7 @@ describe('When creating a resource that has a reference to another resource', ()
 
         await rootURLRequest()
           .get(location)
-          .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
           .expect(200);
       });
 
@@ -73,7 +73,7 @@ describe('When creating a resource that has a reference to another resource', ()
     it('should add the location', async () => {
       location = await createResource({
         endpoint: 'locations',
-        credentials: Clients.Host,
+        credentials: 'Host',
         body: {
           classroomIdentificationCode: 'string',
           schoolReference: {
@@ -86,7 +86,7 @@ describe('When creating a resource that has a reference to another resource', ()
 
       await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken(Clients.Host), { type: 'bearer' })
+        .auth(await getAccessToken('Host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(

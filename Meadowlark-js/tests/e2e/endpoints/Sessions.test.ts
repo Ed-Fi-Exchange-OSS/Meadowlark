@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createSchool } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, getDescriptorByLocation, rootURLRequest } from '../helpers/Shared';
@@ -13,7 +13,7 @@ describe('Sessions', () => {
     it('should fail when missing required properties', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/sessions')
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .send({
           sessionName: 'd',
           schoolYearTypeReference: {
@@ -78,7 +78,7 @@ describe('Sessions', () => {
 
       await baseURLRequest()
         .get('/v3.3b/ed-fi/sessions')
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ termDescriptor })]));
@@ -86,7 +86,7 @@ describe('Sessions', () => {
 
       await rootURLRequest()
         .get(sessionLocation)
-        .auth(await getAccessToken(Clients.Vendor), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200);
     });
 
