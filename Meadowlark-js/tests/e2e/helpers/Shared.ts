@@ -4,18 +4,22 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import Chance from 'chance';
-import request from 'supertest';
+import memoize from 'fast-memoize';
+import request, { SuperTest, Test } from 'supertest';
 import { Clients, getAccessToken } from './Credentials';
 
 const chance = new Chance() as Chance.Chance;
 
-export function baseURLRequest() {
+function getBaseURLRequest() {
   return request(process.env.BASE_URL);
 }
 
-export function rootURLRequest() {
+function getRootURLRequest() {
   return request(process.env.ROOT_URL);
 }
+
+export const baseURLRequest: () => SuperTest<Test> = memoize(getBaseURLRequest);
+export const rootURLRequest: () => SuperTest<Test> = memoize(getRootURLRequest);
 
 export function generateRandomId(length = 12): string {
   return chance.hash({ length });
