@@ -10,4 +10,7 @@ const credentialManager = require('./helpers/Credentials');
 
 dotenv.config({ path: path.join(__dirname, './.env') });
 
-module.exports = async () => credentialManager.authenticateAdmin();
+module.exports = async () => {
+  await credentialManager.authenticateAdmin();
+  await credentialManager.createAutomationUsers();
+};
