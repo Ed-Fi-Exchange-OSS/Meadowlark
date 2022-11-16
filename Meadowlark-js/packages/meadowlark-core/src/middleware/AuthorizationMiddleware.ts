@@ -86,6 +86,7 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
     Logger.error(
       `${moduleName}.requestOwnAccessToken OAuth server responded with unexpected status code ${ownAccessTokenResponse.status} on Meadowlark own token request`,
       frontendRequest.traceId,
+      ownAccessTokenResponse.data,
     );
   } catch (e) {
     Logger.error(
