@@ -147,7 +147,7 @@ jobs:
 
       - name: Run Fastify in background
         run: |
-          cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
+          cp ./tests/e2e/automation-setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local > fastify.log &
         env:
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
