@@ -5,7 +5,8 @@ Instructions for running a local "developer" environment on localhost:
 1. Install [Node.js 16.x or higher](https://nodejs.org/en/download/releases/)
 2. Enable [Yarn](https://yarnpkg.com/getting-started/install) as the package manager
 3. Install [Docker Desktop](https://www.docker.com)
-4. Review the [General Docker Guidance](../Meadowlark-js/docker/using-docker.md) for Meadowlark
+4. Review the [Docker Guidance for Meadowlark](../Meadowlark-js/docker/using-docker.md)
+   to startup relevant backend services.
 5. The Meadowlark runtime currently requires running either PostgreSQL or
    MongoDB as the primary datastore, and OpenSearch as a secondary storage for
    high-performance queries. Before running the Meadowlark code, startup local
