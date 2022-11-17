@@ -36,9 +36,9 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          process.env.SIGNING_KEY = EXPECTED_STRING;
+          process.env.OAUTH_SIGNING_KEY = EXPECTED_STRING;
 
-          result = getStringFromEnvironment('SIGNING_KEY');
+          result = getStringFromEnvironment('OAUTH_SIGNING_KEY');
         });
 
         it('returns the value as a string', () => {
@@ -46,7 +46,7 @@ describe('when getting an environment variable', () => {
         });
 
         it('has been cached', () => {
-          expect(getFromCache('SIGNING_KEY')).toBe(EXPECTED_STRING);
+          expect(getFromCache('OAUTH_SIGNING_KEY')).toBe(EXPECTED_STRING);
         });
       });
 
@@ -59,10 +59,10 @@ describe('when getting an environment variable', () => {
           clearCache();
 
           // Ensure we're not re-reading the environment variable
-          process.env.SIGNING_KEY = 'something unexpected';
-          updateCache('SIGNING_KEY', EXPECTED);
+          process.env.OAUTH_SIGNING_KEY = 'something unexpected';
+          updateCache('OAUTH_SIGNING_KEY', EXPECTED);
 
-          result = getStringFromEnvironment('SIGNING_KEY');
+          result = getStringFromEnvironment('OAUTH_SIGNING_KEY');
         });
 
         it('returns the value as a string', () => {
@@ -77,7 +77,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          expect(() => getStringFromEnvironment('SIGNING_KEY')).toThrowError();
+          expect(() => getStringFromEnvironment('OAUTH_SIGNING_KEY')).toThrowError();
         });
       });
 
@@ -88,7 +88,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          result = getStringFromEnvironment('SIGNING_KEY', EXPECTED_STRING);
+          result = getStringFromEnvironment('OAUTH_SIGNING_KEY', EXPECTED_STRING);
         });
 
         it('throws an error', () => {
@@ -108,8 +108,8 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
-        result = getFloatFromEnvironment('SIGNING_KEY');
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
+        result = getFloatFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
       it('returns the value', () => {
@@ -117,7 +117,7 @@ describe('when getting an environment variable', () => {
       });
 
       it('has been cached', () => {
-        expect(getFromCache('SIGNING_KEY')).not.toBeUndefined();
+        expect(getFromCache('OAUTH_SIGNING_KEY')).not.toBeUndefined();
       });
     });
 
@@ -127,7 +127,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          expect(() => getFloatFromEnvironment('SIGNING_KEY')).toThrowError();
+          expect(() => getFloatFromEnvironment('OAUTH_SIGNING_KEY')).toThrowError();
         });
       });
 
@@ -138,7 +138,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          result = getFloatFromEnvironment('SIGNING_KEY', EXPECTED);
+          result = getFloatFromEnvironment('OAUTH_SIGNING_KEY', EXPECTED);
         });
 
         it('returns the value as a string', () => {
@@ -146,7 +146,7 @@ describe('when getting an environment variable', () => {
         });
 
         it('has been cached', () => {
-          expect(getFromCache('SIGNING_KEY')).toBe(EXPECTED);
+          expect(getFromCache('OAUTH_SIGNING_KEY')).toBe(EXPECTED);
         });
       });
     });
@@ -162,8 +162,8 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
-        result = getIntegerFromEnvironment('SIGNING_KEY');
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
+        result = getIntegerFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
       it('returns the value', () => {
@@ -171,7 +171,7 @@ describe('when getting an environment variable', () => {
       });
 
       it('has been cached', () => {
-        expect(getFromCache('SIGNING_KEY')).not.toBeUndefined();
+        expect(getFromCache('OAUTH_SIGNING_KEY')).not.toBeUndefined();
       });
     });
 
@@ -181,7 +181,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          expect(() => getIntegerFromEnvironment('SIGNING_KEY')).toThrowError();
+          expect(() => getIntegerFromEnvironment('OAUTH_SIGNING_KEY')).toThrowError();
         });
       });
 
@@ -192,7 +192,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          result = getIntegerFromEnvironment('SIGNING_KEY', EXPECTED);
+          result = getIntegerFromEnvironment('OAUTH_SIGNING_KEY', EXPECTED);
         });
 
         it('returns the value', () => {
@@ -200,7 +200,7 @@ describe('when getting an environment variable', () => {
         });
 
         it('has been cached', () => {
-          expect(getFromCache('SIGNING_KEY')).toBe(EXPECTED);
+          expect(getFromCache('OAUTH_SIGNING_KEY')).toBe(EXPECTED);
         });
       });
     });
@@ -216,8 +216,8 @@ describe('when getting an environment variable', () => {
         process.env = {};
         clearCache();
 
-        process.env.SIGNING_KEY = EXPECTED.toString();
-        result = getBooleanFromEnvironment('SIGNING_KEY');
+        process.env.OAUTH_SIGNING_KEY = EXPECTED.toString();
+        result = getBooleanFromEnvironment('OAUTH_SIGNING_KEY');
       });
 
       it('returns the value', () => {
@@ -225,7 +225,7 @@ describe('when getting an environment variable', () => {
       });
 
       it('has been cached', () => {
-        expect(getFromCache('SIGNING_KEY')).not.toBeUndefined();
+        expect(getFromCache('OAUTH_SIGNING_KEY')).not.toBeUndefined();
       });
     });
 
@@ -235,7 +235,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          expect(() => getBooleanFromEnvironment('SIGNING_KEY')).toThrowError();
+          expect(() => getBooleanFromEnvironment('OAUTH_SIGNING_KEY')).toThrowError();
         });
       });
 
@@ -246,7 +246,7 @@ describe('when getting an environment variable', () => {
           process.env = {};
           clearCache();
 
-          result = getBooleanFromEnvironment('SIGNING_KEY', EXPECTED);
+          result = getBooleanFromEnvironment('OAUTH_SIGNING_KEY', EXPECTED);
         });
 
         it('returns the value', () => {
@@ -254,7 +254,7 @@ describe('when getting an environment variable', () => {
         });
 
         it('has been cached', () => {
-          expect(getFromCache('SIGNING_KEY')).toBe(EXPECTED);
+          expect(getFromCache('OAUTH_SIGNING_KEY')).toBe(EXPECTED);
         });
       });
     });

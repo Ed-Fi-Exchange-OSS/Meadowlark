@@ -3,7 +3,17 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type EnvironmentVariable = 'SIGNING_KEY' | 'TOKEN_URL' | 'BEGIN_ALLOWED_SCHOOL_YEAR' | 'END_ALLOWED_SCHOOL_YEAR';
+export type EnvironmentVariable =
+  | 'OAUTH_SIGNING_KEY'
+  | 'BEGIN_ALLOWED_SCHOOL_YEAR'
+  | 'END_ALLOWED_SCHOOL_YEAR'
+  | 'OAUTH_EXPIRATION_MINUTES'
+  | 'OAUTH_TOKEN_ISSUER'
+  | 'OAUTH_TOKEN_AUDIENCE'
+  | 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'
+  | 'OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'
+  | 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'
+  | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};

@@ -5,18 +5,10 @@
 
 import axios, { AxiosResponse } from 'axios';
 import axiosRetry from 'axios-retry';
+import { getOAuthTokenURL, getOAuthVerifyURL, getOwnClientId, getOwnClientSecret } from '../AuthenticationSettings';
 
 // Add default retry to Axios - 3 times, network errors or idempotent 500s
 axiosRetry(axios);
-
-const OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH =
-  process.env.OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH ?? 'meadowlark_verify-only_key_1';
-const OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH =
-  process.env.OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH ?? 'meadowlark_verify-only_secret_1';
-const OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST =
-  process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST ?? 'http://localhost:3000/local/oauth/token';
-const OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION =
-  process.env.OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION ?? 'http://localhost:3000/local/oauth/verify';
 
 /**
  * Call the configured OAuth server to get an own token, which will be used for client verification.
@@ -24,11 +16,11 @@ const OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION =
  */
 export async function fetchOwnAccessToken(): Promise<AxiosResponse> {
   return axios.post(
-    OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST,
+    getOAuthTokenURL(),
     {
       grant_type: 'client_credentials',
-      client_id: OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH,
-      client_secret: OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH,
+      client_id: getOwnClientId(),
+      client_secret: getOwnClientSecret(),
     },
     {
       headers: { 'content-type': 'application/json' },
@@ -45,7 +37,7 @@ export async function fetchClientTokenVerification(
   clientBearerToken: string,
   ownAccessToken: string,
 ): Promise<AxiosResponse> {
-  return axios.post(OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION, `token=${clientBearerToken}`, {
+  return axios.post(getOAuthVerifyURL(), `token=${clientBearerToken}`, {
     headers: {
       'content-type': 'application/x-www-form-urlencoded',
       authorization: `bearer ${ownAccessToken}`,

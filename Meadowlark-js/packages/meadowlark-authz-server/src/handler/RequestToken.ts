@@ -16,7 +16,7 @@ import { BodyValidation, validateRequestTokenBody } from '../validation/BodyVali
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
-import { TOKEN_ISSUER } from '../security/TokenIssuer';
+import { getTokenExpiration, getTokenIssuer } from '../security/TokenSettings';
 
 const moduleName = 'RequestToken';
 
@@ -28,11 +28,12 @@ type ParsedRequestTokenBody =
  * Creates a standard Meadowlark Jwt.
  */
 function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
-  const claims = { iss: TOKEN_ISSUER, aud: TOKEN_ISSUER, roles, client_id: clientId };
+  const issuer = getTokenIssuer();
+  const claims = { iss: issuer, aud: issuer, roles, client_id: clientId };
 
   const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey()) as Jwt;
 
-  token.setExpiration(new Date().getTime() + 60 * 60 * 1000); // One hour from now
+  token.setExpiration(new Date().getTime() + getTokenExpiration() * 60 * 1000);
   return token;
 }
 
@@ -187,7 +188,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
     return { body: '', statusCode: 401 };
   } catch (e) {
-    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId);
+    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId, e);
     return { body: '', statusCode: 500 };
   }
 }

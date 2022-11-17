@@ -13,7 +13,7 @@ describe('when getting the Open API metadata list', () => {
     const event: FrontendRequest = {
       ...newFrontendRequest(),
       headers: {
-        Host: 'l:1',
+        host: 'l:1',
       },
       path: '/local/metadata/',
       stage: 'local',
@@ -51,7 +51,7 @@ describe('when getting the Open API metadata list', () => {
     const event: FrontendRequest = {
       ...newFrontendRequest(),
       headers: {
-        Host: 'l:1',
+        host: 'l:1',
       },
       path: '/!@#/metadata/',
       stage: '!@#',

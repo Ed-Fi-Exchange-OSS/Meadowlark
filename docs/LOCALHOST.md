@@ -5,7 +5,8 @@ Instructions for running a local "developer" environment on localhost:
 1. Install [Node.js 16.x or higher](https://nodejs.org/en/download/releases/)
 2. Enable [Yarn](https://yarnpkg.com/getting-started/install) as the package manager
 3. Install [Docker Desktop](https://www.docker.com)
-4. Review the [General Docker Guidance](../Meadowlark-js/docker/using-docker.md) for Meadowlark
+4. Review the [Docker Guidance for Meadowlark](../Meadowlark-js/docker/using-docker.md)
+   to startup relevant backend services.
 5. The Meadowlark runtime currently requires running either PostgreSQL or
    MongoDB as the primary datastore, and OpenSearch as a secondary storage for
    high-performance queries. Before running the Meadowlark code, startup local
@@ -22,9 +23,8 @@ Instructions for running a local "developer" environment on localhost:
 7. Run `yarn build`
 8. Setup environment variables for running
    [meadowlark-fastify](../Meadowlark-js/services/meadowlark-fastify/readme.md) service.
-9. In your command prompt navigate to `/Meadowlark-js/services/fastify`
-10. Run `yarn start:local` to start the fastify service
-
+9. Setup environment variables for OAuth. See [OAUTH2](OAUTH2.md) for more details.
+10. Run `yarn start:local` to start the Meadowlark API service
 
 ## Clearing Out Local Databases
 

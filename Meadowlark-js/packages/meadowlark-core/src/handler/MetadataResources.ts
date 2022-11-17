@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { getOAuthTokenURL } from '../AuthenticationSettings';
+
 export const CreateApiVersionObject = (serverBaseUrl: string) => `{
     "version": "5.3",
     "informationalVersion": "5.3",
@@ -18,7 +20,7 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => `{
     "urls": {
       "dependencies": "${serverBaseUrl}/metadata/data/v3/dependencies",
       "openApiMetadata": "${serverBaseUrl}/metadata/",
-      "oauth": "${process.env.TOKEN_URL}",
+      "oauth": "${getOAuthTokenURL()}",
       "dataManagementApi": "${serverBaseUrl}/v3.3b/",
       "xsdMetadata": ""
     }

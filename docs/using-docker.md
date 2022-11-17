@@ -7,7 +7,12 @@ These compose files require [Docker Compose v2](https://github.com/docker/compos
 (which comes with Docker Desktop for Windows users). They provision the following
 services, all using local volumes to for permanent data storage:
 
-### Docker
+* [MongoDB, Kafka, and Zookeeper](../backends/meadowlark-mongodb-backend/docker/readme.md) <-- :exclamation: be sure to read
+  for critical one-time manual setup instructions.
+* [PostgreSQL](../backends/meadowlark-postgresql-backend/docker/readme.md)
+* [OpenSearch](../backends/meadowlark-opensearch-backend/docker/readme.md)
+
+## Global Docker Configuration
 
 Ensure that you have sufficient resources allocated to Docker:
 
@@ -37,7 +42,6 @@ Ensure that you have sufficient resources allocated to Docker:
     }
     Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
     ```
-
 
 ## Operations
 

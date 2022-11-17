@@ -9,9 +9,9 @@ import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { createAuthorizationHeader, createTokenString, ONE_HOUR_AGO } from '../security/TestHelper';
-import { TOKEN_ISSUER } from '../../src/security/TokenIssuer';
+import { getTokenAudience, getTokenIssuer } from '../../src/security/TokenSettings';
 
-process.env.SIGNING_KEY =
+process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
 
 const authorizationRequest: AuthorizationRequest = {
@@ -272,9 +272,9 @@ describe('given vendor role provided token for introspection and client ids matc
   it('returns response', () => {
     const parsedResponseBody = JSON.parse(response.body);
     expect(parsedResponseBody.active).toBe(true);
-    expect(parsedResponseBody.aud).toBe(TOKEN_ISSUER);
+    expect(parsedResponseBody.aud).toBe(getTokenAudience());
     expect(parsedResponseBody.client_id).toBe('clientId');
-    expect(parsedResponseBody.iss).toBe(TOKEN_ISSUER);
+    expect(parsedResponseBody.iss).toBe(getTokenIssuer());
     expect(parsedResponseBody.roles).toHaveLength(1);
     expect(parsedResponseBody.roles[0]).toBe('vendor');
   });
@@ -318,9 +318,9 @@ describe('given admin role provided token for introspection and client ids do no
   it('returns response', () => {
     const parsedResponseBody = JSON.parse(response.body);
     expect(parsedResponseBody.active).toBe(true);
-    expect(parsedResponseBody.aud).toBe(TOKEN_ISSUER);
+    expect(parsedResponseBody.aud).toBe(getTokenAudience());
     expect(parsedResponseBody.client_id).toBe('clientId');
-    expect(parsedResponseBody.iss).toBe(TOKEN_ISSUER);
+    expect(parsedResponseBody.iss).toBe(getTokenIssuer());
     expect(parsedResponseBody.roles).toHaveLength(1);
     expect(parsedResponseBody.roles[0]).toBe('vendor');
   });
