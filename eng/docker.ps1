@@ -20,6 +20,7 @@ param(
     "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-postgresql-backend"
 ) | ForEach-Object {
     try {
+	"Starting $_" | Out-Host
         Push-Location $_/docker
 
         if ($Stop) {
