@@ -7,7 +7,7 @@ import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { signingKey } from '../model/SigningKey';
-import { admin1, client1, client2, client3, client4, verifyOnly1 } from '../security/HardcodedCredential';
+import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
@@ -141,34 +141,6 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       // Check hardcoded credentials first
       const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
 
-      if (clientId === client1.key && clientSecret === client1.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded client1`, authorizationRequest.traceId);
-        return {
-          body: tokenResponseFrom(createToken(client1.key, client1.vendor, client1.role)),
-          statusCode: 200,
-        };
-      }
-      if (clientId === client2.key && clientSecret === client2.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded client2`, authorizationRequest.traceId);
-        return {
-          body: tokenResponseFrom(createToken(client2.key, client2.vendor, client1.role)),
-          statusCode: 200,
-        };
-      }
-      if (clientId === client3.key && clientSecret === client3.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded client3`, authorizationRequest.traceId);
-        return {
-          body: tokenResponseFrom(createToken(client3.key, client3.vendor, client3.role)),
-          statusCode: 200,
-        };
-      }
-      if (clientId === client4.key && clientSecret === client4.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded client4`, authorizationRequest.traceId);
-        return {
-          body: tokenResponseFrom(createToken(client4.key, client4.vendor, client4.role)),
-          statusCode: 200,
-        };
-      }
       if (clientId === admin1.key && clientSecret === admin1.secret) {
         Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded admin1`, authorizationRequest.traceId);
         return {

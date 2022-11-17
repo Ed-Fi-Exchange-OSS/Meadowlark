@@ -123,8 +123,8 @@ jobs:
           sudo systemctl start postgresql.service
           sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password '${{ env.POSTGRES_PASSWORD }}';"
 
-      - if: ${{ matrix.config.db == 'Mongo' }}
-        name: Start MongoDB
+      # Always start MongoDB, as it is used by the authorization system.
+      - name: Start MongoDB
         uses: supercharge/mongodb-github-action@538a4d2a1041920c47630172445cb688592d6e51 #v1.8.0
         with:
           mongodb-version: "4.0.28"
@@ -148,7 +148,7 @@ jobs:
 
       - name: Run Fastify in background
         run: |
-          cp ./tests/e2e/setup/e2e.env ./services/meadowlark-fastify/.env
+          cp ./tests/e2e/automation-setup/e2e.env ./services/meadowlark-fastify/.env
           yarn start:local > fastify.log &
         env:
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
@@ -161,7 +161,7 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/.env.example ./tests/e2e/.env
-          yarn test:e2e --ci --config ./jest.ci-config.js
+          yarn test:e2e --ci
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
 

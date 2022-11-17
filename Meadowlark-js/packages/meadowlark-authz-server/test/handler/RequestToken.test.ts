@@ -8,7 +8,7 @@ import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPlugin
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
-import { client1 } from '../../src/security/HardcodedCredential';
+import { admin1 } from '../../src/security/HardcodedCredential';
 import { hashClientSecretHexString } from '../../src/security/HashClientSecret';
 
 process.env.SIGNING_KEY =
@@ -281,7 +281,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
         }),
     });
 
-    const unencodedCredentials = `${client1.key}:${client1.secret}`;
+    const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
 
     // Act
@@ -322,7 +322,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
         }),
     });
 
-    const unencodedCredentials = `${client1.key}:${client1.secret}`;
+    const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
 
     // Act
@@ -730,7 +730,7 @@ describe('given request body is json with valid hardcoded credential', () => {
     // Act
     response = await requestToken({
       ...jsonAuthorizationRequest,
-      body: JSON.stringify({ grant_type: 'client_credentials', client_id: client1.key, client_secret: client1.secret }),
+      body: JSON.stringify({ grant_type: 'client_credentials', client_id: admin1.key, client_secret: admin1.secret }),
     });
   });
 
@@ -767,7 +767,7 @@ describe('given request body is json with valid hardcoded credential but grant_t
     // Act
     response = await requestToken({
       ...jsonAuthorizationRequest,
-      body: JSON.stringify({ grant_type: 'not_client_credentials', client_id: client1.key, client_secret: client1.secret }),
+      body: JSON.stringify({ grant_type: 'not_client_credentials', client_id: admin1.key, client_secret: admin1.secret }),
     });
   });
 

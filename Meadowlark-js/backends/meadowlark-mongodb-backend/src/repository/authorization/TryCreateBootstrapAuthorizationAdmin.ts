@@ -48,7 +48,7 @@ export async function tryCreateBootstrapAuthorizationAdminDocument(
           Logger.debug(`${functionName}: Inserted admin client`, request.traceId);
         } else {
           Logger.info(
-            `${functionName}: An attempt was made to create a boostrap Admin ID when one already exists.`,
+            `${functionName}: An attempt was made to create a bootstrap Admin ID when one already exists.`,
             request.traceId,
           );
         }

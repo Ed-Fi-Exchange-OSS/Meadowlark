@@ -14,7 +14,7 @@ import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { JwtStatus } from './JwtStatus';
 import { verifyJwt } from './JwtAction';
 import { signingKey } from '../model/SigningKey';
-import { admin1, client1, client2, client3, client4, verifyOnly1 } from './HardcodedCredential';
+import { admin1, verifyOnly1 } from './HardcodedCredential';
 
 export function hasAdminRole(roles: string[]): boolean {
   return roles.some((role) => role.toLocaleLowerCase() === 'admin');
@@ -90,7 +90,7 @@ async function isValidClientId(clientId: string | undefined, traceId: string): P
   if (clientId == null) return false;
 
   // Check hardcoded credentials first
-  if ([client1.key, client2.key, client3.key, client4.key, admin1.key, verifyOnly1.key].includes(clientId)) {
+  if ([admin1.key, verifyOnly1.key].includes(clientId)) {
     return true;
   }
 

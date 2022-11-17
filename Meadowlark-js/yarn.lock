@@ -1636,6 +1636,7 @@ __metadata:
     "@types/supertest": ^2.0.12
     chance: ^1.1.9
     dotenv: ^16.0.3
+    fast-memoize: ^2.5.2
     supertest: ^6.3.1
   languageName: unknown
   linkType: soft

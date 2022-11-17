@@ -2,6 +2,9 @@
   "env": {
     "jest": true
   },
+  "ignorePatterns": [
+    "**/jest-*.config.js"
+  ],
   "rules": {
     "no-unused-expressions": "off",
     "import/no-extraneous-dependencies": [

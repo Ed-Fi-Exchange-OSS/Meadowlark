@@ -3,74 +3,178 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest } from '../Setup';
+import memoize from 'fast-memoize';
+import { baseURLRequest } from './Shared';
 
-// eslint-disable-next-line no-shadow
-export enum Clients {
-  Vendor1,
-  Vendor2,
-  Host1,
-  Assessment1,
+export type Clients = 'Vendor' | 'Host' | 'Admin';
+
+type Credentials = {
+  clientName: string;
+  roles: Array<string>;
+  key?: string;
+  secret?: string;
+  token?: string;
+};
+
+async function getAdminAccessToken(): Promise<string> {
+  let adminAccessToken = process.env.ADMIN_AT;
+
+  if (!adminAccessToken) {
+    adminAccessToken = await baseURLRequest()
+      .post('/oauth/token')
+      .send({
+        grant_type: 'client_credentials',
+        client_id: process.env.ADMIN_KEY,
+        client_secret: process.env.ADMIN_SECRET,
+      })
+      .then((response) => {
+        if (response.status !== 200) {
+          return Promise.reject(new Error(`Error getting admin token: ${JSON.stringify(response.body)}`));
+        }
+        return response.body.access_token;
+      });
+
+    if (!adminAccessToken) {
+      throw new Error('Admin Access Token not found');
+    }
+
+    process.env.ADMIN_AT = adminAccessToken;
+  }
+
+  return adminAccessToken;
 }
 
-export const accessTokens: Array<{ client: Clients; token: string }> = [];
+export const adminAccessToken: () => Promise<string> = memoize(getAdminAccessToken);
 
-interface Credentials {
-  key: string | undefined;
-  secret: string | undefined;
+async function createClient(client: Credentials): Promise<Credentials> {
+  return baseURLRequest()
+    .post(`/oauth/client`)
+    .send(client)
+    .auth(await adminAccessToken(), { type: 'bearer' })
+    .then((response) => {
+      if (response.status !== 200 && response.status !== 201) {
+        return Promise.reject(new Error(`Error creating client: ${JSON.stringify(response.body)}`));
+      }
+
+      client.key = response.body.client_id;
+      client.secret = response.body.client_secret;
+
+      return client;
+    });
 }
 
-function getCredentials(client: Clients): Credentials {
-  let credentials: Credentials;
-  switch (client) {
-    case Clients.Vendor1:
-      credentials = {
-        key: process.env.VENDOR_KEY_1,
-        secret: process.env.VENDOR_SECRET_1,
-      };
-      break;
-    case Clients.Vendor2:
-      credentials = {
-        key: process.env.VENDOR_KEY_2,
-        secret: process.env.VENDOR_SECRET_2,
-      };
-      break;
-    case Clients.Host1:
-      credentials = {
-        key: process.env.HOST_KEY_1,
-        secret: process.env.HOST_SECRET_1,
-      };
-      break;
-    case Clients.Assessment1:
-      credentials = {
-        key: process.env.ASSESSMENT_KEY_1,
-        secret: process.env.ASSESSMENT_SECRET_1,
-      };
-      break;
+async function getClientCredentials(requestedClient: Clients): Promise<Credentials> {
+  let client: Credentials;
 
+  switch (requestedClient) {
+    case 'Vendor':
+      if (process.env.VENDOR_KEY && process.env.VENDOR_SECRET) {
+        client = {
+          clientName: 'Automated Vendor',
+          key: process.env.VENDOR_KEY,
+          secret: process.env.VENDOR_SECRET,
+          roles: ['vendor'],
+        };
+      } else {
+        client = await createClient({
+          clientName: 'Automated Vendor',
+          roles: ['vendor'],
+        });
+
+        process.env.VENDOR_KEY = client.key;
+        process.env.VENDOR_SECRET = client.secret;
+      }
+      break;
+    case 'Host':
+      if (process.env.HOST_KEY && process.env.HOST_SECRET) {
+        client = {
+          clientName: 'Automated Host',
+          key: process.env.HOST_KEY,
+          secret: process.env.HOST_SECRET,
+          roles: ['host', 'assessment'],
+        };
+      } else {
+        client = await createClient({
+          clientName: 'Automated Host',
+          roles: ['host', 'assessment'],
+        });
+
+        process.env.HOST_KEY = client.key;
+        process.env.HOST_SECRET = client.secret;
+      }
+      break;
+    case 'Admin':
+      throw new Error('Admin client should be generated before execution');
     default:
       throw new Error('Specify desired client');
   }
 
-  return credentials;
+  return client;
 }
 
-export async function getAccessToken(client: Clients): Promise<string> {
-  const credentials = getCredentials(client);
+export async function getAccessToken(requestedClient: Clients): Promise<string> {
+  const obtainedClient = await getClientCredentials(requestedClient);
 
-  let token: string = accessTokens.find((t) => t.client === client)?.token ?? '';
-  if (!token) {
-    token = await baseURLRequest
+  if (!obtainedClient.token) {
+    const token = await baseURLRequest()
       .post('/oauth/token')
+      .auth(await adminAccessToken(), { type: 'bearer' })
       .send({
         grant_type: 'client_credentials',
-        client_id: credentials.key,
-        client_secret: credentials.secret,
+        client_id: obtainedClient.key,
+        client_secret: obtainedClient.secret,
       })
       .then((response) => response.body.access_token);
 
-    accessTokens.push({ client, token });
+    obtainedClient.token = token;
   }
 
-  return token;
+  return obtainedClient.token ? obtainedClient.token : '';
+}
+
+async function createAdminClient(): Promise<{ key: string; secret: string }> {
+  return baseURLRequest()
+    .post(`/oauth/client`)
+    .send({
+      clientName: 'Admin Client',
+      roles: ['admin'],
+    })
+    .then((response) => {
+      if (response.status === 401) {
+        return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
+      }
+
+      if (response.status !== 201) {
+        return Promise.reject(new Error(`Unexpected error creating admin client ${JSON.stringify(response.body)}`));
+      }
+
+      return {
+        key: response.body.client_id,
+        secret: response.body.client_secret,
+      };
+    });
+}
+
+function setCredentials({ key, secret }: { key: string; secret: string }) {
+  process.env.ADMIN_KEY = key;
+  process.env.ADMIN_SECRET = secret;
+}
+
+export async function createAutomationUsers(): Promise<void> {
+  await getClientCredentials('Vendor');
+  await getClientCredentials('Host');
+}
+
+export async function authenticateAdmin(): Promise<void> {
+  try {
+    if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
+      const credentials = await createAdminClient();
+      setCredentials(credentials);
+    } else {
+      await getAdminAccessToken();
+    }
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 }

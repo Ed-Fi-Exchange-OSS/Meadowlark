@@ -3,19 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getAccessToken, Clients } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createCountry } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
-import { generateRandomId, getDescriptorByLocation } from '../helpers/Shared';
-import { baseURLRequest, rootURLRequest } from '../Setup';
+import { baseURLRequest, generateRandomId, getDescriptorByLocation, rootURLRequest } from '../helpers/Shared';
 
 describe('When creating a resource that has a reference to a descriptor', () => {
   describe('given a token with strict validation', () => {
     describe('given reference does not exist', () => {
       it('should fail with code 400 and a message', async () => {
-        await baseURLRequest
+        await baseURLRequest()
           .post('/v3.3b/ed-fi/students')
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
           .send({
             studentUniqueId: generateRandomId(),
             firstName: 'First',
@@ -52,9 +51,9 @@ describe('When creating a resource that has a reference to a descriptor', () => 
           },
         });
 
-        await rootURLRequest
+        await rootURLRequest()
           .get(studentLocation)
-          .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
           .expect(200);
       });
 
@@ -74,9 +73,9 @@ describe('When creating a resource that has a reference to a descriptor', () => 
         });
 
         it('should allow to edit', async () => {
-          await rootURLRequest
+          await rootURLRequest()
             .put(studentLocation)
-            .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
             .send({
               studentUniqueId,
               firstName: 'First',
@@ -86,17 +85,17 @@ describe('When creating a resource that has a reference to a descriptor', () => 
             })
             .expect(204);
 
-          await baseURLRequest
+          await baseURLRequest()
             .get('/v3.3b/ed-fi/students')
-            .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ studentUniqueId })]));
             });
 
-          await rootURLRequest
+          await rootURLRequest()
             .get(studentLocation)
-            .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toEqual(expect.objectContaining({ birthDate: '2000-01-01' }));
@@ -120,7 +119,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
     it('should allow invalid country', async () => {
       studentLocation = await createResource({
         endpoint: 'students',
-        credentials: Clients.Assessment1,
+        credentials: 'Host',
         body: {
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -130,9 +129,9 @@ describe('When creating a resource that has a reference to a descriptor', () => 
         },
       });
 
-      await rootURLRequest
+      await rootURLRequest()
         .get(studentLocation)
-        .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+        .auth(await getAccessToken('Host'), { type: 'bearer' })
         .expect(200);
     });
 

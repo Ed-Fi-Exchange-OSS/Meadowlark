@@ -3,13 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Clients } from './Credentials';
 import { createResource } from './Resources';
 
 export async function createContentClassDescriptor(): Promise<string> {
   return createResource({
     endpoint: 'contentClassDescriptors',
-    credentials: Clients.Host1,
+    credentials: 'Host',
     body: {
       codeValue: 'Presentation',
       description: 'Presentation',
@@ -22,7 +21,7 @@ export async function createContentClassDescriptor(): Promise<string> {
 export async function createCountry(): Promise<string> {
   return createResource({
     endpoint: 'countryDescriptors',
-    credentials: Clients.Host1,
+    credentials: 'Host',
     body: {
       codeValue: 'US',
       shortDescription: 'US',
@@ -36,7 +35,7 @@ export async function createSchool(schoolId: number): Promise<string> {
   // Using assessment credentials to bypass strict validation
   return createResource({
     endpoint: 'schools',
-    credentials: Clients.Assessment1,
+    credentials: 'Host',
     body: {
       schoolId,
       nameOfInstitution: `New School ${schoolId}`,

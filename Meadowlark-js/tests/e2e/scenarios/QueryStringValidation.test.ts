@@ -4,16 +4,16 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { createSchoolsInBulk, deleteListOfResources } from '../helpers/BulkCreation';
-import { Clients, getAccessToken } from '../helpers/Credentials';
+import { getAccessToken } from '../helpers/Credentials';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
-import { baseURLRequest } from '../Setup';
+import { baseURLRequest } from '../helpers/Shared';
 
 describe('When retrieving information', () => {
   describe("given there's no data", () => {
     it('should return the total count', async () => {
-      await baseURLRequest
+      await baseURLRequest()
         .get('/v3.3b/ed-fi/schools')
-        .auth(await getAccessToken(Clients.Vendor1), { type: 'bearer' })
+        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.headers['total-count']).toEqual('0');
@@ -39,9 +39,9 @@ describe('When retrieving information', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return the total and a subset of the results', async () => {
           const limit = total - 1;
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -53,9 +53,9 @@ describe('When retrieving information', () => {
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
         it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('limit = %s', async (limit) => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -78,9 +78,9 @@ describe('When retrieving information', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return the total and a subset of the results', async () => {
           const offset = total / 2;
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -92,9 +92,9 @@ describe('When retrieving information', () => {
       describe('when using an offset greater than the total', () => {
         it('should return empty list', async () => {
           const offset = total + 1;
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -107,9 +107,9 @@ describe('When retrieving information', () => {
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
         it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('offset = %s', async (offset) => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -130,9 +130,9 @@ describe('When retrieving information', () => {
         // Use the assessment1 credentials to bypass additional validations
         it('should return an error message', async () => {
           const offset = total - (total - 1);
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?offset=${offset}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -154,9 +154,9 @@ describe('When retrieving information', () => {
       it('should return the total and a subset of the results', async () => {
         const limit = total - 5;
         const schoolName = 'New School 0';
-        await baseURLRequest
+        await baseURLRequest()
           .get(`/v3.3b/ed-fi/schools?limit=${limit}&nameOfInstitution=${schoolName}`)
-          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .auth(await getAccessToken('Host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.headers['total-count']).toEqual(`${1}`);
@@ -188,7 +188,7 @@ describe('When retrieving information', () => {
     beforeAll(async () => {
       resourceLocation = await createResource({
         endpoint: 'academicWeeks',
-        credentials: Clients.Assessment1,
+        credentials: 'Host',
         body: data,
       });
     });
@@ -196,9 +196,9 @@ describe('When retrieving information', () => {
     describe('when querying by date', () => {
       describe('when date is valid', () => {
         it('should return valid data', async () => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.beginDate}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body.length).toBeGreaterThan(0);
@@ -210,9 +210,9 @@ describe('When retrieving information', () => {
       describe('when date is invalid', () => {
         const wrongDate = '2020/01/01';
         it('should return error message', async () => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${wrongDate}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -230,9 +230,9 @@ describe('When retrieving information', () => {
       describe('when date is out of specified dates', () => {
         const oldDate = data.beginDate.replace('2020', '2010');
         it('should return empty array', async () => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${oldDate}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`[]`);
@@ -242,9 +242,9 @@ describe('When retrieving information', () => {
 
       describe('when begin date specified is end date', () => {
         it('should return empty array', async () => {
-          await baseURLRequest
+          await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.endDate}`)
-            .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+            .auth(await getAccessToken('Host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`[]`);
@@ -255,9 +255,9 @@ describe('When retrieving information', () => {
 
     describe('when querying by string identifier', () => {
       it('should return valid data', async () => {
-        await baseURLRequest
+        await baseURLRequest()
           .get(`/v3.3b/ed-fi/academicWeeks?weekIdentifier=${data.weekIdentifier}`)
-          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .auth(await getAccessToken('Host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.body.length).toBeGreaterThan(0);
@@ -269,9 +269,9 @@ describe('When retrieving information', () => {
     describe('when querying by integer', () => {
       // Should be included after RND-427 is done
       it.skip('should return valid data', async () => {
-        await baseURLRequest
+        await baseURLRequest()
           .get(`/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=${data.totalInstructionalDays}`)
-          .auth(await getAccessToken(Clients.Assessment1), { type: 'bearer' })
+          .auth(await getAccessToken('Host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.body.length).toBeGreaterThan(0);

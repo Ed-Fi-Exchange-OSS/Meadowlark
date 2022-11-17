@@ -3,19 +3,19 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { baseURLRequest, rootURLRequest } from '../Setup';
-import { getAccessToken, Clients } from './Credentials';
+import { Clients, getAccessToken } from './Credentials';
+import { baseURLRequest, rootURLRequest } from './Shared';
 
 export async function createResource({
   endpoint,
   body,
-  credentials = Clients.Vendor1,
+  credentials = 'Vendor',
 }: {
   endpoint: string;
   body: Object;
   credentials?: Clients;
 }): Promise<string> {
-  return baseURLRequest
+  return baseURLRequest()
     .post(`/v3.3b/ed-fi/${endpoint}`)
     .auth(await getAccessToken(credentials), { type: 'bearer' })
     .send(body)
@@ -32,9 +32,9 @@ export async function createResource({
 
 export async function deleteResourceByLocation(location: string): Promise<void> {
   if (location) {
-    await rootURLRequest
+    await rootURLRequest()
       .delete(location)
-      .auth(await getAccessToken(Clients.Host1), { type: 'bearer' })
+      .auth(await getAccessToken('Host'), { type: 'bearer' })
       .then((response) => {
         if (response.body) {
           console.error(response.body);
