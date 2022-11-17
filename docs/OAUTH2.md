@@ -123,8 +123,8 @@ showing that the token is not expired and has not otherwise been invalidated.
 
 #### Invalid Token Response
 
-If the token is expired, or has been invalidated (for example, the client's
-access has been revoked), then the response will look like:
+If the token is expired, or has been invalidated (for example, the client
+has been deactivated), then the response will look like:
 
 ```json
 {
@@ -153,6 +153,7 @@ Only clients with the "admin" role may access these endpoints.
 
   ```json
   {
+    "active": true,
     "client_id": "{client id}",
     "clientName": "Hometown SIS",
     "roles": [
@@ -161,7 +162,6 @@ Only clients with the "admin" role may access these endpoints.
   }
   ```
 
-- `DELETE /oauth/client/{client id}` - deactivates, does not remove the client
 - `POST /oauth/client/{client id}/reset` - generates a new `client_secret` for
   the key
 
