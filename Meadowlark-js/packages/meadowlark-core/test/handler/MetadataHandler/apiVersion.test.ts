@@ -16,7 +16,7 @@ describe('when getting API version information', () => {
       const event: FrontendRequest = {
         ...newFrontendRequest(),
         headers: {
-          Host: 'test_url',
+          host: 'test_url',
         },
 
         stage: 'outside',
@@ -64,7 +64,7 @@ describe('when getting API version information', () => {
       const event: FrontendRequest = {
         ...newFrontendRequest(),
         headers: {
-          Host: 'localhost:3000',
+          host: 'localhost:3000',
         },
 
         stage: 'local',
