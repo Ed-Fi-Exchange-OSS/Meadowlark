@@ -188,7 +188,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
     return { body: '', statusCode: 401 };
   } catch (e) {
-    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId);
+    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId, e);
     return { body: '', statusCode: 500 };
   }
 }
