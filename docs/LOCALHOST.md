@@ -24,8 +24,7 @@ Instructions for running a local "developer" environment on localhost:
 8. Setup environment variables for running
    [meadowlark-fastify](../Meadowlark-js/services/meadowlark-fastify/readme.md) service.
 9. Setup environment variables for OAuth. See [OAUTH2](OAUTH2.md) for more details.
-10. In your command prompt navigate to `/Meadowlark-js/services/meadowlark-fastify`
-11. Run `yarn start:local` to start the Meadowlark API service
+10. Run `yarn start:local` to start the Meadowlark API service
 
 ## Clearing Out Local Databases
 
