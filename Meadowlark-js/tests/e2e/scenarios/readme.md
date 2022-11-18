@@ -42,3 +42,17 @@
 - [Missing number property](./SchemaValidation.test.ts#L141)
 - [Empty arrays on optional collections](./SchemaValidation.test.ts#L177)
 - [Incorrect date formats](./SchemaValidation.test.ts#L212)
+
+## Authorization Validation
+
+- [Error creating second admin user](./AuthenticationValidation.test.ts#L19)
+- [Create user with valid role combination](./AuthenticationValidation.test.ts#L34)
+- [Create user with invalid role combination](./AuthenticationValidation.test.ts#L60)
+- [Create user with too many roles](./AuthenticationValidation.test.ts#L93)
+- [Create user with invalid role name](./AuthenticationValidation.test.ts#L121)
+- [Missing client name](./AuthenticationValidation.test.ts#L166)
+- [Invalid client name](./AuthenticationValidation.test.ts#L191)
+
+## Authentication Validation
+
+- Invalid grant type

@@ -8,7 +8,7 @@ import { baseURLRequest } from '../helpers/Shared';
 
 describe("Given it's authenticating a client", () => {
   describe('when generating an admin client', () => {
-    describe('given user already exists', () => {
+    describe('given client already exists', () => {
       it('should fail with 401 error', async () => {
         await baseURLRequest()
           .post(`/oauth/client`)
@@ -31,14 +31,14 @@ describe("Given it's authenticating a client", () => {
 
   describe('when generating a client with role combination', () => {
     // This should be modified when RND-452 is done
-    describe('when generating a user with an valid combination of roles', () => {
+    describe('when generating a client with an valid combination of roles', () => {
       it.each([
         { roles: ['verify-only'] },
         { roles: ['admin'] },
         { roles: ['admin', 'assessment'] },
         { roles: ['assessment', 'host'] },
         { roles: ['assessment', 'vendor'] },
-      ])('create user with %j', async (item) => {
+      ])('create client with %j', async (item) => {
         const { roles } = item;
 
         const clientInfo = {
@@ -57,14 +57,14 @@ describe("Given it's authenticating a client", () => {
       });
     });
 
-    describe('when generating a user with an invalid combination of roles', () => {
+    describe('when generating a client with an invalid combination of roles', () => {
       it.each([
         { roles: ['vendor', 'vendor'] },
         { roles: ['vendor', 'host'] },
         { roles: ['admin', 'host'] },
         { roles: ['admin', 'vendor'] },
         { roles: ['verify-only', 'host'] },
-      ])('create user with %j', async (item) => {
+      ])('create client with %j', async (item) => {
         const { roles } = item;
 
         await baseURLRequest()
@@ -90,7 +90,7 @@ describe("Given it's authenticating a client", () => {
           });
       });
 
-      describe('when generating a user with more than 2 roles', () => {
+      describe('when generating a client with more than 2 roles', () => {
         it('should return error message', async () => {
           const roles = ['admin', 'vendor', 'host'];
 
@@ -118,7 +118,7 @@ describe("Given it's authenticating a client", () => {
         });
       });
 
-      describe('when generating a user with an invalid rol', () => {
+      describe('when generating a client with an invalid role', () => {
         it('should return error message', async () => {
           const roles = ['not-valid'];
 
@@ -160,6 +160,57 @@ describe("Given it's authenticating a client", () => {
             });
         });
       });
+    });
+  });
+
+  describe('when missing client name', () => {
+    it('should return error message', async () => {
+      await baseURLRequest()
+        .post(`/oauth/client`)
+        .auth(await adminAccessToken(), { type: 'bearer' })
+        .send({
+          roles: ['vendor'],
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body).toMatchInlineSnapshot(`
+            [
+              {
+                "context": {
+                  "errorType": "required",
+                },
+                "message": "{requestBody} must have required property 'clientName'",
+                "path": "{requestBody}",
+              },
+            ]
+          `);
+        });
+    });
+  });
+
+  describe('when adding invalid client name', () => {
+    it('should return error message', async () => {
+      await baseURLRequest()
+        .post(`/oauth/client`)
+        .auth(await adminAccessToken(), { type: 'bearer' })
+        .send({
+          clientName: 1,
+          roles: ['vendor'],
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body).toMatchInlineSnapshot(`
+            [
+              {
+                "context": {
+                  "errorType": "type",
+                },
+                "message": "'clientName' property type must be string",
+                "path": "{requestBody}.clientName",
+              },
+            ]
+          `);
+        });
     });
   });
 });
