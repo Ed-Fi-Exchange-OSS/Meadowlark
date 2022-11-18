@@ -267,8 +267,7 @@ describe('When retrieving information', () => {
     });
 
     describe('when querying by integer', () => {
-      // Should be included after RND-427 is done
-      it.skip('should return valid data', async () => {
+      it('should return valid data', async () => {
         await baseURLRequest()
           .get(`/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=${data.totalInstructionalDays}`)
           .auth(await getAccessToken('Host'), { type: 'bearer' })
