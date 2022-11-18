@@ -2,7 +2,7 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { Logger } from '@edfi/meadowlark-utilities';
+
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
 import { UpdateClientBody } from '../model/CreateClientBody';
@@ -90,7 +90,6 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
     }
 
     writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 500);
-    Logger.debug(`${moduleName}.createAuthorization 500`, authorizationRequest.traceId);
     return { body: '', statusCode: 500 };
   } catch (e) {
     writeErrorToLog(moduleName, authorizationRequest.traceId, 'updateClient', 500, e);
