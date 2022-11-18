@@ -56,3 +56,9 @@
 ## Authentication Validation
 
 - Invalid grant type
+- Invalid key
+- Invalid secret
+- Expired key (how?)
+- Client not found
+- Admin client not found
+- Wrong key / secret combination

@@ -6,9 +6,9 @@
 import memoize from 'fast-memoize';
 import { baseURLRequest } from './Shared';
 
-export type Clients = 'Vendor' | 'Host' | 'Admin';
+export type Role = 'vendor' | 'host' | 'admin';
 
-type Credentials = {
+export type Credentials = {
   clientName: string;
   roles: Array<string>;
   key?: string;
@@ -63,56 +63,56 @@ async function createClient(client: Credentials): Promise<Credentials> {
     });
 }
 
-async function getClientCredentials(requestedClient: Clients): Promise<Credentials> {
-  let client: Credentials;
+export async function getClientCredentials(requestedClient: Role): Promise<Credentials> {
+  let credentials: Credentials;
 
   switch (requestedClient) {
-    case 'Vendor':
+    case 'vendor':
       if (process.env.VENDOR_KEY && process.env.VENDOR_SECRET) {
-        client = {
+        credentials = {
           clientName: 'Automated Vendor',
           key: process.env.VENDOR_KEY,
           secret: process.env.VENDOR_SECRET,
           roles: ['vendor'],
         };
       } else {
-        client = await createClient({
+        credentials = await createClient({
           clientName: 'Automated Vendor',
           roles: ['vendor'],
         });
 
-        process.env.VENDOR_KEY = client.key;
-        process.env.VENDOR_SECRET = client.secret;
+        process.env.VENDOR_KEY = credentials.key;
+        process.env.VENDOR_SECRET = credentials.secret;
       }
       break;
-    case 'Host':
+    case 'host':
       if (process.env.HOST_KEY && process.env.HOST_SECRET) {
-        client = {
+        credentials = {
           clientName: 'Automated Host',
           key: process.env.HOST_KEY,
           secret: process.env.HOST_SECRET,
           roles: ['host', 'assessment'],
         };
       } else {
-        client = await createClient({
+        credentials = await createClient({
           clientName: 'Automated Host',
           roles: ['host', 'assessment'],
         });
 
-        process.env.HOST_KEY = client.key;
-        process.env.HOST_SECRET = client.secret;
+        process.env.HOST_KEY = credentials.key;
+        process.env.HOST_SECRET = credentials.secret;
       }
       break;
-    case 'Admin':
+    case 'admin':
       throw new Error('Admin client should be generated before execution');
     default:
       throw new Error('Specify desired client');
   }
 
-  return client;
+  return credentials;
 }
 
-export async function getAccessToken(requestedClient: Clients): Promise<string> {
+export async function getAccessToken(requestedClient: Role): Promise<string> {
   const obtainedClient = await getClientCredentials(requestedClient);
 
   if (!obtainedClient.token) {
@@ -161,8 +161,8 @@ function setCredentials({ key, secret }: { key: string; secret: string }) {
 }
 
 export async function createAutomationUsers(): Promise<void> {
-  await getClientCredentials('Vendor');
-  await getClientCredentials('Host');
+  await getClientCredentials('vendor');
+  await getClientCredentials('host');
 }
 
 export async function authenticateAdmin(): Promise<void> {

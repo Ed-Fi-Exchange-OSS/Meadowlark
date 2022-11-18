@@ -10,7 +10,7 @@ describe('given an abstract entity', () => {
   it('does not allow a post request', async () => {
     await baseURLRequest()
       .post('/v3.3b/ed-fi/educationOrganizations')
-      .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+      .auth(await getAccessToken('vendor'), { type: 'bearer' })
       .send({
         schoolId: 123,
         categories: [],

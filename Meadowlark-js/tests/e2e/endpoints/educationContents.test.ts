@@ -34,7 +34,7 @@ describe('Education contents', () => {
 
       await baseURLRequest()
         .get('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ contentIdentifier })]));
@@ -42,7 +42,7 @@ describe('Education contents', () => {
 
       await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200);
     });
   });
@@ -66,7 +66,7 @@ describe('Education contents', () => {
       const uri = 'uri://ed-fi.org/fake-updated-uri';
       await rootURLRequest()
         .put(educationContentLocation)
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           contentIdentifier,
           namespace: '43210',
@@ -78,7 +78,7 @@ describe('Education contents', () => {
 
       await rootURLRequest()
         .get(educationContentLocation)
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.objectContaining({ learningResourceMetadataURI: uri }));

@@ -14,7 +14,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
       it('should fail with code 400 and a message', async () => {
         await baseURLRequest()
           .post('/v3.3b/ed-fi/students')
-          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
           .send({
             studentUniqueId: generateRandomId(),
             firstName: 'First',
@@ -53,7 +53,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
 
         await rootURLRequest()
           .get(studentLocation)
-          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
           .expect(200);
       });
 
@@ -75,7 +75,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
         it('should allow to edit', async () => {
           await rootURLRequest()
             .put(studentLocation)
-            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+            .auth(await getAccessToken('vendor'), { type: 'bearer' })
             .send({
               studentUniqueId,
               firstName: 'First',
@@ -87,7 +87,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
 
           await baseURLRequest()
             .get('/v3.3b/ed-fi/students')
-            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+            .auth(await getAccessToken('vendor'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ studentUniqueId })]));
@@ -95,7 +95,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
 
           await rootURLRequest()
             .get(studentLocation)
-            .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+            .auth(await getAccessToken('vendor'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toEqual(expect.objectContaining({ birthDate: '2000-01-01' }));
@@ -119,7 +119,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
     it('should allow invalid country', async () => {
       studentLocation = await createResource({
         endpoint: 'students',
-        credentials: 'Host',
+        role: 'host',
         body: {
           studentUniqueId: generateRandomId(),
           firstName: 'First',
@@ -131,7 +131,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
 
       await rootURLRequest()
         .get(studentLocation)
-        .auth(await getAccessToken('Host'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200);
     });
 

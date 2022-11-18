@@ -13,7 +13,7 @@ describe('When retrieving information', () => {
     it('should return the total count', async () => {
       await baseURLRequest()
         .get('/v3.3b/ed-fi/schools')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.headers['total-count']).toEqual('0');
@@ -41,7 +41,7 @@ describe('When retrieving information', () => {
           const limit = total - 1;
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -55,7 +55,7 @@ describe('When retrieving information', () => {
         it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('limit = %s', async (limit) => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -80,7 +80,7 @@ describe('When retrieving information', () => {
           const offset = total / 2;
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -94,7 +94,7 @@ describe('When retrieving information', () => {
           const offset = total + 1;
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.headers['total-count']).toEqual(`${total}`);
@@ -109,7 +109,7 @@ describe('When retrieving information', () => {
         it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('offset = %s', async (offset) => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -132,7 +132,7 @@ describe('When retrieving information', () => {
           const offset = total - (total - 1);
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?offset=${offset}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -156,7 +156,7 @@ describe('When retrieving information', () => {
         const schoolName = 'New School 0';
         await baseURLRequest()
           .get(`/v3.3b/ed-fi/schools?limit=${limit}&nameOfInstitution=${schoolName}`)
-          .auth(await getAccessToken('Host'), { type: 'bearer' })
+          .auth(await getAccessToken('host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.headers['total-count']).toEqual(`${1}`);
@@ -188,7 +188,7 @@ describe('When retrieving information', () => {
     beforeAll(async () => {
       resourceLocation = await createResource({
         endpoint: 'academicWeeks',
-        credentials: 'Host',
+        role: 'host',
         body: data,
       });
     });
@@ -198,7 +198,7 @@ describe('When retrieving information', () => {
         it('should return valid data', async () => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.beginDate}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body.length).toBeGreaterThan(0);
@@ -212,7 +212,7 @@ describe('When retrieving information', () => {
         it('should return error message', async () => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${wrongDate}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
@@ -232,7 +232,7 @@ describe('When retrieving information', () => {
         it('should return empty array', async () => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${oldDate}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`[]`);
@@ -244,7 +244,7 @@ describe('When retrieving information', () => {
         it('should return empty array', async () => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/academicWeeks?beginDate=${data.endDate}`)
-            .auth(await getAccessToken('Host'), { type: 'bearer' })
+            .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`[]`);
@@ -257,7 +257,7 @@ describe('When retrieving information', () => {
       it('should return valid data', async () => {
         await baseURLRequest()
           .get(`/v3.3b/ed-fi/academicWeeks?weekIdentifier=${data.weekIdentifier}`)
-          .auth(await getAccessToken('Host'), { type: 'bearer' })
+          .auth(await getAccessToken('host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.body.length).toBeGreaterThan(0);
@@ -270,7 +270,7 @@ describe('When retrieving information', () => {
       it('should return valid data', async () => {
         await baseURLRequest()
           .get(`/v3.3b/ed-fi/academicWeeks?totalInstructionalDays=${data.totalInstructionalDays}`)
-          .auth(await getAccessToken('Host'), { type: 'bearer' })
+          .auth(await getAccessToken('host'), { type: 'bearer' })
           .expect(200)
           .then((response) => {
             expect(response.body.length).toBeGreaterThan(0);

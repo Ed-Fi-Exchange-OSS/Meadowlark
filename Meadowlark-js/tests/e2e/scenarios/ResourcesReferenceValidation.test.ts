@@ -14,7 +14,7 @@ describe('When creating a resource that has a reference to another resource', ()
       it('should fail with code 400 and a message', async () => {
         await baseURLRequest()
           .post('/v3.3b/ed-fi/locations')
-          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
           .send({
             classroomIdentificationCode: 'string',
             schoolReference: {
@@ -55,7 +55,7 @@ describe('When creating a resource that has a reference to another resource', ()
 
         await rootURLRequest()
           .get(location)
-          .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
           .expect(200);
       });
 
@@ -73,7 +73,7 @@ describe('When creating a resource that has a reference to another resource', ()
     it('should add the location', async () => {
       location = await createResource({
         endpoint: 'locations',
-        credentials: 'Host',
+        role: 'host',
         body: {
           classroomIdentificationCode: 'string',
           schoolReference: {
@@ -86,7 +86,7 @@ describe('When creating a resource that has a reference to another resource', ()
 
       await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken('Host'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(
