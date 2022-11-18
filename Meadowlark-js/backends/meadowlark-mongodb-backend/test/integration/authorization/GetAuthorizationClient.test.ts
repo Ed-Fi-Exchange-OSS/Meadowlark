@@ -63,6 +63,7 @@ describe('given the get of an existing authorization client', () => {
   it('should return get success', async () => {
     expect(getClientRequest).toMatchInlineSnapshot(`
       {
+        "active": true,
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
         "response": "GET_SUCCESS",
