@@ -45,17 +45,17 @@
 
 ## Authorization Validation
 
-- [Error creating second admin user](./AuthenticationValidation.test.ts#L19)
-- [Create user with valid role combination](./AuthenticationValidation.test.ts#L34)
-- [Create user with invalid role combination](./AuthenticationValidation.test.ts#L60)
-- [Create user with too many roles](./AuthenticationValidation.test.ts#L93)
-- [Create user with invalid role name](./AuthenticationValidation.test.ts#L121)
-- [Missing client name](./AuthenticationValidation.test.ts#L166)
-- [Invalid client name](./AuthenticationValidation.test.ts#L191)
+- [Error creating second admin user](./AuthorizationValidation.test.ts#L19)
+- [Create user with valid role combination](./AuthorizationValidation.test.ts#L34)
+- [Create user with invalid role combination](./AuthorizationValidation.test.ts#L60)
+- [Create user with too many roles](./AuthorizationValidation.test.ts#L93)
+- [Create user with invalid role name](./AuthorizationValidation.test.ts#L121)
+- [Missing client name](./AuthorizationValidation.test.ts#L166)
+- [Invalid client name](./AuthorizationValidation.test.ts#L191)
 
 ## Authentication Validation
 
-- Invalid grant type
+- [Invalid grant type](./AuthenticationValidation.test.ts#L15)
 - Invalid key
 - Invalid secret
 - Expired key (how?)
