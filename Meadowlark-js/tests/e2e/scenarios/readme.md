@@ -52,13 +52,15 @@
 - [Create user with invalid role name](./AuthorizationValidation.test.ts#L121)
 - [Missing client name](./AuthorizationValidation.test.ts#L166)
 - [Invalid client name](./AuthorizationValidation.test.ts#L191)
+- Retrieve client information
 
 ## Authentication Validation
 
 - [Invalid grant type](./AuthenticationValidation.test.ts#L15)
-- Invalid key
-- Invalid secret
-- Expired key (how?)
+- [Invalid key](./AuthenticationValidation.test.ts#L35)
+- [Invalid secret](./AuthenticationValidation.test.ts#L48)
+- Expired key (This might be possible when RND-444 is done setting up the OAUTH_EXPIRATION_MINUTES to a minimum value and waiting, while this does not affect the other tests)
 - Client not found
 - Admin client not found
-- Wrong key / secret combination
+
+- Permissions to read resources for vendors (could reuse existing scenarios)

@@ -31,4 +31,33 @@ describe("Given it's authenticating an user", () => {
         });
     });
   });
+
+  describe('when providing invalid key', () => {
+    it('should return 404', async () => {
+      await baseURLRequest()
+        .post('/oauth/token')
+        .send({
+          grant_type: 'client_credentials',
+          client_id: 'key',
+          client_secret: client.secret,
+        })
+        .expect(404);
+    });
+  });
+
+  describe('when providing invalid secret', () => {
+    it('should return 404', async () => {
+      await baseURLRequest()
+        .post('/oauth/token')
+        .send({
+          grant_type: 'client_credentials',
+          client_id: client.key,
+          client_secret: 'secret',
+        })
+        .expect(401)
+        .then((response) => {
+          expect(response.body).toMatchInlineSnapshot(`""`);
+        });
+    });
+  });
 });
