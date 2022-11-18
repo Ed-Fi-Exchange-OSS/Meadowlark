@@ -39,7 +39,7 @@ jobs:
           JEST_JUNIT_OUTPUT_DIR: unit-tests
 
       - name: Archive coverage results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: code-coverage-report
           path: Meadowlark-js/coverage/lcov-report
@@ -62,7 +62,7 @@ jobs:
           POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: system-tests
       - name: Upload test results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: test-results
           path: |
@@ -161,13 +161,13 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/.env.example ./tests/e2e/.env
-          yarn test:e2e --ci
+          yarn test:e2e --ci --reporters="jest-junit"
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
 
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: fastify-logs
           path: "**/fastify.log"
@@ -175,7 +175,7 @@ jobs:
 
       # Workaround for issue https://github.com/actions/upload-artifact/issues/174
       - name: Upload test results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: test-results
           path: |
