@@ -262,6 +262,7 @@ describe('given validation of valid token with clientId in datastore', () => {
           clientName: 'clientName',
           roles: ['vendor'],
           clientSecretHashed: 'hash',
+          active: true,
         }),
     });
 

@@ -435,6 +435,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
           clientName: 'clientName',
           roles: ['admin'],
           clientSecretHashed: 'not_a_matching_hashed_secret',
+          active: true,
         }),
     });
 
@@ -478,6 +479,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid cred
           clientName: 'clientName',
           roles: ['admin'],
           clientSecretHashed,
+          active: true,
         }),
     });
 
@@ -865,6 +867,7 @@ describe('given request body is json with credential client_id in authorization 
           clientName: 'clientName',
           roles: ['admin'],
           clientSecretHashed: 'not_a_matching_hashed_secret',
+          active: true,
         }),
     });
 
@@ -904,6 +907,7 @@ describe('given request body is json with valid credential in authorization data
           clientName: 'clientName',
           roles: ['admin'],
           clientSecretHashed,
+          active: true,
         }),
     });
 

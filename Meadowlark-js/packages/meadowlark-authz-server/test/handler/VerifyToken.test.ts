@@ -215,6 +215,7 @@ describe('given vendor role provided token for introspection but client ids do n
           clientName: 'clientName',
           roles: ['vendor'],
           clientSecretHashed: 'hash',
+          active: true,
         }),
     });
 
@@ -251,6 +252,7 @@ describe('given vendor role provided token for introspection and client ids matc
           clientName: 'clientName',
           roles: ['vendor'],
           clientSecretHashed: 'hash',
+          active: true,
         }),
     });
 
@@ -293,6 +295,7 @@ describe('given admin role provided token for introspection and client ids do no
           clientName: 'clientName',
           roles: ['vendor'],
           clientSecretHashed: 'hash',
+          active: true,
         }),
     });
 
@@ -339,6 +342,7 @@ describe('given admin role provided expired token for introspection', () => {
           clientName: 'clientName',
           roles: ['vendor'],
           clientSecretHashed: 'hash',
+          active: true,
         }),
     });
 

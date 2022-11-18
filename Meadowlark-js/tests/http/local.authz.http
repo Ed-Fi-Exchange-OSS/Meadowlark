@@ -18,7 +18,6 @@ content-type: application/json
 @admin_client_id={{created_admin.response.body.$.client_id}}
 @admin_client_secret={{created_admin.response.body.$.client_secret}}
 
-
 ### Try bootstrapping another admin, should fail 401 no token provided
 POST http://localhost:3000/local/oauth/client
 content-type: application/json
@@ -46,6 +45,12 @@ content-type: application/json
 @auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
 
 
+### Retrieve the admin client
+@admin_client_location = {{created_admin.response.headers.location}}
+GET http://localhost:3000{{admin_client_location}}
+{{ auth_header_admin_1 }}
+
+
 ### Create client as an admin, should succeed
 # @name created_client1
 POST http://localhost:3000/local/oauth/client
@@ -58,6 +63,11 @@ content-type: application/json
         "vendor"
     ]
 }
+
+### Retrieve the new client as admin
+@created_client1_location = {{created_client1.response.headers.location}}
+GET http://localhost:3000{{created_client1_location}}
+{{ auth_header_admin_1 }}
 
 ###
 @client1_client_id={{created_client1.response.body.$.client_id}}
@@ -80,6 +90,10 @@ content-type: application/json
 
 #################### POST authorization client
 
+
+### 403: can't retrieve a client with non-admin token
+GET http://localhost:3000{{created_client1_location}}
+{{ auth_header_client_1 }}
 
 ### Try creating client as a non-admin, should 403 Forbidden
 POST http://localhost:3000/local/oauth/client

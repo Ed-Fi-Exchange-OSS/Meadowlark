@@ -24,6 +24,8 @@ export async function getAuthorizationClientDocument(
       clientName: result.clientName,
       roles: result.roles,
       clientSecretHashed: result.clientSecretHashed,
+      // Temporarily hard-coded to true
+      active: true,
     };
   } catch (e) {
     Logger.error('GetAuthorizationClient.getAuthorizationClientDocument', traceId, e);
