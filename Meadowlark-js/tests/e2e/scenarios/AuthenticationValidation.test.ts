@@ -12,6 +12,29 @@ describe("given it's authenticating a client", () => {
     client = await getClientCredentials('host');
   });
 
+  describe('when providing valid admin information', () => {
+    it('should be able to return access token', async () => {
+      await baseURLRequest()
+        .post('/oauth/token')
+        .send({
+          grant_type: 'client_credentials',
+          client_id: client.key,
+          client_secret: client.secret,
+        })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              access_token: expect.any(String),
+              expires_in: expect.any(Number),
+              refresh_token: 'not available',
+              token_type: 'bearer',
+            }),
+          );
+        });
+    });
+  });
+
   describe('when providing invalid grant type', () => {
     it('should return error message', async () => {
       await baseURLRequest()
