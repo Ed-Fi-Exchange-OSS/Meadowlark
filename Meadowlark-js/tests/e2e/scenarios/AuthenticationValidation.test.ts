@@ -6,7 +6,7 @@
 import { Credentials, getClientCredentials } from '../helpers/Credentials';
 import { baseURLRequest } from '../helpers/Shared';
 
-describe("Given it's authenticating an user", () => {
+describe("given it's authenticating a client", () => {
   let client: Credentials;
   beforeAll(async () => {
     client = await getClientCredentials('host');

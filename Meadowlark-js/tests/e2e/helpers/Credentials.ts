@@ -170,6 +170,9 @@ export async function authenticateAdmin(): Promise<void> {
     if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
       const credentials = await createAdminClient();
       setCredentials(credentials);
+      console.info('Admin credentials, save in .env file since it cannot be regenerated');
+      console.log(credentials.key);
+      console.log(credentials.secret);
     } else {
       await getAdminAccessToken();
     }

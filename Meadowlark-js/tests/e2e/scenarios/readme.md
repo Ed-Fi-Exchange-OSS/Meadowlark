@@ -52,7 +52,9 @@
 - [Create user with invalid role name](./AuthorizationValidation.test.ts#L121)
 - [Missing client name](./AuthorizationValidation.test.ts#L166)
 - [Invalid client name](./AuthorizationValidation.test.ts#L191)
-- Retrieve client information
+- [Retrieve client information with admin](./AuthorizationValidation.test.ts#L240)
+- [Retrieve client information with wrong location](./AuthorizationValidation.test.ts#L252)
+- [Retrieve client information with not admin](./AuthorizationValidation.test.ts#L261)
 
 ## Authentication Validation
 
