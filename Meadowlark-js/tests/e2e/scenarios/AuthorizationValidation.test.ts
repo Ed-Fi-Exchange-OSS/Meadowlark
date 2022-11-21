@@ -30,6 +30,47 @@ describe("given it's managing the client authorization", () => {
       });
     });
 
+    describe('when generating a client with invalid admin token', () => {
+      it('should return error message', async () => {
+        await baseURLRequest()
+          .post(`/oauth/client`)
+          .auth('', { type: 'bearer' })
+          .send({
+            clientName: 'Automation Client',
+            roles: ['vendor'],
+          })
+          .expect(401)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+              {
+                "error": "invalid_client",
+                "error_description": "Authorization token not provided",
+              }
+            `);
+          });
+      });
+    });
+
+    describe('when generating a client without admin token', () => {
+      it('should return error message', async () => {
+        await baseURLRequest()
+          .post(`/oauth/client`)
+          .send({
+            clientName: 'Automation Client',
+            roles: ['vendor'],
+          })
+          .expect(401)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+              {
+                "error": "invalid_client",
+                "error_description": "Authorization token not provided",
+              }
+            `);
+          });
+      });
+    });
+
     describe('when generating a client with a valid role combination', () => {
       // This should be modified when RND-452 is done
       describe('when generating a client with an valid combination of roles', () => {
@@ -39,7 +80,7 @@ describe("given it's managing the client authorization", () => {
           { roles: ['admin', 'assessment'] },
           { roles: ['assessment', 'host'] },
           { roles: ['assessment', 'vendor'] },
-        ])('create client with %j', async (item) => {
+        ])('should create client with %j', async (item) => {
           const { roles } = item;
 
           const clientInfo = {
