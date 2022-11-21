@@ -8,28 +8,6 @@ import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe("given it's managing the client authorization", () => {
   describe("given it's creating a client", () => {
-    describe('when generating an admin client', () => {
-      describe('given client already exists', () => {
-        it('should fail with 401 error', async () => {
-          await baseURLRequest()
-            .post(`/oauth/client`)
-            .send({
-              clientName: 'Admin Client',
-              roles: ['admin'],
-            })
-            .expect(401)
-            .then((response) => {
-              expect(response.body).toMatchInlineSnapshot(`
-                {
-                  "error": "invalid_client",
-                  "error_description": "Authorization token not provided",
-                }
-              `);
-            });
-        });
-      });
-    });
-
     describe('when generating a client with invalid admin token', () => {
       it('should return error message', async () => {
         await baseURLRequest()
