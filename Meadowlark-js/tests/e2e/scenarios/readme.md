@@ -62,8 +62,7 @@
 - [Invalid grant type](./AuthenticationValidation.test.ts#L15)
 - [Invalid key](./AuthenticationValidation.test.ts#L35)
 - [Invalid secret](./AuthenticationValidation.test.ts#L48)
-- Get vendor Client not found
-- Get vendor client when Admin client not found
+
 - Expired key (This might be possible when RND-444 is done setting up the OAUTH_EXPIRATION_MINUTES to a minimum value and waiting, while this does not affect the other tests)
 
 - Permissions to read resources for vendors (could reuse existing scenarios)

@@ -12,7 +12,7 @@ describe("given it's authenticating a client", () => {
     client = await getClientCredentials('host');
   });
 
-  describe('when providing valid admin information', () => {
+  describe('when providing valid information', () => {
     it('should be able to return access token', async () => {
       await baseURLRequest()
         .post('/oauth/token')
