@@ -45,24 +45,27 @@
 
 ## Authorization Validation
 
-- [Error creating second admin user](./AuthorizationValidation.test.ts#L19)
-- [Create user with valid role combination](./AuthorizationValidation.test.ts#L34)
-- [Create user with invalid role combination](./AuthorizationValidation.test.ts#L60)
-- [Create user with too many roles](./AuthorizationValidation.test.ts#L93)
-- [Create user with invalid role name](./AuthorizationValidation.test.ts#L121)
-- [Missing client name](./AuthorizationValidation.test.ts#L166)
-- [Invalid client name](./AuthorizationValidation.test.ts#L191)
-- [Retrieve client information with admin](./AuthorizationValidation.test.ts#L240)
-- [Retrieve client information with wrong location](./AuthorizationValidation.test.ts#L252)
-- [Retrieve client information with not admin](./AuthorizationValidation.test.ts#L261)
+- [Creating a client with invalid admin token](./AuthorizationValidation.test.ts#L28)
+- [Creating a client without admin token](./AuthorizationValidation.test.ts#L49)
+- [Create client with valid role combination](./AuthorizationValidation.test.ts#L71)
+- [Create client with invalid role combination](./AuthorizationValidation.test.ts#L97)
+- [Create client with too many roles](./AuthorizationValidation.test.ts#L130)
+- [Create user with invalid role name](./AuthorizationValidation.test.ts#L158)
+- [Missing client name](./AuthorizationValidation.test.ts#L203)
+- [Invalid client name](./AuthorizationValidation.test.ts#L228)
+- [Retrieve client information with admin](./AuthorizationValidation.test.ts#L256)
+- [Retrieve client information with wrong location](./AuthorizationValidation.test.ts#L274)
+- [Retrieve client information with not admin](./AuthorizationValidation.test.ts#L280)
+- [Update client information](./AuthorizationValidation.test.ts#L300)
 
 ## Authentication Validation
 
 - [Get access token success](./AuthenticationValidation.test.ts#L15)
-- [Invalid grant type](./AuthenticationValidation.test.ts#L15)
-- [Invalid key](./AuthenticationValidation.test.ts#L35)
-- [Invalid secret](./AuthenticationValidation.test.ts#L48)
+- [Invalid grant type](./AuthenticationValidation.test.ts#L38)
+- [Invalid key](./AuthenticationValidation.test.ts#L58)
+- [Invalid secret](./AuthenticationValidation.test.ts#L71)
+
+Pending:
 
 - Expired key (This might be possible when RND-444 is done setting up the OAUTH_EXPIRATION_MINUTES to a minimum value and waiting, while this does not affect the other tests)
-
 - Permissions to read resources for vendors (could reuse existing scenarios)

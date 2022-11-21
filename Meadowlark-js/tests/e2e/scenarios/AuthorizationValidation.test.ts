@@ -298,7 +298,7 @@ describe("given it's managing the client authorization", () => {
           });
 
           describe("given it's and administrator user", () => {
-            it('should be able to add additional roles', async () => {
+            it('should be able update', async () => {
               await rootURLRequest().put(location).auth(adminToken, { type: 'bearer' }).send(updatedClientData).expect(204);
 
               await rootURLRequest()
