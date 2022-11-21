@@ -65,7 +65,19 @@
 - [Invalid key](./AuthenticationValidation.test.ts#L58)
 - [Invalid secret](./AuthenticationValidation.test.ts#L71)
 
+## Client Credential Management
+
+- [Vendor cannot update resource created by host](./ClientCredentialManagement.test.ts#L20)
+- [Admin can create but cannot query resources](./ClientCredentialManagementValidation.test.ts#L78)
+
+## Token Introspection Management
+
+- Host can see resources from admin
+- Vendor cannot see token from host
+- Host cannot see token from vendor
+- Admin can see token from host
+- Admin can see token from vendor
+
 Pending:
 
 - Expired key (This might be possible when RND-444 is done setting up the OAUTH_EXPIRATION_MINUTES to a minimum value and waiting, while this does not affect the other tests)
-- Permissions to read resources for vendors (could reuse existing scenarios)
