@@ -70,9 +70,9 @@
 - [Vendor cannot update resource created by host](./ClientCredentialManagement.test.ts#L20)
 - [Admin can create but cannot query resources](./ClientCredentialManagementValidation.test.ts#L78)
 
-## Token Introspection Management
+## Token Introspection
 
-- Host can see resources from admin
+- Host can see token from admin
 - Vendor cannot see token from host
 - Host cannot see token from vendor
 - Admin can see token from host

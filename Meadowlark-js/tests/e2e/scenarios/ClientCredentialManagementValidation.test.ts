@@ -5,9 +5,15 @@
 
 import { adminAccessToken, getAccessToken } from '../helpers/Credentials';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
-import { baseURLRequest } from '../helpers/Shared';
+import { rootURLRequest } from '../helpers/Shared';
 
 describe("given it's handling the client permission", () => {
+  const countryDescriptor = {
+    codeValue: 'US',
+    shortDescription: 'US',
+    description: 'US',
+    namespace: 'uri://ed-fi.org/CountryDescriptor',
+  };
   let vendorToken: string;
   let hostToken: string;
   let adminToken: string;
@@ -23,27 +29,32 @@ describe("given it's handling the client permission", () => {
       countryLocation = await createResource({
         endpoint: 'countryDescriptors',
         role: 'host',
-        body: {
-          codeValue: 'US',
-          shortDescription: 'US',
-          description: 'US',
-          namespace: 'uri://ed-fi.org/CountryDescriptor',
-        },
+        body: countryDescriptor,
       });
     });
 
     it('returns 200 when querying by host', async () => {
-      await baseURLRequest().get(countryLocation).auth(hostToken, { type: 'bearer' }).expect(404);
+      await rootURLRequest()
+        .get(countryLocation)
+        .auth(hostToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.objectContaining(countryDescriptor));
+        });
     });
 
-    it('returns 404 when querying by vendor', async () => {
-      await baseURLRequest().get(countryLocation).auth(vendorToken, { type: 'bearer' }).expect(404);
+    it('returns 200 when querying by vendor', async () => {
+      await rootURLRequest()
+        .get(countryLocation)
+        .auth(vendorToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.objectContaining(countryDescriptor));
+        });
     });
 
-    it('returns 404 when updating by vendor', async () => {
-      console.log(countryLocation);
-
-      await baseURLRequest()
+    it('returns 403 when updating by vendor', async () => {
+      await rootURLRequest()
         .put(countryLocation)
         .auth(vendorToken, { type: 'bearer' })
         .send({
@@ -52,7 +63,7 @@ describe("given it's handling the client permission", () => {
           description: 'USA',
           namespace: 'uri://ed-fi.org/CountryDescriptor',
         })
-        .expect(404);
+        .expect(403);
     });
 
     afterAll(async () => {
@@ -66,23 +77,28 @@ describe("given it's handling the client permission", () => {
       countryLocation = await createResource({
         endpoint: 'countryDescriptors',
         role: 'admin',
-        body: {
-          codeValue: 'US',
-          shortDescription: 'US',
-          description: 'US',
-          namespace: 'uri://ed-fi.org/CountryDescriptor',
-        },
+        body: countryDescriptor,
       });
     });
 
-    it('returns 404 when querying by same role', async () => {
-      await baseURLRequest().get(countryLocation).auth(adminToken, { type: 'bearer' }).expect(404);
+    it('returns 200 when querying by admin', async () => {
+      await rootURLRequest()
+        .get(countryLocation)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.objectContaining(countryDescriptor));
+        });
     });
 
-    // According to https://techdocs.ed-fi.org/display/EFTD/Meadowlark+-+Internal+OAuth+2+Client+Credential+Provider
-    // This should work, but it's not
-    it.skip('returns 200 when querying by host', async () => {
-      await baseURLRequest().get(countryLocation).auth(hostToken, { type: 'bearer' }).expect(200);
+    it('returns 200 when querying by host', async () => {
+      await rootURLRequest()
+        .get(countryLocation)
+        .auth(hostToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.objectContaining(countryDescriptor));
+        });
     });
 
     afterAll(async () => {
