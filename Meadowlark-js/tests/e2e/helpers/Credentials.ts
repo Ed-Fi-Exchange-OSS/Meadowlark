@@ -104,7 +104,17 @@ export async function getClientCredentials(requestedClient: Role): Promise<Crede
       }
       break;
     case 'admin':
-      throw new Error('Admin client should be generated before execution');
+      // We don't want to check for env variables because those should be automatically set.
+      // This case is for scenarios where we specifically need to create another admin user.
+      credentials = await createClient({
+        clientName: 'Automated Admin',
+        roles: ['admin'],
+      });
+
+      process.env.HOST_KEY = credentials.key;
+      process.env.HOST_SECRET = credentials.secret;
+
+      break;
     default:
       throw new Error('Specify desired client');
   }

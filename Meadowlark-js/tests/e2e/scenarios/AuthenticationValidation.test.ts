@@ -69,7 +69,7 @@ describe("given it's authenticating a client", () => {
   });
 
   describe('when providing invalid secret', () => {
-    it('should return 404', async () => {
+    it('should return 401', async () => {
       await baseURLRequest()
         .post('/oauth/token')
         .send({

@@ -49,9 +49,9 @@ describe("given it's managing the client authorization", () => {
       });
     });
 
-    describe('when generating a client with a valid role combination', () => {
+    describe('when generating a client with a role combination', () => {
       // This should be modified when RND-452 is done
-      describe('when generating a client with an valid combination of roles', () => {
+      describe('when using a valid combination of roles', () => {
         it.each([
           { roles: ['verify-only'] },
           { roles: ['admin'] },
@@ -77,7 +77,7 @@ describe("given it's managing the client authorization", () => {
         });
       });
 
-      describe('when generating a client with an invalid combination of roles', () => {
+      describe('when using an invalid combination of roles', () => {
         it.each([
           { roles: ['vendor', 'vendor'] },
           { roles: ['vendor', 'host'] },
@@ -298,37 +298,5 @@ describe("given it's managing the client authorization", () => {
           .expect(403);
       });
     });
-
-    // describe('given client is created', () => {
-    //   let client: Credentials;
-    //   beforeAll(async () => {
-    //     client = await getClientCredentials('admin');
-    //   });
-    //   describe('given user is not admin', () => {
-    //     it('should return 403', async () => {
-    //       await baseURLRequest()
-    //         .post('/oauth/token')
-    //         .send({
-    //           grant_type: 'wrong',
-    //           client_id: client.key,
-    //           client_secret: client.secret,
-    //         })
-    //         .expect(400)
-    //         .then((response) => {
-    //           expect(response.body).toMatchInlineSnapshot(`
-    //         {
-    //           "error": "[{"message":"'grant_type' property must be equal to one of the allowed values","path":"{requestBody}.grant_type","context":{"errorType":"enum","allowedValues":["client_credentials"]}}]",
-    //         }
-    //       `);
-    //         });
-    //     });
-    //   });
-    //   describe('given user is admin', () => {
-    //     it('should retrieve information', () => {});
-    //   });
-    // });
-    // describe('given client does not exists', () => {
-    //   it('should return 404', async () => {});
-    // });
   });
 });
