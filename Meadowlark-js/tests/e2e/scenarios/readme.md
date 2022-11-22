@@ -72,11 +72,16 @@
 
 ## Token Introspection
 
-- Host can see token from admin
-- Vendor cannot see token from host
-- Host cannot see token from vendor
-- Admin can see token from host
-- Admin can see token from vendor
+- [Content type not specified](TokenIntrospection.test.ts#L19)
+- [Host can see token token for host](TokenIntrospection.test.ts#L35)
+- [Host can see token from admin](TokenIntrospection.test.ts#L55)
+- [Host cannot see token from vendor](TokenIntrospection.test.ts#L65)
+- [Vendor can see token from vendor](TokenIntrospection.test.ts#L77)
+- [Vendor cannot see token from host](TokenIntrospection.test.ts#L97)
+- [Vendor cannot see token from admin](TokenIntrospection.test.ts#L107)
+- [Admin can see token from admin](TokenIntrospection.test.ts#L120)
+- [Admin can see token from host](TokenIntrospection.test.ts#L139)
+- [Admin can see token from vendor](TokenIntrospection.test.ts#L159)
 
 Pending:
 
