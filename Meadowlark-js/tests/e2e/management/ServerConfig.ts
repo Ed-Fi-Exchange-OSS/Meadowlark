@@ -9,6 +9,11 @@ import { initializeLogging } from '@edfi/meadowlark-utilities';
 // import { getLogger } from '@edfi/meadowlark-utilities';
 
 let serverInstance;
+let serverAlreadyRunning = false;
+
+export function wasServerAlreadyRunning(): boolean {
+  return serverAlreadyRunning;
+}
 
 export function getServer() {
   return serverInstance;
@@ -33,7 +38,11 @@ export async function setup() {
 
     await serverInstance.listen(port);
   } catch (err) {
-    console.error(err);
-    process.exit(1);
+    if (err.code === 'EADDRINUSE') {
+      serverAlreadyRunning = true;
+    } else {
+      console.error(err);
+      process.exit(1);
+    }
   }
 }
