@@ -152,6 +152,12 @@ jobs:
           yarn test:e2e --ci --reporters="jest-junit"
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
+          DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: abcdefgh1!
+          OPENSEARCH_USERNAME: admin
+          OPENSEARCH_PASSWORD: admin
+          MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
 
       # Should be refactored until issue with save to file is fixed
       # - name: Upload logs
