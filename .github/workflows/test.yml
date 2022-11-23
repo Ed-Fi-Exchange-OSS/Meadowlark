@@ -159,7 +159,7 @@ jobs:
           OPENSEARCH_PASSWORD: admin
           MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
 
-      # Should be refactored until issue with save to file is fixed
+      # Should be refactored when issue with save to file is fixed
       # - name: Upload logs
       #   if: failure()
       #   uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
