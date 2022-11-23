@@ -61,6 +61,10 @@ let logger: winston.Logger = winston.createLogger({
   transports: [transport],
 });
 
+export function getLogger(): winston.Logger {
+  return logger;
+}
+
 /**
  * This should be called by frontend services at startup, before logging. Because services can have
  * multiple startup points (e.g. multiple lambdas), this checks if initialization has already happened.
