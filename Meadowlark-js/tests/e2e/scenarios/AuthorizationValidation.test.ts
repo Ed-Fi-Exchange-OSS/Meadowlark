@@ -6,6 +6,8 @@
 import { adminAccessToken, getAccessToken } from '../helpers/Credentials';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
+const ENDPOINT = `/oauth/client`;
+
 describe("given it's managing the client authorization", () => {
   describe('given client already exists ', () => {
     let adminToken: string;
@@ -17,7 +19,7 @@ describe("given it's managing the client authorization", () => {
     beforeAll(async () => {
       adminToken = await adminAccessToken();
       location = await baseURLRequest()
-        .post(`/oauth/client`)
+        .post(ENDPOINT)
         .send(clientData)
         .expect(201)
         .auth(adminToken, { type: 'bearer' })
@@ -28,7 +30,7 @@ describe("given it's managing the client authorization", () => {
       describe('when generating a client with invalid admin token', () => {
         it('should return error message', async () => {
           await baseURLRequest()
-            .post(`/oauth/client`)
+            .post(ENDPOINT)
             .auth('', { type: 'bearer' })
             .send({
               clientName: 'Automation Client',
@@ -49,7 +51,7 @@ describe("given it's managing the client authorization", () => {
       describe('when generating a client without admin token', () => {
         it('should return error message', async () => {
           await baseURLRequest()
-            .post(`/oauth/client`)
+            .post(ENDPOINT)
             .send({
               clientName: 'Automation Client',
               roles: ['vendor'],
@@ -84,7 +86,7 @@ describe("given it's managing the client authorization", () => {
             };
 
             await baseURLRequest()
-              .post(`/oauth/client`)
+              .post(ENDPOINT)
               .auth(await adminAccessToken(), { type: 'bearer' })
               .send(clientInfo)
               .expect(201)
@@ -105,7 +107,7 @@ describe("given it's managing the client authorization", () => {
             const { roles } = item;
 
             await baseURLRequest()
-              .post(`/oauth/client`)
+              .post(ENDPOINT)
               .auth(await adminAccessToken(), { type: 'bearer' })
               .send({
                 clientName: 'Admin Client',
@@ -132,7 +134,7 @@ describe("given it's managing the client authorization", () => {
               const roles = ['admin', 'vendor', 'host'];
 
               await baseURLRequest()
-                .post(`/oauth/client`)
+                .post(ENDPOINT)
                 .auth(await adminAccessToken(), { type: 'bearer' })
                 .send({
                   clientName: 'Admin Client',
@@ -160,7 +162,7 @@ describe("given it's managing the client authorization", () => {
               const roles = ['not-valid'];
 
               await baseURLRequest()
-                .post(`/oauth/client`)
+                .post(ENDPOINT)
                 .auth(await adminAccessToken(), { type: 'bearer' })
                 .send({
                   clientName: 'Admin Client',
@@ -203,7 +205,7 @@ describe("given it's managing the client authorization", () => {
       describe('when missing client name', () => {
         it('should return error message', async () => {
           await baseURLRequest()
-            .post(`/oauth/client`)
+            .post(ENDPOINT)
             .auth(await adminAccessToken(), { type: 'bearer' })
             .send({
               roles: ['vendor'],
@@ -228,7 +230,7 @@ describe("given it's managing the client authorization", () => {
       describe('when adding invalid client name', () => {
         it('should return error message', async () => {
           await baseURLRequest()
-            .post(`/oauth/client`)
+            .post(ENDPOINT)
             .auth(await adminAccessToken(), { type: 'bearer' })
             .send({
               clientName: 1,
@@ -267,6 +269,16 @@ describe("given it's managing the client authorization", () => {
                   active: true,
                 }),
               );
+            });
+        });
+
+        it('should be able to retrieve all clients', async () => {
+          await rootURLRequest()
+            .get(ENDPOINT)
+            .auth(adminToken, { type: 'bearer' })
+            .expect(200)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot('a');
             });
         });
       });
