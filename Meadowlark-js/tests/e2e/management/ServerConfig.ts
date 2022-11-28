@@ -22,7 +22,7 @@ export async function setup() {
   initializeLogging();
   const logger = getLogger();
 
-  const fileLogger = new winston.transports.File({ filename: 'fastify-run.log', level: 'INFO' });
+  const fileLogger = new winston.transports.File({ filename: 'fastify.log', level: 'INFO' });
   logger.add(fileLogger);
 
   serverInstance = buildService();

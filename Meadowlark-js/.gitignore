@@ -9,7 +9,7 @@ tmp
 dist/
 docs/
 yarn-error.log
-fastify-run.log
+fastify.log
 
 # AWS emulator directories
 .dynamodb/

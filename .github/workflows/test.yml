@@ -160,11 +160,11 @@ jobs:
           MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
 
       - name: Upload logs
-        if: failure()
+        # if: failure()
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: fastify-logs
-          path: "fastify-run.log"
+          path: "**/fastify.log"
           retention-days: 10
 
       # Workaround for issue https://github.com/actions/upload-artifact/issues/174
