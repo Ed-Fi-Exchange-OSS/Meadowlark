@@ -42,6 +42,7 @@ describe('given the create of a new authorization client', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientId",
+        "active": true,
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
         "isBootstrapAdmin": false,

@@ -45,6 +45,7 @@ describe('given the first time create of a bootstrap admin client', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientId",
+        "active": true,
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
         "isBootstrapAdmin": true,
@@ -127,6 +128,7 @@ describe('given two attempts at the create of a bootstrap admin client', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientId",
+        "active": true,
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
         "isBootstrapAdmin": true,

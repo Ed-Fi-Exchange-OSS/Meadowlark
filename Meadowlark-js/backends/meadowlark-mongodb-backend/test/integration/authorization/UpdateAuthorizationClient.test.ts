@@ -56,6 +56,7 @@ describe('given the update of an authorization client', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientIdSame",
+        "active": true,
         "clientName": "clientNameChanged",
         "clientSecretHashed": "clientSecretHashed",
         "isBootstrapAdmin": false,
