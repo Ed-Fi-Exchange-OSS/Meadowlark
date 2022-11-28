@@ -8,6 +8,7 @@ import type { AuthorizationClientRole } from '../model/AuthorizationClientRole';
 export type UpdateAuthorizationClientRequest = {
   clientId: string;
   clientName: string;
+  active: boolean;
   roles: AuthorizationClientRole[];
   traceId: string;
 };

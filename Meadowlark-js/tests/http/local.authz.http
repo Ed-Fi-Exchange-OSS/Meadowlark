@@ -411,23 +411,49 @@ content-type: application/x-www-form-urlencoded
 
 token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxOTE2MjM5MDIyfQ.DGme0_qbXW79j7VftKA1L1b6qugxEJ6-nqcmnvmi7DA
 
-#### WON'T WORK UNTIL AFTER RND-354
+### Deactivate the "reset" client
+PUT http://localhost:3000/local/oauth/client/a4d03bd8-ab32-4233-aa33-3c470b8c7772
+content-type: application/json
+{{auth_header_admin_1}}
 
-# ### Delete the "reset" client
-# DELETE http://localhost:3000/local/oauth/client/{{created_client_id_2}}
-# content-type: application/x-www-form-urlencoded
-# {{auth_header_admin_1}}
+{
+    "clientName": "Totally new SIS",
+    "roles": [
+        "vendor"
+    ],
+    "active": false
+}
 
-# ### Now verification of the "reset" client should fail
-# POST http://localhost:3000/local/oauth/verify
-# content-type: application/x-www-form-urlencoded
-# {{auth_header_admin_1}}
+### Now verification of the "reset" client should fail
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+{{auth_header_admin_1}}
 
-# token={{reset_token}}
+token={{reset_token}}
 
-# ### And the "reset" client shouldn't be able to verify own token
-# POST http://localhost:3000/local/oauth/verify
-# content-type: application/x-www-form-urlencoded
-# authorization: bearer {{reset_token}}
+### And the "reset" client shouldn't be able to verify own token
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+authorization: bearer {{reset_token}}
 
-# token={{reset_token}}
+token={{reset_token}}
+
+### Reactivate the client
+PUT http://localhost:3000/local/oauth/client/a4d03bd8-ab32-4233-aa33-3c470b8c7772
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Totally new SIS",
+    "roles": [
+        "vendor"
+    ],
+    "active": true
+}
+
+### Test the "reset" client should be able to verify own token again
+POST http://localhost:3000/local/oauth/verify
+content-type: application/x-www-form-urlencoded
+authorization: bearer {{reset_token}}
+
+token={{reset_token}}

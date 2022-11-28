@@ -139,6 +139,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
       clientId,
       clientSecretHashed,
       traceId: authorizationRequest.traceId,
+      active: createClientBody.active ?? true,
     };
 
     if (bootstrapAdminRequest) {

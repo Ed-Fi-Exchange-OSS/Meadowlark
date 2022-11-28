@@ -100,8 +100,12 @@ async function isValidClientId(clientId: string | undefined, traceId: string): P
     traceId,
   });
 
-  if (result.response === 'GET_SUCCESS') return true;
-  Logger.debug(`TokenValidator.isValidClientId clientId ${clientId} not found in datastore`, traceId);
+  if (result.response === 'GET_SUCCESS' && result.active) return true;
+
+  Logger.debug(
+    `TokenValidator.isValidClientId clientId ${clientId} not found in datastore or has been deactivated`,
+    traceId,
+  );
   return false;
 }
 

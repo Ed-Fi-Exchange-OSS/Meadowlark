@@ -478,8 +478,8 @@ describe('given request body is x-www-form-urlencoded grant_type with valid cred
           response: 'GET_SUCCESS',
           clientName: 'clientName',
           roles: ['admin'],
-          clientSecretHashed,
           active: true,
+          clientSecretHashed,
         }),
     });
 

@@ -10,8 +10,8 @@ export type GetAuthorizationClientResult =
       response: 'GET_SUCCESS' | 'UNKNOWN_FAILURE';
       clientSecretHashed: string;
       clientName: string;
+      active: boolean;
       roles: AuthorizationClientRole[];
-      active: boolean | undefined;
     }
   | { response: 'GET_FAILURE_NOT_EXISTS' }
   | { response: 'UNKNOWN_FAILURE' };
