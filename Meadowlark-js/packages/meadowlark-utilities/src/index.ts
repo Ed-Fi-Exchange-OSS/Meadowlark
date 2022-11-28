@@ -4,5 +4,5 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export * from './Environment';
-export { Logger, initializeLogging, isDebugEnabled, isInfoEnabled, writeErrorToLog } from './Logger';
+export { Logger, initializeLogging, isDebugEnabled, isInfoEnabled, writeErrorToLog, getLogger } from './Logger';
 export { LOCATION_HEADER_NAME } from './LocationHeader';

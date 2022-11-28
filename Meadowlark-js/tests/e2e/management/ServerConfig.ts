@@ -3,10 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-// import winston from 'winston';
+import winston from 'winston';
 import { buildService } from '@edfi/meadowlark-fastify/src/Service';
-import { initializeLogging } from '@edfi/meadowlark-utilities';
-// import { getLogger } from '@edfi/meadowlark-utilities';
+import { getLogger, initializeLogging } from '@edfi/meadowlark-utilities';
 
 let serverInstance;
 let serverAlreadyRunning = false;
@@ -20,22 +19,20 @@ export function getServer() {
 }
 
 export async function setup() {
-  // const logger = getLogger();
-  // const consoleLogger = new winston.transports.Console();
-  // logger.add(consoleLogger);
   initializeLogging();
+  const logger = getLogger();
+
+  const fileLogger = new winston.transports.File({ filename: 'fastify-run.log', level: 'INFO' });
+  logger.add(fileLogger);
 
   serverInstance = buildService();
   try {
     let port: number = 3000;
     if (process.env.FASTIFY_PORT != null) {
       const possiblePort: number = parseInt(process.env.FASTIFY_PORT, 10);
-
       if (!Number.isNaN(possiblePort)) port = possiblePort;
     }
-
     process.env.MEADOWLARK_STAGE ?? 'local';
-
     await serverInstance.listen(port);
   } catch (err) {
     if (err.code === 'EADDRINUSE') {
