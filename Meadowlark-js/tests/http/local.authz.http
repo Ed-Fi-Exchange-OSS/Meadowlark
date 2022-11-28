@@ -69,6 +69,10 @@ content-type: application/json
 GET http://localhost:3000{{created_client1_location}}
 {{ auth_header_admin_1 }}
 
+### Get all clients
+GET http://localhost:3000/local/oauth/client
+{{auth_header_admin_1}}
+
 ###
 @client1_client_id={{created_client1.response.body.$.client_id}}
 @client1_client_secret={{created_client1.response.body.$.client_secret}}
