@@ -149,7 +149,7 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
-          yarn test:e2e --ci --reporters="jest-junit"
+          yarn test:e2e --ci --reporters="default" --reporters="jest-junit"
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
