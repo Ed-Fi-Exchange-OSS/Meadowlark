@@ -19,6 +19,7 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   clientName: 'clientName',
   roles: ['admin'],
   traceId: 'traceId',
+  active: true,
 });
 
 describe('given the first time create of a bootstrap admin client', () => {

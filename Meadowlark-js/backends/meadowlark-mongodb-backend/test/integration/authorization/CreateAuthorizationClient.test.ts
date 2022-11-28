@@ -19,6 +19,7 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   clientName: 'clientName',
   roles: ['vendor'],
   traceId: 'traceId',
+  active: true,
 });
 
 describe('given the create of a new authorization client', () => {

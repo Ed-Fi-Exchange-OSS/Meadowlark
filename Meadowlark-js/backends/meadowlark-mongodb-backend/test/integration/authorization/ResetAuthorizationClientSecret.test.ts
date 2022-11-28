@@ -22,6 +22,7 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   clientName: 'clientName',
   roles: ['vendor'],
   traceId: 'traceId',
+  active: true,
 });
 
 const newResetAuthorizationClientSecretRequest = (): ResetAuthorizationClientSecretRequest => ({

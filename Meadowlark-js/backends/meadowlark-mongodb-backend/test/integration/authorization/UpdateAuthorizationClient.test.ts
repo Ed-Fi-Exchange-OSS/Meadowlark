@@ -21,6 +21,7 @@ const newCreateAuthorizationClientRequest = (clientId: string): CreateAuthorizat
   clientName: 'clientName',
   roles: ['vendor'],
   traceId: 'traceId',
+  active: true,
 });
 
 const newUpdateAuthorizationClientRequest = (clientId: string): UpdateAuthorizationClientRequest => ({
@@ -28,6 +29,7 @@ const newUpdateAuthorizationClientRequest = (clientId: string): UpdateAuthorizat
   clientName: 'clientNameChanged',
   roles: ['host'],
   traceId: 'traceId',
+  active: true,
 });
 
 describe('given the update of an authorization client', () => {
