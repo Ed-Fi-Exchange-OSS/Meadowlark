@@ -12,7 +12,7 @@ describe('When creating a resource', () => {
       // This is entirely missing the "categories" collection
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -47,7 +47,7 @@ describe('When creating a resource', () => {
       // This is has a "categories" array, but it is empty
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           categories: [],
           communityOrganizationId: 19,
@@ -83,7 +83,7 @@ describe('When creating a resource', () => {
       // educationOrganizationIdentificationSystemDescriptor: '',
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -118,7 +118,7 @@ describe('When creating a resource', () => {
       // shortNameOfInstitution: '',
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -161,7 +161,7 @@ describe('When creating a resource', () => {
       // communityOrganizationId
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           nameOfInstitution: 'Communities in Schools',
           shortNameOfInstitution: 'CIS',
@@ -203,7 +203,7 @@ describe('When creating a resource', () => {
       // In other words, empty arrays are acceptable!
       await baseURLRequest()
         .post('/v3.3b/ed-fi/communityOrganizations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           communityOrganizationId: 19,
           nameOfInstitution: 'Communities in Schools',
@@ -237,7 +237,7 @@ describe('When creating a resource', () => {
     it('should return error message', async () => {
       await baseURLRequest()
         .post(`/v3.3b/ed-fi/academicWeeks`)
-        .auth(await getAccessToken('Host'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
           weekIdentifier: '123456',
           schoolReference: {

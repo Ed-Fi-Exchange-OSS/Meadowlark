@@ -12,7 +12,7 @@ describe('Sections', () => {
     it('should fail when missing data', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/sections')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           sectionIdentifier: 'c00v',
           courseOfferingReference: {
@@ -57,7 +57,7 @@ describe('Sections', () => {
     it('should add the section', async () => {
       location = await createResource({
         endpoint: 'sections',
-        credentials: 'Host',
+        role: 'host',
         body: {
           sectionIdentifier: 'c00v',
           courseOfferingReference: {
@@ -90,7 +90,7 @@ describe('Sections', () => {
 
       await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken('Host'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(

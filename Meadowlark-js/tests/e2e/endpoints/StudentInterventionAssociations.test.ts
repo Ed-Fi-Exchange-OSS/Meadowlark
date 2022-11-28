@@ -12,7 +12,7 @@ describe('Student Intervention Association', () => {
     it('should fail when missing data', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/StudentInterventionAssociations')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           studentReference: {
             studentUniqueId: 's0zf6d1123d3e',
@@ -36,7 +36,7 @@ describe('Student Intervention Association', () => {
     it('should add the association', async () => {
       location = await createResource({
         endpoint: 'StudentInterventionAssociations',
-        credentials: 'Host',
+        role: 'host',
         body: {
           studentReference: {
             studentUniqueId: 's0zf6d1123d3e',
@@ -50,7 +50,7 @@ describe('Student Intervention Association', () => {
 
       await rootURLRequest()
         .get(location)
-        .auth(await getAccessToken('Host'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(

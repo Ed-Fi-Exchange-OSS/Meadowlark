@@ -13,7 +13,7 @@ describe('Sessions', () => {
     it('should fail when missing required properties', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/sessions')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
           sessionName: 'd',
           schoolYearTypeReference: {
@@ -78,7 +78,7 @@ describe('Sessions', () => {
 
       await baseURLRequest()
         .get('/v3.3b/ed-fi/sessions')
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
           expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ termDescriptor })]));
@@ -86,7 +86,7 @@ describe('Sessions', () => {
 
       await rootURLRequest()
         .get(sessionLocation)
-        .auth(await getAccessToken('Vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .expect(200);
     });
 
