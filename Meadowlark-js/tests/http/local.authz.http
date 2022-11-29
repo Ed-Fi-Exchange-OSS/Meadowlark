@@ -412,7 +412,7 @@ content-type: application/x-www-form-urlencoded
 token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxOTE2MjM5MDIyfQ.DGme0_qbXW79j7VftKA1L1b6qugxEJ6-nqcmnvmi7DA
 
 ### Deactivate the "reset" client
-PUT http://localhost:3000/local/oauth/client/a4d03bd8-ab32-4233-aa33-3c470b8c7772
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_2}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -439,7 +439,7 @@ authorization: bearer {{reset_token}}
 token={{reset_token}}
 
 ### Reactivate the client
-PUT http://localhost:3000/local/oauth/client/a4d03bd8-ab32-4233-aa33-3c470b8c7772
+PUT http://localhost:3000/local/oauth/client/{{created_client_id_2}}
 content-type: application/json
 {{auth_header_admin_1}}
 
