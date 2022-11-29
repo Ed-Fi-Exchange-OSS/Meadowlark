@@ -173,6 +173,14 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
         return { body: '', statusCode: 404 };
       }
 
+      if (!result.active) {
+        Logger.debug(
+          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client deactivated `,
+          authorizationRequest.traceId,
+        );
+        return { body: '', statusCode: 403 };
+      }
+
       if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
         Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`, authorizationRequest.traceId);
         return { body: '', statusCode: 401 };

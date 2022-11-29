@@ -9,6 +9,7 @@ export type CreateAuthorizationClientRequest = {
   clientId: string;
   clientSecretHashed: string;
   clientName: string;
+  active: boolean;
   roles: AuthorizationClientRole[];
   traceId: string;
 };

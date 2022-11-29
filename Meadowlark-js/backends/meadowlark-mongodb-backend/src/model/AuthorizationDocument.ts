@@ -30,6 +30,11 @@ export interface AuthorizationDocument {
    * Whether this is the initial admin account created by bootstrapping
    */
   isBootstrapAdmin: boolean;
+
+  /**
+   * Whether a client is active or not
+   */
+  active: boolean;
 }
 
 export function authorizationDocumentFromCreate(
@@ -41,6 +46,7 @@ export function authorizationDocumentFromCreate(
     clientSecretHashed: request.clientSecretHashed,
     clientName: request.clientName,
     roles: request.roles,
+    active: request.active,
     isBootstrapAdmin,
   };
 }

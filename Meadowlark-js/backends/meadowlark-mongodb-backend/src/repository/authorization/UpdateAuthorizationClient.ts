@@ -29,7 +29,7 @@ export async function updateAuthorizationClientDocument(
 
       const { acknowledged, matchedCount } = await mongoCollection.updateOne(
         { _id: request.clientId },
-        { $set: { clientName: request.clientName, roles: request.roles } },
+        { $set: { clientName: request.clientName, roles: request.roles, active: request.active } },
         { session },
       );
 

@@ -7,6 +7,7 @@ import type { AuthorizationClientRole } from './AuthorizationClientRole';
 
 export type CreateClientBody = {
   clientName: string;
+  active: boolean;
   roles: AuthorizationClientRole[];
 };
 
@@ -19,6 +20,10 @@ export const createClientBodySchema = {
     clientName: {
       description: 'Client name',
       type: 'string',
+    },
+    active: {
+      description: 'Flag determining whether this client can be used to authenticate',
+      type: 'boolean',
     },
     roles: {
       type: 'array',

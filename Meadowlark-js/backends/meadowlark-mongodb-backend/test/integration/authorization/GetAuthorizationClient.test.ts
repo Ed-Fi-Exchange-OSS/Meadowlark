@@ -20,6 +20,7 @@ const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest
   clientName: 'clientName',
   roles: ['vendor'],
   traceId: 'traceId',
+  active: true,
 });
 
 const newGetAuthorizationClientRequest = (): GetAuthorizationClientRequest => ({
@@ -50,6 +51,7 @@ describe('given the get of an existing authorization client', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientId",
+        "active": true,
         "clientName": "clientName",
         "clientSecretHashed": "clientSecretHashed",
         "isBootstrapAdmin": false,
