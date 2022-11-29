@@ -9,6 +9,7 @@ export type CreateClientBody = {
   clientName: string;
   active: boolean;
   roles: AuthorizationClientRole[];
+  active: boolean;
 };
 
 export const createClientBodySchema = {
