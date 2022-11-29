@@ -14,6 +14,7 @@ import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizat
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
+import { GetAllAuthorizationClientsResult } from '../message/GetAllAuthorizationClientsResult';
 
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
   createAuthorizationClient: async (
@@ -54,6 +55,13 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
     _request: ResetAuthorizationClientSecretRequest,
   ): Promise<ResetAuthorizationClientSecretResult> => {
     Logger.warn('NoAuthorizationStorePlugin.updateClientSecret(): No authorization store plugin has been configured', null);
+    return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
+  },
+  getAllAuthorizationClients: async (_request: GetAuthorizationClientRequest): Promise<GetAllAuthorizationClientsResult> => {
+    Logger.error(
+      'NoAuthorizationStorePlugin.getAllAuthorizationClients(): An authorization store plugin has not been configured',
+      null,
+    );
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 };

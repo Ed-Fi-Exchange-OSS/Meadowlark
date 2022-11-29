@@ -18,6 +18,7 @@ export { CreateAuthorizationClientResult } from './message/CreateAuthorizationCl
 export { TryCreateBootstrapAuthorizationAdminResult } from './message/TryCreateBootstrapAuthorizationAdminResult';
 export { GetAuthorizationClientRequest } from './message/GetAuthorizationClientRequest';
 export { GetAuthorizationClientResult } from './message/GetAuthorizationClientResult';
+export { GetAllAuthorizationClientsResult } from './message/GetAllAuthorizationClientsResult';
 export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';
 export { UpdateAuthorizationClientResult } from './message/UpdateAuthorizationClientResult';
 export { ResetAuthorizationClientSecretRequest } from './message/ResetAuthorizationClientSecretRequest';

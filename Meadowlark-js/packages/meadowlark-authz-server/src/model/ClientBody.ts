@@ -9,7 +9,6 @@ export type ClientBody = {
   clientName: string;
   active: boolean;
   roles: AuthorizationClientRole[];
-  active: boolean;
 };
 
 export const clientBodySchema = {
@@ -41,10 +40,6 @@ export const clientBodySchema = {
         enum: ['vendor', 'host', 'admin', 'verify-only'],
       },
       maxContains: 1,
-    },
-    active: {
-      description: 'Client activation status',
-      type: 'boolean',
     },
   },
   required: ['clientName', 'roles'],

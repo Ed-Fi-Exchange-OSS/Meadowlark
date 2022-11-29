@@ -14,6 +14,18 @@ import { AuthorizationResponse } from './AuthorizationResponse';
 
 const moduleName = 'handler.GetClient';
 
+export async function getClients(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
+  try {
+    writeRequestToLog(moduleName, authorizationRequest, 'getClient');
+    await ensurePluginsLoaded();
+
+    return { body: '', statusCode: 500 };
+  } catch (e) {
+    writeErrorToLog(moduleName, authorizationRequest.traceId, 'getClient', 500, e);
+    return { body: '', statusCode: 500 };
+  }
+}
+
 export async function getClientById(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
     writeRequestToLog(moduleName, authorizationRequest, 'getClientById');
