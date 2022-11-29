@@ -150,27 +150,56 @@ describe('given a valid admin user', () => {
           `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
         );
       });
+    });
+
+    describe('given there are no clients', () => {
+      let response: AuthorizationResponse;
+      let mockAuthorizationStore: any;
+      let mockMeadowlarkCore: any;
+
+      beforeAll(async () => {
+        mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+          ...NoAuthorizationStorePlugin,
+          getAllAuthorizationClients: async () =>
+            Promise.resolve({
+              response: 'GET_SUCCESS',
+              clients: [],
+            } as GetAllAuthorizationClientsResult),
+        });
+
+        mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+          ...newJwtStatus(),
+          isValid: true,
+          roles: ['admin'],
+        });
+
+        // Act
+        response = await getClients(authorizationRequest);
+      });
+
+      afterAll(() => {
+        mockAuthorizationStore.mockRestore();
+        mockMeadowlarkCore.mockRestore();
+      });
+
+      it('returns status 200', () => {
+        expect(response.statusCode).toEqual(200);
+      });
+
+      it('returns a proper message body', () => {
+        expect(response.body).toMatchInlineSnapshot('');
+      });
+    });
   });
 
-  describe('given there are no clients', () => {
+  describe('given missing authorization token', () => {
     let response: AuthorizationResponse;
-    let mockAuthorizationStore: any;
     let mockMeadowlarkCore: any;
 
     beforeAll(async () => {
-      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
-        ...NoAuthorizationStorePlugin,
-        getAllAuthorizationClients: async () =>
-        Promise.resolve({
-          response: 'GET_SUCCESS',
-          clients: [],
-        } as GetAllAuthorizationClientsResult),
-      });
-
       mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
         ...newJwtStatus(),
-        isValid: true,
-        roles: ['admin'],
+        isMissing: true,
       });
 
       // Act
@@ -178,40 +207,11 @@ describe('given a valid admin user', () => {
     });
 
     afterAll(() => {
-      mockAuthorizationStore.mockRestore();
       mockMeadowlarkCore.mockRestore();
     });
 
-    it('returns status 200', () => {
-      expect(response.statusCode).toEqual(200);
-    });
-
-    it('returns a proper message body', () => {
-      expect(response.body).toMatchInlineSnapshot('');
-    });
-  });
-});
-
-describe('given missing authorization token', () => {
-  let response: AuthorizationResponse;
-  let mockMeadowlarkCore: any;
-
-  beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-      ...newJwtStatus(),
-      isMissing: true,
-    });
-
-    // Act
-    response = await getClients(authorizationRequest);
-  });
-
-  afterAll(() => {
-    mockMeadowlarkCore.mockRestore();
-  });
-
-  it('returns error response', () => {
-    expect(response).toMatchInlineSnapshot(`
+    it('returns error response', () => {
+      expect(response).toMatchInlineSnapshot(`
       {
         "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
         "headers": {
@@ -220,30 +220,30 @@ describe('given missing authorization token', () => {
         "statusCode": 401,
       }
     `);
+    });
   });
-});
 
-describe('given expired authorization token', () => {
-  let response: AuthorizationResponse;
-  let mockMeadowlarkCore: any;
+  describe('given expired authorization token', () => {
+    let response: AuthorizationResponse;
+    let mockMeadowlarkCore: any;
 
-  beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-      ...newJwtStatus(),
-      isMissing: false,
-      isExpired: true,
+    beforeAll(async () => {
+      mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+        ...newJwtStatus(),
+        isMissing: false,
+        isExpired: true,
+      });
+
+      // Act
+      response = await getClients(authorizationRequest);
     });
 
-    // Act
-    response = await getClients(authorizationRequest);
-  });
+    afterAll(() => {
+      mockMeadowlarkCore.mockRestore();
+    });
 
-  afterAll(() => {
-    mockMeadowlarkCore.mockRestore();
-  });
-
-  it('returns error response', () => {
-    expect(response).toMatchInlineSnapshot(`
+    it('returns error response', () => {
+      expect(response).toMatchInlineSnapshot(`
       {
         "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
         "headers": {
@@ -252,59 +252,60 @@ describe('given expired authorization token', () => {
         "statusCode": 401,
       }
     `);
+    });
   });
-});
 
-describe('given non-admin authorization token', () => {
-  let response: AuthorizationResponse;
-  let mockMeadowlarkCore: any;
+  describe('given non-admin authorization token', () => {
+    let response: AuthorizationResponse;
+    let mockMeadowlarkCore: any;
 
-  beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-      ...newJwtStatus(),
-      isMissing: false,
-      isExpired: false,
-      isValid: true,
-      roles: ['vendor'],
+    beforeAll(async () => {
+      mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+        ...newJwtStatus(),
+        isMissing: false,
+        isExpired: false,
+        isValid: true,
+        roles: ['vendor'],
+      });
+
+      // Act
+      response = await getClients(authorizationRequest);
     });
 
-    // Act
-    response = await getClients(authorizationRequest);
-  });
-
-  afterAll(() => {
-    mockMeadowlarkCore.mockRestore();
-  });
-
-  it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
-  });
-});
-
-describe('given invalid authorization token', () => {
-  let response: AuthorizationResponse;
-  let mockMeadowlarkCore: any;
-
-  beforeAll(async () => {
-    mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-      ...newJwtStatus(),
-      isMissing: false,
-      isExpired: false,
-      roles: ['admin'],
-      isValid: false,
+    afterAll(() => {
+      mockMeadowlarkCore.mockRestore();
     });
 
-    // Act
-    response = await getClients(authorizationRequest);
+    it('returns error response', () => {
+      expect(response.body).toMatchInlineSnapshot(`""`);
+    });
   });
 
-  afterAll(() => {
-    mockMeadowlarkCore.mockRestore();
-  });
+  describe('given invalid authorization token', () => {
+    let response: AuthorizationResponse;
+    let mockMeadowlarkCore: any;
 
-  it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
-    );
+    beforeAll(async () => {
+      mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+        ...newJwtStatus(),
+        isMissing: false,
+        isExpired: false,
+        roles: ['admin'],
+        isValid: false,
+      });
+
+      // Act
+      response = await getClients(authorizationRequest);
+    });
+
+    afterAll(() => {
+      mockMeadowlarkCore.mockRestore();
+    });
+
+    it('returns error response', () => {
+      expect(response.body).toMatchInlineSnapshot(
+        `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
+      );
+    });
   });
 });
