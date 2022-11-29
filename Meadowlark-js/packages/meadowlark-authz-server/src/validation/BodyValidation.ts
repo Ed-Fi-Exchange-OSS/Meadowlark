@@ -6,13 +6,13 @@
 import { ValidateFunction } from 'ajv';
 import { betterAjvErrors } from '@apideck/better-ajv-errors';
 import { ajv } from './SharedAjv';
-import { createClientBodySchema } from '../model/CreateClientBody';
+import { clientBodySchema } from '../model/ClientBody';
 import { requestTokenBodySchema } from '../model/RequestTokenBody';
 import { verifyTokenBodySchema } from '../model/VerifyTokenBody';
 
 export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: string };
 
-const createClientBodyValidator: ValidateFunction = ajv.compile(createClientBodySchema);
+const createClientBodyValidator: ValidateFunction = ajv.compile(clientBodySchema);
 const requestTokenBodyValidator: ValidateFunction = ajv.compile(requestTokenBodySchema);
 const verifyTokenBodyValidator: ValidateFunction = ajv.compile(verifyTokenBodySchema);
 
@@ -33,7 +33,7 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
 }
 
 export function validateCreateClientBody(body: object): BodyValidation {
-  return validateBody(body, createClientBodySchema, createClientBodyValidator);
+  return validateBody(body, clientBodySchema, createClientBodyValidator);
 }
 
 export function validateRequestTokenBody(body: object): BodyValidation {
@@ -46,5 +46,5 @@ export function validateVerifyTokenBody(body: object): BodyValidation {
 
 export function validateUpdateClientBody(body: object): BodyValidation {
   // Same as CreateClientBody
-  return validateBody(body, createClientBodySchema, createClientBodyValidator);
+  return validateBody(body, clientBodySchema, createClientBodyValidator);
 }
