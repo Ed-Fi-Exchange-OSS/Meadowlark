@@ -6,9 +6,6 @@
 const teardownServer = require('./ServerConfig');
 
 async function endServer() {
-  // const service = teardownServer.getServer();
-
-  // return service.close();
   if (!teardownServer.wasServerAlreadyRunning()) {
     process.exit(0);
   }

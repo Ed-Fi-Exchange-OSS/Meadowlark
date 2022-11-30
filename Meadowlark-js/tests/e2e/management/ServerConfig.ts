@@ -3,9 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import winston from 'winston';
 import { buildService } from '@edfi/meadowlark-fastify/src/Service';
-import { getLogger, initializeLogging } from '@edfi/meadowlark-utilities';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 
 let serverInstance;
 let serverAlreadyRunning = false;
@@ -14,16 +13,8 @@ export function wasServerAlreadyRunning(): boolean {
   return serverAlreadyRunning;
 }
 
-export function getServer() {
-  return serverInstance;
-}
-
 export async function setup() {
   initializeLogging();
-  const logger = getLogger();
-
-  const fileLogger = new winston.transports.File({ filename: 'fastify.log', level: 'INFO' });
-  logger.add(fileLogger);
 
   serverInstance = buildService();
   try {

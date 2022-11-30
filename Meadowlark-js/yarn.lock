@@ -1640,7 +1640,6 @@ __metadata:
     dotenv: ^16.0.3
     fast-memoize: ^2.5.2
     supertest: ^6.3.1
-    winston: ^3.8.2
   languageName: unknown
   linkType: soft
 
