@@ -49,4 +49,8 @@ export const clientBodySchema = {
 // Update body is the same as create body
 export type UpdateClientBody = ClientBody;
 export type CreateClientBody = ClientBody;
-export type GetClientBody = ClientBody;
+
+type GetClientBodyID = {
+  clientId: string;
+};
+export type GetClientBody = ClientBody & GetClientBodyID;

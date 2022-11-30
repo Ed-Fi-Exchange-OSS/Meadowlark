@@ -21,7 +21,13 @@ export async function getAllAuthorizationClientDocuments(
 
     return {
       response: 'GET_SUCCESS',
-      clients: result,
+      clients: result.map((x) => ({
+        // eslint-disable-next-line no-underscore-dangle
+        clientId: x._id,
+        clientName: x.clientName,
+        active: x.active,
+        roles: x.roles,
+      })),
     };
   } catch (e) {
     Logger.error('GetAuthorizationClient.getAuthorizationClientDocument', traceId, e);

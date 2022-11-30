@@ -21,12 +21,14 @@ const authorizationRequest: AuthorizationRequest = {
 };
 
 const client1: GetClientBody = {
+  clientId: 'a',
   clientName: 'Hometown SIS',
   roles: ['vendor', 'assessment'],
   active: false,
 };
 
 const client2: GetClientBody = {
+  clientId: 'b',
   clientName: '2 Hometown SIS',
   roles: ['vendor'],
   active: true,
@@ -107,7 +109,7 @@ describe('given a valid admin user', () => {
 
     it('returns a proper message body', () => {
       expect(response.body).toMatchInlineSnapshot(
-        `"[{"clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false}]"`,
+        `"[{"clientId":"a","clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false}]"`,
       );
     });
   });
@@ -148,7 +150,7 @@ describe('given a valid admin user', () => {
 
     it('returns a proper message body', () => {
       expect(response.body).toMatchInlineSnapshot(
-        `"[{"clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false},{"clientName":"2 Hometown SIS","roles":["vendor"],"active":true}]"`,
+        `"[{"clientId":"a","clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false},{"clientId":"b","clientName":"2 Hometown SIS","roles":["vendor"],"active":true}]"`,
       );
     });
   });
