@@ -46,11 +46,9 @@ describe('when fetching authorization clients', () => {
         {
           "clients": [
             {
-              "_id": "clientId",
               "active": true,
+              "clientId": "clientId",
               "clientName": "clientName",
-              "clientSecretHashed": "clientSecretHashed",
-              "isBootstrapAdmin": false,
               "roles": [
                 "vendor",
               ],
