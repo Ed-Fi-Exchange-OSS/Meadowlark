@@ -107,7 +107,7 @@ describe('given a valid admin user', () => {
 
     it('returns a proper message body', () => {
       expect(response.body).toMatchInlineSnapshot(
-        `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
+        `"[{"clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false}]"`,
       );
     });
   });
@@ -148,7 +148,7 @@ describe('given a valid admin user', () => {
 
     it('returns a proper message body', () => {
       expect(response.body).toMatchInlineSnapshot(
-        `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
+        `"[{"clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false},{"clientName":"2 Hometown SIS","roles":["vendor"],"active":true}]"`,
       );
     });
   });
@@ -188,7 +188,7 @@ describe('given a valid admin user', () => {
     });
 
     it('returns a proper message body', () => {
-      expect(response.body).toMatchInlineSnapshot('');
+      expect(response.body).toMatchInlineSnapshot(`"[]"`);
     });
   });
 
@@ -212,14 +212,14 @@ describe('given a valid admin user', () => {
 
     it('returns error response', () => {
       expect(response).toMatchInlineSnapshot(`
-      {
-        "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
-        "headers": {
-          "WWW-Authenticate": "Bearer",
-        },
-        "statusCode": 401,
-      }
-    `);
+              {
+                "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
+                "headers": {
+                  "WWW-Authenticate": "Bearer",
+                },
+                "statusCode": 401,
+              }
+          `);
     });
   });
 
@@ -244,14 +244,14 @@ describe('given a valid admin user', () => {
 
     it('returns error response', () => {
       expect(response).toMatchInlineSnapshot(`
-      {
-        "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
-        "headers": {
-          "WWW-Authenticate": "Bearer",
-        },
-        "statusCode": 401,
-      }
-    `);
+              {
+                "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
+                "headers": {
+                  "WWW-Authenticate": "Bearer",
+                },
+                "statusCode": 401,
+              }
+          `);
     });
   });
 

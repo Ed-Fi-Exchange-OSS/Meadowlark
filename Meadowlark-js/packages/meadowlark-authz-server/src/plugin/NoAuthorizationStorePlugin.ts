@@ -57,7 +57,7 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
     Logger.warn('NoAuthorizationStorePlugin.updateClientSecret(): No authorization store plugin has been configured', null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
-  getAllAuthorizationClients: async (_request: GetAuthorizationClientRequest): Promise<GetAllAuthorizationClientsResult> => {
+  getAllAuthorizationClients: async (_traceId: string): Promise<GetAllAuthorizationClientsResult> => {
     Logger.error(
       'NoAuthorizationStorePlugin.getAllAuthorizationClients(): An authorization store plugin has not been configured',
       null,

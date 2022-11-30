@@ -79,10 +79,8 @@ export async function getAuthorizationClientDocument(
   return GetAuthorizationClient.getAuthorizationClientDocument(request, await getSharedClient());
 }
 
-export async function getAllAuthorizationClientDocuments(
-  request: GetAuthorizationClientRequest,
-): Promise<GetAllAuthorizationClientsResult> {
-  return GetAllAuthorizationClients.getAllAuthorizationClientDocuments(request.traceId, await getSharedClient());
+export async function getAllAuthorizationClientDocuments(traceId: string): Promise<GetAllAuthorizationClientsResult> {
+  return GetAllAuthorizationClients.getAllAuthorizationClientDocuments(traceId, await getSharedClient());
 }
 
 export async function updateAuthorizationClientDocument(

@@ -19,7 +19,7 @@ export interface AuthorizationStorePlugin {
   tryCreateBootstrapAuthorizationAdmin: (
     request: CreateAuthorizationClientRequest,
   ) => Promise<TryCreateBootstrapAuthorizationAdminResult>;
-  getAllAuthorizationClients: (request: GetAuthorizationClientRequest) => Promise<GetAllAuthorizationClientsResult>;
+  getAllAuthorizationClients: (traceId: string) => Promise<GetAllAuthorizationClientsResult>;
   getAuthorizationClient: (request: GetAuthorizationClientRequest) => Promise<GetAuthorizationClientResult>;
   updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
   resetAuthorizationClientSecret: (
