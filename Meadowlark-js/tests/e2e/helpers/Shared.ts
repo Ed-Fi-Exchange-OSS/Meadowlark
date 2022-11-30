@@ -11,7 +11,7 @@ import { getAccessToken } from './Credentials';
 const chance = new Chance() as Chance.Chance;
 
 function getBaseURLRequest() {
-  return request(process.env.BASE_URL);
+  return request(`${process.env.ROOT_URL}/${process.env.MEADOWLARK_STAGE}`);
 }
 
 function getRootURLRequest() {

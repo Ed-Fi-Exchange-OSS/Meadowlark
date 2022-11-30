@@ -6,11 +6,16 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
-const credentialManager = require('./helpers/Credentials');
+const credentialManager = require('../helpers/Credentials');
+const setupServer = require('./ServerConfig');
 
-dotenv.config({ path: path.join(__dirname, './.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
+// Load fastify environment
+dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.env') });
 
 module.exports = async () => {
+  await setupServer.setup();
+
   await credentialManager.authenticateAdmin();
   await credentialManager.createAutomationUsers();
 };
