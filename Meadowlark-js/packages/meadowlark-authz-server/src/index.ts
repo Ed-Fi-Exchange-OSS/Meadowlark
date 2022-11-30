@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export { createClient } from './handler/CreateClient';
-export { getClientById } from './handler/GetClient';
+export { getClientById, getClients } from './handler/GetClient';
 export { updateClient } from './handler/UpdateClient';
 export { requestToken } from './handler/RequestToken';
 export { verifyToken } from './handler/VerifyToken';

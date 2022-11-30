@@ -30,6 +30,7 @@ import {
   verifyTokenAuthorizationHandler,
   createSigningKeyHandler,
   getClientByIdHandler,
+  getClientsHandler,
 } from './handler/authorization/AuthorizationHandler';
 
 export function buildService(): FastifyInstance {
@@ -125,6 +126,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
     // Authorization server handlers
+    fastify.get(`/${stage}/oauth/client`, getClientsHandler);
     fastify.get(`/${stage}/oauth/client/:clientId`, getClientByIdHandler);
     fastify.post(`/${stage}/oauth/client/:clientId/reset`, resetAuthorizationClientSecretHandler);
     fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);

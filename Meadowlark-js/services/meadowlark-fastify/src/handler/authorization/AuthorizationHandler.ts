@@ -7,6 +7,7 @@ import {
   createClient,
   createSigningKey,
   getClientById,
+  getClients,
   requestToken,
   resetAuthorizationClientSecret,
   updateClient,
@@ -41,4 +42,8 @@ export async function createSigningKeyHandler(request: FastifyRequest, reply: Fa
 
 export async function getClientByIdHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   respondWith(await getClientById(fromRequest(request)), reply);
+}
+
+export async function getClientsHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  respondWith(await getClients(fromRequest(request)), reply);
 }
