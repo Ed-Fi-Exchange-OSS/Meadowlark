@@ -11,7 +11,7 @@ jest.setTimeout(40000);
 
 const updateClientRequest: InjectOptions = {
   method: 'PUT',
-  url: '/local/oauth/client/890',
+  url: '/local/oauth/clients/890',
   headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   payload: `{
     "clientName": "Hometown SIS",
@@ -54,7 +54,7 @@ describe('given a PUT to update a new client', () => {
         }"
     `);
     expect(mock.headers.authorization).toBe('bearer 1234');
-    expect(mock.path).toBe('/oauth/client/890');
+    expect(mock.path).toBe('/oauth/clients/890');
     expect(mock.queryParameters).toEqual({});
   });
 });

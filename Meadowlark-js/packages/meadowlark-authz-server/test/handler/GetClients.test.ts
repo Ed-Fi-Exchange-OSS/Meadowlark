@@ -17,7 +17,7 @@ process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
-  path: '/oauth/client/11111111-1111-1111-1111111111111111',
+  path: '/oauth/clients/11111111-1111-1111-1111111111111111',
 };
 
 const client1: GetClientBody = {

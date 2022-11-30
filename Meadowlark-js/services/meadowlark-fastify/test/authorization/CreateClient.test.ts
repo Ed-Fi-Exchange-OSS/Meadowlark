@@ -11,7 +11,7 @@ jest.setTimeout(40000);
 
 const createClientRequest: InjectOptions = {
   method: 'POST',
-  url: '/local/oauth/client',
+  url: '/local/oauth/clients',
   headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   payload: `{
     "clientName": "Hometown SIS",
@@ -54,7 +54,7 @@ describe('given a POST to create a new client', () => {
         }"
     `);
     expect(mock.headers.authorization).toBe('bearer 1234');
-    expect(mock.path).toBe('/oauth/client');
+    expect(mock.path).toBe('/oauth/clients');
     expect(mock.queryParameters).toEqual({});
   });
 });

@@ -6,7 +6,7 @@
 import { adminAccessToken, getAccessToken } from '../helpers/Credentials';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
-const ENDPOINT = `/oauth/client`;
+const ENDPOINT = `/oauth/clients`;
 
 describe("given it's managing the client authorization", () => {
   describe('given client already exists ', () => {
@@ -273,19 +273,101 @@ describe("given it's managing the client authorization", () => {
         });
 
         it('should be able to retrieve all clients', async () => {
-          await rootURLRequest()
+          await baseURLRequest()
             .get(ENDPOINT)
             .auth(adminToken, { type: 'bearer' })
             .expect(200)
             .then((response) => {
-              expect(response.body).toMatchInlineSnapshot('a');
+              expect(response.body).toMatchInlineSnapshot(
+                'a',
+                `
+                [
+                  {
+                    "active": true,
+                    "clientId": "15f4a6e8-386e-4e38-a9be-16c29803097f",
+                    "clientName": "Admin Client",
+                    "roles": [
+                      "admin",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "8176b587-c645-46fd-906e-03abdaa09d67",
+                    "clientName": "Automated Vendor",
+                    "roles": [
+                      "vendor",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "7379e28a-0ea2-4777-b3f6-5dfb71a533ba",
+                    "clientName": "Automated Host",
+                    "roles": [
+                      "host",
+                      "assessment",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "6088c190-23e6-4f22-bdb2-b56e355aef71",
+                    "clientName": "Test Vendor",
+                    "roles": [
+                      "vendor",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "99a4e140-2e8e-46b2-9dcf-51f762dccd0f",
+                    "clientName": "Test Client",
+                    "roles": [
+                      "verify-only",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "32ec9428-faa6-49cf-a63f-85736d8eb94a",
+                    "clientName": "Test Client",
+                    "roles": [
+                      "admin",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "28341b69-e24b-436f-bfa9-d19a098f7811",
+                    "clientName": "Test Client",
+                    "roles": [
+                      "admin",
+                      "assessment",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "0bc5d890-ee33-4ebd-9ddd-62507e40d59f",
+                    "clientName": "Test Client",
+                    "roles": [
+                      "assessment",
+                      "host",
+                    ],
+                  },
+                  {
+                    "active": true,
+                    "clientId": "15919ffe-24e4-4579-a50f-a5112b631413",
+                    "clientName": "Test Client",
+                    "roles": [
+                      "assessment",
+                      "vendor",
+                    ],
+                  },
+                ]
+              `,
+              );
             });
         });
       });
 
-      describe('given location not found', () => {
+      describe('given ID not found', () => {
         it('should return 404', async () => {
-          await rootURLRequest().get('/fake-location').auth(adminToken, { type: 'bearer' }).expect(404);
+          await baseURLRequest().get(`${ENDPOINT}/fake-location`).auth(adminToken, { type: 'bearer' }).expect(404);
         });
       });
 

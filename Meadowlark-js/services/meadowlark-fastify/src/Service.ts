@@ -126,11 +126,11 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);
 
     // Authorization server handlers
-    fastify.get(`/${stage}/oauth/client`, getClientsHandler);
-    fastify.get(`/${stage}/oauth/client/:clientId`, getClientByIdHandler);
-    fastify.post(`/${stage}/oauth/client/:clientId/reset`, resetAuthorizationClientSecretHandler);
-    fastify.post(`/${stage}/oauth/client`, createAuthorizationClientHandler);
-    fastify.put(`/${stage}/oauth/client/*`, updateAuthorizationClientHandler);
+    fastify.get(`/${stage}/oauth/clients`, getClientsHandler);
+    fastify.get(`/${stage}/oauth/clients/:clientId`, getClientByIdHandler);
+    fastify.post(`/${stage}/oauth/clients/:clientId/reset`, resetAuthorizationClientSecretHandler);
+    fastify.post(`/${stage}/oauth/clients`, createAuthorizationClientHandler);
+    fastify.put(`/${stage}/oauth/clients/*`, updateAuthorizationClientHandler);
     fastify.post(`/${stage}/oauth/token`, requestTokenAuthorizationHandler);
     fastify.post(`/${stage}/oauth/verify`, verifyTokenAuthorizationHandler);
     fastify.get(`/${stage}/oauth/createSigningKey`, createSigningKeyHandler);

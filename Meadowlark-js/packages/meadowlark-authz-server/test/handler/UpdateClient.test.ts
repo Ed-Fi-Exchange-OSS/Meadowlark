@@ -16,7 +16,7 @@ process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
-  path: '/oauth/client/11111111-1111-1111-1111111111111111',
+  path: '/oauth/clients/11111111-1111-1111-1111111111111111',
   body: `{
     "clientName": "Hometown SIS",
     "roles": [
@@ -260,7 +260,7 @@ describe('given invalid authorization token', () => {
 describe('given update has missing client id', () => {
   const missingBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/clients',
   };
 
   let response: AuthorizationResponse;
@@ -303,7 +303,7 @@ describe('given update has missing client id', () => {
 describe('given update has missing body', () => {
   const missingBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+    path: '/oauth/clients/11111111-1111-1111-1111111111111111',
   };
 
   let response: AuthorizationResponse;
@@ -346,7 +346,7 @@ describe('given update has missing body', () => {
 describe('given update has malformed json body', () => {
   const malformedBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+    path: '/oauth/clients/11111111-1111-1111-1111111111111111',
     body: '{ bad',
   };
 
@@ -390,7 +390,7 @@ describe('given update has malformed json body', () => {
 describe('given update has well-formed but invalid json body', () => {
   const invalidBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client/11111111-1111-1111-1111111111111111',
+    path: '/oauth/clients/11111111-1111-1111-1111111111111111',
     body: '{}',
   };
 

@@ -9,7 +9,7 @@ import { buildService } from '../../src/Service';
 
 const getClientByIdRequest: InjectOptions = {
   method: 'GET',
-  url: '/local/oauth/client/890',
+  url: '/local/oauth/clients/890',
   headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   payload: '',
 };
@@ -61,7 +61,7 @@ describe('given a GET by ID request', () => {
 
     expect(mock.body).toMatchInlineSnapshot(`null`);
     expect(mock.headers.authorization).toBe('bearer 1234');
-    expect(mock.path).toBe('/oauth/client/890');
+    expect(mock.path).toBe('/oauth/clients/890');
     expect(mock.queryParameters).toEqual({});
   });
 });
