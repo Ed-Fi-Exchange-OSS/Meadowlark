@@ -110,85 +110,85 @@ describe('given a valid admin user', () => {
         `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
       );
     });
+  });
 
-    describe('given there are two clients', () => {
-      let response: AuthorizationResponse;
-      let mockAuthorizationStore: any;
-      let mockMeadowlarkCore: any;
+  describe('given there are two clients', () => {
+    let response: AuthorizationResponse;
+    let mockAuthorizationStore: any;
+    let mockMeadowlarkCore: any;
 
-      beforeAll(async () => {
-        mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
-          ...NoAuthorizationStorePlugin,
-          getAllAuthorizationClients: async () =>
-            Promise.resolve({
-              response: 'GET_SUCCESS',
-              clients: [client1, client2],
-            } as GetAllAuthorizationClientsResult),
-        });
-
-        mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-          ...newJwtStatus(),
-          isValid: true,
-          roles: ['admin'],
-        });
-
-        // Act
-        response = await getClients(authorizationRequest);
+    beforeAll(async () => {
+      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+        ...NoAuthorizationStorePlugin,
+        getAllAuthorizationClients: async () =>
+          Promise.resolve({
+            response: 'GET_SUCCESS',
+            clients: [client1, client2],
+          } as GetAllAuthorizationClientsResult),
       });
 
-      afterAll(() => {
-        mockAuthorizationStore.mockRestore();
-        mockMeadowlarkCore.mockRestore();
+      mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+        ...newJwtStatus(),
+        isValid: true,
+        roles: ['admin'],
       });
 
-      it('returns status 200', () => {
-        expect(response.statusCode).toEqual(200);
-      });
-
-      it('returns a proper message body', () => {
-        expect(response.body).toMatchInlineSnapshot(
-          `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
-        );
-      });
+      // Act
+      response = await getClients(authorizationRequest);
     });
 
-    describe('given there are no clients', () => {
-      let response: AuthorizationResponse;
-      let mockAuthorizationStore: any;
-      let mockMeadowlarkCore: any;
+    afterAll(() => {
+      mockAuthorizationStore.mockRestore();
+      mockMeadowlarkCore.mockRestore();
+    });
 
-      beforeAll(async () => {
-        mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
-          ...NoAuthorizationStorePlugin,
-          getAllAuthorizationClients: async () =>
-            Promise.resolve({
-              response: 'GET_SUCCESS',
-              clients: [],
-            } as GetAllAuthorizationClientsResult),
-        });
+    it('returns status 200', () => {
+      expect(response.statusCode).toEqual(200);
+    });
 
-        mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
-          ...newJwtStatus(),
-          isValid: true,
-          roles: ['admin'],
-        });
+    it('returns a proper message body', () => {
+      expect(response.body).toMatchInlineSnapshot(
+        `"[{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}]"`,
+      );
+    });
+  });
 
-        // Act
-        response = await getClients(authorizationRequest);
+  describe('given there are no clients', () => {
+    let response: AuthorizationResponse;
+    let mockAuthorizationStore: any;
+    let mockMeadowlarkCore: any;
+
+    beforeAll(async () => {
+      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+        ...NoAuthorizationStorePlugin,
+        getAllAuthorizationClients: async () =>
+          Promise.resolve({
+            response: 'GET_SUCCESS',
+            clients: [],
+          } as GetAllAuthorizationClientsResult),
       });
 
-      afterAll(() => {
-        mockAuthorizationStore.mockRestore();
-        mockMeadowlarkCore.mockRestore();
+      mockMeadowlarkCore = jest.spyOn(JwtAction, 'verifyJwt').mockReturnValue({
+        ...newJwtStatus(),
+        isValid: true,
+        roles: ['admin'],
       });
 
-      it('returns status 200', () => {
-        expect(response.statusCode).toEqual(200);
-      });
+      // Act
+      response = await getClients(authorizationRequest);
+    });
 
-      it('returns a proper message body', () => {
-        expect(response.body).toMatchInlineSnapshot('');
-      });
+    afterAll(() => {
+      mockAuthorizationStore.mockRestore();
+      mockMeadowlarkCore.mockRestore();
+    });
+
+    it('returns status 200', () => {
+      expect(response.statusCode).toEqual(200);
+    });
+
+    it('returns a proper message body', () => {
+      expect(response.body).toMatchInlineSnapshot('');
     });
   });
 
