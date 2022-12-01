@@ -278,7 +278,11 @@ describe('given a valid admin user', () => {
       mockMeadowlarkCore.mockRestore();
     });
 
-    it('returns error response', () => {
+    it('returns status code 403', () => {
+      expect(response.statusCode).toBe(403);
+    });
+
+    it('returns empty message body', () => {
       expect(response.body).toMatchInlineSnapshot(`""`);
     });
   });
