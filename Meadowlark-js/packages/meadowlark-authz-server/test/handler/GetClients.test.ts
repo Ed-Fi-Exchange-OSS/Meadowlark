@@ -189,7 +189,7 @@ describe('given a valid admin user', () => {
       expect(response.statusCode).toEqual(200);
     });
 
-    it('returns a proper message body', () => {
+    it('returns an empty array', () => {
       expect(response.body).toMatchInlineSnapshot(`"[]"`);
     });
   });

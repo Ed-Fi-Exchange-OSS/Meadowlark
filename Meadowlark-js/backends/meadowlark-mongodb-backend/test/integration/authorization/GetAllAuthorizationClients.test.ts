@@ -102,7 +102,7 @@ describe('when fetching authorization clients', () => {
       await mongoClient.close();
     });
 
-    it('should return not found', async () => {
+    it('should return OK with empty array', async () => {
       expect(response).toMatchInlineSnapshot(`
         {
           "clients": [],
