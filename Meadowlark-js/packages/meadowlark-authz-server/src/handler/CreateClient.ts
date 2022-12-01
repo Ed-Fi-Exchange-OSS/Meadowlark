@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { LOCATION_HEADER_NAME, Logger } from '@edfi/meadowlark-utilities';
 import { CreateAuthorizationClientRequest } from '../message/CreateAuthorizationClientRequest';
 import { CreateAuthorizationClientResult } from '../message/CreateAuthorizationClientResult';
-import { CreateClientBody } from '../model/CreateClientBody';
+import { CreateClientBody } from '../model/ClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';

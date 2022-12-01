@@ -7,36 +7,36 @@ import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fas
 import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
 import { buildService } from '../../src/Service';
 
-const getClientByIdRequest: InjectOptions = {
+const getClientRequest: InjectOptions = {
   method: 'GET',
-  url: '/local/oauth/clients/890',
+  url: '/local/oauth/clients',
   headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
   payload: '',
 };
 
 const clientResponse: AuthorizationServer.AuthorizationResponse = {
   statusCode: 200,
-  body: `{
+  body: `[{
   "clientId": "890",
   "clientName": "Hometown SIS",
   "roles": ["vendor", "assessment"],
   "active": true,
-}`,
+}]`,
 };
 
-describe('given a GET by ID request', () => {
+describe('given a GET request', () => {
   let mockAuthServer: any;
   let service: FastifyInstance;
   let response: LightMyRequestResponse;
 
   beforeAll(async () => {
-    mockAuthServer = jest.spyOn(AuthorizationServer, 'getClientById');
+    mockAuthServer = jest.spyOn(AuthorizationServer, 'getClients');
     mockAuthServer.mockReturnValue(clientResponse);
     service = buildService();
     await service.ready();
 
     // Act
-    response = await service.inject(getClientByIdRequest);
+    response = await service.inject(getClientRequest);
   });
 
   afterAll(async () => {
@@ -44,14 +44,14 @@ describe('given a GET by ID request', () => {
     mockAuthServer.mockRestore();
   });
 
-  it('should respond with the appropriate Client ', async () => {
+  it('should respond with the appropriate clients', async () => {
     expect(response.body).toMatchInlineSnapshot(`
-      "{
+      "[{
         "clientId": "890",
         "clientName": "Hometown SIS",
         "roles": ["vendor", "assessment"],
         "active": true,
-      }"
+      }]"
     `);
   });
 
@@ -61,7 +61,7 @@ describe('given a GET by ID request', () => {
 
     expect(mock.body).toMatchInlineSnapshot(`null`);
     expect(mock.headers.authorization).toBe('bearer 1234');
-    expect(mock.path).toBe('/oauth/clients/890');
+    expect(mock.path).toBe('/oauth/clients');
     expect(mock.queryParameters).toEqual({});
   });
 });

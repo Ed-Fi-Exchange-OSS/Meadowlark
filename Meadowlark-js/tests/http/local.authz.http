@@ -4,7 +4,7 @@
 
 ### Bootstrap an admin
 # @name created_admin
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 
 {
@@ -19,7 +19,7 @@ content-type: application/json
 @admin_client_secret={{created_admin.response.body.$.client_secret}}
 
 ### Try bootstrapping another admin, should fail 401 no token provided
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 
 {
@@ -53,7 +53,7 @@ GET http://localhost:3000{{admin_client_location}}
 
 ### Create client as an admin, should succeed
 # @name created_client1
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -68,6 +68,10 @@ content-type: application/json
 @created_client1_location = {{created_client1.response.headers.location}}
 GET http://localhost:3000{{created_client1_location}}
 {{ auth_header_admin_1 }}
+
+### Get all clients
+GET http://localhost:3000/local/oauth/clients
+{{auth_header_admin_1}}
 
 ###
 @client1_client_id={{created_client1.response.body.$.client_id}}
@@ -96,7 +100,7 @@ GET http://localhost:3000{{created_client1_location}}
 {{ auth_header_client_1 }}
 
 ### Try creating client as a non-admin, should 403 Forbidden
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_client_1}}
 
@@ -109,7 +113,7 @@ content-type: application/json
 }
 
 ### Try creating client with a bad token, should 401
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 Authorization: bearer Not-A-Token
 
@@ -125,7 +129,7 @@ Authorization: bearer Not-A-Token
 
 
 ### Create client with additional assessment role, should succeed
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -138,7 +142,7 @@ content-type: application/json
 }
 
 ### Send request body with empty body, should fail with 400 Bad Request
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -154,7 +158,7 @@ content-type: application/json
 }
 
 ### Send request body with invalid role, should fail with 400 Bad Request
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -166,7 +170,7 @@ content-type: application/json
 }
 
 ### Create client with one valid, one invalid role, should fail with 400 Bad Request
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -179,7 +183,7 @@ content-type: application/json
 }
 
 ### Send request body with only assessment role, should fail with 400 Bad Request
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -194,7 +198,7 @@ content-type: application/json
 #################### PUT authorization client
 
 ### Update client as an admin, should succeed
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -207,7 +211,7 @@ content-type: application/json
 
 
 ### Update with non-existent client id, should 404
-PUT http://localhost:3000/local/oauth/client/11111111-1111-1111-1111-111111111111
+PUT http://localhost:3000/local/oauth/clients/11111111-1111-1111-1111-111111111111
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -220,7 +224,7 @@ content-type: application/json
 
 
 ### Update client with additional assessment role, should succeed
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -233,14 +237,14 @@ content-type: application/json
 }
 
 ### Send request body with empty body, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
 {}
 
 ### Send request body without roles, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -249,7 +253,7 @@ content-type: application/json
 }
 
 ### Send request body with invalid role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -261,7 +265,7 @@ content-type: application/json
 }
 
 ### Create client with one valid, one invalid role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -274,7 +278,7 @@ content-type: application/json
 }
 
 ### Send request body with only assessment role, should fail with 400 Bad Request
-PUT http://localhost:3000/local/oauth/client/{{client1_client_id}}
+PUT http://localhost:3000/local/oauth/clients/{{client1_client_id}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -309,7 +313,7 @@ grant_type=client_credentials&client_id={{client1_client_id}}&client_secret=bad_
 
 ### Create client as an admin, should succeed
 # @name client2
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -331,7 +335,7 @@ grant_type=client_credentials&client_id={{created_client_id_2}}&client_secret={{
 
 ### Reset secret for client 2
 # @name reset
-POST http://localhost:3000/local/oauth/client/{{created_client_id_2}}/reset
+POST http://localhost:3000/local/oauth/clients/{{created_client_id_2}}/reset
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -412,7 +416,7 @@ content-type: application/x-www-form-urlencoded
 token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxOTE2MjM5MDIyfQ.DGme0_qbXW79j7VftKA1L1b6qugxEJ6-nqcmnvmi7DA
 
 ### Deactivate the "reset" client
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_2}}
+PUT http://localhost:3000/local/oauth/clients/{{created_client_id_2}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -439,7 +443,7 @@ authorization: bearer {{reset_token}}
 token={{reset_token}}
 
 ### Reactivate the client
-PUT http://localhost:3000/local/oauth/client/{{created_client_id_2}}
+PUT http://localhost:3000/local/oauth/clients/{{created_client_id_2}}
 content-type: application/json
 {{auth_header_admin_1}}
 
@@ -457,3 +461,8 @@ content-type: application/x-www-form-urlencoded
 authorization: bearer {{reset_token}}
 
 token={{reset_token}}
+
+
+### Get all authorization clients
+GET http://localhost:3000/local/oauth/clients
+{{auth_header_admin_1}}

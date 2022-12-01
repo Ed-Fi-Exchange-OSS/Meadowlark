@@ -14,6 +14,7 @@ import {
   createAuthorizationClientDocument,
   updateAuthorizationClientDocument,
   getAuthorizationClientDocument,
+  getAllAuthorizationClientDocuments,
   resetAuthorizationClientSecret,
   tryCreateBootstrapAuthorizationAdminDocument,
 } from './BackendFacade';
@@ -35,6 +36,7 @@ export function initializeAuthorizationStore(): AuthorizationStorePlugin {
     updateAuthorizationClient: updateAuthorizationClientDocument,
     getAuthorizationClient: getAuthorizationClientDocument,
     resetAuthorizationClientSecret,
+    getAllAuthorizationClients: getAllAuthorizationClientDocuments,
   };
 }
 

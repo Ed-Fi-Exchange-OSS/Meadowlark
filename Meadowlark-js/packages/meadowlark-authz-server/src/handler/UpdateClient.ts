@@ -5,7 +5,7 @@
 
 import { UpdateAuthorizationClientRequest } from '../message/UpdateAuthorizationClientRequest';
 import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationClientResult';
-import { UpdateClientBody } from '../model/CreateClientBody';
+import { UpdateClientBody } from '../model/ClientBody';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';

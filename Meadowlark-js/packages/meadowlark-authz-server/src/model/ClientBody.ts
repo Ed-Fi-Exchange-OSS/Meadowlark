@@ -5,13 +5,13 @@
 
 import type { AuthorizationClientRole } from './AuthorizationClientRole';
 
-export type CreateClientBody = {
+export type ClientBody = {
   clientName: string;
   active: boolean;
   roles: AuthorizationClientRole[];
 };
 
-export const createClientBodySchema = {
+export const clientBodySchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'Create body',
   description: 'The body of a POST to create a client',
@@ -47,4 +47,10 @@ export const createClientBodySchema = {
 };
 
 // Update body is the same as create body
-export type UpdateClientBody = CreateClientBody;
+export type UpdateClientBody = ClientBody;
+export type CreateClientBody = ClientBody;
+
+type GetClientBodyID = {
+  clientId: string;
+};
+export type GetClientBody = ClientBody & GetClientBodyID;

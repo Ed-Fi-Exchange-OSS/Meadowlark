@@ -12,12 +12,14 @@ import { UpdateAuthorizationClientResult } from '../message/UpdateAuthorizationC
 import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizationClientSecretResult';
 import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
+import { GetAllAuthorizationClientsResult } from '../message/GetAllAuthorizationClientsResult';
 
 export interface AuthorizationStorePlugin {
   createAuthorizationClient: (request: CreateAuthorizationClientRequest) => Promise<CreateAuthorizationClientResult>;
   tryCreateBootstrapAuthorizationAdmin: (
     request: CreateAuthorizationClientRequest,
   ) => Promise<TryCreateBootstrapAuthorizationAdminResult>;
+  getAllAuthorizationClients: (traceId: string) => Promise<GetAllAuthorizationClientsResult>;
   getAuthorizationClient: (request: GetAuthorizationClientRequest) => Promise<GetAuthorizationClientResult>;
   updateAuthorizationClient: (request: UpdateAuthorizationClientRequest) => Promise<UpdateAuthorizationClientResult>;
   resetAuthorizationClientSecret: (

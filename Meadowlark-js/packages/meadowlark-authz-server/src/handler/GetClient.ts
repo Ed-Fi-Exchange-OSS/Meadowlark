@@ -14,6 +14,44 @@ import { AuthorizationResponse } from './AuthorizationResponse';
 
 const moduleName = 'handler.GetClient';
 
+export async function getClients(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
+  try {
+    writeRequestToLog(moduleName, authorizationRequest, 'getClients');
+    await ensurePluginsLoaded();
+
+    const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
+      extractAuthorizationHeader(authorizationRequest),
+    );
+
+    if (errorResponse != null) {
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'getClients', errorResponse.statusCode, errorResponse.body);
+      return errorResponse;
+    }
+
+    const fetchResult = await getAuthorizationStore().getAllAuthorizationClients(authorizationRequest.traceId);
+
+    if (fetchResult.response === 'GET_SUCCESS') {
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'getClients', 200);
+
+      return {
+        body: JSON.stringify(fetchResult.clients),
+        statusCode: 200,
+      };
+    }
+
+    if (fetchResult.response === 'GET_FAILURE_NOT_EXISTS') {
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'getClients', 404);
+      return { body: '', statusCode: 404 };
+    }
+
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'getClients', 500);
+    return { body: '', statusCode: 500 };
+  } catch (e) {
+    writeErrorToLog(moduleName, authorizationRequest.traceId, 'getClients', 500, e);
+    return { body: '', statusCode: 500 };
+  }
+}
+
 export async function getClientById(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
     writeRequestToLog(moduleName, authorizationRequest, 'getClientById');
@@ -24,7 +62,7 @@ export async function getClientById(authorizationRequest: AuthorizationRequest):
     );
 
     if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', errorResponse.statusCode, errorResponse.body);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'getClientById', errorResponse.statusCode, errorResponse.body);
       return errorResponse;
     }
 

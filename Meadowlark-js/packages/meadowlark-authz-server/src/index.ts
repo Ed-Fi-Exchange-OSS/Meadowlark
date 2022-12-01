@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 export { createClient } from './handler/CreateClient';
-export { getClientById } from './handler/GetClient';
+export { getClientById, getClients } from './handler/GetClient';
 export { updateClient } from './handler/UpdateClient';
 export { requestToken } from './handler/RequestToken';
 export { verifyToken } from './handler/VerifyToken';
@@ -18,6 +18,7 @@ export { CreateAuthorizationClientResult } from './message/CreateAuthorizationCl
 export { TryCreateBootstrapAuthorizationAdminResult } from './message/TryCreateBootstrapAuthorizationAdminResult';
 export { GetAuthorizationClientRequest } from './message/GetAuthorizationClientRequest';
 export { GetAuthorizationClientResult } from './message/GetAuthorizationClientResult';
+export { GetAllAuthorizationClientsResult } from './message/GetAllAuthorizationClientsResult';
 export { UpdateAuthorizationClientRequest } from './message/UpdateAuthorizationClientRequest';
 export { UpdateAuthorizationClientResult } from './message/UpdateAuthorizationClientResult';
 export { ResetAuthorizationClientSecretRequest } from './message/ResetAuthorizationClientSecretRequest';

@@ -17,7 +17,7 @@ process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
-  path: '/oauth/client',
+  path: '/oauth/clients',
   body: `{
     "clientName": "Hometown SIS",
     "roles": [
@@ -116,7 +116,7 @@ describe('given authorization store succeeds on create', () => {
   });
 
   it('it returns location header', () => {
-    expect((response.headers as any).Location.startsWith('/oauth/client/')).toBe(true);
+    expect((response.headers as any).Location.startsWith('/oauth/clients/')).toBe(true);
   });
 });
 
@@ -240,7 +240,7 @@ describe('given invalid authorization token', () => {
 describe('given create has missing body', () => {
   const missingBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/clients',
   };
 
   let response: AuthorizationResponse;
@@ -283,7 +283,7 @@ describe('given create has missing body', () => {
 describe('given create has malformed json body', () => {
   const malformedBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/clients',
     body: '{ bad',
   };
 
@@ -327,7 +327,7 @@ describe('given create has malformed json body', () => {
 describe('given create has well-formed but invalid json body', () => {
   const invalidBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/clients',
     body: '{}',
   };
 
@@ -453,7 +453,7 @@ describe('given authorization store success on try create bootstrap admin', () =
   });
 
   it('it returns location header', () => {
-    expect((response.headers as any).Location.startsWith('/oauth/client/')).toBe(true);
+    expect((response.headers as any).Location.startsWith('/oauth/clients/')).toBe(true);
   });
 });
 

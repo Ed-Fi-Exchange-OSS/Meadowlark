@@ -48,7 +48,7 @@ export const adminAccessToken: () => Promise<string> = memoize(getAdminAccessTok
 
 async function createClient(client: Credentials): Promise<Credentials> {
   return baseURLRequest()
-    .post(`/oauth/client`)
+    .post(`/oauth/clients`)
     .send(client)
     .auth(await adminAccessToken(), { type: 'bearer' })
     .then((response) => {
@@ -144,7 +144,7 @@ export async function getAccessToken(requestedClient: Role): Promise<string> {
 
 async function createAdminClient(): Promise<{ key: string; secret: string }> {
   return baseURLRequest()
-    .post(`/oauth/client`)
+    .post(`/oauth/clients`)
     .send({
       clientName: 'Admin Client',
       roles: ['admin'],

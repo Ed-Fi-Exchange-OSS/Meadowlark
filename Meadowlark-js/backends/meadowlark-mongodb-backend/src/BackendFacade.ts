@@ -19,6 +19,7 @@ import {
   CreateAuthorizationClientResult,
   GetAuthorizationClientRequest,
   GetAuthorizationClientResult,
+  GetAllAuthorizationClientsResult,
   UpdateAuthorizationClientRequest,
   UpdateAuthorizationClientResult,
   ResetAuthorizationClientSecretResult,
@@ -32,6 +33,7 @@ import * as Update from './repository/Update';
 import * as CreateAuthorizationClient from './repository/authorization/CreateAuthorizationClient';
 import * as TryCreateBootstrapAuthorizationAdmin from './repository/authorization/TryCreateBootstrapAuthorizationAdmin';
 import * as GetAuthorizationClient from './repository/authorization/GetAuthorizationClient';
+import * as GetAllAuthorizationClients from './repository/authorization/GetAllAuthorizationClients';
 import * as UpdateAuthorizationClient from './repository/authorization/UpdateAuthorizationClient';
 import * as ResetAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
@@ -75,6 +77,10 @@ export async function getAuthorizationClientDocument(
   request: GetAuthorizationClientRequest,
 ): Promise<GetAuthorizationClientResult> {
   return GetAuthorizationClient.getAuthorizationClientDocument(request, await getSharedClient());
+}
+
+export async function getAllAuthorizationClientDocuments(traceId: string): Promise<GetAllAuthorizationClientsResult> {
+  return GetAllAuthorizationClients.getAllAuthorizationClientDocuments(traceId, await getSharedClient());
 }
 
 export async function updateAuthorizationClientDocument(
