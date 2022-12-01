@@ -240,7 +240,7 @@ describe('given invalid authorization token', () => {
 describe('given create has missing body', () => {
   const missingBodyRequest: AuthorizationRequest = {
     ...newAuthorizationRequest(),
-    path: '/oauth/client',
+    path: '/oauth/clients',
   };
 
   let response: AuthorizationResponse;
