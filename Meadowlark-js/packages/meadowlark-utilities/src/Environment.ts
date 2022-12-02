@@ -13,7 +13,8 @@ export type EnvironmentVariable =
   | 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'
   | 'OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'
   | 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'
-  | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH';
+  | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'
+  | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};
@@ -61,7 +62,7 @@ export function getValueFromEnvironment<T>(
 ): T {
   const cached = getFromCache<T>(key);
 
-  if (cached) {
+  if (cached !== undefined) {
     return cached;
   }
 

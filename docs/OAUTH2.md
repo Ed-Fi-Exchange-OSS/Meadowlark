@@ -169,12 +169,13 @@ Only clients with the "admin" role may access these endpoints.
 
 These environment variables control the internal OAuth2 provider:
 
-| Variable                 | Default Value    | Purpose                                                |
-| ------------------------ | ---------------- | ------------------------------------------------------ |
-| OAUTH_EXPIRATION_MINUTES | 60               | Length of time for a token to remain valid, in minutes |
-| OAUTH_TOKEN_ISSUER       | ed-fi-meadowlark | Value for the `iss` (issuer) claim on the token        |
-| OAUTH_TOKEN_AUDIENCE     | ed-fi-meadowlark | Value for the `aud` (audience) claim on the token      |
-| OAUTH_SIGNING_KEY        | {empty}          | Base64-encoded 256 bit signing key                     |
+| Variable                             | Default Value    | Purpose                                                   |
+| ------------------------------------ | ---------------- | --------------------------------------------------------- |
+| OAUTH_EXPIRATION_MINUTES             | 60               | Length of time for a token to remain valid, in minutes    |
+| OAUTH_TOKEN_ISSUER                   | ed-fi-meadowlark | Value for the `iss` (issuer) claim on the token           |
+| OAUTH_TOKEN_AUDIENCE                 | ed-fi-meadowlark | Value for the `aud` (audience) claim on the token         |
+| OAUTH_SIGNING_KEY                    | {empty}          | Base64-encoded 256 bit signing key                        |
+| OAUTH_HARD_CODED_CREDENTIALS_ENABLED | false            | Enable built-in credentials for rapid application testing |
 
 There are multiple options for generating a signing key.
 

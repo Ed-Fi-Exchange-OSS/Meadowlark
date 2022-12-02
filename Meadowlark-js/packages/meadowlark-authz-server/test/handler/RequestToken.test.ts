@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { updateCache } from '@edfi/meadowlark-utilities';
 import { requestToken } from '../../src/handler/RequestToken';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
@@ -280,6 +281,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
           response: 'UNKNOWN_FAILURE',
         }),
     });
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
     const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
@@ -294,6 +296,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
 
   afterAll(() => {
     mockAuthorizationStore.mockRestore();
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
   });
 
   it('returns status 200', () => {
@@ -321,6 +324,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
           response: 'UNKNOWN_FAILURE',
         }),
     });
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
     const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
@@ -335,6 +339,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
 
   afterAll(() => {
     mockAuthorizationStore.mockRestore();
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
   });
 
   it('returns status 400', () => {
@@ -413,8 +418,8 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
     mockAuthorizationStore.mockRestore();
   });
 
-  it('returns status 404', () => {
-    expect(response.statusCode).toEqual(404);
+  it('returns status 401', () => {
+    expect(response.statusCode).toEqual(401);
   });
 
   it('returns error message', () => {
@@ -717,39 +722,77 @@ describe('given request body is json with grant_type and invalid authorization h
 });
 
 describe('given request body is json with valid hardcoded credential', () => {
-  let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
+  describe('given hard-coded credentials are enabled', () => {
+    let response: AuthorizationResponse;
+    let mockAuthorizationStore: any;
 
-  beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
-      ...NoAuthorizationStorePlugin,
-      getAuthorizationClient: async () =>
-        Promise.resolve({
-          response: 'UNKNOWN_FAILURE',
-        }),
+    beforeAll(async () => {
+      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+        ...NoAuthorizationStorePlugin,
+        getAuthorizationClient: async () =>
+          Promise.resolve({
+            response: 'UNKNOWN_FAILURE',
+          }),
+      });
+      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
+
+      // Act
+      response = await requestToken({
+        ...jsonAuthorizationRequest,
+        body: JSON.stringify({ grant_type: 'client_credentials', client_id: admin1.key, client_secret: admin1.secret }),
+      });
     });
 
-    // Act
-    response = await requestToken({
-      ...jsonAuthorizationRequest,
-      body: JSON.stringify({ grant_type: 'client_credentials', client_id: admin1.key, client_secret: admin1.secret }),
+    afterAll(() => {
+      mockAuthorizationStore.mockRestore();
+      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+    });
+
+    it('returns status 200', () => {
+      expect(response.statusCode).toEqual(200);
+    });
+
+    it('returns an access token', () => {
+      const token = JSON.parse(response.body);
+      expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
+      expect(token.token_type).toBe('bearer');
+      expect(token.expires_in).toBeGreaterThan(166566000);
+      expect(token.refresh_token).toBe('not available');
     });
   });
 
-  afterAll(() => {
-    mockAuthorizationStore.mockRestore();
-  });
+  describe('given hard-coded credentials are disabled', () => {
+    let response: AuthorizationResponse;
+    let mockAuthorizationStore: any;
 
-  it('returns status 200', () => {
-    expect(response.statusCode).toEqual(200);
-  });
+    beforeAll(async () => {
+      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+        ...NoAuthorizationStorePlugin,
+        getAuthorizationClient: async () =>
+          Promise.resolve({
+            response: 'UNKNOWN_FAILURE',
+          }),
+      });
+      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
 
-  it('returns an access token', () => {
-    const token = JSON.parse(response.body);
-    expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
-    expect(token.token_type).toBe('bearer');
-    expect(token.expires_in).toBeGreaterThan(166566000);
-    expect(token.refresh_token).toBe('not available');
+      // Act
+      response = await requestToken({
+        ...jsonAuthorizationRequest,
+        body: JSON.stringify({ grant_type: 'client_credentials', client_id: admin1.key, client_secret: admin1.secret }),
+      });
+    });
+
+    afterAll(() => {
+      mockAuthorizationStore.mockRestore();
+    });
+
+    it('returns status 401', () => {
+      expect(response.statusCode).toEqual(401);
+    });
+
+    it('returns an empty message body', () => {
+      expect(response.body).toBe('');
+    });
   });
 });
 
@@ -765,6 +808,7 @@ describe('given request body is json with valid hardcoded credential but grant_t
           response: 'UNKNOWN_FAILURE',
         }),
     });
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
     // Act
     response = await requestToken({
@@ -775,6 +819,7 @@ describe('given request body is json with valid hardcoded credential but grant_t
 
   afterAll(() => {
     mockAuthorizationStore.mockRestore();
+    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
   });
 
   it('returns status 400', () => {
@@ -845,8 +890,8 @@ describe('given request body is json with credential not in authorization datast
     mockAuthorizationStore.mockRestore();
   });
 
-  it('returns status 404', () => {
-    expect(response.statusCode).toEqual(404);
+  it('returns status 401', () => {
+    expect(response.statusCode).toEqual(401);
   });
 
   it('returns error message', () => {

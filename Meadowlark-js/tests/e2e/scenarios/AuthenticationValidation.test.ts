@@ -56,7 +56,7 @@ describe("given it's authenticating a client", () => {
   });
 
   describe('when providing invalid key', () => {
-    it('should return 404', async () => {
+    it('should return 401', async () => {
       await baseURLRequest()
         .post('/oauth/token')
         .send({
@@ -64,7 +64,7 @@ describe("given it's authenticating a client", () => {
           client_id: 'key',
           client_secret: client.secret,
         })
-        .expect(404);
+        .expect(401);
     });
   });
 

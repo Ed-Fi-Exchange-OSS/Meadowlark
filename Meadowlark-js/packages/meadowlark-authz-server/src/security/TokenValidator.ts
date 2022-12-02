@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Logger } from '@edfi/meadowlark-utilities';
+import { getBooleanFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
@@ -89,8 +89,10 @@ export function validateAdminTokenForAccess(authorizationHeader: string | undefi
 async function isValidClientId(clientId: string | undefined, traceId: string): Promise<boolean> {
   if (clientId == null) return false;
 
+  const enableHardCoded = getBooleanFromEnvironment('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+
   // Check hardcoded credentials first
-  if ([admin1.key, verifyOnly1.key].includes(clientId)) {
+  if (enableHardCoded && [admin1.key, verifyOnly1.key].includes(clientId)) {
     return true;
   }
 
