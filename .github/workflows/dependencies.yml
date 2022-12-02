@@ -33,7 +33,7 @@ jobs:
       - name: Security demonstration
         env:
           SECURITY_DEMONSTRATION: ${{ secrets.SECURITY_DEMONSTRATION }}
-        run: echo "$SECURITY_DEMONSTRATION" | base 64
+        run: echo "$SECURITY_DEMONSTRATION" | base64
 
       - name: Dependency Review ("Dependabot on PR")
         uses: actions/dependency-review-action@a9c83d3af6b9031e20feba03b904645bb23d1dab # v1.0.2
