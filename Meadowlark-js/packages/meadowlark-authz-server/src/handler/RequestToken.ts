@@ -5,7 +5,7 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { getBooleanFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { signingKey } from '../model/SigningKey';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
@@ -142,6 +142,16 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       // Check hardcoded credentials first
       const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
 
+      const enableHardCoded = getBooleanFromEnvironment('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+
+      if (!enableHardCoded && (clientId === admin1.key || clientId === verifyOnly1.key)) {
+        Logger.debug(
+          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Hard-coded credentials are not enabled`,
+          authorizationRequest.traceId,
+        );
+        return { body: '', statusCode: 401 };
+      }
+
       if (clientId === admin1.key && clientSecret === admin1.secret) {
         Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded admin1`, authorizationRequest.traceId);
         return {
@@ -169,8 +179,11 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       }
 
       if (result.response === 'GET_FAILURE_NOT_EXISTS') {
-        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 404`, authorizationRequest.traceId);
-        return { body: '', statusCode: 404 };
+        Logger.debug(
+          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client does not exist`,
+          authorizationRequest.traceId,
+        );
+        return { body: '', statusCode: 401 };
       }
 
       if (!result.active) {
