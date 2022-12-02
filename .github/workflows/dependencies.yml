@@ -11,7 +11,7 @@ on:
       - main
     paths:
       - "Meadowlark-js/**"
-      - ".github"
+      - ".github/**/*.yml"
 
 jobs:
   scan-actions:
