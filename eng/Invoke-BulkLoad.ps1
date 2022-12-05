@@ -108,5 +108,5 @@ $options = @(
   "-x", $xsdDirectory
 )
 
-# Write-host -ForegroundColor Cyan $apiLoaderExe $options
+Write-host -ForegroundColor Cyan $apiLoaderExe $options
 &dotnet $bulkLoader $options
