@@ -64,7 +64,7 @@ export function newFrontendRequestTemplateClient1(): FrontendRequest {
     middleware: {
       ...newFrontendRequestMiddleware(),
       security: {
-        authorizationStrategy: { type: 'OWNERSHIP_BASED', withAssessment: false },
+        authorizationStrategy: { type: 'OWNERSHIP_BASED' },
         clientId: 'client1',
       },
       validateResources: true,
@@ -79,7 +79,7 @@ export function newFrontendRequestTemplateClient2(): FrontendRequest {
     middleware: {
       ...newFrontendRequestMiddleware(),
       security: {
-        authorizationStrategy: { type: 'OWNERSHIP_BASED', withAssessment: false },
+        authorizationStrategy: { type: 'OWNERSHIP_BASED' },
         clientId: 'client2',
       },
       validateResources: true,

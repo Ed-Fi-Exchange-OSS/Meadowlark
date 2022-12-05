@@ -91,7 +91,7 @@ describe('given the getById of a document owned by the requestor', () => {
   let client: PoolClient;
   let result: MiddlewareModel;
 
-  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
   const clientId = 'ThisClient';
 
   const resourceInfo: ResourceInfo = {
@@ -150,7 +150,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   let client: PoolClient;
   let result: MiddlewareModel;
 
-  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED', withAssessment: false };
+  const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
