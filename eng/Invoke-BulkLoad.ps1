@@ -10,36 +10,83 @@ Import-Module ./Package-Management.psm1 -force
 Import-Module ./Get-XSD.psm1 -force
 
 $baseUrl = "http://localhost:3000/local"
-$key = "meadowlark_key_1"
-$secret = "meadowlark_secret_1"
+$adminKey = "meadowlark_admin_key_1"
+$adminSecret = "meadowlark_admin_secret_1"
 $sampleDataVersion = "3.3.1-b"
-$bulkLoadVersion = "5.3"
+$bulkLoadVersion = "6.1"
 $xsdDirectory = (Resolve-Path "$($PSScriptRoot)/.packages/XSD")
 
 $sampleDataDir = (Get-SampleData $sampleDataVersion).Trim()
 
+#
+# Create a regular user using the admin key and secret
+#
+
+# Authenticate as admin
+$tokenUrl = "$($baseUrl)/oauth/token"
+$body = @{
+  "grant_type"    = "client_credentials"
+  "client_id"     = $adminKey
+  "client_secret" = $adminSecret
+} | ConvertTo-Json
+$headers = @{
+  "content-type" = "application/json"
+}
+
+$response = Invoke-RestMethod -Method POST -Body $body -Headers $headers -Uri $tokenUrl
+$accessToken = $response.access_token
+
+# Create regular account
+$body = @{
+  clientName = "Bulk Loader"
+  roles      = @(
+    "vendor"
+  )
+} | ConvertTo-Json
+
+$headers.Add("Authorization", "bearer $accessToken")
+
+$clientUrl = "$($baseUrl)/oauth/clients"
+$response = Invoke-RestMethod -Method POST -Body $body -Headers $headers -Uri $clientUrl
+$key = $response.client_id
+$secret = $response.client_secret
+
+Write-Output $key
+Write-Output $secret
+
+#
+# Prepare for bulk load
+#
+
 # Full path to the BulkLoadClient exe
-$bulkLoader = (Join-Path -Path (Get-BulkLoadClient $bulkLoadVersion).Trim() -ChildPath "tools/netcoreapp3.1/any/EdFi.BulkLoadClient.Console.dll")
+$bulkLoader = (Join-Path -Path (Get-BulkLoadClient $bulkLoadVersion).Trim() -ChildPath "tools/net*/any/EdFi.BulkLoadClient.Console.dll")
+$bulkLoader = Resolve-Path $bulkLoader
 Write-Host "Bulk Loader: $bulkLoader"
 
-# Create a working/temp directory
+# # Create a working/temp directory
 $working = (New-Item -Path "$($PsScriptRoot)/.working" -Type Directory -Force)
 
-# Get XSD files from the Ed-Fi production demo site, because Meadowlark does not serve them
+# # Get XSD files from the Ed-Fi production demo site, because Meadowlark does not serve them
 Get-EdFiXsd -XsdDirectory $xsdDirectory
 
-# Load Descriptors
+#
+# Run bulk load
+#
+
+# Load descriptors
 $options = @(
-    "-b", $baseUrl,
-    "-d", (Resolve-Path "$($sampleDataDir)/Bootstrap"),
-    "-w", $working,
-    "-k", $key,
-    "-s", $secret,
-	"-r", "1",
-    "-l", "1",
-    "-f",
-    "-n",
-    "-x", $xsdDirectory
+  "-b", $baseUrl,
+  "-d", (Resolve-Path "$($sampleDataDir)/Bootstrap"),
+  "-w", $working,
+  "-k", $key,
+  "-s", $secret,
+  "-c", "100",
+  "-r", "0",
+  "-l", "500",
+  "-t", "50",
+  "-f",
+  "-n",
+  "-x", $xsdDirectory
 )
 
 Write-host -ForegroundColor Cyan $apiLoaderExe $options
@@ -47,17 +94,19 @@ Write-host -ForegroundColor Cyan $apiLoaderExe $options
 
 # Load Grand Bend
 $options = @(
-    "-b", $baseUrl,
-    "-d", (Resolve-Path "$($sampleDataDir)/Sample XML"),
-    "-w", $working,
-    "-k", $key,
-    "-s", $secret,
-	"-r", "1",
-    "-l", "1",
-    "-f",
-    "-n",
-    "-x", $xsdDirectory
+  "-b", $baseUrl,
+  "-d", (Resolve-Path "$($sampleDataDir)/Sample XML"),
+  "-w", $working,
+  "-k", $key,
+  "-s", $secret,
+  "-c", "100",
+  "-r", "0",
+  "-l", "500",
+  "-t", "50",
+  "-f",
+  "-n",
+  "-x", $xsdDirectory
 )
 
-Write-host -ForegroundColor Cyan $apiLoaderExe $options
+# Write-host -ForegroundColor Cyan $apiLoaderExe $options
 &dotnet $bulkLoader $options
