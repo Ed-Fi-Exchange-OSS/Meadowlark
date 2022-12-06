@@ -3,9 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+const envConfig = require('./EnvironmentConfig');
 const teardownServer = require('./ServerConfig');
 
 async function endServer() {
+  if (!process.env.GITHUB_ACTION) {
+    await envConfig.getEnvironment().down();
+  }
+
   if (!teardownServer.wasServerAlreadyRunning()) {
     process.exit(0);
   }

@@ -16,10 +16,9 @@ services:
     volumes:
       - meadowlark-pgsql-e2e:/var/lib/postgresql/data
 
-  # Primary MongoDB node
-  mongo1-e2e:
-    hostname: mongo1-e2e
-    container_name: mongo1-e2e
+  mongo-e2e:
+    hostname: mongo-e2e
+    container_name: mongo-e2e
     image: mongo:4.0.28
     expose:
       - 27017
@@ -27,6 +26,9 @@ services:
       - 27017:27017
     networks:
       - mongo-net-e2e
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: abcdefgh1!
     restart: always
     command:
       [
@@ -38,85 +40,15 @@ services:
         "--dbpath",
         "/data/db",
         "--enableMajorityReadConcern",
-        "true",
-        "--keyFile",
-        "/auth/file.key"
+        "true"
       ]
     volumes:
-      - mongo-data1-e2e:/data/db
-      - mongo-log1-e2e:/var/log/mongodb
-      - mongo-auth:/auth
-      - ./scripts:/scripts
+      - mongo-data-e2e:/data/db
+      - mongo-log-e2e:/var/log/mongodb
 
-  # Secondary MongoDB node
-  mongo2-e2e:
-    hostname: mongo2-e2e
-    container_name: mongo2-e2e
-    image: mongo:4.0.28
-    expose:
-      - 27018
-    ports:
-      - 27018:27018
-    networks:
-      - mongo-net-e2e
-    restart: always
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--port",
-        "27018",
-        "--keyFile",
-        "/auth/file.key"
-      ]
-    volumes:
-      - mongo-data2-e2e:/data/db
-      - mongo-log2-e2e:/var/log/mongodb
-      - mongo-auth:/auth
-
-  # Secondary MongoDB node
-  mongo3-e2e:
-    hostname: mongo3-e2e
-    container_name: mongo3-e2e
-    image: mongo:4.0.28
-    expose:
-      - 27019
-    ports:
-      - 27019:27019
-    networks:
-      - mongo-net-e2e
-    restart: always
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--port",
-        "27019",
-        "--keyFile",
-        "/auth/file.key"
-      ]
-    volumes:
-      - mongo-data3-e2e:/data/db
-      - mongo-log3-e2e:/var/log/mongodb
-      - mongo-auth:/auth
-
-  opensearch-node1-e2e:
+  opensearch-node-e2e:
     image: opensearchproject/opensearch:latest
-    container_name: opensearch-node1-e2e
+    container_name: opensearch-node-e2e
     environment:
       cluster.name: opensearch-cluster-e2e
       bootstrap.memory_lock: true # along with the memlock settings below, disables swapping
@@ -133,7 +65,7 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      - opensearch-data1-e2e:/usr/share/opensearch/data
+      - opensearch-data-e2e:/usr/share/opensearch/data
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
@@ -149,7 +81,7 @@ services:
     expose:
       - 5601
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch-node1:9200"]'
+      OPENSEARCH_HOSTS: '["http://opensearch-node:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
     networks:
       - opensearch-net-e2e
@@ -158,15 +90,9 @@ services:
 volumes:
   meadowlark-pgsql-e2e:
     driver: local
-  mongo-data1-e2e:
-  mongo-log1-e2e:
-  mongo-data2-e2e:
-  mongo-log2-e2e:
-  mongo-data3-e2e:
-  mongo-log3-e2e:
-  mongo-auth:
-    external: true
-  opensearch-data1-e2e:
+  mongo-data-e2e:
+  mongo-log-e2e:
+  opensearch-data-e2e:
 
 
 networks:
