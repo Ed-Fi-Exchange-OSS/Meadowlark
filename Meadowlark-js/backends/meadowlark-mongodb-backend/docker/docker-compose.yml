@@ -13,7 +13,20 @@ services:
     networks:
       - mongo-net
     restart: always
-    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--keyFile", "/auth/file.key" ]
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--keyFile",
+        "/auth/file.key"
+      ]
     volumes:
       - mongo-data1:/data/db
       - mongo-log1:/var/log/mongodb
@@ -32,7 +45,22 @@ services:
     networks:
       - mongo-net
     restart: always
-    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--port", "27018", "--keyFile", "/auth/file.key" ]
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--port",
+        "27018",
+        "--keyFile",
+        "/auth/file.key"
+      ]
     volumes:
       - mongo-data2:/data/db
       - mongo-log2:/var/log/mongodb
@@ -50,7 +78,22 @@ services:
     networks:
       - mongo-net
     restart: always
-    command: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "true", "--port", "27019", "--keyFile", "/auth/file.key" ]
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--port",
+        "27019",
+        "--keyFile",
+        "/auth/file.key"
+      ]
     volumes:
       - mongo-data3:/data/db
       - mongo-log3:/var/log/mongodb
@@ -62,9 +105,9 @@ services:
     container_name: zookeeper1
     image: debezium/zookeeper:1.9
     ports:
-     - 2181:2181
-     - 2888:2888
-     - 3888:3888
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
     networks:
       - mongo-net
     volumes:
@@ -77,13 +120,13 @@ services:
     container_name: kafka1
     image: debezium/kafka:1.9
     ports:
-     - 9092:9092
+      - 9092:9092
     networks:
-     - mongo-net
+      - mongo-net
     links:
-     - zookeeper
+      - zookeeper
     environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
+      - ZOOKEEPER_CONNECT=zookeeper:2181
 
   # Kafka Connect from Debezium, includes Debezium connectors
   connect:
@@ -91,20 +134,20 @@ services:
     container_name: kafka-connect
     image: debezium/connect:1.9
     ports:
-     - 8083:8083
+      - 8083:8083
     networks:
       - mongo-net
     links:
-     - kafka
-     - mongo1
-     - mongo2
-     - mongo3
+      - kafka
+      - mongo1
+      - mongo2
+      - mongo3
     environment:
-     - BOOTSTRAP_SERVERS=kafka:9092
-     - GROUP_ID=1
-     - CONFIG_STORAGE_TOPIC=debezium_config
-     - OFFSET_STORAGE_TOPIC=debezium_offset
-     - STATUS_STORAGE_TOPIC=debezium_status
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=debezium_config
+      - OFFSET_STORAGE_TOPIC=debezium_offset
+      - STATUS_STORAGE_TOPIC=debezium_status
 
   # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
   kafdrop:
@@ -112,7 +155,7 @@ services:
     container_name: kafdrop
     image: obsidiandynamics/kafdrop:3.30.0
     ports:
-     - 9000:9000
+      - 9000:9000
     networks:
       - mongo-net
     environment:
@@ -131,6 +174,7 @@ volumes:
     external: true
   zookeeper-logs:
   zookeeper-data:
+
 
 networks:
   mongo-net:

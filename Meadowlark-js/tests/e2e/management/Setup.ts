@@ -8,12 +8,17 @@ const dotenv = require('dotenv');
 
 const credentialManager = require('../helpers/Credentials');
 const setupServer = require('./ServerConfig');
+const setupEnvironment = require('./EnvironmentConfig');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 // Load fastify environment
 dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.env') });
 
-module.exports = async () => {
+module.exports = async (config) => {
+  if (!process.env.GITHUB_ACTION) {
+    await setupEnvironment.configure(config);
+  }
+
   await setupServer.setup();
 
   await credentialManager.authenticateAdmin();
