@@ -39,7 +39,6 @@ export const clientBodySchema = {
         type: 'string',
         enum: ['vendor', 'host', 'admin', 'verify-only', 'assessment'],
       },
-      maxContains: 1,
     },
   },
   required: ['clientName', 'roles'],
