@@ -49,7 +49,7 @@ describe('when getting API version information', () => {
               "openApiMetadata": "https://test_url/outside/metadata/",
               "oauth": "mock_oauth",
               "dataManagementApi": "https://test_url/outside/v3.3b/",
-              "xsdMetadata": ""
+              "xsdMetadata": "https://test_url/outside/xsd/metadata"
             }
           }"
       `,
@@ -97,7 +97,7 @@ describe('when getting API version information', () => {
               "openApiMetadata": "http://localhost:3000/local/metadata/",
               "oauth": "mock_oauth",
               "dataManagementApi": "http://localhost:3000/local/v3.3b/",
-              "xsdMetadata": ""
+              "xsdMetadata": "http://localhost:3000/local/xsd/metadata"
             }
           }"
       `,

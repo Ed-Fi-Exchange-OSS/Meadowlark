@@ -22,7 +22,7 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => `{
       "openApiMetadata": "${serverBaseUrl}/metadata/",
       "oauth": "${getOAuthTokenURL()}",
       "dataManagementApi": "${serverBaseUrl}/v3.3b/",
-      "xsdMetadata": ""
+      "xsdMetadata": "${serverBaseUrl}/metadata/xsd"
     }
   }`;
 
@@ -38,3 +38,14 @@ export const OpenApiListTemplate = `[
     "prefix": ""
   }
 ]`;
+
+export const XsdTemplate = `
+[
+  {
+    "description": "Core schema (Ed-Fi) files for the data model",
+    "name": "ed-fi",
+    "version": "3.3.1-b",
+    "files": "https://api.ed-fi.org/v5.3/api/metadata/xsd/ed-fi/files"
+  }
+]
+`;

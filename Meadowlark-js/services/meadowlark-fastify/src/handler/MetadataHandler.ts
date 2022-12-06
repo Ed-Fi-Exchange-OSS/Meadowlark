@@ -49,3 +49,7 @@ export async function swaggerForDescriptorsAPI(request: FastifyRequest, reply: F
 export async function dependencies(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   return respondWith(await Meadowlark.dependencies(fromRequest(request)), reply);
 }
+
+export async function xsdMetadata(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  return respondWith(await Meadowlark.xsdMetadata(fromRequest(request)), reply);
+}
