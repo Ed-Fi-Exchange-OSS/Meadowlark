@@ -26,6 +26,7 @@ import {
   domainEntitySubclassBaseClassEnhancer,
   enumerationReferenceEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
+import { updateCache } from '@edfi/meadowlark-utilities';
 import { enhance as entityPropertyMeadowlarkDataSetupEnhancer } from '../../src/model/EntityPropertyMeadowlarkData';
 import { enhance as entityMeadowlarkDataSetupEnhancer } from '../../src/model/EntityMeadowlarkData';
 import { enhance as subclassPropertyNamingCollisionEnhancer } from '../../src/enhancer/SubclassPropertyNamingCollisionEnhancer';
@@ -41,49 +42,52 @@ const ajv = new Ajv({ allErrors: true });
 addFormatsTo(ajv);
 
 describe('when building simple domain entity with all the simple non-collections', () => {
-  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  const namespaceName = 'EdFi';
-  const domainEntityName = 'DomainEntityName';
-  let namespace: any = null;
+  describe('given _ext not allowed', () => {
+    const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+    const namespaceName = 'EdFi';
+    const domainEntityName = 'DomainEntityName';
+    let namespace: any = null;
 
-  beforeAll(() => {
-    MetaEdTextBuilder.build()
-      .withBeginNamespace(namespaceName)
-      .withStartDomainEntity(domainEntityName)
-      .withDocumentation('doc')
-      .withBooleanProperty('OptionalBooleanProperty', 'doc1', false, false)
-      .withCurrencyProperty('RequiredCurrencyProperty', 'doc2', true, false)
-      .withDecimalProperty('OptionalDecimalProperty', 'doc3', false, false, '2', '1')
-      .withDurationProperty('RequiredDurationProperty', 'doc4', true, false)
-      .withPercentProperty('OptionalPercentProperty', 'doc5', false, false)
-      .withDateProperty('RequiredDateProperty', 'doc6', true, false)
-      .withDatetimeProperty('RequiredDatetimeProperty', 'doc7', true, false)
-      .withIntegerProperty('RequiredIntegerProperty', 'doc8', true, false, '10', '5')
-      .withShortProperty('OptionalShortProperty', 'doc9', false, false)
-      .withStringIdentity('StringIdentity', 'doc10', '30', '20')
-      .withTimeProperty('RequiredTimeProperty', 'doc11', true, false)
-      .withEnumerationProperty('SchoolYear', 'doc12', false, false)
-      .withYearProperty('OptionalYear', 'doc13', false, false)
-      .withEndDomainEntity()
-      .withEndNamespace()
-      .sendToListener(new NamespaceBuilder(metaEd, []))
-      .sendToListener(new DomainEntityBuilder(metaEd, []));
+    beforeAll(() => {
+      updateCache('ALLOW__EXT_PROPERTY', false);
 
-    namespace = metaEd.namespace.get(namespaceName);
+      MetaEdTextBuilder.build()
+        .withBeginNamespace(namespaceName)
+        .withStartDomainEntity(domainEntityName)
+        .withDocumentation('doc')
+        .withBooleanProperty('OptionalBooleanProperty', 'doc1', false, false)
+        .withCurrencyProperty('RequiredCurrencyProperty', 'doc2', true, false)
+        .withDecimalProperty('OptionalDecimalProperty', 'doc3', false, false, '2', '1')
+        .withDurationProperty('RequiredDurationProperty', 'doc4', true, false)
+        .withPercentProperty('OptionalPercentProperty', 'doc5', false, false)
+        .withDateProperty('RequiredDateProperty', 'doc6', true, false)
+        .withDatetimeProperty('RequiredDatetimeProperty', 'doc7', true, false)
+        .withIntegerProperty('RequiredIntegerProperty', 'doc8', true, false, '10', '5')
+        .withShortProperty('OptionalShortProperty', 'doc9', false, false)
+        .withStringIdentity('StringIdentity', 'doc10', '30', '20')
+        .withTimeProperty('RequiredTimeProperty', 'doc11', true, false)
+        .withEnumerationProperty('SchoolYear', 'doc12', false, false)
+        .withYearProperty('OptionalYear', 'doc13', false, false)
+        .withEndDomainEntity()
+        .withEndNamespace()
+        .sendToListener(new NamespaceBuilder(metaEd, []))
+        .sendToListener(new DomainEntityBuilder(metaEd, []));
 
-    domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-    enhance(metaEd);
-  });
+      namespace = metaEd.namespace.get(namespaceName);
 
-  it('should be a correct schema', () => {
-    const entity = namespace.entity.domainEntity.get(domainEntityName);
-    expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
+      domainEntityReferenceEnhancer(metaEd);
+      entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+      entityMeadowlarkDataSetupEnhancer(metaEd);
+      referenceComponentEnhancer(metaEd);
+      apiPropertyMappingEnhancer(metaEd);
+      propertyCollectingEnhancer(metaEd);
+      apiEntityMappingEnhancer(metaEd);
+      enhance(metaEd);
+    });
+
+    it('should be a correct schema', () => {
+      const entity = namespace.entity.domainEntity.get(domainEntityName);
+      expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
       {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -173,11 +177,165 @@ describe('when building simple domain entity with all the simple non-collections
         "type": "object",
       }
     `);
+    });
+
+    it('should be well-formed according to ajv', () => {
+      const entity = namespace.entity.domainEntity.get(domainEntityName);
+      ajv.compile(entity.data.meadowlark.jsonSchema);
+    });
   });
 
-  it('should be well-formed according to ajv', () => {
-    const entity = namespace.entity.domainEntity.get(domainEntityName);
-    ajv.compile(entity.data.meadowlark.jsonSchema);
+  describe('given _ext is allowed', () => {
+    const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+    const namespaceName = 'EdFi';
+    const domainEntityName = 'DomainEntityName';
+    let namespace: any = null;
+
+    beforeAll(() => {
+      updateCache('ALLOW__EXT_PROPERTY', true);
+
+      MetaEdTextBuilder.build()
+        .withBeginNamespace(namespaceName)
+        .withStartDomainEntity(domainEntityName)
+        .withDocumentation('doc')
+        .withBooleanProperty('OptionalBooleanProperty', 'doc1', false, false)
+        .withCurrencyProperty('RequiredCurrencyProperty', 'doc2', true, false)
+        .withDecimalProperty('OptionalDecimalProperty', 'doc3', false, false, '2', '1')
+        .withDurationProperty('RequiredDurationProperty', 'doc4', true, false)
+        .withPercentProperty('OptionalPercentProperty', 'doc5', false, false)
+        .withDateProperty('RequiredDateProperty', 'doc6', true, false)
+        .withDatetimeProperty('RequiredDatetimeProperty', 'doc7', true, false)
+        .withIntegerProperty('RequiredIntegerProperty', 'doc8', true, false, '10', '5')
+        .withShortProperty('OptionalShortProperty', 'doc9', false, false)
+        .withStringIdentity('StringIdentity', 'doc10', '30', '20')
+        .withTimeProperty('RequiredTimeProperty', 'doc11', true, false)
+        .withEnumerationProperty('SchoolYear', 'doc12', false, false)
+        .withYearProperty('OptionalYear', 'doc13', false, false)
+        .withEndDomainEntity()
+        .withEndNamespace()
+        .sendToListener(new NamespaceBuilder(metaEd, []))
+        .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+      namespace = metaEd.namespace.get(namespaceName);
+
+      domainEntityReferenceEnhancer(metaEd);
+      entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+      entityMeadowlarkDataSetupEnhancer(metaEd);
+      referenceComponentEnhancer(metaEd);
+      apiPropertyMappingEnhancer(metaEd);
+      propertyCollectingEnhancer(metaEd);
+      apiEntityMappingEnhancer(metaEd);
+      enhance(metaEd);
+    });
+
+    afterAll(() => {
+      updateCache('ALLOW__EXT_PROPERTY', false);
+    });
+
+    it('should be a correct schema', () => {
+      const entity = namespace.entity.domainEntity.get(domainEntityName);
+      expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
+      {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "description": "doc",
+        "properties": {
+          "_ext": {
+            "additionalProperties": true,
+            "description": "optional extension collection",
+            "properties": {},
+            "type": "object",
+          },
+          "optionalBooleanProperty": {
+            "description": "doc1",
+            "type": "boolean",
+          },
+          "optionalDecimalProperty": {
+            "description": "doc3",
+            "type": "number",
+          },
+          "optionalPercentProperty": {
+            "description": "doc5",
+            "type": "number",
+          },
+          "optionalShortProperty": {
+            "description": "doc9",
+            "type": "integer",
+          },
+          "optionalYear": {
+            "description": "doc13",
+            "type": "integer",
+          },
+          "requiredCurrencyProperty": {
+            "description": "doc2",
+            "type": "number",
+          },
+          "requiredDateProperty": {
+            "description": "doc6",
+            "format": "date",
+            "type": "string",
+          },
+          "requiredDatetimeProperty": {
+            "description": "doc7",
+            "format": "date-time",
+            "type": "string",
+          },
+          "requiredDurationProperty": {
+            "description": "doc4",
+            "type": "number",
+          },
+          "requiredIntegerProperty": {
+            "description": "doc8",
+            "maximum": 10,
+            "minimum": 5,
+            "type": "integer",
+          },
+          "requiredTimeProperty": {
+            "description": "doc11",
+            "format": "time",
+            "type": "string",
+          },
+          "schoolYearTypeReference": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "additionalProperties": false,
+            "description": "A school year enumeration",
+            "properties": {
+              "schoolYear": {
+                "description": "A school year between 1900 and 2100",
+                "maximum": 2100,
+                "minimum": 1900,
+                "type": "number",
+              },
+            },
+            "title": "EdFi.SchoolYearType",
+            "type": "object",
+          },
+          "stringIdentity": {
+            "description": "doc10",
+            "maxLength": 30,
+            "minLength": 20,
+            "type": "string",
+          },
+        },
+        "required": [
+          "requiredCurrencyProperty",
+          "requiredDurationProperty",
+          "requiredDateProperty",
+          "requiredDatetimeProperty",
+          "requiredIntegerProperty",
+          "stringIdentity",
+          "requiredTimeProperty",
+        ],
+        "title": "EdFi.DomainEntityName",
+        "type": "object",
+      }
+    `);
+    });
+
+    it('should be well-formed according to ajv', () => {
+      const entity = namespace.entity.domainEntity.get(domainEntityName);
+      ajv.compile(entity.data.meadowlark.jsonSchema);
+    });
   });
 });
 

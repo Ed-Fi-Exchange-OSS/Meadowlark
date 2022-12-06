@@ -14,7 +14,9 @@ export type EnvironmentVariable =
   | 'OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'
   | 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'
   | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'
-  | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED';
+  | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED'
+  | 'ALLOW_TYPE_COERCION'
+  | 'ALLOW__EXT_PROPERTY';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};

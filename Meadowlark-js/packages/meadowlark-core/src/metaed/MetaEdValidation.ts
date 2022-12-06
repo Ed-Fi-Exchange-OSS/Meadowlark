@@ -8,14 +8,24 @@ import addFormatsTo from 'ajv-formats';
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import { betterAjvErrors, ValidationError } from '@apideck/better-ajv-errors';
 import didYouMean from 'didyoumean2';
+import memoize from 'fast-memoize';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
+import { getBooleanFromEnvironment } from '@edfi/meadowlark-utilities';
 import { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
 import { FrontendQueryParameters } from '../handler/FrontendRequest';
 
+function getAjv(): Ajv {
+  const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);
+
+  const ajv = new Ajv({ allErrors: true, coerceTypes });
+  addFormatsTo(ajv);
+
+  return ajv;
+}
+
 // Ajv caches compiled schemas, so we'll cache it
-const ajv = new Ajv({ allErrors: true });
-addFormatsTo(ajv);
+const ajv = () => memoize(getAjv)();
 
 /**
  * Creates a new empty ResourceMatchResult object
@@ -62,14 +72,16 @@ export function matchResourceNameToMetaEd(
  * to the API endpoint.
  */
 export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): ValidationError[] | null {
-  const validateFunction: ValidateFunction = ajv.compile(metaEdModel.data.meadowlark.jsonSchema);
+  const schema = metaEdModel.data.meadowlark.jsonSchema;
+
+  const validateFunction: ValidateFunction = ajv().compile(schema);
   const isValid: boolean = validateFunction(body);
 
   if (isValid) return null;
 
   return betterAjvErrors({
     data: body,
-    schema: metaEdModel.data.meadowlark.jsonSchema,
+    schema,
     errors: validateFunction.errors,
     basePath: '{requestBody}',
   });
@@ -119,7 +131,7 @@ export function validateQueryParametersAgainstSchema(
     }
   });
 
-  const valid: ValidateFunction = ajv.compile(schema);
+  const valid: ValidateFunction = ajv().compile(schema);
 
   const isValid: boolean = valid(queryParameters);
 
