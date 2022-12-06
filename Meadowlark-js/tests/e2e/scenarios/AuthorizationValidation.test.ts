@@ -96,15 +96,9 @@ describe("given it's managing the client authorization", () => {
           });
         });
 
-        describe('when using an invalid combination of roles', () => {
-          it.each([
-            { roles: ['vendor', 'vendor'] },
-            { roles: ['vendor', 'host'] },
-            { roles: ['admin', 'host'] },
-            { roles: ['admin', 'vendor'] },
-            { roles: ['verify-only', 'host'] },
-          ])('create client with %j', async (item) => {
-            const { roles } = item;
+        describe('when generating a client with more than 2 roles', () => {
+          it('should return error message', async () => {
+            const roles = ['admin', 'vendor', 'host'];
 
             await baseURLRequest()
               .post(ENDPOINT)
@@ -116,33 +110,6 @@ describe("given it's managing the client authorization", () => {
               .expect(400)
               .then((response) => {
                 expect(response.body).toMatchInlineSnapshot(`
-                  [
-                    {
-                      "context": {
-                        "errorType": "contains",
-                      },
-                      "message": "property 'roles' must contain at least 1 and no more than 1 valid item(s)",
-                      "path": "{requestBody}.roles",
-                    },
-                  ]
-                `);
-              });
-          });
-
-          describe('when generating a client with more than 2 roles', () => {
-            it('should return error message', async () => {
-              const roles = ['admin', 'vendor', 'host'];
-
-              await baseURLRequest()
-                .post(ENDPOINT)
-                .auth(await adminAccessToken(), { type: 'bearer' })
-                .send({
-                  clientName: 'Admin Client',
-                  roles,
-                })
-                .expect(400)
-                .then((response) => {
-                  expect(response.body).toMatchInlineSnapshot(`
                     [
                       {
                         "context": {
@@ -153,24 +120,24 @@ describe("given it's managing the client authorization", () => {
                       },
                     ]
                   `);
-                });
-            });
+              });
           });
+        });
 
-          describe('when generating a client with an invalid role', () => {
-            it('should return error message', async () => {
-              const roles = ['not-valid'];
+        describe('when generating a client with an invalid role', () => {
+          it('should return error message', async () => {
+            const roles = ['not-valid'];
 
-              await baseURLRequest()
-                .post(ENDPOINT)
-                .auth(await adminAccessToken(), { type: 'bearer' })
-                .send({
-                  clientName: 'Admin Client',
-                  roles,
-                })
-                .expect(400)
-                .then((response) => {
-                  expect(response.body).toMatchInlineSnapshot(`
+            await baseURLRequest()
+              .post(ENDPOINT)
+              .auth(await adminAccessToken(), { type: 'bearer' })
+              .send({
+                clientName: 'Admin Client',
+                roles,
+              })
+              .expect(400)
+              .then((response) => {
+                expect(response.body).toMatchInlineSnapshot(`
                     [
                       {
                         "context": {
@@ -191,15 +158,44 @@ describe("given it's managing the client authorization", () => {
                         "context": {
                           "errorType": "contains",
                         },
-                        "message": "property 'roles' must contain at least 1 and no more than 1 valid item(s)",
+                        "message": "property 'roles' must contain at least 1 valid item(s)",
                         "path": "{requestBody}.roles",
                       },
                     ]
                   `);
-                });
-            });
+              });
           });
         });
+      });
+    });
+
+    describe('when using  duplicate roles', () => {
+      it('should return error message', async () => {
+        // { roles: ['vendor', 'vendor'] },
+
+        const roles = ['vendor', 'vendor'];
+
+        await baseURLRequest()
+          .post(ENDPOINT)
+          .auth(await adminAccessToken(), { type: 'bearer' })
+          .send({
+            clientName: 'Admin Client',
+            roles,
+          })
+          .expect(400)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+                [
+                  {
+                    "context": {
+                      "errorType": "contains",
+                    },
+                    "message": "property 'roles' must contain at least 1 and no more than 1 valid item(s)",
+                    "path": "{requestBody}.roles",
+                  },
+                ]
+              `);
+          });
       });
 
       describe('when missing client name', () => {
