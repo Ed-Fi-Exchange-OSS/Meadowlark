@@ -23,7 +23,7 @@ content-type: application/json
 
 ### Create client1
 # @name created_client1
-POST http://localhost:3000/local/oauth/client
+POST http://localhost:3000/local/oauth/clients
 content-type: application/json
 {{auth_header_admin_1}}
 

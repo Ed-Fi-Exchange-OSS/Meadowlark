@@ -37,7 +37,7 @@ export const clientBodySchema = {
       maxItems: 2,
       contains: {
         type: 'string',
-        enum: ['vendor', 'host', 'admin', 'verify-only'],
+        enum: ['vendor', 'host', 'admin', 'verify-only', 'assessment'],
       },
       maxContains: 1,
     },
