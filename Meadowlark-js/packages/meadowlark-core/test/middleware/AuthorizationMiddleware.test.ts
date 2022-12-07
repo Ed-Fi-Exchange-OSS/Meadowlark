@@ -58,7 +58,7 @@ describe('given a previous middleware has provided security information', () => 
     middleware: {
       ...newFrontendRequestMiddleware(),
       security: {
-        authorizationStrategy: { type: 'OWNERSHIP_BASED', withAssessment: false },
+        authorizationStrategy: { type: 'OWNERSHIP_BASED' },
         clientId: 'clientId',
       },
       validateResources: true,
@@ -597,7 +597,6 @@ describe('given the client token is active for a vendor without assessment role'
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": false,
         },
         "clientId": "clientId",
       }
@@ -658,7 +657,6 @@ describe('given the client token is active for a vendor with assessment role', (
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": true,
         },
         "clientId": "clientId",
       }
@@ -811,7 +809,6 @@ describe('given the own token requires a refresh, and the client token is active
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": false,
         },
         "clientId": "clientId",
       }
@@ -888,7 +885,6 @@ describe('given two calls for verification with different client ids', () => {
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": false,
         },
         "clientId": "clientId1",
       }
@@ -908,7 +904,6 @@ describe('given two calls for verification with different client ids', () => {
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": true,
         },
         "clientId": "clientId2",
       }
@@ -985,7 +980,6 @@ describe('given two calls for verification with the same client id', () => {
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": false,
         },
         "clientId": "clientId",
       }
@@ -1005,7 +999,6 @@ describe('given two calls for verification with the same client id', () => {
       {
         "authorizationStrategy": {
           "type": "OWNERSHIP_BASED",
-          "withAssessment": false,
         },
         "clientId": "clientId",
       }

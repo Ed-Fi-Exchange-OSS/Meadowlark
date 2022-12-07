@@ -5,5 +5,4 @@
 
 export type AuthorizationStrategy = {
   type: 'OWNERSHIP_BASED' | 'FULL_ACCESS' | 'UNDEFINED';
-  withAssessment: boolean;
 };
