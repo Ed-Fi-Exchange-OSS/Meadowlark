@@ -1,19 +1,17 @@
 import { AuthorizationStrategy } from '../security/AuthorizationStrategy';
 
 export function determineAuthStrategyFromRoles(rolesList: string[]): AuthorizationStrategy {
-  const withAssessment = rolesList.some((role) => role.toLocaleLowerCase() === 'assessment');
-
   if (rolesList.some((role) => role.toLocaleLowerCase() === 'host')) {
-    return { type: 'FULL_ACCESS', withAssessment };
+    return { type: 'FULL_ACCESS' };
   }
 
   if (rolesList.some((role) => role.toLocaleLowerCase() === 'admin')) {
-    return { type: 'FULL_ACCESS', withAssessment };
+    return { type: 'FULL_ACCESS' };
   }
 
-  if (rolesList.some((role) => role.toLocaleLowerCase() === 'vendor')) {
-    return { type: 'OWNERSHIP_BASED', withAssessment };
+  if (rolesList.some((role) => role.toLocaleLowerCase() === 'vendor' || role.toLocaleLowerCase() === 'assessment')) {
+    return { type: 'OWNERSHIP_BASED' };
   }
 
-  return { type: 'UNDEFINED', withAssessment };
+  return { type: 'UNDEFINED' };
 }

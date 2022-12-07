@@ -17,7 +17,7 @@ export type Security = {
 
 export function newSecurity(): Security {
   return {
-    authorizationStrategy: { type: 'UNDEFINED', withAssessment: false },
+    authorizationStrategy: { type: 'UNDEFINED' },
     clientId: 'UNKNOWN',
   };
 }
