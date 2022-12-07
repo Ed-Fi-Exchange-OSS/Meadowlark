@@ -169,7 +169,7 @@ describe("given it's managing the client authorization", () => {
       });
     });
 
-    describe('when using  duplicate roles', () => {
+    describe('when using duplicate roles', () => {
       it('should return error message', async () => {
         // { roles: ['vendor', 'vendor'] },
 
@@ -188,9 +188,9 @@ describe("given it's managing the client authorization", () => {
                 [
                   {
                     "context": {
-                      "errorType": "contains",
+                      "errorType": "uniqueItems",
                     },
-                    "message": "property 'roles' must contain at least 1 and no more than 1 valid item(s)",
+                    "message": "property 'roles' must not have duplicate items (items ## 1 and 0 are identical)",
                     "path": "{requestBody}.roles",
                   },
                 ]
