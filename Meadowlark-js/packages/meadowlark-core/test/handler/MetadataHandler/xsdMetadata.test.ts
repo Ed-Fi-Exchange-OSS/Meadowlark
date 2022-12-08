@@ -27,13 +27,19 @@ describe('when getting the XSD metadata URL', () => {
     expect(response.statusCode).toEqual(200);
   });
   it('returns the expected JSON output', () => {
-    expect(response.body).toMatchInlineSnapshot(`[
+    expect(response.body).toMatchInlineSnapshot(`
+      "[
         {
-          "description": "Core schema (Ed-Fi) files for the data model",
-          "name": "ed-fi",
-          "version": "3.3.1-b",
-          "files": "https://api.ed-fi.org/v5.3/api/metadata/xsd/ed-fi/files"
+          "name": "Descriptors",
+          "endpointUri": "http://l:1/local/metadata/descriptors/swagger.json",
+          "prefix": ""
+        },
+        {
+          "name": "Resources",
+          "endpointUri": "http://l:1/local/metadata/resources/swagger.json",
+          "prefix": ""
         }
-      ]`);
+      ]"
+    `);
   });
 });
