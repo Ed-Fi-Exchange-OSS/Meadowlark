@@ -9,7 +9,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=abcdefgh1!
     ports:
-      - 5433:5432
+      # If no port provided through an env file, default to 5433
+      - ${POSTGRES_PORT:-5433}:5432
     volumes:
       - meadowlark-pgsql-e2e:/var/lib/postgresql/data
 
@@ -34,7 +35,8 @@ services:
     volumes:
       - opensearch-data-e2e:/usr/share/opensearch/data
     ports:
-      - 8200:9200
+      # If no port provided through an env file, default to 8200
+      - ${OPENSEARCH_PORT:-8200}:9200
     restart: unless-stopped
 
 volumes:
