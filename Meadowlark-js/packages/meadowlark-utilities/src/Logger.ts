@@ -29,9 +29,10 @@ const offlineFormat = winston.format.combine(
   winston.format.timestamp({
     format: timestampFormat,
   }),
-  winston.format.printf(({ level, message, timestamp, extra, error }) => {
+  winston.format.printf(({ level, message, timestamp, traceId, extra, error }) => {
     let m = message;
     let e = error ?? extra ?? '';
+    const t = traceId ?? 'not-applicable';
 
     if (typeof message === 'object') {
       // TypeScript thinks that this is a string, but it there are cases where it ends up being an object
@@ -41,7 +42,7 @@ const offlineFormat = winston.format.combine(
       e = JSON.stringify(e);
     }
 
-    return `${timestamp} ${level} ${m} ${e}`;
+    return `${timestamp} ${level} ${t} ${m} ${e}`;
   }),
   winston.format.colorize({
     all: true,
@@ -101,7 +102,7 @@ export const Logger = {
     logger.debug({ message, traceId, extra });
   },
   trace: (message: string) => {
-    logger.debug(message);
+    logger.debug({ message: JSON.stringify(message) });
   },
   child: () => Logger,
 };
