@@ -20,6 +20,7 @@ import {
   swaggerForDescriptorsAPI,
   openApiUrlList,
   dependencies,
+  xsdMetadata,
 } from './handler/MetadataHandler';
 import { loadDescriptors } from './handler/DescriptorLoader';
 import {
@@ -121,6 +122,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metadata/resources/swagger.json`, swaggerForResourcesAPI);
     fastify.get(`/${stage}/metadata/descriptors/swagger.json`, swaggerForDescriptorsAPI);
     fastify.get(`/${stage}/metadata/data/v3/dependencies`, dependencies);
+    fastify.get(`/${stage}/metadata/xsd`, xsdMetadata);
 
     // Descriptor loader
     fastify.get(`/${stage}/loadDescriptors`, loadDescriptors);

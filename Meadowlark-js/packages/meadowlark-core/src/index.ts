@@ -53,4 +53,5 @@ export {
   swaggerForDescriptorsAPI,
   swaggerForResourcesAPI,
   dependencies,
+  xsdMetadata,
 } from './handler/MetadataHandler';

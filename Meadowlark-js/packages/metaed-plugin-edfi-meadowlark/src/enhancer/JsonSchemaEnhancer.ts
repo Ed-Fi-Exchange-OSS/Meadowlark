@@ -17,7 +17,7 @@ import {
   IntegerProperty,
   ShortProperty,
 } from '@edfi/metaed-core';
-import { getIntegerFromEnvironment } from '@edfi/meadowlark-utilities';
+import { getBooleanFromEnvironment, getIntegerFromEnvironment } from '@edfi/meadowlark-utilities';
 import { invariant } from 'ts-invariant';
 import type { EntityMeadowlarkData } from '../model/EntityMeadowlarkData';
 import type { EntityPropertyMeadowlarkData } from '../model/EntityPropertyMeadowlarkData';
@@ -403,6 +403,16 @@ function buildJsonSchema(entityForSchema: TopLevelEntity): SchemaRoot {
     schemaRoot.properties[schemaObjectBaseName] = schemaProperty;
     addRequired(isSchemaPropertyRequired(property, propertyModifier), schemaRoot, schemaObjectBaseName);
   });
+
+  if (getBooleanFromEnvironment('ALLOW__EXT_PROPERTY', false)) {
+    // eslint-disable-next-line no-underscore-dangle
+    schemaRoot.properties._ext = {
+      description: 'optional extension collection',
+      type: 'object',
+      properties: {},
+      additionalProperties: true,
+    };
+  }
 
   return schemaRoot;
 }

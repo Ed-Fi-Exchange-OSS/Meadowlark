@@ -17,7 +17,7 @@ export type SchemaObject = {
   type: 'object';
   description?: string;
   properties: SchemaProperties;
-  additionalProperties: false;
+  additionalProperties: boolean;
   required?: string[];
 };
 

@@ -8,7 +8,7 @@ import { Namespace } from '@edfi/metaed-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
-import { CreateApiVersionObject, OpenApiListTemplate } from './MetadataResources';
+import { CreateApiVersionObject, OpenApiListTemplate, XsdTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
 import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
@@ -191,4 +191,15 @@ export async function swaggerForDescriptorsAPI(frontendRequest: FrontendRequest)
 export async function dependencies(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   writeRequestToLog(frontendRequest, 'dependencies');
   return getFileFromBlobStorage(Constants.dependenciesUrl, frontendRequest, (data: any) => data);
+}
+
+/**
+ * Endpoint for accessing information about available XSD files.
+ */
+export async function xsdMetadata(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeRequestToLog(frontendRequest, 'xsdMetadata');
+  return {
+    body: XsdTemplate,
+    statusCode: 200,
+  };
 }
