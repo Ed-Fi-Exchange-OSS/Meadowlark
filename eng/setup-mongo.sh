@@ -3,7 +3,7 @@ docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
 docker exec mongo-temp mkdir /scripts
 docker cp ./backends/meadowlark-mongodb-backend/docker/scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
 docker exec mongo-temp ./scripts/mongo-key-file-setup.sh
-docker compose up -d
+docker compose -f ./backends/meadowlark-mongodb-backend/docker/docker-compose.yml  up -d
 
 echo "Adding URL to hosts"
 echo '127.0.0.1 mongo1 mongo2 mongo3' | sudo tee -a /etc/hosts
