@@ -5,7 +5,7 @@
 
 import { isDebugEnabled, isInfoEnabled, Logger, writeErrorToLog as logError } from '@edfi/meadowlark-utilities';
 
-import { FrontendRequest, frontendRequestForLogging } from './handler/FrontendRequest';
+import { FrontendRequest } from './handler/FrontendRequest';
 
 export function writeDebugStatusToLog(
   moduleName: string,
@@ -21,7 +21,7 @@ export function writeDebugStatusToLog(
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
   if (isInfoEnabled()) {
-    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, frontendRequestForLogging(request));
+    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId);
   }
 }
 
