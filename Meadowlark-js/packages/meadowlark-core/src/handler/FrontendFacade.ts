@@ -25,7 +25,7 @@ import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
-const moduleName = 'FrontendFacade';
+const moduleName = 'core.handler.FrontendFacade';
 
 /**
  * Initialization - anything here should be runnable more than once without impact

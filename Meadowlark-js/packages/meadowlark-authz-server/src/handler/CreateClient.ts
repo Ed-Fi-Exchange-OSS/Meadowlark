@@ -18,7 +18,7 @@ import { BodyValidation, validateCreateClientBody } from '../validation/BodyVali
 import { hashClientSecretBuffer } from '../security/HashClientSecret';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
 
-const moduleName = 'handler.CreateClient';
+const moduleName = 'authz.handler.CreateClient';
 
 async function tryCreateBootstrapAdmin(
   request: CreateAuthorizationClientRequest,
@@ -87,10 +87,10 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
 
     // If no authorization header for creating an admin client, this might be an attempt to create a bootstrap admin
     if (authorizationHeader == null || authorizationHeader === '') {
-      Logger.debug(`${moduleName}.createClient: No authorization header`, authorizationRequest.traceId);
+      Logger.debug(`${moduleName}.createClient No authorization header`, authorizationRequest.traceId);
       bootstrapAdminRequest = true;
     } else {
-      tokenValidationErrorResponse = validateAdminTokenForAccess(authorizationHeader);
+      tokenValidationErrorResponse = validateAdminTokenForAccess(authorizationHeader, authorizationRequest.traceId);
     }
 
     if (tokenValidationErrorResponse != null) {
@@ -143,7 +143,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     };
 
     if (bootstrapAdminRequest) {
-      Logger.debug(`${moduleName}.createClient: Will try to create bootstrap admin`, authorizationRequest.traceId);
+      Logger.info(`${moduleName}.createClient create bootstrap admin`, authorizationRequest.traceId);
       return tryCreateBootstrapAdmin(createRequest, clientSecretBuffer.toString('hex'), authorizationRequest.path);
     }
 
@@ -170,7 +170,7 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
     }
 
     writeDebugStatusToLog(moduleName, authorizationRequest, 'createClient', 500);
-    Logger.debug(`${moduleName}.createAuthorization 500`, authorizationRequest.traceId);
+    Logger.error(`${moduleName}.createAuthorization 500`, authorizationRequest.traceId, 'unknown error');
     return { body: '', statusCode: 500 };
   } catch (e) {
     writeErrorToLog(moduleName, authorizationRequest.traceId, 'createClient', 500, e);

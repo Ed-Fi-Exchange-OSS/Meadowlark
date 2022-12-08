@@ -16,7 +16,7 @@ import { BlockingDocument } from '../message/BlockingDocument';
 import { resourceUriFrom } from './UriBuilder';
 import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
 
-const moduleName = 'Delete';
+const moduleName = 'core.handler.Delete';
 
 const DELETE_FAILURE_REFERENCE_MESSAGE: string =
   'The resource cannot be deleted because it is a dependency of other documents';
@@ -49,6 +49,7 @@ function blockingDocumentsToUris(frontendRequest: FrontendRequest, blockingDocum
 export async function deleteIt(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   try {
     writeRequestToLog(moduleName, frontendRequest, 'deleteIt');
+
     if (frontendRequest.middleware.pathComponents.resourceId == null) {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
       return { body: '', statusCode: 404 };
@@ -90,7 +91,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       };
     }
 
-    writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 500, result.failureMessage);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, result.failureMessage);
     return {
       body: JSON.stringify({ message: result.failureMessage ?? 'Failure' }),
       statusCode: 500,

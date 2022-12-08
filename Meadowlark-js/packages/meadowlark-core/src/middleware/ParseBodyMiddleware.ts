@@ -6,7 +6,7 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 
-const moduleName = 'ParseBodyMiddleware';
+const moduleName = 'core.middleware.ParseBodyMiddleware';
 
 /**
  * Handles initial body validation and parsing

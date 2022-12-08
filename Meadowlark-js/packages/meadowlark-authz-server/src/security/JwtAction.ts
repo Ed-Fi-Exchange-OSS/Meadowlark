@@ -9,11 +9,13 @@ import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
 import { signingKey } from '../model/SigningKey';
 
+const moduleName = 'authz.security.JwtAction';
+
 /**
  * Converts a Jwt object to a Meadowlark JwtStatus
  */
 function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
-  Logger.debug('JwtAction.toJwtStatus', null, jwt);
+  Logger.debug(`${moduleName}.toJwtStatus`, null, jwt);
 
   if (jwt == null) return { ...newJwtStatus(), isValid: false };
 
@@ -36,8 +38,9 @@ function toJwtStatus(jwt: Jwt | undefined): JwtStatus {
 /*
  * Verifies that a JWT is valid, not expired, and returns parsed claim data.
  */
-export function verifyJwt(authorization?: string): JwtStatus {
-  Logger.debug('JwtAction.verifyJwt authorization header', null, authorization ?? '*None Supplied*');
+export function verifyJwt(authorization?: string, traceId?: string): JwtStatus {
+  Logger.debug(`${moduleName}.verifyJwt authorization header`, traceId || null);
+
   // "Bearer" is case sensitive per the spec. Accept "bearer" for flexibility.
   if (authorization == null || (!authorization.startsWith('Bearer ') && !authorization.startsWith('bearer '))) {
     return { ...newJwtStatus(), isMissing: true, isValid: false };
@@ -49,7 +52,7 @@ export function verifyJwt(authorization?: string): JwtStatus {
     const verified: nJwt | undefined = verify(token, signingKey());
     return toJwtStatus(verified as Jwt);
   } catch (err) {
-    Logger.debug('Jwt.verifyPromise user-submitted token error', null, err);
+    Logger.error(`${moduleName}.verifyPromise user-submitted token error`, traceId || null, err);
     return toJwtStatus(err);
   }
 }

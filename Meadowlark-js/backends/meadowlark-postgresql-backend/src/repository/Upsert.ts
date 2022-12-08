@@ -23,10 +23,14 @@ import {
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
+const moduleName = 'postgresql.repository.Upsert';
+
 export async function upsertDocument(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: PoolClient,
 ): Promise<UpsertResult> {
+  Logger.info(`${moduleName}.upsertDocument`, traceId);
+
   const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
 
   try {
@@ -45,7 +49,7 @@ export async function upsertDocument(
 
       if (superclassAliasIdInUse) {
         Logger.debug(
-          `postgresql.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to another subclass with the same identity`,
+          `${moduleName}.upsertDocument: Upserting document id ${id} failed due to another subclass with the same identity`,
           traceId,
         );
 
@@ -72,10 +76,7 @@ export async function upsertDocument(
       );
       // Abort on validation failure
       if (failures.length > 0) {
-        Logger.debug(
-          `postgresql.repository.Upsert.upsertDocument: Inserting document id ${id} failed due to invalid references`,
-          traceId,
-        );
+        Logger.debug(`${moduleName}.upsertDocument: Inserting document id ${id} failed due to invalid references`, traceId);
 
         await client.query('ROLLBACK');
         return {
@@ -86,7 +87,7 @@ export async function upsertDocument(
     }
 
     // Perform the document upsert
-    Logger.debug(`postgresql.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
+    Logger.debug(`${moduleName}.upsertDocument: Upserting document id ${id}`, traceId);
     await client.query(documentUpsertSql);
 
     // Delete existing values from the aliases table
@@ -100,7 +101,7 @@ export async function upsertDocument(
     }
 
     // Delete existing references in references table
-    Logger.debug(`postgresql.repository.Upsert.upsertDocument: Deleting references for document id ${id}`, traceId);
+    Logger.debug(`${moduleName}.upsertDocument: Deleting references for document id ${id}`, traceId);
     await client.query(deleteOutboundReferencesOfDocumentSql(id));
 
     // Adding descriptors to outboundRefs for reference checking
@@ -112,14 +113,14 @@ export async function upsertDocument(
     // Perform insert of references to the references table
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
-      Logger.debug(`postgresql.repository.Upsert.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
+      Logger.debug(`post${moduleName}.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
       await client.query(insertOutboundReferencesSql(id, ref));
     }
 
     await client.query('COMMIT');
     return { response: isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS' };
   } catch (e) {
-    Logger.error('postgresql.repository.Upsert.upsertDocument', traceId, e);
+    Logger.error(`${moduleName}.upsertDocument`, traceId, e);
     await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }

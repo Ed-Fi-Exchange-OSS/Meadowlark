@@ -7,7 +7,7 @@ import { AuthorizationRequest } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { writeRequestToLog } from '../Logger';
 
-const moduleName = 'handler.CreateSigningKey';
+const moduleName = 'authz.handler.CreateSigningKey';
 
 /**
  * Handler for client creation

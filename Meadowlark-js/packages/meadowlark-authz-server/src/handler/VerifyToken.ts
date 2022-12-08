@@ -18,7 +18,7 @@ import {
   ValidateTokenResult,
 } from '../security/TokenValidator';
 
-const moduleName = 'VerifyToken';
+const moduleName = 'authz.handler.VerifyToken';
 
 type ParsedVerifyTokenBody =
   | { isValid: true; verifyTokenBody: VerifyTokenBody }
@@ -73,6 +73,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
     // Get the client id and roles for the requester
     const requesterTokenResult: ValidateTokenResult = validateTokenForAccess(
       extractAuthorizationHeader(authorizationRequest),
+      authorizationRequest.traceId,
     );
 
     if (!requesterTokenResult.isValid) {

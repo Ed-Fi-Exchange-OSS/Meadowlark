@@ -19,12 +19,14 @@ import { getTokenAudience, getTokenIssuer } from '../../src/security/TokenSettin
 process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
 
+const traceId = 'this is a trace id';
+
 describe('given validation of missing token', () => {
   let result: ValidateTokenResult;
 
   beforeAll(async () => {
     // Act
-    result = validateTokenForAccess(undefined);
+    result = validateTokenForAccess(undefined, traceId);
   });
 
   it('returns missing', () => {
@@ -50,7 +52,7 @@ describe('given validation of expired token', () => {
     const token = createAuthorizationHeader('clientId', ['vendor'], ONE_HOUR_AGO);
 
     // Act
-    result = validateTokenForAccess(token);
+    result = validateTokenForAccess(token, traceId);
   });
 
   it('returns expired', () => {
@@ -76,7 +78,7 @@ describe('given validation of invalid token', () => {
     const token = 'bearer notValidToken';
 
     // Act
-    result = validateTokenForAccess(token);
+    result = validateTokenForAccess(token, traceId);
   });
 
   it('returns invalid', () => {
@@ -102,7 +104,7 @@ describe('given validation of valid token', () => {
     const token = createAuthorizationHeader('clientId', ['vendor']);
 
     // Act
-    result = validateTokenForAccess(token);
+    result = validateTokenForAccess(token, traceId);
   });
 
   it('returns valid with token information', () => {
@@ -125,7 +127,7 @@ describe('given admin validation of non-admin token', () => {
     const token = createAuthorizationHeader('clientId', ['vendor']);
 
     // Act
-    result = validateAdminTokenForAccess(token);
+    result = validateAdminTokenForAccess(token, traceId);
   });
 
   it('returns forbidden', () => {
@@ -148,7 +150,7 @@ describe('given admin validation of admin token', () => {
     const token = createAuthorizationHeader('clientId', ['admin']);
 
     // Act
-    result = validateAdminTokenForAccess(token);
+    result = validateAdminTokenForAccess(token, traceId);
   });
 
   it('returns no error response', () => {

@@ -10,7 +10,7 @@ import { validatePaginationParameters } from '../validation/PaginationValidator'
 import { validateQueryString } from '../validation/QueryStringValidator';
 import { PaginationParameters } from '../message/PaginationParameters';
 
-const moduleName = 'ValidateQueryMiddleware';
+const moduleName = 'core.middleware.ValidateQueryMiddleware';
 
 /**
  * Validates that query parameters belong with this resource type.

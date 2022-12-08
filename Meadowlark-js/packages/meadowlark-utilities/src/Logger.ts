@@ -106,8 +106,14 @@ export const Logger = {
   child: () => Logger,
 };
 
-export function writeErrorToLog(moduleName: string, traceId: string, method: string, status: number, error?: any): void {
-  Logger.error(`${moduleName}.${method} ${status}`, traceId, error);
+export function writeErrorToLog(
+  moduleName: string,
+  traceId: string,
+  method: string,
+  status?: number | undefined,
+  error?: any,
+): void {
+  Logger.error(`${moduleName}.${method} ${status || ''}`, traceId, error);
 }
 
 export function isDebugEnabled(): boolean {

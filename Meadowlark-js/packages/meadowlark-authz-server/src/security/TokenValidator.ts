@@ -28,8 +28,8 @@ export type ValidateTokenResult =
   | { isValid: true; roles: string[]; clientId: string }
   | { isValid: false; errorResponse: AuthorizationResponse };
 
-export function validateTokenForAccess(authorizationHeader: string | undefined): ValidateTokenResult {
-  const jwtStatus: JwtStatus = verifyJwt(authorizationHeader);
+export function validateTokenForAccess(authorizationHeader: string | undefined, traceId: string): ValidateTokenResult {
+  const jwtStatus: JwtStatus = verifyJwt(authorizationHeader, traceId);
 
   if (jwtStatus.isMissing) {
     return {
@@ -67,8 +67,11 @@ export function validateTokenForAccess(authorizationHeader: string | undefined):
   };
 }
 
-export function validateAdminTokenForAccess(authorizationHeader: string | undefined): AuthorizationResponse | undefined {
-  const validateTokenResult: ValidateTokenResult = validateTokenForAccess(authorizationHeader);
+export function validateAdminTokenForAccess(
+  authorizationHeader: string | undefined,
+  traceId: string,
+): AuthorizationResponse | undefined {
+  const validateTokenResult: ValidateTokenResult = validateTokenForAccess(authorizationHeader, traceId);
 
   if (!validateTokenResult.isValid) return validateTokenResult.errorResponse;
 

@@ -8,8 +8,11 @@ import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByIdSql } from './SqlHelper';
 
+const moduleName = 'postgresql.repository.Get';
+
 export async function getDocumentById({ id, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {
   try {
+    Logger.debug(`${moduleName}.getDocumentById ${id}`, traceId);
     const queryResult: QueryResult = await client.query(findDocumentByIdSql(id));
 
     // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
@@ -32,7 +35,7 @@ export async function getDocumentById({ id, traceId }: GetRequest, client: PoolC
     };
     return response;
   } catch (e) {
-    Logger.error(`postgresql.repository.Get.getDocumentById - Error retrieving document ${id}`, traceId, e);
+    Logger.error(`${moduleName}.getDocumentById Error retrieving document ${id}`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', document: [] };
   }
 }

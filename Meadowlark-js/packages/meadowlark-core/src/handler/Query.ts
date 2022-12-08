@@ -13,7 +13,7 @@ import { QueryResult } from '../message/QueryResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
-const moduleName = 'Query';
+const moduleName = 'core.handler.Query';
 const TOTAL_COUNT_HEADER_NAME: string = 'total-count';
 
 const removeDisallowedQueryParameters = R.omit(['offset', 'limit', 'totalCount']);
@@ -25,8 +25,23 @@ const onlyPaginationParameters = R.pick(['offset', 'limit']);
  * Forwards query request to datastore backend
  */
 export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  writeDebugStatusToLog(
+    moduleName,
+    frontendRequest,
+    'query',
+    undefined,
+    `query string: ${JSON.stringify(frontendRequest.queryParameters)}`,
+  );
+
   const cleanQueryParameters: object = removeDisallowedQueryParameters(frontendRequest.queryParameters);
   const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryParameters);
+  writeDebugStatusToLog(
+    moduleName,
+    frontendRequest,
+    'query',
+    undefined,
+    `cleansed query string: ${JSON.stringify(cleanQueryParameters)}`,
+  );
 
   const request: QueryRequest = {
     resourceInfo: frontendRequest.middleware.resourceInfo,

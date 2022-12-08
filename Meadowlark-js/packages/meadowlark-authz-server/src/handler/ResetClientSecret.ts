@@ -16,7 +16,7 @@ import { ResetAuthorizationClientSecretResult } from '../message/ResetAuthorizat
 import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthorizationClientSecretRequest';
 import { hashClientSecretBuffer } from '../security/HashClientSecret';
 
-const moduleName = 'handler.UpdateClientSecret';
+const moduleName = 'authz.handler.UpdateClientSecret';
 
 export async function resetAuthorizationClientSecret(
   authorizationRequest: AuthorizationRequest,
@@ -27,6 +27,7 @@ export async function resetAuthorizationClientSecret(
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       extractAuthorizationHeader(authorizationRequest),
+      authorizationRequest.traceId,
     );
 
     if (errorResponse != null) {

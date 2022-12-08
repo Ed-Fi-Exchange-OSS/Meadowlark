@@ -11,7 +11,7 @@ import { GetResult } from '../message/GetResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
-const moduleName = 'GetById';
+const moduleName = 'core.handler.GetById';
 
 /**
  * Handler for API "get by id" requests

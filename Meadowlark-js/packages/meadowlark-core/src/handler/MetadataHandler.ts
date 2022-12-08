@@ -5,7 +5,6 @@
 
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
-import { Logger } from '@edfi/meadowlark-utilities';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate, XsdTemplate } from './MetadataResources';
@@ -14,6 +13,7 @@ import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { getOAuthTokenURL } from '../AuthenticationSettings';
+import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 
 interface ExternalResource {
   body: string;
@@ -21,17 +21,7 @@ interface ExternalResource {
 }
 export const resourceCache: { [key: string]: ExternalResource } = {};
 
-function writeRequestToLog(frontendRequest: FrontendRequest, method: string): void {
-  Logger.info(`MetadataHandler.${method} ${frontendRequest.path}`, frontendRequest.traceId);
-}
-
-function writeDebugStatusToLog(frontendRequest: FrontendRequest, method: string, message?: string, status?: number): void {
-  Logger.debug(`MetadataHandler.${method} ${status} ${message || ''}`.trimEnd(), frontendRequest.traceId);
-}
-
-function writeErrorToLog(frontendRequest: FrontendRequest, method: string, status: number, error?: any): void {
-  Logger.error(`MetadataHandler.${method} ${status}`, frontendRequest.traceId, error);
-}
+const moduleName = 'core.handler.MetadataHandler';
 
 /**
  * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd
@@ -109,7 +99,7 @@ async function getFileFromBlobStorage(
   const resource: ExternalResource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
-    writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', `getting ${url}`);
+    writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, `getting ${url}`);
     const response = await axios.get(url, {
       headers: { 'If-None-Match': resource.etag },
       validateStatus(status) {
@@ -118,13 +108,13 @@ async function getFileFromBlobStorage(
     });
 
     if (response.status === 200) {
-      writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', '200 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '200 from AWS');
       resource.etag = response.headers.etag;
       resource.body = transformer(response.data);
 
       resourceCache[url] = resource;
     } else {
-      writeDebugStatusToLog(frontendRequest, 'getFileFromBlobStorage', '304 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '304 from AWS');
     }
 
     return {
@@ -135,7 +125,7 @@ async function getFileFromBlobStorage(
       },
     };
   } catch (error) {
-    writeErrorToLog(frontendRequest, 'getFileFromBlobStorage', 404, error);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', error);
     return {
       body: '',
       statusCode: 404,
@@ -155,7 +145,7 @@ async function getSwaggerSpecification(url: string, frontendRequest: FrontendReq
  * Endpoint for accessing Resources API swagger metadata
  */
 export async function swaggerForResourcesAPI(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  writeRequestToLog(frontendRequest, 'swaggerForResourcesAPI');
+  writeRequestToLog(moduleName, frontendRequest, 'swaggerForResourcesAPI');
   // For now, we are serving a (nearly) static JSON file extracted from the real
   // ODS/API 5.3. This file is > 2 MB even when minified. Instead of keeping it
   // in the source code repository, it is being stored in S3.
@@ -166,7 +156,7 @@ export async function swaggerForResourcesAPI(frontendRequest: FrontendRequest): 
  * Endpoint for listing available Open API metadata descriptions
  */
 export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  writeRequestToLog(frontendRequest, 'openApiUrlList');
+  writeRequestToLog(moduleName, frontendRequest, 'openApiUrlList');
 
   const baseUrl = buildBaseUrlFromRequest(frontendRequest);
   const baseUrlToken = /{{ baseUrl }}/g;
@@ -181,7 +171,7 @@ export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<
  * Endpoint for accessing Descriptors API swagger metadata
  */
 export async function swaggerForDescriptorsAPI(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  writeRequestToLog(frontendRequest, 'swaggerForDescriptorsAPI');
+  writeRequestToLog(moduleName, frontendRequest, 'swaggerForDescriptorsAPI');
   return getSwaggerSpecification(Constants.swaggerDescriptorUrl, frontendRequest);
 }
 
@@ -189,7 +179,7 @@ export async function swaggerForDescriptorsAPI(frontendRequest: FrontendRequest)
  * Endpoint for accessing the dependencies JSON file
  */
 export async function dependencies(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  writeRequestToLog(frontendRequest, 'dependencies');
+  writeRequestToLog(moduleName, frontendRequest, 'dependencies');
   return getFileFromBlobStorage(Constants.dependenciesUrl, frontendRequest, (data: any) => data);
 }
 
@@ -197,7 +187,7 @@ export async function dependencies(frontendRequest: FrontendRequest): Promise<Fr
  * Endpoint for accessing information about available XSD files.
  */
 export async function xsdMetadata(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  writeRequestToLog(frontendRequest, 'xsdMetadata');
+  writeRequestToLog(moduleName, frontendRequest, 'xsdMetadata');
   return {
     body: XsdTemplate,
     statusCode: 200,

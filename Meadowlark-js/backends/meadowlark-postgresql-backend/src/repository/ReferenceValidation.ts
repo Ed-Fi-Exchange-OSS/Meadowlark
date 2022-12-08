@@ -9,6 +9,8 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { validateReferenceExistenceSql } from './SqlHelper';
 
+const moduleName = 'postgresql.repository.ReferenceValidation';
+
 /**
  * Finds whether the given reference ids are actually documents in the db.
  *
@@ -16,7 +18,13 @@ import { validateReferenceExistenceSql } from './SqlHelper';
  * @param client The PostgreSQL client used for querying the database
  * @returns The subset of the given reference ids that are actually documents in the db
  */
-async function findReferencedDocumentIdsById(referenceIds: string[], client: PoolClient): Promise<string[]> {
+async function findReferencedDocumentIdsById(
+  referenceIds: string[],
+  traceId: string,
+  client: PoolClient,
+): Promise<string[]> {
+  Logger.info(`${moduleName}.findReferencedDocumentIdsById`, traceId);
+
   if (referenceIds.length === 0) {
     return [];
   }
@@ -24,13 +32,8 @@ async function findReferencedDocumentIdsById(referenceIds: string[], client: Poo
   const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds));
 
   if (referenceExistenceResult.rows == null) {
-    Logger.error(
-      'postgresql.repository.referencevalidation.findReferencedDocumentIdsById: Database error parsing references',
-      null,
-    );
-    throw new Error(
-      'postgresql.repository.referencevalidation.findReferencedDocumentIdsById: Database error parsing references',
-    );
+    Logger.error(`${moduleName}.findReferencedDocumentIdsById Database error parsing references`, traceId);
+    throw new Error(`${moduleName}.findReferencedDocumentIdsById Database error parsing references`);
   }
 
   return referenceExistenceResult.rows.map((val) => val.alias_id);
@@ -84,9 +87,9 @@ export async function validateReferences(
 ): Promise<string[]> {
   const failureMessages: string[] = [];
 
-  const referencesInDb = await findReferencedDocumentIdsById(outboundRefs, client);
+  const referencesInDb = await findReferencedDocumentIdsById(outboundRefs, traceId, client);
   if (outboundRefs.length !== referencesInDb.length) {
-    Logger.debug('postgresql.repository.WriteHelper.validateReferences: documentReferences not found', traceId);
+    Logger.debug(`${moduleName}.validateReferences documentReferences not found`, traceId);
     failureMessages.push(...findMissingReferences(referencesInDb, outboundRefs, documentReferences));
   }
 
@@ -94,9 +97,9 @@ export async function validateReferences(
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, client);
+  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, traceId, client);
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
-    Logger.debug('postgres.repository.WriteHelper.upsertDocument: descriptorReferences not found', traceId);
+    Logger.debug(`${moduleName}.upsertDocument: descriptorReferences not found`, traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
   }
   return failureMessages;

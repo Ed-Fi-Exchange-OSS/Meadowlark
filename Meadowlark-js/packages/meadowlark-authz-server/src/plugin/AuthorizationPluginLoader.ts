@@ -9,6 +9,8 @@ import { AuthorizationStoreInitializer } from './AuthorizationStoreInitializer';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 import { NoAuthorizationStorePlugin } from './NoAuthorizationStorePlugin';
 
+const moduleName = 'authz.plugin.AuthorizationPluginLoader';
+
 let loadedAuthorizationStore: AuthorizationStorePlugin = NoAuthorizationStorePlugin;
 
 export async function loadAuthorizationStore() {
@@ -16,10 +18,7 @@ export async function loadAuthorizationStore() {
 
   if (process.env.AUTHORIZATION_STORE_PLUGIN == null) return;
 
-  Logger.debug(
-    `AuthorizationPluginLoader.loadAuthorizationStore - loading plugin ${process.env.AUTHORIZATION_STORE_PLUGIN}`,
-    '',
-  );
+  Logger.debug(`${moduleName}.loadAuthorizationStore - loading plugin ${process.env.AUTHORIZATION_STORE_PLUGIN}`, null);
 
   try {
     loadedAuthorizationStore = (
@@ -40,11 +39,11 @@ export function getAuthorizationStore(): AuthorizationStorePlugin {
 }
 
 async function loadAllPlugins(): Promise<void> {
-  Logger.debug('AuthorizationPluginLoader.loadAllPlugins', '');
+  Logger.debug(`${moduleName}.loadAllPlugins`, null);
   try {
     await loadAuthorizationStore();
   } catch (e) {
-    writeErrorToLog('AuthorizationPluginLoader', '', 'loadAllPlugins', 500, e);
+    writeErrorToLog(`${moduleName}.loadAllPlugins`, '', 'loadAllPlugins', 500, e);
   }
 }
 

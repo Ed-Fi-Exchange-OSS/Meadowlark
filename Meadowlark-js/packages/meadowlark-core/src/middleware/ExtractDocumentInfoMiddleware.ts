@@ -8,7 +8,7 @@ import { MiddlewareModel } from './MiddlewareModel';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { extractDocumentInfo } from '../extraction/DocumentInfoExtractor';
 
-const moduleName = 'ExtractDocumentInfoMiddleware';
+const moduleName = 'core.middleware.ExtractDocumentInfoMiddleware';
 
 /**
  * Extracts identity and reference information from a valid JSON document

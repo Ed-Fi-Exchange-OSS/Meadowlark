@@ -18,7 +18,7 @@ import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/Authorizat
 import { hashClientSecretHexString } from '../security/HashClientSecret';
 import { getTokenExpiration, getTokenIssuer } from '../security/TokenSettings';
 
-const moduleName = 'RequestToken';
+const moduleName = 'authz.handler.RequestToken';
 
 type ParsedRequestTokenBody =
   | { isValid: true; requestTokenBody: RequestTokenBody }

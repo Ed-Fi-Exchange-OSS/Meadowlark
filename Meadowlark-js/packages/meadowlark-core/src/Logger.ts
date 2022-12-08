@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { isInfoEnabled, Logger } from '@edfi/meadowlark-utilities';
+import { isDebugEnabled, isInfoEnabled, Logger, writeErrorToLog as logError } from '@edfi/meadowlark-utilities';
 
 import { FrontendRequest, frontendRequestForLogging } from './handler/FrontendRequest';
 
@@ -11,14 +11,20 @@ export function writeDebugStatusToLog(
   moduleName: string,
   request: FrontendRequest,
   method: string,
-  status: number,
+  status: number | undefined = undefined,
   message: string = '',
 ): void {
-  Logger.debug(`${moduleName}.${method} ${status} ${message || ''}`.trimEnd(), request.traceId);
+  if (isDebugEnabled()) {
+    Logger.debug(`${moduleName}.${method} ${status || ''} ${message || ''}`.trimEnd(), request.traceId);
+  }
 }
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
   if (isInfoEnabled()) {
     Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, frontendRequestForLogging(request));
   }
+}
+
+export function writeErrorToLog(moduleName: string, traceId: string, functionName: string, error: any): void {
+  logError(moduleName, traceId, functionName, undefined, error);
 }

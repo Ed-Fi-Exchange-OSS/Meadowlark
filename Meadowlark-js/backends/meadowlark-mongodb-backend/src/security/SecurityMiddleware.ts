@@ -16,7 +16,7 @@ export async function securityMiddleware(
   { frontendRequest, frontendResponse }: MiddlewareModel,
   client: MongoClient,
 ): Promise<MiddlewareModel> {
-  const moduleName = 'MongoDBBackend.SecurityMiddleware';
+  const moduleName = 'mongodb.security.SecurityMiddleware';
 
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };

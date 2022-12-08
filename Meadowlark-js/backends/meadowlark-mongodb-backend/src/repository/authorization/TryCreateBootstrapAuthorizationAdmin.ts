@@ -47,7 +47,7 @@ export async function tryCreateBootstrapAuthorizationAdminDocument(
         if (upsertedCount === 1) {
           Logger.debug(`${functionName}: Inserted admin client`, request.traceId);
         } else {
-          Logger.info(
+          Logger.warn(
             `${functionName}: An attempt was made to create a bootstrap Admin ID when one already exists.`,
             request.traceId,
           );

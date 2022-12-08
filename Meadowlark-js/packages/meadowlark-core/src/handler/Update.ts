@@ -13,7 +13,7 @@ import { UpdateResult } from '../message/UpdateResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 
-const moduleName = 'Update';
+const moduleName = 'core.handler.Update';
 
 /**
  * Entry point for API update requests, which are "by id"
@@ -72,7 +72,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       };
     }
 
-    writeDebugStatusToLog(moduleName, frontendRequest, 'update', 500, failureMessage);
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, failureMessage);
 
     return {
       body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
