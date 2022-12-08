@@ -16,36 +16,6 @@ services:
     volumes:
       - meadowlark-pgsql-e2e:/var/lib/postgresql/data
 
-  mongo-e2e:
-    hostname: mongo-e2e
-    container_name: mongo-e2e
-    image: mongo:4.0.28
-    expose:
-      - 27017
-    ports:
-      - 27017:27017
-    networks:
-      - mongo-net-e2e
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: abcdefgh1!
-    restart: always
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true"
-      ]
-    volumes:
-      - mongo-data-e2e:/data/db
-      - mongo-log-e2e:/var/log/mongodb
-
   opensearch-node-e2e:
     image: opensearchproject/opensearch:latest
     container_name: opensearch-node-e2e
@@ -90,11 +60,8 @@ services:
 volumes:
   meadowlark-pgsql-e2e:
     driver: local
-  mongo-data-e2e:
-  mongo-log-e2e:
   opensearch-data-e2e:
 
 
 networks:
-  mongo-net-e2e:
   opensearch-net-e2e:
