@@ -199,7 +199,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
         return { body: '', statusCode: 401 };
       }
 
-      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 200`, authorizationRequest.traceId);
+      Logger.debug(`${moduleName}.requestToken authorized 200`, authorizationRequest.traceId);
 
       return {
         body: tokenResponseFrom(createToken(clientId, result.clientName, result.roles)),
