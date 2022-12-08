@@ -6,13 +6,10 @@ services:
     image: postgres:14.3-alpine
     restart: always
     environment:
-      # If username and password not provided through and env file
-      # default to postres/abcdefgh1!
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-abcdefgh1!}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abcdefgh1!
     ports:
-      # If no port provided through an env file, default to 5432
-      - ${POSTGRES_PORT:-5432}:5432
+      - 5433:5432
     volumes:
       - meadowlark-pgsql-e2e:/var/lib/postgresql/data
 
@@ -37,31 +34,10 @@ services:
     volumes:
       - opensearch-data-e2e:/usr/share/opensearch/data
     ports:
-      - 9200:9200
-      - 9600:9600 # required for Performance Analyzer
-    networks:
-      - opensearch-net-e2e
-    restart: unless-stopped
-
-  opensearch-dashboards-e2e:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards-e2e
-    ports:
-      - 5601:5601
-    expose:
-      - 5601
-    environment:
-      OPENSEARCH_HOSTS: '["http://opensearch-node:9200"]'
-      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
-    networks:
-      - opensearch-net-e2e
+      - 8200:9200
     restart: unless-stopped
 
 volumes:
   meadowlark-pgsql-e2e:
     driver: local
   opensearch-data-e2e:
-
-
-networks:
-  opensearch-net-e2e:
