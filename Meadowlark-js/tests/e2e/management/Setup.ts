@@ -15,9 +15,9 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.env') });
 
 module.exports = async (config) => {
-  if (!process.env.GITHUB_ACTION) {
-    await setupEnvironment.configure(config);
-  }
+  // if (!process.env.GITHUB_ACTION) {
+  await setupEnvironment.configure(config);
+  // }
 
   await setupServer.setup();
 

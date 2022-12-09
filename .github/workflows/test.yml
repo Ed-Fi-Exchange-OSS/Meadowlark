@@ -117,19 +117,19 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - if: ${{ matrix.config.db == 'PGSQL' }}
-        name: Start Postgres Container
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password '${{ env.POSTGRES_PASSWORD }}';"
+      # - if: ${{ matrix.config.db == 'PGSQL' }}
+      #   name: Start Postgres Container
+      #   run: |
+      #     sudo systemctl start postgresql.service
+      #     sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password '${{ env.POSTGRES_PASSWORD }}';"
 
       # Always start MongoDB, as it is used by the authorization system.
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@538a4d2a1041920c47630172445cb688592d6e51 #v1.8.0
-        with:
-          mongodb-version: "4.0.28"
-          mongodb-replica-set: rs0
-          mongodb-port: 42069
+      # - name: Start MongoDB
+      #   uses: supercharge/mongodb-github-action@538a4d2a1041920c47630172445cb688592d6e51 #v1.8.0
+      #   with:
+      #     mongodb-version: "4.0.28"
+      #     mongodb-replica-set: rs0
+      #     mongodb-port: 42069
 
       # This caching is breaking Lerna 6. Look into in more detail to see if we can fix.
       # - name: Cache Build
