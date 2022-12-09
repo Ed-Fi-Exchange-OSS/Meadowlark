@@ -19,11 +19,11 @@ services:
     container_name: opensearch-node-e2e
     environment:
       cluster.name: opensearch-cluster-e2e
-      bootstrap.memory_lock: true # along with the memlock settings below, disables swapping
+      bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
       discovery.type: single-node
-      DISABLE_INSTALL_DEMO_CONFIG: true # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
-      DISABLE_SECURITY_PLUGIN: true # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+      DISABLE_INSTALL_DEMO_CONFIG: "true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      DISABLE_SECURITY_PLUGIN: "true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
     mem_limit: 2g
     ulimits:
       memlock:
