@@ -7,12 +7,14 @@ const envConfig = require('./EnvironmentConfig');
 const teardownServer = require('./ServerConfig');
 
 async function endServer() {
-  if (!teardownServer.wasServerAlreadyRunning()) {
-    // if (!process.env.GITHUB_ACTION) {
-    await envConfig.getEnvironment().down();
-    // }
+  try {
+    if (!teardownServer.wasServerAlreadyRunning()) {
+      await envConfig.getEnvironment().down();
 
-    process.exit(0);
+      process.exit(0);
+    }
+  } catch (error) {
+    console.info(error);
   }
 }
 
