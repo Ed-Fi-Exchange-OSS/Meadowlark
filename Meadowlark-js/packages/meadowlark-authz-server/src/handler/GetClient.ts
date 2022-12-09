@@ -12,7 +12,7 @@ import { clientIdFrom } from '../Utility';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 
-const moduleName = 'handler.GetClient';
+const moduleName = 'authz.handler.GetClient';
 
 export async function getClients(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
@@ -21,6 +21,7 @@ export async function getClients(authorizationRequest: AuthorizationRequest): Pr
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       extractAuthorizationHeader(authorizationRequest),
+      authorizationRequest.traceId,
     );
 
     if (errorResponse != null) {
@@ -59,6 +60,7 @@ export async function getClientById(authorizationRequest: AuthorizationRequest):
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       extractAuthorizationHeader(authorizationRequest),
+      authorizationRequest.traceId,
     );
 
     if (errorResponse != null) {

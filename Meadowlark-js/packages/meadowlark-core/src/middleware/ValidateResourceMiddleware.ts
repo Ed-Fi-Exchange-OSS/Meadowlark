@@ -8,7 +8,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { NoResourceInfo } from '../model/ResourceInfo';
 
-const moduleName = 'ValidateResourceMiddleware';
+const moduleName = 'core.middleware.ValidateResourceMiddleware';
 
 /**
  * Validates resource

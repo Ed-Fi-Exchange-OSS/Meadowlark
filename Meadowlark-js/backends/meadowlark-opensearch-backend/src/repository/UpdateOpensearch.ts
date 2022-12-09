@@ -15,6 +15,8 @@ import {
 import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QueryOpensearch';
 
+const moduleName = 'opensearch.repository.UpdateOpensearch';
+
 /**
  * Parameters for an OpenSearch request
  */
@@ -24,19 +26,19 @@ type OpensearchRequest = { index: string; id: string };
  * Listener for afterDeleteDocumentById events
  */
 export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult, client: Client) {
-  Logger.info('UpdateOpenSearch.afterDeleteDocumentById', request.traceId);
+  Logger.info(`${moduleName}.afterDeleteDocumentById`, request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
   const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
 
   try {
     Logger.debug(
-      `UpdateOpensearch.afterDeleteDocumentById removing ${opensearchRequest.id} from index ${opensearchRequest.index}`,
+      `${moduleName}.afterDeleteDocumentById removing ${opensearchRequest.id} from index ${opensearchRequest.index}`,
       request.traceId,
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    Logger.error(`UpdateOpensearch.afterDeleteDocumentById`, request.traceId, err);
+    Logger.error(`${moduleName}.afterDeleteDocumentById`, request.traceId, err);
     throw err;
   }
 }
@@ -48,7 +50,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
 
   Logger.debug(
-    `UpdateOpensearch.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
+    `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
     request.traceId,
   );
   try {
@@ -63,7 +65,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`UpdateOpensearch.upsertToOpensearch`, request.traceId, err);
+    Logger.error(`${moduleName}.upsertToOpensearch`, request.traceId, err);
     throw err;
   }
 }
@@ -72,7 +74,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
  * Listener for afterUpsertDocument events
  */
 export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult, client: Client) {
-  Logger.info('UpdateOpenSearch.afterUpsertDocument', request.traceId);
+  Logger.info(`${moduleName}.afterUpsertDocument`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
   await upsertToOpensearch(request, client);
 }
@@ -81,7 +83,7 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
  * Listener for afterUpdateDocumentById events
  */
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: Client) {
-  Logger.info('UpdateOpenSearch.afterUpdateDocumentById', request.traceId);
+  Logger.info(`${moduleName}.afterUpdateDocumentById`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
   await upsertToOpensearch(request, client);
 }

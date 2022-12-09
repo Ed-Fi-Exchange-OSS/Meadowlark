@@ -8,7 +8,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { findMetaEdModel } from '../metaed/MetaEdModelFinder';
 
-const moduleName = 'FindMetaEdModelMiddleware';
+const moduleName = 'core.middleware.FindMetaEdModelMiddleware';
 
 /**
  * Finds the matching MetaEd model from the path components
@@ -20,7 +20,7 @@ export async function metaEdModelFinding({ frontendRequest, frontendResponse }: 
 
   const matchingMetaEdModel = await findMetaEdModel(frontendRequest.middleware.pathComponents);
   if (matchingMetaEdModel == null) {
-    const errorMessage = `${moduleName}.metaEdModelFinding: Fatal error - matchingMetaEdModel not found`;
+    const errorMessage = `${moduleName}.metaEdModelFinding Fatal error - matchingMetaEdModel not found`;
     Logger.error(errorMessage, frontendRequest.traceId);
     const statusCode = 500;
     writeDebugStatusToLog(moduleName, frontendRequest, 'metaEdModelFinding', statusCode, errorMessage);
@@ -30,7 +30,7 @@ export async function metaEdModelFinding({ frontendRequest, frontendResponse }: 
     };
   }
   Logger.debug(
-    `${moduleName}: Found matching MetaEd model ${matchingMetaEdModel.namespace}.${matchingMetaEdModel.metaEdName}`,
+    `${moduleName}.metaEdModelMatching Found model ${matchingMetaEdModel.namespace.namespaceName}.${matchingMetaEdModel.metaEdName}`,
     frontendRequest.traceId,
   );
 

@@ -7,7 +7,7 @@ import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
-const moduleName = 'ValidateResourceIdMiddleware';
+const moduleName = 'core.middleware.ValidateResourceIdMiddleware';
 
 /**
  * Validates resource id against resource

@@ -14,7 +14,7 @@ import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
 import { resourceUriFrom } from './UriBuilder';
 
-const moduleName = 'Upsert';
+const moduleName = 'core.handler.Upsert';
 
 /**
  * Entry point for API upsert requests

@@ -18,7 +18,7 @@ import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/Authorizat
 import { hashClientSecretHexString } from '../security/HashClientSecret';
 import { getTokenExpiration, getTokenIssuer } from '../security/TokenSettings';
 
-const moduleName = 'RequestToken';
+const moduleName = 'authz.handler.RequestToken';
 
 type ParsedRequestTokenBody =
   | { isValid: true; requestTokenBody: RequestTokenBody }
@@ -199,7 +199,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
         return { body: '', statusCode: 401 };
       }
 
-      Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 200`, authorizationRequest.traceId);
+      Logger.debug(`${moduleName}.requestToken authorized 200`, authorizationRequest.traceId);
 
       return {
         body: tokenResponseFrom(createToken(clientId, result.clientName, result.roles)),

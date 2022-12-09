@@ -8,11 +8,13 @@ import { Logger } from '@edfi/meadowlark-utilities';
 
 let singletonClient: Client | null = null;
 
+const moduleName = 'opensearch.repository.Db';
+
 /**
  * Create and return an OpenSearch connection object
  */
 export async function getNewClient(): Promise<Client> {
-  Logger.debug('meadowlark-opensearch: creating local client', null);
+  Logger.debug(`${moduleName}.getNewClient creating local client`, null);
 
   const clientOpts: ClientOptions = {
     node: process.env.OPENSEARCH_ENDPOINT,
@@ -26,7 +28,7 @@ export async function getNewClient(): Promise<Client> {
     const masked = { ...clientOpts } as any;
     delete masked.auth?.password;
 
-    Logger.error(`meadowlark-opensearch: error connecting with options ${JSON.stringify(masked)}`, null, e);
+    Logger.error(`${moduleName}.getNewClient error connecting with options ${JSON.stringify(masked)}`, null, e);
     throw e;
   }
 }

@@ -8,6 +8,8 @@ import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 
+const moduleName = 'opensearch.repository.QueryOpensearch';
+
 /**
  * Returns OpenSearch index name from the given ResourceInfo.
  *
@@ -70,7 +72,7 @@ function appendedWhereClause(existingWhereClause: string, newWhereClause: string
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
   const { resourceInfo, queryParameters, paginationParameters, traceId } = request;
 
-  Logger.debug(`Building query`, traceId);
+  Logger.debug(`${moduleName}.queryDocuments Building query`, traceId);
 
   let documents: any = [];
   let recordCount: number;
@@ -98,7 +100,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 
-    Logger.debug(`meadowlark-opensearch-backend: queryDocuments executing query: ${query}`, traceId);
+    Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
     recordCount = body.total;
@@ -107,7 +109,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
 
     if (isDebugEnabled()) {
       const idsForLogging: string[] = documents.map((document) => document.id);
-      Logger.debug(`Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
+      Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
     const body = JSON.parse(e.meta.body);
@@ -115,13 +117,14 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     switch (body?.error?.type) {
       case 'IndexNotFoundException':
         // No object has been uploaded for the requested type
+        Logger.debug(`${moduleName}.queryDocuments index not found`, traceId, e.meta.body);
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
       case 'SemanticAnalysisException':
         // The query term is invalid
-        Logger.debug('meadowlark-opensearch: queryDocuments', traceId, e.meta.body);
+        Logger.debug(`${moduleName}.queryDocuments invalid query terms`, traceId, e.meta.body);
         return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
       default:
-        Logger.error('meadowlark-opensearch: queryDocuments', traceId, body ?? e);
+        Logger.error(`${moduleName}.queryDocuments`, traceId, body ?? e);
         return { response: 'UNKNOWN_FAILURE', documents: [] };
     }
   }

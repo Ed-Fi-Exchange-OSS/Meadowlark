@@ -10,10 +10,14 @@ import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkD
 import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
 import { validateReferences } from './ReferenceValidation';
 
+const moduleName: string = 'mongodb.repository.Upsert';
+
 export async function upsertDocument(
   { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
+  Logger.info(`${moduleName}.updateDocumentById ${id}`, traceId);
+
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
 
@@ -31,8 +35,8 @@ export async function upsertDocument(
           (await mongoCollection.findOne({ aliasIds: superclassAliasId }, onlyReturnId(session))) != null;
 
         if (superclassAliasIdInUse) {
-          Logger.debug(
-            `mongodb.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to another subclass with the same identity`,
+          Logger.warn(
+            `${moduleName}.upsertDocument Upserting document id ${id} failed due to another subclass with the same identity`,
             traceId,
           );
 
@@ -57,10 +61,7 @@ export async function upsertDocument(
 
         // Abort on validation failure
         if (failures.length > 0) {
-          Logger.debug(
-            `mongodb.repository.Upsert.upsertDocument: Upserting document id ${id} failed due to invalid references`,
-            traceId,
-          );
+          Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id} failed due to invalid references`, traceId);
 
           upsertResult = {
             response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
@@ -84,7 +85,7 @@ export async function upsertDocument(
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
       // Perform the document upsert
-      Logger.debug(`mongodb.repository.Upsert.upsertDocument: Upserting document id ${id}`, traceId);
+      Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
 
       const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
       if (acknowledged) {
@@ -92,11 +93,11 @@ export async function upsertDocument(
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-        Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, msg);
+        Logger.error(`${moduleName}.upsertDocument`, traceId, msg);
       }
     });
   } catch (e) {
-    Logger.error('mongodb.repository.Upsert.upsertDocument', traceId, e);
+    Logger.error(`${moduleName}.upsertDocument`, traceId, e);
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

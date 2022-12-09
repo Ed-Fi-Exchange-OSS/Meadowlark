@@ -7,7 +7,7 @@ import { validateDocument } from '../validation/DocumentValidator';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 
-const moduleName = 'ValidateDocumentMiddleware';
+const moduleName = 'core.middleware.ValidateDocumentMiddleware';
 
 /**
  * Validates JSON document shape

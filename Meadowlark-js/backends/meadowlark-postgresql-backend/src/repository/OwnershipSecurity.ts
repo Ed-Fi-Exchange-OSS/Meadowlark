@@ -19,7 +19,7 @@ export async function rejectByOwnershipSecurity(
   frontendRequest: FrontendRequest,
   client: PoolClient,
 ): Promise<SecurityResult> {
-  const moduleName = 'OwnershipSecurity';
+  const moduleName = 'postgresql.repository.OwnershipSecurity';
   const functionName = `${moduleName}.rejectByOwnershipSecurity`;
 
   writeRequestToLog(moduleName, frontendRequest, 'rejectByOwnershipSecurity');
@@ -29,7 +29,7 @@ export async function rejectByOwnershipSecurity(
     frontendRequest.middleware.resourceInfo.isDescriptor &&
     (frontendRequest.action === 'getById' || frontendRequest.action === 'query')
   ) {
-    Logger.debug(`GET style request for a descriptor, bypassing ownership check`, frontendRequest.traceId);
+    Logger.debug(`${functionName} GET style request for a descriptor, bypassing ownership check`, frontendRequest.traceId);
     return 'NOT_APPLICABLE';
   }
 
@@ -38,7 +38,7 @@ export async function rejectByOwnershipSecurity(
   if (id == null) id = extractIdIfUpsert(frontendRequest);
 
   if (id == null) {
-    Logger.error(`${functionName} - no id to secure against`, frontendRequest.traceId);
+    Logger.error(`${functionName} no id to secure against`, frontendRequest.traceId);
     return 'NOT_APPLICABLE';
   }
 
@@ -46,24 +46,24 @@ export async function rejectByOwnershipSecurity(
     const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
 
     if (result.rows == null) {
-      Logger.error(`${functionName} - Unknown Error determining access`, frontendRequest.traceId);
+      Logger.error(`${functionName} Unknown Error determining access`, frontendRequest.traceId);
       return 'UNKNOWN_FAILURE';
     }
 
     if (result.rowCount === 0) {
-      Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
+      Logger.debug(`${functionName} document not found for id ${id}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
     const { clientId } = frontendRequest.middleware.security;
 
     if (result.rows[0].created_by === clientId) {
-      Logger.debug(`${functionName} - access approved: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
+      Logger.debug(`${functionName} access approved: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }
-    Logger.debug(`${functionName} - access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
+    Logger.debug(`${functionName} access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
     return 'ACCESS_DENIED';
   } catch (e) {
-    Logger.error(`${functionName} - Error determining access`, frontendRequest.traceId, e);
+    Logger.error(`${functionName} Error determining access`, frontendRequest.traceId, e);
     return 'UNKNOWN_FAILURE';
   }
 }

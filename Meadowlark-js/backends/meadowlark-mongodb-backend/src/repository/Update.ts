@@ -10,10 +10,14 @@ import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkD
 import { getDocumentCollection, writeLockReferencedDocuments } from './Db';
 import { validateReferences } from './ReferenceValidation';
 
+const moduleName: string = 'mongodb.repository.Update';
+
 export async function updateDocumentById(
   { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
+  Logger.info(`${moduleName}.updateDocumentById ${id}`, traceId);
+
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
 
@@ -33,7 +37,7 @@ export async function updateDocumentById(
         // Abort on validation failure
         if (failures.length > 0) {
           Logger.debug(
-            `mongodb.repository.Update.updateDocumentById: Updating document id ${id} failed due to invalid references`,
+            `${moduleName}.updateDocumentById: Updating document id ${id} failed due to invalid references`,
             traceId,
           );
 
@@ -59,7 +63,7 @@ export async function updateDocumentById(
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
       // Perform the document update
-      Logger.debug(`mongodb.repository.Update.updateDocumentById: Updating document id ${id}`, traceId);
+      Logger.debug(`${moduleName}.updateDocumentById: Updating document id ${id}`, traceId);
 
       const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
       if (acknowledged) {
@@ -67,11 +71,11 @@ export async function updateDocumentById(
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-        Logger.error('mongodb.repository.Update.updateDocumentById', traceId, msg);
+        Logger.error(`${moduleName}.updateDocumentById`, traceId, msg);
       }
     });
   } catch (e) {
-    Logger.error('mongodb.repository.Update.updateDocumentById', traceId, e);
+    Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

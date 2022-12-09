@@ -16,39 +16,32 @@ import { ResetAuthorizationClientSecretRequest } from '../message/ResetAuthoriza
 import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
 import { GetAllAuthorizationClientsResult } from '../message/GetAllAuthorizationClientsResult';
 
+const moduleName = 'authz.plugin.NoAuthorizationStorePlugin';
+
 export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
   createAuthorizationClient: async (
     _request: CreateAuthorizationClientRequest,
   ): Promise<CreateAuthorizationClientResult> => {
-    Logger.error(
-      'NoAuthorizationStorePlugin.createAuthorizationClient(): An authorization store plugin has not been configured',
-      null,
-    );
+    Logger.error(`${moduleName}.createAuthorizationClient(): An authorization store plugin has not been configured`, null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
   tryCreateBootstrapAuthorizationAdmin: async (
     _request: CreateAuthorizationClientRequest,
   ): Promise<TryCreateBootstrapAuthorizationAdminResult> => {
     Logger.error(
-      'NoAuthorizationStorePlugin.tryCreateBootstrapAuthorizationAdmin(): An authorization store plugin has not been configured',
+      `${moduleName}.tryCreateBootstrapAuthorizationAdmin(): An authorization store plugin has not been configured`,
       null,
     );
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
   getAuthorizationClient: async (_request: GetAuthorizationClientRequest): Promise<GetAuthorizationClientResult> => {
-    Logger.error(
-      'NoAuthorizationStorePlugin.getAuthorizationClient(): An authorization store plugin has not been configured',
-      null,
-    );
+    Logger.error(`${moduleName}.getAuthorizationClient(): An authorization store plugin has not been configured`, null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
   updateAuthorizationClient: async (
     _request: UpdateAuthorizationClientRequest,
   ): Promise<UpdateAuthorizationClientResult> => {
-    Logger.warn(
-      'NoAuthorizationStorePlugin.updateAuthorizationClient(): No authorization store plugin has been configured',
-      null,
-    );
+    Logger.warn(`${moduleName}.updateAuthorizationClient(): No authorization store plugin has been configured`, null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
   resetAuthorizationClientSecret: async (
@@ -58,10 +51,7 @@ export const NoAuthorizationStorePlugin: AuthorizationStorePlugin = {
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
   getAllAuthorizationClients: async (_traceId: string): Promise<GetAllAuthorizationClientsResult> => {
-    Logger.error(
-      'NoAuthorizationStorePlugin.getAllAuthorizationClients(): An authorization store plugin has not been configured',
-      null,
-    );
+    Logger.error(`${moduleName}.getAllAuthorizationClients(): An authorization store plugin has not been configured`, null);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 };

@@ -15,10 +15,14 @@ import {
   findReferencingDocumentIdsSql,
 } from './SqlHelper';
 
+const moduleName = 'postgresql.repository.Delete';
+
 export async function deleteDocumentById(
   { id, validate, traceId }: DeleteRequest,
   client: PoolClient,
 ): Promise<DeleteResult> {
+  Logger.debug(`${moduleName}.deleteDocumentById ${id}`, traceId);
+
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
 
   try {
@@ -31,7 +35,7 @@ export async function deleteDocumentById(
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
       if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
         await client.query('ROLLBACK');
-        Logger.debug(`postgres.repository.Delete.deleteDocumentById: Document id ${id} does not exist`, traceId);
+        Logger.debug(`${moduleName}.deleteDocumentById: Document id ${id} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
       }
@@ -40,11 +44,11 @@ export async function deleteDocumentById(
       const documentAliasIds: string[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
 
       // Find any documents that reference this document, either it's own id or an alias
-      const referenceResult = await client.query(findReferencingDocumentIdsSql(documentAliasIds));
+      const referenceResult: QueryResult<any> = await client.query(findReferencingDocumentIdsSql(documentAliasIds));
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
-        const errorMessage = `deleteDocumentById: Error determining documents referenced by ${id}, a null result set was returned`;
+        const errorMessage = `${moduleName}.deleteDocumentById: Error determining documents referenced by ${id}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
         Logger.error(errorMessage, traceId);
         return deleteResult;
@@ -55,7 +59,7 @@ export async function deleteDocumentById(
       // If this document is referenced, it's a validation failure
       if (references.length > 0) {
         Logger.debug(
-          `postgres.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
+          `${moduleName}.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
           traceId,
         );
 
@@ -65,7 +69,7 @@ export async function deleteDocumentById(
 
         if (referringDocuments.rows == null) {
           await client.query('ROLLBACK');
-          const errorMessage = `deleteDocumentById: Error retrieving documents referenced by ${id}, a null result set was returned`;
+          const errorMessage = `${moduleName}.deleteDocumentById Error retrieving documents referenced by ${id}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
           Logger.error(errorMessage, traceId);
           return deleteResult;
@@ -88,7 +92,7 @@ export async function deleteDocumentById(
     }
 
     // Perform the document delete
-    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
+    Logger.debug(`${moduleName}.deleteDocumentById: Deleting document id ${id}`, traceId);
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(id));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
@@ -101,16 +105,16 @@ export async function deleteDocumentById(
       deleteQueryResult.rows[0].count === '0' ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
 
     // Delete references where this is the parent document
-    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting references with id ${id} as parent id`, traceId);
+    Logger.debug(`${moduleName}.deleteDocumentById Deleting references with id ${id} as parent id`, traceId);
     await client.query(deleteOutboundReferencesOfDocumentSql(id));
 
     // Delete this document from the aliases table
-    Logger.debug(`postgresql.repository.Delete.deleteDocumentById: Deleting alias entries with id ${id}`, traceId);
+    Logger.debug(`${moduleName}.deleteDocumentById Deleting alias entries with id ${id}`, traceId);
     await client.query(deleteAliasesForDocumentSql(id));
 
     await client.query('COMMIT');
   } catch (e) {
-    Logger.error('postgresql.repository.Delete.deleteDocumentById', traceId, e);
+    Logger.error(`${moduleName}.deleteDocumentById`, traceId, e);
     await client.query('ROLLBACK');
     return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   }

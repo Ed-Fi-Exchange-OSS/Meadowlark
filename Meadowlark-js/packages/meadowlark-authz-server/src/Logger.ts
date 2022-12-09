@@ -21,5 +21,5 @@ export function writeErrorToLog(moduleName: string, traceId: string, method: str
 }
 
 export function writeRequestToLog(moduleName: string, request: AuthorizationRequest, method: string): void {
-  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, request);
+  Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId);
 }

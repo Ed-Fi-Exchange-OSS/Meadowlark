@@ -8,7 +8,7 @@ import { isDocumentIdWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
 import type { MiddlewareModel } from './MiddlewareModel';
 
-const moduleName = 'ParsePathMiddleware';
+const moduleName = 'core.middleware.ParsePathMiddleware';
 
 function pathComponentsFrom(path: string): PathComponents | null {
   // Matches all of the following sample expressions:

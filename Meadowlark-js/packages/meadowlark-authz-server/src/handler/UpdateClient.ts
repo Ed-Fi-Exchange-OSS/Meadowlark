@@ -14,7 +14,7 @@ import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Lo
 import { BodyValidation, validateUpdateClientBody } from '../validation/BodyValidation';
 import { clientIdFrom } from '../Utility';
 
-const moduleName = 'handler.UpdateClient';
+const moduleName = 'authz.handler.UpdateClient';
 
 /**
  * Handler for client update
@@ -26,6 +26,7 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
 
     const errorResponse: AuthorizationResponse | undefined = validateAdminTokenForAccess(
       extractAuthorizationHeader(authorizationRequest),
+      authorizationRequest.traceId,
     );
 
     if (errorResponse != null) {

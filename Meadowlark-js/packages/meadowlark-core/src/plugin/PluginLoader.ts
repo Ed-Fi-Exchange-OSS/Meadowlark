@@ -18,20 +18,24 @@ let loadedDocumentStore: DocumentStorePlugin = NoDocumentStorePlugin;
 let loadedQueryHandler: QueryHandlerPlugin = NoQueryHandlerPlugin;
 let listenersLoadAttempted: boolean = false;
 
+const moduleName = 'core.plugin.PluginLoader';
+
 export async function loadDocumentStore() {
   if (loadedDocumentStore !== NoDocumentStorePlugin) return;
 
   if (process.env.DOCUMENT_STORE_PLUGIN == null) return;
 
-  Logger.debug(`PluginLoader.loadDocumentStore - loading plugin ${process.env.DOCUMENT_STORE_PLUGIN}`, '');
+  Logger.debug(`${moduleName}.loadDocumentStore Loading plugin ${process.env.DOCUMENT_STORE_PLUGIN}`, '');
 
   try {
     loadedDocumentStore = (
       (await import(process.env.DOCUMENT_STORE_PLUGIN)) as DocumentStoreInitializer
     ).initializeDocumentStore();
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
-    Logger.error(`Unable to load document store plugin "${process.env.DOCUMENT_STORE_PLUGIN}". Error was ${message}`, null);
+    Logger.error(
+      `${moduleName}.loadDocumentStore Unable to load document store plugin "${process.env.DOCUMENT_STORE_PLUGIN}".`,
+      e,
+    );
     throw e;
   }
 }
@@ -41,21 +45,23 @@ export async function loadQueryHandler() {
 
   if (process.env.QUERY_HANDLER_PLUGIN == null) return;
 
-  Logger.debug(`PluginLoader.loadQueryHandler - loading plugin ${process.env.QUERY_HANDLER_PLUGIN}`, '');
+  Logger.debug(`${moduleName}.loadQueryHandler Loading plugin ${process.env.QUERY_HANDLER_PLUGIN}`, null);
 
   try {
     loadedQueryHandler = (
       (await import(process.env.QUERY_HANDLER_PLUGIN)) as QueryHandlerInitializer
     ).initializeQueryHandler();
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'unknown';
-    Logger.error(`Unable to load query handler plugin "${process.env.QUERY_HANDLER_PLUGIN}". Error was ${message}`, null);
+    Logger.error(
+      `${moduleName}.loadQueryHandler Unable to load query handler plugin "${process.env.QUERY_HANDLER_PLUGIN}".`,
+      e,
+    );
     throw e;
   }
 }
 
 async function loadListener(pluginNpmName: string) {
-  Logger.debug(`PluginLoader.loadListener - loading plugin ${pluginNpmName}`, '');
+  Logger.debug(`${moduleName}.loadListener loading plugin ${pluginNpmName}`, '');
 
   return ((await import(pluginNpmName)) as ListenerInitializer).initializeListener(Subscribe);
 }
@@ -70,8 +76,7 @@ export async function loadListeners() {
     try {
       await loadListener(process.env.LISTENER1_PLUGIN);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'unknown';
-      Logger.error(`Unable to load listener plugin "${process.env.LISTENER1_PLUGIN}". Error was ${message}`, null);
+      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${process.env.LISTENER1_PLUGIN}"`, e);
       throw e;
     }
   }
@@ -80,8 +85,7 @@ export async function loadListeners() {
     try {
       await loadListener(process.env.LISTENER2_PLUGIN);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'unknown';
-      Logger.error(`Unable to load listener plugin "${process.env.LISTENER2_PLUGIN}". Error was ${message}`, null);
+      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${process.env.LISTENER2_PLUGIN}"`, e);
       throw e;
     }
   }
@@ -96,13 +100,13 @@ export function getQueryHandler(): QueryHandlerPlugin {
 }
 
 async function loadAllPlugins(): Promise<void> {
-  Logger.debug('PluginLoader.loadAllPlugins', '');
+  Logger.info(`${moduleName}.loadAllPlugins`, null);
   try {
     await loadDocumentStore();
     await loadQueryHandler();
     await loadListeners();
   } catch (e) {
-    writeErrorToLog('PluginLoader', '', 'ensurePluginsLoaded', 500, e);
+    writeErrorToLog(moduleName, '', 'loadAllPlugins', 500, e);
   }
 }
 

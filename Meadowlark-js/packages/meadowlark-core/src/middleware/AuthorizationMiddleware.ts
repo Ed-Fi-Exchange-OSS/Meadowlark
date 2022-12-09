@@ -5,7 +5,7 @@
 
 import TTLCache from '@isaacs/ttlcache';
 import { AxiosResponse } from 'axios';
-import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
+import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { FrontendRequest } from '../handler/FrontendRequest';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
@@ -14,7 +14,7 @@ import { FrontendResponse } from '../handler/FrontendResponse';
 import { determineAuthStrategyFromRoles } from './ParseUserRole';
 import { fetchOwnAccessToken, fetchClientTokenVerification } from './OAuthFetch';
 
-const moduleName = 'AuthorizationMiddleware';
+const moduleName = 'core.middleware.AuthorizationMiddleware';
 
 const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL: number = process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL
   ? parseInt(process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL, 10)
@@ -59,7 +59,8 @@ type RequestOwnAccessTokenResult = { success: true; token: string } | { success:
  * or a FrontEndResponse with an error.
  */
 async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<RequestOwnAccessTokenResult> {
-  Logger.debug(`${moduleName}.requestOwnAccessToken Requesting access token from OAuth server`, frontendRequest.traceId);
+  writeDebugStatusToLog(moduleName, frontendRequest, 'requestOwnAccessToken');
+
   try {
     // Request a token for Meadowlark using configured OAuth server and configured Meadowlark credentials
     const ownAccessTokenResponse: AxiosResponse = await fetchOwnAccessToken();
@@ -69,10 +70,9 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
     }
 
     if (ownAccessTokenResponse.status === 401 || ownAccessTokenResponse.status === 404) {
-      Logger.error(
-        `${moduleName}.requestOwnAccessToken OAuth server responded that configuration of Meadowlark client_id or client_secret is not valid`,
-        frontendRequest.traceId,
-      );
+      writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, {
+        message: 'OAuth server responded that configuration of Meadowlark client_id or client_secret is not valid',
+      });
 
       return {
         success: false,
@@ -82,18 +82,11 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
         },
       };
     }
-
-    Logger.error(
-      `${moduleName}.requestOwnAccessToken OAuth server responded with unexpected status code ${ownAccessTokenResponse.status} on Meadowlark own token request`,
-      frontendRequest.traceId,
-      ownAccessTokenResponse.data,
-    );
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, {
+      message: `OAuth server responded with unexpected status code ${ownAccessTokenResponse.status} on Meadowlark own token request`,
+    });
   } catch (e) {
-    Logger.error(
-      `${moduleName}.requestOwnAccessToken Unexpected failure on request from Meadowlark to OAuth server for Meadowlark own token`,
-      frontendRequest.traceId,
-      e,
-    );
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, e);
   }
 
   return {
@@ -116,9 +109,12 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
   // if upstream has already provided security information, we are done
   if (frontendRequest.middleware.security !== UndefinedSecurity) {
-    Logger.debug(
-      `${moduleName}.authorize credentials provided upstream, skipping OAuth server requests`,
-      frontendRequest.traceId,
+    writeDebugStatusToLog(
+      moduleName,
+      frontendRequest,
+      'authorize',
+      undefined,
+      'credentials provided upstream, skipping OAuth server requests',
     );
     return { frontendRequest, frontendResponse };
   }
@@ -145,11 +141,14 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
   if (cachedClientTokenInfo != null) {
     if (isDebugEnabled()) {
-      Logger.debug(
-        `${moduleName}.authorize Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${cachedClientsTokenInfo.getRemainingTTL(
+      writeDebugStatusToLog(
+        moduleName,
+        frontendRequest,
+        'authorize',
+        undefined,
+        `Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${cachedClientsTokenInfo.getRemainingTTL(
           clientBearerToken,
         )}`,
-        frontendRequest.traceId,
       );
     }
     frontendRequest.middleware.security = { ...cachedClientTokenInfo.security };
@@ -179,9 +178,12 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
     if (verificationResponse.status === 401) {
       // Meadowlark own token is no longer valid -- most likely expired
-      Logger.debug(
-        `${moduleName}.authorize OAuth server responded that Meadowlark own token is not valid`,
-        frontendRequest.traceId,
+      writeDebugStatusToLog(
+        moduleName,
+        frontendRequest,
+        'authorize',
+        undefined,
+        `OAuth server responded that Meadowlark own token is not valid`,
       );
 
       // Re-fetch Meadowlark own token - in case it expired - and try one more time
@@ -200,9 +202,12 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
 
     if (verificationResponse.status === 400) {
       // Client-provided token is not a well-formed JWT
-      Logger.debug(
-        `${moduleName}.authorize verification response returned 400 - Client-provided token is not a JWT`,
-        frontendRequest.traceId,
+      writeDebugStatusToLog(
+        moduleName,
+        frontendRequest,
+        'authorize',
+        400,
+        'verification response returned 400 - Client-provided token is not a JWT',
       );
       return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
     }
@@ -210,7 +215,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     if (verificationResponse.status === 200) {
       if (!verificationResponse.data?.active) {
         // Client-provided token accepted by OAuth server but not active
-        Logger.debug(`${moduleName}.authorize Client-provided token is inactive`, frontendRequest.traceId);
+        writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', 401, 'Client-provided token is inactive');
         return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
       }
 
@@ -232,18 +237,17 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     }
 
     // Unexpected http status returned by OAuth server. Nothing Meadowlark can do about it.
-    Logger.debug(
-      `${moduleName}.authorize verification response returned ${verificationResponse.status} unexpectedly - returning 502`,
+    writeErrorToLog(
+      moduleName,
       frontendRequest.traceId,
+      'authorize',
+      502,
+      `verification response returned ${verificationResponse.status} unexpectedly`,
     );
     return { frontendRequest, frontendResponse: { body: '', statusCode: 502 } };
   } catch (e) {
     // Unexpected failure communicating with OAuth server
-    Logger.error(
-      `${moduleName}.authorize verify client access token failure. Check Meadowlark OAuth configuration and access to OAuth server.`,
-      frontendRequest.traceId,
-      e,
-    );
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'authorize', 500, e);
     return { frontendRequest, frontendResponse: { body: '', statusCode: 500 } };
   }
 }

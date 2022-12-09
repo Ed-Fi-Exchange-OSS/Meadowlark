@@ -9,7 +9,7 @@ import { QueryHandlerPlugin } from './QueryHandlerPlugin';
 
 export const NoQueryHandlerPlugin: QueryHandlerPlugin = {
   queryDocuments: async ({ traceId }: QueryRequest): Promise<QueryResult> => {
-    Logger.warn('NoQueryHandlerPlugin.queryDocuments(): No backend plugin has been configured', traceId);
+    Logger.warn('core.plugin.backend.NoQueryHandlerPlugin.queryDocuments(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE', documents: [] });
   },
 };

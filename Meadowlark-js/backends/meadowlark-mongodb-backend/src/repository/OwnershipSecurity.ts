@@ -20,7 +20,7 @@ export async function rejectByOwnershipSecurity(
   frontendRequest: FrontendRequest,
   client: MongoClient,
 ): Promise<SecurityResult> {
-  const moduleName = 'OwnershipSecurity';
+  const moduleName = 'mongodb.repository.OwnershipSecurity';
   const functionName = `${moduleName}.rejectByOwnershipSecurity`;
 
   writeRequestToLog(moduleName, frontendRequest, 'rejectByOwnershipSecurity');

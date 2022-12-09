@@ -15,30 +15,32 @@ import { UpsertResult } from '../../message/UpsertResult';
 import { DocumentStorePlugin } from './DocumentStorePlugin';
 import { MiddlewareModel } from '../../middleware/MiddlewareModel';
 
+const moduleName = 'core.plugin.backend.NoDocumentStorePlugin';
+
 export const NoDocumentStorePlugin: DocumentStorePlugin = {
   upsertDocument: async ({ traceId }: UpsertRequest): Promise<UpsertResult> => {
-    Logger.warn('NoDocumentStorePlugin.upsertDocument(): No backend plugin has been configured', traceId);
+    Logger.warn(`${moduleName}.upsertDocument No backend plugin has been configured`, traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 
   getDocumentById: async ({ traceId }: GetRequest): Promise<GetResult> => {
-    Logger.warn('NoDocumentStorePlugin.getDocumentById(): No backend plugin has been configured', traceId);
+    Logger.warn(`${moduleName}.getDocumentById No backend plugin has been configured`, traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE', document: {} });
   },
 
   updateDocumentById: async ({ traceId }: UpdateRequest): Promise<UpdateResult> => {
-    Logger.warn('NoDocumentStorePlugin.updateDocumentById(): No backend plugin has been configured', traceId);
+    Logger.warn(`${moduleName}.updateDocumentById No backend plugin has been configured`, traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE' });
   },
 
   deleteDocumentById: async ({ traceId }: DeleteRequest): Promise<DeleteResult> => {
-    Logger.warn('NoDocumentStorePlugin.deleteDocumentById(): No backend plugin has been configured', traceId);
+    Logger.warn(`${moduleName}.deleteDocumentById No backend plugin has been configured`, traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE', failureMessage: '' });
   },
 
   securityMiddleware: async (middlewareModel: MiddlewareModel): Promise<MiddlewareModel> => {
     Logger.warn(
-      'NoDocumentStorePlugin.securityMiddleware(): No backend plugin has been configured',
+      `${moduleName}.securityMiddleware No backend plugin has been configured`,
       middlewareModel.frontendRequest.traceId,
     );
     return Promise.resolve(middlewareModel);
