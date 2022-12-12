@@ -100,6 +100,10 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   dbConfiguration.database = 'meadowlark';
   singletonDbPool = new Pool(dbConfiguration);
 
+  singletonDbPool.on('error', (err, _client) => {
+    Logger.error(`${moduleName} a PostgreSQL connection error occurred.`, null, err);
+  });
+
   return singletonDbPool.connect();
 }
 
