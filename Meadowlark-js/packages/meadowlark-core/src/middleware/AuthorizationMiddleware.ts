@@ -106,6 +106,7 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
 export async function authorize({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
+  writeDebugStatusToLog(moduleName, frontendRequest, 'authorize');
 
   // if upstream has already provided security information, we are done
   if (frontendRequest.middleware.security !== UndefinedSecurity) {
@@ -119,10 +120,9 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     return { frontendRequest, frontendResponse };
   }
 
-  writeRequestToLog(moduleName, frontendRequest, 'authorize');
-
   // Extract the JWT token sent by the client
   const clientBearerToken: string | undefined = extractClientBearerTokenFrom(frontendRequest);
+
   if (clientBearerToken == null) {
     const statusCode = 400;
     writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', statusCode);
@@ -213,6 +213,10 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     }
 
     if (verificationResponse.status === 200) {
+      writeRequestToLog(moduleName, frontendRequest, 'authorize', {
+        ClientId: verificationResponse.data?.client_id ?? 'UNKNOWN',
+      });
+
       if (!verificationResponse.data?.active) {
         // Client-provided token accepted by OAuth server but not active
         writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', 401, 'Client-provided token is inactive');

@@ -19,9 +19,9 @@ export function writeDebugStatusToLog(
   }
 }
 
-export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
+export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string, extra?: any): void {
   if (isInfoEnabled()) {
-    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId);
+    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, extra);
   }
 }
 
