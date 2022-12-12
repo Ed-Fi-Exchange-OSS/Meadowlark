@@ -90,19 +90,6 @@ jobs:
     env:
       POSTGRES_PASSWORD: abcdefgh1!
 
-    services:
-      opensearch:
-        image: opensearchproject/opensearch:latest
-        ports:
-          - 9200:9200
-        env:
-          cluster.name: opensearch-cluster
-          bootstrap.memory_lock: true # along with the memlock settings below, disables swapping
-          OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-          discovery.type: single-node
-          DISABLE_INSTALL_DEMO_CONFIG: true # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
-          DISABLE_SECURITY_PLUGIN: true # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
