@@ -129,7 +129,7 @@ describe('when reviewing access token', () => {
                 active: true,
                 aud: 'ed-fi-meadowlark',
                 roles: ['admin'],
-                sub: 'Admin Client',
+                sub: expect.any(String),
               }),
             );
           });
