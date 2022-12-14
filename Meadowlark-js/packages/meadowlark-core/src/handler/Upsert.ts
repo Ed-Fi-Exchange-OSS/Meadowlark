@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import R from 'ramda';
 import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentInfo';
@@ -46,7 +47,6 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     if (response === 'INSERT_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
       return {
-        body: '',
         statusCode: 201,
         headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
       };
@@ -55,7 +55,6 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
       return {
-        body: '',
         statusCode: 200,
         headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
       };
@@ -63,23 +62,23 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409);
-      return { body: '', statusCode: 409, headers: headerMetadata };
+      return { statusCode: 409, headers: headerMetadata };
     }
 
     if (response === 'INSERT_FAILURE_REFERENCE' || response === 'INSERT_FAILURE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, '', failureMessage);
       return {
-        body: JSON.stringify({ message: failureMessage }),
-        statusCode: 400,
+        body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
+        statusCode: 409,
         headers: headerMetadata,
       };
     }
 
     // Otherwise, it's a 500 error
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, failureMessage);
-    return { body: '', statusCode: 500, headers: headerMetadata };
+    return { statusCode: 500, headers: headerMetadata };
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

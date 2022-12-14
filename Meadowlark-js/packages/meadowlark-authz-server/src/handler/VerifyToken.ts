@@ -13,16 +13,16 @@ import { ensurePluginsLoaded } from '../plugin/AuthorizationPluginLoader';
 import {
   hasAdminOrVerifyOnlyRole,
   introspectBearerToken,
-  IntrospectionResponse,
   validateTokenForAccess,
   ValidateTokenResult,
 } from '../security/TokenValidator';
+import { IntrospectionResponse } from '../model/TokenResponse';
 
 const moduleName = 'authz.handler.VerifyToken';
 
 type ParsedVerifyTokenBody =
   | { isValid: true; verifyTokenBody: VerifyTokenBody }
-  | { isValid: false; failureMessage: string };
+  | { isValid: false; failureMessage: object | string };
 
 /**
  * Parses the request which is form url-encoded with two tokens. One is the bearer token itself and the
@@ -38,17 +38,17 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (!authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
-    const message = 'Requires application/x-www-form-urlencoded content type';
-    Logger.debug(`${moduleName}.parseVerifyTokenBody: ${message}`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: message };
+    const error = 'Requires application/x-www-form-urlencoded content type';
+    Logger.debug(`${moduleName}.parseVerifyTokenBody: ${error}`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: error };
   }
 
   try {
     unvalidatedBody = querystring.parse(authorizationRequest.body);
-  } catch (error) {
-    const message = `Malformed body: ${error.message}`;
-    Logger.debug(`${moduleName}.parseRequestTokenBody: ${message}`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: message };
+  } catch (e) {
+    const error = `Malformed body: ${e.message}`;
+    Logger.debug(`${moduleName}.parseRequestTokenBody: ${error}`, authorizationRequest.traceId);
+    return { isValid: false, failureMessage: { error } };
   }
 
   const bodyValidation: BodyValidation = validateVerifyTokenBody(unvalidatedBody);
@@ -79,7 +79,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
     if (!requesterTokenResult.isValid) {
       return {
         statusCode: 401,
-        body: JSON.stringify(requesterTokenResult.errorResponse),
+        body: requesterTokenResult.errorResponse.body,
       };
     }
 
@@ -88,7 +88,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
     if (!parsedRequest.isValid) {
       Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, parsedRequest.failureMessage);
       return {
-        body: JSON.stringify({ error: parsedRequest.failureMessage }),
+        body: { error: parsedRequest.failureMessage },
         statusCode: 400,
       };
     }
@@ -103,7 +103,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
       const message = 'Invalid token provided for introspection';
       Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, message);
       return {
-        body: JSON.stringify({ error: message }),
+        body: { error: message },
         statusCode: 400,
       };
     }
@@ -116,24 +116,16 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
       !hasAdminOrVerifyOnlyRole(requesterTokenResult.roles)
     ) {
       Logger.debug(`${moduleName}.verifyToken: 401`, authorizationRequest.traceId);
-      return { body: '', statusCode: 401 };
-    }
-
-    if (!introspectedToken.active) {
-      Logger.debug(`${moduleName}.verifyToken: 200`, authorizationRequest.traceId);
-      return {
-        body: JSON.stringify({ active: false }),
-        statusCode: 200,
-      };
+      return { statusCode: 401 };
     }
 
     Logger.debug(`${moduleName}.verifyToken: 200`, authorizationRequest.traceId);
     return {
-      body: JSON.stringify(introspectedToken),
+      body: introspectedToken,
       statusCode: 200,
     };
   } catch (e) {
     Logger.error(`${moduleName}.verifyToken: 500`, authorizationRequest.traceId, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

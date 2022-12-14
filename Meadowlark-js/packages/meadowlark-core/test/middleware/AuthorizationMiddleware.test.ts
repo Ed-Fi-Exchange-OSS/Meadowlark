@@ -128,7 +128,11 @@ describe('given a request has no authorization header', () => {
 
   it('returns a 400 response with invalid authorization header', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(400);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`"{ message: "Invalid authorization header" }"`);
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid authorization header",
+      }
+    `);
   });
 
   it('never calls mockFetchOwnAccessToken', () => {
@@ -173,7 +177,11 @@ describe('given a request has non-bearer authorization header', () => {
 
   it('returns a 400 response with invalid authorization header', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(400);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`"{ message: "Invalid authorization header" }"`);
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid authorization header",
+      }
+    `);
   });
 
   it('never calls mockFetchOwnAccessToken', () => {
@@ -220,9 +228,11 @@ describe('given an invalid configuration of Meadowlark client secret', () => {
 
   it('returns a 500 response due to OAuth server 401', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(500);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Invalid Meadowlark to OAuth server configuration"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid Meadowlark to OAuth server configuration",
+      }
+    `);
   });
 
   it('never calls fetchClientTokenVerification', () => {
@@ -265,9 +275,11 @@ describe('given an invalid configuration of Meadowlark client id', () => {
 
   it('returns a 500 response due to OAuth server 404', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(500);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Invalid Meadowlark to OAuth server configuration"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid Meadowlark to OAuth server configuration",
+      }
+    `);
   });
 
   it('never calls fetchClientTokenVerification', () => {
@@ -310,9 +322,11 @@ describe('given a 500 from OAuth server when requesting own token', () => {
 
   it('returns a 502 response due to OAuth server 500', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(502);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Request from Meadowlark to OAuth server failed"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Request from Meadowlark to OAuth server failed",
+      }
+    `);
   });
 
   it('never calls fetchClientTokenVerification', () => {
@@ -356,9 +370,11 @@ describe('given an exception when requesting own token from OAuth server', () =>
 
   it('returns a 502 response due to exception', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(502);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Request from Meadowlark to OAuth server failed"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Request from Meadowlark to OAuth server failed",
+      }
+    `);
   });
 
   it('never calls fetchClientTokenVerification', () => {
@@ -407,9 +423,11 @@ describe('given a valid own token, but then the own token expires on client toke
 
   it('returns a 502 response due to OAuth server 500 on own token refresh', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(502);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Request from Meadowlark to OAuth server failed"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Request from Meadowlark to OAuth server failed",
+      }
+    `);
   });
 });
 
@@ -454,9 +472,11 @@ describe('given a valid own token, but then the own token expires on client toke
 
   it('returns a 500 response due to OAuth server 401 on own token refresh', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(500);
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(
-      `"{"message":"Invalid Meadowlark to OAuth server configuration"}"`,
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid Meadowlark to OAuth server configuration",
+      }
+    `);
   });
 });
 
@@ -500,7 +520,7 @@ describe('given the client token is not a well-formed JWT', () => {
 
   it('returns a 401 response due to OAuth server 400 on client token validation', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(401);
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 
@@ -544,7 +564,7 @@ describe('given the client token is not active', () => {
 
   it('returns a 401 response due to client token validation responding with inactive', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(401);
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 
@@ -708,7 +728,7 @@ describe('given a 500 from the OAuth server on client token verification', () =>
 
   it('returns a 502 response due to client token validation failing with a 500', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(502);
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 
@@ -752,7 +772,7 @@ describe('given an exception during the client token verification call to the OA
 
   it('returns a 500 response due to client token validation failing with an exception', () => {
     expect(resultChain.frontendResponse?.statusCode).toBe(500);
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 

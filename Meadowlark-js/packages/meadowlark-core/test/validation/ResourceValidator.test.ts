@@ -41,9 +41,11 @@ describe('given an invalid resource name with a suggested matching name', () => 
   });
 
   it('returns an error message', () => {
-    expect(JSON.parse(result.errorBody ?? '').message).toBe(
-      `Invalid resource '${invalidName}'. The most similar resource is '${matchedMetaEdName}'.`,
-    );
+    expect(result.errorBody).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid resource 'Mtch'. The most similar resource is 'match'.",
+      }
+    `);
   });
 
   it('returns no entity info', () => {
@@ -82,7 +84,11 @@ describe('given an invalid resource name with no suggested matching name', () =>
   });
 
   it('returns an error message', () => {
-    expect(JSON.parse(result.errorBody ?? '').message).toBe(`Invalid resource '${invalidName}'.`);
+    expect(result.errorBody).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid resource 'Mtch'.",
+      }
+    `);
   });
 
   it('returns no entity info', () => {

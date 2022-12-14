@@ -88,7 +88,7 @@ describe('given there are no query string parameters in the request', () => {
 });
 
 describe('given an error response from validatePaginationParameters', () => {
-  const errorBody = 'An error';
+  const errorBody = { message: 'An error' };
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
     queryParameters: { key: 'value' },
@@ -126,7 +126,7 @@ describe('given an error response from validatePaginationParameters', () => {
 });
 
 describe('given an error response from validateQueryString', () => {
-  const errorBody = 'An error';
+  const errorBody: string = 'An error';
   const frontendRequest: FrontendRequest = {
     ...newFrontendRequest(),
     queryParameters: { key: 'value' },

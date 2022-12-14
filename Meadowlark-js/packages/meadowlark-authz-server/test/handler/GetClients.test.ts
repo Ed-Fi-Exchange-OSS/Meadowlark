@@ -68,7 +68,7 @@ describe('given the authorization store is going to fail', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -108,9 +108,19 @@ describe('given a valid admin user', () => {
     });
 
     it('returns a proper message body', () => {
-      expect(response.body).toMatchInlineSnapshot(
-        `"[{"clientId":"a","clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false}]"`,
-      );
+      expect(response.body).toMatchInlineSnapshot(`
+        [
+          {
+            "active": false,
+            "clientId": "a",
+            "clientName": "Hometown SIS",
+            "roles": [
+              "vendor",
+              "assessment",
+            ],
+          },
+        ]
+      `);
     });
   });
 
@@ -149,9 +159,27 @@ describe('given a valid admin user', () => {
     });
 
     it('returns a proper message body', () => {
-      expect(response.body).toMatchInlineSnapshot(
-        `"[{"clientId":"a","clientName":"Hometown SIS","roles":["vendor","assessment"],"active":false},{"clientId":"b","clientName":"2 Hometown SIS","roles":["vendor"],"active":true}]"`,
-      );
+      expect(response.body).toMatchInlineSnapshot(`
+        [
+          {
+            "active": false,
+            "clientId": "a",
+            "clientName": "Hometown SIS",
+            "roles": [
+              "vendor",
+              "assessment",
+            ],
+          },
+          {
+            "active": true,
+            "clientId": "b",
+            "clientName": "2 Hometown SIS",
+            "roles": [
+              "vendor",
+            ],
+          },
+        ]
+      `);
     });
   });
 
@@ -190,7 +218,7 @@ describe('given a valid admin user', () => {
     });
 
     it('returns an empty array', () => {
-      expect(response.body).toMatchInlineSnapshot(`"[]"`);
+      expect(response.body).toStrictEqual([]);
     });
   });
 
@@ -214,14 +242,17 @@ describe('given a valid admin user', () => {
 
     it('returns error response', () => {
       expect(response).toMatchInlineSnapshot(`
-              {
-                "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
-                "headers": {
-                  "WWW-Authenticate": "Bearer",
-                },
-                "statusCode": 401,
-              }
-          `);
+        {
+          "body": {
+            "error": "invalid_client",
+            "error_description": "Authorization token not provided",
+          },
+          "headers": {
+            "WWW-Authenticate": "Bearer",
+          },
+          "statusCode": 401,
+        }
+      `);
     });
   });
 
@@ -246,14 +277,17 @@ describe('given a valid admin user', () => {
 
     it('returns error response', () => {
       expect(response).toMatchInlineSnapshot(`
-              {
-                "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
-                "headers": {
-                  "WWW-Authenticate": "Bearer",
-                },
-                "statusCode": 401,
-              }
-          `);
+        {
+          "body": {
+            "error": "invalid_token",
+            "error_description": "Token is expired",
+          },
+          "headers": {
+            "WWW-Authenticate": "Bearer",
+          },
+          "statusCode": 401,
+        }
+      `);
     });
   });
 
@@ -283,7 +317,7 @@ describe('given a valid admin user', () => {
     });
 
     it('returns empty message body', () => {
-      expect(response.body).toMatchInlineSnapshot(`""`);
+      expect(response.body).toBeUndefined();
     });
   });
 
@@ -309,9 +343,12 @@ describe('given a valid admin user', () => {
     });
 
     it('returns error response', () => {
-      expect(response.body).toMatchInlineSnapshot(
-        `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
-      );
+      expect(response.body).toMatchInlineSnapshot(`
+        {
+          "error": "invalid_token",
+          "error_description": "Invalid authorization token",
+        }
+      `);
     });
   });
 });

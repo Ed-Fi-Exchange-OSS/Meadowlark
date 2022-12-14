@@ -31,26 +31,23 @@ describe('when getting API version information', () => {
     });
     it('returns the expected JSON output with https', () => {
       expect(response.body).toMatchInlineSnapshot(`
-        "{
-            "version": "5.3",
-            "informationalVersion": "5.3",
-            "suite": "3",
-            "build": "5.3.663.0",
-            "apiMode": "Sandbox",
-            "dataModels": [
-              {
-                "name": "Ed-Fi",
-                "version": "3.3.1-b"
-              }
-            ],
-            "urls": {
-              "dependencies": "https://test_url/outside/metadata/data/v3/dependencies",
-              "openApiMetadata": "https://test_url/outside/metadata/",
-              "oauth": "mock_oauth",
-              "dataManagementApi": "https://test_url/outside/v3.3b/",
-              "xsdMetadata": "https://test_url/outside/metadata/xsd"
-            }
-          }"
+        {
+          "apiMode": "SharedInstance",
+          "dataModels": [
+            {
+              "name": "Ed-Fi",
+              "version": "3.3.1-b",
+            },
+          ],
+          "urls": {
+            "dataManagementApi": "https://test_url/outside/v3.3b/",
+            "dependencies": "https://test_url/outside/metadata/data/v3/dependencies",
+            "oauth": "mock_oauth",
+            "openApiMetadata": "https://test_url/outside/metadata/",
+            "xsdMetadata": "https://test_url/outside/metadata/xsd",
+          },
+          "version": "1.0.0",
+        }
       `);
     });
   });
@@ -77,26 +74,23 @@ describe('when getting API version information', () => {
     });
     it('returns the expected JSON output with https', () => {
       expect(response.body).toMatchInlineSnapshot(`
-        "{
-            "version": "5.3",
-            "informationalVersion": "5.3",
-            "suite": "3",
-            "build": "5.3.663.0",
-            "apiMode": "Sandbox",
-            "dataModels": [
-              {
-                "name": "Ed-Fi",
-                "version": "3.3.1-b"
-              }
-            ],
-            "urls": {
-              "dependencies": "http://localhost:3000/local/metadata/data/v3/dependencies",
-              "openApiMetadata": "http://localhost:3000/local/metadata/",
-              "oauth": "mock_oauth",
-              "dataManagementApi": "http://localhost:3000/local/v3.3b/",
-              "xsdMetadata": "http://localhost:3000/local/metadata/xsd"
-            }
-          }"
+        {
+          "apiMode": "SharedInstance",
+          "dataModels": [
+            {
+              "name": "Ed-Fi",
+              "version": "3.3.1-b",
+            },
+          ],
+          "urls": {
+            "dataManagementApi": "http://localhost:3000/local/v3.3b/",
+            "dependencies": "http://localhost:3000/local/metadata/data/v3/dependencies",
+            "oauth": "mock_oauth",
+            "openApiMetadata": "http://localhost:3000/local/metadata/",
+            "xsdMetadata": "http://localhost:3000/local/metadata/xsd",
+          },
+          "version": "1.0.0",
+        }
       `);
     });
   });

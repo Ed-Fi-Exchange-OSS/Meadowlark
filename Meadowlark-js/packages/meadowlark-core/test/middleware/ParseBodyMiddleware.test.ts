@@ -47,7 +47,11 @@ describe('given a missing body', () => {
   });
 
   it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toMatch('Missing body');
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Missing body",
+      }
+    `);
   });
 });
 
@@ -71,7 +75,11 @@ describe('given a malformed body', () => {
   });
 
   it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toMatch('Malformed body');
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Malformed body: Unexpected token N in JSON at position 0",
+      }
+    `);
   });
 });
 

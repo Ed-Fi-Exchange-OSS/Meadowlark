@@ -43,7 +43,7 @@ describe('given there is no resourceId', () => {
   });
 
   it('has an empty body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 
   it('never calls deleteDocumentById', () => {
@@ -79,7 +79,7 @@ describe('given delete has unknown failure', () => {
   });
 
   it('has a failure message', () => {
-    expect(JSON.parse(response.body).message).toEqual(expectedError);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -109,7 +109,7 @@ describe('given id does not exist', () => {
   });
 
   it('has an empty body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -146,14 +146,15 @@ describe('given the document to be deleted is referenced by other documents ', (
   });
 
   it('returns the error message', () => {
-    const responseBody = JSON.parse(response.body);
-    expect(responseBody.message).toMatchInlineSnapshot(
-      `"The resource cannot be deleted because it is a dependency of other documents"`,
-    );
-    expect(responseBody.blockingUris).toMatchInlineSnapshot(`
-      [
-        "/v3.3b/ed-fi/resourceNames/documentId",
-      ]
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "blockingUris": [
+            "/v3.3b/ed-fi/resourceNames/documentId",
+          ],
+          "message": "The resource cannot be deleted because it is a dependency of other documents",
+        },
+      }
     `);
   });
 });
@@ -184,6 +185,6 @@ describe('given a valid request', () => {
   });
 
   it('has an empty body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });

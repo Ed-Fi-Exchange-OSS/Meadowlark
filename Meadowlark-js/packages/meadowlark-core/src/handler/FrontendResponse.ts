@@ -6,13 +6,13 @@
 export interface FrontendResponse {
   statusCode: number;
   headers?: { [header: string]: string } | undefined;
-  body: string;
+  body?: object | string;
 }
 
 export function newFrontendResponse(): FrontendResponse {
   return {
     statusCode: 0,
     headers: {},
-    body: '',
+    body: {},
   };
 }

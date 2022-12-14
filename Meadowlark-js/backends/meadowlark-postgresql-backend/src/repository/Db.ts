@@ -63,6 +63,11 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
     // database, and disconnect. From there reconnect the pool to the meadowlark database and continue
 
     singletonDbPool = new Pool(dbConfiguration);
+
+    singletonDbPool.on('error', (err, _client) => {
+      Logger.error(`${moduleName} a PostgreSQL connection error occurred.`, null, err);
+    });
+
     const poolClient: PoolClient = await singletonDbPool.connect();
 
     Logger.info(

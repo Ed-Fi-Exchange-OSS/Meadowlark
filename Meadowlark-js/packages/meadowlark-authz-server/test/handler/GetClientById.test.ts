@@ -60,7 +60,7 @@ describe('given the authorization store is going to fail', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -100,9 +100,17 @@ describe('given a valid admin user', () => {
     });
 
     it('returns a proper message body', () => {
-      expect(response.body).toMatchInlineSnapshot(
-        `"{"active":false,"clientId":"11111111-1111-1111-1111111111111111","clientName":"Hometown SIS","roles":["vendor","assessment"]}"`,
-      );
+      expect(response.body).toMatchInlineSnapshot(`
+        {
+          "active": false,
+          "clientId": "11111111-1111-1111-1111111111111111",
+          "clientName": "Hometown SIS",
+          "roles": [
+            "vendor",
+            "assessment",
+          ],
+        }
+      `);
     });
   });
 
@@ -140,7 +148,7 @@ describe('given a valid admin user', () => {
     });
 
     it('does not return a message body', () => {
-      expect(response.body).toEqual('');
+      expect(response.body).toBeUndefined();
     });
   });
 });
@@ -166,7 +174,10 @@ describe('given missing authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
+        "body": {
+          "error": "invalid_client",
+          "error_description": "Authorization token not provided",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -198,7 +209,10 @@ describe('given expired authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
+        "body": {
+          "error": "invalid_token",
+          "error_description": "Token is expired",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -230,7 +244,7 @@ describe('given non-admin authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -256,8 +270,11 @@ describe('given invalid authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_token",
+        "error_description": "Invalid authorization token",
+      }
+    `);
   });
 });

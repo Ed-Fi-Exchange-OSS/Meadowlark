@@ -28,18 +28,18 @@ describe('when getting the XSD metadata URL', () => {
   });
   it('returns the expected JSON output', () => {
     expect(response.body).toMatchInlineSnapshot(`
-      "[
+      [
         {
-          "name": "Descriptors",
           "endpointUri": "http://l:1/local/metadata/descriptors/swagger.json",
-          "prefix": ""
+          "name": "Descriptors",
+          "prefix": "",
         },
         {
-          "name": "Resources",
           "endpointUri": "http://l:1/local/metadata/resources/swagger.json",
-          "prefix": ""
-        }
-      ]"
+          "name": "Resources",
+          "prefix": "",
+        },
+      ]
     `);
   });
 });

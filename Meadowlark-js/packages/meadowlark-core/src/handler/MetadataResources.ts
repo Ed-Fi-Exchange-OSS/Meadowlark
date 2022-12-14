@@ -5,47 +5,42 @@
 
 import { getOAuthTokenURL } from '../AuthenticationSettings';
 
-export const CreateApiVersionObject = (serverBaseUrl: string) => `{
-    "version": "5.3",
-    "informationalVersion": "5.3",
-    "suite": "3",
-    "build": "5.3.663.0",
-    "apiMode": "Sandbox",
-    "dataModels": [
-      {
-        "name": "Ed-Fi",
-        "version": "3.3.1-b"
-      }
-    ],
-    "urls": {
-      "dependencies": "${serverBaseUrl}/metadata/data/v3/dependencies",
-      "openApiMetadata": "${serverBaseUrl}/metadata/",
-      "oauth": "${getOAuthTokenURL()}",
-      "dataManagementApi": "${serverBaseUrl}/v3.3b/",
-      "xsdMetadata": "${serverBaseUrl}/metadata/xsd"
-    }
-  }`;
+export const CreateApiVersionObject = (serverBaseUrl: string) => ({
+  version: '1.0.0',
+  apiMode: 'SharedInstance',
+  dataModels: [
+    {
+      name: 'Ed-Fi',
+      version: '3.3.1-b',
+    },
+  ],
+  urls: {
+    dependencies: `${serverBaseUrl}/metadata/data/v3/dependencies`,
+    openApiMetadata: `${serverBaseUrl}/metadata/`,
+    oauth: getOAuthTokenURL(),
+    dataManagementApi: `${serverBaseUrl}/v3.3b/`,
+    xsdMetadata: `${serverBaseUrl}/metadata/xsd`,
+  },
+});
 
-export const OpenApiListTemplate = `[
+export const OpenApiListTemplate = (serverBaseUrl: string) => [
   {
-    "name": "Descriptors",
-    "endpointUri": "{{ baseUrl }}/metadata/descriptors/swagger.json",
-    "prefix": ""
+    name: 'Descriptors',
+    endpointUri: `${serverBaseUrl}/metadata/descriptors/swagger.json`,
+    prefix: '',
   },
   {
-    "name": "Resources",
-    "endpointUri": "{{ baseUrl }}/metadata/resources/swagger.json",
-    "prefix": ""
-  }
-]`;
+    name: 'Resources',
+    endpointUri: `${serverBaseUrl}/metadata/resources/swagger.json`,
+    prefix: '',
+  },
+];
 
-export const XsdTemplate = `
-[
+export const XsdTemplate = [
   {
-    "description": "Core schema (Ed-Fi) files for the data model",
-    "name": "ed-fi",
-    "version": "3.3.1-b",
-    "files": "https://api.ed-fi.org/v5.3/api/metadata/xsd/ed-fi/files"
-  }
-]
-`;
+    description: 'Core schema (Ed-Fi) files for the data model',
+    name: 'ed-fi',
+    version: '3.3.1-b',
+    files: 'https://api.ed-fi.org/v5.3/api/metadata/xsd/ed-fi/files',
+  },
+];

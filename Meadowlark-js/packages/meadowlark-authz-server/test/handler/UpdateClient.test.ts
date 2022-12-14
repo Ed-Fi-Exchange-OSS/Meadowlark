@@ -60,7 +60,7 @@ describe('given valid admin user but authorization store is going to fail', () =
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -98,7 +98,7 @@ describe('given authorization store succeeds on update', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -136,7 +136,7 @@ describe('given authorization store fails update with client id not found', () =
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -161,7 +161,10 @@ describe('given missing authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
+        "body": {
+          "error": "invalid_client",
+          "error_description": "Authorization token not provided",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -193,7 +196,10 @@ describe('given expired authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
+        "body": {
+          "error": "invalid_token",
+          "error_description": "Token is expired",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -225,7 +231,7 @@ describe('given non-admin authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -251,9 +257,12 @@ describe('given invalid authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_token",
+        "error_description": "Invalid authorization token",
+      }
+    `);
   });
 });
 
@@ -296,7 +305,11 @@ describe('given update has missing client id', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing client id"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Missing client id",
+      }
+    `);
   });
 });
 
@@ -339,7 +352,11 @@ describe('given update has missing body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing body"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Missing body",
+      }
+    `);
   });
 });
 
@@ -383,7 +400,11 @@ describe('given update has malformed json body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Malformed body: Unexpected token b in JSON at position 2"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Malformed body: Unexpected token b in JSON at position 2",
+      }
+    `);
   });
 });
 
@@ -427,9 +448,26 @@ describe('given update has well-formed but invalid json body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"[{"message":"{requestBody} must have required property 'clientName'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'roles'","path":"{requestBody}","context":{"errorType":"required"}}]"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'clientName'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'roles'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -463,6 +501,6 @@ describe('given update throws internal error', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });

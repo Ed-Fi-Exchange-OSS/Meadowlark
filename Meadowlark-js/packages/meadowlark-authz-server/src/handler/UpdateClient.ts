@@ -10,7 +10,7 @@ import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/Authorizat
 import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
-import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
+import { writeDebugObject, writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 import { BodyValidation, validateUpdateClientBody } from '../validation/BodyValidation';
 import { clientIdFrom } from '../Utility';
 
@@ -30,38 +30,38 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
     );
 
     if (errorResponse != null) {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', errorResponse.statusCode, errorResponse.body);
+      writeDebugObject(moduleName, authorizationRequest, 'updateClient', errorResponse.statusCode, errorResponse.body);
       return errorResponse;
     }
 
     const pathExpression = /\/(?<oauth>[^/]+)\/(?<client>[^/]+)\/((?<clientId>[^/]*$))?/gm;
     const clientId: string = clientIdFrom(pathExpression, authorizationRequest.path);
     if (clientId === '') {
-      const message = 'Missing client id';
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, message);
-      return { body: JSON.stringify({ message }), statusCode: 400 };
+      const error = 'Missing client id';
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, error);
+      return { body: { error }, statusCode: 400 };
     }
 
     if (authorizationRequest.body == null) {
-      const message = 'Missing body';
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, message);
-      return { body: JSON.stringify({ message }), statusCode: 400 };
+      const error = 'Missing body';
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, error);
+      return { body: { error }, statusCode: 400 };
     }
 
     let parsedBody: any = {};
     try {
       parsedBody = JSON.parse(authorizationRequest.body);
-    } catch (error) {
-      const message = `Malformed body: ${error.message}`;
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, message);
-      return { body: JSON.stringify({ message }), statusCode: 400 };
+    } catch (exception) {
+      const error = `Malformed body: ${exception.message}`;
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, exception);
+      return { body: { error }, statusCode: 400 };
     }
 
     const validation: BodyValidation = validateUpdateClientBody(parsedBody);
     if (!validation.isValid) {
-      writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 400, validation.failureMessage);
+      writeDebugObject(moduleName, authorizationRequest, 'updateClient', 400, validation.failureMessage);
       return {
-        body: validation.failureMessage,
+        body: { error: validation.failureMessage },
         statusCode: 400,
       };
     }
@@ -82,18 +82,18 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
 
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 204);
-      return { body: '', statusCode: 204 };
+      return { statusCode: 204 };
     }
 
     if (response === 'UPDATE_FAILED_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 404);
-      return { body: '', statusCode: 404 };
+      return { statusCode: 404 };
     }
 
     writeDebugStatusToLog(moduleName, authorizationRequest, 'updateClient', 500);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   } catch (e) {
     writeErrorToLog(moduleName, authorizationRequest.traceId, 'updateClient', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

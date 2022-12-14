@@ -7,7 +7,6 @@ import { getBooleanFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
-import { IntrospectedToken } from './IntrospectedToken';
 import { getTokenAudience, getTokenIssuer } from './TokenSettings';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
@@ -15,6 +14,7 @@ import { JwtStatus } from './JwtStatus';
 import { verifyJwt } from './JwtAction';
 import { signingKey } from '../model/SigningKey';
 import { admin1, verifyOnly1 } from './HardcodedCredential';
+import { IntrospectionResponse } from '../model/TokenResponse';
 
 export function hasAdminRole(roles: string[]): boolean {
   return roles.some((role) => role.toLocaleLowerCase() === 'admin');
@@ -36,7 +36,7 @@ export function validateTokenForAccess(authorizationHeader: string | undefined, 
       isValid: false,
       errorResponse: {
         statusCode: 401,
-        body: '{ "error": "invalid_client", "error_description": "Authorization token not provided" }',
+        body: { error: 'invalid_client', error_description: 'Authorization token not provided' },
         headers: { 'WWW-Authenticate': 'Bearer' },
       },
     };
@@ -47,7 +47,7 @@ export function validateTokenForAccess(authorizationHeader: string | undefined, 
       isValid: false,
       errorResponse: {
         statusCode: 401,
-        body: '{ "error": "invalid_token", "error_description": "Token is expired" }',
+        body: { error: 'invalid_token', error_description: 'Token is expired' },
         headers: { 'WWW-Authenticate': 'Bearer' },
       },
     };
@@ -61,7 +61,7 @@ export function validateTokenForAccess(authorizationHeader: string | undefined, 
     isValid: false,
     errorResponse: {
       statusCode: 401,
-      body: '{ "error": "invalid_token", "error_description": "Invalid authorization token" }',
+      body: { error: 'invalid_token', error_description: 'Invalid authorization token' },
       headers: { 'WWW-Authenticate': 'Bearer' },
     },
   };
@@ -78,7 +78,6 @@ export function validateAdminTokenForAccess(
   if (!hasAdminRole(validateTokenResult.roles)) {
     return {
       statusCode: 403,
-      body: '',
       headers: { 'WWW-Authenticate': 'Bearer' },
     };
   }
@@ -113,8 +112,6 @@ async function isValidClientId(clientId: string | undefined, traceId: string): P
   );
   return false;
 }
-
-export type IntrospectionResponse = { isValid: false } | { isValid: true; introspectedToken: IntrospectedToken };
 
 /*
  * Verifies that a bearer token is valid, not expired, etc. Returns parsed claim data

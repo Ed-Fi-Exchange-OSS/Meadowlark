@@ -59,17 +59,15 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
 
   if (response === 'QUERY_FAILURE_AUTHORIZATION') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 400);
-
-    return { body: JSON.stringify(documents), statusCode: 400, headers: frontendRequest.middleware.headerMetadata };
+    return { body: documents, statusCode: 400, headers: frontendRequest.middleware.headerMetadata };
   }
 
   if (response === 'UNKNOWN_FAILURE') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 500);
-    return { body: '', statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
+    return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
-  const body = JSON.stringify(documents);
 
   const headers = {
     ...frontendRequest.middleware.headerMetadata,
@@ -77,7 +75,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
   };
 
   return {
-    body,
+    body: documents,
     statusCode: 200,
     headers,
   };

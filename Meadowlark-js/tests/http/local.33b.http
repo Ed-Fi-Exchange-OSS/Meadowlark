@@ -124,7 +124,7 @@ authorization: bearer {{authToken1}}
     "contentIdentifier": "933zsd4350",
     "namespace": "43210",
     "shortDescription": "abc",
-    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "contentClassDescriptor": "iuri://ed-fi.org/ContentClassDescriptor#Presentation",
     "learningResourceMetadataURI": "21430"
 }
 
@@ -253,7 +253,7 @@ authorization: bearer {{authToken1}}
 ### Succeeds despite intervention code not existing - note uses client4 which has reference validation turned off
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
-authorization: bearer {{authToken4}}
+authorization: bearer {{authToken1}}
 
 { 
     "studentReference": {

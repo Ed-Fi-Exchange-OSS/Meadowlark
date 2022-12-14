@@ -11,7 +11,7 @@ import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
  *
  * Validates the request body for the resource. If invalid, returns an error message.
  */
-export async function validateDocument(body: object, matchingMetaEdModel: TopLevelEntity): Promise<string> {
+export async function validateDocument(body: object, matchingMetaEdModel: TopLevelEntity): Promise<object | null> {
   const validationErrors: ValidationError[] | null = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
-  return validationErrors == null ? '' : JSON.stringify({ message: validationErrors });
+  return validationErrors == null ? null : { error: validationErrors };
 }

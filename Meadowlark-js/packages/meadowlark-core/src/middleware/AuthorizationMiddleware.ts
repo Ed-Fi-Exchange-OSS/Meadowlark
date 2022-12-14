@@ -71,19 +71,19 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
 
     if (ownAccessTokenResponse.status === 401 || ownAccessTokenResponse.status === 404) {
       writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, {
-        message: 'OAuth server responded that configuration of Meadowlark client_id or client_secret is not valid',
+        error: 'OAuth server responded that configuration of Meadowlark client_id or client_secret is not valid',
       });
 
       return {
         success: false,
         errorResponse: {
-          body: JSON.stringify({ message: 'Invalid Meadowlark to OAuth server configuration' }),
+          body: { error: 'Invalid Meadowlark to OAuth server configuration' },
           statusCode: 500,
         },
       };
     }
     writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, {
-      message: `OAuth server responded with unexpected status code ${ownAccessTokenResponse.status} on Meadowlark own token request`,
+      error: `OAuth server responded with unexpected status code ${ownAccessTokenResponse.status} on Meadowlark own token request`,
     });
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'requestOwnAccessToken', 500, e);
@@ -92,7 +92,7 @@ async function requestOwnAccessToken(frontendRequest: FrontendRequest): Promise<
   return {
     success: false,
     errorResponse: {
-      body: JSON.stringify({ message: 'Request from Meadowlark to OAuth server failed' }),
+      body: { error: 'Request from Meadowlark to OAuth server failed' },
       statusCode: 502,
     },
   };
@@ -129,7 +129,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
     return {
       frontendRequest,
       frontendResponse: {
-        body: '{ message: "Invalid authorization header" }',
+        body: { error: 'Invalid authorization header' },
         statusCode,
         headers: frontendRequest.middleware.headerMetadata,
       },
@@ -209,7 +209,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
         400,
         'verification response returned 400 - Client-provided token is not a JWT',
       );
-      return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
+      return { frontendRequest, frontendResponse: { statusCode: 401 } };
     }
 
     if (verificationResponse.status === 200) {
@@ -220,7 +220,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
       if (!verificationResponse.data?.active) {
         // Client-provided token accepted by OAuth server but not active
         writeDebugStatusToLog(moduleName, frontendRequest, 'authorize', 401, 'Client-provided token is inactive');
-        return { frontendRequest, frontendResponse: { body: '', statusCode: 401 } };
+        return { frontendRequest, frontendResponse: { statusCode: 401 } };
       }
 
       // Return client id and Meadowlark authorization strategy (via roles in JWT) to middleware stack
@@ -248,10 +248,10 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
       502,
       `verification response returned ${verificationResponse.status} unexpectedly`,
     );
-    return { frontendRequest, frontendResponse: { body: '', statusCode: 502 } };
+    return { frontendRequest, frontendResponse: { statusCode: 502 } };
   } catch (e) {
     // Unexpected failure communicating with OAuth server
     writeErrorToLog(moduleName, frontendRequest.traceId, 'authorize', 500, e);
-    return { frontendRequest, frontendResponse: { body: '', statusCode: 500 } };
+    return { frontendRequest, frontendResponse: { statusCode: 500 } };
   }
 }

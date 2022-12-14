@@ -12,5 +12,5 @@ export type UpsertResult = {
     | 'UPDATE_FAILURE_REFERENCE'
     | 'UPSERT_FAILURE_AUTHORIZATION'
     | 'UNKNOWN_FAILURE';
-  failureMessage?: string;
+  failureMessage?: string | object;
 };

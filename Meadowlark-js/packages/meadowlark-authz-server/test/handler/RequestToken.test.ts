@@ -11,6 +11,7 @@ import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { admin1 } from '../../src/security/HardcodedCredential';
 import { hashClientSecretHexString } from '../../src/security/HashClientSecret';
+import { TokenSuccessResponse } from '../../src/model/TokenResponse';
 
 process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
@@ -58,7 +59,7 @@ describe('given authorization store is going to fail', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -91,9 +92,27 @@ describe('given request body is invalid x-www-form-urlencoded', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'grant_type'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"'Not form-urlencoded' property is not expected to be here\\",\\"suggestion\\":\\"Did you mean property 'client_id'?\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"additionalProperties\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'grant_type'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "'Not form-urlencoded' property is not expected to be here",
+            "path": "{requestBody}",
+            "suggestion": "Did you mean property 'client_id'?",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -126,9 +145,26 @@ describe('given request body is valid x-www-form-urlencoded but without expected
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'grant_type'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"'abc' property is not expected to be here\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"additionalProperties\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'grant_type'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "'abc' property is not expected to be here",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -161,9 +197,33 @@ describe('given request body is valid x-www-form-urlencoded but has client_id wi
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'client_secret'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"{requestBody} must not be valid\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"not\\"}},{\\"message\\":\\"{requestBody} must have required property 'grant_type'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'client_secret'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "not",
+            },
+            "message": "{requestBody} must not be valid",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'grant_type'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -196,9 +256,26 @@ describe('given request body is valid x-www-form-urlencoded but has client_id an
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'client_secret'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"{requestBody} must not be valid\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"not\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'client_secret'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "not",
+            },
+            "message": "{requestBody} must not be valid",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -231,7 +308,13 @@ describe('given request body has x-www-form-urlencoded grant_type and no authori
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Missing authorization header"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "message": "Missing authorization header",
+        },
+      }
+    `);
   });
 });
 
@@ -265,7 +348,13 @@ describe('given request body has x-www-form-urlencoded grant_type and invalid au
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Invalid authorization header"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "message": "Invalid authorization header",
+        },
+      }
+    `);
   });
 });
 
@@ -304,7 +393,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
   });
 
   it('returns an access token', () => {
-    const token = JSON.parse(response.body);
+    const token = response.body as TokenSuccessResponse;
     expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
     expect(token.token_type).toBe('bearer');
     expect(token.expires_in).toBeGreaterThan(166566000);
@@ -347,9 +436,23 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"'grant_type' property must be equal to one of the allowed values\\",\\"suggestion\\":\\"Did you mean 'client_credentials'?\\",\\"path\\":\\"{requestBody}.grant_type\\",\\"context\\":{\\"errorType\\":\\"enum\\",\\"allowedValues\\":[\\"client_credentials\\"]}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "allowedValues": [
+                "client_credentials",
+              ],
+              "errorType": "enum",
+            },
+            "message": "'grant_type' property must be equal to one of the allowed values",
+            "path": "{requestBody}.grant_type",
+            "suggestion": "Did you mean 'client_credentials'?",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -386,7 +489,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -423,7 +526,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -464,7 +567,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -508,7 +611,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid cred
   });
 
   it('returns an access token', () => {
-    const token = JSON.parse(response.body);
+    const token = response.body as TokenSuccessResponse;
     expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
     expect(token.token_type).toBe('bearer');
     expect(token.expires_in).toBeGreaterThan(166566000);
@@ -545,7 +648,13 @@ describe('given request body is invalid json', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Malformed body: Unexpected token N in JSON at position 0"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "message": "Malformed body: Unexpected token N in JSON at position 0",
+        },
+      }
+    `);
   });
 });
 
@@ -578,9 +687,26 @@ describe('given request body is valid json but without expected fields', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'grant_type'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"'abc' property is not expected to be here\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"additionalProperties\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'grant_type'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "'abc' property is not expected to be here",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -613,9 +739,33 @@ describe('given request body is valid json with client_id but without grant_type
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'client_secret'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"{requestBody} must not be valid\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"not\\"}},{\\"message\\":\\"{requestBody} must have required property 'grant_type'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'client_secret'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "not",
+            },
+            "message": "{requestBody} must not be valid",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'grant_type'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -648,9 +798,26 @@ describe('given request body is valid json with client_id and grant_type but wit
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'client_secret'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"{requestBody} must not be valid\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"not\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'client_secret'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "not",
+            },
+            "message": "{requestBody} must not be valid",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -683,7 +850,13 @@ describe('given request body is json with grant_type and no authorization header
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Missing authorization header"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "message": "Missing authorization header",
+        },
+      }
+    `);
   });
 });
 
@@ -717,7 +890,13 @@ describe('given request body is json with grant_type and invalid authorization h
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Invalid authorization header"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "message": "Invalid authorization header",
+        },
+      }
+    `);
   });
 });
 
@@ -753,7 +932,7 @@ describe('given request body is json with valid hardcoded credential', () => {
     });
 
     it('returns an access token', () => {
-      const token = JSON.parse(response.body);
+      const token = response.body as TokenSuccessResponse;
       expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
       expect(token.token_type).toBe('bearer');
       expect(token.expires_in).toBeGreaterThan(166566000);
@@ -791,7 +970,7 @@ describe('given request body is json with valid hardcoded credential', () => {
     });
 
     it('returns an empty message body', () => {
-      expect(response.body).toBe('');
+      expect(response.body).toBeUndefined();
     });
   });
 });
@@ -827,9 +1006,23 @@ describe('given request body is json with valid hardcoded credential but grant_t
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"'grant_type' property must be equal to one of the allowed values\\",\\"suggestion\\":\\"Did you mean 'client_credentials'?\\",\\"path\\":\\"{requestBody}.grant_type\\",\\"context\\":{\\"errorType\\":\\"enum\\",\\"allowedValues\\":[\\"client_credentials\\"]}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "allowedValues": [
+                "client_credentials",
+              ],
+              "errorType": "enum",
+            },
+            "message": "'grant_type' property must be equal to one of the allowed values",
+            "path": "{requestBody}.grant_type",
+            "suggestion": "Did you mean 'client_credentials'?",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -862,7 +1055,7 @@ describe('given request body is json with credential but authorization datastore
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -895,7 +1088,7 @@ describe('given request body is json with credential not in authorization datast
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -932,7 +1125,7 @@ describe('given request body is json with credential client_id in authorization 
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -976,7 +1169,7 @@ describe('given request body is json with valid credential in authorization data
   });
 
   it('returns an access token', () => {
-    const token = JSON.parse(response.body);
+    const token = response.body as TokenSuccessResponse;
     expect(token.access_token).toMatch(/^eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9/);
     expect(token.token_type).toBe('bearer');
     expect(token.expires_in).toBeGreaterThan(166566000);

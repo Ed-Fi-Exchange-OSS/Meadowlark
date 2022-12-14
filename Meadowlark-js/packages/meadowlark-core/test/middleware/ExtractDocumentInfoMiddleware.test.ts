@@ -69,7 +69,7 @@ describe('given a no document info response from extractDocumentInfo', () => {
   });
 
   it('returns an empty body', () => {
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 

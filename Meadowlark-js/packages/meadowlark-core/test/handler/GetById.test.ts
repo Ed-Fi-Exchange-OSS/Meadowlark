@@ -151,6 +151,10 @@ describe('given a valid request', () => {
   });
 
   it('returns expected document', () => {
-    expect(response.body).toEqual(JSON.stringify(document));
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "document": "d",
+      }
+    `);
   });
 });

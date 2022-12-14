@@ -52,7 +52,7 @@ describe('given persistence is going to fail', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -90,10 +90,18 @@ describe('given successful query result', () => {
   });
 
   it('returns 1 result', () => {
-    expect(JSON.parse(response.body)).toHaveLength(1);
+    expect(response.body).toHaveLength(1);
   });
 
-  it('returns good result', () => {
-    expect(JSON.parse(response.body)[0].goodResult).toEqual('result');
+  it('returns expected object', () => {
+    expect(response.body).toMatchInlineSnapshot(
+      `
+      [
+        {
+          "goodResult": "result",
+        },
+      ]
+    `,
+    );
   });
 });

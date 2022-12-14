@@ -65,7 +65,7 @@ describe('given a no match response from findMetaEdModel', () => {
   });
 
   it('returns an empty body', () => {
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 

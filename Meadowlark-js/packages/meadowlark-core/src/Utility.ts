@@ -19,12 +19,9 @@ export function omitEmptyArrays(_: string, value: any): any {
 }
 
 /** Creates a message structured similar to that provided by ASP.NET APIs */
-export function createInvalidRequestResponse(modelState: { [key: string]: string[] }): string {
-  return JSON.stringify(
-    {
-      message: 'The request is invalid.',
-      modelState,
-    },
-    omitEmptyArrays,
-  );
+export function createInvalidRequestResponse(modelState: { [key: string]: string[] }): object {
+  return {
+    error: 'The request is invalid.',
+    modelState,
+  };
 }

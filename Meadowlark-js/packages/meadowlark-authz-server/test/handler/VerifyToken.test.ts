@@ -8,8 +8,7 @@ import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPlugin
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
-import { createAuthorizationHeader, createTokenString, ONE_HOUR_AGO } from '../security/TestHelper';
-import { getTokenAudience, getTokenIssuer } from '../../src/security/TokenSettings';
+import { createAuthorizationHeader, createTokenString } from '../security/TestHelper';
 
 process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
@@ -56,9 +55,12 @@ describe('given bearer token is invalid', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"statusCode":401,"body":"{ \\"error\\": \\"invalid_token\\", \\"error_description\\": \\"Invalid authorization token\\" }","headers":{"WWW-Authenticate":"Bearer"}}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_token",
+        "error_description": "Invalid authorization token",
+      }
+    `);
   });
 });
 
@@ -95,7 +97,11 @@ describe('given content type is not x-www-form-urlencoded', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Requires application/x-www-form-urlencoded content type"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Requires application/x-www-form-urlencoded content type",
+      }
+    `);
   });
 });
 
@@ -128,9 +134,27 @@ describe('given content type is x-www-form-urlencoded but data is not', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'token'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"'not form encoded' property is not expected to be here\\",\\"suggestion\\":\\"Did you mean property 'token'?\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"additionalProperties\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'token'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "'not form encoded' property is not expected to be here",
+            "path": "{requestBody}",
+            "suggestion": "Did you mean property 'token'?",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -163,9 +187,27 @@ describe('given request body is valid x-www-form-urlencoded but without expected
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"error":"[{\\"message\\":\\"{requestBody} must have required property 'token'\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"required\\"}},{\\"message\\":\\"'not_token' property is not expected to be here\\",\\"suggestion\\":\\"Did you mean property 'token'?\\",\\"path\\":\\"{requestBody}\\",\\"context\\":{\\"errorType\\":\\"additionalProperties\\"}}]"}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'token'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "'not_token' property is not expected to be here",
+            "path": "{requestBody}",
+            "suggestion": "Did you mean property 'token'?",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -198,7 +240,11 @@ describe('given request body provided invalid token for introspection', () => {
   });
 
   it('returns error message', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"error":"Invalid token provided for introspection"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid token provided for introspection",
+      }
+    `);
   });
 });
 
@@ -235,7 +281,7 @@ describe('given vendor role provided token for introspection but client ids do n
   });
 
   it('returns empty body', () => {
-    expect(response.body).toBe('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -259,7 +305,7 @@ describe('given vendor role provided token for introspection and client ids matc
     // Act
     response = await verifyToken({
       ...authorizationRequest,
-      body: `token=${createTokenString('clientId', ['vendor'])}`,
+      body: `token=${createTokenString('clientId', ['vendor'], 12345000, 'i', 'a', 67890)}`,
     });
   });
 
@@ -272,17 +318,24 @@ describe('given vendor role provided token for introspection and client ids matc
   });
 
   it('returns response', () => {
-    const parsedResponseBody = JSON.parse(response.body);
-    expect(parsedResponseBody.active).toBe(true);
-    expect(parsedResponseBody.aud).toBe(getTokenAudience());
-    expect(parsedResponseBody.client_id).toBe('clientId');
-    expect(parsedResponseBody.iss).toBe(getTokenIssuer());
-    expect(parsedResponseBody.roles).toHaveLength(1);
-    expect(parsedResponseBody.roles[0]).toBe('vendor');
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "active": false,
+        "aud": "a",
+        "client_id": "clientId",
+        "exp": 12345,
+        "iat": 67890,
+        "iss": "i",
+        "roles": [
+          "vendor",
+        ],
+        "sub": "",
+      }
+    `);
   });
 });
 
-describe('given admin role provided token for introspection and client ids do not match', () => {
+describe('given admin role provided a token from a different client for introspection', () => {
   let response: AuthorizationResponse;
   let mockAuthorizationStore: any;
 
@@ -306,7 +359,7 @@ describe('given admin role provided token for introspection and client ids do no
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: createAuthorizationHeader('adminClientId', ['admin']),
       },
-      body: `token=${createTokenString('clientId', ['vendor'])}`,
+      body: `token=${createTokenString('clientId', ['vendor'], 1671118426, 'a', 'i', 1671114826)}`,
     });
   });
 
@@ -319,13 +372,20 @@ describe('given admin role provided token for introspection and client ids do no
   });
 
   it('returns response', () => {
-    const parsedResponseBody = JSON.parse(response.body);
-    expect(parsedResponseBody.active).toBe(true);
-    expect(parsedResponseBody.aud).toBe(getTokenAudience());
-    expect(parsedResponseBody.client_id).toBe('clientId');
-    expect(parsedResponseBody.iss).toBe(getTokenIssuer());
-    expect(parsedResponseBody.roles).toHaveLength(1);
-    expect(parsedResponseBody.roles[0]).toBe('vendor');
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "active": false,
+        "aud": "i",
+        "client_id": "clientId",
+        "exp": 1671118,
+        "iat": 1671114826,
+        "iss": "a",
+        "roles": [
+          "vendor",
+        ],
+        "sub": "",
+      }
+    `);
   });
 });
 
@@ -353,7 +413,7 @@ describe('given admin role provided expired token for introspection', () => {
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: createAuthorizationHeader('adminClientId', ['admin']),
       },
-      body: `token=${createTokenString('clientId', ['vendor'], ONE_HOUR_AGO)}`,
+      body: `token=${createTokenString('clientId', ['vendor'], 1671111226, 'i', 'a', 1671114826)}`,
     });
   });
 
@@ -366,11 +426,19 @@ describe('given admin role provided expired token for introspection', () => {
   });
 
   it('returns response', () => {
-    const parsedResponseBody = JSON.parse(response.body);
-    expect(parsedResponseBody.active).toBe(false);
-    expect(parsedResponseBody.aud).toBeUndefined();
-    expect(parsedResponseBody.client_id).toBeUndefined();
-    expect(parsedResponseBody.iss).toBeUndefined();
-    expect(parsedResponseBody.roles).toBeUndefined();
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "active": false,
+        "aud": "a",
+        "client_id": "clientId",
+        "exp": 1671111,
+        "iat": 1671114826,
+        "iss": "i",
+        "roles": [
+          "vendor",
+        ],
+        "sub": "",
+      }
+    `);
   });
 });

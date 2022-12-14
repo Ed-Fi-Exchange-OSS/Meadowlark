@@ -36,7 +36,7 @@ export async function metaed(_frontendRequest: FrontendRequest): Promise<Fronten
   const descriptor: string[] = Array.from(entity.descriptor.values()).map((x) => x.metaEdName);
   const domainEntity: string[] = Array.from(entity.domainEntity.values()).map((x) => x.metaEdName);
   return {
-    body: JSON.stringify({ projectName, projectVersion, common, descriptor, domainEntity }),
+    body: { projectName, projectVersion, common, descriptor, domainEntity },
     statusCode: 200,
     headers: {
       'X-MetaEd-Project-Name': metaEdConfiguration.projects[0].projectName,
@@ -159,10 +159,9 @@ export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<
   writeRequestToLog(moduleName, frontendRequest, 'openApiUrlList');
 
   const baseUrl = buildBaseUrlFromRequest(frontendRequest);
-  const baseUrlToken = /{{ baseUrl }}/g;
 
   return {
-    body: OpenApiListTemplate.replace(baseUrlToken, baseUrl),
+    body: OpenApiListTemplate(baseUrl),
     statusCode: 200,
   };
 }
