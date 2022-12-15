@@ -73,30 +73,6 @@ describe('When querying for a resource that has multiple references to resources
               expect(response.body).not.toEqual([]);
             });
         });
-
-        it('should return results', async () => {
-          await baseURLRequest()
-            .get(`/v3.3b/ed-fi/studentSchoolAssociations?entryDate=2010-01-01`)
-            .auth(await getAccessToken('host'), { type: 'bearer' })
-            .expect(200)
-            .then((response) => {
-              expect(response.body).toEqual(
-                expect.arrayContaining([
-                  expect.objectContaining({
-                    entryDate: '2010-01-01',
-                    entryGradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#Eight Grade',
-                    id: expect.any(String),
-                    schoolReference: {
-                      schoolId,
-                    },
-                    studentReference: {
-                      studentUniqueId,
-                    },
-                  }),
-                ]),
-              );
-            });
-        });
       });
 
       describe('when querying all results', () => {
@@ -126,10 +102,9 @@ describe('When querying for a resource that has multiple references to resources
       });
 
       describe('when filtering by non existing reference', () => {
-        it('should return empty array', async () => {
-          // Same scenario as skip
+        it.skip('should return empty array', async () => {
           await baseURLRequest()
-            .get(`/v3.3b/ed-fi/studentSchoolAssociations?entryDate=2012-01-01`)
+            .get(`/v3.3b/ed-fi/studentSchoolAssociations?studentReference.studentUniqueId=n0tEx1sts`)
             .auth(await getAccessToken('host'), { type: 'bearer' })
             .expect(200)
             .then((response) => {
