@@ -21,7 +21,7 @@ export async function createResource({
     .send(body)
     .then((response) => {
       if (response.body) {
-        console.error(response.body);
+        console.error(`Error on ${endpoint}:\n${response.body}`);
       }
       expect(response.status).toEqual(201);
 

@@ -18,6 +18,19 @@ export async function createContentClassDescriptor(): Promise<string> {
   });
 }
 
+export async function createGradeLevelDescriptor(): Promise<string> {
+  return createResource({
+    endpoint: 'gradeLevelDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'Eighth',
+      description: 'Eight Grade',
+      shortDescription: '8°',
+      namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+    },
+  });
+}
+
 export async function createCountry(): Promise<string> {
   return createResource({
     endpoint: 'countryDescriptors',
@@ -54,6 +67,19 @@ export async function createSchool(schoolId: number): Promise<string> {
           gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
         },
       ],
+    },
+  });
+}
+
+export async function createStudent(studentUniqueId: string) {
+  return createResource({
+    endpoint: 'students',
+    role: 'host',
+    body: {
+      studentUniqueId,
+      birthDate: '2010-01-01',
+      firstName: 'Automation',
+      lastSurname: 'Student',
     },
   });
 }
