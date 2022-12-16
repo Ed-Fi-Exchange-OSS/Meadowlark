@@ -17,8 +17,6 @@ export async function anonymizeAndLogRequestBody({
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
 
   if (isDebugEnabled() && !frontendRequest.middleware.resourceInfo.isDescriptor) {
-    writeRequestToLog(moduleName, frontendRequest, 'anonymizeAndLogRequestBody');
-
     const copyOfParsedBody = { ...frontendRequest.middleware.parsedBody };
     Object.keys(copyOfParsedBody).forEach((key) => {
       copyOfParsedBody[key] = null;
