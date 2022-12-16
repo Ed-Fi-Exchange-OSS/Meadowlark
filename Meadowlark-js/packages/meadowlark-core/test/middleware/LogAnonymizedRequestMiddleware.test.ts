@@ -88,10 +88,13 @@ describe('given previous middleware has created a response with debug log level 
 
     await anonymizeAndLogRequestBody(resultChain);
 
-    expect(loggerSpy).toHaveBeenCalledWith(
-      `Anonymized request body: {"studentUniqueId":null,"firstName":null,"lastSurname":null,"birthDate":null,"birthCountryDescriptor":null}`,
-      traceId,
-    );
+    expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
+      birthCountryDescriptor: null,
+      birthDate: null,
+      firstName: null,
+      lastSurname: null,
+      studentUniqueId: null,
+    });
   });
 });
 
