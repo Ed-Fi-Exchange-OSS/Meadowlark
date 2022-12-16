@@ -128,7 +128,10 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Query.query(model.frontendRequest);
+    const queryResponse = await Query.query(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: queryResponse });
+    return queryResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'query', 500, e);
     return { statusCode: 500 };
@@ -149,7 +152,10 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await GetById.getById(model.frontendRequest);
+    const getByIdResponse = await GetById.getById(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: getByIdResponse });
+    return getByIdResponse;
   } catch (e) {
     writeErrorToLog('FrontendFacade', frontendRequest.traceId, 'getById', 500, e);
     return { statusCode: 500 };
@@ -170,7 +176,10 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
       return await query(frontendRequest);
     }
 
-    return await getById(frontendRequest);
+    const getResponse = await getById(frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: getResponse });
+    return getResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'get', 500, e);
     return { statusCode: 500 };
@@ -191,7 +200,10 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Update.update(model.frontendRequest);
+    const updateResult = await Update.update(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: updateResult });
+    return updateResult;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);
     return { statusCode: 500 };
@@ -212,7 +224,10 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Upsert.upsert(model.frontendRequest);
+    const upsertResponse = await Upsert.upsert(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: upsertResponse });
+    return upsertResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, e);
     return { statusCode: 500 };
@@ -233,7 +248,10 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Delete.deleteIt(model.frontendRequest);
+    const deleteResponse = await Delete.deleteIt(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: deleteResponse });
+    return deleteResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, e);
     return { statusCode: 500 };
