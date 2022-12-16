@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - "Meadowlark-js/**"
-      - ".github"
+      - ".github/**"
   workflow_dispatch:
 
 env:
@@ -26,6 +26,7 @@ jobs:
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@latest
 
   analyze-code:
+    if: github.event_name == 'pull_request'
     name: Analyze Code Dependencies
     runs-on: ubuntu-latest
     permissions:
