@@ -85,8 +85,8 @@ describe('given the new document has an invalid reference ', () => {
     mockDocumentStore.mockRestore();
   });
 
-  it('returns status 409', () => {
-    expect(response.statusCode).toEqual(409);
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
   });
 
   it('returns an appropriate message', () => {
