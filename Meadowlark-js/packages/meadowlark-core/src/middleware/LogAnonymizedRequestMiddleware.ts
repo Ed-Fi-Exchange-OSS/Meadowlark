@@ -4,10 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
-import { writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
-
-const moduleName = 'core.middleware.ParseBodyMiddleware';
 
 export async function anonymizeAndLogRequestBody({
   frontendRequest,
