@@ -34,6 +34,7 @@
     "FASTIFY",
     "metaed",
     "teamcity",
+    "testcontainers",
     "uncapitalize"
   ],
   "git.ignoreLimitWarning": true,

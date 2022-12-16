@@ -2,7 +2,6 @@ const { defaults: tsjPreset } = require('ts-jest/presets');
 
 module.exports = {
   transform: tsjPreset.transform,
-  testEnvironment: 'node',
   preset: '@shelf/jest-mongodb',
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
