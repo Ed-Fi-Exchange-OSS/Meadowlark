@@ -56,16 +56,30 @@ describe('given a POST of a school followed by the PUT of the school with a chan
   });
 
   it('should return put success', async () => {
-    expect(updateResult.body).toEqual('');
+    expect(updateResult.body).toBeUndefined();
     expect(updateResult.statusCode).toBe(204);
-    expect(updateResult.headers?.Location).toMatchInlineSnapshot(`undefined`);
+    expect(updateResult.headers?.Location).toBeUndefined();
   });
 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
-    expect(getResult.body).toMatchInlineSnapshot(
-      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abcdefghijklmnopqrstuvwxyz","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
-    );
+    expect(getResult.body).toMatchInlineSnapshot(`
+      {
+        "educationOrganizationCategories": [
+          {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other",
+          },
+        ],
+        "gradeLevels": [
+          {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
+          },
+        ],
+        "id": "LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ",
+        "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
+        "schoolId": 123,
+      }
+    `);
     expect(getResult.statusCode).toBe(200);
   });
 });
