@@ -106,10 +106,7 @@ describe('When querying for a resource that has multiple references to resources
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/studentSchoolAssociations?studentReference.studentUniqueId=n0tEx1sts`)
             .auth(await getAccessToken('host'), { type: 'bearer' })
-            .expect(200)
-            .then((response) => {
-              expect(response.body).toEqual([]);
-            });
+            .expect(404);
         });
       });
     });
