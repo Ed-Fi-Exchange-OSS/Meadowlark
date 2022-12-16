@@ -48,8 +48,8 @@ describe('given persistence is going to throw a reference error on insert', () =
     mockDocumentStore.mockRestore();
   });
 
-  it('returns status 409', () => {
-    expect(response.statusCode).toEqual(409);
+  it('returns status 400', () => {
+    expect(response.statusCode).toEqual(400);
   });
 
   it('returns an appropriate message', () => {
