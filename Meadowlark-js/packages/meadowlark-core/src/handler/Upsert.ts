@@ -66,7 +66,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'INSERT_FAILURE_REFERENCE' || response === 'INSERT_FAILURE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, '', failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, 'reference error');
       return {
         body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
         statusCode: 409,

@@ -65,11 +65,10 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, '', failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'reference error');
       return {
-        // ??
         body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
-        statusCode: 400,
+        statusCode: 409,
         headers: headerMetadata,
       };
     }
