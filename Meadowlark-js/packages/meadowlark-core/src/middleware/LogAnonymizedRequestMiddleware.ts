@@ -22,7 +22,7 @@ export async function anonymizeAndLogRequestBody({
       copyOfParsedBody[key] = null;
     });
 
-    Logger.debug(`Anonymized request body: ${JSON.stringify(copyOfParsedBody)}`, frontendRequest.traceId);
+    Logger.debug('Anonymized request body: copyOfParsedBody', frontendRequest.traceId, copyOfParsedBody);
   }
 
   return { frontendRequest, frontendResponse: null };

@@ -112,7 +112,7 @@ content-type: application/json
 {{auth_header}}
 
 { 
-    "studentUniqueId": "abca123",
+    "studentUniqueId": "abc123",
     "firstName": "Hello",
     "lastSurname": "World",
     "birthDate": "2001-01-01",
