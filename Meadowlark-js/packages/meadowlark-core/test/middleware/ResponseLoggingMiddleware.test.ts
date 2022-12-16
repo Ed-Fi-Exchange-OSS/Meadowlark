@@ -42,6 +42,42 @@ describe('when logging the response', () => {
     });
   });
 
+  describe('given a resource that does not exist (404)', () => {
+    let loggerSpy: any;
+
+    beforeEach(() => {
+      loggerSpy = jest.spyOn(Logger, 'debug');
+      jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+    });
+
+    afterAll(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('logs the message body unchanged', async () => {
+      const traceId = 'traceId';
+      const body = {
+        error: 'this is not the real 404 message, but it is the real shape of the response',
+      };
+
+      const model: MiddlewareModel = {
+        frontendRequest: {
+          ...newFrontendRequest(),
+          traceId,
+        },
+        frontendResponse: {
+          ...newFrontendResponse(),
+          body,
+          statusCode: 404,
+        },
+      };
+
+      await logTheResponse(model);
+
+      expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 404', traceId, body);
+    });
+  });
+
   describe('given an error status code with no body', () => {
     let loggerSpy: any;
 
@@ -84,7 +120,7 @@ describe('when logging the response', () => {
     });
 
     it('logs the message body unchanged', async () => {
-      const traceId = 'traceid';
+      const traceId = 'traceId';
       const body = JSON.stringify({
         message: [
           {
@@ -195,7 +231,7 @@ describe('when logging the response', () => {
     });
 
     it('logs the message body without anonymization', async () => {
-      const traceId = 'traceid';
+      const traceId = 'traceId';
       const body = {
         error: {
           message: 'Reference validation failed',
