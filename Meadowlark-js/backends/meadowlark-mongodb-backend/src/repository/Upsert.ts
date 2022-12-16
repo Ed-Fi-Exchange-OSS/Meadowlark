@@ -65,7 +65,7 @@ export async function upsertDocument(
 
           upsertResult = {
             response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: { error: { message: 'Reference validation failed', ...failures } },
+            failureMessage: { error: { message: 'Reference validation failed', failures } },
           };
 
           await session.abortTransaction();

@@ -131,39 +131,33 @@ describe('when logging the response', () => {
       const traceId = 'traceId';
       const body = {
         error: {
-          '0': {
-            resourceName: 'Intervention',
-            identity: {
-              'educationOrganizationReference.educationOrganizationId': 123,
-              interventionIdentificationCode: '111',
-            },
-          },
-          '1': {
-            resourceName: 'Student',
-            identity: {
-              'studentReference.studentUniqueId': 'aaaa',
-            },
-          },
           message: 'Reference validation failed',
+          failures: [
+            {
+              resourceName: 'Intervention',
+              identity: {
+                'educationOrganizationReference.educationOrganizationId': 123,
+                interventionIdentificationCode: '111',
+              },
+            },
+          ],
         },
       };
 
       // In the expectedBody, the object values have been anonymized
       const expectedBody = {
-        '0': {
-          resourceName: 'Intervention',
-          identity: {
-            'educationOrganizationReference.educationOrganizationId': '*',
-            interventionIdentificationCode: '*',
-          },
+        error: {
+          message: 'Reference validation failed',
+          failures: [
+            {
+              resourceName: 'Intervention',
+              identity: {
+                'educationOrganizationReference.educationOrganizationId': '*',
+                interventionIdentificationCode: '*',
+              },
+            },
+          ],
         },
-        '1': {
-          resourceName: 'Student',
-          identity: {
-            'studentReference.studentUniqueId': '*',
-          },
-        },
-        message: 'Reference validation failed',
       };
 
       const model: MiddlewareModel = {
@@ -204,24 +198,16 @@ describe('when logging the response', () => {
       const traceId = 'traceid';
       const body = {
         error: {
-          '0': {
-            resourceName: 'ContentClassDescriptor',
-            identity: {
-              descriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
-            },
-          },
           message: 'Reference validation failed',
+          failures: [
+            {
+              resourceName: 'ContentClassDescriptor',
+              identity: {
+                descriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+              },
+            },
+          ],
         },
-      };
-
-      const expectedBody = {
-        '0': {
-          resourceName: 'ContentClassDescriptor',
-          identity: {
-            descriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
-          },
-        },
-        message: 'Reference validation failed',
       };
 
       const model: MiddlewareModel = {
@@ -238,11 +224,7 @@ describe('when logging the response', () => {
 
       await logTheResponse(model);
 
-      expect(loggerSpy).toHaveBeenCalledWith(
-        'core.middleware.ResponseLoggingMiddleware.logTheResponse 400',
-        traceId,
-        expectedBody,
-      );
+      expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 400', traceId, body);
     });
   });
 });

@@ -59,7 +59,7 @@ export async function updateDocumentById(
         Logger.debug(`${moduleName}.updateDocument: Inserting document id ${id} failed due to invalid references`, traceId);
         updateResult = {
           response: 'UPDATE_FAILURE_REFERENCE',
-          failureMessage: `Reference validation failed: ${failures.join(',')}`,
+          failureMessage: { error: { message: 'Reference validation failed', failures } },
         };
         await client.query('ROLLBACK');
         return updateResult;

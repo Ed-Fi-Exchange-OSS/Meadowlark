@@ -81,7 +81,7 @@ export async function upsertDocument(
         await client.query('ROLLBACK');
         return {
           response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
-          failureMessage: `Reference validation failed: ${failures.join(',')}`,
+          failureMessage: { error: { message: 'Reference validation failed', failures } },
         };
       }
     }

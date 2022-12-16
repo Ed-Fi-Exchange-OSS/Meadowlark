@@ -12,7 +12,8 @@ const moduleName = 'core.middleware.ResponseLoggingMiddleware';
 
 type ReferenceError = {
   error: {
-    [key: 'message' | string]: string | MissingIdentity;
+    message: string;
+    failures: MissingIdentity[];
   };
 };
 
@@ -23,20 +24,15 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
         message: frontendResponse?.body,
       });
     } else {
-      const body = R.clone((frontendResponse?.body as ReferenceError).error);
+      const body = R.clone(frontendResponse?.body as ReferenceError);
 
       const notADescriptor = (x: MissingIdentity): boolean => !x.resourceName.endsWith('Descriptor');
 
-      Object.keys(body).forEach((key) => {
-        // Skip the error message
-        if (key === 'message') return;
-
-        const identity = body[key] as MissingIdentity;
-
+      body.error.failures.forEach((failure) => {
         // Anonymize values for non-Descriptors
-        if (notADescriptor(identity)) {
-          Object.keys(identity.identity).forEach((identityKey) => {
-            identity.identity[identityKey] = '*';
+        if (notADescriptor(failure)) {
+          Object.keys(failure.identity).forEach((identityKey) => {
+            failure.identity[identityKey] = '*';
           });
         }
 
