@@ -363,12 +363,14 @@ describe('given an upsert of a new document with one existing and one non-existe
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(`
       {
         "error": {
-          "0": {
-            "identity": {
-              "natural": "not a valid reference",
+          "failures": [
+            {
+              "identity": {
+                "natural": "not a valid reference",
+              },
+              "resourceName": "School",
             },
-            "resourceName": "School",
-          },
+          ],
           "message": "Reference validation failed",
         },
       }
@@ -812,12 +814,14 @@ describe('given an update of a document with one existing and one non-existent r
     expect(upsertResult.failureMessage).toMatchInlineSnapshot(`
       {
         "error": {
-          "0": {
-            "identity": {
-              "natural": "not a valid reference",
+          "failures": [
+            {
+              "identity": {
+                "natural": "not a valid reference",
+              },
+              "resourceName": "School",
             },
-            "resourceName": "School",
-          },
+          ],
           "message": "Reference validation failed",
         },
       }
