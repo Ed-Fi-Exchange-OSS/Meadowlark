@@ -27,16 +27,18 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(`
-            [
-              {
-                "context": {
-                  "errorType": "required",
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "required",
+                  },
+                  "message": "{requestBody} must have required property 'categories'",
+                  "path": "{requestBody}",
                 },
-                "message": "{requestBody} must have required property 'categories'",
-                "path": "{requestBody}",
-              },
-            ]
+              ],
+            }
           `);
         });
     });
@@ -63,16 +65,18 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(`
-            [
-              {
-                "context": {
-                  "errorType": "minItems",
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "minItems",
+                  },
+                  "message": "property 'categories' must not have fewer than 1 items",
+                  "path": "{requestBody}.categories",
                 },
-                "message": "property 'categories' must not have fewer than 1 items",
-                "path": "{requestBody}.categories",
-              },
-            ]
+              ],
+            }
           `);
         });
     });
@@ -106,9 +110,21 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `"Reference validation failed: Resource EducationOrganizationCategory is missing identity {"descriptor":"abc"}"`,
-          );
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "descriptor": "abc",
+                    },
+                    "resourceName": "EducationOrganizationCategory",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+          `);
         });
     });
   });
@@ -141,16 +157,18 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(`
-            [
-              {
-                "context": {
-                  "errorType": "minLength",
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "minLength",
+                  },
+                  "message": "property 'shortNameOfInstitution' must not have fewer than 1 characters",
+                  "path": "{requestBody}.shortNameOfInstitution",
                 },
-                "message": "property 'shortNameOfInstitution' must not have fewer than 1 characters",
-                "path": "{requestBody}.shortNameOfInstitution",
-              },
-            ]
+              ],
+            }
           `);
         });
     });
@@ -183,16 +201,18 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(`
-            [
-              {
-                "context": {
-                  "errorType": "required",
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "required",
+                  },
+                  "message": "{requestBody} must have required property 'communityOrganizationId'",
+                  "path": "{requestBody}",
                 },
-                "message": "{requestBody} must have required property 'communityOrganizationId'",
-                "path": "{requestBody}",
-              },
-            ]
+              ],
+            }
           `);
         });
     });
@@ -226,9 +246,21 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(
-            `"Reference validation failed: Resource EducationOrganizationCategory is missing identity {"descriptor":"abc"}"`,
-          );
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "descriptor": "abc",
+                    },
+                    "resourceName": "EducationOrganizationCategory",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+            `);
         });
     });
   });
@@ -249,23 +281,25 @@ describe('When creating a resource', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toMatchInlineSnapshot(`
-            [
-              {
-                "context": {
-                  "errorType": "format",
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "format",
+                  },
+                  "message": "property 'beginDate' must match format 'date'",
+                  "path": "{requestBody}.beginDate",
                 },
-                "message": "property 'beginDate' must match format 'date'",
-                "path": "{requestBody}.beginDate",
-              },
-              {
-                "context": {
-                  "errorType": "format",
+                {
+                  "context": {
+                    "errorType": "format",
+                  },
+                  "message": "property 'endDate' must match format 'date'",
+                  "path": "{requestBody}.endDate",
                 },
-                "message": "property 'endDate' must match format 'date'",
-                "path": "{requestBody}.endDate",
-              },
-            ]
+              ],
+            }
           `);
         });
     });

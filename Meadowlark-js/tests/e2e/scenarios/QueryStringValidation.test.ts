@@ -116,6 +116,7 @@ describe('When retrieving information', () => {
                   {
                     "message": "The request is invalid.",
                     "modelState": {
+                      "limit": [],
                       "offset": [
                         "Must be set to a numeric value >= 1",
                       ],
@@ -142,6 +143,7 @@ describe('When retrieving information', () => {
                       "limit": [
                         "Limit must be provided when using offset",
                       ],
+                      "offset": [],
                     },
                   }
                 `);
@@ -217,7 +219,7 @@ describe('When retrieving information', () => {
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
                 {
-                  "message": "The request is invalid.",
+                  "error": "The request is invalid.",
                   "modelState": {
                     "/beginDate must match format "date"": "Invalid property",
                   },
