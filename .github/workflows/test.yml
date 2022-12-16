@@ -7,14 +7,48 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: abcdefgh1!
+
+defaults:
+  run:
+    working-directory: Meadowlark-js
+
 jobs:
-  test:
-    name: Full testing process
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: Meadowlark-js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+      - name: Setup Node
+        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
+
+      - name: Linter
+        run: yarn test:lint
+
+  test:
+    name: Unit, Integration and System Tests
+    needs: lint
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -27,11 +61,16 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
 
-      - name: Install dependencies
-        run: yarn install
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Linter
-        run: yarn test:lint
+      - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
 
       - name: Unit tests with code coverage
         run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
@@ -45,34 +84,34 @@ jobs:
           path: Meadowlark-js/coverage/lcov-report
           retention-days: 10
 
-      - name: Integration tests
+      - name: Configure postgres
         run: |
           sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password 'abcdefgh1!';"
-          yarn test:integration --ci --config ./jest.ci-config.js
+          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
+
+      - name: Integration tests
+        run: yarn test:integration --ci --config ./jest.ci-config.js
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: integration-tests
 
       - name: System tests
         run: yarn test:system --ci --config ./jest.ci-config.js
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "abcdefgh1!"
           JEST_JUNIT_OUTPUT_DIR: system-tests
+
       - name: Upload test results
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: test-results
           path: |
-            Meadowlark-js/unit-tests/junit.xml
             Meadowlark-js/integration-tests/junit.xml
             Meadowlark-js/system-tests/junit.xml
+            Meadowlark-js/unit-tests/junit.xml
           retention-days: 1
 
   end-to-end:
     name: End to End tests for ${{ matrix.config.db }}
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -82,13 +121,6 @@ jobs:
             { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
             { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" },
           ]
-
-    defaults:
-      run:
-        working-directory: Meadowlark-js
-
-    env:
-      POSTGRES_PASSWORD: abcdefgh1!
 
     steps:
       - name: Checkout repository
@@ -101,7 +133,15 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
 
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: yarn install
 
       # This caching is breaking Lerna 6. Look into in more detail to see if we can fix.
@@ -126,8 +166,6 @@ jobs:
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: abcdefgh1!
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
           MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
