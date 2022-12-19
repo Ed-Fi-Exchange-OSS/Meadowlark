@@ -36,10 +36,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Dependency Review ("Dependabot on PR")
-        uses: actions/dependency-review-action@a9c83d3af6b9031e20feba03b904645bb23d1dab # v1.0.2
+        uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
 
   analyze:
     name: Analyze Code
@@ -53,10 +53,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -64,7 +64,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -74,13 +74,13 @@ jobs:
         run: yarn install
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@1fae5bf71b0ecdc7d0a2ef0d0c28409d99693966 # v2.9.2
+        uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
         with:
           languages: "typescript"
           setup-python-dependencies: false
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@1fae5bf71b0ecdc7d0a2ef0d0c28409d99693966 # v2.9.2
+        uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
 
   lint:
     name: Lint
@@ -88,10 +88,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -99,7 +99,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -118,10 +118,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -129,7 +129,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -190,10 +190,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -201,7 +201,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -212,7 +212,7 @@ jobs:
 
       # This caching is breaking Lerna 6. Look into in more detail to see if we can fix.
       # - name: Cache Build
-      #   uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+      #   uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
       #   env:
       #     cache-name: cache-build
       #   with:
