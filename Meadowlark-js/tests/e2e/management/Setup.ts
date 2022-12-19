@@ -17,8 +17,11 @@ dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.e
 module.exports = async (config) => {
   console.info(`\nRunning e2e tests with: ${process.env.DOCUMENT_STORE_PLUGIN}\n`);
 
-  await setupEnvironment.configure(config);
-
+  try {
+    await setupEnvironment.configure(config);
+  } catch (error) {
+    throw new Error(`Unexpected error setting up environment. Verify that Docker is running ${error}`);
+  }
   await setupServer.setup();
 
   await credentialManager.authenticateAdmin();
