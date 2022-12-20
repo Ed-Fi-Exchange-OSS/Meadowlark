@@ -111,6 +111,43 @@ jobs:
       - name: Linter
         run: yarn test:lint
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+
+      - name: Setup Node
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
+
+      - name: Build Cache
+        id: build-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
+
+      - name: Build
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
+        run: yarn build
+
   unit-test:
     name: Unit Tests
     needs: lint
@@ -166,10 +203,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -177,7 +214,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -212,10 +249,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Setup Node
-        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
           cache: "yarn"
@@ -223,7 +260,7 @@ jobs:
 
       - name: Node modules cache
         id: modules-cache
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -253,7 +290,7 @@ jobs:
 
   end-to-end:
     name: End to End tests for ${{ matrix.config.db }}
-    needs: lint
+    needs: [lint, build]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -286,19 +323,15 @@ jobs:
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: yarn install
 
-      # This caching is breaking Lerna 6. Look into in more detail to see if we can fix.
-      # - name: Cache Build
-      #   uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-      #   env:
-      #     cache-name: cache-build
-      #   with:
-      #     path: "**/dist/**"
-      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/dist/**') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      - name: Build Cache
+        id: build-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
 
       - name: Build
-        # if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
         run: yarn build
 
       - name: End to End tests for ${{matrix.config.db}}
