@@ -111,9 +111,8 @@ jobs:
       - name: Linter
         run: yarn test:lint
 
-  test:
-    name: Unit, Integration and System Tests
-    needs: lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -138,46 +137,100 @@ jobs:
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: yarn install
 
-      - name: Unit tests with code coverage
-        run: yarn test:unit:coverage --ci --config ./jest.ci-config.js
+      - name: Build Cache
+        id: build-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
+
+      - name: Build
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
+        run: yarn build
+
+  tests:
+    name: ${{matrix.tests.type}} tests
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tests:
+          [
+            {
+              type: "Unit",
+              command: "yarn test:unit:coverage --ci --config ./jest.ci-config.js",
+            },
+            {
+              type: "Integration",
+              command: "yarn test:integration --ci --config ./jest.ci-config.js",
+            },
+            {
+              type: "System",
+              command: "yarn test:system --ci --config ./jest.ci-config.js",
+            },
+          ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+
+      - name: Setup Node
+        uses: actions/setup-node@17f8bd926464a1afa4c6a11669539e9c1ba77048 # v3.2.0
+        with:
+          node-version: "16"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
+
+      - name: Configure postgres
+        if: ${{ matrix.tests.type != 'Unit' }}
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
+
+      - name: Run ${{matrix.tests.type}} Tests
+        run: ${{matrix.tests.command}}
         env:
-          JEST_JUNIT_OUTPUT_DIR: unit-tests
+          JEST_JUNIT_OUTPUT_DIR: ${{matrix.tests.type}}-tests
 
       - name: Archive coverage results
+        if: ${{ matrix.tests.type == 'Unit' }}
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: code-coverage-report
           path: Meadowlark-js/coverage/lcov-report
           retention-days: 10
 
-      - name: Configure postgres
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
-
-      - name: Integration tests
-        run: yarn test:integration --ci --config ./jest.ci-config.js
-        env:
-          JEST_JUNIT_OUTPUT_DIR: integration-tests
-
-      - name: System tests
-        run: yarn test:system --ci --config ./jest.ci-config.js
-        env:
-          JEST_JUNIT_OUTPUT_DIR: system-tests
-
       - name: Upload test results
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: test-results
           path: |
-            Meadowlark-js/integration-tests/junit.xml
-            Meadowlark-js/system-tests/junit.xml
-            Meadowlark-js/unit-tests/junit.xml
+            Meadowlark-js/${{matrix.tests.type}}-tests/junit.xml
+            Meadowlark-js/.prettierrc
           retention-days: 1
 
   end-to-end:
     name: End to End tests for ${{ matrix.config.db }}
-    needs: lint
+    needs: [lint, build]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -199,6 +252,13 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
 
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
+
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
@@ -210,19 +270,15 @@ jobs:
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: yarn install
 
-      # This caching is breaking Lerna 6. Look into in more detail to see if we can fix.
-      # - name: Cache Build
-      #   uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-      #   env:
-      #     cache-name: cache-build
-      #   with:
-      #     path: "**/dist/**"
-      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/dist/**') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      - name: Build Cache
+        id: build-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
 
       - name: Build
-        # if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
         run: yarn build
 
       - name: End to End tests for ${{matrix.config.db}}
