@@ -182,6 +182,13 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
 
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
+
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
@@ -244,6 +251,13 @@ jobs:
           node-version: "16"
           cache: "yarn"
           cache-dependency-path: "**/yarn.lock"
+
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 #v3.0.2
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
 
       - name: Node modules cache
         id: modules-cache
