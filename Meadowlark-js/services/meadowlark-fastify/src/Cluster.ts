@@ -12,7 +12,7 @@ const CPUS = os.cpus().length;
 
 export class ClusterService {
   // eslint-disable-next-line no-useless-constructor, no-empty-function
-  constructor(private readonly applicationFactory: ServiceFactory) {}
+  constructor(private readonly serviceFactory: ServiceFactory) {}
 
   /** Run in multi-threaded mode */
   run() {
@@ -52,7 +52,7 @@ export class ClusterService {
       // Run application
       Logger.debug(`Worker ${process.pid} started`, null);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.applicationFactory(index);
+      this.serviceFactory(index);
     };
 
     process.on('message', cb);
