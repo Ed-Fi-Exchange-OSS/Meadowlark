@@ -32,5 +32,4 @@ const start = async () => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 start();
