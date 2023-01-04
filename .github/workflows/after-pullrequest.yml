@@ -19,12 +19,12 @@ jobs:
       matrix:
         tests:
           [
-            { name: "Unit Test Report", file: "unit-tests/junit.xml" },
+            { name: "Unit Test Report", file: "Unit-tests/junit.xml" },
             {
               name: "Integration Test Report",
-              file: "integration-tests/junit.xml",
+              file: "Integration-tests/junit.xml",
             },
-            { name: "System Test Report", file: "system-tests/junit.xml" },
+            { name: "System Test Report", file: "System-tests/junit.xml" },
             {
               name: "Mongo End To End Tests",
               file: "Mongo-e2e-tests/junit.xml",
