@@ -11,7 +11,7 @@ import { MiddlewareModel } from './MiddlewareModel';
 function anonymizeObject(object: Object): Object {
   Object.keys(object).forEach((key) => {
     if (R.is(Object, object[key])) {
-      object[key] = anonymizeObject(object[key]);
+      object[key] = anonymizeObject({ ...object[key] });
     } else {
       object[key] = null;
     }

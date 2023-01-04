@@ -144,6 +144,17 @@ describe('nested doc example - given previous middleware has created a response 
         educationOrganizationId: null,
       },
     });
+
+    // Don't modify the original on accident
+    expect(resultChain.frontendRequest.middleware.parsedBody).toStrictEqual({
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+      interventionReference: {
+        interventionIdentificationCode: '111',
+        educationOrganizationId: 123,
+      },
+    });
   });
 });
 
