@@ -9,7 +9,6 @@ import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendR
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { anonymizeAndLogRequestBody } from '../../src/middleware/LogAnonymizedRequestMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
-import { newResourceInfo } from '../../src/model/ResourceInfo';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -52,7 +51,7 @@ describe('given a null response', () => {
   });
 });
 
-describe('given previous middleware has created a response with debug log level and is not a descriptor', () => {
+describe('flat doc example - given previous middleware has created a response with debug log level', () => {
   let loggerSpy: any;
 
   beforeEach(() => {
@@ -98,7 +97,68 @@ describe('given previous middleware has created a response with debug log level 
   });
 });
 
-describe('given previous middleware has created a response with info log level and is not a descriptor', () => {
+describe('nested doc example - given previous middleware has created a response with debug log level', () => {
+  let loggerSpy: any;
+
+  beforeEach(() => {
+    loggerSpy = jest.spyOn(MeadowlarkUtilities.Logger, 'debug');
+    jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('An anonymized version of the body is logged', async () => {
+    const traceId = 'traceid';
+
+    const body = JSON.stringify({
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+      interventionReference: {
+        interventionIdentificationCode: '111',
+        educationOrganizationId: 123,
+      },
+    });
+
+    const model: MiddlewareModel = {
+      frontendRequest: {
+        ...newFrontendRequest(),
+        body,
+        traceId,
+      },
+      frontendResponse: null,
+    };
+
+    const resultChain = await parseBody(model);
+
+    await anonymizeAndLogRequestBody(resultChain);
+
+    expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
+      studentReference: {
+        studentUniqueId: null,
+      },
+      interventionReference: {
+        interventionIdentificationCode: null,
+        educationOrganizationId: null,
+      },
+    });
+
+    // Don't modify the original on accident
+    expect(resultChain.frontendRequest.middleware.parsedBody).toStrictEqual({
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+      interventionReference: {
+        interventionIdentificationCode: '111',
+        educationOrganizationId: 123,
+      },
+    });
+  });
+});
+
+describe('given previous middleware has created a response with info log level', () => {
   let loggerSpy: any;
 
   beforeEach(() => {
@@ -129,47 +189,6 @@ describe('given previous middleware has created a response with info log level a
       },
       frontendResponse: null,
     };
-
-    const resultChain = await parseBody(model);
-
-    await anonymizeAndLogRequestBody(resultChain);
-
-    expect(loggerSpy).toBeCalledTimes(0);
-  });
-});
-
-describe('given previous middleware has created a response with debug log level and is a descriptor', () => {
-  let loggerSpy: any;
-
-  beforeEach(() => {
-    loggerSpy = jest.spyOn(MeadowlarkUtilities.Logger, 'debug');
-    jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('Logger is not called', async () => {
-    const traceId = 'traceid';
-
-    const body = JSON.stringify({
-      codeValue: 'US',
-      shortDescription: 'US',
-      namespace: 'uri://ed-fi.org/CountryDescriptor',
-    });
-
-    const model: MiddlewareModel = {
-      frontendRequest: {
-        ...newFrontendRequest(),
-        body,
-        traceId,
-      },
-      frontendResponse: null,
-    };
-
-    model.frontendRequest.middleware.resourceInfo = newResourceInfo();
-    model.frontendRequest.middleware.resourceInfo.isDescriptor = true;
 
     const resultChain = await parseBody(model);
 
