@@ -5,7 +5,7 @@
 
 import cluster from 'cluster';
 import os from 'os';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { getIntegerFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
 import { ServiceFactory } from './Factory';
 
 const CPUS = os.cpus().length;
@@ -17,17 +17,18 @@ export class ClusterService {
   /** Run in multi-threaded mode */
   run() {
     if (cluster.isPrimary) {
-      this.master();
+      ClusterService.primary();
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.worker();
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  master() {
-    Logger.debug(`Total Number of Cores: ${CPUS}`, null);
-    Logger.debug(`Master ${process.pid} is running`, null);
+  static primary(): void {
+    // Use the lower of the configured number of worker threads or the number of available CPUs.
+    const configuredThreadCount = Math.min(getIntegerFromEnvironment('FASTIFY_NUM_THREADS', CPUS), CPUS);
+
+    Logger.debug(`Spawning ${configuredThreadCount} worker threads`, null);
+    Logger.debug(`Primary process ID ${process.pid} is running`, null);
 
     // Fork workers
     for (let i = 0; i < CPUS; i += 1) {
@@ -44,7 +45,7 @@ export class ClusterService {
     });
   }
 
-  async worker() {
+  worker(): void {
     const cb = (index: number) => {
       // Unregister immediately current listener for message
       process.off('message', cb);
