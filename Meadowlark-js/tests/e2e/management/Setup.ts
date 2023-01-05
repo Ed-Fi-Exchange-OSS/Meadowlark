@@ -15,7 +15,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.env') });
 
 module.exports = async (config) => {
-  console.info(`\nRunning e2e tests with: ${process.env.DOCUMENT_STORE_PLUGIN}\n`);
+  console.info(`\n🧪Running e2e tests with: ${process.env.DOCUMENT_STORE_PLUGIN}🧪\n`);
 
   try {
     await setupEnvironment.configure(config);

@@ -16,7 +16,8 @@ export type EnvironmentVariable =
   | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'
   | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED'
   | 'ALLOW_TYPE_COERCION'
-  | 'ALLOW__EXT_PROPERTY';
+  | 'ALLOW__EXT_PROPERTY'
+  | 'FASTIFY_NUM_THREADS';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};

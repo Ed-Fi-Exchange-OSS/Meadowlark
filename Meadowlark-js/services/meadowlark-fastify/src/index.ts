@@ -4,32 +4,16 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import dotenv from 'dotenv';
-import type { FastifyInstance } from 'fastify';
-import { Logger, initializeLogging } from '@edfi/meadowlark-utilities';
-import { buildService } from './Service';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
+import { ClusterService } from './Cluster';
+import { serviceFactory } from './Factory';
 
 dotenv.config();
 
 const start = async () => {
   initializeLogging();
 
-  const service: FastifyInstance = buildService();
-  try {
-    let port: number = 3000;
-    if (process.env.FASTIFY_PORT != null) {
-      const possiblePort: number = parseInt(process.env.FASTIFY_PORT, 10);
-
-      if (!Number.isNaN(possiblePort)) port = possiblePort;
-    }
-
-    const stage = process.env.MEADOWLARK_STAGE ?? 'local';
-
-    const address: string = await service.listen(port);
-    Logger.info(`Starting Meadowlark API at ${address}/${stage}`, null);
-  } catch (err) {
-    service.log.error(err);
-    process.exit(1);
-  }
+  new ClusterService(serviceFactory).run();
 };
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
