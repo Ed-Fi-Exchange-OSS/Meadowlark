@@ -22,21 +22,22 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
     // There are several error message formats. We need to anonymize those that are like the ReferenceError type.
     // TypeScript alone doesn't isolate this - need runtime code to detect if the body is in the specific shape.
 
+    const responseBody = R.clone(frontendResponse?.body);
     if (
-      frontendRequest != null &&
-      frontendRequest.body != null &&
+      frontendResponse != null &&
+      frontendResponse.body != null &&
       // eslint-disable-next-line dot-notation
-      frontendRequest.body['error'] != null &&
+      frontendResponse.body['error'] != null &&
       // eslint-disable-next-line dot-notation
-      frontendRequest.body['error']['failures'] != null
+      frontendResponse.body['error']['failures'] != null
     ) {
-      const body = R.clone(frontendResponse?.body as ReferenceError);
+      const anonymizedBody = responseBody as ReferenceError;
 
       // On a 404, we have a body.error that is just a string. Otherwise, body.error is an object and we want to anonymize
       // and data values in it.
       const notADescriptor = (x: MissingIdentity): boolean => !x.resourceName.endsWith('Descriptor');
 
-      body.error.failures.forEach((failure) => {
+      anonymizedBody.error.failures.forEach((failure) => {
         // Anonymize values for non-Descriptors
         if (notADescriptor(failure)) {
           Object.keys(failure.identity).forEach((identityKey) => {
@@ -44,6 +45,8 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
           });
         }
       });
+
+      // responseBody = anonymizedBody;
     }
 
     writeDebugObject(
@@ -51,7 +54,7 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
       frontendRequest,
       'logTheResponse',
       frontendResponse?.statusCode,
-      R.is(String, frontendResponse?.body) ? { error: frontendResponse?.body } : frontendResponse?.body,
+      R.is(String, responseBody) ? { error: responseBody } : responseBody,
     );
   }
 
