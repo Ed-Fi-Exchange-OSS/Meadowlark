@@ -3,7 +3,7 @@
 This product includes software developed at the [Ed-Fi
 Alliance](https://www.ed-fi.org).
 
-Copyright (c) 2022 Ed-Fi Alliance, LLC and contributors.
+Copyright (c) 2023 Ed-Fi Alliance, LLC and contributors.
 
 This software distribution includes or contains external references to several
 open source packages that are attributed below in this notice. Where required,
@@ -15,3 +15,30 @@ distributed in its original form without modification.
 
 Please run the command `yarn licenses list` for a full list of all of the
 licenses used by this package's dependencies.
+
+--
+
+Fastify clustering code was adapted from
+[fastify-cluster-example](https://github.com/joseluisq/fastify-cluster-example/)
+under the following license:
+
+    The MIT License (MIT)
+
+    Copyright (c) 2019 Jose Quintana https://git.io/joseluisq
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of
+    this software and associated documentation files (the "Software"), to deal in
+    the Software without restriction, including without limitation the rights to
+    use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+    the Software, and to permit persons to whom the Software is furnished to do so,
+    subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+    COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
