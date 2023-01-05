@@ -31,7 +31,7 @@ export class ClusterService {
     Logger.debug(`Primary process ID ${process.pid} is running`, null);
 
     // Fork workers
-    for (let i = 0; i < CPUS; i += 1) {
+    for (let i = 0; i < configuredThreadCount; i += 1) {
       const fork = cluster.fork();
       fork.send(i);
     }
