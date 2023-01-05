@@ -122,7 +122,7 @@ describe('when logging the response', () => {
     it('logs the message body unchanged', async () => {
       const traceId = 'traceId';
       const body = JSON.stringify({
-        message: [
+        error: [
           {
             message: "{requestBody} must have required property 'contentIdentifier'",
             path: '{requestBody}',
@@ -146,7 +146,7 @@ describe('when logging the response', () => {
       await logTheResponse(model);
 
       expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 400', traceId, {
-        message: body,
+        error: body,
       });
     });
   });
