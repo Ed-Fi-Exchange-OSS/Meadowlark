@@ -34,7 +34,7 @@ describe('given a GET of a non-existent school', () => {
   });
 
   it('should return not found', async () => {
-    expect(getResult.body).toEqual('');
+    expect(getResult.body).toBeUndefined();
     expect(getResult.statusCode).toBe(404);
   });
 });
