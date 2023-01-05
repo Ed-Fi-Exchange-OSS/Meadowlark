@@ -90,7 +90,40 @@ describe('given a POST of a school with an empty body', () => {
   });
 
   it('should return insert failure', async () => {
-    expect(upsertResult.body).toMatchInlineSnapshot(`undefined`);
+    expect(upsertResult.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'schoolId'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'gradeLevels'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'nameOfInstitution'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'educationOrganizationCategories'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
     expect(upsertResult.statusCode).toBe(400);
   });
 });
@@ -187,12 +220,14 @@ describe('given a POST of an academic week referencing a school that does not ex
     expect(upsertResult.body).toMatchInlineSnapshot(`
       {
         "error": {
-          "0": {
-            "identity": {
-              "schoolId": 123,
+          "failures": [
+            {
+              "identity": {
+                "schoolId": 123,
+              },
+              "resourceName": "School",
             },
-            "resourceName": "School",
-          },
+          ],
           "message": "Reference validation failed",
         },
       }
@@ -269,12 +304,14 @@ describe('given a POST of an academic week referencing a school that exists foll
     expect(upsertResult.body).toMatchInlineSnapshot(`
       {
         "error": {
-          "0": {
-            "identity": {
-              "schoolId": 999,
+          "failures": [
+            {
+              "identity": {
+                "schoolId": 999,
+              },
+              "resourceName": "School",
             },
-            "resourceName": "School",
-          },
+          ],
           "message": "Reference validation failed",
         },
       }
