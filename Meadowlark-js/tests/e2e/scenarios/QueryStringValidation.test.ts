@@ -60,11 +60,12 @@ describe('When retrieving information', () => {
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
                   {
-                    "message": "The request is invalid.",
+                    "error": "The request is invalid.",
                     "modelState": {
                       "limit": [
                         "Must be set to a numeric value >= 1",
                       ],
+                      "offset": [],
                     },
                   }
                 `);
@@ -114,7 +115,7 @@ describe('When retrieving information', () => {
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
                   {
-                    "message": "The request is invalid.",
+                    "error": "The request is invalid.",
                     "modelState": {
                       "limit": [],
                       "offset": [
@@ -138,7 +139,7 @@ describe('When retrieving information', () => {
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
                   {
-                    "message": "The request is invalid.",
+                    "error": "The request is invalid.",
                     "modelState": {
                       "limit": [
                         "Limit must be provided when using offset",

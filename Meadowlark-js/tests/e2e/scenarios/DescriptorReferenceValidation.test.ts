@@ -25,7 +25,6 @@ describe('When creating a resource that has a reference to a descriptor', () => 
           .expect(400)
           .then((response) => {
             expect(response.body).toMatchInlineSnapshot(
-              'Resource CountryDescriptor is missing identity',
               `
               {
                 "error": {
