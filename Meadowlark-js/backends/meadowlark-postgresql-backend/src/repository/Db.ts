@@ -75,10 +75,6 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
       null,
     );
 
-    singletonDbPool.on('error', (err, _client) => {
-      Logger.error(`${moduleName} a PostgreSQL connection error occurred.`, null, err);
-    });
-
     return poolClient;
   } catch (e) {
     Logger.error(`${moduleName}.createConnectionPoolAndReturnClient error connecting to PostgreSQL`, null, e);
