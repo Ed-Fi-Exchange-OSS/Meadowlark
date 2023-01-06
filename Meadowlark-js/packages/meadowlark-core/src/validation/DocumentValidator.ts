@@ -6,12 +6,17 @@ import { TopLevelEntity } from '@edfi/metaed-core';
 import type { ValidationError } from '@apideck/better-ajv-errors';
 import { validateEntityBodyAgainstSchema } from '../metaed/MetaEdValidation';
 
+export type ValidationFailure = { error: ValidationError[] | null };
+
 /**
  * Performs validation of a document against a resource.
  *
  * Validates the request body for the resource. If invalid, returns an error message.
  */
-export async function validateDocument(body: object, matchingMetaEdModel: TopLevelEntity): Promise<object | null> {
+export async function validateDocument(
+  body: object,
+  matchingMetaEdModel: TopLevelEntity,
+): Promise<ValidationFailure | null> {
   const validationErrors: ValidationError[] | null = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
   return validationErrors == null ? null : { error: validationErrors };
 }
