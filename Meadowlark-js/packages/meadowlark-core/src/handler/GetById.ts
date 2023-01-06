@@ -21,7 +21,7 @@ const moduleName = 'core.handler.GetById';
 export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   if (frontendRequest.middleware.pathComponents.resourceId == null) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
-    return { body: '', statusCode: 404 };
+    return { statusCode: 404 };
   }
   const request: GetRequest = {
     id: frontendRequest.middleware.pathComponents.resourceId,
@@ -38,13 +38,12 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
 
   if (response === 'UNKNOWN_FAILURE') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 500);
-    return { body: '', statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
+    return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
   if (response === 'GET_FAILURE_NOT_EXISTS') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
     return {
-      body: '',
       statusCode: 404,
       headers: frontendRequest.middleware.headerMetadata,
     };
@@ -52,7 +51,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
 
   writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 200);
   return {
-    body: JSON.stringify(document),
+    body: document,
     statusCode: 200,
     headers: frontendRequest.middleware.headerMetadata,
   };

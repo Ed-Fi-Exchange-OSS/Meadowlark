@@ -18,12 +18,16 @@ export async function resourceValidation({ frontendRequest, frontendResponse }: 
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'resourceValidation');
 
-  const { resourceInfo, errorBody, headerMetadata } = await validateResource(frontendRequest.middleware.pathComponents);
+  const {
+    resourceInfo,
+    errorBody: error,
+    headerMetadata,
+  } = await validateResource(frontendRequest.middleware.pathComponents);
 
-  if (errorBody != null) {
+  if (error != null) {
     const statusCode = resourceInfo === NoResourceInfo ? 404 : 400;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'resourceValidation', statusCode, errorBody);
-    return { frontendRequest, frontendResponse: { body: errorBody, statusCode, headers: headerMetadata } };
+    writeDebugStatusToLog(moduleName, frontendRequest, 'resourceValidation', statusCode, undefined, error);
+    return { frontendRequest, frontendResponse: { body: error, statusCode, headers: headerMetadata } };
   }
 
   frontendRequest.middleware.resourceInfo = resourceInfo;

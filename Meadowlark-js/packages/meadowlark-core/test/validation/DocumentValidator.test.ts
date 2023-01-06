@@ -11,13 +11,13 @@ import * as MetaEdValidation from '../../src/metaed/MetaEdValidation';
 import * as ResourceNameMapping from '../../src/metaed/ResourceNameMapping';
 
 describe('given a valid resource name but body fails schema validation', () => {
-  let result: string;
+  let result: object | null;
   let mockValidateBodyAgainstSchema: any;
   let mockLoadMetaEdState: any;
   let mockMatchEndpointToMetaEd: any;
   const validationError: ValidationError = {
-    message: 'message',
-    path: 'path',
+    message: '_message',
+    path: '_path',
     context: { errorType: 'required' },
   };
 
@@ -53,8 +53,18 @@ describe('given a valid resource name but body fails schema validation', () => {
   });
 
   it('returns an error message', () => {
-    expect(result).toMatchInlineSnapshot(
-      `"{"message":[{"message":"message","path":"path","context":{"errorType":"required"}}]}"`,
-    );
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "_message",
+            "path": "_path",
+          },
+        ],
+      }
+    `);
   });
 });

@@ -5,7 +5,7 @@
 
 import R from 'ramda';
 import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
-import { documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import { documentIdForDocumentReference, DocumentReference, MissingIdentity } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
 import { onlyReturnId } from './Db';
@@ -42,7 +42,7 @@ export function findMissingReferences(
   refsInDb: MeadowlarkDocumentId[],
   documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
-): string[] {
+): MissingIdentity[] {
   // eslint-disable-next-line no-underscore-dangle
   const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef._id);
   const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
@@ -56,9 +56,10 @@ export function findMissingReferences(
     documentReferences as any[],
   );
 
-  return pickedDocumentReferencesOfMissing.map(
-    (reference) => `Resource ${reference.resourceName} is missing identity ${JSON.stringify(reference.documentIdentity)}`,
-  );
+  return pickedDocumentReferencesOfMissing.map((reference) => ({
+    resourceName: reference.resourceName,
+    identity: reference.documentIdentity,
+  }));
 }
 
 // MongoDB FindOption to return only the aliasIds field
@@ -88,8 +89,8 @@ export async function validateReferences(
   mongoDocuments: Collection<MeadowlarkDocument>,
   session: ClientSession,
   traceId: string,
-): Promise<string[]> {
-  const failureMessages: string[] = [];
+): Promise<MissingIdentity[]> {
+  const failures: MissingIdentity[] = [];
 
   const referencedDocumentIds: string[] = documentReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
@@ -103,7 +104,7 @@ export async function validateReferences(
 
   if (referencedDocumentIds.length !== referenceIdsInDb.length) {
     Logger.debug('mongodb.repository.WriteHelper.validateReferences: documentReferences not found', traceId);
-    failureMessages.push(...findMissingReferences(referenceIdsInDb, referencedDocumentIds, documentReferences));
+    failures.push(...findMissingReferences(referenceIdsInDb, referencedDocumentIds, documentReferences));
   }
 
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
@@ -114,8 +115,8 @@ export async function validateReferences(
 
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
     Logger.debug('mongodb.repository.WriteHelper.validateReferences: descriptorReferences not found', traceId);
-    failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
+    failures.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
   }
 
-  return failureMessages;
+  return failures;
 }

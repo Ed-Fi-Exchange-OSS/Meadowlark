@@ -26,7 +26,7 @@ export async function metaEdModelFinding({ frontendRequest, frontendResponse }: 
     writeDebugStatusToLog(moduleName, frontendRequest, 'metaEdModelFinding', statusCode, errorMessage);
     return {
       frontendRequest,
-      frontendResponse: { body: '', statusCode, headers: frontendRequest.middleware.headerMetadata },
+      frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
   Logger.debug(

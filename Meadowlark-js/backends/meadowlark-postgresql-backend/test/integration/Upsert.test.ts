@@ -366,9 +366,21 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('INSERT_FAILURE_REFERENCE');
-    expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
-    );
+    expect(upsertResult.failureMessage).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "failures": [
+            {
+              "identity": {
+                "natural": "not a valid reference",
+              },
+              "resourceName": "School",
+            },
+          ],
+          "message": "Reference validation failed",
+        },
+      }
+    `);
   });
 
   it('should not have inserted the document with an invalid reference in the db', async () => {
@@ -720,9 +732,21 @@ describe('given an update of a document with one existing and one non-existent r
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(upsertResult.response).toBe('UPDATE_FAILURE_REFERENCE');
-    expect(upsertResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
-    );
+    expect(upsertResult.failureMessage).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "failures": [
+            {
+              "identity": {
+                "natural": "not a valid reference",
+              },
+              "resourceName": "School",
+            },
+          ],
+          "message": "Reference validation failed",
+        },
+      }
+    `);
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {

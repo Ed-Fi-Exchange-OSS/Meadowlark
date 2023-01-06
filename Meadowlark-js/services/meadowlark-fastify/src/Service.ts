@@ -61,7 +61,7 @@ export function buildService(): FastifyInstance {
     fastify.addHook('onRequest', (req, reply, done) => {
       // eslint-disable-next-line dot-notation
       reply.headers['startTime'] = now();
-      Logger.info('Request', req.id, { url: req.raw.url, contentType: req.headers['content-type'] });
+      Logger.info('Request', req.id, { url: req.raw.url, contentType: req.headers['content-type'], method: req.method });
       done();
     });
 

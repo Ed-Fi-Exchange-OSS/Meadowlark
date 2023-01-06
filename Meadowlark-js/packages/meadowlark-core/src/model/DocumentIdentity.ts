@@ -21,6 +21,14 @@ export type DocumentIdentity = { [key: string]: string };
  */
 export const NoDocumentIdentity: DocumentIdentity = {};
 
+/*
+ * For use in error messages
+ */
+export type MissingIdentity = {
+  resourceName: string;
+  identity: DocumentIdentity;
+};
+
 /**
  * Converts Base64 to Base64Url by character replacement and truncation of padding.
  * '+' becomes '-', '/' becomes '_', and any trailing '=' are removed.

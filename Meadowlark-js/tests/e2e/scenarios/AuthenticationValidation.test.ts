@@ -48,7 +48,18 @@ describe("given it's authenticating a client", () => {
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {
-              "error": "[{"message":"'grant_type' property must be equal to one of the allowed values","path":"{requestBody}.grant_type","context":{"errorType":"enum","allowedValues":["client_credentials"]}}]",
+              "error": [
+                {
+                  "context": {
+                    "allowedValues": [
+                      "client_credentials",
+                    ],
+                    "errorType": "enum",
+                  },
+                  "message": "'grant_type' property must be equal to one of the allowed values",
+                  "path": "{requestBody}.grant_type",
+                },
+              ],
             }
           `);
         });

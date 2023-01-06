@@ -10,9 +10,12 @@ import {
   SystemTestablePlugin,
   SystemTestClient,
 } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { initializeLogging, Logger } from '@edfi/meadowlark-utilities';
+
+initializeLogging();
 
 // Environment setup
+process.env.FASTIFY_NUM_THREADS = '1';
 const TEST_SIGNING_KEY =
   'zE1mgVCZ01pO5gEioEp/ShcdVMcYjvGMMyE37Tu513WzSgDr4gtMKAFSWrprwXa825Eeu7xj2Ok35KFChE+6oyDF0PuVQdf9YaE9iTTs/nLXDbOJspDvQswYZ7Iq5Mx6lIcixgLbWcK/OckOin608ivPa5aLkJOJXDdl2cgwgf1E9rHWuRs0iYNWoMbqGN2iFH5af3wOF/RusrWJDLLJ9riWeIINeZwzE9cLq75hLBHLpQlcz9enU1zC49B93OTPWPwCqZIBaSqvbsgSULYANoU0JZa+NB5BsgrmlQgldfEPLQj73z09a7yqLAwlJJRYXuJQo6onYQ7RVVHD4PD2Sg==';
 process.env.OAUTH_SIGNING_KEY = TEST_SIGNING_KEY;

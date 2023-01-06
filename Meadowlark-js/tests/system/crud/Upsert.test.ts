@@ -37,7 +37,7 @@ describe('given a POST of a school', () => {
   });
 
   it('should return insert success', async () => {
-    expect(upsertResult.body).toEqual('');
+    expect(upsertResult.body).toBeUndefined();
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
       `"/v3.3b/ed-fi/schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ"`,
@@ -46,9 +46,23 @@ describe('given a POST of a school', () => {
 
   it('should return get success', async () => {
     const getResult = await get(schoolGetClient1());
-    expect(getResult.body).toMatchInlineSnapshot(
-      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abc","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
-    );
+    expect(getResult.body).toMatchInlineSnapshot(`
+      {
+        "educationOrganizationCategories": [
+          {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other",
+          },
+        ],
+        "gradeLevels": [
+          {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
+          },
+        ],
+        "id": "LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ",
+        "nameOfInstitution": "abc",
+        "schoolId": 123,
+      }
+    `);
     expect(getResult.statusCode).toBe(200);
   });
 });
@@ -76,9 +90,40 @@ describe('given a POST of a school with an empty body', () => {
   });
 
   it('should return insert failure', async () => {
-    expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{"message":[{"message":"{requestBody} must have required property 'schoolId'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'gradeLevels'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'nameOfInstitution'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'educationOrganizationCategories'","path":"{requestBody}","context":{"errorType":"required"}}]}"`,
-    );
+    expect(upsertResult.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'schoolId'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'gradeLevels'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'nameOfInstitution'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'educationOrganizationCategories'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
     expect(upsertResult.statusCode).toBe(400);
   });
 });
@@ -124,20 +169,34 @@ describe('given a POST of a school followed by a second POST of the school with 
   });
 
   it('should return 1st post 201 as an insert', async () => {
-    expect(firstUpsertResult.body).toEqual('');
+    expect(firstUpsertResult.body).toBeUndefined();
     expect(firstUpsertResult.statusCode).toBe(201);
   });
 
   it('should return 2nd post 200 as an update', async () => {
-    expect(secondUpsertResult.body).toEqual('');
+    expect(secondUpsertResult.body).toBeUndefined();
     expect(secondUpsertResult.statusCode).toBe(200);
   });
 
   it('should return get with updated nameOfInstitution', async () => {
     const getResult: FrontendResponse = await get(schoolGetClient1());
-    expect(getResult.body).toMatchInlineSnapshot(
-      `"{"id":"LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ","schoolId":123,"gradeLevels":[{"gradeLevelDescriptor":"uri://ed-fi.org/GradeLevelDescriptor#First Grade"}],"nameOfInstitution":"abcdefghijklmnopqrstuvwxyz","educationOrganizationCategories":[{"educationOrganizationCategoryDescriptor":"uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"}]}"`,
-    );
+    expect(getResult.body).toMatchInlineSnapshot(`
+      {
+        "educationOrganizationCategories": [
+          {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other",
+          },
+        ],
+        "gradeLevels": [
+          {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
+          },
+        ],
+        "id": "LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ",
+        "nameOfInstitution": "abcdefghijklmnopqrstuvwxyz",
+        "schoolId": 123,
+      }
+    `);
     expect(getResult.statusCode).toBe(200);
   });
 });
@@ -158,9 +217,21 @@ describe('given a POST of an academic week referencing a school that does not ex
   });
 
   it('should return failure due to missing reference', async () => {
-    expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{"message":"Reference validation failed: Resource School is missing identity {\\"schoolId\\":123}"}"`,
-    );
+    expect(upsertResult.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "failures": [
+            {
+              "identity": {
+                "schoolId": 123,
+              },
+              "resourceName": "School",
+            },
+          ],
+          "message": "Reference validation failed",
+        },
+      }
+    `);
     expect(upsertResult.statusCode).toBe(400);
   });
 });
@@ -186,7 +257,7 @@ describe('given a POST of an academic week referencing a school that exists', ()
   });
 
   it('should return success', async () => {
-    expect(upsertResult.body).toEqual('');
+    expect(upsertResult.body).toBeUndefined();
     expect(upsertResult.statusCode).toBe(201);
     expect(upsertResult.headers?.Location).toMatchInlineSnapshot(
       `"/v3.3b/ed-fi/academicWeeks/02pe_9hl1wM_jO1vMF1kvGV72yj2l2b8qNnnFg"`,
@@ -230,9 +301,21 @@ describe('given a POST of an academic week referencing a school that exists foll
   });
 
   it('should return failure due to missing reference', async () => {
-    expect(upsertResult.body).toMatchInlineSnapshot(
-      `"{"message":"Reference validation failed: Resource School is missing identity {\\"schoolId\\":999}"}"`,
-    );
+    expect(upsertResult.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "failures": [
+            {
+              "identity": {
+                "schoolId": 999,
+              },
+              "resourceName": "School",
+            },
+          ],
+          "message": "Reference validation failed",
+        },
+      }
+    `);
     expect(upsertResult.statusCode).toBe(400);
   });
 });
@@ -258,7 +341,7 @@ describe('given a POST of a school by one client followed by a second POST of th
   });
 
   it('should return 1st post 201 as an insert', async () => {
-    expect(firstUpsertResult.body).toEqual('');
+    expect(firstUpsertResult.body).toBeUndefined();
     expect(firstUpsertResult.statusCode).toBe(201);
   });
 

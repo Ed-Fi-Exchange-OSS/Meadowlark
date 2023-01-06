@@ -110,7 +110,8 @@ describe("given it's managing the client authorization", () => {
               .expect(400)
               .then((response) => {
                 expect(response.body).toMatchInlineSnapshot(`
-                    [
+                  {
+                    "error": [
                       {
                         "context": {
                           "errorType": "maxItems",
@@ -118,8 +119,9 @@ describe("given it's managing the client authorization", () => {
                         "message": "property 'roles' must not have more than 2 items",
                         "path": "{requestBody}.roles",
                       },
-                    ]
-                  `);
+                    ],
+                  }
+                `);
               });
           });
         });
@@ -138,7 +140,8 @@ describe("given it's managing the client authorization", () => {
               .expect(400)
               .then((response) => {
                 expect(response.body).toMatchInlineSnapshot(`
-                    [
+                  {
+                    "error": [
                       {
                         "context": {
                           "allowedValues": [
@@ -161,8 +164,9 @@ describe("given it's managing the client authorization", () => {
                         "message": "property 'roles' must contain at least 1 valid item(s)",
                         "path": "{requestBody}.roles",
                       },
-                    ]
-                  `);
+                    ],
+                  }
+                `);
               });
           });
         });
@@ -185,7 +189,8 @@ describe("given it's managing the client authorization", () => {
           .expect(400)
           .then((response) => {
             expect(response.body).toMatchInlineSnapshot(`
-                [
+              {
+                "error": [
                   {
                     "context": {
                       "errorType": "uniqueItems",
@@ -193,8 +198,9 @@ describe("given it's managing the client authorization", () => {
                     "message": "property 'roles' must not have duplicate items (items ## 1 and 0 are identical)",
                     "path": "{requestBody}.roles",
                   },
-                ]
-              `);
+                ],
+              }
+            `);
           });
       });
 
@@ -209,15 +215,17 @@ describe("given it's managing the client authorization", () => {
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
-                [
-                  {
-                    "context": {
-                      "errorType": "required",
+                {
+                  "error": [
+                    {
+                      "context": {
+                        "errorType": "required",
+                      },
+                      "message": "{requestBody} must have required property 'clientName'",
+                      "path": "{requestBody}",
                     },
-                    "message": "{requestBody} must have required property 'clientName'",
-                    "path": "{requestBody}",
-                  },
-                ]
+                  ],
+                }
               `);
             });
         });
@@ -235,15 +243,17 @@ describe("given it's managing the client authorization", () => {
             .expect(400)
             .then((response) => {
               expect(response.body).toMatchInlineSnapshot(`
-                [
-                  {
-                    "context": {
-                      "errorType": "type",
+                {
+                  "error": [
+                    {
+                      "context": {
+                        "errorType": "type",
+                      },
+                      "message": "'clientName' property type must be string",
+                      "path": "{requestBody}.clientName",
                     },
-                    "message": "'clientName' property type must be string",
-                    "path": "{requestBody}.clientName",
-                  },
-                ]
+                  ],
+                }
               `);
             });
         });

@@ -10,7 +10,7 @@ import { clientBodySchema } from '../model/ClientBody';
 import { requestTokenBodySchema } from '../model/RequestTokenBody';
 import { verifyTokenBodySchema } from '../model/VerifyTokenBody';
 
-export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: string };
+export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: object };
 
 const createClientBodyValidator: ValidateFunction = ajv.compile(clientBodySchema);
 const requestTokenBodyValidator: ValidateFunction = ajv.compile(requestTokenBodySchema);
@@ -21,14 +21,12 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
   if (isValid) return { isValid };
   return {
     isValid,
-    failureMessage: JSON.stringify(
-      betterAjvErrors({
-        data: body,
-        schema,
-        errors: validateFunction.errors,
-        basePath: '{requestBody}',
-      }),
-    ),
+    failureMessage: betterAjvErrors({
+      data: body,
+      schema,
+      errors: validateFunction.errors,
+      basePath: '{requestBody}',
+    }),
   };
 }
 

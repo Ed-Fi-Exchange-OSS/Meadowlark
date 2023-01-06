@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import { MissingIdentity, documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { validateReferenceExistenceSql } from './SqlHelper';
@@ -51,7 +51,7 @@ export function findMissingReferences(
   refsInDb: string[],
   documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
-): string[] {
+): MissingIdentity[] {
   const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, refsInDb);
 
   // Gets the array indexes of the missing references, for the documentOutboundRefs array
@@ -63,9 +63,10 @@ export function findMissingReferences(
     documentReferences as any[],
   );
 
-  return pickedDocumentReferencesOfMissing.map(
-    (reference) => `Resource ${reference.resourceName} is missing identity ${JSON.stringify(reference.documentIdentity)}`,
-  );
+  return pickedDocumentReferencesOfMissing.map((reference) => ({
+    resourceName: reference.resourceName,
+    identity: reference.documentIdentity,
+  }));
 }
 
 /**
@@ -84,8 +85,8 @@ export async function validateReferences(
   outboundRefs: string[],
   client: PoolClient,
   traceId: string,
-): Promise<string[]> {
-  const failureMessages: string[] = [];
+): Promise<MissingIdentity[]> {
+  const failureMessages: MissingIdentity[] = [];
 
   const referencesInDb = await findReferencedDocumentIdsById(outboundRefs, traceId, client);
   if (outboundRefs.length !== referencesInDb.length) {

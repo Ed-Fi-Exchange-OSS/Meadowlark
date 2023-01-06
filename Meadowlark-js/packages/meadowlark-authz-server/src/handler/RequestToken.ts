@@ -17,12 +17,13 @@ import type { GetAuthorizationClientResult } from '../message/GetAuthorizationCl
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
 import { getTokenExpiration, getTokenIssuer } from '../security/TokenSettings';
+import { TokenSuccessResponse } from '../model/TokenResponse';
 
 const moduleName = 'authz.handler.RequestToken';
 
 type ParsedRequestTokenBody =
   | { isValid: true; requestTokenBody: RequestTokenBody }
-  | { isValid: false; failureMessage: string };
+  | { isValid: false; failureMessage: object };
 
 /*
  * Creates a standard Meadowlark Jwt.
@@ -37,13 +38,13 @@ function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
   return token;
 }
 
-function tokenResponseFrom(token: Jwt): string {
-  return JSON.stringify({
+function tokenResponseFrom(token: Jwt): TokenSuccessResponse {
+  return {
     access_token: token.compact(),
     token_type: 'bearer',
     expires_in: token.body.exp,
     refresh_token: 'not available',
-  });
+  };
 }
 
 function maskClientSecret(body: RequestTokenBody): string {
@@ -59,7 +60,7 @@ function maskClientSecret(body: RequestTokenBody): string {
  * is not valid.
  */
 function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): ParsedRequestTokenBody {
-  if (authorizationRequest.body == null) return { isValid: false, failureMessage: 'Request body is empty' };
+  if (authorizationRequest.body == null) return { isValid: false, failureMessage: { message: 'Request body is empty' } };
 
   let unvalidatedBody: any;
 
@@ -69,14 +70,14 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
       unvalidatedBody = querystring.parse(authorizationRequest.body);
     } catch (error) {
       Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
-      return { isValid: false, failureMessage: `Malformed body: ${error.message}` };
+      return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   } else {
     try {
       unvalidatedBody = JSON.parse(authorizationRequest.body);
     } catch (error) {
       Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
-      return { isValid: false, failureMessage: `Malformed body: ${error.message}` };
+      return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   }
 
@@ -98,19 +99,19 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
 
   if (authorizationHeader == null) {
     Logger.debug(`${moduleName}.parseRequestTokenBody: Missing authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: 'Missing authorization header' };
+    return { isValid: false, failureMessage: { message: 'Missing authorization header' } };
   }
 
   if (!authorizationHeader.startsWith('Basic ')) {
     Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: 'Invalid authorization header' };
+    return { isValid: false, failureMessage: { message: 'Invalid authorization header' } };
   }
 
   // Extract from "Basic <encoded>" where encoded is the Base64 form of "client_id:client_secret"
   const split = Buffer.from(authorizationHeader.slice(6), 'base64').toString('binary').split(':');
   if (split.length !== 2) {
     Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: 'Invalid authorization header' };
+    return { isValid: false, failureMessage: { message: 'Invalid authorization header' } };
   }
 
   [validatedBody.client_id, validatedBody.client_secret] = split;
@@ -129,7 +130,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
     const parsedRequest: ParsedRequestTokenBody = parseRequestTokenBody(authorizationRequest);
     if (!parsedRequest.isValid) {
       return {
-        body: JSON.stringify({ error: parsedRequest.failureMessage }),
+        body: { error: parsedRequest.failureMessage },
         statusCode: 400,
       };
     }
@@ -149,7 +150,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
           `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Hard-coded credentials are not enabled`,
           authorizationRequest.traceId,
         );
-        return { body: '', statusCode: 401 };
+        return { statusCode: 401 };
       }
 
       if (clientId === admin1.key && clientSecret === admin1.secret) {
@@ -175,7 +176,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
       if (result.response === 'UNKNOWN_FAILURE') {
         Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`, authorizationRequest.traceId);
-        return { body: '', statusCode: 500 };
+        return { statusCode: 500 };
       }
 
       if (result.response === 'GET_FAILURE_NOT_EXISTS') {
@@ -183,7 +184,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
           `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client does not exist`,
           authorizationRequest.traceId,
         );
-        return { body: '', statusCode: 401 };
+        return { statusCode: 401 };
       }
 
       if (!result.active) {
@@ -191,12 +192,12 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
           `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client deactivated `,
           authorizationRequest.traceId,
         );
-        return { body: '', statusCode: 403 };
+        return { statusCode: 403 };
       }
 
       if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
         Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`, authorizationRequest.traceId);
-        return { body: '', statusCode: 401 };
+        return { statusCode: 401 };
       }
 
       Logger.debug(`${moduleName}.requestToken authorized 200`, authorizationRequest.traceId);
@@ -207,9 +208,9 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       };
     }
 
-    return { body: '', statusCode: 401 };
+    return { statusCode: 401 };
   } catch (e) {
     Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

@@ -370,9 +370,19 @@ describe('given an update of a document with one existing and one non-existent r
 
   it('should have returned a failure to insert the document with an invalid reference', async () => {
     expect(updateResult.response).toBe('UPDATE_FAILURE_REFERENCE');
-    expect(updateResult.failureMessage).toMatchInlineSnapshot(
-      `"Reference validation failed: Resource School is missing identity {"natural":"not a valid reference"}"`,
-    );
+    expect(updateResult.failureMessage).toMatchInlineSnapshot(`
+      {
+        "failures": [
+          {
+            "identity": {
+              "natural": "not a valid reference",
+            },
+            "resourceName": "School",
+          },
+        ],
+        "message": "Reference validation failed",
+      }
+    `);
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {

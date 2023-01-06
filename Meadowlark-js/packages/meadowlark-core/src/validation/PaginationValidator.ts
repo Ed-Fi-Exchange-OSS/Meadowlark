@@ -13,7 +13,7 @@ const isNotPositiveInteger = (value: string | number): Boolean =>
 /**
  * Validates the `limit` and `offset` parameters from a query string.
  */
-export function validatePaginationParameters(parameters: PaginationParameters): string | undefined {
+export function validatePaginationParameters(parameters: PaginationParameters): object | undefined {
   function validateLimit(): void {
     if (parameters.limit != null) {
       if (isNotPositiveInteger(parameters.limit)) {

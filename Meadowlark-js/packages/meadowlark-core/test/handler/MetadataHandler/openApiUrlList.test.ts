@@ -19,20 +19,6 @@ describe('when getting the Open API metadata list', () => {
       stage: 'local',
     };
 
-    // In this expected output, note that `http` is used instead of `https`
-    const EXPECTED_OUTPUT = `[
-  {
-    "name": "Descriptors",
-    "endpointUri": "http://l:1/local/metadata/descriptors/swagger.json",
-    "prefix": ""
-  },
-  {
-    "name": "Resources",
-    "endpointUri": "http://l:1/local/metadata/resources/swagger.json",
-    "prefix": ""
-  }
-]`;
-
     // eslint-disable-next-line no-return-assign
     beforeAll(async () => {
       response = await openApiUrlList(event);
@@ -41,8 +27,23 @@ describe('when getting the Open API metadata list', () => {
     it('returns status 200', () => {
       expect(response.statusCode).toEqual(200);
     });
+
     it('returns the expected JSON output', () => {
-      expect(response.body).toEqual(EXPECTED_OUTPUT);
+      // In this expected output, note that `http` is used instead of `https`
+      expect(response.body).toMatchInlineSnapshot(`
+        [
+          {
+            "endpointUri": "http://l:1/local/metadata/descriptors/swagger.json",
+            "name": "Descriptors",
+            "prefix": "",
+          },
+          {
+            "endpointUri": "http://l:1/local/metadata/resources/swagger.json",
+            "name": "Resources",
+            "prefix": "",
+          },
+        ]
+      `);
     });
   });
 
@@ -57,20 +58,6 @@ describe('when getting the Open API metadata list', () => {
       stage: '!@#',
     };
 
-    // In this expected output, note that `https` is used instead of `http`
-    const EXPECTED_OUTPUT = `[
-  {
-    "name": "Descriptors",
-    "endpointUri": "https://l:1/!@#/metadata/descriptors/swagger.json",
-    "prefix": ""
-  },
-  {
-    "name": "Resources",
-    "endpointUri": "https://l:1/!@#/metadata/resources/swagger.json",
-    "prefix": ""
-  }
-]`;
-
     // eslint-disable-next-line no-return-assign
     beforeAll(async () => {
       response = await openApiUrlList(event);
@@ -80,7 +67,21 @@ describe('when getting the Open API metadata list', () => {
       expect(response.statusCode).toEqual(200);
     });
     it('returns the expected JSON output', () => {
-      expect(response.body).toEqual(EXPECTED_OUTPUT);
+      // In this expected output, note that `https` is used instead of `http`
+      expect(response.body).toMatchInlineSnapshot(`
+        [
+          {
+            "endpointUri": "https://l:1/!@#/metadata/descriptors/swagger.json",
+            "name": "Descriptors",
+            "prefix": "",
+          },
+          {
+            "endpointUri": "https://l:1/!@#/metadata/resources/swagger.json",
+            "name": "Resources",
+            "prefix": "",
+          },
+        ]
+      `);
     });
   });
 });

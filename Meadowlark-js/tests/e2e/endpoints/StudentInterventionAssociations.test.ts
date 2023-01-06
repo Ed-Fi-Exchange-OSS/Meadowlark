@@ -24,8 +24,28 @@ describe('Student Intervention Association', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toContain('Resource Intervention is missing identity');
-          expect(response.body.message).toContain('Resource Student is missing identity');
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "educationOrganizationReference.educationOrganizationId": 123,
+                      "interventionIdentificationCode": "111",
+                    },
+                    "resourceName": "Intervention",
+                  },
+                  {
+                    "identity": {
+                      "studentUniqueId": "s0zf6d1123d3e",
+                    },
+                    "resourceName": "Student",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+          `);
         });
     });
   });

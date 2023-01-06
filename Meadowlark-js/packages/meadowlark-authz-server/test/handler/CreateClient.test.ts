@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import crypto from 'node:crypto';
 import { createClient } from '../../src/handler/CreateClient';
 import { CreateAuthorizationClientResult } from '../../src/message/CreateAuthorizationClientResult';
 import * as JwtAction from '../../src/security/JwtAction';
@@ -12,6 +13,7 @@ import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { newJwtStatus } from '../../src/security/JwtStatus';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../../src/message/TryCreateBootstrapAuthorizationAdminResult';
+import { ClientId } from '../../src/Utility';
 
 process.env.ACCESS_TOKEN_REQUIRED = 'false';
 
@@ -62,7 +64,7 @@ describe('given valid admin user but authorization store is going to fail', () =
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -86,6 +88,18 @@ describe('given authorization store succeeds on create', () => {
       roles: ['admin'],
     });
 
+    jest.spyOn(ClientId, 'new').mockReturnValue('ea530639-6cf1-40a5-b959-58fce20018c4');
+
+    // Weird mechanism for dealing with the overloaded randomBytes() function; otherwise, Jest ends up spying on the other
+    // signature instead of the desired one.
+    type cryptoOverload = {
+      randomBytes(size: number): Buffer;
+    };
+
+    jest
+      .spyOn(crypto as cryptoOverload, 'randomBytes')
+      .mockReturnValue(Buffer.from('48a8caf085d98a074f9e2cda364e08adfe2c37bf19217f3eaa993254c7f9940b', 'hex'));
+
     // Act
     response = await createClient(authorizationRequest);
   });
@@ -99,20 +113,18 @@ describe('given authorization store succeeds on create', () => {
     expect(response.statusCode).toEqual(201);
   });
 
-  it('returns a message body with client name', () => {
-    expect(response.body).toMatch(`"clientName":"Hometown SIS"`);
-  });
-
-  it('returns a message body with roles', () => {
-    expect(response.body).toMatch(`"roles":["vendor","assessment"]`);
-  });
-
-  it('returns a message body with client id', () => {
-    expect(response.body).toMatch(`"client_id":`);
-  });
-
-  it('returns a message body with client secret', () => {
-    expect(response.body).toMatch(`"client_secret":`);
+  it('returns a message containing new client information', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "clientName": "Hometown SIS",
+        "client_id": "ea530639-6cf1-40a5-b959-58fce20018c4",
+        "client_secret": "48a8caf085d98a074f9e2cda364e08adfe2c37bf19217f3eaa993254c7f9940b",
+        "roles": [
+          "vendor",
+          "assessment",
+        ],
+      }
+    `);
   });
 
   it('it returns location header', () => {
@@ -141,7 +153,10 @@ describe('given missing authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
+        "body": {
+          "error": "invalid_client",
+          "error_description": "Authorization token not provided",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -173,7 +188,10 @@ describe('given expired authorization token', () => {
   it('returns error response', () => {
     expect(response).toMatchInlineSnapshot(`
       {
-        "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
+        "body": {
+          "error": "invalid_token",
+          "error_description": "Token is expired",
+        },
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -205,7 +223,7 @@ describe('given non-admin authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`""`);
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -231,9 +249,12 @@ describe('given invalid authorization token', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_token", "error_description": "Invalid authorization token" }"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_token",
+        "error_description": "Invalid authorization token",
+      }
+    `);
   });
 });
 
@@ -276,7 +297,11 @@ describe('given create has missing body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Missing body"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Missing body",
+      }
+    `);
   });
 });
 
@@ -320,7 +345,11 @@ describe('given create has malformed json body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(`"{"message":"Malformed body: Unexpected token b in JSON at position 2"}"`);
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Malformed body: Unexpected token b in JSON at position 2",
+      }
+    `);
   });
 });
 
@@ -364,9 +393,26 @@ describe('given create has well-formed but invalid json body', () => {
   });
 
   it('returns error response', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"[{"message":"{requestBody} must have required property 'clientName'","path":"{requestBody}","context":{"errorType":"required"}},{"message":"{requestBody} must have required property 'roles'","path":"{requestBody}","context":{"errorType":"required"}}]"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'clientName'",
+            "path": "{requestBody}",
+          },
+          {
+            "context": {
+              "errorType": "required",
+            },
+            "message": "{requestBody} must have required property 'roles'",
+            "path": "{requestBody}",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -400,7 +446,7 @@ describe('given create throws internal error', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -416,6 +462,18 @@ describe('given authorization store success on try create bootstrap admin', () =
           response: 'CREATE_SUCCESS',
         } as TryCreateBootstrapAuthorizationAdminResult),
     });
+
+    jest.spyOn(ClientId, 'new').mockReturnValue('68d78668-edc1-4c80-818c-5c0b5e15125a');
+
+    // Weird mechanism for dealing with the overloaded randomBytes() function; otherwise, Jest ends up spying on the other
+    // signature instead of the desired one.
+    type cryptoOverload = {
+      randomBytes(size: number): Buffer;
+    };
+
+    jest
+      .spyOn(crypto as cryptoOverload, 'randomBytes')
+      .mockReturnValue(Buffer.from('c58370c8570215a8923a63704aeb2df4fe1029f251198edc8fe16f27bb20943a', 'hex'));
 
     // Act
     response = await createClient({
@@ -436,20 +494,17 @@ describe('given authorization store success on try create bootstrap admin', () =
     expect(response.statusCode).toEqual(201);
   });
 
-  it('returns a message body with client name', () => {
-    expect(response.body).toMatch(`"clientName":"Admin Bootstrap"`);
-  });
-
-  it('returns a message body with roles', () => {
-    expect(response.body).toMatch(`"roles":["admin"]`);
-  });
-
-  it('returns a message body with client id', () => {
-    expect(response.body).toMatch(`"client_id":`);
-  });
-
-  it('returns a message body with client secret', () => {
-    expect(response.body).toMatch(`"client_secret":`);
+  it('returns a response describing the created client', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "clientName": "Admin Bootstrap",
+        "client_id": "68d78668-edc1-4c80-818c-5c0b5e15125a",
+        "client_secret": "c58370c8570215a8923a63704aeb2df4fe1029f251198edc8fe16f27bb20943a",
+        "roles": [
+          "admin",
+        ],
+      }
+    `);
   });
 
   it('it returns location header', () => {
@@ -477,9 +532,12 @@ describe('given try create bootstrap admin for non-admin role', () => {
   });
 
   it('returns an error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_client", "error_description": "Authorization token not provided" }"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_client",
+        "error_description": "Authorization token not provided",
+      }
+    `);
   });
 });
 
@@ -516,8 +574,11 @@ describe('given already exists on try create bootstrap admin', () => {
   });
 
   it('returns an error message', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{ "error": "invalid_client", "error_description": "Authorization token not provided" }"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "invalid_client",
+        "error_description": "Authorization token not provided",
+      }
+    `);
   });
 });

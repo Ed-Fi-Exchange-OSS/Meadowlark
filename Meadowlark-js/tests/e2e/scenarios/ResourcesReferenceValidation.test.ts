@@ -25,7 +25,21 @@ describe('When creating a resource that has a reference to another resource', ()
           })
           .expect(400)
           .then((response) => {
-            expect(response.body.message).toContain('Resource School is missing identity');
+            expect(response.body).toMatchInlineSnapshot(`
+              {
+                "error": {
+                  "failures": [
+                    {
+                      "identity": {
+                        "schoolId": 99,
+                      },
+                      "resourceName": "School",
+                    },
+                  ],
+                  "message": "Reference validation failed",
+                },
+              }
+            `);
           });
       });
     });

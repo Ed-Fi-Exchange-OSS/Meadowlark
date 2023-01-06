@@ -17,9 +17,15 @@ export function createTokenString(
   expirationMillis: number = ONE_HOUR_FROM_NOW,
   tokenIssuer: string = getTokenIssuer(),
   tokenAudience: string = getTokenAudience(),
+  issuedAt: number | undefined = undefined,
 ): string {
   const token: Jwt = createJwt({ iss: tokenIssuer, aud: tokenAudience, roles, client_id: clientId }, signingKey()) as Jwt;
   token.setExpiration(expirationMillis);
+
+  if (issuedAt != null) {
+    token.setIssuedAt(issuedAt);
+  }
+
   return token.compact();
 }
 

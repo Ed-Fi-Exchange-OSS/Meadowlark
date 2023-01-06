@@ -22,7 +22,7 @@ export type ResourceValidationResult = {
   /**
    * Error message for validation failure
    */
-  errorBody?: string;
+  errorBody?: {};
   /**
    * Information on the validated MetaEd entity matching the API request
    */
@@ -60,9 +60,9 @@ export async function validateResource(pathComponents: PathComponents): Promise<
       headerMetadata,
       resourceName: pathComponents.resourceName,
       resourceInfo: NoResourceInfo,
-      errorBody: JSON.stringify({
-        message: invalidResourceMessage,
-      }),
+      errorBody: {
+        error: invalidResourceMessage,
+      },
     };
   }
 
@@ -71,7 +71,7 @@ export async function validateResource(pathComponents: PathComponents): Promise<
       headerMetadata,
       resourceName: pathComponents.resourceName,
       resourceInfo: NoResourceInfo,
-      errorBody: JSON.stringify({ message: `Invalid resource '${pathComponents.resourceName}'.` }),
+      errorBody: { error: `Invalid resource '${pathComponents.resourceName}'.` },
     };
   }
 

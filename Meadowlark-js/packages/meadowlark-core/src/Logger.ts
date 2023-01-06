@@ -11,17 +11,28 @@ export function writeDebugStatusToLog(
   moduleName: string,
   request: FrontendRequest,
   method: string,
-  status: number | undefined = undefined,
-  message: string = '',
+  status?: number,
+  message?: string,
+  extra?: any,
 ): void {
   if (isDebugEnabled()) {
-    Logger.debug(`${moduleName}.${method} ${status || ''} ${message || ''}`.trimEnd(), request.traceId);
+    Logger.debug(`${moduleName}.${method} ${status ?? ''} ${message ?? ''}`.trimEnd(), request.traceId, extra);
   }
 }
 
-export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string): void {
+export function writeDebugObject(
+  moduleName: string,
+  request: FrontendRequest,
+  method: string,
+  statusCode?: number,
+  messageBody?: object,
+): void {
+  Logger.debug(`${moduleName}.${method} ${statusCode}`.trimEnd(), request.traceId, messageBody);
+}
+
+export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string, extra?: any): void {
   if (isInfoEnabled()) {
-    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId);
+    Logger.info(`${moduleName}.${method} ${request.path}`, request.traceId, extra);
   }
 }
 

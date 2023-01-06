@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeErrorToLog } from '@edfi/meadowlark-utilities';
+import R from 'ramda';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
@@ -31,7 +32,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
 
       return {
-        body: JSON.stringify({ message: failureMessage }),
+        body: { error: failureMessage },
         statusCode: 400,
         headers: headerMetadata,
       };
@@ -55,18 +56,18 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 204);
-      return { body: '', statusCode: 204, headers: headerMetadata };
+      return { statusCode: 204, headers: headerMetadata };
     }
 
     if (response === 'UPDATE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 404);
-      return { body: '', statusCode: 404, headers: headerMetadata };
+      return { statusCode: 404, headers: headerMetadata };
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, 'reference error');
       return {
-        body: JSON.stringify({ message: failureMessage }),
+        body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
         statusCode: 400,
         headers: headerMetadata,
       };
@@ -75,12 +76,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, failureMessage);
 
     return {
-      body: JSON.stringify({ message: failureMessage ?? 'Failure' }),
       statusCode: 500,
       headers: headerMetadata,
     };
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

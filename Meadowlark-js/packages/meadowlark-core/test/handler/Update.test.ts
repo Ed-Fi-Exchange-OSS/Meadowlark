@@ -58,13 +58,13 @@ describe('given the requested document does not exist', () => {
   });
 
   it('returns no error message', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
-  const expectedError = 'Error';
+  const expectedError = 'this is the message';
   let response: FrontendResponse;
 
   beforeAll(async () => {
@@ -89,8 +89,13 @@ describe('given the new document has an invalid reference ', () => {
     expect(response.statusCode).toEqual(400);
   });
 
-  it('returns the persistence error message', () => {
-    expect(JSON.parse(response.body).message).toEqual(expectedError);
+  it('returns an appropriate message', () => {
+    // it should NOT return the detailed message from the database - information leakage
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "this is the message",
+      }
+    `);
   });
 });
 
@@ -120,7 +125,7 @@ describe('given the update succeeds', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -164,8 +169,10 @@ describe('given the resourceId of the update does not match the id derived from 
   });
 
   it('returns a failure message body', () => {
-    expect(response.body).toMatchInlineSnapshot(
-      `"{"message":"The identity of the resource does not match the identity in the updated document."}"`,
-    );
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "The identity of the resource does not match the identity in the updated document.",
+      }
+    `);
   });
 });

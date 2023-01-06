@@ -3,16 +3,28 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { GetAllClientsResponseBody, GetClientResponseBody } from '../model/GetClientResponseBody';
+import { ResetClientSecretResponseBody } from '../model/ResetClientSecretResponseBody';
+import { TokenErrorResponse, TokenSuccessResponse, VerificationResponse } from '../model/TokenResponse';
+import { SigningKeyResponse } from './CreateSigningKey';
+
 export interface AuthorizationResponse {
   statusCode: number;
   headers?: { [header: string]: string } | undefined;
-  body: string;
+  body?:
+    | TokenErrorResponse
+    | TokenSuccessResponse
+    | VerificationResponse
+    | ResetClientSecretResponseBody
+    | GetClientResponseBody
+    | GetAllClientsResponseBody
+    | SigningKeyResponse
+    | undefined;
 }
 
 export function newAuthorizationResponse(): AuthorizationResponse {
   return {
     statusCode: 0,
     headers: {},
-    body: '',
   };
 }

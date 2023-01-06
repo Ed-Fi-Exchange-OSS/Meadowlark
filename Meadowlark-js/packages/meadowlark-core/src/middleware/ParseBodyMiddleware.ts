@@ -17,18 +17,18 @@ export async function parseBody({ frontendRequest, frontendResponse }: Middlewar
   writeRequestToLog(moduleName, frontendRequest, 'parseBody');
 
   if (frontendRequest.body == null) {
-    const message = 'Missing body';
-    writeDebugStatusToLog(moduleName, frontendRequest, 'parseBody', 400, message);
-    return { frontendRequest, frontendResponse: { body: JSON.stringify({ message }), statusCode: 400 } };
+    const error = 'Missing body';
+    writeDebugStatusToLog(moduleName, frontendRequest, 'parseBody', 400, error);
+    return { frontendRequest, frontendResponse: { body: { error }, statusCode: 400 } };
   }
 
   let body: object = {};
   try {
     body = JSON.parse(frontendRequest.body);
-  } catch (error) {
-    const message = `Malformed body: ${error.message}`;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'parseBody', 400, message);
-    return { frontendRequest, frontendResponse: { body: JSON.stringify({ message }), statusCode: 400 } };
+  } catch (e) {
+    const error = `Malformed body: ${e.message}`;
+    writeDebugStatusToLog(moduleName, frontendRequest, 'parseBody', 400, error);
+    return { frontendRequest, frontendResponse: { body: { error }, statusCode: 400 } };
   }
 
   frontendRequest.middleware.parsedBody = body;

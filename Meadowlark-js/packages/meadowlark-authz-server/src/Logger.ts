@@ -16,6 +16,16 @@ export function writeDebugStatusToLog(
   Logger.debug(`${moduleName}.${method} ${status} ${message || ''}`.trimEnd(), request.traceId);
 }
 
+export function writeDebugObject(
+  moduleName: string,
+  request: AuthorizationRequest,
+  method: string,
+  statusCode?: number,
+  messageBody?: object,
+): void {
+  Logger.debug(`${moduleName}.${method} ${statusCode}`.trimEnd(), request.traceId, messageBody);
+}
+
 export function writeErrorToLog(moduleName: string, traceId: string, method: string, status: number, error?: any): void {
   Logger.error(`${moduleName}.${method} ${status}`, traceId, error);
 }

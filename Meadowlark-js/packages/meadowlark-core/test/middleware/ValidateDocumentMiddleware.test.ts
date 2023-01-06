@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import type { ValidationError } from '@apideck/better-ajv-errors';
 import * as DocumentValidator from '../../src/validation/DocumentValidator';
 import { documentValidation } from '../../src/middleware/ValidateDocumentMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
@@ -41,12 +42,21 @@ describe('given a previous middleware has created a response', () => {
 
 describe('given an error response and document info from documentValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
-  const errorBody = 'An error occurred';
+  const errorBody = [
+    {
+      message: 'a',
+      path: 'b',
+      context: {
+        errorType: 'additionalProperties',
+      },
+    } as ValidationError,
+  ];
+
   let resultChain: MiddlewareModel;
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = errorBody;
+    const validationResult = { error: errorBody };
 
     mockDocumentValidator = jest
       .spyOn(DocumentValidator, 'validateDocument')
@@ -69,7 +79,19 @@ describe('given an error response and document info from documentValidation', ()
   });
 
   it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(errorBody);
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": [
+          {
+            "context": {
+              "errorType": "additionalProperties",
+            },
+            "message": "a",
+            "path": "b",
+          },
+        ],
+      }
+    `);
   });
 });
 
@@ -80,11 +102,7 @@ describe('given a valid response from documentValidation', () => {
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    const validationResult = '';
-
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
-      .mockReturnValue(Promise.resolve(validationResult));
+    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(Promise.resolve(null));
 
     // Act
     resultChain = await documentValidation({ frontendRequest, frontendResponse: null });

@@ -98,7 +98,7 @@ describe('given an invalid response from resourceIdValidation', () => {
   });
 
   it('returns an empty body', () => {
-    expect(resultChain.frontendResponse?.body).toEqual('');
+    expect(resultChain.frontendResponse?.body).toBeUndefined();
   });
 });
 

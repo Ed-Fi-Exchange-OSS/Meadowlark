@@ -43,7 +43,7 @@ describe('given a previous middleware has created a response', () => {
 describe('given an error response and no document info from resourceValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   let resultChain: MiddlewareModel;
-  const errorBody = 'An error occurred';
+  const errorBody = 'An error occurred XYZ';
   let mockResourceValidator: any;
 
   beforeAll(async () => {
@@ -74,7 +74,7 @@ describe('given an error response and no document info from resourceValidation',
   });
 
   it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(errorBody);
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`"An error occurred XYZ"`);
   });
 });
 
@@ -187,9 +187,11 @@ describe('given requesting abstract domain entity', () => {
   });
 
   it('returns the expected message body', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(
-      '{"message":"Invalid resource \'educationOrganizations\'. The most similar resource is \'educationOrganizationNetworks\'."}',
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid resource 'educationOrganizations'. The most similar resource is 'educationOrganizationNetworks'.",
+      }
+    `);
   });
 });
 
@@ -221,8 +223,10 @@ describe('given requesting abstract association', () => {
   });
 
   it('returns the expected message body', () => {
-    expect(resultChain.frontendResponse?.body).toEqual(
-      '{"message":"Invalid resource \'generalStudentProgramAssociations\'. The most similar resource is \'studentProgramAssociations\'."}',
-    );
+    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
+      {
+        "error": "Invalid resource 'generalStudentProgramAssociations'. The most similar resource is 'studentProgramAssociations'.",
+      }
+    `);
   });
 });

@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { validateDocument } from '../validation/DocumentValidator';
-import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
+import { writeDebugObject, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ValidateDocumentMiddleware';
@@ -17,17 +17,17 @@ export async function documentValidation({ frontendRequest, frontendResponse }: 
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'documentValidation');
 
-  const errorBody: string = await validateDocument(
+  const error: object | null = await validateDocument(
     frontendRequest.middleware.parsedBody,
     frontendRequest.middleware.matchingMetaEdModel,
   );
 
-  if (errorBody !== '') {
+  if (error != null) {
     const statusCode = 400;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'documentValidation', statusCode, errorBody);
+    writeDebugObject(moduleName, frontendRequest, 'documentValidation', statusCode, error);
     return {
       frontendRequest,
-      frontendResponse: { body: errorBody, statusCode, headers: frontendRequest.middleware.headerMetadata },
+      frontendResponse: { body: error, statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
 

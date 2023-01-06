@@ -9,13 +9,17 @@ import { writeRequestToLog } from '../Logger';
 
 const moduleName = 'authz.handler.CreateSigningKey';
 
+export type SigningKeyResponse = {
+  key: string;
+};
+
 /**
  * Handler for client creation
  */
 export async function createSigningKey(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   writeRequestToLog(moduleName, authorizationRequest, 'createSigningKey');
   return {
-    body: JSON.stringify({ key: crypto.randomBytes(256).toString('base64') }),
+    body: { key: crypto.randomBytes(256).toString('base64') },
     statusCode: 201,
   };
 }

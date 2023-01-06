@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
+import { writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { validatePaginationParameters } from '../validation/PaginationValidator';
 import { validateQueryString } from '../validation/QueryStringValidator';
@@ -31,7 +31,6 @@ export async function queryValidation({ frontendRequest, frontendResponse }: Mid
 
   if (paginationValidationResult != null) {
     const statusCode = 400;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'queryValidation', statusCode, paginationValidationResult);
     return {
       frontendRequest,
       frontendResponse: { body: paginationValidationResult, statusCode, headers: frontendRequest.middleware.headerMetadata },
@@ -45,7 +44,6 @@ export async function queryValidation({ frontendRequest, frontendResponse }: Mid
 
   if (errorBody != null) {
     const statusCode = 400;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'queryValidation', statusCode, errorBody);
     return {
       frontendRequest,
       frontendResponse: { body: errorBody, statusCode, headers: frontendRequest.middleware.headerMetadata },

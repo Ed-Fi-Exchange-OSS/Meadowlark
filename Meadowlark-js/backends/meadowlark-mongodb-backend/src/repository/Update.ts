@@ -43,7 +43,7 @@ export async function updateDocumentById(
 
           updateResult = {
             response: 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: `Reference validation failed: ${failures.join(',')}`,
+            failureMessage: { message: 'Reference validation failed', failures },
           };
 
           await session.abortTransaction();

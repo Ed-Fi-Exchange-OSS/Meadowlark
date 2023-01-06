@@ -24,7 +24,23 @@ describe('When creating a resource that has a reference to a descriptor', () => 
           })
           .expect(400)
           .then((response) => {
-            expect(response.body.message).toContain('Resource CountryDescriptor is missing identity');
+            expect(response.body).toMatchInlineSnapshot(
+              `
+              {
+                "error": {
+                  "failures": [
+                    {
+                      "identity": {
+                        "descriptor": "uri://ed-fi.org/CountryDescriptor#AD3",
+                      },
+                      "resourceName": "CountryDescriptor",
+                    },
+                  ],
+                  "message": "Reference validation failed",
+                },
+              }
+            `,
+            );
           });
       });
     });

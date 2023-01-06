@@ -52,7 +52,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
 
     if (frontendRequest.middleware.pathComponents.resourceId == null) {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
-      return { body: '', statusCode: 404 };
+      return { statusCode: 404 };
     }
 
     const request: DeleteRequest = {
@@ -69,12 +69,12 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
 
     if (result.response === 'DELETE_SUCCESS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 204);
-      return { body: '', statusCode: 204, headers: frontendRequest.middleware.headerMetadata };
+      return { statusCode: 204, headers: frontendRequest.middleware.headerMetadata };
     }
 
     if (result.response === 'DELETE_FAILURE_NOT_EXISTS') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
-      return { body: '', statusCode: 404, headers: frontendRequest.middleware.headerMetadata };
+      return { statusCode: 404, headers: frontendRequest.middleware.headerMetadata };
     }
 
     if (result.response === 'DELETE_FAILURE_REFERENCE') {
@@ -85,7 +85,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       }
 
       return {
-        body: JSON.stringify({ message: DELETE_FAILURE_REFERENCE_MESSAGE, blockingUris }),
+        body: { error: { message: DELETE_FAILURE_REFERENCE_MESSAGE, blockingUris } },
         statusCode: 409,
         headers: frontendRequest.middleware.headerMetadata,
       };
@@ -93,12 +93,11 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
 
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, result.failureMessage);
     return {
-      body: JSON.stringify({ message: result.failureMessage ?? 'Failure' }),
       statusCode: 500,
       headers: frontendRequest.middleware.headerMetadata,
     };
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }

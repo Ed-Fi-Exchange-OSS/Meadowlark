@@ -11,7 +11,7 @@ export type QueryStringValidationResult = {
   /**
    * Error message for validation failure
    */
-  errorBody?: string;
+  errorBody?: object | string;
 };
 
 /**

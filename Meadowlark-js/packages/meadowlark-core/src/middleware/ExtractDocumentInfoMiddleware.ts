@@ -32,7 +32,7 @@ export async function documentInfoExtraction({
     writeDebugStatusToLog(moduleName, frontendRequest, 'documentInfoExtraction', statusCode);
     return {
       frontendRequest,
-      frontendResponse: { body: '', statusCode, headers: frontendRequest.middleware.headerMetadata },
+      frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
 

@@ -29,8 +29,27 @@ describe('Sessions', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toContain('Resource School is missing identity');
-          expect(response.body.message).toContain('Resource TermDescriptor is missing identity');
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "schoolId": 99,
+                    },
+                    "resourceName": "School",
+                  },
+                  {
+                    "identity": {
+                      "descriptor": "uri://ed-fi.org/fake-uri",
+                    },
+                    "resourceName": "TermDescriptor",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+          `);
         });
     });
   });

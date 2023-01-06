@@ -43,10 +43,52 @@ describe('Sections', () => {
         })
         .expect(400)
         .then((response) => {
-          expect(response.body.message).toContain('Resource ClassPeriod is missing identity');
-          expect(response.body.message).toContain('Resource CourseOffering is missing identity');
-          expect(response.body.message).toContain('Resource Location is missing identity');
-          expect(response.body.message).toContain('Resource CreditTypeDescriptor is missing identity');
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "classPeriodName": "z1",
+                      "schoolReference.schoolId": 66,
+                    },
+                    "resourceName": "ClassPeriod",
+                  },
+                  {
+                    "identity": {
+                      "classPeriodName": "z2",
+                      "schoolReference.schoolId": 66,
+                    },
+                    "resourceName": "ClassPeriod",
+                  },
+                  {
+                    "identity": {
+                      "localCourseCode": "abc",
+                      "schoolReference.schoolId": 666,
+                      "sessionReference.schoolId": 666,
+                      "sessionReference.schoolYear": 2034,
+                      "sessionReference.sessionName": "d",
+                    },
+                    "resourceName": "CourseOffering",
+                  },
+                  {
+                    "identity": {
+                      "classroomIdentificationCode": "1",
+                      "schoolReference.schoolId": 2,
+                    },
+                    "resourceName": "Location",
+                  },
+                  {
+                    "identity": {
+                      "descriptor": "k",
+                    },
+                    "resourceName": "CreditTypeDescriptor",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+          `);
         });
     });
   });

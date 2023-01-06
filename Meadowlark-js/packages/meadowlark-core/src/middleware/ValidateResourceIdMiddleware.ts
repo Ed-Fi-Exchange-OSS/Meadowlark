@@ -39,7 +39,7 @@ export async function resourceIdValidation({
     );
     return {
       frontendRequest,
-      frontendResponse: { body: '', statusCode, headers: frontendRequest.middleware.headerMetadata },
+      frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
 

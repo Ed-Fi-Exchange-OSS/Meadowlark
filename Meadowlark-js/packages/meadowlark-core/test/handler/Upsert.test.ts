@@ -28,7 +28,7 @@ const frontendRequest: FrontendRequest = {
 describe('given persistence is going to throw a reference error on insert', () => {
   let response: FrontendResponse;
   let mockDocumentStore: any;
-  const expectedError = 'Error';
+  const expectedError = 'Error message';
 
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
@@ -52,8 +52,13 @@ describe('given persistence is going to throw a reference error on insert', () =
     expect(response.statusCode).toEqual(400);
   });
 
-  it('returns an error message', () => {
-    expect(JSON.parse(response.body).message).toEqual(expectedError);
+  it('returns an appropriate message', () => {
+    // it should NOT return the detailed message from the database - information leakage
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Error message",
+      }
+    `);
   });
 });
 
@@ -84,7 +89,7 @@ describe('given persistence is going to throw a reference error on update though
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -116,7 +121,7 @@ describe('given persistence is going to fail', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 });
 
@@ -147,7 +152,7 @@ describe('given persistence succeeds as insert', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 
   it('it returns headers', () => {
@@ -183,7 +188,7 @@ describe('given persistence succeeds as update', () => {
   });
 
   it('does not return a message body', () => {
-    expect(response.body).toEqual('');
+    expect(response.body).toBeUndefined();
   });
 
   it('it returns headers', () => {

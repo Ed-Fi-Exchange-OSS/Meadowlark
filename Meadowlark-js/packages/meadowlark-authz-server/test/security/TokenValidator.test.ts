@@ -8,13 +8,13 @@ import {
   validateTokenForAccess,
   validateAdminTokenForAccess,
   introspectBearerToken,
-  IntrospectionResponse,
 } from '../../src/security/TokenValidator';
 import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { createAuthorizationHeader, createTokenString, ONE_HOUR_AGO, ONE_HOUR_FROM_NOW } from './TestHelper';
 import { getTokenAudience, getTokenIssuer } from '../../src/security/TokenSettings';
+import { IntrospectionResponse } from '../../src/model/TokenResponse';
 
 process.env.OAUTH_SIGNING_KEY =
   'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
@@ -33,7 +33,10 @@ describe('given validation of missing token', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "errorResponse": {
-          "body": "{ "error": "invalid_client", "error_description": "Authorization token not provided" }",
+          "body": {
+            "error": "invalid_client",
+            "error_description": "Authorization token not provided",
+          },
           "headers": {
             "WWW-Authenticate": "Bearer",
           },
@@ -59,7 +62,10 @@ describe('given validation of expired token', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "errorResponse": {
-          "body": "{ "error": "invalid_token", "error_description": "Token is expired" }",
+          "body": {
+            "error": "invalid_token",
+            "error_description": "Token is expired",
+          },
           "headers": {
             "WWW-Authenticate": "Bearer",
           },
@@ -85,7 +91,10 @@ describe('given validation of invalid token', () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "errorResponse": {
-          "body": "{ "error": "invalid_token", "error_description": "Invalid authorization token" }",
+          "body": {
+            "error": "invalid_token",
+            "error_description": "Invalid authorization token",
+          },
           "headers": {
             "WWW-Authenticate": "Bearer",
           },
@@ -133,7 +142,6 @@ describe('given admin validation of non-admin token', () => {
   it('returns forbidden', () => {
     expect(result).toMatchInlineSnapshot(`
       {
-        "body": "",
         "headers": {
           "WWW-Authenticate": "Bearer",
         },
@@ -242,12 +250,13 @@ describe('given validation of valid token with clientId no longer in datastore',
 
   it('returns valid with inactive token information', () => {
     expect(result.isValid).toBe(true);
-    expect((result as any).introspectedToken.active).toBe(false);
-    expect((result as any).introspectedToken.aud).toBe(getTokenAudience());
-    expect((result as any).introspectedToken.client_id).toBe('clientId');
-    expect((result as any).introspectedToken.iss).toBe(getTokenIssuer());
-    expect((result as any).introspectedToken.roles).toHaveLength(1);
-    expect((result as any).introspectedToken.roles[0]).toBe('vendor');
+    const tokenResponse = (result as any).introspectedToken;
+    expect(tokenResponse.active).toBe(false);
+    expect(tokenResponse.aud).toBe(getTokenAudience());
+    expect(tokenResponse.client_id).toBe('clientId');
+    expect(tokenResponse.iss).toBe(getTokenIssuer());
+    expect(tokenResponse.roles).toHaveLength(1);
+    expect(tokenResponse.roles[0]).toBe('vendor');
   });
 });
 

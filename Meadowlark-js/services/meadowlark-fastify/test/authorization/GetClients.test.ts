@@ -16,12 +16,14 @@ const getClientRequest: InjectOptions = {
 
 const clientResponse: AuthorizationServer.AuthorizationResponse = {
   statusCode: 200,
-  body: `[{
-  "clientId": "890",
-  "clientName": "Hometown SIS",
-  "roles": ["vendor", "assessment"],
-  "active": true,
-}]`,
+  body: [
+    {
+      clientId: '890',
+      clientName: 'Hometown SIS',
+      roles: ['vendor', 'assessment'],
+      active: true,
+    },
+  ],
 };
 
 describe('given a GET request', () => {
@@ -45,14 +47,9 @@ describe('given a GET request', () => {
   });
 
   it('should respond with the appropriate clients', async () => {
-    expect(response.body).toMatchInlineSnapshot(`
-      "[{
-        "clientId": "890",
-        "clientName": "Hometown SIS",
-        "roles": ["vendor", "assessment"],
-        "active": true,
-      }]"
-    `);
+    expect(response.body).toMatchInlineSnapshot(
+      `"[{"clientId":"890","clientName":"Hometown SIS","roles":["vendor","assessment"],"active":true}]"`,
+    );
   });
 
   it('should call the authorization server correctly', async () => {

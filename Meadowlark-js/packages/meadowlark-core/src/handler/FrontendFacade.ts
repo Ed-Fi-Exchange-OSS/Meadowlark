@@ -23,6 +23,7 @@ import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
 import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 import { anonymizeAndLogRequestBody } from '../middleware/LogAnonymizedRequestMiddleware';
+import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -49,6 +50,7 @@ function postStack(): MiddlewareStack {
       R.andThen(documentValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
+      R.andThen(logTheResponse),
     ),
   );
 }
@@ -67,6 +69,7 @@ function putStack(): MiddlewareStack {
       R.andThen(documentValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
+      R.andThen(logTheResponse),
     ),
   );
 }
@@ -80,6 +83,7 @@ function deleteStack(): MiddlewareStack {
       R.andThen(resourceValidation),
       R.andThen(resourceIdValidation),
       R.andThen(getDocumentStore().securityMiddleware),
+      R.andThen(logTheResponse),
     ),
   );
 }
@@ -92,13 +96,22 @@ function getByIdStack(): MiddlewareStack {
       R.andThen(resourceValidation),
       R.andThen(resourceIdValidation),
       R.andThen(getDocumentStore().securityMiddleware),
+      R.andThen(logTheResponse),
     ),
   );
 }
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
 function queryStack(): MiddlewareStack {
-  return R.once(R.pipe(authorize, R.andThen(resourceValidation), R.andThen(metaEdModelFinding), R.andThen(queryValidation)));
+  return R.once(
+    R.pipe(
+      authorize,
+      R.andThen(resourceValidation),
+      R.andThen(metaEdModelFinding),
+      R.andThen(queryValidation),
+      R.andThen(logTheResponse),
+    ),
+  );
 }
 
 /**
@@ -115,10 +128,13 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Query.query(model.frontendRequest);
+    const queryResponse = await Query.query(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: queryResponse });
+    return queryResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'query', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
 
@@ -136,10 +152,13 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await GetById.getById(model.frontendRequest);
+    const getByIdResponse = await GetById.getById(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: getByIdResponse });
+    return getByIdResponse;
   } catch (e) {
     writeErrorToLog('FrontendFacade', frontendRequest.traceId, 'getById', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
 
@@ -157,10 +176,13 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
       return await query(frontendRequest);
     }
 
-    return await getById(frontendRequest);
+    const getResponse = await getById(frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: getResponse });
+    return getResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'get', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
 
@@ -178,10 +200,13 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Update.update(model.frontendRequest);
+    const updateResult = await Update.update(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: updateResult });
+    return updateResult;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
 
@@ -199,10 +224,13 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Upsert.upsert(model.frontendRequest);
+    const upsertResponse = await Upsert.upsert(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: upsertResponse });
+    return upsertResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'upsert', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
 
@@ -220,9 +248,12 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     // if there is a response posted by the stack, we are done
     if (model.frontendResponse != null) return model.frontendResponse;
 
-    return await Delete.deleteIt(model.frontendRequest);
+    const deleteResponse = await Delete.deleteIt(model.frontendRequest);
+
+    await logTheResponse({ frontendRequest, frontendResponse: deleteResponse });
+    return deleteResponse;
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, e);
-    return { body: '', statusCode: 500 };
+    return { statusCode: 500 };
   }
 }
