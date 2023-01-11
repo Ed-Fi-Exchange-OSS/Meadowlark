@@ -8,21 +8,11 @@ npm-debug.log
 tmp
 dist/
 docs/
-yarn-error.log
 
 # AWS emulator directories
 .dynamodb/
 dynamodb_local_data/
 .localstack/
-
-# Modern Yarn
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 
 # jest-mongodb
 globalConfig.json

@@ -8,7 +8,7 @@ import { getSigningKey } from '../security/TokenSettings';
 function getSigningKeyFromEnvironment(): Buffer {
   const signingKeyEncoded = getSigningKey();
   if (signingKeyEncoded == null) {
-    throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `yarn createKey`');
+    throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
   return Buffer.from(signingKeyEncoded, 'base64');
 }

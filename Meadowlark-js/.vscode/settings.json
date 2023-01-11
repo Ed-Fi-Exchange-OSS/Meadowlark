@@ -1,6 +1,6 @@
 {
   "eslint.enable": true,
-  "eslint.packageManager": "yarn",
+  "eslint.packageManager": "npm",
   "eslint.validate": [
     "javascript",
     "typescript"
@@ -9,8 +9,6 @@
     125
   ],
   "typescript.tsdk": "./node_modules/typescript/lib",
-  "npm.packageManager": "yarn",
-  "npm.enableScriptExplorer": true,
   "files.exclude": {
     "**/.DS_Store": false,
     "**/.git": true,

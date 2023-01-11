@@ -53,7 +53,7 @@
     "rimraf": "^3.0.2"
   },
   "scripts": {
-    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
