@@ -50,10 +50,11 @@
     "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest --testPathIgnorePatterns=\"system|integration|e2e\"",
     "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest integration --runInBand",
     "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest e2e --config ./jest.e2e-config.js --runInBand",
+    "test:system:ci": "npm run test:system:mongodb  -- --ci --config ./jest.ci-config.js && npm run test:system:postgresql  -- --ci --config ./jest.ci-config.js",
     "test:system": "npm run test:system:mongodb && npm run test:system:postgresql",
     "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend LOG_LEVEL=warn npx jest system --runInBand",
     "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend LOG_LEVEL=warn npx jest system --runInBand",
-    "test:unit:coverage": "rimraf coverage/ && npm run test:unit --collectCoverage",
+    "test:unit:coverage": "rimraf coverage/ && npm run test:unit -- --collectCoverage",
     "prepare": "cd .. && husky install"
   },
   "husky": {
