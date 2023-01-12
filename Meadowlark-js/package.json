@@ -43,24 +43,22 @@
   "scripts": {
     "build": "lerna run build --stream",
     "build:clean": "lerna run build:clean --stream",
-    "test:all": "yarn test && yarn test:integration",
-    "test": "yarn test:lint && yarn test:unit && yarn test:integration && yarn test:system",
-    "test:lint": "yarn test:lint:ts && yarn test:lint:eslint",
+    "test": "npm run test:lint && npm run test:unit && npm run test:integration && npm run test:system",
+    "test:lint": "npm run test:lint:ts && npm run test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",
-    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest --testPathIgnorePatterns=\"system|integration|e2e\"",
-    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest integration --runInBand",
-    "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn yarn jest e2e --config ./jest.e2e-config.js --runInBand",
-    "test:system": "yarn test:system:mongodb && yarn test:system:postgresql",
-    "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend LOG_LEVEL=warn yarn jest system --runInBand",
-    "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend LOG_LEVEL=warn yarn jest system --runInBand",
-    "test:unit:coverage": "rimraf coverage/ && yarn test:unit --collectCoverage",
+    "test:unit": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest --testPathIgnorePatterns=\"system|integration|e2e\"",
+    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest integration --runInBand",
+    "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=4096 LOG_LEVEL=warn npx jest e2e --config ./jest.e2e-config.js --runInBand",
+    "test:system": "npm run test:system:mongodb && npm run test:system:postgresql",
+    "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend LOG_LEVEL=warn npx jest system --runInBand",
+    "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend LOG_LEVEL=warn npx jest system --runInBand",
+    "test:unit:coverage": "rimraf coverage/ && npm run test:unit --collectCoverage",
     "prepare": "cd .. && husky install"
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn test:lint"
+      "pre-push": "npm run test:lint"
     }
-  },
-  "packageManager": "yarn@3.2.1"
+  }
 }

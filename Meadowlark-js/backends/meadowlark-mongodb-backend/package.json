@@ -13,7 +13,7 @@
     "/package.json"
   ],
   "scripts": {
-    "build": "yarn build:clean && yarn build:copy-non-ts && yarn build:dist",
+    "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
@@ -21,7 +21,7 @@
   "dependencies": {
     "@edfi/meadowlark-authz-server": "0.2.0-dev.0",
     "@edfi/meadowlark-core": "0.2.0-dev.0",
-    "@edfi/meadowlark-utilities": "workspace:^",
+    "@edfi/meadowlark-utilities": "0.2.0-dev.0",
     "mongodb": "^4.11.0",
     "ramda": "0.27.2",
     "ts-invariant": "^0.10.3"

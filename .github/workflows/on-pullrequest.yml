@@ -59,19 +59,19 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: npm install
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
@@ -94,22 +94,22 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: npm install
 
       - name: Linter
-        run: yarn test:lint
+        run: npm run test:lint
 
   build:
     name: Build
@@ -123,19 +123,19 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: npm install
 
       - name: Build Cache
         id: build-cache
@@ -146,7 +146,7 @@ jobs:
 
       - name: Build
         if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
-        run: yarn build
+        run: npm run build
 
   tests:
     name: ${{matrix.tests.type}} tests
@@ -159,15 +159,15 @@ jobs:
           [
             {
               type: "Unit",
-              command: "yarn test:unit:coverage --ci --config ./jest.ci-config.js",
+              command: "npm run test:unit:coverage --ci --config ./jest.ci-config.js",
             },
             {
               type: "Integration",
-              command: "yarn test:integration --ci --config ./jest.ci-config.js",
+              command: "npm run test:integration --ci --config ./jest.ci-config.js",
             },
             {
               type: "System",
-              command: "yarn test:system --ci --config ./jest.ci-config.js",
+              command: "npm run test:system --ci --config ./jest.ci-config.js",
             },
           ]
 
@@ -179,26 +179,26 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: ~/.cache/mongodb-binaries
-          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
 
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: npm install
 
       - name: Configure postgres
         if: ${{ matrix.tests.type != 'Unit' }}
@@ -249,26 +249,26 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: "16"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
 
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: ~/.cache/mongodb-binaries
-          key: ${{ runner.os }}-mongo-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
 
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: npm install
 
       - name: Build Cache
         id: build-cache
@@ -279,12 +279,12 @@ jobs:
 
       - name: Build
         if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
-        run: yarn build
+        run: npm run build
 
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
-          yarn test:e2e --ci --reporters="default" --reporters="jest-junit"
+          npm run test:e2e --ci --reporters="default" --reporters="jest-junit"
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}

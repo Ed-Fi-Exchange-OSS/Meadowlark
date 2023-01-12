@@ -20,6 +20,6 @@ Instructions for running a local "developer" environment:
      * To use the Meadowlark-js provided Authorization plugin, this should be set to `@edfi/meadowlark-mongodb-backend`
 3. If you have already built the Meadowlark-js project, you can skip to step 4, otherwise:
    * Open a command prompt and navigate to the `/Meadowlark-js` folder
-   * Run `yarn build`
+   * Run `npm run build`
 4. Open a command prompt and navigate to the `/Meadowlark-js/services/meadowlark-fastify` folder
-5. Run `yarn start:local` to start the Fastify service
+5. Run `npm run start:local` to start the Fastify service

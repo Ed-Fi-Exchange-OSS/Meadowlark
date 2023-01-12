@@ -7,7 +7,6 @@ deployment.
 ## Required Toolkit
 
 * NodeJs 16
-* Yarn 3
 * Docker Desktop or equivalent
 * Visual Studio Code (recommended)
 
@@ -37,18 +36,18 @@ See [Running on Localhost](LOCALHOST.md).
 
 * Start Visual Studio Code and open the `meadowlark-js` directory.
 * Install all extension recommendations.
-* Open a terminal in the meadowlark-js directory and run `yarn install`.
-  * Note that `yarn install` will add a git hook to run linters before pushing
+* Open a terminal in the meadowlark-js directory and run `npm install`.
+  * Note that `npm install` will add a git hook to run linters before pushing
     with git.
 
 ## Test a local deploy
 
 Meadowlark is bundled with test scripts to exercise the API.
 
-* Run `yarn build` from the root `Meadowlark-js` directory.
+* Run `npm run build` from the root `Meadowlark-js` directory.
 * cd into your chosen service (fastify or AWS Lambda)
-* Run `yarn build`
-* Run `yarn start:local`
+* Run `npm run build`
+* Run `npm run start:local`
 * Use a test/http/local.*.http file to make API calls.
 
 ## Load Ed-Fi Descriptors
@@ -56,14 +55,11 @@ Meadowlark is bundled with test scripts to exercise the API.
 Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not
 required, must be loaded in order for descriptors to validate successfully.
 
-* Run `yarn start:local` in one shell.
+* Run `npm run start:local` in one shell.
 * In a second shell, cd into /Meadowlark/eng and the run Invoke-Bulkload.ps1
   script
   * Note: This requires building the [Bulk Load Client
     Utility](https://techdocs.ed-fi.org/display/ODSAPIS3V53/Bulk+Load+Client+Utility)
-* If using AWS-lambda as your service layer, you can also run `yarn
-  load:descriptors:local` from the /Meadowlark-js/services/meadowlark-aws-lambda
-  folder to load descriptors
 
 ## Other Build Scripts
 
