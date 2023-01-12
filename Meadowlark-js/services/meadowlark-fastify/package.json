@@ -29,8 +29,8 @@
     "build:clean": "rimraf dist",
     "build:dist": "tsc",
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
-    "start:local": "npm run node --require=dotenv/config dist/index.js",
-    "start:local-ts": "npm run ts-node --require=dotenv/config src/index.ts",
+    "start:local": "node --require=dotenv/config dist/index.js",
+    "start:local-ts": "ts-node --require=dotenv/config src/index.ts",
     "createKey": "openssl rand -base64 256"
   },
   "husky": {
