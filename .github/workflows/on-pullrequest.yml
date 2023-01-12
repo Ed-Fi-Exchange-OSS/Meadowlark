@@ -159,16 +159,13 @@ jobs:
           [
             {
               type: "Unit",
-              command: "npm run test:unit:coverage --ci --config ./jest.ci-config.js",
+              command: "npm run test:unit:coverage -- --ci --config ./jest.ci-config.js",
             },
             {
               type: "Integration",
-              command: "npm run test:integration --ci --config ./jest.ci-config.js",
+              command: "npm run test:integration -- --ci --config ./jest.ci-config.js",
             },
-            {
-              type: "System",
-              command: "npm run test:system --ci --config ./jest.ci-config.js",
-            },
+            { type: "System", command: "npm run test:system:ci" },
           ]
 
     steps:
@@ -284,7 +281,7 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
-          npm run test:e2e --ci --reporters="default" --reporters="jest-junit"
+          npm run test:e2e -- --ci --reporters="default" --reporters="jest-junit"
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
