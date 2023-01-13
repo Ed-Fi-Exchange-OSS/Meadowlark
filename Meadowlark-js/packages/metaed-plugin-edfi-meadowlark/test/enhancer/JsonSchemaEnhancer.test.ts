@@ -88,95 +88,95 @@ describe('when building simple domain entity with all the simple non-collections
     it('should be a correct schema', () => {
       const entity = namespace.entity.domainEntity.get(domainEntityName);
       expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "additionalProperties": false,
-        "description": "doc",
-        "properties": {
-          "optionalBooleanProperty": {
-            "description": "doc1",
-            "type": "boolean",
-          },
-          "optionalDecimalProperty": {
-            "description": "doc3",
-            "type": "number",
-          },
-          "optionalPercentProperty": {
-            "description": "doc5",
-            "type": "number",
-          },
-          "optionalShortProperty": {
-            "description": "doc9",
-            "type": "integer",
-          },
-          "optionalYear": {
-            "description": "doc13",
-            "type": "integer",
-          },
-          "requiredCurrencyProperty": {
-            "description": "doc2",
-            "type": "number",
-          },
-          "requiredDateProperty": {
-            "description": "doc6",
-            "format": "date",
-            "type": "string",
-          },
-          "requiredDatetimeProperty": {
-            "description": "doc7",
-            "format": "date-time",
-            "type": "string",
-          },
-          "requiredDurationProperty": {
-            "description": "doc4",
-            "type": "number",
-          },
-          "requiredIntegerProperty": {
-            "description": "doc8",
-            "maximum": 10,
-            "minimum": 5,
-            "type": "integer",
-          },
-          "requiredTimeProperty": {
-            "description": "doc11",
-            "format": "time",
-            "type": "string",
-          },
-          "schoolYearTypeReference": {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "additionalProperties": false,
-            "description": "A school year enumeration",
-            "properties": {
-              "schoolYear": {
-                "description": "A school year between 1900 and 2100",
-                "maximum": 2100,
-                "minimum": 1900,
-                "type": "number",
-              },
-            },
-            "title": "EdFi.SchoolYearType",
-            "type": "object",
-          },
-          "stringIdentity": {
-            "description": "doc10",
-            "maxLength": 30,
-            "minLength": 20,
-            "type": "string",
-          },
-        },
-        "required": [
-          "requiredCurrencyProperty",
-          "requiredDurationProperty",
-          "requiredDateProperty",
-          "requiredDatetimeProperty",
-          "requiredIntegerProperty",
-          "stringIdentity",
-          "requiredTimeProperty",
-        ],
-        "title": "EdFi.DomainEntityName",
-        "type": "object",
-      }
-    `);
+              {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "additionalProperties": false,
+                "description": "doc",
+                "properties": {
+                  "optionalBooleanProperty": {
+                    "description": "doc1",
+                    "type": "boolean",
+                  },
+                  "optionalDecimalProperty": {
+                    "description": "doc3",
+                    "type": "number",
+                  },
+                  "optionalPercentProperty": {
+                    "description": "doc5",
+                    "type": "number",
+                  },
+                  "optionalShortProperty": {
+                    "description": "doc9",
+                    "type": "integer",
+                  },
+                  "optionalYear": {
+                    "description": "doc13",
+                    "type": "integer",
+                  },
+                  "requiredCurrencyProperty": {
+                    "description": "doc2",
+                    "type": "number",
+                  },
+                  "requiredDateProperty": {
+                    "description": "doc6",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "requiredDatetimeProperty": {
+                    "description": "doc7",
+                    "format": "date-time",
+                    "type": "string",
+                  },
+                  "requiredDurationProperty": {
+                    "description": "doc4",
+                    "type": "number",
+                  },
+                  "requiredIntegerProperty": {
+                    "description": "doc8",
+                    "maximum": 10,
+                    "minimum": 5,
+                    "type": "integer",
+                  },
+                  "requiredTimeProperty": {
+                    "description": "doc11",
+                    "format": "time",
+                    "type": "string",
+                  },
+                  "schoolYearTypeReference": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "additionalProperties": false,
+                    "description": "A school year enumeration",
+                    "properties": {
+                      "schoolYear": {
+                        "description": "A school year between 1900 and 2100",
+                        "maximum": 2100,
+                        "minimum": 1900,
+                        "type": "integer",
+                      },
+                    },
+                    "title": "EdFi.SchoolYearType",
+                    "type": "object",
+                  },
+                  "stringIdentity": {
+                    "description": "doc10",
+                    "maxLength": 30,
+                    "minLength": 20,
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "requiredCurrencyProperty",
+                  "requiredDurationProperty",
+                  "requiredDateProperty",
+                  "requiredDatetimeProperty",
+                  "requiredIntegerProperty",
+                  "stringIdentity",
+                  "requiredTimeProperty",
+                ],
+                "title": "EdFi.DomainEntityName",
+                "type": "object",
+              }
+          `);
     });
 
     it('should be well-formed according to ajv', () => {
@@ -235,101 +235,101 @@ describe('when building simple domain entity with all the simple non-collections
     it('should be a correct schema', () => {
       const entity = namespace.entity.domainEntity.get(domainEntityName);
       expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
-      {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "additionalProperties": false,
-        "description": "doc",
-        "properties": {
-          "_ext": {
-            "additionalProperties": true,
-            "description": "optional extension collection",
-            "properties": {},
-            "type": "object",
-          },
-          "optionalBooleanProperty": {
-            "description": "doc1",
-            "type": "boolean",
-          },
-          "optionalDecimalProperty": {
-            "description": "doc3",
-            "type": "number",
-          },
-          "optionalPercentProperty": {
-            "description": "doc5",
-            "type": "number",
-          },
-          "optionalShortProperty": {
-            "description": "doc9",
-            "type": "integer",
-          },
-          "optionalYear": {
-            "description": "doc13",
-            "type": "integer",
-          },
-          "requiredCurrencyProperty": {
-            "description": "doc2",
-            "type": "number",
-          },
-          "requiredDateProperty": {
-            "description": "doc6",
-            "format": "date",
-            "type": "string",
-          },
-          "requiredDatetimeProperty": {
-            "description": "doc7",
-            "format": "date-time",
-            "type": "string",
-          },
-          "requiredDurationProperty": {
-            "description": "doc4",
-            "type": "number",
-          },
-          "requiredIntegerProperty": {
-            "description": "doc8",
-            "maximum": 10,
-            "minimum": 5,
-            "type": "integer",
-          },
-          "requiredTimeProperty": {
-            "description": "doc11",
-            "format": "time",
-            "type": "string",
-          },
-          "schoolYearTypeReference": {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "additionalProperties": false,
-            "description": "A school year enumeration",
-            "properties": {
-              "schoolYear": {
-                "description": "A school year between 1900 and 2100",
-                "maximum": 2100,
-                "minimum": 1900,
-                "type": "number",
-              },
-            },
-            "title": "EdFi.SchoolYearType",
-            "type": "object",
-          },
-          "stringIdentity": {
-            "description": "doc10",
-            "maxLength": 30,
-            "minLength": 20,
-            "type": "string",
-          },
-        },
-        "required": [
-          "requiredCurrencyProperty",
-          "requiredDurationProperty",
-          "requiredDateProperty",
-          "requiredDatetimeProperty",
-          "requiredIntegerProperty",
-          "stringIdentity",
-          "requiredTimeProperty",
-        ],
-        "title": "EdFi.DomainEntityName",
-        "type": "object",
-      }
-    `);
+              {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "additionalProperties": false,
+                "description": "doc",
+                "properties": {
+                  "_ext": {
+                    "additionalProperties": true,
+                    "description": "optional extension collection",
+                    "properties": {},
+                    "type": "object",
+                  },
+                  "optionalBooleanProperty": {
+                    "description": "doc1",
+                    "type": "boolean",
+                  },
+                  "optionalDecimalProperty": {
+                    "description": "doc3",
+                    "type": "number",
+                  },
+                  "optionalPercentProperty": {
+                    "description": "doc5",
+                    "type": "number",
+                  },
+                  "optionalShortProperty": {
+                    "description": "doc9",
+                    "type": "integer",
+                  },
+                  "optionalYear": {
+                    "description": "doc13",
+                    "type": "integer",
+                  },
+                  "requiredCurrencyProperty": {
+                    "description": "doc2",
+                    "type": "number",
+                  },
+                  "requiredDateProperty": {
+                    "description": "doc6",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "requiredDatetimeProperty": {
+                    "description": "doc7",
+                    "format": "date-time",
+                    "type": "string",
+                  },
+                  "requiredDurationProperty": {
+                    "description": "doc4",
+                    "type": "number",
+                  },
+                  "requiredIntegerProperty": {
+                    "description": "doc8",
+                    "maximum": 10,
+                    "minimum": 5,
+                    "type": "integer",
+                  },
+                  "requiredTimeProperty": {
+                    "description": "doc11",
+                    "format": "time",
+                    "type": "string",
+                  },
+                  "schoolYearTypeReference": {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "additionalProperties": false,
+                    "description": "A school year enumeration",
+                    "properties": {
+                      "schoolYear": {
+                        "description": "A school year between 1900 and 2100",
+                        "maximum": 2100,
+                        "minimum": 1900,
+                        "type": "integer",
+                      },
+                    },
+                    "title": "EdFi.SchoolYearType",
+                    "type": "object",
+                  },
+                  "stringIdentity": {
+                    "description": "doc10",
+                    "maxLength": 30,
+                    "minLength": 20,
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "requiredCurrencyProperty",
+                  "requiredDurationProperty",
+                  "requiredDateProperty",
+                  "requiredDatetimeProperty",
+                  "requiredIntegerProperty",
+                  "stringIdentity",
+                  "requiredTimeProperty",
+                ],
+                "title": "EdFi.DomainEntityName",
+                "type": "object",
+              }
+          `);
     });
 
     it('should be well-formed according to ajv', () => {
@@ -621,7 +621,7 @@ describe('when building simple domain entity with all the simple collections', (
                 "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
-                "type": "number",
+                "type": "integer",
               },
             },
             "title": "EdFi.SchoolYearType",
@@ -2092,7 +2092,7 @@ describe('when building domain entity with two school year enumerations, one rol
                 "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
-                "type": "number",
+                "type": "integer",
               },
             },
             "title": "EdFi.SchoolYearType",
@@ -2111,7 +2111,7 @@ describe('when building domain entity with two school year enumerations, one rol
                 "description": "A school year between 1900 and 2100",
                 "maximum": 2100,
                 "minimum": 1900,
-                "type": "number",
+                "type": "integer",
               },
             },
             "title": "EdFi.SchoolYearType",
@@ -2186,10 +2186,19 @@ describe('when building domain entity with reference to domain entity with schoo
                 "type": "integer",
               },
               "schoolYear": {
-                "description": "doc",
-                "maximum": 2100,
-                "minimum": 1900,
-                "type": "integer",
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "additionalProperties": false,
+                "description": "A school year enumeration",
+                "properties": {
+                  "schoolYear": {
+                    "description": "A school year between 1900 and 2100",
+                    "maximum": 2100,
+                    "minimum": 1900,
+                    "type": "integer",
+                  },
+                },
+                "title": "EdFi.SchoolYearType",
+                "type": "object",
               },
             },
             "required": [
@@ -2324,7 +2333,7 @@ describe('when building a school year enumeration', () => {
             "description": "A school year between 1900 and 2100",
             "maximum": 2100,
             "minimum": 1900,
-            "type": "number",
+            "type": "integer",
           },
         },
         "title": "EdFi.SchoolYearType",
@@ -2336,5 +2345,109 @@ describe('when building a school year enumeration', () => {
   it('should be well-formed according to ajv', () => {
     const entity = namespace.entity.schoolYearEnumeration.get('SchoolYear');
     ajv.compile(entity.data.meadowlark.jsonSchema);
+  });
+});
+
+describe('when building a schema studentEducationOrganizationAssociation', () => {
+  // The core problem addressed by this test is in RND-456: The CohortYears schoolYearTypeReference was being interpreted as
+  // an integer, rather than as a SchoolYearTypeEnumeration. This test builds the minimum components of
+  // studentEducationOrganizationAssociation required to duplicate the issue.
+
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+
+      .withStartDomainEntity('StudentCohort')
+      .withDocumentation('doc')
+      .withCommonProperty('CohortYear', '', false, true)
+      .withStringIdentity('StudentUniqueId', '', '100')
+      .withEndDomainEntity()
+
+      .withStartEnumeration('SchoolYear')
+      .withDocumentation('doc')
+      .withEnumerationItem('2022')
+      .withEndEnumeration()
+
+      .withStartCommon('CohortYear')
+      .withDocumentation('doc')
+      .withEnumerationIdentity('SchoolYear', '')
+      .withEndCommon()
+
+      .withEndNamespace()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new EnumerationBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    domainEntityReferenceEnhancer(metaEd);
+    enumerationReferenceEnhancer(metaEd);
+    commonReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('StudentCohort');
+    expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
+      {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "description": "doc",
+        "properties": {
+          "cohortYears": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "schoolYearTypeReference": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "additionalProperties": false,
+                  "description": "A school year enumeration",
+                  "properties": {
+                    "schoolYear": {
+                      "description": "A school year between 1900 and 2100",
+                      "maximum": 2100,
+                      "minimum": 1900,
+                      "type": "integer",
+                    },
+                  },
+                  "title": "EdFi.SchoolYearType",
+                  "type": "object",
+                },
+              },
+              "required": [
+                "schoolYearTypeReference",
+              ],
+              "type": "object",
+            },
+            "minItems": 0,
+            "type": "array",
+            "uniqueItems": false,
+          },
+          "studentUniqueId": {
+            "description": "",
+            "maxLength": 100,
+            "type": "string",
+          },
+        },
+        "required": [
+          "studentUniqueId",
+        ],
+        "title": "EdFi.StudentCohort",
+        "type": "object",
+      }
+    `);
   });
 });

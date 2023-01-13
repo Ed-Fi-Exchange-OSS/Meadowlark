@@ -74,7 +74,7 @@ const schoolYearEnumerationSchema: SchemaRoot = {
   description: 'A school year enumeration',
   properties: {
     schoolYear: {
-      type: 'number',
+      type: 'integer',
       description: `A school year between ${beginYear} and ${endYear}`,
       minimum: beginYear,
       maximum: endYear,
@@ -258,7 +258,7 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
       return { type: 'string', format: 'time', description };
 
     case 'schoolYearEnumeration':
-      return { type: 'integer', description, minimum: beginYear, maximum: endYear };
+      return schoolYearEnumerationSchema;
 
     case 'year':
       return { type: 'integer', description };
