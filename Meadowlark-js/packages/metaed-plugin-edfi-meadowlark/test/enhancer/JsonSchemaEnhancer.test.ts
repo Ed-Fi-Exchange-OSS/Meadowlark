@@ -814,6 +814,7 @@ describe('when building a domain entity referencing CourseOffering with an impli
       .withStartDomainEntity('Session')
       .withDocumentation('doc')
       .withStringIdentity('SessionName', 'doc', '30')
+      .withEnumerationIdentity('SchoolYear', 'doc')
       .withDomainEntityIdentity('School', 'doc')
       .withEndDomainEntity()
 
@@ -858,6 +859,12 @@ describe('when building a domain entity referencing CourseOffering with an impli
                 "maxLength": 30,
                 "type": "string",
               },
+              "schoolYear": {
+                "description": "A school year between 1900 and 2100",
+                "maximum": 2100,
+                "minimum": 1900,
+                "type": "integer",
+              },
               "sessionName": {
                 "description": "doc",
                 "maxLength": 30,
@@ -867,6 +874,7 @@ describe('when building a domain entity referencing CourseOffering with an impli
             "required": [
               "localCourseCode",
               "schoolId",
+              "schoolYear",
               "sessionName",
             ],
             "type": "object",
@@ -2186,19 +2194,10 @@ describe('when building domain entity with reference to domain entity with schoo
                 "type": "integer",
               },
               "schoolYear": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "additionalProperties": false,
-                "description": "A school year enumeration",
-                "properties": {
-                  "schoolYear": {
-                    "description": "A school year between 1900 and 2100",
-                    "maximum": 2100,
-                    "minimum": 1900,
-                    "type": "integer",
-                  },
-                },
-                "title": "EdFi.SchoolYearType",
-                "type": "object",
+                "description": "A school year between 1900 and 2100",
+                "maximum": 2100,
+                "minimum": 1900,
+                "type": "integer",
               },
             },
             "required": [
@@ -2348,7 +2347,7 @@ describe('when building a school year enumeration', () => {
   });
 });
 
-describe('when building a schema studentEducationOrganizationAssociation', () => {
+describe('when building a schema for studentEducationOrganizationAssociation', () => {
   // The core problem addressed by this test is in RND-456: The CohortYears schoolYearTypeReference was being interpreted as
   // an integer, rather than as a SchoolYearTypeEnumeration. This test builds the minimum components of
   // studentEducationOrganizationAssociation required to duplicate the issue.
