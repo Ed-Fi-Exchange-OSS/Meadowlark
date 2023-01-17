@@ -6,15 +6,18 @@
 import { Role, getAccessToken } from './Credentials';
 import { baseURLRequest, rootURLRequest } from './Shared';
 
-export async function createResource({
-  endpoint,
-  body,
-  role = 'vendor',
-}: {
-  endpoint: string;
-  body: Object;
-  role?: Role;
-}): Promise<string> {
+export async function createResource(
+  {
+    endpoint,
+    body,
+    role = 'vendor',
+  }: {
+    endpoint: string;
+    body: Object;
+    role?: Role;
+  },
+  upsert = false,
+): Promise<string> {
   return baseURLRequest()
     .post(`/v3.3b/ed-fi/${endpoint}`)
     .auth(await getAccessToken(role), { type: 'bearer' })
@@ -24,7 +27,11 @@ export async function createResource({
         console.error(`Error on ${endpoint}:\n${response.body}`);
         expect(response.body).toBeUndefined();
       }
-      expect(response.status).toEqual(201);
+      if (upsert) {
+        expect([200, 201].indexOf(response.status)).toBeGreaterThan(-1);
+      } else {
+        expect(response.status).toEqual(201);
+      }
 
       expect(response.headers.location).not.toBe(null);
       return response.headers.location;
