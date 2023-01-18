@@ -76,9 +76,30 @@ describe('When posting a resource that contains a SchoolYear enumeration', () =>
       }
     });
 
-    it('each item is accepted', async () => {
+    /* DO NOT REORDER THESE TESTS!
+
+       1. student
+       2. School
+       3. StudentEducationOrganizationAssociation
+
+      The larger numbers are dependent on the earlier steps succeeding. Relying on Jest's documented behavior:
+      https://jestjs.io/docs/setup-teardown#order-of-execution-of-describe-and-test-blocks
+
+      > Once the describe blocks are complete, by default Jest runs all the tests serially in the order they were encountered
+      > in the collection phase, waiting for each to finish and be tidied up before moving on.
+
+      We simply need to accept that a failure on the student will cause "downstream" failures as well.
+    */
+
+    it('creates a student successfully', async () => {
       locations.push(await createStudent(studentUniqueId));
+    });
+
+    it('creates a school successfully', async () => {
       locations.push(await createSchool(schoolId));
+    });
+
+    it('creates a studentEducationOrganizationAssociation successfully', async () => {
       locations.push(await createStudentEdOrgAssociation(studentUniqueId, schoolId));
     });
   });
