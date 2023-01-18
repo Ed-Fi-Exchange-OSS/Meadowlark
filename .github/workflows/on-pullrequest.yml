@@ -147,7 +147,7 @@ jobs:
         uses: actions/cache/save@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
         with:
           path: "**/dist/**"
-          key: ${{ runner.os }}-build-${ hashFiles('**/dist/**') }"
+          key: ${{ runner.os }}-build-${{} hashFiles('**/dist/**') }}"
 
   tests:
     name: ${{matrix.tests.type}} tests
