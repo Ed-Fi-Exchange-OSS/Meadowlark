@@ -3,10 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-/*
-  "message": "Reference validation failed: Resource ClassPeriod is missing identity {"classPeriodName":"z1","schoolReference.schoolId":66},Resource ClassPeriod is missing identity {"classPeriodName":"z2","schoolReference.schoolId":66},Resource CourseOffering is missing identity {"localCourseCode":"abc","schoolReference.schoolId":666,"sessionReference.schoolId":666,"sessionReference.schoolYear":2034,"sessionReference.sessionName":"d"},Resource Location is missing identity {"classroomIdentificationCode":"1","schoolReference.schoolId":2},Resource CreditTypeDescriptor is missing identity {"descriptor":"k"}"
-*/
-
 import * as MeadowlarkUtilities from '@edfi/meadowlark-utilities';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { logTheResponse } from '../../src/middleware/ResponseLoggingMiddleware';
