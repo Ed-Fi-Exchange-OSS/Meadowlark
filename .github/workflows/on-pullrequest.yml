@@ -268,6 +268,9 @@ jobs:
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm install
 
+      - name: Test echo
+        run: echo "hashKey = ${{ needs.build.outputs.hashKey }}"
+
       - name: Restore build cache
         id: build-cache
         uses: actions/cache/restore@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
