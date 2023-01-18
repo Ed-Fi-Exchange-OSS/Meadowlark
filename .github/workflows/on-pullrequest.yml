@@ -114,6 +114,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      hashKey: ${{ steps.build-cache.outputs.key }}
 
     steps:
       - name: Checkout repository
@@ -137,16 +139,15 @@ jobs:
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm install
 
-      - name: Build Cache
+      - name: Build
+        run: npm run build
+
+      - name: Cache the build output
         id: build-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        uses: actions/cache/save@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
         with:
           path: "**/dist/**"
-          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
-
-      - name: Build
-        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
-        run: npm run build
+          key: ${{ runner.os }}-build-${ hashFiles('**/dist/**') }"
 
   tests:
     name: ${{matrix.tests.type}} tests
@@ -269,10 +270,10 @@ jobs:
 
       - name: Build Cache
         id: build-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        uses: actions/cache/restore@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
         with:
           path: "**/dist/**"
-          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
+          key: ${{ needs.build.outputs.key }}
 
       - name: Build
         if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
