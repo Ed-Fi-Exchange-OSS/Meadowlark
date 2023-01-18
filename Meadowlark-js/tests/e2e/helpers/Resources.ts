@@ -25,7 +25,7 @@ export async function createResource(
     .then((response) => {
       if (response.body) {
         console.error(`Error on ${endpoint}:\n${response.body}`);
-        expect(response.body).toBeUndefined();
+        expect(response.body).toMatchInlineSnapshot(`undefined`);
       }
       if (upsert) {
         expect([200, 201].indexOf(response.status)).toBeGreaterThan(-1);
