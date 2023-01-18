@@ -115,7 +115,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-      hashKey: ${{ steps.build-cache.outputs.key }}
+      hashKey: ${{ steps.hash-key.outputs.hashKey }}
 
     steps:
       - name: Checkout repository
@@ -142,12 +142,16 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Calculate dist/ hash
+        id: hash-key
+        run: echo "hashKey=${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}" >> $GITHUB_OUTPUT
+
       - name: Cache the build output
         id: build-cache
         uses: actions/cache/save@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
         with:
           path: "**/dist/**"
-          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
+          key: ${{ steps.hash-key.outputs.hashKey }}
 
   tests:
     name: ${{matrix.tests.type}} tests
