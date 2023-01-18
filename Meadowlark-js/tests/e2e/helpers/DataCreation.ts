@@ -45,7 +45,6 @@ export async function createCountry(): Promise<string> {
 }
 
 export async function createSchool(schoolId: number): Promise<string> {
-  // Using role that includes assessment credentials to bypass strict validation
   return createResource({
     endpoint: 'schools',
     role: 'host',
@@ -227,6 +226,56 @@ export async function createStudentSectionAssociation(
       studentReference: {
         studentUniqueId,
       },
+    },
+  });
+}
+
+export async function createStudentEdOrgAssociation(studentUniqueId: string, schoolId: number) {
+  await createResource(
+    {
+      endpoint: 'SexDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'NotSelected',
+        shortDescription: 'Not Selected',
+        description: 'Not Selected',
+        namespace: 'uri://ed-fi.org/SexDescriptor#NotSelected',
+      },
+    },
+    true,
+  );
+
+  await createResource(
+    {
+      endpoint: 'CohortYearTypeDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Twelfth grade',
+        shortDescription: 'Twelfth grade',
+        description: 'Twelfth grade',
+        namespace: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
+      },
+    },
+    true,
+  );
+
+  return createResource({
+    endpoint: 'StudentEducationOrganizationAssociations',
+    role: 'host',
+    body: {
+      educationOrganizationReference: {
+        educationOrganizationId: schoolId,
+      },
+      studentReference: {
+        studentUniqueId,
+      },
+      sexDescriptor: 'uri://ed-fi.org/SexDescriptor#Female',
+      cohortYears: [
+        {
+          schoolYearTypeReference: { schoolYear: 2022 },
+          cohortYearTypeDescriptor: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
+        },
+      ],
     },
   });
 }

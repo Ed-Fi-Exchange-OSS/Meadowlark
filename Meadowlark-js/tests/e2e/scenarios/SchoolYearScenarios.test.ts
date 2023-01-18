@@ -10,14 +10,16 @@ import {
   createSection,
   createSession,
   createStudent,
+  createStudentEdOrgAssociation,
   createStudentSectionAssociation,
 } from '../helpers/DataCreation';
 import { deleteResourceByLocation } from '../helpers/Resources';
 import { generateRandomId } from '../helpers/Shared';
 
 describe('When posting a resource that contains a SchoolYear enumeration', () => {
-  describe('given a chain of resources Session -> CourseOffering -> Section -> StudentSectionAssociation', () => {
-    /*
+  jest.setTimeout(10000);
+
+  /*
     There are several different ways of representing school years. Sometimes testing one way of storing it requires saving
     another "upstream" reference that also has a schoolYear. Thus if one wants to test a courseOffering, then one must upload
     a Session. Once a Session is created, one can create a CourseOffering. Instead of creating a stand-alone test for
@@ -25,6 +27,7 @@ describe('When posting a resource that contains a SchoolYear enumeration', () =>
     scenario that is a chain of successive Posts.
     */
 
+  describe('given a chain of resources Session -> CourseOffering -> Section -> StudentSectionAssociation', () => {
     const schoolId = 120;
     const courseCode = '03100500';
     const schoolYear = 2022;
@@ -58,6 +61,25 @@ describe('When posting a resource that contains a SchoolYear enumeration', () =>
           studentUniqueId,
         ),
       );
+    });
+  });
+
+  describe('given a StudentEducationOrganizationAssociation with CohortYears', () => {
+    const schoolId = 120;
+    const studentUniqueId = generateRandomId();
+
+    const locations: string[] = [];
+
+    afterAll(async () => {
+      for (let i = 0; i < locations.length; i += 1) {
+        await deleteResourceByLocation(locations[i]);
+      }
+    });
+
+    it('each item is accepted', async () => {
+      locations.push(await createStudent(studentUniqueId));
+      locations.push(await createSchool(schoolId));
+      locations.push(await createStudentEdOrgAssociation(studentUniqueId, schoolId));
     });
   });
 });
