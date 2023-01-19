@@ -23,6 +23,39 @@ import { upsertDocument } from '../../src/repository/Upsert';
 
 jest.setTimeout(40000);
 
+describe('given the getById where resource info is a Descriptor', () => {
+  let client;
+  let result;
+
+  const frontendRequest: FrontendRequest = {
+    ...newFrontendRequest(),
+    action: 'getById',
+    middleware: {
+      ...newFrontendRequestMiddleware(),
+      pathComponents: { ...newPathComponents() },
+      resourceInfo: { ...newResourceInfo(), isDescriptor: true },
+    },
+  };
+
+  beforeAll(async () => {
+    client = (await getNewClient()) as MongoClient;
+
+    frontendRequest.middleware.resourceInfo.isDescriptor = true;
+
+    // Act
+    result = await rejectByOwnershipSecurity(frontendRequest, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should ignore ownership', async () => {
+    expect(result).toBe('NOT_APPLICABLE');
+  });
+});
+
 describe('given the upsert where no document id is specified', () => {
   let client;
   let result;
