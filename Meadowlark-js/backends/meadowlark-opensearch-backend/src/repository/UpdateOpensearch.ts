@@ -22,33 +22,6 @@ const moduleName = 'opensearch.repository.UpdateOpensearch';
  */
 type OpensearchRequest = { index: string; id: string };
 
-type MapperParsingException = {
-  error: {
-    root_cause: [{ type: string; reason: string }];
-    type: string;
-    reason: string;
-    caused_by: [{ type: string; reason: string }];
-  };
-};
-
-// Exported for the sake of unit testing
-export function safelyLogOpenSearchErrors(err: MapperParsingException | object): object {
-  const mapperParsingException = err as MapperParsingException;
-  if (mapperParsingException != null) {
-    mapperParsingException.error.root_cause.forEach((cause) => {
-      // Remove the "Preview of field's value: ..." text, because is not easily parsable for anonymization.
-      const position = cause.reason.indexOf(' Preview');
-      if (position > -1) {
-        cause.reason = cause.reason.substring(0, position);
-      }
-    });
-
-    return mapperParsingException;
-  }
-
-  return err;
-}
-
 /**
  * Listener for afterDeleteDocumentById events
  */
@@ -65,7 +38,8 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    throw safelyLogOpenSearchErrors(err);
+    Logger.error(`${moduleName}.afterDeleteDocumentById`, request.traceId, err);
+    throw err;
   }
 }
 
@@ -92,7 +66,8 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    throw safelyLogOpenSearchErrors(err);
+    Logger.error(`${moduleName}.upsertToOpensearch`, request.traceId, err);
+    throw err;
   }
 }
 
