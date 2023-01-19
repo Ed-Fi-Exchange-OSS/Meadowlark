@@ -45,7 +45,6 @@ export async function createCountry(): Promise<string> {
 }
 
 export async function createSchool(schoolId: number): Promise<string> {
-  // Using role that includes assessment credentials to bypass strict validation
   return createResource({
     endpoint: 'schools',
     role: 'host',
@@ -80,6 +79,203 @@ export async function createStudent(studentUniqueId: string) {
       birthDate: '2010-01-01',
       firstName: 'Automation',
       lastSurname: 'Student',
+    },
+  });
+}
+
+export async function createCourse(courseCode: string, educationOrganizationId: number) {
+  await createResource(
+    {
+      endpoint: 'CourseIdentificationSystemDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'LEA course code',
+        shortDescription: 'LEA course code',
+        description: 'LEA course code',
+        namespace: 'uri://ed-fi.org/CourseIdentificationSystemDescriptor',
+      },
+    },
+    true,
+  );
+
+  return createResource({
+    endpoint: 'courses',
+    role: 'host',
+    body: {
+      courseCode,
+      educationOrganizationReference: {
+        educationOrganizationId,
+      },
+      courseTitle: 'courseTitle',
+      numberOfParts: 1,
+      identificationCodes: [
+        {
+          courseIdentificationSystemDescriptor: 'uri://ed-fi.org/CourseIdentificationSystemDescriptor#LEA course code',
+          courseCatalogURL: 'http://www.GBISD.edu/coursecatalog',
+          identificationCode: 'ALG-1',
+        },
+      ],
+    },
+  });
+}
+
+export async function createSession(schoolId: number, schoolYear: number, sessionName: string) {
+  await createResource(
+    {
+      endpoint: 'TermDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Spring',
+        shortDescription: 'Spring',
+        description: 'Spring',
+        namespace: 'uri://ed-fi.org/TermDescriptor',
+      },
+    },
+    true,
+  );
+
+  return createResource({
+    endpoint: 'sessions',
+    role: 'host',
+    body: {
+      schoolReference: {
+        schoolId,
+      },
+      schoolYearTypeReference: {
+        schoolYear,
+      },
+      sessionName,
+      beginDate: '1900-01-01',
+      endDate: '1900-05-01',
+      termDescriptor: 'uri://ed-fi.org/TermDescriptor#Spring',
+      totalInstructionalDays: 200,
+    },
+  });
+}
+
+export async function createCourseOffering(
+  localCourseCode: string,
+  courseCode: string,
+  schoolId: number,
+  schoolYear: number,
+  sessionName: string,
+) {
+  return createResource({
+    endpoint: 'courseOfferings',
+    role: 'host',
+    body: {
+      localCourseCode,
+      courseReference: {
+        courseCode,
+        educationOrganizationId: schoolId,
+      },
+      schoolReference: {
+        schoolId,
+      },
+      sessionReference: {
+        schoolId,
+        schoolYear,
+        sessionName,
+      },
+    },
+  });
+}
+
+export async function createSection(
+  localCourseCode: string,
+  schoolId: number,
+  schoolYear: number,
+  sessionName: string,
+  sectionIdentifier: string,
+) {
+  return createResource({
+    endpoint: 'sections',
+    role: 'host',
+    body: {
+      sectionIdentifier,
+      courseOfferingReference: {
+        localCourseCode,
+        schoolId,
+        schoolYear,
+        sessionName,
+      },
+    },
+  });
+}
+
+export async function createStudentSectionAssociation(
+  localCourseCode: string,
+  schoolId: number,
+  schoolYear: number,
+  sessionName: string,
+  sectionIdentifier: string,
+  studentUniqueId: string,
+) {
+  return createResource({
+    endpoint: 'studentSectionAssociations',
+    role: 'host',
+    body: {
+      beginDate: '2023-01-16',
+      sectionReference: {
+        localCourseCode,
+        schoolId,
+        schoolYear,
+        sessionName,
+        sectionIdentifier,
+      },
+      studentReference: {
+        studentUniqueId,
+      },
+    },
+  });
+}
+
+export async function createStudentEdOrgAssociation(studentUniqueId: string, schoolId: number) {
+  await createResource(
+    {
+      endpoint: 'SexDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'NotSelected',
+        shortDescription: 'Not Selected',
+        description: 'Not Selected',
+        namespace: 'uri://ed-fi.org/SexDescriptor#NotSelected',
+      },
+    },
+    true,
+  );
+
+  await createResource(
+    {
+      endpoint: 'CohortYearTypeDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Twelfth grade',
+        shortDescription: 'Twelfth grade',
+        description: 'Twelfth grade',
+        namespace: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
+      },
+    },
+    true,
+  );
+
+  return createResource({
+    endpoint: 'StudentEducationOrganizationAssociations',
+    role: 'host',
+    body: {
+      educationOrganizationReference: {
+        educationOrganizationId: schoolId,
+      },
+      studentReference: {
+        studentUniqueId,
+      },
+      sexDescriptor: 'uri://ed-fi.org/SexDescriptor#Female',
+      cohortYears: [
+        {
+          schoolYearTypeReference: { schoolYear: 2022 },
+          cohortYearTypeDescriptor: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
+        },
+      ],
     },
   });
 }

@@ -23,8 +23,7 @@ Instructions for running a local "developer" environment on localhost:
 7. Setup environment variables for running
    [meadowlark-fastify](../Meadowlark-js/services/meadowlark-fastify/readme.md) service.
 8. Setup environment variables for OAuth. See [OAUTH2](OAUTH2.md) for more details.
-9. In your command prompt navigate to `/Meadowlark-js/services/fastify`
-10. Run `npm run start:local` to start the Meadowlark API service
+9. Run `npm run start:local` to start the Meadowlark API service
 
 ## Clearing Out Local Databases
 
@@ -37,7 +36,9 @@ to delete the volumes, then you can manually delete records. Examples:
 ### OpenSearch
 
 Open the [DevTools console](http://localhost:5601/app/dev_tools#/console) in a
-browser and run this dangerous command:
+browser and run these dangerous commands:
+
+Delete all documents:
 
 ```none
 POST */_delete_by_query
@@ -46,6 +47,12 @@ POST */_delete_by_query
     "match_all": {}
   }
 }
+```
+
+Delete all indices:
+
+```none
+DELETE *
 ```
 
 ### MongoDB

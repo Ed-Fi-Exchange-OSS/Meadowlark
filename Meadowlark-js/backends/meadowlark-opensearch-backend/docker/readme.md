@@ -23,3 +23,24 @@ visualizations with the OpenSearch Dashboards. Basic steps:
    * Tip: above the metric display you'll find "+ Add Filter". Use this if you
      want to filter on a particular entity type, such as `studentUniqueId:
      exists`.
+
+## Clearing Out All Data
+
+Run the following commands from the Dev Tools console.
+
+Delete all documents:
+
+```none
+POST */_delete_by_query
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+Delete all indices:
+
+```none
+DELETE *
+```

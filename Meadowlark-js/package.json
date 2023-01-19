@@ -55,7 +55,8 @@
     "test:system:mongodb": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend LOG_LEVEL=warn npx jest system --runInBand",
     "test:system:postgresql": "cross-env DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-postgresql-backend LOG_LEVEL=warn npx jest system --runInBand",
     "test:unit:coverage": "rimraf coverage/ && npm run test:unit -- --collectCoverage",
-    "prepare": "cd .. && husky install"
+    "prepare": "cd .. && husky install",
+    "start:local": "lerna run start:local"
   },
   "husky": {
     "hooks": {

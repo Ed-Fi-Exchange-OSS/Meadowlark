@@ -53,6 +53,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
     `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
     request.traceId,
   );
+
   try {
     await client.index({
       ...opensearchRequest,

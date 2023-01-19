@@ -67,18 +67,20 @@ const descriptorSchema: SchemaRoot = {
 const beginYear = getIntegerFromEnvironment('BEGIN_ALLOWED_SCHOOL_YEAR', 1900);
 const endYear = getIntegerFromEnvironment('END_ALLOWED_SCHOOL_YEAR', 2100);
 
+const schoolYear: SchemaProperty = {
+  type: 'integer',
+  description: `A school year between ${beginYear} and ${endYear}`,
+  minimum: beginYear,
+  maximum: endYear,
+};
+
 const schoolYearEnumerationSchema: SchemaRoot = {
   ...newSchemaRoot(),
   type: 'object',
   title: 'EdFi.SchoolYearType',
   description: 'A school year enumeration',
   properties: {
-    schoolYear: {
-      type: 'number',
-      description: `A school year between ${beginYear} and ${endYear}`,
-      minimum: beginYear,
-      maximum: endYear,
-    },
+    schoolYear,
   },
   additionalProperties: false,
 };
@@ -258,7 +260,12 @@ function schemaPropertyForNonReference(property: EntityProperty): SchemaProperty
       return { type: 'string', format: 'time', description };
 
     case 'schoolYearEnumeration':
-      return { type: 'integer', description, minimum: beginYear, maximum: endYear };
+      if (property.parentEntity.type === 'common') {
+        // For a common, the school year ends up being nested under a reference object
+        return schoolYearEnumerationSchema;
+      }
+
+      return schoolYear;
 
     case 'year':
       return { type: 'integer', description };

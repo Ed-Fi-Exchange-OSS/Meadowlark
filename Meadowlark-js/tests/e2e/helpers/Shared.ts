@@ -11,11 +11,11 @@ import { getAccessToken } from './Credentials';
 const chance = new Chance() as Chance.Chance;
 
 function getBaseURLRequest() {
-  return request(`${process.env.ROOT_URL}/${process.env.MEADOWLARK_STAGE}`);
+  return request(`${process.env.ROOT_URL ?? 'http://localhost:3000'}/${process.env.MEADOWLARK_STAGE ?? 'local'}`);
 }
 
 function getRootURLRequest() {
-  return request(process.env.ROOT_URL);
+  return request(process.env.ROOT_URL ?? 'http://localhost:3000');
 }
 
 export const baseURLRequest: () => SuperTest<Test> = memoize(getBaseURLRequest);
