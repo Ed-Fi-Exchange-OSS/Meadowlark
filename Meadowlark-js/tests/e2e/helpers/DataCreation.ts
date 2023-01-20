@@ -31,6 +31,19 @@ export async function createGradeLevelDescriptor(): Promise<string> {
   });
 }
 
+export async function createAcademicSubjectDescriptor(): Promise<string> {
+  return createResource({
+    endpoint: 'academicSubjectDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'Composite',
+      description: 'Composite',
+      shortDescription: 'Composite',
+      namespace: 'uri://ed-fi.org/AcademicSubjectDescriptor',
+    },
+  });
+}
+
 export async function createCountry(): Promise<string> {
   return createResource({
     endpoint: 'countryDescriptors',
