@@ -33,6 +33,11 @@ function parentPrefixRemovalConvention(property: EntityProperty): string {
   if (property.type === 'association' || property.type === 'domainEntity') return name;
 
   if (name.startsWith(property.parentEntity.metaEdName)) return name.slice(property.parentEntity.metaEdName.length);
+
+  if (property.parentEntity.metaEdName.endsWith(property.roleName) && name.startsWith(property.roleName)) {
+    return name.slice(property.roleName.length);
+  }
+
   return name;
 }
 
