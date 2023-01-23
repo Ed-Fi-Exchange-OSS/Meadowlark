@@ -6,7 +6,7 @@
 import { createAcademicSubjectDescriptor, createGradeLevelDescriptor } from '../helpers/DataCreation';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 
-describe('When creating a resource', () => {
+describe('When mapping a resource that meets requirements for prefix removal', () => {
   let gradeLevelDescriptorLocation: string;
   let academicSubjectDescriptorLocation: string;
   let learningObjectiveLocation: string;
@@ -22,11 +22,11 @@ describe('When creating a resource', () => {
     await deleteResourceByLocation(academicSubjectDescriptorLocation);
   });
 
-  describe('when creating a resource with a descriptor collection that meets requirements for prefix removal', () => {
+  describe('given a LearningObjective entity with GradeLevel descriptor with role name Objective', () => {
     // LearningObjective has a GradeLevel descriptor collection with a role name of Objective, thus the full name of
     // the collection is objectiveGradeLevels. That would make the property learningObjective.objectiveGradeLevels in the ODS
     // this becomes learningObjectives.gradeLevels.
-    it('should succeed when passed the trimmed descriptor name', async () => {
+    it('should trim the extra "objective" prefix', async () => {
       learningObjectiveLocation = await createResource({
         endpoint: 'learningObjectives',
         role: 'host',
