@@ -33,7 +33,7 @@ describe('given the upsert where response already posted', () => {
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should return the original arguments without modification', async () => {
     expect(result.frontendResponse.statusCode).toBe(200);
 
     expect(result.frontendRequest).toEqual({
@@ -65,7 +65,7 @@ describe('given the upsert where authorization strategy type is different than O
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should return the original arguments without modification', async () => {
     expect(result.frontendResponse).toBe(null);
 
     expect(result.frontendRequest).toEqual({
@@ -73,51 +73,6 @@ describe('given the upsert where authorization strategy type is different than O
       action: 'upsert',
       middleware: {
         ...newFrontendRequestMiddleware(),
-        pathComponents: { ...newPathComponents() },
-      },
-    });
-  });
-});
-
-describe('given the upsert where authorization strategy type is equal to OWNERSHIP_BASED', () => {
-  let result;
-  const mongoClienttMock = {};
-  const frontendResponse: any = null;
-
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'upsert',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      security: {
-        authorizationStrategy: {
-          type: 'OWNERSHIP_BASED',
-        },
-        clientId: 'someClientId',
-      },
-      pathComponents: { ...newPathComponents() },
-    },
-  };
-
-  beforeAll(async () => {
-    jest.spyOn(OwnershipSecurity, 'rejectByOwnershipSecurity').mockResolvedValueOnce('ACCESS_APPROVED');
-
-    result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
-  });
-
-  it('should not do anything', async () => {
-    expect(result.frontendResponse).toBe(null);
-    expect(result.frontendRequest).toEqual({
-      ...newFrontendRequest(),
-      action: 'upsert',
-      middleware: {
-        ...newFrontendRequestMiddleware(),
-        security: {
-          authorizationStrategy: {
-            type: 'OWNERSHIP_BASED',
-          },
-          clientId: 'someClientId',
-        },
         pathComponents: { ...newPathComponents() },
       },
     });
@@ -150,7 +105,7 @@ describe('given the upsert where AuthorizationStrategy type is equal to OWNERSHI
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should return the original arguments without modification', async () => {
     expect(result.frontendResponse).toBe(null);
     expect(result.frontendRequest).toEqual({
       ...newFrontendRequest(),
@@ -195,7 +150,7 @@ describe('given the upsert where AuthorizationStrategy type is equal to OWNERSHI
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should return the original arguments without modification', async () => {
     expect(result.frontendResponse).toBe(null);
     expect(result.frontendRequest).toEqual({
       ...newFrontendRequest(),
@@ -240,7 +195,7 @@ describe('given the upsert where AuthorizationStrategy type is equal to OWNERSHI
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should respond with an internal server error code', async () => {
     expect(result.frontendResponse).toEqual({
       statusCode: 500,
       headers: {},
@@ -289,7 +244,7 @@ describe('given the upsert where AuthorizationStrategy type is equal to OWNERSHI
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClienttMock as any);
   });
 
-  it('should not do anything', async () => {
+  it('should respond with a Forbidden error code', async () => {
     expect(result.frontendResponse).toEqual({
       statusCode: 403,
       headers: {},
