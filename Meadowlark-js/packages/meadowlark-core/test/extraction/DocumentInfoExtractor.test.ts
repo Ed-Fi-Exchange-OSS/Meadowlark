@@ -8,20 +8,6 @@ import { DocumentInfo } from '../../src/model/DocumentInfo';
 import { DescriptorDocument } from '../../src/model/DescriptorDocument';
 import { extractDocumentInfo } from '../../src/extraction/DocumentInfoExtractor';
 import { DocumentIdentity } from '../../dist';
-/*
-import { extractDocumentReferences } from './DocumentReferenceExtractor';
-import { extractDocumentIdentity, deriveSuperclassInfoFrom } from './DocumentIdentityExtractor';
-
-import { extractDescriptorValues } from './DescriptorValueExtractor';
-import { SuperclassInfo } from '../model/SuperclassInfo';
-import { DocumentIdentity } from '../model/DocumentIdentity';
-*/
-/* const resourceInfo: ResourceInfo = {
-  ...newResourceInfo(),
-};
-const documentInfo: DocumentInfo = {
-  ...newDocumentInfo(),
-}; */
 
 const testModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
