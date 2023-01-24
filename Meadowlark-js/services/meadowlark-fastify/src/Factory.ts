@@ -8,7 +8,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { buildService } from './Service';
 
 export type ServiceFactory = (worker: number) => Promise<void>;
-
+/* istanbul ignore file */
 export async function serviceFactory(worker: number) {
   const service: FastifyInstance = buildService();
   try {
