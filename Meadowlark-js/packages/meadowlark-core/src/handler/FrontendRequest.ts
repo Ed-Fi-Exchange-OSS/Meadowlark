@@ -125,7 +125,7 @@ const removeDocumentIdentity: (f: FrontendRequest) => FrontendRequest = R.dissoc
 /**
  * Returns a copy of a FrontendRequest with the sensitive data 'documentIdentity' field in the document references removed
  */
-const removeReferencesDocumentIdentity: (f: FrontendRequest) => FrontendRequest = (f: FrontendRequest) => {
+export const removeReferencesDocumentIdentity: (f: FrontendRequest) => FrontendRequest = (f: FrontendRequest) => {
   const cloneOfFrontendRequest: FrontendRequest = R.clone(f);
   const { documentReferences } = cloneOfFrontendRequest.middleware.documentInfo;
   cloneOfFrontendRequest.middleware.documentInfo.documentReferences = documentReferences.map((reference) =>
