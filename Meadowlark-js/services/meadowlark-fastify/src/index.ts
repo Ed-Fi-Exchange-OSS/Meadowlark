@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* istanbul ignore file */
 import dotenv from 'dotenv';
 import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { ClusterService } from './Cluster';

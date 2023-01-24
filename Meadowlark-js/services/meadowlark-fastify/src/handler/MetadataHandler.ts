@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* istanbul ignore file */
 import * as Meadowlark from '@edfi/meadowlark-core';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
