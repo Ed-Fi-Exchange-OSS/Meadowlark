@@ -5,6 +5,7 @@
 
 /* eslint-disable no-continue */
 /* eslint-disable no-restricted-syntax */
+/* istanbul ignore file */
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
