@@ -43,7 +43,11 @@ const frontendRequest: FrontendRequest = {
 
 describe('given a document with document references', () => {
   const request: FrontendRequest = frontendRequest;
-  const queryResult = removeReferencesDocumentIdentity(request);
+  let queryResult: FrontendRequest;
+  beforeAll(() => {
+    // Act
+    queryResult = removeReferencesDocumentIdentity(request);
+  });
   it('should remove documentIdentity from documentReferences', async () => {
     // Assert
     expect(queryResult.middleware.documentInfo.documentReferences[0].documentIdentity).toEqual(undefined);
