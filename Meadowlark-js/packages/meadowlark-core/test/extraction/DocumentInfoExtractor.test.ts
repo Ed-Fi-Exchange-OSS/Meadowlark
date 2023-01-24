@@ -2,12 +2,11 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { newEntityProperty, newTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
+import { DocumentIdentity, newEntityProperty, newTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
 import { ResourceInfo, newResourceInfo } from '../../src/model/ResourceInfo';
 import { DocumentInfo } from '../../src/model/DocumentInfo';
 import { DescriptorDocument } from '../../src/model/DescriptorDocument';
 import { extractDocumentInfo } from '../../src/extraction/DocumentInfoExtractor';
-import { DocumentIdentity } from '../../dist';
 
 const testModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
