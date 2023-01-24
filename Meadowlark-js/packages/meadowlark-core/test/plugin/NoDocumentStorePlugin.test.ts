@@ -3,20 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import {
-  NoDocumentInfo,
-  newSecurity,
-  DeleteRequest,
-  DeleteResult,
-  UpdateRequest,
-  UpdateResult,
-  UpsertRequest,
-  UpsertResult,
-  NoResourceInfo,
-} from '@edfi/meadowlark-core';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { GetRequest } from '../../src/message/GetRequest';
 import { GetResult } from '../../src/message/GetResult';
+import { UpsertRequest } from '../../src/message/UpsertRequest';
+import { NoResourceInfo } from '../../src/model/ResourceInfo';
+import { NoDocumentInfo } from '../../src/model/DocumentInfo';
+import { newSecurity } from '../../src/security/Security';
+import { UpdateRequest } from '../../src/message/UpdateRequest';
+import { DeleteRequest } from '../../src/message/DeleteRequest';
+import { UpsertResult } from '../../src/message/UpsertResult';
+import { UpdateResult } from '../../src/message/UpdateResult';
+import { DeleteResult } from '../../src/message/DeleteResult';
 
 const newUpsertRequest = (): UpsertRequest => ({
   id: '',
