@@ -3,16 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getBooleanFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
+import { getBooleanFromEnvironment, Config, Logger } from '@edfi/meadowlark-utilities';
 import { Jwt as nJwt, verify } from 'njwt';
 import { AuthorizationResponse } from '../handler/AuthorizationResponse';
 import { Jwt } from './Jwt';
-import { getTokenAudience, getTokenIssuer } from './TokenSettings';
 import { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { JwtStatus } from './JwtStatus';
 import { verifyJwt } from './JwtAction';
-import { signingKey } from '../model/SigningKey';
 import { admin1, verifyOnly1 } from './HardcodedCredential';
 import { IntrospectionResponse } from '../model/TokenResponse';
 
@@ -118,13 +116,15 @@ async function isValidClientId(clientId: string | undefined, traceId: string): P
  * as a ParsedBearerToken. Uses nJWT verify()
  */
 export async function introspectBearerToken(bearerToken: string, traceId: string): Promise<IntrospectionResponse> {
-  Logger.debug('TokenValidator.introspectBearerToken token', traceId, bearerToken);
+  const func = 'TokenValidator.introspectBearerToken';
+
+  Logger.debug(`${func} token`, traceId, bearerToken);
 
   let verified: nJwt | undefined;
   try {
-    verified = verify(bearerToken, signingKey());
+    verified = verify(bearerToken, Config.get('OAUTH_SIGNING_KEY'));
   } catch (err) {
-    Logger.debug('TokenValidator.introspectBearerToken nJwt responded with exception', traceId, err);
+    Logger.debug(`${func} nJwt responded with exception`, traceId, err);
     if (err.message !== 'Jwt is expired') return { isValid: false };
     return {
       isValid: true,
@@ -144,8 +144,17 @@ export async function introspectBearerToken(bearerToken: string, traceId: string
   if (verified == null) return { isValid: false };
   const jwt: Jwt = verified as Jwt;
 
-  // Check for correct issuer
-  if (jwt.body?.iss !== getTokenIssuer() || jwt.body?.aud !== getTokenAudience()) return { isValid: false };
+  const issuer = Config.get('OAUTH_TOKEN_ISSUER');
+  if (jwt.body?.iss !== issuer) {
+    Logger.debug(`${func} invalid issuer '${jwt.body?.iss}', expected '${issuer}'`, traceId);
+    return { isValid: false };
+  }
+
+  const audience = Config.get('OAUTH_TOKEN_AUDIENCE');
+  if (jwt.body?.aud !== audience) {
+    Logger.debug(`${func} invalid audience '${jwt.body?.aud}', expected '${audience}'`, traceId);
+    return { isValid: false };
+  }
 
   // Checked for expired in catch, but just in case
   const isNotExpired: boolean = jwt.message !== 'Jwt is expired';

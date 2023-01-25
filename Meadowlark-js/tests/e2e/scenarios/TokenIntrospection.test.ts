@@ -43,7 +43,8 @@ describe('when reviewing access token', () => {
             expect(response.body).toEqual(
               expect.objectContaining({
                 active: true,
-                aud: 'ed-fi-meadowlark',
+                aud: 'edfi-meadowlark-audience',
+                iss: 'edfi-meadowlark-issuer',
                 roles: ['host', 'assessment'],
                 sub: 'Automated Host',
               }),
@@ -85,7 +86,8 @@ describe('when reviewing access token', () => {
             expect(response.body).toEqual(
               expect.objectContaining({
                 active: true,
-                aud: 'ed-fi-meadowlark',
+                aud: 'edfi-meadowlark-audience',
+                iss: 'edfi-meadowlark-issuer',
                 roles: ['vendor'],
                 sub: 'Automated Vendor',
               }),
@@ -127,7 +129,8 @@ describe('when reviewing access token', () => {
             expect(response.body).toEqual(
               expect.objectContaining({
                 active: true,
-                aud: 'ed-fi-meadowlark',
+                aud: 'edfi-meadowlark-audience',
+                iss: 'edfi-meadowlark-issuer',
                 roles: ['admin'],
                 sub: expect.any(String),
               }),
@@ -147,7 +150,8 @@ describe('when reviewing access token', () => {
             expect(response.body).toEqual(
               expect.objectContaining({
                 active: true,
-                aud: 'ed-fi-meadowlark',
+                aud: 'edfi-meadowlark-audience',
+                iss: 'edfi-meadowlark-issuer',
                 roles: ['host', 'assessment'],
                 sub: 'Automated Host',
               }),
@@ -167,7 +171,8 @@ describe('when reviewing access token', () => {
             expect(response.body).toEqual(
               expect.objectContaining({
                 active: true,
-                aud: 'ed-fi-meadowlark',
+                aud: 'edfi-meadowlark-audience',
+                iss: 'edfi-meadowlark-issuer',
                 roles: ['vendor'],
                 sub: 'Automated Vendor',
               }),
