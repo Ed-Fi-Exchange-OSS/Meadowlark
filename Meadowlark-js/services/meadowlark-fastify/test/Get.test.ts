@@ -5,12 +5,13 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
-import { initializeLogging } from '@edfi/meadowlark-utilities';
+import { Config, initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
 
 jest.setTimeout(40000);
 
 initializeLogging();
+Config.set('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST', 'https://example.com/a/b/c');
 
 describe('given a GET of a school by id', () => {
   const schoolGetByIdRequest: InjectOptions = {

@@ -5,7 +5,7 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
-import { initializeLogging } from '@edfi/meadowlark-utilities';
+import { Config, initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
 
 jest.setTimeout(40000);
@@ -23,6 +23,7 @@ describe('given a DELETE of a school by id', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    Config.set('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST', 'https://example.com/a/b/c');
     mockDeleteIt = jest.spyOn(MeadowlarkCore, 'deleteIt');
     service = buildService();
     await service.ready();

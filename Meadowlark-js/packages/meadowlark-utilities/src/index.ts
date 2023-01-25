@@ -6,5 +6,5 @@
 export * from './Environment';
 export { Logger, initializeLogging, isDebugEnabled, isInfoEnabled, writeErrorToLog } from './Logger';
 export { LOCATION_HEADER_NAME } from './LocationHeader';
-export * from './Config';
+export * as Config from './Config';
 export * from './ConfigPlugin';
