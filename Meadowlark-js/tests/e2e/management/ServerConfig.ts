@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { buildService } from '@edfi/meadowlark-fastify/src/Service';
-import { initializeLogging } from '@edfi/meadowlark-utilities';
+import { CachedEnvironmentConfigProvider, Config, initializeLogging } from '@edfi/meadowlark-utilities';
 
 let serverInstance;
 let serverAlreadyRunning = false;
@@ -15,6 +15,7 @@ export function wasServerAlreadyRunning(): boolean {
 
 export async function setup() {
   initializeLogging();
+  await Config.initializeConfig(CachedEnvironmentConfigProvider);
 
   serverInstance = buildService();
   try {
