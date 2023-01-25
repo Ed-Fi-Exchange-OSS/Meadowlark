@@ -294,7 +294,7 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
-          npm run test:e2e -- --ci --reporters="default" --reporters="github-actions"
+          npm run test:e2e -- --ci
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
