@@ -3,21 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type EnvironmentVariable =
-  | 'OAUTH_SIGNING_KEY'
-  | 'BEGIN_ALLOWED_SCHOOL_YEAR'
-  | 'END_ALLOWED_SCHOOL_YEAR'
-  | 'OAUTH_EXPIRATION_MINUTES'
-  | 'OAUTH_TOKEN_ISSUER'
-  | 'OAUTH_TOKEN_AUDIENCE'
-  | 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'
-  | 'OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'
-  | 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'
-  | 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'
-  | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED'
-  | 'ALLOW_TYPE_COERCION'
-  | 'ALLOW__EXT_PROPERTY'
-  | 'FASTIFY_NUM_THREADS';
+import { ConfigKeys } from './Config';
+import { ConfigPlugin } from './ConfigPlugin';
 
 // Local cache to be used for storing parsed environment variables.
 let cache: { [key: string]: any } = {};
@@ -25,14 +12,14 @@ let cache: { [key: string]: any } = {};
 /*
  * Insert or replace a value in the environment cache by key name.
  */
-export function updateCache(key: EnvironmentVariable, value: any): void {
+export function updateCache(key: ConfigKeys, value: any): void {
   cache[key] = value;
 }
 
 /*
  * Retrieve a value from the environment cache by key name.
  */
-export function getFromCache<T>(key: EnvironmentVariable): T | undefined {
+export function getFromCache<T>(key: ConfigKeys): T | undefined {
   if (key in cache) {
     return cache[key] as T;
   }
@@ -43,7 +30,7 @@ export function getFromCache<T>(key: EnvironmentVariable): T | undefined {
 /*
  * Remove a key from the environment cache.
  */
-export function removeFromCache(key: EnvironmentVariable): void {
+export function removeFromCache(key: ConfigKeys): void {
   delete cache[key];
 }
 
@@ -58,7 +45,7 @@ export function clearCache(): void {
  * Gets a value from the environment variables, throwing an error if not found.
  */
 export function getValueFromEnvironment<T>(
-  key: EnvironmentVariable,
+  key: ConfigKeys,
   typeDescription: string,
   parser: (value: string) => T,
   defaultValue: T | undefined = undefined,
@@ -92,14 +79,14 @@ export function getValueFromEnvironment<T>(
 /*
  * Gets a string value from the environment variables, throwing an error if not found.
  */
-export function getStringFromEnvironment(key: EnvironmentVariable, defaultValue: string | undefined = undefined): string {
+export function getStringFromEnvironment(key: ConfigKeys, defaultValue: string | undefined = undefined): string {
   return getValueFromEnvironment<string>(key, 'string', (value: string) => value, defaultValue);
 }
 
 /*
  * Gets a boolean value from the environment variables, throwing an error if not found.
  */
-export function getBooleanFromEnvironment(key: EnvironmentVariable, defaultValue: boolean | undefined = undefined): boolean {
+export function getBooleanFromEnvironment(key: ConfigKeys, defaultValue: boolean | undefined = undefined): boolean {
   return getValueFromEnvironment<boolean>(
     key,
     'boolean',
@@ -111,13 +98,33 @@ export function getBooleanFromEnvironment(key: EnvironmentVariable, defaultValue
 /*
  * Gets an integer value from the environment variables, throwing an error if not found.
  */
-export function getIntegerFromEnvironment(key: EnvironmentVariable, defaultValue: number | undefined = undefined): number {
+export function getIntegerFromEnvironment(key: ConfigKeys, defaultValue: number | undefined = undefined): number {
   return getValueFromEnvironment<number>(key, 'integer', (value: string) => Number.parseInt(value, 10), defaultValue);
 }
 
 /*
  * Gets an float value from the environment variables, throwing an error if not found.
  */
-export function getFloatFromEnvironment(key: EnvironmentVariable, defaultValue: number | undefined = undefined): number {
+export function getFloatFromEnvironment(key: ConfigKeys, defaultValue: number | undefined = undefined): number {
   return getValueFromEnvironment<number>(key, 'float', (value: string) => Number.parseFloat(value), defaultValue);
 }
+
+export const CachedEnvironmentConfigProvider: ConfigPlugin = {
+  async getBool(key: ConfigKeys, defaultValue: boolean | undefined): Promise<boolean> {
+    return getValueFromEnvironment<boolean>(
+      key,
+      'boolean',
+      (value: string) => value === 'true' || value === '1',
+      defaultValue,
+    );
+  },
+  async getFloat(key: ConfigKeys, defaultValue: number | undefined): Promise<number> {
+    return getValueFromEnvironment<number>(key, 'float', (value: string) => Number.parseFloat(value), defaultValue);
+  },
+  async getInt(key: ConfigKeys, defaultValue: number | undefined): Promise<number> {
+    return getValueFromEnvironment<number>(key, 'integer', (value: string) => Number.parseInt(value, 10), defaultValue);
+  },
+  async getString(key: ConfigKeys, defaultValue: string | undefined): Promise<string> {
+    return getValueFromEnvironment<string>(key, 'string', (value: string) => value, defaultValue);
+  },
+};
