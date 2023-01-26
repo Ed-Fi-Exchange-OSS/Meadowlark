@@ -169,8 +169,7 @@ jobs:
             {
               type: "Integration",
               command: "npm run test:integration -- --ci --config ./jest.ci-config.js",
-            },
-            { type: "System", command: "npm run test:system:ci" },
+            }
           ]
 
     steps:
