@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
+import { Config, Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { AuthorizationStoreInitializer } from './AuthorizationStoreInitializer';
 import { AuthorizationStorePlugin } from './AuthorizationStorePlugin';
 import { NoAuthorizationStorePlugin } from './NoAuthorizationStorePlugin';
@@ -16,20 +16,17 @@ let loadedAuthorizationStore: AuthorizationStorePlugin = NoAuthorizationStorePlu
 export async function loadAuthorizationStore() {
   if (loadedAuthorizationStore !== NoAuthorizationStorePlugin) return;
 
-  if (process.env.AUTHORIZATION_STORE_PLUGIN == null) return;
+  const authStorePlugin: string = Config.get('AUTHORIZATION_STORE_PLUGIN');
 
-  Logger.debug(`${moduleName}.loadAuthorizationStore - loading plugin ${process.env.AUTHORIZATION_STORE_PLUGIN}`, null);
+  Logger.debug(`${moduleName}.loadAuthorizationStore - loading plugin ${authStorePlugin}`, null);
 
   try {
     loadedAuthorizationStore = (
-      (await import(process.env.AUTHORIZATION_STORE_PLUGIN)) as AuthorizationStoreInitializer
+      (await import(authStorePlugin)) as AuthorizationStoreInitializer
     ).initializeAuthorizationStore();
   } catch (e) {
     const message = e instanceof Error ? e.message : 'unknown';
-    Logger.error(
-      `Unable to load authorization store plugin "${process.env.AUTHORIZATION_STORE_PLUGIN}". Error was ${message}`,
-      null,
-    );
+    Logger.error(`Unable to load authorization store plugin "${authStorePlugin}". Error was ${message}`, null);
     throw e;
   }
 }

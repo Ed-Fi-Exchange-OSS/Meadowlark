@@ -64,6 +64,7 @@ describe('when initializing configuration', () => {
   const OAUTH_HARD_CODED_CREDENTIALS_ENABLED = true;
   const BEGIN_ALLOWED_SCHOOL_YEAR = 1999;
   const END_ALLOWED_SCHOOL_YEAR = 3992;
+  const AUTHORIZATION_STORE_PLUGIN = 'c3';
 
   // eslint-disable-next-line prefer-destructuring
   const env = process.env;
@@ -100,6 +101,7 @@ describe('when initializing configuration', () => {
     process.env.MONGO_LOG_LEVEL = MONGO_LOG_LEVEL;
     process.env.DOCUMENT_STORE_PLUGIN = DOCUMENT_STORE_PLUGIN;
     process.env.OAUTH_SIGNING_KEY = OAUTH_SIGNING_KEY;
+    process.env.AUTHORIZATION_STORE_PLUGIN = AUTHORIZATION_STORE_PLUGIN;
   };
 
   beforeEach(() => {
@@ -177,12 +179,13 @@ describe('when initializing configuration', () => {
       ['OAUTH_HARD_CODED_CREDENTIALS_ENABLED', OAUTH_HARD_CODED_CREDENTIALS_ENABLED],
       ['BEGIN_ALLOWED_SCHOOL_YEAR', BEGIN_ALLOWED_SCHOOL_YEAR],
       ['END_ALLOWED_SCHOOL_YEAR', END_ALLOWED_SCHOOL_YEAR],
+      ['AUTHORIZATION_STORE_PLUGIN', AUTHORIZATION_STORE_PLUGIN],
     ])('retrieves the value of %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
   });
 
-  describe('given all of the keys that have default values are undefined', () => {
+  describe('given a key that has not been set and has a default value', () => {
     let Config: any;
 
     beforeAll(async () => {
@@ -244,6 +247,41 @@ describe('when initializing configuration', () => {
       ['END_ALLOWED_SCHOOL_YEAR', 2100],
     ])('retrieves default value for %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
+    });
+  });
+
+  describe('given a key that has not been set and does not have a default value', () => {
+    let Config: any;
+
+    beforeAll(async () => {
+      setAllValues();
+      process.env.AUTHORIZATION_STORE_PLUGIN = undefined;
+      process.env.DOCUMENT_STORE_PLUGIN = undefined;
+      process.env.OPENSEARCH_ENDPOINT = undefined;
+      process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST = undefined;
+      process.env.OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION = undefined;
+      process.env.OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH = undefined;
+      process.env.OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH = undefined;
+
+      Config = await import('../src/Config');
+      const Environment = await import('../src/Environment');
+      await Config.initializeConfig(Environment.CachedEnvironmentConfigProvider);
+    });
+
+    afterAll(() => {
+      setAllValues();
+    });
+
+    it.each([
+      ['AUTHORIZATION_STORE_PLUGIN'],
+      ['DOCUMENT_STORE_PLUGIN'],
+      ['OPENSEARCH_ENDPOINT'],
+      ['OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'],
+      ['OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'],
+      ['OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'],
+      ['OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'],
+    ])('throws an error for %s', (k) => {
+      expect(() => Config.get(k as ConfigKeys)).toThrowError();
     });
   });
 });

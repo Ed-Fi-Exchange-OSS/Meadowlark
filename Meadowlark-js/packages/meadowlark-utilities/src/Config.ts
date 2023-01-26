@@ -10,6 +10,7 @@ export type ConfigKeys =
   | 'OAUTH_SIGNING_KEY'
   | 'BEGIN_ALLOWED_SCHOOL_YEAR'
   | 'END_ALLOWED_SCHOOL_YEAR'
+  | 'AUTHORIZATION_STORE_PLUGIN'
   | 'OAUTH_EXPIRATION_MINUTES'
   | 'OAUTH_TOKEN_ISSUER'
   | 'OAUTH_TOKEN_AUDIENCE'
@@ -76,6 +77,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
 
+  set('AUTHORIZATION_STORE_PLUGIN', await provider.getString('AUTHORIZATION_STORE_PLUGIN', ThrowIfNotFound));
   set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', ThrowIfNotFound));
   set('MONGO_LOG_LEVEL', await provider.getString('MONGO_LOG_LEVEL', 'error'));
   set(
