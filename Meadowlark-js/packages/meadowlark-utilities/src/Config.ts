@@ -37,7 +37,9 @@ export type ConfigKeys =
   | 'POSTGRES_HOST'
   | 'POSTGRES_PORT'
   | 'POSTGRES_USER'
-  | 'POSTGRES_PASSWORD';
+  | 'POSTGRES_PASSWORD'
+  | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL'
+  | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -77,6 +79,11 @@ export async function initializeConfig(provider: ConfigPlugin) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
 
+  set('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000));
+  set(
+    'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES',
+    await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000),
+  );
   set('AUTHORIZATION_STORE_PLUGIN', await provider.getString('AUTHORIZATION_STORE_PLUGIN', ThrowIfNotFound));
   set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', ThrowIfNotFound));
   set('MONGO_LOG_LEVEL', await provider.getString('MONGO_LOG_LEVEL', 'error'));

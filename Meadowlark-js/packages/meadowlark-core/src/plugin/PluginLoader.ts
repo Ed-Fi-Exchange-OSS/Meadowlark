@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
+import { Config, Logger, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { DocumentStoreInitializer } from './backend/DocumentStoreInitializer';
 import { DocumentStorePlugin } from './backend/DocumentStorePlugin';
 import { ListenerInitializer } from './backend/ListenerInitializer';
@@ -23,19 +23,14 @@ const moduleName = 'core.plugin.PluginLoader';
 export async function loadDocumentStore() {
   if (loadedDocumentStore !== NoDocumentStorePlugin) return;
 
-  if (process.env.DOCUMENT_STORE_PLUGIN == null) return;
+  const docStorePlugin: string = Config.get('DOCUMENT_STORE_PLUGIN');
 
-  Logger.debug(`${moduleName}.loadDocumentStore Loading plugin ${process.env.DOCUMENT_STORE_PLUGIN}`, '');
+  Logger.debug(`${moduleName}.loadDocumentStore Loading plugin ${docStorePlugin}`, '');
 
   try {
-    loadedDocumentStore = (
-      (await import(process.env.DOCUMENT_STORE_PLUGIN)) as DocumentStoreInitializer
-    ).initializeDocumentStore();
+    loadedDocumentStore = ((await import(docStorePlugin)) as DocumentStoreInitializer).initializeDocumentStore();
   } catch (e) {
-    Logger.error(
-      `${moduleName}.loadDocumentStore Unable to load document store plugin "${process.env.DOCUMENT_STORE_PLUGIN}".`,
-      e,
-    );
+    Logger.error(`${moduleName}.loadDocumentStore Unable to load document store plugin "${docStorePlugin}".`, e);
     throw e;
   }
 }
@@ -43,19 +38,14 @@ export async function loadDocumentStore() {
 export async function loadQueryHandler() {
   if (loadedQueryHandler !== NoQueryHandlerPlugin) return;
 
-  if (process.env.QUERY_HANDLER_PLUGIN == null) return;
+  const queryHandlerPlugin: string = Config.get('QUERY_HANDLER_PLUGIN');
 
-  Logger.debug(`${moduleName}.loadQueryHandler Loading plugin ${process.env.QUERY_HANDLER_PLUGIN}`, null);
+  Logger.debug(`${moduleName}.loadQueryHandler Loading plugin ${queryHandlerPlugin}`, null);
 
   try {
-    loadedQueryHandler = (
-      (await import(process.env.QUERY_HANDLER_PLUGIN)) as QueryHandlerInitializer
-    ).initializeQueryHandler();
+    loadedQueryHandler = ((await import(queryHandlerPlugin)) as QueryHandlerInitializer).initializeQueryHandler();
   } catch (e) {
-    Logger.error(
-      `${moduleName}.loadQueryHandler Unable to load query handler plugin "${process.env.QUERY_HANDLER_PLUGIN}".`,
-      e,
-    );
+    Logger.error(`${moduleName}.loadQueryHandler Unable to load query handler plugin "${queryHandlerPlugin}".`, e);
     throw e;
   }
 }
@@ -71,21 +61,24 @@ export async function loadListeners() {
 
   listenersLoadAttempted = true;
 
+  const listener1: string = Config.get('LISTENER1_PLUGIN');
+
   // If this works out, we'll discover listeners dynamically - no need to specify
-  if (process.env.LISTENER1_PLUGIN != null) {
+  if (listener1 !== '') {
     try {
-      await loadListener(process.env.LISTENER1_PLUGIN);
+      await loadListener(listener1);
     } catch (e) {
-      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${process.env.LISTENER1_PLUGIN}"`, e);
+      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${listener1}"`, e);
       throw e;
     }
   }
 
-  if (process.env.LISTENER2_PLUGIN != null) {
+  const listener2: string = Config.get('LISTENER2_PLUGIN');
+  if (listener2 !== '') {
     try {
-      await loadListener(process.env.LISTENER2_PLUGIN);
+      await loadListener(listener2);
     } catch (e) {
-      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${process.env.LISTENER2_PLUGIN}"`, e);
+      Logger.error(`${moduleName}.loadListeners Unable to load listener plugin "${listener2}"`, e);
       throw e;
     }
   }

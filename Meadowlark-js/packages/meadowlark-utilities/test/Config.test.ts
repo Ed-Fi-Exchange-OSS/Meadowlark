@@ -65,6 +65,8 @@ describe('when initializing configuration', () => {
   const BEGIN_ALLOWED_SCHOOL_YEAR = 1999;
   const END_ALLOWED_SCHOOL_YEAR = 3992;
   const AUTHORIZATION_STORE_PLUGIN = 'c3';
+  const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = 11;
+  const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = 12;
 
   // eslint-disable-next-line prefer-destructuring
   const env = process.env;
@@ -102,6 +104,8 @@ describe('when initializing configuration', () => {
     process.env.DOCUMENT_STORE_PLUGIN = DOCUMENT_STORE_PLUGIN;
     process.env.OAUTH_SIGNING_KEY = OAUTH_SIGNING_KEY;
     process.env.AUTHORIZATION_STORE_PLUGIN = AUTHORIZATION_STORE_PLUGIN;
+    process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL.toString();
+    process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES.toString();
   };
 
   beforeEach(() => {
@@ -180,6 +184,8 @@ describe('when initializing configuration', () => {
       ['BEGIN_ALLOWED_SCHOOL_YEAR', BEGIN_ALLOWED_SCHOOL_YEAR],
       ['END_ALLOWED_SCHOOL_YEAR', END_ALLOWED_SCHOOL_YEAR],
       ['AUTHORIZATION_STORE_PLUGIN', AUTHORIZATION_STORE_PLUGIN],
+      ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL],
+      ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES],
     ])('retrieves the value of %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
@@ -213,6 +219,8 @@ describe('when initializing configuration', () => {
       process.env.END_ALLOWED_SCHOOL_YEAR = undefined;
       process.env.OPENSEARCH_USERNAME = undefined;
       process.env.OPENSEARCH_PASSWORD = undefined;
+      process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = undefined;
+      process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = undefined;
 
       Config = await import('../src/Config');
       const Environment = await import('../src/Environment');
@@ -245,6 +253,8 @@ describe('when initializing configuration', () => {
       ['OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false],
       ['BEGIN_ALLOWED_SCHOOL_YEAR', 1900],
       ['END_ALLOWED_SCHOOL_YEAR', 2100],
+      ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000],
+      ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000],
     ])('retrieves default value for %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
