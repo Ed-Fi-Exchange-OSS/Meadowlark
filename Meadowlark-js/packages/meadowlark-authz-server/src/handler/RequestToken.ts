@@ -5,7 +5,7 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { getBooleanFromEnvironment, Config, Logger } from '@edfi/meadowlark-utilities';
+import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
@@ -144,7 +144,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       // Check hardcoded credentials first
       const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
 
-      const enableHardCoded = getBooleanFromEnvironment('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+      const enableHardCoded = Config.get('OAUTH_HARD_CODED_CREDENTIALS_ENABLED');
 
       if (!enableHardCoded && (clientId === admin1.key || clientId === verifyOnly1.key)) {
         Logger.debug(
