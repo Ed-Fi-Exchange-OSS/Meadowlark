@@ -251,27 +251,6 @@ describe('when initializing configuration', () => {
   });
 
   describe('given a key that has not been set and does not have a default value', () => {
-    let Config: any;
-
-    beforeAll(async () => {
-      setAllValues();
-      process.env.AUTHORIZATION_STORE_PLUGIN = undefined;
-      process.env.DOCUMENT_STORE_PLUGIN = undefined;
-      process.env.OPENSEARCH_ENDPOINT = undefined;
-      process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST = undefined;
-      process.env.OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION = undefined;
-      process.env.OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH = undefined;
-      process.env.OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH = undefined;
-
-      Config = await import('../src/Config');
-      const Environment = await import('../src/Environment');
-      await Config.initializeConfig(Environment.CachedEnvironmentConfigProvider);
-    });
-
-    afterAll(() => {
-      setAllValues();
-    });
-
     it.each([
       ['AUTHORIZATION_STORE_PLUGIN'],
       ['DOCUMENT_STORE_PLUGIN'],
@@ -281,7 +260,18 @@ describe('when initializing configuration', () => {
       ['OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'],
       ['OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'],
     ])('throws an error for %s', (k) => {
-      expect(() => Config.get(k as ConfigKeys)).toThrowError();
+      setAllValues();
+      process.env[k] = undefined;
+
+      const act = async (): Promise<void> => {
+        const Config = await import('../src/Config');
+        const Environment = await import('../src/Environment');
+        await Config.initializeConfig(Environment.CachedEnvironmentConfigProvider);
+      };
+
+      act().catch((e) =>
+        expect(e).toMatchInlineSnapshot(`[Error: Environment variable '${k}' has not been setup properly.]`),
+      );
     });
   });
 });
