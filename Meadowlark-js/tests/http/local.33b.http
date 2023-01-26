@@ -180,9 +180,14 @@ authorization: bearer {{authToken4}}
 }
 
 
-###
+### 403 deleting with wrong owner
 DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
 authorization: bearer {{authToken1}}
+
+
+### 204 deleting with correct owner
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+authorization: bearer {{authToken4}}
 
 ###
 POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
@@ -211,11 +216,22 @@ authorization: bearer {{authToken1}}
 }
 
 
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "codeValue": "CA",
+  "shortDescription": "CA",
+  "description": "CA",
+  "namespace": "uri://ed-fi.org/CountryDescriptor"
+}
+
 ### Update this student
-# reference-validation: false
 PUT http://localhost:3000{{student.response.headers.location}}
 content-type: application/json
-authorization: bearer {{authToken4}}
+authorization: bearer {{authToken1}}
 
 { 
     "studentUniqueId": "s0zf6d1123d3e",
@@ -254,7 +270,7 @@ authorization: bearer {{authToken1}}
 ### Succeeds despite intervention code not existing - note uses client4 which has reference validation turned off
 POST http://localhost:3000/local/v3.3b/ed-fi/StudentInterventionAssociations
 content-type: application/json
-authorization: bearer {{authToken1}}
+authorization: bearer {{authToken4}}
 
 { 
     "studentReference": {
