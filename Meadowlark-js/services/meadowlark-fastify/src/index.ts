@@ -12,8 +12,8 @@ import { serviceFactory } from './Factory';
 dotenv.config();
 
 const start = async () => {
-  initializeLogging();
   await Config.initializeConfig(CachedEnvironmentConfigProvider);
+  initializeLogging();
 
   new ClusterService(serviceFactory).run();
 };

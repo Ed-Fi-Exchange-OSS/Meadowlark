@@ -14,8 +14,8 @@ export function wasServerAlreadyRunning(): boolean {
 }
 
 export async function setup() {
-  initializeLogging();
   await Config.initializeConfig(CachedEnvironmentConfigProvider);
+  initializeLogging();
 
   serverInstance = buildService();
   try {

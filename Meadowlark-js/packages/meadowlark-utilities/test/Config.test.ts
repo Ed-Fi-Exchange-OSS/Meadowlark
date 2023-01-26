@@ -67,12 +67,16 @@ describe('when initializing configuration', () => {
   const AUTHORIZATION_STORE_PLUGIN = 'c3';
   const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = 11;
   const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = 12;
+  const IS_LOCAL = false;
+  const LOG_LEVEL = 'debug';
 
   // eslint-disable-next-line prefer-destructuring
   const env = process.env;
 
   const setAllValues = () => {
     process.env = {};
+    process.env.IS_LOCAL = IS_LOCAL.toString();
+    process.env.LOG_LEVEL = LOG_LEVEL;
     process.env.END_ALLOWED_SCHOOL_YEAR = END_ALLOWED_SCHOOL_YEAR.toString();
     process.env.BEGIN_ALLOWED_SCHOOL_YEAR = BEGIN_ALLOWED_SCHOOL_YEAR.toString();
     process.env.OAUTH_HARD_CODED_CREDENTIALS_ENABLED = OAUTH_HARD_CODED_CREDENTIALS_ENABLED.toString();
@@ -154,6 +158,8 @@ describe('when initializing configuration', () => {
     });
 
     it.each([
+      ['IS_LOCAL', IS_LOCAL],
+      ['LOG_LEVEL', LOG_LEVEL],
       ['DOCUMENT_STORE_PLUGIN', DOCUMENT_STORE_PLUGIN],
       ['MONGO_LOG_LEVEL', MONGO_LOG_LEVEL],
       ['MONGO_URL', MONGO_URL],
@@ -221,6 +227,8 @@ describe('when initializing configuration', () => {
       process.env.OPENSEARCH_PASSWORD = undefined;
       process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = undefined;
       process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = undefined;
+      process.env.IS_LOCAL = undefined;
+      process.env.LOG_LEVEL = undefined;
 
       Config = await import('../src/Config');
       const Environment = await import('../src/Environment');
@@ -232,6 +240,8 @@ describe('when initializing configuration', () => {
     });
 
     it.each([
+      ['IS_LOCAL', true],
+      ['LOG_LEVEL', 'info'],
       ['MONGO_LOG_LEVEL', 'error'],
       ['MONGO_URL', 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0'],
       ['MONGO_WRITE_CONCERN', 'majority'],

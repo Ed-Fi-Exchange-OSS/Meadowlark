@@ -39,7 +39,9 @@ export type ConfigKeys =
   | 'POSTGRES_USER'
   | 'POSTGRES_PASSWORD'
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL'
-  | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES';
+  | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES'
+  | 'IS_LOCAL'
+  | 'LOG_LEVEL';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -79,6 +81,8 @@ export async function initializeConfig(provider: ConfigPlugin) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
 
+  set('IS_LOCAL', await provider.getBool('IS_LOCAL', true));
+  set('LOG_LEVEL', await provider.getString('LOG_LEVEL', 'info'));
   set('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000));
   set(
     'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES',
