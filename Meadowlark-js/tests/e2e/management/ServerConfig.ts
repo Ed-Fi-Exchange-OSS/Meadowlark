@@ -19,13 +19,7 @@ export async function setup() {
 
   serverInstance = buildService();
   try {
-    let port: number = 3000;
-    if (process.env.FASTIFY_PORT != null) {
-      const possiblePort: number = parseInt(process.env.FASTIFY_PORT, 10);
-      if (!Number.isNaN(possiblePort)) port = possiblePort;
-    }
-    process.env.MEADOWLARK_STAGE ?? 'local';
-    await serverInstance.listen(port);
+    await serverInstance.listen(Config.get('FASTIFY_PORT'));
   } catch (err) {
     if (err.code === 'EADDRINUSE') {
       serverAlreadyRunning = true;

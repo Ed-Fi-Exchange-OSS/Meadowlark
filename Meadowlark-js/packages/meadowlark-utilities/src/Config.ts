@@ -41,7 +41,11 @@ export type ConfigKeys =
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL'
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES'
   | 'IS_LOCAL'
-  | 'LOG_LEVEL';
+  | 'LOG_LEVEL'
+  | 'FASTIFY_PORT'
+  | 'MEADOWLARK_STAGE'
+  | 'FASTIFY_RATE_LIMIT'
+  | 'HTTP_PROTOCOL_AND_SERVER';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -81,6 +85,9 @@ export async function initializeConfig(provider: ConfigPlugin) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
 
+  set('HTTP_PROTOCOL_AND_SERVER', await provider.getString('HTTP_PROTOCOL_AND_SERVER', 'http://localhost'));
+  set('FASTIFY_RATE_LIMIT', await provider.getInt('FASTIFY_RATE_LIMIT', 0));
+  set('MEADOWLARK_STAGE', await provider.getString('MEADOWLARK_STAGE', 'local'));
   set('IS_LOCAL', await provider.getBool('IS_LOCAL', true));
   set('LOG_LEVEL', await provider.getString('LOG_LEVEL', 'info'));
   set('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000));
@@ -122,6 +129,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
   set('ALLOW_TYPE_COERCION', await provider.getBool('ALLOW_TYPE_COERCION', false));
   set('ALLOW__EXT_PROPERTY', await provider.getBool('ALLOW__EXT_PROPERTY', false));
   set('FASTIFY_NUM_THREADS', await provider.getInt('FASTIFY_NUM_THREADS', CpuCount));
+  set('FASTIFY_PORT', await provider.getInt('FASTIFY_PORT', 3000));
 
   set('OAUTH_EXPIRATION_MINUTES', await provider.getInt('OAUTH_EXPIRATION_MINUTES', 60));
   set('OAUTH_TOKEN_ISSUER', await provider.getString('OAUTH_TOKEN_ISSUER', DEFAULT_TOKEN_ISSUER));

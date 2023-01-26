@@ -69,6 +69,10 @@ describe('when initializing configuration', () => {
   const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = 12;
   const IS_LOCAL = false;
   const LOG_LEVEL = 'debug';
+  const FASTIFY_PORT = 3934;
+  const MEADOWLARK_STAGE = 'not-local';
+  const FASTIFY_RATE_LIMIT = 932;
+  const HTTP_PROTOCOL_AND_SERVER = 'https://example.com';
 
   // eslint-disable-next-line prefer-destructuring
   const env = process.env;
@@ -110,6 +114,10 @@ describe('when initializing configuration', () => {
     process.env.AUTHORIZATION_STORE_PLUGIN = AUTHORIZATION_STORE_PLUGIN;
     process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL = OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL.toString();
     process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES.toString();
+    process.env.FASTIFY_PORT = FASTIFY_PORT.toString();
+    process.env.MEADOWLARK_STAGE = MEADOWLARK_STAGE;
+    process.env.FASTIFY_RATE_LIMIT = FASTIFY_RATE_LIMIT.toString();
+    process.env.HTTP_PROTOCOL_AND_SERVER = HTTP_PROTOCOL_AND_SERVER;
   };
 
   beforeEach(() => {
@@ -192,6 +200,10 @@ describe('when initializing configuration', () => {
       ['AUTHORIZATION_STORE_PLUGIN', AUTHORIZATION_STORE_PLUGIN],
       ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL],
       ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES],
+      ['FASTIFY_PORT', FASTIFY_PORT],
+      ['MEADOWLARK_STAGE', MEADOWLARK_STAGE],
+      ['FASTIFY_RATE_LIMIT', FASTIFY_RATE_LIMIT],
+      ['HTTP_PROTOCOL_AND_SERVER', HTTP_PROTOCOL_AND_SERVER],
     ])('retrieves the value of %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
@@ -229,6 +241,10 @@ describe('when initializing configuration', () => {
       process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES = undefined;
       process.env.IS_LOCAL = undefined;
       process.env.LOG_LEVEL = undefined;
+      process.env.FASTIFY_PORT = undefined;
+      process.env.MEADOWLARK_STAGE = undefined;
+      process.env.FASTIFY_RATE_LIMIT = undefined;
+      process.env.HTTP_PROTOCOL_AND_SERVER = undefined;
 
       Config = await import('../src/Config');
       const Environment = await import('../src/Environment');
@@ -240,6 +256,7 @@ describe('when initializing configuration', () => {
     });
 
     it.each([
+      ['FASTIFY_PORT', 3000],
       ['IS_LOCAL', true],
       ['LOG_LEVEL', 'info'],
       ['MONGO_LOG_LEVEL', 'error'],
@@ -265,6 +282,8 @@ describe('when initializing configuration', () => {
       ['END_ALLOWED_SCHOOL_YEAR', 2100],
       ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000],
       ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000],
+      ['FASTIFY_RATE_LIMIT', 0],
+      ['HTTP_PROTOCOL_AND_SERVER', 'http://localhost'],
     ])('retrieves default value for %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });

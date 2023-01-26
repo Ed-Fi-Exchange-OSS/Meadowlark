@@ -10,6 +10,9 @@ import { getAccessToken } from './Credentials';
 
 const chance = new Chance() as Chance.Chance;
 
+// There is a timing problem that this code runs before configuration can be setup. Therefore do not replace process.env.KEY
+// with Config.get('KEY');
+
 function getBaseURLRequest() {
   return request(`${process.env.ROOT_URL ?? 'http://localhost:3000'}/${process.env.MEADOWLARK_STAGE ?? 'local'}`);
 }

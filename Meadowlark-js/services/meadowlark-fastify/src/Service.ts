@@ -11,7 +11,7 @@ import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
 import {
   metaed,
@@ -83,7 +83,7 @@ export function buildService(): FastifyInstance {
   }
 
   function setupRateLimiting(fastify: FastifyInstance): void {
-    if (process.env.FASTIFY_RATE_LIMIT == null || process.env.FASTIFY_RATE_LIMIT.toLowerCase() === 'true') {
+    if (Config.get<number>('FASTIFY_RATE_LIMIT') > 0) {
       // Add rate limiter, taking the defaults. Note this uses an in-memory store by default, better multi-server
       // effectiveness requires configuring for redis or an alternative store
       fastify.register(FastifyRateLimit);
@@ -101,7 +101,7 @@ export function buildService(): FastifyInstance {
   }
 
   function configureRouting(fastify: FastifyInstance): void {
-    const stage: string = process.env.MEADOWLARK_STAGE || 'local';
+    const stage: string = Config.get('MEADOWLARK_STAGE');
 
     // Matching crud operations handlers
     fastify.get(`/${stage}/*`, get);

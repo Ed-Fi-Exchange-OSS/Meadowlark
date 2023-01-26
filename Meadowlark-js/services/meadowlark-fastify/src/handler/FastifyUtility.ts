@@ -12,8 +12,6 @@ import type { FastifyRequest } from 'fastify';
 
 export type CompatibleParameters = { [header: string]: string | undefined };
 
-export const MEADOWLARK_STAGE = process.env.MEADOWLARK_STAGE || 'local';
-
 // Returns header names lowercased
 export function getHeaders(fastifyRequest: FastifyRequest): Headers {
   const headers = (fastifyRequest.headers as CompatibleParameters) ?? {};
