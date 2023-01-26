@@ -18,9 +18,6 @@ export const setupConfigForIntegration = async () => {
   // Backup to the root directory to find a .env file
   const path = resolve(join(__dirname, '..', '..', '..', '..', '.env'));
 
-  // console.error(path, null);
-  // process.exit(-444);
-
   if (!existsSync(path)) {
     // eslint-disable-next-line no-console
     console.error(`Cannot run integration tests because there is no .env file in '${path}'`);
