@@ -9,6 +9,7 @@ import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument'
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
 import { updateAuthorizationClientDocument } from '../../../src/repository/authorization/UpdateAuthorizationClient';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
+import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(40000);
 
@@ -37,6 +38,8 @@ describe('given the update of an authorization client', () => {
   let updateClientRequest;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
     await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(clientIdSame), mongoClient);
     updateClientRequest = await updateAuthorizationClientDocument(
@@ -81,6 +84,8 @@ describe('given the attempted update of an authorization client that does not ex
   let updateClientRequest;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
     await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(clientIdSame), mongoClient);
     updateClientRequest = await updateAuthorizationClientDocument(
@@ -114,6 +119,8 @@ describe('given a closed MongoDB connection', () => {
   let updateClientRequest;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
 
     mongoClient.close();

@@ -20,6 +20,7 @@ import { MongoClient } from 'mongodb';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -37,6 +38,8 @@ describe('given the upsert where no document id is specified', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // Act
@@ -67,6 +70,8 @@ describe('given the getById of a non-existent document', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // Act
@@ -122,6 +127,8 @@ describe('given the getById of a document owned by the requestor', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // Insert owned document
@@ -179,6 +186,8 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // Insert non-owned document

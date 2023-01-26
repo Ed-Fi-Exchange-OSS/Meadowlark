@@ -22,6 +22,7 @@ import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -50,6 +51,8 @@ describe('given the update of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     updateResult = await updateDocumentById(
@@ -89,6 +92,8 @@ describe('given the update of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
     const updateRequest: UpdateRequest = {
       ...newUpdateRequest(),
@@ -144,6 +149,8 @@ describe('given an update of a document that references a non-existent document 
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // Insert the original document with no reference
@@ -225,6 +232,8 @@ describe('given an update of a document that references an existing document wit
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
@@ -324,6 +333,8 @@ describe('given an update of a document with one existing and one non-existent r
   const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced
@@ -437,6 +448,8 @@ describe('given an update of a subclass document referenced by an existing docum
   );
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     //  The document that will be referenced

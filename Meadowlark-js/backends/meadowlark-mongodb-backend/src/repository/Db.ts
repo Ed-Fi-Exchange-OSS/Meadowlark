@@ -29,8 +29,8 @@ let singletonClient: MongoClient | null = null;
  * Return a brand new client - which is a connection pool.
  */
 export async function getNewClient(): Promise<MongoClient> {
-  const mongoUrl = Config.get<string>('MONGO_URL');
-  const databaseName = Config.get<string>('MEADOWLARK_DATABASE_NAME');
+  const mongoUrl: string = Config.get('MONGO_URL');
+  const databaseName: string = Config.get('MEADOWLARK_DATABASE_NAME');
 
   try {
     const newClient: MongoClient = new MongoClient(mongoUrl, {

@@ -8,6 +8,7 @@ import { Collection, MongoClient } from 'mongodb';
 import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
 import { tryCreateBootstrapAuthorizationAdminDocument } from '../../../src/repository/authorization/TryCreateBootstrapAuthorizationAdmin';
+import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(40000);
 
@@ -27,6 +28,8 @@ describe('given the first time create of a bootstrap admin client', () => {
   let createClientRequest;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
     createClientRequest = await tryCreateBootstrapAuthorizationAdminDocument(
       newCreateAuthorizationClientRequest(),
@@ -70,6 +73,8 @@ describe('given a closed MongoDB connection', () => {
   let createClientRequest;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
 
     mongoClient.close();
@@ -106,6 +111,8 @@ describe('given two attempts at the create of a bootstrap admin client', () => {
   let createClientRequest2;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
     createClientRequest1 = await tryCreateBootstrapAuthorizationAdminDocument(
       newCreateAuthorizationClientRequest(),

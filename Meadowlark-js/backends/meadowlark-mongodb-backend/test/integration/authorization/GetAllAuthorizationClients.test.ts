@@ -8,6 +8,7 @@ import { MongoClient } from 'mongodb';
 import { getAuthorizationCollection, getNewClient } from '../../../src/repository/Db';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { getAllAuthorizationClientDocuments } from '../../../src/repository/authorization/GetAllAuthorizationClients';
+import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(40000);
 
@@ -29,6 +30,8 @@ describe('when fetching authorization clients', () => {
     let response;
 
     beforeAll(async () => {
+      await setupConfigForIntegration();
+
       mongoClient = (await getNewClient()) as MongoClient;
       // create the client
       await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
@@ -65,6 +68,8 @@ describe('when fetching authorization clients', () => {
     let response;
 
     beforeAll(async () => {
+      await setupConfigForIntegration();
+
       mongoClient = (await getNewClient()) as MongoClient;
       response = await getAllAuthorizationClientDocuments(TRACE_ID, mongoClient);
     });
@@ -89,6 +94,8 @@ describe('when fetching authorization clients', () => {
     let response;
 
     beforeAll(async () => {
+      await setupConfigForIntegration();
+
       mongoClient = (await getNewClient()) as MongoClient;
 
       mongoClient.close();

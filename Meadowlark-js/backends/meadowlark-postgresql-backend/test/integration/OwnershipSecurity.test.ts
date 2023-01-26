@@ -22,6 +22,7 @@ import { deleteAll } from './TestHelper';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { SecurityResult } from '../../src/security/SecurityResult';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -39,6 +40,8 @@ describe('given the upsert where no document id is specified', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
 
     // Act
@@ -70,6 +73,8 @@ describe('given the getById of a non-existent document', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
 
     // Act
@@ -126,6 +131,8 @@ describe('given the getById of a document owned by the requestor', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
 
     // Insert owned document
@@ -184,6 +191,8 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
 
     // Insert non-owned document
