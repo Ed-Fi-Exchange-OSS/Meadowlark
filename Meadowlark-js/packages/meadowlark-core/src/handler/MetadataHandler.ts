@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import { Namespace } from '@edfi/metaed-core';
+import { Config } from '@edfi/meadowlark-utilities';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate, XsdTemplate } from './MetadataResources';
@@ -12,7 +13,6 @@ import { Constants } from '../Constants';
 import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
-import { getOAuthTokenURL } from '../AuthenticationSettings';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 
 interface ExternalResource {
@@ -81,7 +81,7 @@ function useTemplate(data: string, host: string, stage: string): string {
 
   return data
     .replace(basePathToken, basePath)
-    .replace(tokenUrlToken, getOAuthTokenURL())
+    .replace(tokenUrlToken, Config.get('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'))
     .replace(hostToken, host)
     .replace(schemesToken, schemes);
 }

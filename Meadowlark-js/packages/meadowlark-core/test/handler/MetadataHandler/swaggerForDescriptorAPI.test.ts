@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import axios from 'axios';
+import { Config } from '@edfi/meadowlark-utilities';
 import { swaggerForDescriptorsAPI, resourceCache } from '../../../src/handler/MetadataHandler';
 import { Constants } from '../../../src/Constants';
 import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
@@ -12,12 +13,24 @@ import { FrontendResponse } from '../../../src/handler/FrontendResponse';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const setupMockConfiguration = () => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
+        return 'https://a/b/oauth/token';
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};
+
 describe('when getting Swagger resources', () => {
-  // eslint-disable-next-line no-return-assign
-  beforeAll(() => (process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST = 'https://a/b/oauth/token'));
+  beforeAll(() => {
+    setupMockConfiguration();
+  });
 
   afterAll(() => {
-    delete process.env.TOKEN_URL;
+    jest.restoreAllMocks();
 
     delete resourceCache[Constants.swaggerDescriptorUrl];
   });

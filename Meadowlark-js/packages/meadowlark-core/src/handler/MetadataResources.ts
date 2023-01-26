@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { getOAuthTokenURL } from '../AuthenticationSettings';
+import { Config } from '@edfi/meadowlark-utilities';
 
 export const CreateApiVersionObject = (serverBaseUrl: string) => ({
   version: '1.0.0',
@@ -17,7 +17,7 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => ({
   urls: {
     dependencies: `${serverBaseUrl}/metadata/data/v3/dependencies`,
     openApiMetadata: `${serverBaseUrl}/metadata/`,
-    oauth: getOAuthTokenURL(),
+    oauth: Config.get('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'),
     dataManagementApi: `${serverBaseUrl}/v3.3b/`,
     xsdMetadata: `${serverBaseUrl}/metadata/xsd`,
   },

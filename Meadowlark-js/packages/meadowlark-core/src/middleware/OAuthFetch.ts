@@ -5,7 +5,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import axiosRetry from 'axios-retry';
-import { getOAuthTokenURL, getOAuthVerifyURL, getOwnClientId, getOwnClientSecret } from '../AuthenticationSettings';
+import { Config } from '@edfi/meadowlark-utilities';
 
 // Add default retry to Axios - 3 times, network errors or idempotent 500s
 axiosRetry(axios);
@@ -16,11 +16,11 @@ axiosRetry(axios);
  */
 export async function fetchOwnAccessToken(): Promise<AxiosResponse> {
   return axios.post(
-    getOAuthTokenURL(),
+    Config.get('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'),
     {
       grant_type: 'client_credentials',
-      client_id: getOwnClientId(),
-      client_secret: getOwnClientSecret(),
+      client_id: Config.get('OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'),
+      client_secret: Config.get('OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'),
     },
     {
       headers: { 'content-type': 'application/json' },
@@ -37,7 +37,7 @@ export async function fetchClientTokenVerification(
   clientBearerToken: string,
   ownAccessToken: string,
 ): Promise<AxiosResponse> {
-  return axios.post(getOAuthVerifyURL(), `token=${clientBearerToken}`, {
+  return axios.post(Config.get('OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'), `token=${clientBearerToken}`, {
     headers: {
       'content-type': 'application/x-www-form-urlencoded',
       authorization: `bearer ${ownAccessToken}`,
