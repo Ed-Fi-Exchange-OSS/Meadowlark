@@ -15,8 +15,6 @@ import { newJwtStatus } from '../../src/security/JwtStatus';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../../src/message/TryCreateBootstrapAuthorizationAdminResult';
 import { ClientId } from '../../src/Utility';
 
-process.env.ACCESS_TOKEN_REQUIRED = 'false';
-
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
   path: '/oauth/clients',

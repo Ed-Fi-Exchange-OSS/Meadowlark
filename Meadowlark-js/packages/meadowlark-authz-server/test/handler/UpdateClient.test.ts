@@ -12,8 +12,6 @@ import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { newJwtStatus } from '../../src/security/JwtStatus';
 
-process.env.ACCESS_TOKEN_REQUIRED = 'false';
-
 const authorizationRequest: AuthorizationRequest = {
   ...newAuthorizationRequest(),
   path: '/oauth/clients/11111111-1111-1111-1111111111111111',

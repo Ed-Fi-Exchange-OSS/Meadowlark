@@ -10,8 +10,6 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { documentIdForDocumentInfo } from '../../src/model/DocumentInfo';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
-process.env.ACCESS_TOKEN_REQUIRED = 'false';
-
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   body: '{}',
