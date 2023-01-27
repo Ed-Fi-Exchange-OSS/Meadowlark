@@ -12,6 +12,17 @@ jest.setTimeout(40000);
 
 initializeLogging();
 
+const setupMockConfiguration = () => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
+        return 'https://example.com/a/b/c';
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};
+
 describe('given a DELETE of a school by id', () => {
   const schoolDeleteByIdRequest: InjectOptions = {
     method: 'DELETE',
@@ -23,7 +34,8 @@ describe('given a DELETE of a school by id', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
-    Config.set('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST', 'https://example.com/a/b/c');
+    setupMockConfiguration();
+
     mockDeleteIt = jest.spyOn(MeadowlarkCore, 'deleteIt');
     service = buildService();
     await service.ready();
@@ -34,7 +46,8 @@ describe('given a DELETE of a school by id', () => {
 
   afterAll(async () => {
     await service.close();
-    mockDeleteIt.mockRestore();
+
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {

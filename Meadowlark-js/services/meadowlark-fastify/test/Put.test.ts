@@ -11,7 +11,16 @@ import { buildService } from '../src/Service';
 jest.setTimeout(40000);
 
 initializeLogging();
-Config.set('OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST', 'https://example.com/a/b/c');
+const setupMockConfiguration = () => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
+        return 'https://example.com/a/b/c';
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};
 
 const schoolPutRequest: InjectOptions = {
   method: 'PUT',
@@ -30,6 +39,8 @@ describe('given a PUT of a school', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
+
     mockUpdate = jest.spyOn(MeadowlarkCore, 'update');
     service = buildService();
     await service.ready();
@@ -40,7 +51,8 @@ describe('given a PUT of a school', () => {
 
   afterAll(async () => {
     await service.close();
-    mockUpdate.mockRestore();
+
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {
