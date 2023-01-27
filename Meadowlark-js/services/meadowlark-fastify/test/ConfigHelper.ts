@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import { Config } from '@edfi/meadowlark-utilities';
+
+export const setupMockConfiguration = () => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'FASTIFY_RATE_LIMIT':
+        return 0;
+      case 'FASTIFY_PORT':
+        return 0;
+      case 'MEADOWLARK_STAGE':
+        return 'local';
+      case 'IS_LOCAL':
+        return true;
+      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
+        return 'https://example.com/a/b/c';
+      case 'LOG_LEVEL':
+        return 'ERROR';
+      case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL':
+        return 10;
+      case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES':
+        return 11;
+      case 'DOCUMENT_STORE_PLUGIN':
+        return '@edfi/meadowlark-mongodb-backend';
+      case 'OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH':
+        return 'meadowlark_verify-only_key_1';
+      case 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH':
+        return 'meadowlark_verify-only_secret_1';
+      case 'QUERY_HANDLER_PLUGIN':
+        return '@edfi/meadowlark-opensearch-backend';
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};

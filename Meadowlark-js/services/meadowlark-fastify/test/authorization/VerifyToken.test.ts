@@ -6,6 +6,7 @@
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
 import { buildService } from '../../src/Service';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 jest.setTimeout(40000);
 
@@ -21,6 +22,7 @@ describe('given a POST to verify a token', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
     mockVerify = jest.spyOn(AuthorizationServer, 'verifyToken');
     service = buildService();
     await service.ready();
@@ -31,7 +33,7 @@ describe('given a POST to verify a token', () => {
 
   afterAll(async () => {
     await service.close();
-    mockVerify.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('should send the expected AuthorizationRequest to Authorization Server', async () => {

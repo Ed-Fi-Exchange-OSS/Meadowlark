@@ -5,23 +5,11 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
-import { Config, initializeLogging } from '@edfi/meadowlark-utilities';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
+import { setupMockConfiguration } from './ConfigHelper';
 
 jest.setTimeout(40000);
-
-initializeLogging();
-
-const setupMockConfiguration = () => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
-        return 'https://example.com/a/b/c';
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-};
 
 describe('given a GET of a school by id', () => {
   const schoolGetByIdRequest: InjectOptions = {
@@ -35,6 +23,7 @@ describe('given a GET of a school by id', () => {
 
   beforeAll(async () => {
     setupMockConfiguration();
+    initializeLogging();
 
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();
@@ -72,6 +61,7 @@ describe('given a GET of a school query without path ending slash', () => {
 
   beforeAll(async () => {
     setupMockConfiguration();
+    initializeLogging();
 
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();
@@ -113,6 +103,7 @@ describe('given a GET of a school query with path ending slash', () => {
 
   beforeAll(async () => {
     setupMockConfiguration();
+    initializeLogging();
 
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();

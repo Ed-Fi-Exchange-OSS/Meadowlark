@@ -5,22 +5,11 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
-import { Config, initializeLogging } from '@edfi/meadowlark-utilities';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
+import { setupMockConfiguration } from './ConfigHelper';
 
 jest.setTimeout(40000);
-
-initializeLogging();
-const setupMockConfiguration = () => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
-        return 'https://example.com/a/b/c';
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-};
 
 const schoolPutRequest: InjectOptions = {
   method: 'PUT',
@@ -40,6 +29,7 @@ describe('given a PUT of a school', () => {
 
   beforeAll(async () => {
     setupMockConfiguration();
+    initializeLogging();
 
     mockUpdate = jest.spyOn(MeadowlarkCore, 'update');
     service = buildService();
