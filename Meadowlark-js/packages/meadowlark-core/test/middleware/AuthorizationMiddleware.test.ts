@@ -45,8 +45,7 @@ describe('given a previous middleware has created a response', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -94,8 +93,7 @@ describe('given a previous middleware has provided security information', () => 
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -134,8 +132,7 @@ describe('given a request has no authorization header', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -184,8 +181,7 @@ describe('given a request has non-bearer authorization header', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -236,8 +232,7 @@ describe('given an invalid configuration of Meadowlark client secret', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -284,8 +279,7 @@ describe('given an invalid configuration of Meadowlark client id', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -332,8 +326,7 @@ describe('given a 500 from OAuth server when requesting own token', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -381,8 +374,7 @@ describe('given an exception when requesting own token from OAuth server', () =>
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -435,8 +427,7 @@ describe('given a valid own token, but then the own token expires on client toke
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -485,8 +476,7 @@ describe('given a valid own token, but then the own token expires on client toke
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -534,8 +524,7 @@ describe('given the client token is not a well-formed JWT', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -579,8 +568,7 @@ describe('given the client token is not active', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -630,8 +618,7 @@ describe('given the client token is active for a vendor without assessment role'
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -691,8 +678,7 @@ describe('given the client token is active for a vendor with assessment role', (
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -746,8 +732,7 @@ describe('given a 500 from the OAuth server on client token verification', () =>
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -791,8 +776,7 @@ describe('given an exception during the client token verification call to the OA
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -846,8 +830,7 @@ describe('given the own token requires a refresh, and the client token is active
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -923,8 +906,7 @@ describe('given two calls for verification with different client ids', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -1019,8 +1001,7 @@ describe('given two calls for verification with the same client id', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
