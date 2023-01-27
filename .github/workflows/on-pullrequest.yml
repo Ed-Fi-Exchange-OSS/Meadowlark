@@ -207,20 +207,23 @@ jobs:
           sudo systemctl start postgresql.service
           sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
 
+      - name: Create .env file
+        run: |
           # Create a .env file with proper settings
           touch .env
           echo POSTGRES_USER=${{ env.POSTGRES_PASSWORD }} >> .env
           echo POSTGRES_PASSWORD=${{ env.POSTGRES_USER }} >> .env
+          echo POSTGRES_HOST=localhost >> .env
+          echo POSTGRES_PORT=5432 >> .env
+          echo MEADOWLARK_DATABASE_NAME=meadowark >> .env
+          # The actual values below don't matter for integration tests - but _something_ must be set
+          echo AUTHORIZATION_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
           echo DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
           echo OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 >> .env
           echo OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 >> .env
           echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3000/local/oauth/token >> .env
           echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3000/local/oauth/verify >> .env
-          echo IS_LOCAL=true >> .env
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
-          echo MEADOWLARK_DATABASE_NAME=meadowark >> .env
-          echo POSTGRES_HOST=localhost >> .env
-          echo POSTGRES_PORT=5432 >> .env
 
       - name: Run ${{matrix.tests.type}} Tests
         run: ${{matrix.tests.command}}
