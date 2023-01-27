@@ -3,28 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as MeadowlarkUtilities from '@edfi/meadowlark-utilities';
-import { Config, Logger } from '@edfi/meadowlark-utilities';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { anonymizeAndLogRequestBody } from '../../src/middleware/LogAnonymizedRequestMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
-
-const setupMockConfiguration = (isDebug: boolean = false) => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'IS_LOCAL':
-        return true;
-      case 'LOG_LEVEL':
-        return isDebug ? 'DEBUG' : 'ERROR';
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-
-  jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => isDebug);
-};
+import { setupMockConfiguration } from '../ConfigHelper';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();

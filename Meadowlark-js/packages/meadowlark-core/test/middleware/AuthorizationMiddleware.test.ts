@@ -3,29 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Config } from '@edfi/meadowlark-utilities';
 import { authorize, clearCaches } from '../../src/middleware/AuthorizationMiddleware';
 import * as OAuthFetch from '../../src/middleware/OAuthFetch';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 jest.setTimeout(40000);
 
 const newAxiosResponse = () => ({ status: 0, data: {}, headers: {}, config: {}, statusText: '' });
-
-const setupMockConfiguration = () => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL':
-        return 10;
-      case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES':
-        return 10;
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-};
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();

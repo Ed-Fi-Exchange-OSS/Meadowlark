@@ -3,21 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Config } from '@edfi/meadowlark-utilities';
 import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../../src/handler/FrontendResponse';
 import { apiVersion } from '../../../src/handler/MetadataHandler';
-
-const setupMockConfiguration = () => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
-        return 'https://a/b/oauth/token';
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-};
+import { setupMockConfiguration } from '../../ConfigHelper';
 
 describe('when getting API version information', () => {
   describe('given a valid request not running in localhost', () => {

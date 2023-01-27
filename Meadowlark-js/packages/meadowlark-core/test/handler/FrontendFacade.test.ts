@@ -3,22 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Config, initializeLogging } from '@edfi/meadowlark-utilities';
+import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { get } from '../../src/handler/FrontendFacade';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
+import { setupMockConfiguration } from '../ConfigHelper';
 
-const setupMockConfiguration = () => {
-  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
-    switch (key) {
-      case 'IS_LOCAL':
-        return true;
-      case 'LOG_LEVEL':
-        return 'ERROR';
-      default:
-        throw new Error(`Key '${key}' not configured`);
-    }
-  });
-};
 describe('given there is no resourceId in a get request', () => {
   const request: FrontendRequest = { ...newFrontendRequest(), path: '/1/2/3' };
 
