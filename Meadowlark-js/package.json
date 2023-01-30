@@ -53,7 +53,9 @@
     "test:system:ci": "npm run test:system:mongodb  -- --ci --config ./jest.ci-config.js && npm run test:system:postgresql  -- --ci --config ./jest.ci-config.js",
     "test:unit:coverage": "rimraf coverage/ && npm run test:unit -- --collectCoverage",
     "prepare": "cd .. && husky install",
-    "start:local": "lerna run start:local"
+    "start:local": "lerna run start:local",
+    "docker:build": "docker build -t meadowlark .",
+    "docker:start": "docker run -d -n ml-fastify -p 3000:3000 meadowlark"
   },
   "husky": {
     "hooks": {
