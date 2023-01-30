@@ -1,4 +1,4 @@
-# Contributing to the Meadowlark Project <!-- omit in toc -->
+# Contributing to the Meadowlark Project
 
 You are here, so presumably you are thinking about making contributions to this
 project. Thank you! You are on the first step to being a member of our open
