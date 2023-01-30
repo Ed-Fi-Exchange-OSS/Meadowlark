@@ -74,7 +74,14 @@ export function buildService(): FastifyInstance {
       });
       done();
     });
+
+    fastify.addHook('onClose', (_instance, done) => {
+      Logger.info('Close signal received', null);
+      // TODO: close database connections
+      done();
+    });
   }
+
   function alwaysRespondAsJson(fastify: FastifyInstance): void {
     fastify.addHook('onSend', (_request, reply, _payload, done) => {
       reply.headers({ 'content-type': 'application/json' });
