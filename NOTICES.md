@@ -13,11 +13,6 @@ distributed in its original form without modification.
 
 --
 
-Please run the command `yarn licenses list` for a full list of all of the
-licenses used by this package's dependencies.
-
---
-
 Fastify clustering code was adapted from
 [fastify-cluster-example](https://github.com/joseluisq/fastify-cluster-example/)
 under the following license:
