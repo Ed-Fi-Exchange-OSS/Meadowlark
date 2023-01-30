@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import path from 'path';
+import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
+
+let environment: StartedDockerComposeEnvironment;
+const containerName = 'opensearch-node-integration';
+
+export async function setupOpenSearch() {
+  let container: StartedTestContainer;
+  try {
+    const port = 8200;
+    const composeFile = 'docker-compose.yml';
+    const composeFilePath = path.resolve(__dirname, './');
+    environment = await new DockerComposeEnvironment(composeFilePath, composeFile).withNoRecreate().up();
+    container = environment.getContainer(containerName);
+    const host = container.getHost();
+    process.env.OPENSEARCH_ENDPOINT = `http://${host}:${port}`;
+  } catch (e) {
+    throw new Error(`Error setting up opensearch: ${e}`);
+  }
+}
+
+export async function teardownOpenSearch() {
+  await environment.getContainer(containerName).stop();
+}
