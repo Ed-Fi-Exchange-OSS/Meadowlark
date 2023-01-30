@@ -13,11 +13,10 @@ import {
   UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Client } from '@opensearch-project/opensearch/.';
-import path from 'path';
-import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
 import { afterUpsertDocument } from '../../src/repository/UpdateOpensearch';
+import { setupOpenSearch, teardownOpenSearch } from '../setup/OpenSearchSetup';
 
 jest.setTimeout(40000);
 
@@ -51,21 +50,9 @@ const setupQueryRequest = (queryParameters: any, paginationParameters: Paginatio
 describe('given the upsert of a new document', () => {
   let client: Client;
   let upsertResult: UpsertResult;
-  let container: StartedTestContainer;
-  let environment: StartedDockerComposeEnvironment;
 
   beforeAll(async () => {
-    try {
-      const port = 8200;
-      const composeFile = 'docker-compose.yml';
-      const composeFilePath = path.resolve(__dirname, './');
-      environment = await new DockerComposeEnvironment(composeFilePath, composeFile).up();
-      container = environment.getContainer('opensearch-node-integration');
-      const host = container.getHost();
-      process.env.OPENSEARCH_ENDPOINT = `http://${host}:${port}`;
-    } catch (e) {
-      throw new Error(`Error setting up opensearch: ${e}`);
-    }
+    await setupOpenSearch();
 
     client = await getNewClient();
   });
@@ -96,8 +83,6 @@ describe('given the upsert of a new document', () => {
   });
 
   afterAll(async () => {
-    await container.stop();
-    // await environment.stop();
-    // await environment.down();
+    await teardownOpenSearch();
   });
 });

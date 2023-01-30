@@ -17,7 +17,7 @@ export function getEnvironment(): StartedDockerComposeEnvironment {
 export async function configure(_config: any) {
   await mongoSetup(_config);
 
-  const composeFilePath = path.resolve(__dirname, '../automation-setup/');
+  const composeFilePath = path.resolve(process.cwd(), './tests/setup/');
   const composeFile = 'docker-compose.yml';
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile).up();
 }
