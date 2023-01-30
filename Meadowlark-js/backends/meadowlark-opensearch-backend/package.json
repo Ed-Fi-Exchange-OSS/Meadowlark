@@ -28,6 +28,7 @@
     "@short.io/opensearch-mock": "^0.3.1",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "testcontainers": "^9.0.1"
   }
 }
