@@ -7,14 +7,14 @@ import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
 
 let environment: StartedDockerComposeEnvironment;
-const containerName = 'opensearch-node-integration';
+const containerName = 'opensearch-test';
 
 export async function setupOpenSearch() {
   let container: StartedTestContainer;
   try {
     const port = 8200;
     const composeFile = 'docker-compose.yml';
-    const composeFilePath = path.resolve(__dirname, './');
+    const composeFilePath = path.resolve(process.cwd(), './tests/setup/');
     environment = await new DockerComposeEnvironment(composeFilePath, composeFile).withNoRecreate().up();
     container = environment.getContainer(containerName);
     const host = container.getHost();
