@@ -77,7 +77,7 @@ export function buildService(): FastifyInstance {
 
     fastify.addHook('onClose', (_instance, done) => {
       Logger.info('Close signal received', null);
-      // TODO: close database connections
+
       done();
     });
   }

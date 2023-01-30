@@ -11,6 +11,21 @@ export type ServiceFactory = (worker: number) => Promise<void>;
 /* istanbul ignore file */
 export async function serviceFactory(worker: number) {
   const service: FastifyInstance = buildService();
+
+  const closeGracefully = async (signal: string | number | undefined) => {
+    Logger.info(`Received signal to terminate: ${signal}`, null);
+
+    await service.close();
+    // TODO: close database connections Initial thoughts: may need to have a global registry of backends to go through,
+    // manually closing any connections.
+    process.kill(process.pid, signal);
+  };
+  // The code below works correctly, and is not a misuse of promises.
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  process.once('SIGINT', closeGracefully);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  process.once('SIGTERM', closeGracefully);
+
   try {
     const address: string = await service.listen(Config.get('FASTIFY_PORT'), '0.0.0.0');
     Logger.info(`🚀 Starting Meadowlark API at ${address}/${Config.get('MEADOWLARK_STAGE')} for worker ${worker}`, null);
