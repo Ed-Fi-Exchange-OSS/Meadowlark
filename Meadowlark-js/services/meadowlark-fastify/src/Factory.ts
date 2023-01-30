@@ -12,7 +12,7 @@ export type ServiceFactory = (worker: number) => Promise<void>;
 export async function serviceFactory(worker: number) {
   const service: FastifyInstance = buildService();
   try {
-    const address: string = await service.listen(Config.get('FASTIFY_PORT'));
+    const address: string = await service.listen(Config.get('FASTIFY_PORT'), '0.0.0.0');
     Logger.info(`🚀 Starting Meadowlark API at ${address}/${Config.get('MEADOWLARK_STAGE')} for worker ${worker}`, null);
   } catch (err) {
     service.log.error(err);
