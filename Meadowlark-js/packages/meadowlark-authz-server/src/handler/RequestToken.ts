@@ -5,8 +5,7 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { getBooleanFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
-import { signingKey } from '../model/SigningKey';
+import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
@@ -16,7 +15,6 @@ import { BodyValidation, validateRequestTokenBody } from '../validation/BodyVali
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
-import { getTokenExpiration, getTokenIssuer } from '../security/TokenSettings';
 import { TokenSuccessResponse } from '../model/TokenResponse';
 
 const moduleName = 'authz.handler.RequestToken';
@@ -29,12 +27,15 @@ type ParsedRequestTokenBody =
  * Creates a standard Meadowlark Jwt.
  */
 function createToken(clientId: string, vendor: string, roles: string[]): Jwt {
-  const issuer = getTokenIssuer();
-  const claims = { iss: issuer, aud: issuer, roles, client_id: clientId };
+  const iss: string = Config.get('OAUTH_TOKEN_ISSUER');
+  const aud: string = Config.get('OAUTH_TOKEN_AUDIENCE');
+  const claims = { iss, aud, roles, client_id: clientId };
 
-  const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey()) as Jwt;
+  const signingKey = Config.get('OAUTH_SIGNING_KEY');
+  const token: Jwt = createJwt({ ...claims, sub: vendor }, signingKey) as Jwt;
 
-  token.setExpiration(new Date().getTime() + getTokenExpiration() * 60 * 1000);
+  const expiresIn: number = Config.get('OAUTH_EXPIRATION_MINUTES');
+  token.setExpiration(new Date().getTime() + expiresIn * 60 * 1000);
   return token;
 }
 
@@ -143,7 +144,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       // Check hardcoded credentials first
       const { client_id: clientId, client_secret: clientSecret } = requestTokenBody;
 
-      const enableHardCoded = getBooleanFromEnvironment('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+      const enableHardCoded = Config.get('OAUTH_HARD_CODED_CREDENTIALS_ENABLED');
 
       if (!enableHardCoded && (clientId === admin1.key || clientId === verifyOnly1.key)) {
         Logger.debug(

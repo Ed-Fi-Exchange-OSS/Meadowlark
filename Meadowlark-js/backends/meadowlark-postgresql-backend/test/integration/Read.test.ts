@@ -22,6 +22,7 @@ import { deleteAll } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -57,6 +58,8 @@ describe('given the get of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
 
     getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
@@ -94,6 +97,8 @@ describe('given the get of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { inserted: 'yes' } };
 

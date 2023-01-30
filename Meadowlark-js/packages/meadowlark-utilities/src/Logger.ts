@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import winston from 'winston';
+import * as Config from './Config';
 
 const timestampFormat: string = 'YYYY-MM-DD HH:mm:SS';
 
@@ -69,10 +70,10 @@ let logger: winston.Logger = winston.createLogger({
 export function initializeLogging(): void {
   if (isInitialized) return;
 
-  const offline = process.env.IS_LOCAL === 'true';
+  const offline = Config.get('IS_LOCAL') === true;
   isInitialized = true;
   logger = winston.createLogger({
-    level: process.env.LOG_LEVEL?.toLocaleLowerCase() ?? (offline ? 'debug' : 'info'),
+    level: Config.get<string>('LOG_LEVEL').toLocaleLowerCase(),
     transports: [
       new winston.transports.Console({
         format: offline ? offlineFormat : format,

@@ -5,6 +5,7 @@
 
 import type { PoolClient, QueryResult } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -12,6 +13,8 @@ describe('Test Connection to Postgres Successful', () => {
   let client: PoolClient;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = await getSharedClient();
   });
 

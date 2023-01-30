@@ -7,10 +7,9 @@ import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
+import { setupMockConfiguration } from './ConfigHelper';
 
 jest.setTimeout(40000);
-
-initializeLogging();
 
 describe('given a GET of a school by id', () => {
   const schoolGetByIdRequest: InjectOptions = {
@@ -23,6 +22,9 @@ describe('given a GET of a school by id', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
+    initializeLogging();
+
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();
     await service.ready();
@@ -33,7 +35,7 @@ describe('given a GET of a school by id', () => {
 
   afterAll(async () => {
     await service.close();
-    mockGet.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {
@@ -58,6 +60,9 @@ describe('given a GET of a school query without path ending slash', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
+    initializeLogging();
+
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();
     await service.ready();
@@ -68,7 +73,7 @@ describe('given a GET of a school query without path ending slash', () => {
 
   afterAll(async () => {
     await service.close();
-    mockGet.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {
@@ -97,6 +102,9 @@ describe('given a GET of a school query with path ending slash', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
+    initializeLogging();
+
     mockGet = jest.spyOn(MeadowlarkCore, 'get');
     service = buildService();
     await service.ready();
@@ -107,7 +115,7 @@ describe('given a GET of a school query with path ending slash', () => {
 
   afterAll(async () => {
     await service.close();
-    mockGet.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {

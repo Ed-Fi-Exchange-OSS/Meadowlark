@@ -30,6 +30,7 @@ import {
   onlyDocumentsReferencing,
 } from '../../../src/repository/ReferenceValidation';
 import { upsertDocument } from '../../../src/repository/Upsert';
+import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(10000);
 
@@ -90,6 +91,8 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   let client: MongoClient;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 

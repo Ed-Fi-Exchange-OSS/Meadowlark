@@ -9,6 +9,7 @@ import { getAuthorizationCollection, getNewClient } from '../../../src/repositor
 import { resetAuthorizationClientSecret } from '../../../src/repository/authorization/ResetAuthorizationClientSecret';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { AuthorizationDocument } from '../../../src/model/AuthorizationDocument';
+import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(40000);
 
@@ -36,6 +37,8 @@ describe('given the get of an existing authorization client', () => {
   let resetClientSecretResponse;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
 
     await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), mongoClient);
@@ -83,6 +86,8 @@ describe('given the attempted reset of a secret for an authorization client that
   let resetClientSecretResponse;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
 
     resetClientSecretResponse = await resetAuthorizationClientSecret(
@@ -116,6 +121,8 @@ describe('given a closed MongoDB connection', () => {
   let resetClientSecretResponse;
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     mongoClient = (await getNewClient()) as MongoClient;
 
     mongoClient.close();

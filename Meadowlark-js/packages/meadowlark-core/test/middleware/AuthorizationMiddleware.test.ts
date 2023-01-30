@@ -8,6 +8,7 @@ import * as OAuthFetch from '../../src/middleware/OAuthFetch';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 jest.setTimeout(40000);
 
@@ -22,6 +23,7 @@ describe('given a previous middleware has created a response', () => {
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
+    setupMockConfiguration();
     mockFetchOwnAccessToken = jest.spyOn(OAuthFetch, 'fetchOwnAccessToken');
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
 
@@ -30,8 +32,7 @@ describe('given a previous middleware has created a response', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -70,6 +71,7 @@ describe('given a previous middleware has provided security information', () => 
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
+    setupMockConfiguration();
     mockFetchOwnAccessToken = jest.spyOn(OAuthFetch, 'fetchOwnAccessToken');
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
 
@@ -78,8 +80,7 @@ describe('given a previous middleware has provided security information', () => 
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -109,6 +110,7 @@ describe('given a request has no authorization header', () => {
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
+    setupMockConfiguration();
     mockFetchOwnAccessToken = jest.spyOn(OAuthFetch, 'fetchOwnAccessToken');
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
 
@@ -117,8 +119,7 @@ describe('given a request has no authorization header', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -158,6 +159,7 @@ describe('given a request has non-bearer authorization header', () => {
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
+    setupMockConfiguration();
     mockFetchOwnAccessToken = jest.spyOn(OAuthFetch, 'fetchOwnAccessToken');
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
 
@@ -166,8 +168,7 @@ describe('given a request has non-bearer authorization header', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -203,11 +204,11 @@ describe('given an invalid configuration of Meadowlark client secret', () => {
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 401 }));
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
@@ -217,8 +218,7 @@ describe('given an invalid configuration of Meadowlark client secret', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -250,11 +250,11 @@ describe('given an invalid configuration of Meadowlark client id', () => {
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
   let mockFetchClientTokenVerification: any;
 
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 404 }));
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
@@ -264,8 +264,7 @@ describe('given an invalid configuration of Meadowlark client id', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -297,11 +296,11 @@ describe('given a 500 from OAuth server when requesting own token', () => {
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
+  let mockFetchClientTokenVerification;
 
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 500 }));
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
@@ -311,8 +310,7 @@ describe('given a 500 from OAuth server when requesting own token', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -344,13 +342,11 @@ describe('given an exception when requesting own token from OAuth server', () =>
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
+  let mockFetchClientTokenVerification;
 
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
-      .spyOn(OAuthFetch, 'fetchOwnAccessToken')
-      .mockImplementationOnce(async () => Promise.reject(new Error()));
+    setupMockConfiguration();
+    jest.spyOn(OAuthFetch, 'fetchOwnAccessToken').mockImplementationOnce(async () => Promise.reject(new Error()));
 
     mockFetchClientTokenVerification = jest.spyOn(OAuthFetch, 'fetchClientTokenVerification');
 
@@ -359,8 +355,7 @@ describe('given an exception when requesting own token from OAuth server', () =>
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -392,18 +387,16 @@ describe('given a valid own token, but then the own token expires on client toke
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       )
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 500 })); // OAuth server crash on own token refresh
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 401 })); // own token no longer valid
 
@@ -412,8 +405,7 @@ describe('given a valid own token, but then the own token expires on client toke
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -441,18 +433,16 @@ describe('given a valid own token, but then the own token expires on client toke
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       )
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 401 })); // own token refresh, still not valid
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 401 })); // own token no longer valid
 
@@ -461,8 +451,7 @@ describe('given a valid own token, but then the own token expires on client toke
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -490,17 +479,15 @@ describe('given the client token is not a well-formed JWT', () => {
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 400 })); // verification fails, client token not well-formed
 
@@ -509,8 +496,7 @@ describe('given the client token is not a well-formed JWT', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -534,17 +520,15 @@ describe('given the client token is not active', () => {
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 200, data: { active: false } }));
 
@@ -553,8 +537,7 @@ describe('given the client token is not active', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -578,33 +561,28 @@ describe('given the client token is active for a vendor without assessment role'
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
-      .spyOn(OAuthFetch, 'fetchClientTokenVerification')
-      .mockImplementationOnce(async () =>
-        Promise.resolve({
-          ...newAxiosResponse(),
-          status: 200,
-          data: { active: true, roles: ['vendor'], client_id: 'clientId' },
-        }),
-      );
+    jest.spyOn(OAuthFetch, 'fetchClientTokenVerification').mockImplementationOnce(async () =>
+      Promise.resolve({
+        ...newAxiosResponse(),
+        status: 200,
+        data: { active: true, roles: ['vendor'], client_id: 'clientId' },
+      }),
+    );
 
     // Act
     resultChain = await authorize({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -638,33 +616,28 @@ describe('given the client token is active for a vendor with assessment role', (
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
-      .spyOn(OAuthFetch, 'fetchClientTokenVerification')
-      .mockImplementationOnce(async () =>
-        Promise.resolve({
-          ...newAxiosResponse(),
-          status: 200,
-          data: { active: true, roles: ['vendor', 'assessment'], client_id: 'clientId' },
-        }),
-      );
+    jest.spyOn(OAuthFetch, 'fetchClientTokenVerification').mockImplementationOnce(async () =>
+      Promise.resolve({
+        ...newAxiosResponse(),
+        status: 200,
+        data: { active: true, roles: ['vendor', 'assessment'], client_id: 'clientId' },
+      }),
+    );
 
     // Act
     resultChain = await authorize({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -698,17 +671,15 @@ describe('given a 500 from the OAuth server on client token verification', () =>
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 500 }));
 
@@ -717,8 +688,7 @@ describe('given a 500 from the OAuth server on client token verification', () =>
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -742,27 +712,22 @@ describe('given an exception during the client token verification call to the OA
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
-      .spyOn(OAuthFetch, 'fetchClientTokenVerification')
-      .mockImplementationOnce(async () => Promise.reject(new Error()));
+    jest.spyOn(OAuthFetch, 'fetchClientTokenVerification').mockImplementationOnce(async () => Promise.reject(new Error()));
 
     // Act
     resultChain = await authorize({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -786,11 +751,9 @@ describe('given the own token requires a refresh, and the client token is active
 
   let resultChain: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(
         async () => Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }), // valid the first time
@@ -799,7 +762,7 @@ describe('given the own token requires a refresh, and the client token is active
         async () => Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }), // valid the second time too
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () => Promise.resolve({ ...newAxiosResponse(), status: 401 })) // own token from first time expires
       .mockImplementationOnce(async () =>
@@ -815,8 +778,7 @@ describe('given the own token requires a refresh, and the client token is active
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -858,17 +820,15 @@ describe('given two calls for verification with different client ids', () => {
   let resultChain1: MiddlewareModel;
   let resultChain2: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () =>
         Promise.resolve({
@@ -891,8 +851,7 @@ describe('given two calls for verification with different client ids', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 
@@ -953,17 +912,15 @@ describe('given two calls for verification with the same client id', () => {
   let resultChain1: MiddlewareModel;
   let resultChain2: MiddlewareModel;
 
-  let mockFetchOwnAccessToken: any;
-  let mockFetchClientTokenVerification: any;
-
   beforeAll(async () => {
-    mockFetchOwnAccessToken = jest
+    setupMockConfiguration();
+    jest
       .spyOn(OAuthFetch, 'fetchOwnAccessToken')
       .mockImplementationOnce(async () =>
         Promise.resolve({ ...newAxiosResponse(), status: 200, data: { access_token: 'own_token' } }),
       );
 
-    mockFetchClientTokenVerification = jest
+    jest
       .spyOn(OAuthFetch, 'fetchClientTokenVerification')
       .mockImplementationOnce(async () =>
         Promise.resolve({
@@ -986,8 +943,7 @@ describe('given two calls for verification with the same client id', () => {
   });
 
   afterAll(() => {
-    mockFetchOwnAccessToken.mockRestore();
-    mockFetchClientTokenVerification.mockRestore();
+    jest.restoreAllMocks();
     clearCaches();
   });
 

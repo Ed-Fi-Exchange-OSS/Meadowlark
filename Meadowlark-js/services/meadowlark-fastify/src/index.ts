@@ -5,13 +5,14 @@
 
 /* istanbul ignore file */
 import dotenv from 'dotenv';
-import { initializeLogging } from '@edfi/meadowlark-utilities';
+import { initializeLogging, Config, CachedEnvironmentConfigProvider } from '@edfi/meadowlark-utilities';
 import { ClusterService } from './Cluster';
 import { serviceFactory } from './Factory';
 
 dotenv.config();
 
 const start = async () => {
+  await Config.initializeConfig(CachedEnvironmentConfigProvider);
   initializeLogging();
 
   new ClusterService(serviceFactory).run();

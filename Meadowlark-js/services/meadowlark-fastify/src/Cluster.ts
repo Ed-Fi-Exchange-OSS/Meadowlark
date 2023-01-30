@@ -6,7 +6,7 @@
 /* istanbul ignore file */
 import cluster from 'cluster';
 import os from 'os';
-import { getIntegerFromEnvironment, Logger } from '@edfi/meadowlark-utilities';
+import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { ServiceFactory } from './Factory';
 
 const CPUS = os.cpus().length;
@@ -26,13 +26,14 @@ export class ClusterService {
 
   static primary(): void {
     // Use the lower of the configured number of worker threads or the number of available CPUs.
-    const configuredThreadCount = Math.min(getIntegerFromEnvironment('FASTIFY_NUM_THREADS', CPUS), CPUS);
+    const configuredNumberOfWorkers: number = Config.get('FASTIFY_NUM_THREADS');
+    const numberOfWorkers = Math.min(configuredNumberOfWorkers, CPUS);
 
-    Logger.debug(`Spawning ${configuredThreadCount} worker threads`, null);
+    Logger.debug(`Spawning ${numberOfWorkers} worker threads`, null);
     Logger.debug(`Primary process ID ${process.pid} is running`, null);
 
     // Fork workers
-    for (let i = 0; i < configuredThreadCount; i += 1) {
+    for (let i = 0; i < numberOfWorkers; i += 1) {
       const fork = cluster.fork();
       fork.send(i);
     }

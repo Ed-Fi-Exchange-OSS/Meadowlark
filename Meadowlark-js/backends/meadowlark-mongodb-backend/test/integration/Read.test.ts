@@ -20,6 +20,7 @@ import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { getDocumentById } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
@@ -55,6 +56,8 @@ describe('given the get of a non-existent document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
 
     getResult = await getDocumentById({ ...newGetRequest(), id }, client);
@@ -91,6 +94,8 @@ describe('given the get of an existing document', () => {
   const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
+    await setupConfigForIntegration();
+
     client = (await getNewClient()) as MongoClient;
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { inserted: 'yes' } };
 

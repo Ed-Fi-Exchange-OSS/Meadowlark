@@ -3,12 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as MeadowlarkUtilities from '@edfi/meadowlark-utilities';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { anonymizeAndLogRequestBody } from '../../src/middleware/LogAnonymizedRequestMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -16,10 +17,14 @@ describe('given a previous middleware has created a response', () => {
   let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
-    MeadowlarkUtilities.initializeLogging();
+    setupMockConfiguration();
 
     // Act
     resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('returns the given request', () => {
@@ -36,10 +41,14 @@ describe('given a null response', () => {
   let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
-    MeadowlarkUtilities.initializeLogging();
+    setupMockConfiguration();
 
     // Act
     resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse: null });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('returns the given request', () => {
@@ -54,9 +63,9 @@ describe('given a null response', () => {
 describe('flat doc example - given previous middleware has created a response with debug log level', () => {
   let loggerSpy: any;
 
-  beforeEach(() => {
-    loggerSpy = jest.spyOn(MeadowlarkUtilities.Logger, 'debug');
-    jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+  beforeAll(() => {
+    setupMockConfiguration(true);
+    loggerSpy = jest.spyOn(Logger, 'debug');
   });
 
   afterAll(() => {
@@ -100,9 +109,9 @@ describe('flat doc example - given previous middleware has created a response wi
 describe('nested doc example - given previous middleware has created a response with debug log level', () => {
   let loggerSpy: any;
 
-  beforeEach(() => {
-    loggerSpy = jest.spyOn(MeadowlarkUtilities.Logger, 'debug');
-    jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+  beforeAll(() => {
+    setupMockConfiguration(true);
+    loggerSpy = jest.spyOn(Logger, 'debug');
   });
 
   afterAll(() => {
@@ -161,9 +170,9 @@ describe('nested doc example - given previous middleware has created a response 
 describe('given previous middleware has created a response with info log level', () => {
   let loggerSpy: any;
 
-  beforeEach(() => {
-    loggerSpy = jest.spyOn(MeadowlarkUtilities.Logger, 'debug');
-    jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => false);
+  beforeAll(() => {
+    setupMockConfiguration(false);
+    loggerSpy = jest.spyOn(Logger, 'debug');
   });
 
   afterAll(() => {

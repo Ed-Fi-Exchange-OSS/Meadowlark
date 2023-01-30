@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Jwt as nJwt, verify } from 'njwt';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { JwtStatus, newJwtStatus } from './JwtStatus';
 import { Jwt } from './Jwt';
-import { signingKey } from '../model/SigningKey';
 
 const moduleName = 'authz.security.JwtAction';
 
@@ -49,7 +48,8 @@ export function verifyJwt(authorization?: string, traceId?: string): JwtStatus {
   const token = authorization.split(' ')[1];
 
   try {
-    const verified: nJwt | undefined = verify(token, signingKey());
+    const signingKey: string = Config.get('OAUTH_SIGNING_KEY');
+    const verified: nJwt | undefined = verify(token, signingKey);
     return toJwtStatus(verified as Jwt);
   } catch (err) {
     Logger.error(`${moduleName}.verifyPromise user-submitted token error`, traceId || null, err);

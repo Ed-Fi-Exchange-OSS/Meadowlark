@@ -24,8 +24,8 @@ async function getAdminAccessToken(): Promise<string> {
       .post('/oauth/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: process.env.ADMIN_KEY ?? 'meadowlark_admin_key_1',
-        client_secret: process.env.ADMIN_SECRET ?? 'meadowlark_admin_secret_1',
+        client_id: process.env.ADMIN_KEY ?? process.env.OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH,
+        client_secret: process.env.ADMIN_SECRET ?? process.env.OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH,
       })
       .then((response) => {
         if (response.status !== 200) {

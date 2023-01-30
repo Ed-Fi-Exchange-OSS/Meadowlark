@@ -7,10 +7,9 @@ import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { buildService } from '../src/Service';
+import { setupMockConfiguration } from './ConfigHelper';
 
 jest.setTimeout(40000);
-
-initializeLogging();
 
 const schoolPostRequest: InjectOptions = {
   method: 'POST',
@@ -29,6 +28,9 @@ describe('given a POST of a school', () => {
   let service: FastifyInstance;
 
   beforeAll(async () => {
+    setupMockConfiguration();
+    initializeLogging();
+
     mockUpsert = jest.spyOn(MeadowlarkCore, 'upsert');
     service = buildService();
     await service.ready();
@@ -39,7 +41,8 @@ describe('given a POST of a school', () => {
 
   afterAll(async () => {
     await service.close();
-    mockUpsert.mockRestore();
+
+    jest.restoreAllMocks();
   });
 
   it('should send the expected FrontendRequest to Meadowlark', async () => {

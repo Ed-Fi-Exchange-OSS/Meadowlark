@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import { ConfigKeys } from './Config';
+
+export interface ConfigPlugin {
+  getBool(key: ConfigKeys, defaultValue: boolean | undefined): Promise<boolean>;
+  getFloat(key: ConfigKeys, defaultValue: number | undefined): Promise<number>;
+  getInt(key: ConfigKeys, defaultValue: number | undefined): Promise<number>;
+  getString(key: ConfigKeys, defaultValue: string | undefined): Promise<string>;
+}

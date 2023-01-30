@@ -6,15 +6,21 @@
 import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { get } from '../../src/handler/FrontendFacade';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 describe('given there is no resourceId in a get request', () => {
   const request: FrontendRequest = { ...newFrontendRequest(), path: '/1/2/3' };
 
   beforeAll(async () => {
+    setupMockConfiguration();
     initializeLogging();
 
     // Act
     await get(request);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('sets the action to query', () => {
@@ -29,10 +35,15 @@ describe('given there is a resourceId in a get request', () => {
   };
 
   beforeAll(async () => {
+    setupMockConfiguration();
     initializeLogging();
 
     // Act
     await get(request);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('sets the action to getById', () => {

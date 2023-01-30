@@ -8,16 +8,18 @@ import { swaggerForResourcesAPI, resourceCache } from '../../../src/handler/Meta
 import { Constants } from '../../../src/Constants';
 import { FrontendRequest, newFrontendRequest } from '../../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../../src/handler/FrontendResponse';
+import { setupMockConfiguration } from '../../ConfigHelper';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('when getting Swagger resources', () => {
-  // eslint-disable-next-line no-return-assign
-  beforeAll(() => (process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST = 'https://a/b/oauth/token'));
+  beforeAll(() => {
+    setupMockConfiguration();
+  });
 
   afterAll(() => {
-    delete process.env.OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST;
+    jest.restoreAllMocks();
 
     delete resourceCache[Constants.swaggerResourceUrl];
   });

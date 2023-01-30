@@ -5,7 +5,7 @@
 
 import TTLCache from '@isaacs/ttlcache';
 import { AxiosResponse } from 'axios';
-import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
+import { isDebugEnabled, writeErrorToLog, Config } from '@edfi/meadowlark-utilities';
 import { FrontendRequest } from '../handler/FrontendRequest';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
@@ -16,13 +16,6 @@ import { fetchOwnAccessToken, fetchClientTokenVerification } from './OAuthFetch'
 
 const moduleName = 'core.middleware.AuthorizationMiddleware';
 
-const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL: number = process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL
-  ? parseInt(process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL, 10)
-  : 1000 * 60 * 5;
-const OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES: number = process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES
-  ? parseInt(process.env.OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES, 10)
-  : 1000;
-
 // Cache of own access token used for client token validation
 let cachedOwnAccessTokenForClientAuth: string | null = null;
 
@@ -30,15 +23,22 @@ let cachedOwnAccessTokenForClientAuth: string | null = null;
 type ClientTokenInfo = { security: Security; validateResources: boolean };
 
 // Client token info cache, automatically evicts after TTL expires
-const cachedClientsTokenInfo: TTLCache<string, ClientTokenInfo> = new TTLCache({
-  ttl: OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL,
-  max: OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES,
-});
+let cachedClientsTokenInfo: TTLCache<string, ClientTokenInfo>;
+
+const getCachedClientsTokenInfo = () => {
+  if (cachedClientsTokenInfo == null) {
+    cachedClientsTokenInfo = new TTLCache({
+      ttl: Config.get('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL'),
+      max: Config.get('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES'),
+    });
+  }
+  return cachedClientsTokenInfo;
+};
 
 // For testing
 export function clearCaches() {
   cachedOwnAccessTokenForClientAuth = null;
-  cachedClientsTokenInfo.clear();
+  cachedClientsTokenInfo?.clear();
 }
 
 /**
@@ -137,7 +137,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
   }
 
   // See if we've authenticated client token recently - within last TTL timeframe
-  const cachedClientTokenInfo: ClientTokenInfo | undefined = cachedClientsTokenInfo.get(clientBearerToken);
+  const cachedClientTokenInfo: ClientTokenInfo | undefined = getCachedClientsTokenInfo().get(clientBearerToken);
 
   if (cachedClientTokenInfo != null) {
     if (isDebugEnabled()) {
@@ -146,7 +146,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
         frontendRequest,
         'authorize',
         undefined,
-        `Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${cachedClientsTokenInfo.getRemainingTTL(
+        `Client token authorized. Found ${clientBearerToken} in cache with remaining TTL ${getCachedClientsTokenInfo().getRemainingTTL(
           clientBearerToken,
         )}`,
       );
@@ -233,7 +233,7 @@ export async function authorize({ frontendRequest, frontendResponse }: Middlewar
         validateResources: !roles.includes('assessment'),
       };
 
-      cachedClientsTokenInfo.set(clientBearerToken, clientTokenInfo);
+      getCachedClientsTokenInfo().set(clientBearerToken, clientTokenInfo);
 
       frontendRequest.middleware.security = { ...clientTokenInfo.security };
       frontendRequest.middleware.validateResources = clientTokenInfo.validateResources;

@@ -38,6 +38,20 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "name": "MongoDb Integration Tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceRoot}/node_modules/jest-cli/bin/jest.js",
+      "args": [
+        "jest",
+        "--runInBand",
+        "--config",
+        "${workspaceRoot}\\jest.integration-config.js",
+        "backends/meadowlark-mongodb-backend/test/integration"
+      ]
     }
   ]
 }

@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config } from '@edfi/meadowlark-utilities';
 import { verifyToken } from '../../src/handler/VerifyToken';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
@@ -10,24 +11,37 @@ import { AuthorizationResponse } from '../../src/handler/AuthorizationResponse';
 import { NoAuthorizationStorePlugin } from '../../src/plugin/NoAuthorizationStorePlugin';
 import { createAuthorizationHeader, createTokenString } from '../security/TestHelper';
 
-process.env.OAUTH_SIGNING_KEY =
-  'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+const setupMockConfiguration = () => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'OAUTH_SIGNING_KEY':
+        return 'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+      case 'OAUTH_TOKEN_ISSUER':
+        return 'edfi-meadowlark-issuer';
+      case 'OAUTH_TOKEN_AUDIENCE':
+        return 'edfi-meadowlark-audience';
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};
 
-const authorizationRequest: AuthorizationRequest = {
+const createAuthorizationRequest = (): AuthorizationRequest => ({
   ...newAuthorizationRequest(),
   path: '/oauth/verify',
   headers: {
     'content-type': 'application/x-www-form-urlencoded',
     Authorization: createAuthorizationHeader('clientId', ['vendor']),
   },
-};
+});
 
 describe('given bearer token is invalid', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -37,7 +51,7 @@ describe('given bearer token is invalid', () => {
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: 'Bearer invalidToken',
@@ -47,7 +61,7 @@ describe('given bearer token is invalid', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -66,10 +80,11 @@ describe('given bearer token is invalid', () => {
 
 describe('given content type is not x-www-form-urlencoded', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -79,7 +94,7 @@ describe('given content type is not x-www-form-urlencoded', () => {
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       headers: {
         'content-type': 'application/json',
         Authorization: createAuthorizationHeader('clientId', ['vendor']),
@@ -89,7 +104,7 @@ describe('given content type is not x-www-form-urlencoded', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -107,10 +122,11 @@ describe('given content type is not x-www-form-urlencoded', () => {
 
 describe('given content type is x-www-form-urlencoded but data is not', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -120,13 +136,13 @@ describe('given content type is x-www-form-urlencoded but data is not', () => {
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       body: 'not form encoded',
     });
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -160,10 +176,11 @@ describe('given content type is x-www-form-urlencoded but data is not', () => {
 
 describe('given request body is valid x-www-form-urlencoded but without expected fields', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -173,13 +190,13 @@ describe('given request body is valid x-www-form-urlencoded but without expected
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       body: 'not_token=123',
     });
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -213,10 +230,11 @@ describe('given request body is valid x-www-form-urlencoded but without expected
 
 describe('given request body provided invalid token for introspection', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -226,13 +244,13 @@ describe('given request body provided invalid token for introspection', () => {
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       body: 'token=invalidToken',
     });
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -250,10 +268,11 @@ describe('given request body provided invalid token for introspection', () => {
 
 describe('given vendor role provided token for introspection but client ids do not match', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -267,13 +286,13 @@ describe('given vendor role provided token for introspection but client ids do n
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       body: `token=${createTokenString('differentClientId', ['vendor'])}`,
     });
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -287,10 +306,11 @@ describe('given vendor role provided token for introspection but client ids do n
 
 describe('given vendor role provided token for introspection and client ids match', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -304,13 +324,13 @@ describe('given vendor role provided token for introspection and client ids matc
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       body: `token=${createTokenString('clientId', ['vendor'], 12345000, 'i', 'a', 67890)}`,
     });
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {
@@ -337,10 +357,11 @@ describe('given vendor role provided token for introspection and client ids matc
 
 describe('given admin role provided a token from a different client for introspection', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -354,7 +375,7 @@ describe('given admin role provided a token from a different client for introspe
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: createAuthorizationHeader('adminClientId', ['admin']),
@@ -364,7 +385,7 @@ describe('given admin role provided a token from a different client for introspe
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {
@@ -391,10 +412,11 @@ describe('given admin role provided a token from a different client for introspe
 
 describe('given admin role provided expired token for introspection', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -408,7 +430,7 @@ describe('given admin role provided expired token for introspection', () => {
 
     // Act
     response = await verifyToken({
-      ...authorizationRequest,
+      ...createAuthorizationRequest(),
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
         Authorization: createAuthorizationHeader('adminClientId', ['admin']),
@@ -418,7 +440,7 @@ describe('given admin role provided expired token for introspection', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {

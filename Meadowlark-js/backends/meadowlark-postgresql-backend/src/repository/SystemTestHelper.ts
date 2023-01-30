@@ -3,11 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from './Db';
 
 async function clearTables(client: PoolClient): Promise<void> {
-  const dbName = process.env.MEADOWLARK_DATABASE_NAME;
+  const dbName = Config.get('MEADOWLARK_DATABASE_NAME');
   await client.query(`TRUNCATE TABLE ${dbName}.documents`);
   await client.query(`TRUNCATE TABLE ${dbName}.references`);
   await client.query(`TRUNCATE TABLE ${dbName}.aliases`);

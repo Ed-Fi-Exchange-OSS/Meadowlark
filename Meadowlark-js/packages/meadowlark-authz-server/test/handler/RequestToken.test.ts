@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { updateCache } from '@edfi/meadowlark-utilities';
+import { Config } from '@edfi/meadowlark-utilities';
 import { requestToken } from '../../src/handler/RequestToken';
 import * as AuthorizationPluginLoader from '../../src/plugin/AuthorizationPluginLoader';
 import { AuthorizationRequest, newAuthorizationRequest } from '../../src/handler/AuthorizationRequest';
@@ -13,8 +13,24 @@ import { admin1 } from '../../src/security/HardcodedCredential';
 import { hashClientSecretHexString } from '../../src/security/HashClientSecret';
 import { TokenSuccessResponse } from '../../src/model/TokenResponse';
 
-process.env.OAUTH_SIGNING_KEY =
-  'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+const setupMockConfiguration = (enableHardCodedCredentials = false) => {
+  jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
+    switch (key) {
+      case 'OAUTH_SIGNING_KEY':
+        return 'v/AbsYGRvIfCf1bxufA6+Ras5NR+kIroLUg5RKYMjmqvNa1fVanmPBXKFH+MD1TPHpSgna0g+6oRnmRGUme6vJ7x91OA7Lp1hWzr6NnpdLYA9BmDHWjkRFvlx9bVmP+GTave2E4RAYa5b/qlvXOVnwaqEWzHxefqzkd1F1mQ6dVNFWYdiOmgw8ofQ87Xi1W0DkToRNS/Roc4rxby/BZwHUj7Y4tYdMpkWDMrZK6Vwat1KuPyiqsaBQYa9Xd0pxKqUOrAp8a+BFwiPfxf4nyVdOSAd77A/wuKIJaERNY5xJXUHwNgEOMf+Lg4032u4PnsnH7aJb2F4z8AhHldM6w5jw==';
+      case 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED':
+        return enableHardCodedCredentials;
+      case 'OAUTH_TOKEN_ISSUER':
+        return 'edfi-meadowlark-issuer';
+      case 'OAUTH_TOKEN_AUDIENCE':
+        return 'edfi-meadowlark-audience';
+      case 'OAUTH_EXPIRATION_MINUTES':
+        return 60;
+      default:
+        throw new Error(`Key '${key}' not configured`);
+    }
+  });
+};
 
 const validJsonBody = `{
   "grant_type": "client_credentials",
@@ -35,10 +51,11 @@ const formAuthorizationRequest: AuthorizationRequest = {
 
 describe('given authorization store is going to fail', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -51,7 +68,7 @@ describe('given authorization store is going to fail', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 500', () => {
@@ -65,10 +82,11 @@ describe('given authorization store is going to fail', () => {
 
 describe('given request body is invalid x-www-form-urlencoded', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -84,7 +102,7 @@ describe('given request body is invalid x-www-form-urlencoded', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -118,10 +136,11 @@ describe('given request body is invalid x-www-form-urlencoded', () => {
 
 describe('given request body is valid x-www-form-urlencoded but without expected fields', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -137,7 +156,7 @@ describe('given request body is valid x-www-form-urlencoded but without expected
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -170,10 +189,11 @@ describe('given request body is valid x-www-form-urlencoded but without expected
 
 describe('given request body is valid x-www-form-urlencoded but has client_id without grant_type', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -189,7 +209,7 @@ describe('given request body is valid x-www-form-urlencoded but has client_id wi
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -229,10 +249,11 @@ describe('given request body is valid x-www-form-urlencoded but has client_id wi
 
 describe('given request body is valid x-www-form-urlencoded but has client_id and grant_type without client_secret', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -248,7 +269,7 @@ describe('given request body is valid x-www-form-urlencoded but has client_id an
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -281,10 +302,11 @@ describe('given request body is valid x-www-form-urlencoded but has client_id an
 
 describe('given request body has x-www-form-urlencoded grant_type and no authorization header', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -300,7 +322,7 @@ describe('given request body has x-www-form-urlencoded grant_type and no authori
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -320,10 +342,11 @@ describe('given request body has x-www-form-urlencoded grant_type and no authori
 
 describe('given request body has x-www-form-urlencoded grant_type and invalid authorization header', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -340,7 +363,7 @@ describe('given request body has x-www-form-urlencoded grant_type and invalid au
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -360,17 +383,17 @@ describe('given request body has x-www-form-urlencoded grant_type and invalid au
 
 describe('given request body is x-www-form-urlencoded grant_type with valid hardcoded credential', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration(true);
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
         }),
     });
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
     const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
@@ -384,8 +407,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {
@@ -403,18 +425,17 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
 
 describe('given request body is x-www-form-urlencoded grant_type with valid hardcoded credential but grant_type is not client_credentials', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration(true);
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
         }),
     });
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
-
     const unencodedCredentials = `${admin1.key}:${admin1.secret}`;
     const encodedCredentials = Buffer.from(unencodedCredentials).toString('base64');
 
@@ -427,8 +448,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -458,10 +478,11 @@ describe('given request body is x-www-form-urlencoded grant_type with valid hard
 
 describe('given request body is x-www-form-urlencoded grant_type with credential but authorization datastore has unknown failure', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -481,7 +502,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 500', () => {
@@ -495,10 +516,11 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
 
 describe('given request body is x-www-form-urlencoded grant_type with credential not in authorization datastore', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -518,7 +540,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -532,10 +554,11 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
 
 describe('given request body is x-www-form-urlencoded grant_type with credential client_id in authorization datastore but wrong secret', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -559,7 +582,7 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -573,13 +596,14 @@ describe('given request body is x-www-form-urlencoded grant_type with credential
 
 describe('given request body is x-www-form-urlencoded grant_type with valid credential in authorization datastore', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   const clientSecretHexString = 'ABCDEFABCDEF';
   const clientSecretHashed = hashClientSecretHexString(clientSecretHexString);
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -603,7 +627,7 @@ describe('given request body is x-www-form-urlencoded grant_type with valid cred
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {
@@ -621,10 +645,11 @@ describe('given request body is x-www-form-urlencoded grant_type with valid cred
 
 describe('given request body is invalid json', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -640,7 +665,7 @@ describe('given request body is invalid json', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -660,10 +685,11 @@ describe('given request body is invalid json', () => {
 
 describe('given request body is valid json but without expected fields', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -679,7 +705,7 @@ describe('given request body is valid json but without expected fields', () => {
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -712,10 +738,11 @@ describe('given request body is valid json but without expected fields', () => {
 
 describe('given request body is valid json with client_id but without grant_type', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -731,7 +758,7 @@ describe('given request body is valid json with client_id but without grant_type
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -771,10 +798,11 @@ describe('given request body is valid json with client_id but without grant_type
 
 describe('given request body is valid json with client_id and grant_type but without client_secret', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -790,7 +818,7 @@ describe('given request body is valid json with client_id and grant_type but wit
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -823,10 +851,11 @@ describe('given request body is valid json with client_id and grant_type but wit
 
 describe('given request body is json with grant_type and no authorization header', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -842,7 +871,7 @@ describe('given request body is json with grant_type and no authorization header
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -862,10 +891,11 @@ describe('given request body is json with grant_type and no authorization header
 
 describe('given request body is json with grant_type and invalid authorization header', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -882,7 +912,7 @@ describe('given request body is json with grant_type and invalid authorization h
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -903,17 +933,17 @@ describe('given request body is json with grant_type and invalid authorization h
 describe('given request body is json with valid hardcoded credential', () => {
   describe('given hard-coded credentials are enabled', () => {
     let response: AuthorizationResponse;
-    let mockAuthorizationStore: any;
 
     beforeAll(async () => {
-      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      setupMockConfiguration(true);
+
+      jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
         ...NoAuthorizationStorePlugin,
         getAuthorizationClient: async () =>
           Promise.resolve({
             response: 'UNKNOWN_FAILURE',
           }),
       });
-      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
       // Act
       response = await requestToken({
@@ -923,8 +953,7 @@ describe('given request body is json with valid hardcoded credential', () => {
     });
 
     afterAll(() => {
-      mockAuthorizationStore.mockRestore();
-      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+      jest.restoreAllMocks();
     });
 
     it('returns status 200', () => {
@@ -942,17 +971,17 @@ describe('given request body is json with valid hardcoded credential', () => {
 
   describe('given hard-coded credentials are disabled', () => {
     let response: AuthorizationResponse;
-    let mockAuthorizationStore: any;
 
     beforeAll(async () => {
-      mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+      setupMockConfiguration();
+
+      jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
         ...NoAuthorizationStorePlugin,
         getAuthorizationClient: async () =>
           Promise.resolve({
             response: 'UNKNOWN_FAILURE',
           }),
       });
-      updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
 
       // Act
       response = await requestToken({
@@ -962,7 +991,7 @@ describe('given request body is json with valid hardcoded credential', () => {
     });
 
     afterAll(() => {
-      mockAuthorizationStore.mockRestore();
+      jest.restoreAllMocks();
     });
 
     it('returns status 401', () => {
@@ -977,17 +1006,17 @@ describe('given request body is json with valid hardcoded credential', () => {
 
 describe('given request body is json with valid hardcoded credential but grant_type is not client_credentials', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration(true);
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
         }),
     });
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', true);
 
     // Act
     response = await requestToken({
@@ -997,8 +1026,7 @@ describe('given request body is json with valid hardcoded credential but grant_t
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
-    updateCache('OAUTH_HARD_CODED_CREDENTIALS_ENABLED', false);
+    jest.restoreAllMocks();
   });
 
   it('returns status 400', () => {
@@ -1028,10 +1056,11 @@ describe('given request body is json with valid hardcoded credential but grant_t
 
 describe('given request body is json with credential but authorization datastore has unknown failure', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -1047,7 +1076,7 @@ describe('given request body is json with credential but authorization datastore
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 500', () => {
@@ -1061,10 +1090,11 @@ describe('given request body is json with credential but authorization datastore
 
 describe('given request body is json with credential not in authorization datastore', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -1080,7 +1110,7 @@ describe('given request body is json with credential not in authorization datast
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -1094,10 +1124,11 @@ describe('given request body is json with credential not in authorization datast
 
 describe('given request body is json with credential client_id in authorization datastore but wrong secret', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -1117,7 +1148,7 @@ describe('given request body is json with credential client_id in authorization 
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 401', () => {
@@ -1131,13 +1162,14 @@ describe('given request body is json with credential client_id in authorization 
 
 describe('given request body is json with valid credential in authorization datastore', () => {
   let response: AuthorizationResponse;
-  let mockAuthorizationStore: any;
 
   const clientSecretHexString = 'ABCDEFABCDEF';
   const clientSecretHashed = hashClientSecretHexString(clientSecretHexString);
 
   beforeAll(async () => {
-    mockAuthorizationStore = jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
+    setupMockConfiguration();
+
+    jest.spyOn(AuthorizationPluginLoader, 'getAuthorizationStore').mockReturnValue({
       ...NoAuthorizationStorePlugin,
       getAuthorizationClient: async () =>
         Promise.resolve({
@@ -1161,7 +1193,7 @@ describe('given request body is json with valid credential in authorization data
   });
 
   afterAll(() => {
-    mockAuthorizationStore.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('returns status 200', () => {
