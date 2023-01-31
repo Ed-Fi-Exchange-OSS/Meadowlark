@@ -6,7 +6,7 @@
 import winston from 'winston';
 import * as Config from './Config';
 
-const timestampFormat: string = 'YYYY-MM-DD HH:mm:SS';
+const timestampFormat: string = 'YYYY-MM-DD HH:mm:ss';
 
 const convertErrorToString = (err) => {
   // Preserve any dictionary, but otherwise convert to string
