@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config } from '@edfi/meadowlark-utilities';
 import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
 
@@ -18,7 +19,10 @@ export async function setupOpenSearch() {
     environment = await new DockerComposeEnvironment(composeFilePath, composeFile).withNoRecreate().up();
     container = environment.getContainer(containerName);
     const host = container.getHost();
-    process.env.OPENSEARCH_ENDPOINT = `http://${host}:${port}`;
+
+    Config.set('OPENSEARCH_ENDPOINT', `http://${host}:${port}`);
+    Config.set('OPENSEARCH_USERNAME', 'admin');
+    Config.set('OPENSEARCH_PASSWORD', 'admin');
   } catch (e) {
     throw new Error(`Error setting up opensearch: ${e}`);
   }
