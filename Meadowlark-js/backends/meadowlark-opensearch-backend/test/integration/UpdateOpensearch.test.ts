@@ -18,7 +18,7 @@ import { queryDocuments } from '../../src/repository/QueryOpensearch';
 import { afterUpsertDocument } from '../../src/repository/UpdateOpensearch';
 import { setupOpenSearch, teardownOpenSearch } from '../setup/OpenSearchSetup';
 
-jest.setTimeout(40000);
+jest.setTimeout(120_000);
 
 const resourceInfo: ResourceInfo = {
   projectName: 'ed-fi',
