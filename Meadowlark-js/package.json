@@ -52,7 +52,10 @@
     "test:system:ci": "npm run test:system:mongodb  -- --ci --config ./jest.ci-config.js && npm run test:system:postgresql  -- --ci --config ./jest.ci-config.js",
     "test:unit:coverage": "rimraf coverage/ && npm run test:unit -- --collectCoverage",
     "start:local": "lerna run start:local",
+    "docker:install": "npm i lerna@^6.0.2 rimraf@^3.0.2 copyfiles@^2.4.1 typescript@4.8.4 -g && npm ci --only=production",
     "docker:build": "docker build -t meadowlark .",
-    "docker:start": "docker run -d -n ml-fastify -p 3000:3000 meadowlark"
+    "docker:start": "docker run -d --env-file ./.env-docker --name ml-api -p 3000:3000 meadowlark",
+    "docker:halt": "docker stop ml-api && docker rm ml-api",
+    "docker:debug": "docker run -d --env-file ./.env-docker -p 3000:3000 --name ml-api meadowlark tail -F /dev/null && docker exec -it ml-api bash"
   }
 }
