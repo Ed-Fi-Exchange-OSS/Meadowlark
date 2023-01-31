@@ -16,7 +16,10 @@ export async function setupOpenSearch() {
     const port = 8200;
     const composeFile = 'docker-compose.yml';
     const composeFilePath = path.resolve(process.cwd(), './tests/setup/');
-    environment = await new DockerComposeEnvironment(composeFilePath, composeFile).withNoRecreate().up();
+    environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
+      .withNoRecreate()
+      .withStartupTimeout(120_000)
+      .up();
     container = environment.getContainer(containerName);
     const host = container.getHost();
 
