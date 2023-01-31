@@ -169,7 +169,7 @@ jobs:
             {
               type: "Integration",
               command: "npm run test:integration -- --ci --config ./jest.ci-config.js",
-            }
+            },
           ]
 
     steps:
@@ -200,12 +200,6 @@ jobs:
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm install
-
-      - name: Configure postgres
-        if: ${{ matrix.tests.type != 'Unit' }}
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
 
       - name: Create .env file
         run: |

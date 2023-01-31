@@ -3,10 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Config } from '@edfi/meadowlark-utilities';
 import path from 'path';
 
-import { DockerComposeEnvironment, PostgreSqlContainer, StartedDockerComposeEnvironment } from 'testcontainers';
+import { DockerComposeEnvironment, StartedDockerComposeEnvironment } from 'testcontainers';
 
 const mongoSetup = require('@shelf/jest-mongodb/lib/setup');
 
@@ -21,7 +20,4 @@ export async function configure(_config: any) {
   const composeFilePath = path.resolve(process.cwd(), './tests/setup/');
   const composeFile = 'docker-compose.yml';
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile).up();
-
-  Config.set('POSTGRES_PORT', 5433);
-  await new PostgreSqlContainer('postgres:14.3-alpine').start();
 }

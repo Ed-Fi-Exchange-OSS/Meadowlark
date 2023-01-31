@@ -1,6 +1,18 @@
 version: '3'
 services:
 
+  postgres-test:
+    container_name: postgres-test
+    image: postgres:14.3-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=abcdefgh1!
+    ports:
+      - ${POSTGRES_PORT:-5433}:5432
+    volumes:
+      - meadowlark-pgsql-test:/var/lib/postgresql/data
+
   opensearch-test:
     image: opensearchproject/opensearch:latest
     container_name: opensearch-test
@@ -11,3 +23,7 @@ services:
     ports:
       - ${OPENSEARCH_PORT:-8200}:9200
     restart: unless-stopped
+
+volumes:
+  meadowlark-pgsql-test:
+    driver: local
