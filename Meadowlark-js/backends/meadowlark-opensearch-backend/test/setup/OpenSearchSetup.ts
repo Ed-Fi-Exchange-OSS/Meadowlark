@@ -15,7 +15,7 @@ export async function setupOpenSearch() {
   try {
     const port = 8200;
     const composeFile = 'docker-compose.yml';
-    const composeFilePath = path.resolve(process.cwd(), './tests/setup/');
+    const composeFilePath = path.resolve(__dirname, './');
     environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
       .withNoRecreate()
       .withStartupTimeout(120_000)
