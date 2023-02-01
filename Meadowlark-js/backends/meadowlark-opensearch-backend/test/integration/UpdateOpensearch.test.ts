@@ -185,4 +185,28 @@ describe('given the upsert of a new document', () => {
       },
     );
   });
+
+  describe('when deleting by id', () => {
+    beforeEach(async () => {
+      await afterUpdateDocumentById(
+        newUpsertRequest,
+        {
+          response: 'UPDATE_SUCCESS',
+        } as UpdateResult,
+        client,
+      );
+    });
+
+    it('should be able to delete document', async () => {
+      await afterDeleteDocumentById(
+        { id, resourceInfo } as DeleteRequest,
+        { response: 'DELETE_SUCCESS' } as DeleteResult,
+        client,
+      );
+
+      const response = await queryDocuments(setupQueryRequest({}, {}), client);
+
+      expect(response.documents).toHaveLength(0);
+    });
+  });
 });
