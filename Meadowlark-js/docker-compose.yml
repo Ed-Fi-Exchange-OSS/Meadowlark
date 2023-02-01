@@ -1,0 +1,265 @@
+version: '3.8'
+
+services:
+  # Meadowlark API
+  meadowlark-api-local:
+    # requires a local build, `npm run docker:build`.
+    image: meadowlark:latest
+    container_name: meadowlark-api-local
+    hostname: api
+    ports:
+      - 3000:3000
+    environment:
+      # Next three settings should not be used as such in production environment
+      OAUTH_HARD_CODED_CREDENTIALS_ENABLED: true
+      OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH: meadowlark_verify-only_key_1
+      OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH: meadowlark_verify-only_secret_1
+      OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: http://localhost:3000/local/oauth/token
+      OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: http://localhost:3000/local/oauth/verify
+      OPENSEARCH_USERNAME: admin
+      OPENSEARCH_PASSWORD: admin
+      OPENSEARCH_ENDPOINT: http://opensearch:9200
+      DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
+      QUERY_HANDLER_PLUGIN: "@edfi/meadowlark-opensearch-backend"
+      LISTENER1_PLUGIN: "@edfi/meadowlark-opensearch-backend"
+      MONGO_URL: mongodb://${MONGODB_USER:-mongo}:${MONGODB_PASS:-abcdefgh1!}@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      FASTIFY_RATE_LIMIT: false
+      FASTIFY_PORT: 3000
+      FASTIFY_NUM_THREADS: 10
+      MEADOWLARK_STAGE: local
+      LOG_LEVEL: DEBUG
+      IS_LOCAL: true
+      AUTHORIZATION_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
+      BEGIN_ALLOWED_SCHOOL_YEAR: 2022
+      END_ALLOWED_SCHOOL_YEAR: 2034
+      ALLOW_TYPE_COERCION: true
+      ALLOW__EXT_PROPERTY: true
+    restart: unless-stopped
+    healthcheck:
+      test: curl -s http://localhost:3000/local >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  # OpenSearch backend
+  opensearch-local:
+    image: opensearchproject/opensearch:latest   # TODO: pin to specific hash
+    container_name: opensearch-local-node1
+    hostname: opensearch
+    environment:
+      cluster.name: opensearch-cluster-local
+      bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      discovery.type: single-node
+      DISABLE_INSTALL_DEMO_CONFIG: "true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      DISABLE_SECURITY_PLUGIN: "true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+    mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-local-data:/usr/share/opensearch/data
+    ports:
+      - 9201:9200
+      - 9601:9600 # required for Performance Analyzer
+    restart: unless-stopped
+    healthcheck:
+      test: curl -s http://localhost:9200/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards-local
+    ports:
+      - 5602:5601
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch-local-node1:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
+    restart: unless-stopped
+
+
+  # Primary MongoDB node
+  mongo1:
+    image: mongo:4.0.28
+    container_name: mongo1-local
+    hostname: mongo1
+    # expose:
+    #   - 27027
+    ports:
+      - 27027:27017
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--keyFile",
+        "/auth/file.key"
+      ]
+    volumes:
+      - mongo-local-data1:/data/db
+      - mongo-local-log1:/var/log/mongodb
+      - mongo-local-auth:/auth
+      - ./scripts:/scripts
+
+  # Secondary MongoDB node
+  mongo2:
+    image: mongo:4.0.28
+    container_name: mongo2-local
+    hostname: mongo2
+    # expose:
+    #   - 27028
+    ports:
+      - 27028:27018
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--port",
+        "27018",
+        "--keyFile",
+        "/auth/file.key"
+      ]
+    volumes:
+      - mongo-local-data2:/data/db
+      - mongo-local-log2:/var/log/mongodb
+      - mongo-local-auth:/auth
+
+  # Secondary MongoDB node
+  mongo3:
+    image: mongo:4.0.28
+    container_name: mongo3-local
+    hostname: mongo3
+    # expose:
+    #   - 27029
+    ports:
+      - 27029:27019
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    command:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "true",
+        "--port",
+        "27019",
+        "--keyFile",
+        "/auth/file.key"
+      ]
+    volumes:
+      - mongo-local-data3:/data/db
+      - mongo-local-log3:/var/log/mongodb
+      - mongo-local-auth:/auth
+
+volumes:
+  mongo-local-data1:
+  mongo-local-log1:
+  mongo-local-data2:
+  mongo-local-log2:
+  mongo-local-data3:
+  mongo-local-log3:
+  mongo-local-auth:
+    external: true
+  opensearch-local-data:
+  # zookeeper-local-logs:
+  # zookeeper-local-data:
+
+
+  # Zookeeper image from Debezium
+  # zookeeper:
+  #   image: debezium/zookeeper:1.9
+  #   container_name: zookeeper1-local
+  #   hostname: zookeeper1
+  #   ports:
+  #     - 2182:2181
+  #     - 2889:2888
+  #     - 3889:3888
+  #   volumes:
+  #     - zookeeper-local-logs:/var/lib/zookeeper/log
+  #     - zookeeper-local-data:/var/lib/zookeeper/data
+
+  # # Kafka image from Debezium
+  # kafka:
+  #   image: debezium/kafka:1.9
+  #   container_name: kafka1-local
+  #   hostname: kafka1
+  #   ports:
+  #     - 9093:9092
+  #   links:
+  #     - zookeeper
+  #   environment:
+  #     - ZOOKEEPER_CONNECT=zookeeper:2181
+
+  # # Kafka Connect from Debezium, includes Debezium connectors
+  # connect:
+  #   image: debezium/connect:1.9
+  #   container_name: kafka-connect-local
+  #   hostname: kafka-connect
+  #   ports:
+  #     - 8084:8083
+  #   links:
+  #     - kafka
+  #     - mongo1
+  #     - mongo2
+  #     - mongo3
+  #   environment:
+  #     - BOOTSTRAP_SERVERS=kafka:9092
+  #     - GROUP_ID=1
+  #     - CONFIG_STORAGE_TOPIC=debezium_config
+  #     - OFFSET_STORAGE_TOPIC=debezium_offset
+  #     - STATUS_STORAGE_TOPIC=debezium_status
+
+  # # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
+  # kafdrop:
+  #   image: obsidiandynamics/kafdrop:3.30.0
+  #   container_name: kafdrop-local
+  #   hostname: kafdrop
+  #   ports:
+  #     - 9001:9000
+  #   environment:
+  #     KAFKA_BROKERCONNECT: kafka1:9092
+  #     JVM_OPTS: "-Xms32M -Xmx64M"
+  #     SERVER_SERVLET_CONTEXTPATH: "/"
