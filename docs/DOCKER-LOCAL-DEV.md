@@ -52,6 +52,12 @@ Ensure that you have sufficient resources allocated to Docker:
     Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
     ```
 
+## PowerShell Start/Stop Script
+
+[Run-DevContainers.ps1](../eng/Run-DevContainers.ps1) is a convenience script
+for starting or stopping all three sets of dev containers (MongoDB and friends,
+PostgreSQL, OpenSearch).
+
 ## Operations
 
 Summary of some commonly useful [docker CLI
