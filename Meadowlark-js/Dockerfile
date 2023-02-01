@@ -22,15 +22,13 @@ COPY . ./
 RUN npm run docker:install
 RUN npm run build
 
-# need to worry about .env file...
-# will want to remove all src, leaving only the dist files and node_modules
-# ideally will want to bundle/consolidate all of that with webpack
-
 # Start from the node base image, copy all js files, and run Fastify
 FROM base as prod
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 WORKDIR /app
 
+# TODO: only copy js files, ideally use webpack to minimize file size
+# and optimize-away the node_modules directories.
 COPY --chown=node:node --from=build /app .
 
 EXPOSE 3000
