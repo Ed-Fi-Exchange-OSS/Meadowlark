@@ -54,10 +54,18 @@
     "start:local": "lerna run start:local",
     "docker:install": "npm i lerna@^6.0.2 rimraf@^3.0.2 copyfiles@^2.4.1 typescript@4.8.4 -g && npm ci --only=production",
     "docker:build": "docker build -t meadowlark .",
+    "docker:build:wsl1": "docker.exe build -t meadowlark .",
     "docker:start": "docker run -d --env-file ./.env-docker --name ml-api -p 3000:3000 meadowlark",
+    "docker:start:wsl1": "docker.exe run -d --env-file ./.env-docker --name ml-api -p 3000:3000 meadowlark",
     "docker:halt": "docker stop ml-api && docker rm ml-api",
+    "docker:halt:wsl1": "docker.exe stop ml-api && docker rm ml-api",
     "docker:debug": "docker run -d --env-file ./.env-docker -p 3000:3000 --name ml-api meadowlark tail -F /dev/null && docker exec -it ml-api bash",
-    "docker:up": "docker compose --env-file .env-docker -v up -d",
-    "docker:down": "docker compose --env-file .env-docker -v down"
+    "docker:debug:wsl1": "docker.exe run -d --env-file ./.env-docker -p 3000:3000 --name ml-api meadowlark tail -F /dev/null && docker exec -it ml-api bash",
+    "compose:up": "docker compose --env-file .env-docker up -d",
+    "compose:up:wsl1": "docker.exe compose --env-file .env-docker up -d",
+    "compose:down": "docker compose --env-file .env-docker down",
+    "compose:down:wsl1": "docker.exe compose --env-file .env-docker down",
+    "compose:rm": "docker compose rm --stop --volumes --force && docker volume rm mongo-ml-local-auth && docker volume ls -q --filter label=edfi-ml | xargs docker volume rm",
+    "compose:rm:wsl1": "docker.exe compose rm --stop --volumes --force && docker.exe volume rm mongo-ml-local-auth && docker.exe volume ls -q --filter label=edfi-ml | xargs docker.exe volume rm"
   }
 }
