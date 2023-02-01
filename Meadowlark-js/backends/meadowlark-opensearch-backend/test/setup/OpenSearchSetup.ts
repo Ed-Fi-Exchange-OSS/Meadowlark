@@ -8,7 +8,7 @@ import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
 
 let environment: StartedDockerComposeEnvironment;
-const containerName = 'opensearch-test';
+const containerName = 'opensearch-integration-test';
 
 export async function setupOpenSearch() {
   let container: StartedTestContainer;
