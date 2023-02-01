@@ -16,8 +16,9 @@ export async function serviceFactory(worker: number) {
     Logger.info(`Received signal to terminate: ${signal}`, null);
 
     await service.close();
-    // TODO: close database connections Initial thoughts: may need to have a global registry of backends to go through,
-    // manually closing any connections.
+    // TODO RND-481: close database connections Initial thoughts: may need to
+    // have a global registry of backends to go through, manually closing any
+    // connections.
     process.kill(process.pid, signal);
   };
   // The code below works correctly, and is not a misuse of promises.
