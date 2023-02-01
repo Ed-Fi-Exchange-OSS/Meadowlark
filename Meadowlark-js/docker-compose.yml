@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   # Meadowlark API
-  meadowlark-api-local:
+  meadowlark-api-ml-local:
     # requires a local build, `npm run docker:build`.
     image: meadowlark:latest
-    container_name: meadowlark-api-local
+    container_name: meadowlark-api-ml-local
     hostname: api
     ports:
       - 3000:3000
@@ -17,7 +17,7 @@ services:
       OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: http://localhost:3000/local/oauth/token
       OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: http://localhost:3000/local/oauth/verify
       OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: admin
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASS:-admin}
       OPENSEARCH_ENDPOINT: http://opensearch:9200
       DOCUMENT_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
       QUERY_HANDLER_PLUGIN: "@edfi/meadowlark-opensearch-backend"
@@ -42,12 +42,12 @@ services:
       retries: 50
 
   # OpenSearch backend
-  opensearch-local:
-    image: opensearchproject/opensearch:latest   # TODO: pin to specific hash
-    container_name: opensearch-local-node1
+  opensearch-ml-local:
+    image: opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf
+    container_name: opensearch-ml-local-node1
     hostname: opensearch
     environment:
-      cluster.name: opensearch-cluster-local
+      cluster.name: opensearch-cluster-ml-local
       bootstrap.memory_lock: "true" # along with the memlock settings below, disables swapping
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
       discovery.type: single-node
@@ -62,7 +62,7 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      - opensearch-local-data:/usr/share/opensearch/data
+      - opensearch-ml-local-data:/usr/share/opensearch/data
     ports:
       - 9201:9200
       - 9601:9600 # required for Performance Analyzer
@@ -74,20 +74,20 @@ services:
       retries: 50
 
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards-local
+    image: opensearchproject/opensearch-dashboards:2.5.0@sha256:1661c0ee4640e022e87416814f17196f009de627ff0504b8549a1ff6be90240e
+    container_name: opensearch-dashboards-ml-local
     ports:
       - 5602:5601
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch-local-node1:9200"]'
+      OPENSEARCH_HOSTS: '["http://opensearch-ml-local-node1:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
     restart: unless-stopped
 
 
   # Primary MongoDB node
   mongo1:
-    image: mongo:4.0.28
-    container_name: mongo1-local
+    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    container_name: mongo1-ml-local
     hostname: mongo1
     # expose:
     #   - 27027
@@ -115,15 +115,15 @@ services:
         "/auth/file.key"
       ]
     volumes:
-      - mongo-local-data1:/data/db
-      - mongo-local-log1:/var/log/mongodb
-      - mongo-local-auth:/auth
+      - mongo-ml-local-data1:/data/db
+      - mongo-ml-local-log1:/var/log/mongodb
+      - mongo-ml-local-auth:/auth
       - ./scripts:/scripts
 
   # Secondary MongoDB node
   mongo2:
-    image: mongo:4.0.28
-    container_name: mongo2-local
+    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    container_name: mongo2-ml-local
     hostname: mongo2
     # expose:
     #   - 27028
@@ -153,14 +153,14 @@ services:
         "/auth/file.key"
       ]
     volumes:
-      - mongo-local-data2:/data/db
-      - mongo-local-log2:/var/log/mongodb
-      - mongo-local-auth:/auth
+      - mongo-ml-local-data2:/data/db
+      - mongo-ml-local-log2:/var/log/mongodb
+      - mongo-ml-local-auth:/auth
 
   # Secondary MongoDB node
   mongo3:
-    image: mongo:4.0.28
-    container_name: mongo3-local
+    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    container_name: mongo3-ml-local
     hostname: mongo3
     # expose:
     #   - 27029
@@ -190,41 +190,59 @@ services:
         "/auth/file.key"
       ]
     volumes:
-      - mongo-local-data3:/data/db
-      - mongo-local-log3:/var/log/mongodb
-      - mongo-local-auth:/auth
+      - mongo-ml-local-data3:/data/db
+      - mongo-ml-local-log3:/var/log/mongodb
+      - mongo-ml-local-auth:/auth
 
 volumes:
-  mongo-local-data1:
-  mongo-local-log1:
-  mongo-local-data2:
-  mongo-local-log2:
-  mongo-local-data3:
-  mongo-local-log3:
-  mongo-local-auth:
+  mongo-ml-local-data1:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-log1:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-data2:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-log2:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-data3:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-log3:
+    labels:
+      edfi-ml: local
+  mongo-ml-local-auth:
     external: true
-  opensearch-local-data:
-  # zookeeper-local-logs:
-  # zookeeper-local-data:
+  opensearch-ml-local-data:
+    labels:
+      edfi-ml: local
+  # zookeeper-ml-local-logs:
+  #   labels:
+  #     edfi-ml: local
+  # zookeeper-ml-local-data:
+  #   labels:
+  #     edfi-ml: local
 
 
   # Zookeeper image from Debezium
   # zookeeper:
-  #   image: debezium/zookeeper:1.9
-  #   container_name: zookeeper1-local
+  #   image: debezium/zookeeper:2.1@sha256:7dc66b2f30ab8365a92558bfe799e678b31948fd266c1a2116bd04a18a8222b0
+  #   container_name: zookeeper1-ml-local
   #   hostname: zookeeper1
   #   ports:
   #     - 2182:2181
   #     - 2889:2888
   #     - 3889:3888
   #   volumes:
-  #     - zookeeper-local-logs:/var/lib/zookeeper/log
-  #     - zookeeper-local-data:/var/lib/zookeeper/data
+  #     - zookeeper-ml-local-logs:/var/lib/zookeeper/log
+  #     - zookeeper-ml-local-data:/var/lib/zookeeper/data
 
   # # Kafka image from Debezium
   # kafka:
-  #   image: debezium/kafka:1.9
-  #   container_name: kafka1-local
+  #   image: debezium/kafka:2.1
+  #   container_name: kafka1-ml-local
   #   hostname: kafka1
   #   ports:
   #     - 9093:9092
@@ -235,8 +253,8 @@ volumes:
 
   # # Kafka Connect from Debezium, includes Debezium connectors
   # connect:
-  #   image: debezium/connect:1.9
-  #   container_name: kafka-connect-local
+  #   image: debezium/connect:2.1@sha256:320f6fd0bd492d54a5d449699652b26f90549cf891d65356bf1e5a2948993bc5
+  #   container_name: kafka-connect-ml-local
   #   hostname: kafka-connect
   #   ports:
   #     - 8084:8083
@@ -254,8 +272,8 @@ volumes:
 
   # # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
   # kafdrop:
-  #   image: obsidiandynamics/kafdrop:3.30.0
-  #   container_name: kafdrop-local
+  #   image: obsidiandynamics/kafdrop:3.30.0@sha256:5337c9e0e2dee204bdde53e90cf97001f44fb9e8c3380340436efa844901a3f4
+  #   container_name: kafdrop-ml-local
   #   hostname: kafdrop
   #   ports:
   #     - 9001:9000
