@@ -7,7 +7,7 @@ FROM node:16.17.0-bullseye-slim@sha256:fa84c820c0a1106e170137241a66583f80c899d9b
 RUN apt-get update && apt-get upgrade -y
 
 # For running node properly (not as PID 1)
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && apt-get install iputils-ping
 
 # Start a new layer so that we don't need to rebuild everything above
 FROM base as build
