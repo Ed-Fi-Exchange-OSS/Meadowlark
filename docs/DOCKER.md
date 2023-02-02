@@ -63,7 +63,7 @@ before building, be sure that all test are passing at the command line.
 time the source code changes. Be sure to stop and re-start any running
 Meadowlark API containers in order to see the changes.
 
-### Testing the Meadowlark Image
+### Testing the Meadowlark Image with Docker Compose
 
 The instructions above are useful for testing the image creation and basic
 startup, but not very useful for the API itself: it is hard to get the
@@ -72,11 +72,13 @@ that you might have launched for local development.
 
 A better approach is to startup a new set of containers in a single network
 together, completely independent from the "Local Dev" containers. For that, you
-can use the "production-like"
-[docker-compose.yml](../Meadowlark-js/docker-compose.yml) file. This single file
-stitches together the Meadowlark API, OpenSearch, MongoDB, and the
-Debezium/Kafka containers. Note that this does not support PostgreSQL at this
-time, because PostgreSQL is temporarily de-prioritized.
+can use the local [docker-compose.yml](../Meadowlark-js/docker-compose.yml)
+file. This single file stitches together the Meadowlark API, OpenSearch, and
+MongoDB. Note that this does not support PostgreSQL at this time, because
+PostgreSQL is temporarily de-prioritized. The file also contains commented out
+code for running Debezium and Kafka; the code was left commented because the
+data were not flowing, and configuring the correct data flow is not important
+for the current release milestone.
 
 Again the main package.json has a few useful shortcut commands:
 
@@ -108,3 +110,15 @@ What does this do?
    and random MongoDb and OpenSearch passwords.
 2. Builds the Meadowlark-API image.
 3. Configures the MongoDB cluster / replica set.
+
+### External URI's
+
+Based on the default configuration:
+
+| Service                | URL                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| API                    | http://localhost:3000/local                                                            |
+| OpenSearch Dashboard   | http://localhost:5602                                                                  |
+| MongoDB                | mongodb://mongo:${MONGODB_PASS}@mongo1:27027,mongo2:27028,mongo3:27029/?replicaSet=rs0 |
+
+You can get the MongoDB password from the generated `Meadowlark-js/.env-docker` file.
