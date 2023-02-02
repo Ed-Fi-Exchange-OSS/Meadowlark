@@ -18,7 +18,7 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
     # script, but need to use "wsl1" commands with npm.
     docker=docker.exe
     npm run docker:build:wsl1
-  #else
+  else
     npm run docker:build
   fi
 
