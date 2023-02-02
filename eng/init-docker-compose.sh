@@ -10,6 +10,19 @@ set -e -o pipefail
 pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
 { # simulate `try`
 
+  if test -f .env-docker; then
+    echo "There is already a .env-docker file. Do you want to delete it and start over?"
+    read deleteit
+    if [[ $deleteit == y* ]]; then
+        rm .env-docker
+    else
+        echo "OK, we'll append new values to your existing file."
+    fi
+  fi
+
+  echo "Do you want to rebuild the Meadowlark API image?"
+  read rebuild
+
   # Build the local image
   docker=docker
   if [[ $(grep Microsoft /proc/version) ]]; then
@@ -17,13 +30,25 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
     # alias doesn't work, sadly. This variable helps in the context of this
     # script, but need to use "wsl1" commands with npm.
     docker=docker.exe
-    npm run docker:build:wsl1
+
+    if [[ $rebuild == y* ]]; then
+      echo "Building the image..."
+      npm run docker:build:wsl1
+    else
+      echo "Skipping image build."
+    fi
   else
-    npm run docker:build
+    if [[ $rebuild == y* ]]; then
+      echo "Building the image..."
+      npm run docker:build
+    else
+      echo "Skipping image build."
+    fi
   fi
 
   # Create a `.env-docker` file, injecting a new OAUTH signing key
   # and random passwords for each container
+
   echo "Creating .env-docker file..."
   touch .env-docker
   echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\r\n' )" >> .env-docker
