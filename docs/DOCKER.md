@@ -40,6 +40,7 @@ handy commands for dealing with this Dockerfile:
 
 | Command           | Explanation                                                                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| docker:lint       | Runs the Dockerfile through a [Hadolint container](https://github.com/hadolint/hadolint)                                               |
 | docker:install    | Used _inside the Docker container build_, not for manual use. Installs required dev tools and runs `npm ci`                            |
 | docker:build      | Builds the Docker image. Must run this locally any time source code has changed and you want a new local image                         |
 | docker:build:wsl1 | Same as above, but works in Windows Subystem for Linux version 1 (WSL1)                                                                |
@@ -115,10 +116,10 @@ What does this do?
 
 Based on the default configuration:
 
-| Service                | URL                                                                                    |
-| ---------------------- | -------------------------------------------------------------------------------------- |
-| API                    | http://localhost:3000/local                                                            |
-| OpenSearch Dashboard   | http://localhost:5602                                                                  |
-| MongoDB                | mongodb://mongo:${MONGODB_PASS}@mongo1:27027,mongo2:27028,mongo3:27029/?replicaSet=rs0 |
+| Service              | URL                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| API                  | http://localhost:3000/local                                                            |
+| OpenSearch Dashboard | http://localhost:5602                                                                  |
+| MongoDB              | mongodb://mongo:${MONGODB_PASS}@mongo1:27027,mongo2:27028,mongo3:27029/?replicaSet=rs0 |
 
 You can get the MongoDB password from the generated `Meadowlark-js/.env-docker` file.
