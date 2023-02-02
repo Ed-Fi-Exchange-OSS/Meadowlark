@@ -8,7 +8,7 @@ import { PaginationParameters } from '../message/PaginationParameters';
 import { createInvalidRequestResponse } from '../Utility';
 
 const isNotPositiveInteger = (value: string | number): Boolean =>
-  !Number(value) || (R.is(Number, value) ? value : Number.parseInt(value, 10)) < 1;
+  !Number(value) || (R.is(Number, value) ? value : Number.parseInt(value.toString(), 10)) < 1;
 
 /**
  * Validates the `limit` and `offset` parameters from a query string.

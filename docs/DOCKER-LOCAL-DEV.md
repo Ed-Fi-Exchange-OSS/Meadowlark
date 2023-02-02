@@ -1,14 +1,20 @@
-# Docker Localhost for Meadowlark
+# Docker for Local Meadowlark Development
 
-:exclamation: This solution should only be used on localhost with proper firewalls around
-external network access to the workstation. Not appropriate for production use.
+_Also see [DOCKER](DOCKER.md) for more general information about using Docker
+for Meadowlark in development, testing, and production_.
 
-These compose files require [Docker Compose v2](https://github.com/docker/compose)
-(which comes with Docker Desktop for Windows users). They provision the following
-services, all using local volumes to for permanent data storage:
+:exclamation: This solution should only be used on localhost with proper
+firewalls around external network access to the workstation. Not appropriate for
+production use.
 
-* [MongoDB, Kafka, and Zookeeper](../backends/meadowlark-mongodb-backend/docker/readme.md) <-- :exclamation: be sure to read
-  for critical one-time manual setup instructions.
+These compose files require [Docker Compose
+v2](https://github.com/docker/compose) (which comes with Docker Desktop for
+Windows users). They provision the following services, all using local volumes
+to for permanent data storage:
+
+* [MongoDB, Kafka, and
+  Zookeeper](../backends/meadowlark-mongodb-backend/docker/readme.md) <--
+  :exclamation: be sure to read for critical one-time manual setup instructions.
 * [PostgreSQL](../backends/meadowlark-postgresql-backend/docker/readme.md)
 * [OpenSearch](../backends/meadowlark-opensearch-backend/docker/readme.md)
 
@@ -16,9 +22,12 @@ services, all using local volumes to for permanent data storage:
 
 Ensure that you have sufficient resources allocated to Docker:
 
-* Windows (not WSL): set RAM to at least 4 GB [user manual](https://docs.docker.com/desktop/windows/).
-* macOS: set RAM to at least 4 GB [user manual](https://docs.docker.com/desktop/mac/).
-* Linux, including Windows Subsystem for Linux (WSL/WSL2): Ensure vm.max_map_count is set to at least 262144 as [per the
+* Windows (not WSL): set RAM to at least 4 GB [user
+  manual](https://docs.docker.com/desktop/windows/).
+* macOS: set RAM to at least 4 GB [user
+  manual](https://docs.docker.com/desktop/mac/).
+* Linux, including Windows Subsystem for Linux (WSL/WSL2): Ensure
+  vm.max_map_count is set to at least 262144 as [per the
   documentation](https://opensearch.org/docs/opensearch/install/important-settings/).
   * On real Linux: ```sudo sysctl -w vm.max_map_count=262144```
   * On Windows Subsystem for Linux:
@@ -43,6 +52,12 @@ Ensure that you have sufficient resources allocated to Docker:
     Start-Process "$Env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
     ```
 
+## PowerShell Start/Stop Script
+
+[Run-DevContainers.ps1](../eng/Run-DevContainers.ps1) is a convenience script
+for starting or stopping all three sets of dev containers (MongoDB and friends,
+PostgreSQL, OpenSearch).
+
 ## Operations
 
 Summary of some commonly useful [docker CLI
@@ -59,5 +74,6 @@ commands](https://docs.docker.com/engine/reference/commandline/cli/):
 
 ### VSCode Docker Plugin
 
-The Docker for VSCode plugin is an easy way to manage Docker Containers, providing right-click
-`compose up` and `compose down` as well as container monitoring.
+The Docker for VSCode plugin is an easy way to manage Docker Containers,
+providing right-click `compose up` and `compose down` as well as container
+monitoring.

@@ -1,0 +1,31 @@
+name: On Pull Request
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "Meadowlark-js/Dockerfile"
+      - ".github/workflws/on-pullrequest-dockerfile.yml"
+  workflow_dispatch:
+
+jobs:
+  docker-testing:
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+
+      - uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
+        name: Run Linter
+        with:
+          dockerfile: Meadowlark-js/Dockerfile
+
+      - name: Build the Docker image
+        # ...  to confirm no errors occur
+        run: npm run docker:build
+        with:
+          working-directory: Meadowlark-js
+
