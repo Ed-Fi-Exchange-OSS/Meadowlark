@@ -197,16 +197,15 @@ describe('When querying for documents', () => {
     });
 
     describe('when querying with parameters and offset', () => {
-      it.skip('should return value', async () => {
-        const result = await queryDocuments(setupQueryRequest({ firstName: student1.firstName }, { offset: 1 }), client);
+      it('should return value', async () => {
+        const result = await queryDocuments(
+          setupQueryRequest({ firstName: student1.firstName }, { limit: 2, offset: 1 }),
+          client,
+        );
 
-        // This should be success
-        expect(result.response).toEqual('UNKNOWN_FAILURE');
+        expect(result.response).toEqual('QUERY_SUCCESS');
+        expect(result.totalCount).toEqual(1);
         expect(result.documents).toHaveLength(0);
-
-        // expect(result.response).toEqual('QUERY_SUCCESS');
-        // expect(result.totalCount).toEqual(0);
-        // expect(result.documents).toHaveLength(0);
       });
     });
 
