@@ -103,7 +103,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
     const { body } = await performSqlQuery(client, query);
-    recordCount = body.size ?? body.total;
+    recordCount = body.total;
 
     documents = body.datarows.map((datarow) => JSON.parse(datarow));
 
