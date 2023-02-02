@@ -94,6 +94,10 @@ Again the main package.json has a few useful shortcut commands:
 
 ### One Time Initialization
 
+💡 Windows users: you need to run this from Window Subsystem for Linux. Make sure that you run a Bash prompt from WSL, not
+the one provided by Git. You also need to have Node.js 16 installed _inside WSL_. The development team likes using
+[NVM](https://github.com/nvm-sh/nvm) to manage this installation of Node 16.
+
 From a Bash prompt, run init-docker-compose.sh.
 
 ```bash
@@ -101,9 +105,6 @@ From a Bash prompt, run init-docker-compose.sh.
 chmod +x ./eng/init-docker-compose.sh
 ./eng/init-docker-compose.sh
 ```
-
-If you are running on Windows, use the WSl1 or WSL2 Bash prompts, not the Bash
-provided by Git.
 
 What does this do?
 
