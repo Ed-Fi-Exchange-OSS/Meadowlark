@@ -209,8 +209,8 @@ describe('When querying for documents', () => {
       });
     });
 
-    describe('when querying with valid parameters', () => {
-      it('should return value', async () => {
+    describe('when querying with extra characters', () => {
+      it("shouldn't return values", async () => {
         const result = await queryDocuments(
           setupQueryRequest({ firstName: "student1.firstName'%20or%20studentUniqueId%20is%20not%20null%20%23" }, {}),
           client,
