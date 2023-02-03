@@ -19,16 +19,19 @@ export async function createContentClassDescriptor(): Promise<string> {
 }
 
 export async function createGradeLevelDescriptor(): Promise<string> {
-  return createResource({
-    endpoint: 'gradeLevelDescriptors',
-    role: 'host',
-    body: {
-      codeValue: 'Eighth',
-      description: 'Eight Grade',
-      shortDescription: '8°',
-      namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+  return createResource(
+    {
+      endpoint: 'gradeLevelDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Eighth',
+        description: 'Eight Grade',
+        shortDescription: '8°',
+        namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+      },
     },
-  });
+    true,
+  );
 }
 
 export async function createAcademicSubjectDescriptor(): Promise<string> {
@@ -291,4 +294,20 @@ export async function createStudentEdOrgAssociation(studentUniqueId: string, sch
       ],
     },
   });
+}
+
+export async function createeducationOrganizationCategoryDescriptor() {
+  return createResource(
+    {
+      endpoint: 'educationOrganizationCategoryDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Other',
+        shortDescription: 'Other',
+        description: 'Other',
+        namespace: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor',
+      },
+    },
+    true,
+  );
 }
