@@ -2450,3 +2450,84 @@ describe('when building a schema for studentEducationOrganizationAssociation', (
     `);
   });
 });
+
+describe('when building a schema with an optional descriptor collection', () => {
+  // This test was created because the property was not being pluralized.
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  const namespaceName = 'EdFi';
+  let namespace: any = null;
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace(namespaceName)
+      .withStartDomainEntity('StudentAssessment')
+      .withDocumentation('doc')
+      .withStringIdentity('StudentUniqueId', 'doc', '100')
+      // isRequired, isCollection -> false, true
+      .withDescriptorProperty('Accommodation', 'doc', false, true)
+      .withEndDomainEntity()
+
+      .withStartDescriptor('Accommodation')
+      .withDocumentation('doc')
+      .withEndDescriptor()
+      .withEndNamespace()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    namespace = metaEd.namespace.get(namespaceName);
+
+    descriptorReferenceEnhancer(metaEd);
+
+    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
+    entityMeadowlarkDataSetupEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+    enhance(metaEd);
+  });
+
+  it('should be a correct schema', () => {
+    const entity = namespace.entity.domainEntity.get('StudentAssessment');
+    expect(entity.data.meadowlark.jsonSchema).toMatchInlineSnapshot(`
+      {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "description": "doc",
+        "properties": {
+          "accommodations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "accommodationDescriptor": {
+                  "description": "An Ed-Fi Descriptor",
+                  "type": "string",
+                },
+              },
+              "required": [
+                "accommodationDescriptor",
+              ],
+              "type": "object",
+            },
+            "minItems": 0,
+            "type": "array",
+            "uniqueItems": false,
+          },
+          "studentUniqueId": {
+            "description": "doc",
+            "maxLength": 100,
+            "type": "string",
+          },
+        },
+        "required": [
+          "studentUniqueId",
+        ],
+        "title": "EdFi.StudentAssessment",
+        "type": "object",
+      }
+    `);
+  });
+});
