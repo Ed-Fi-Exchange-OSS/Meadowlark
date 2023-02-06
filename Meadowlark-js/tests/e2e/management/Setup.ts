@@ -7,22 +7,19 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 const credentialManager = require('../helpers/Credentials');
-const setupServer = require('./ServerConfig');
 const setupEnvironment = require('./EnvironmentConfig');
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
-// Load fastify environment
-dotenv.config({ path: path.join(process.cwd(), './services/meadowlark-fastify/.env') });
+dotenv.config({ path: path.join(__dirname, '../setup/e2e.env') });
 
-module.exports = async (config) => {
-  console.info(`\n🧪Running e2e tests with: ${process.env.DOCUMENT_STORE_PLUGIN}🧪\n`);
+module.exports = async () => {
+  process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
+  console.info(`\n🧪 Running e2e tests with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 
   try {
-    await setupEnvironment.configure(config);
+    await setupEnvironment.configure();
   } catch (error) {
-    throw new Error(`Unexpected error setting up environment. Verify that Docker is running ${error}`);
+    throw new Error(`Unexpected error setting up environment.\n${error}`);
   }
-  await setupServer.setup();
 
   await credentialManager.authenticateAdmin();
   await credentialManager.createAutomationUsers();

@@ -54,7 +54,7 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
   echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\r\n' )" >> .env-docker
   mongoPassword="$( openssl rand -base64 10 | tr -d '\n')"
   echo MONGODB_PASS="$mongoPassword" >> .env-docker
-  echo MONGODB_URI="mongodb://mongo:\${MONGODB_PASS}@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0"
+  echo MONGODB_URI="mongodb://mongo:\${MONGODB_PASS}@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0" >> .env-docker
 
   # TODO: changing the OpenSearch admin credentials is non-trivial and needs to be handled in a different ticket.
 
