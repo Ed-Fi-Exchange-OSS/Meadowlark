@@ -10,16 +10,77 @@ import {
   createSchool,
 } from '../helpers/DataCreation';
 import { deleteResourceByLocation } from '../helpers/Resources';
-import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
+import { rootURLRequest } from '../helpers/Shared';
 
-describe('given a POST of a school with empty body', () => {
-  const endpoint = 'schools';
+describe('given a POST of a school followed by the PUT of the school with a changed field', () => {
+  const schoolId = 1000;
+  let schoolLocation: string;
 
-  it('should return errors', async () => {
-    await baseURLRequest()
-      .post(`/v3.3b/ed-fi/${endpoint}`)
-      .send('{}')
+  const schoolUpdateBody = `{
+    "schoolId": ${schoolId},
+    "gradeLevels": [
+      {
+          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+      }
+    ],
+    "nameOfInstitution": "Updated School ${schoolId}",
+    "educationOrganizationCategories": [
+      {
+        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+      }
+    ]
+  }`;
+
+  beforeAll(async () => {
+    await createeducationOrganizationCategoryDescriptor();
+    await createGradeLevelDescriptor();
+
+    schoolLocation = await createSchool(schoolId);
+  });
+
+  it('should return put success', async () => {
+    await rootURLRequest()
+      .put(schoolLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
+      .send(schoolUpdateBody)
+      .expect(204);
+  });
+
+  it('should return updated field', async () => {
+    await rootURLRequest()
+      .get(schoolLocation)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(
+          expect.objectContaining({
+            nameOfInstitution: `Updated School ${schoolId}`,
+          }),
+        );
+      });
+  });
+
+  afterAll(async () => {
+    await deleteResourceByLocation(schoolLocation);
+  });
+});
+
+describe('given a PUT of the school with empty body', () => {
+  const schoolId = 1000;
+  let schoolLocation: string;
+
+  beforeAll(async () => {
+    await createeducationOrganizationCategoryDescriptor();
+    await createGradeLevelDescriptor();
+
+    schoolLocation = await createSchool(schoolId);
+  });
+
+  it('should return put failure with errors', async () => {
+    await rootURLRequest()
+      .put(schoolLocation)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .send('{}')
       .expect(400)
       .then((response) => {
         expect(response.body).toMatchInlineSnapshot(`
@@ -55,19 +116,21 @@ describe('given a POST of a school with empty body', () => {
             },
           ],
         }
-      `);
+        `);
       });
+  });
+
+  afterAll(async () => {
+    await deleteResourceByLocation(schoolLocation);
   });
 });
 
-describe('given a POST of a school followed by a second POST of the school with a changed field', () => {
+describe('given a POST of a school followed by the PUT of the school with a different identity', () => {
   const schoolId = 1000;
-  let schoolUpdateReponse: any;
   let schoolLocation: string;
-  const endpoint = 'schools';
 
   const schoolUpdateBody = `{
-    "schoolId": ${schoolId},
+    "schoolId": ${schoolId + 1},
     "gradeLevels": [
       {
           "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
@@ -86,28 +149,20 @@ describe('given a POST of a school followed by a second POST of the school with 
     await createGradeLevelDescriptor();
 
     schoolLocation = await createSchool(schoolId);
-
-    await baseURLRequest()
-      .post(`/v3.3b/ed-fi/${endpoint}`)
-      .send(schoolUpdateBody)
-      .auth(await getAccessToken('host'), { type: 'bearer' })
-      .expect(200)
-      .then((response) => {
-        schoolUpdateReponse = response;
-      });
   });
 
-  it('should return upsert success', async () => {
+  it('should return put failure', async () => {
     await rootURLRequest()
-      .get(schoolUpdateReponse.headers.location)
+      .put(schoolLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
-      .expect(200)
+      .send(schoolUpdateBody)
+      .expect(400)
       .then((response) => {
-        expect(response.body).toEqual(
-          expect.objectContaining({
-            nameOfInstitution: `Updated School ${schoolId}`,
-          }),
-        );
+        expect(response.body).toMatchInlineSnapshot(`
+        {
+          "error": "The identity of the resource does not match the identity in the updated document.",
+        }
+        `);
       });
   });
 
