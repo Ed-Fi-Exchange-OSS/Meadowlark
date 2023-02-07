@@ -4,83 +4,101 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken } from '../helpers/Credentials';
-import {
-  createeducationOrganizationCategoryDescriptor,
-  createGradeLevelDescriptor,
-  createSchool,
-} from '../helpers/DataCreation';
+import { createContentClassDescriptor } from '../helpers/DataCreation';
 import { deleteResourceByLocation } from '../helpers/Resources';
-import { rootURLRequest } from '../helpers/Shared';
+import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
-describe('given a POST of a school followed by the PUT of the school with a changed field', () => {
-  const schoolId = 1000;
-  let schoolLocation: string;
+describe('given a POST of an EducationContent followed by a second POST of the EducationContent with a changed field', () => {
+  let contentClassDescriptorLocation = '';
+  let educationContentLocation = '';
+  const educationContentEndpoint = 'EducationContents';
 
-  const schoolUpdateBody = `{
-    "schoolId": ${schoolId},
-    "gradeLevels": [
-      {
-          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
-      }
-    ],
-    "nameOfInstitution": "Updated School ${schoolId}",
-    "educationOrganizationCategories": [
-      {
-        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
-      }
-    ]
-  }`;
+  const educationContentBody = {
+    contentIdentifier: '933zsd4350',
+    namespace: '43210',
+    shortDescription: 'abc',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
+
+  const educationContentBodyUpdated = {
+    contentIdentifier: '933zsd4350',
+    namespace: '43210',
+    shortDescription: 'abc+',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
 
   beforeAll(async () => {
-    await createeducationOrganizationCategoryDescriptor();
-    await createGradeLevelDescriptor();
+    contentClassDescriptorLocation = await createContentClassDescriptor();
 
-    schoolLocation = await createSchool(schoolId);
+    await baseURLRequest()
+      .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+      .send(educationContentBody)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(201)
+      .then((response) => {
+        expect(response).not.toBe('');
+        educationContentLocation = response.headers.location;
+      });
   });
 
-  it('should return put success', async () => {
+  it('should return upsert success', async () => {
     await rootURLRequest()
-      .put(schoolLocation)
+      .put(educationContentLocation)
+      .send(educationContentBodyUpdated)
       .auth(await getAccessToken('host'), { type: 'bearer' })
-      .send(schoolUpdateBody)
       .expect(204);
   });
 
-  it('should return updated field', async () => {
+  it('should return updated EducationContent', async () => {
     await rootURLRequest()
-      .get(schoolLocation)
+      .get(educationContentLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
       .expect(200)
       .then((response) => {
-        expect(response.body).toEqual(
-          expect.objectContaining({
-            nameOfInstitution: `Updated School ${schoolId}`,
-          }),
-        );
+        expect(response.body).toEqual(expect.objectContaining(educationContentBodyUpdated));
       });
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(schoolLocation);
+    await deleteResourceByLocation(educationContentLocation);
+    await deleteResourceByLocation(contentClassDescriptorLocation);
   });
 });
 
-describe('given a PUT of the school with empty body', () => {
-  const schoolId = 1000;
-  let schoolLocation: string;
+describe('given a PUT of the EducationContent with empty body', () => {
+  let contentClassDescriptorLocation = '';
+  let educationContentLocation = '';
+  const educationContentEndpoint = 'EducationContents';
+
+  const educationContentBody = {
+    contentIdentifier: '933zsd4350',
+    namespace: '43210',
+    shortDescription: 'abc',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
 
   beforeAll(async () => {
-    await createeducationOrganizationCategoryDescriptor();
-    await createGradeLevelDescriptor();
+    contentClassDescriptorLocation = await createContentClassDescriptor();
 
-    schoolLocation = await createSchool(schoolId);
+    await baseURLRequest()
+      .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+      .send(educationContentBody)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(201)
+      .then((response) => {
+        expect(response).not.toBe('');
+        educationContentLocation = response.headers.location;
+      });
   });
 
   it('should return put failure with errors', async () => {
     await rootURLRequest()
-      .put(schoolLocation)
+      .put(educationContentLocation)
+      .send({})
       .auth(await getAccessToken('host'), { type: 'bearer' })
-      .send('{}')
       .expect(400)
       .then((response) => {
         expect(response.body).toMatchInlineSnapshot(`
@@ -90,28 +108,35 @@ describe('given a PUT of the school with empty body', () => {
               "context": {
                 "errorType": "required",
               },
-              "message": "{requestBody} must have required property 'schoolId'",
+              "message": "{requestBody} must have required property 'contentIdentifier'",
               "path": "{requestBody}",
             },
             {
               "context": {
                 "errorType": "required",
               },
-              "message": "{requestBody} must have required property 'gradeLevels'",
+              "message": "{requestBody} must have required property 'learningResourceMetadataURI'",
               "path": "{requestBody}",
             },
             {
               "context": {
                 "errorType": "required",
               },
-              "message": "{requestBody} must have required property 'nameOfInstitution'",
+              "message": "{requestBody} must have required property 'shortDescription'",
               "path": "{requestBody}",
             },
             {
               "context": {
                 "errorType": "required",
               },
-              "message": "{requestBody} must have required property 'educationOrganizationCategories'",
+              "message": "{requestBody} must have required property 'contentClassDescriptor'",
+              "path": "{requestBody}",
+            },
+            {
+              "context": {
+                "errorType": "required",
+              },
+              "message": "{requestBody} must have required property 'namespace'",
               "path": "{requestBody}",
             },
           ],
@@ -120,42 +145,63 @@ describe('given a PUT of the school with empty body', () => {
       });
   });
 
+  it('should return EducationContent', async () => {
+    await rootURLRequest()
+      .get(educationContentLocation)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(expect.objectContaining(educationContentBody));
+      });
+  });
+
   afterAll(async () => {
-    await deleteResourceByLocation(schoolLocation);
+    await deleteResourceByLocation(educationContentLocation);
+    await deleteResourceByLocation(contentClassDescriptorLocation);
   });
 });
 
-describe('given a POST of a school followed by the PUT of the school with a different identity', () => {
-  const schoolId = 1000;
-  let schoolLocation: string;
+describe('given a POST of a EducationContent followed by the PUT of the school with a different identity', () => {
+  let contentClassDescriptorLocation = '';
+  let educationContentLocation = '';
+  const educationContentEndpoint = 'EducationContents';
+  const contentIdentifier = '933zsd4350';
 
-  const schoolUpdateBody = `{
-    "schoolId": ${schoolId + 1},
-    "gradeLevels": [
-      {
-          "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
-      }
-    ],
-    "nameOfInstitution": "Updated School ${schoolId}",
-    "educationOrganizationCategories": [
-      {
-        "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
-      }
-    ]
-  }`;
+  const educationContentBody = {
+    contentIdentifier,
+    namespace: '43210',
+    shortDescription: 'abc',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
+
+  const educationContentBodyUpdated = {
+    contentIdentifier: `${contentIdentifier}+`,
+    namespace: '43210',
+    shortDescription: 'abc',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
 
   beforeAll(async () => {
-    await createeducationOrganizationCategoryDescriptor();
-    await createGradeLevelDescriptor();
+    contentClassDescriptorLocation = await createContentClassDescriptor();
 
-    schoolLocation = await createSchool(schoolId);
+    await baseURLRequest()
+      .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+      .send(educationContentBody)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(201)
+      .then((response) => {
+        expect(response).not.toBe('');
+        educationContentLocation = response.headers.location;
+      });
   });
 
   it('should return put failure', async () => {
     await rootURLRequest()
-      .put(schoolLocation)
+      .put(educationContentLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
-      .send(schoolUpdateBody)
+      .send(educationContentBodyUpdated)
       .expect(400)
       .then((response) => {
         expect(response.body).toMatchInlineSnapshot(`
@@ -167,6 +213,7 @@ describe('given a POST of a school followed by the PUT of the school with a diff
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(schoolLocation);
+    await deleteResourceByLocation(educationContentLocation);
+    await deleteResourceByLocation(contentClassDescriptorLocation);
   });
 });

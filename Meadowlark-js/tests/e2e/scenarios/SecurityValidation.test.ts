@@ -32,22 +32,6 @@ describe('given the existance of two vendors and one host', () => {
     learningResourceMetadataURI: '21430',
   };
 
-  const educationContentBodyPOSTUpdated = {
-    contentIdentifier: '933zsd4350',
-    namespace: '43210',
-    shortDescription: 'abc_POST',
-    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
-    learningResourceMetadataURI: '21430',
-  };
-
-  const educationContentBodyPUTUpdated = {
-    contentIdentifier: '933zsd4350',
-    namespace: '43210',
-    shortDescription: 'abc_PUT',
-    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
-    learningResourceMetadataURI: '21430',
-  };
-
   beforeAll(async () => {
     vendor1Data = await createClient(vendor1Data);
     vendor2Data = await createClient(vendor2Data);
@@ -136,12 +120,39 @@ describe('given the existance of two vendors and one host', () => {
         });
     });
 
+    it('Vendor 1 can get all', async () => {
+      await baseURLRequest()
+        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+        .auth(vendor1DataAccessToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(educationContentBody)]));
+        });
+    });
+
     it('Vendor 2 can not get it', async () => {
       await rootURLRequest().get(educationContentLocation).auth(vendor2DataAccessToken, { type: 'bearer' }).expect(403);
     });
 
+    it('Vendor 2 can not get all', async () => {
+      await rootURLRequest()
+        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+        .auth(vendor2DataAccessToken, { type: 'bearer' })
+        .expect(404);
+    });
+
     it('Host 1 can get it', async () => {
       await rootURLRequest().get(educationContentLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(200);
+    });
+
+    it('Vendor 1 can get all', async () => {
+      await baseURLRequest()
+        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+        .auth(host1DataAccessToken, { type: 'bearer' })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(educationContentBody)]));
+        });
     });
 
     afterAll(async () => {
@@ -151,6 +162,14 @@ describe('given the existance of two vendors and one host', () => {
 
   // POST
   describe('given that Vendor 1 creates an educationContent', () => {
+    const educationContentBodyPOSTUpdated = {
+      contentIdentifier: '933zsd4350',
+      namespace: '43210',
+      shortDescription: 'abc_POST',
+      contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+      learningResourceMetadataURI: '21430',
+    };
+
     beforeAll(async () => {
       await baseURLRequest()
         .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
@@ -225,6 +244,14 @@ describe('given the existance of two vendors and one host', () => {
 
   // PUT
   describe('given that Vendor 1 creates an educationContent', () => {
+    const educationContentBodyPUTUpdated = {
+      contentIdentifier: '933zsd4350',
+      namespace: '43210',
+      shortDescription: 'abc_PUT',
+      contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+      learningResourceMetadataURI: '21430',
+    };
+
     beforeAll(async () => {
       await baseURLRequest()
         .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)

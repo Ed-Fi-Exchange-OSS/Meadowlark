@@ -4,39 +4,52 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { getAccessToken } from '../helpers/Credentials';
-import {
-  createeducationOrganizationCategoryDescriptor,
-  createGradeLevelDescriptor,
-  createSchool,
-} from '../helpers/DataCreation';
-import { rootURLRequest } from '../helpers/Shared';
+import { createContentClassDescriptor } from '../helpers/DataCreation';
+import { deleteResourceByLocation } from '../helpers/Resources';
+import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
-describe('given a DELETE of a non-existent school', () => {
-  const endpoint = 'schools';
-  const schoolId = 'some_not_existing_school_id';
+describe('given a DELETE of a non-existent EducationContent', () => {
+  const educationContentEndpoint = 'EducationContents';
+  const educationContentId = 'some_not_existing_EducationContent_id';
 
   it('should return not found from delete', async () => {
-    await rootURLRequest()
-      .delete(`/local/v3.3b/ed-fi/${endpoint}/${schoolId}`)
+    await baseURLRequest()
+      .delete(`/v3.3b/ed-fi/${educationContentEndpoint}/${educationContentId}`)
       .auth(await getAccessToken('host'), { type: 'bearer' })
       .expect(404);
   });
 });
 
-describe('given a DELETE of an school', () => {
-  const schoolId = 100;
-  let schoolLocation: string;
+describe('given a DELETE of an EducationContent', () => {
+  let contentClassDescriptorLocation = '';
+  let educationContentLocation = '';
+  const educationContentEndpoint = 'EducationContents';
+
+  const educationContentBody = {
+    contentIdentifier: '933zsd4350',
+    namespace: '43210',
+    shortDescription: 'abc',
+    contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
+    learningResourceMetadataURI: '21430',
+  };
 
   beforeAll(async () => {
-    await createeducationOrganizationCategoryDescriptor();
-    await createGradeLevelDescriptor();
+    contentClassDescriptorLocation = await createContentClassDescriptor();
 
-    schoolLocation = await createSchool(schoolId);
+    await baseURLRequest()
+      .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
+      .send(educationContentBody)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(201)
+      .then((response) => {
+        expect(response).not.toBe('');
+        educationContentLocation = response.headers.location;
+      });
   });
 
   it('should return delete success', async () => {
     await rootURLRequest()
-      .delete(schoolLocation)
+      .delete(educationContentLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
       .then((response) => {
         expect(response.status).toEqual(204);
@@ -45,8 +58,12 @@ describe('given a DELETE of an school', () => {
 
   it('should return not found from get', async () => {
     await rootURLRequest()
-      .get(schoolLocation)
+      .get(educationContentLocation)
       .auth(await getAccessToken('host'), { type: 'bearer' })
       .expect(404);
+  });
+
+  afterAll(async () => {
+    await deleteResourceByLocation(contentClassDescriptorLocation);
   });
 });
