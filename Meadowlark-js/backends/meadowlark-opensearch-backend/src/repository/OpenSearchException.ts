@@ -28,7 +28,11 @@ export async function LogOpenSearchErrors(
       case 'SerializationError':
       case 'TimeoutError': {
         if (openSearchClientError?.message !== undefined) {
-          Logger.debug(`${moduleName} ${documentProcessError}`, traceId, openSearchClientError.message);
+          Logger.debug(
+            `${moduleName} ${documentProcessError}`,
+            traceId,
+            `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
+          );
           return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: openSearchClientError.message };
         }
         break;
@@ -43,7 +47,11 @@ export async function LogOpenSearchErrors(
             if (position > -1) {
               responseException.message = responseException?.message?.substring(startPosition, position);
             }
-            Logger.debug(`${moduleName} ${documentProcessError}`, traceId, openSearchClientError.message);
+            Logger.debug(
+              `${moduleName} ${documentProcessError}`,
+              traceId,
+              `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
+            );
             return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
           }
           if (responseException?.body !== undefined) {
@@ -51,14 +59,18 @@ export async function LogOpenSearchErrors(
             switch (responseBody?.error?.type) {
               case 'IndexNotFoundException':
                 // No object has been uploaded for the requested type
-                Logger.debug(`${moduleName} ${documentProcessError} index not found`, traceId, responseBody.error.reason);
+                Logger.debug(
+                  `${moduleName} ${documentProcessError} index not found`,
+                  traceId,
+                  `(${openSearchClientError.name}) - ${responseBody.error.reason}`,
+                );
                 return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
               case 'SemanticAnalysisException':
                 // The query term is invalid
                 Logger.debug(
                   `${moduleName} ${documentProcessError} invalid query terms`,
                   traceId,
-                  responseBody?.error?.reason,
+                  `(${openSearchClientError.name}) - ${responseBody?.error?.reason}`,
                 );
                 return {
                   response: 'QUERY_FAILURE_INVALID_QUERY',
