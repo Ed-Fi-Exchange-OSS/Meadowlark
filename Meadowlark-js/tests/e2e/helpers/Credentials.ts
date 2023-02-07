@@ -46,7 +46,7 @@ async function getAdminAccessToken(): Promise<string> {
 
 export const adminAccessToken: () => Promise<string> = memoize(getAdminAccessToken);
 
-async function createClient(client: Credentials): Promise<Credentials> {
+export async function createClient(client: Credentials): Promise<Credentials> {
   return baseURLRequest()
     .post(`/oauth/clients`)
     .send(client)
