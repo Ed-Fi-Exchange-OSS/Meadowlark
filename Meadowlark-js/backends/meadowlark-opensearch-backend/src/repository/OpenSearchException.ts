@@ -10,11 +10,11 @@ export async function LogOpenSearchErrors(
   err: object,
   moduleName: string = '',
   traceId: string = '',
-  opensearchRequestId: string = '',
+  openSearchRequestId: string = '',
 ): Promise<QueryResult> {
   const openSearchClientError = err as OpenSearchClientError;
   const documentProcessError = `OpenSearch Error${
-    opensearchRequestId ? ` processing the object '${opensearchRequestId}'` : ''
+    openSearchRequestId ? ` processing the object '${openSearchRequestId}'` : ''
   }:`;
   if (openSearchClientError?.name !== undefined) {
     switch (openSearchClientError.name) {

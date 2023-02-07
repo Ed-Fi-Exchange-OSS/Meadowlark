@@ -39,7 +39,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.afterDeleteDocumentById`, opensearchRequest.id, request.traceId);
+    await LogOpenSearchErrors(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
   }
 }
 
@@ -66,7 +66,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.upsertToOpensearch`, opensearchRequest.id, request.traceId);
+    await LogOpenSearchErrors(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
   }
 }
 
