@@ -1,10 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
 version: '3.8'
 
 services:
   # Meadowlark API
   meadowlark-api-ml-local:
     # requires a local build, `npm run docker:build`.
-    image: meadowlark:latest
+    image: meadowlark-api:latest
     container_name: meadowlark-api-ml-local
     hostname: api
     ports:
@@ -90,8 +95,6 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo1-ml-local
     hostname: mongo1
-    # expose:
-    #   - 27027
     ports:
       - 27027:27017
     restart: unless-stopped
@@ -126,8 +129,6 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo2-ml-local
     hostname: mongo2
-    # expose:
-    #   - 27028
     ports:
       - 27028:27018
     restart: unless-stopped
@@ -163,8 +164,6 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo3-ml-local
     hostname: mongo3
-    # expose:
-    #   - 27029
     ports:
       - 27029:27019
     restart: unless-stopped
@@ -216,6 +215,8 @@ volumes:
       edfi-ml: local
   mongo-ml-local-auth:
     external: true
+    labels:
+      edfi-ml: external
   opensearch-ml-local-data:
     labels:
       edfi-ml: local
