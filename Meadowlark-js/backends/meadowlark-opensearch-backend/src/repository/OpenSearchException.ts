@@ -28,7 +28,7 @@ export async function LogOpenSearchErrors(
       case 'SerializationError':
       case 'TimeoutError': {
         if (openSearchClientError?.message !== undefined) {
-          Logger.debug(
+          Logger.error(
             `${moduleName} ${documentProcessError}`,
             traceId,
             `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
@@ -47,7 +47,7 @@ export async function LogOpenSearchErrors(
             if (position > -1) {
               responseException.message = responseException?.message?.substring(startPosition, position);
             }
-            Logger.debug(
+            Logger.error(
               `${moduleName} ${documentProcessError}`,
               traceId,
               `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
@@ -59,7 +59,7 @@ export async function LogOpenSearchErrors(
             switch (responseBody?.error?.type) {
               case 'IndexNotFoundException':
                 // No object has been uploaded for the requested type
-                Logger.debug(
+                Logger.error(
                   `${moduleName} ${documentProcessError} index not found`,
                   traceId,
                   `(${openSearchClientError.name}) - ${responseBody.error.reason}`,
@@ -67,7 +67,7 @@ export async function LogOpenSearchErrors(
                 return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
               case 'SemanticAnalysisException':
                 // The query term is invalid
-                Logger.debug(
+                Logger.error(
                   `${moduleName} ${documentProcessError} invalid query terms`,
                   traceId,
                   `(${openSearchClientError.name}) - ${responseBody?.error?.reason}`,
