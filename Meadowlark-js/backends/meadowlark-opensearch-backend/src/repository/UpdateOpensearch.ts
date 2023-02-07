@@ -14,6 +14,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QueryOpensearch';
+import { LogOpenSearchErrors } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.UpdateOpensearch';
 
@@ -38,8 +39,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    Logger.error(`${moduleName}.afterDeleteDocumentById`, request.traceId, err);
-    throw err;
+    await LogOpenSearchErrors(err, `${moduleName}.afterDeleteDocumentById`, opensearchRequest.id, request.traceId);
   }
 }
 
@@ -66,8 +66,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    Logger.error(`${moduleName}.upsertToOpensearch`, request.traceId, err);
-    throw err;
+    await LogOpenSearchErrors(err, `${moduleName}.upsertToOpensearch`, opensearchRequest.id, request.traceId);
   }
 }
 

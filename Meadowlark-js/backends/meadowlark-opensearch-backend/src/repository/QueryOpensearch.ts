@@ -7,6 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
+import { LogOpenSearchErrors } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
 
@@ -112,7 +113,9 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
-    const body = JSON.parse(e.meta.body);
+    return LogOpenSearchErrors(e, `${moduleName}.queryDocuments`, traceId);
+
+    /* const body = JSON.parse(e.meta.body);
 
     switch (body?.error?.type) {
       case 'IndexNotFoundException':
@@ -126,7 +129,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       default:
         Logger.error(`${moduleName}.queryDocuments`, traceId, body ?? e);
         return { response: 'UNKNOWN_FAILURE', documents: [] };
-    }
+    } */
   }
 
   return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };
