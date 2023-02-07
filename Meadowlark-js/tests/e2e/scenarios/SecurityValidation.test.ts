@@ -240,7 +240,7 @@ describe('given the existance of two vendors and one host', () => {
     });
 
     describe('given a PUT by Vendor 1 to the educationContent created', () => {
-      it('should return upsert success', async () => {
+      it('should return success', async () => {
         await rootURLRequest()
           .put(educationContentLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
@@ -277,7 +277,7 @@ describe('given the existance of two vendors and one host', () => {
         await rootURLRequest()
           .put(educationContentLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
-          .send(educationContentBody)
+          .send(educationContentBodyPUTUpdated)
           .expect(204);
       });
 
@@ -287,7 +287,7 @@ describe('given the existance of two vendors and one host', () => {
           .auth(host1DataAccessToken, { type: 'bearer' })
           .expect(200)
           .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBody));
+            expect(response.body).toEqual(expect.objectContaining(educationContentBodyPUTUpdated));
           });
       });
     });
@@ -337,7 +337,7 @@ describe('given the existance of two vendors and one host', () => {
     });
 
     describe('given a DELETE by Host 1 to the educationContent created', () => {
-      it('should return upsert success', async () => {
+      it('should return success', async () => {
         await rootURLRequest().delete(educationContentLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(204);
       });
     });
