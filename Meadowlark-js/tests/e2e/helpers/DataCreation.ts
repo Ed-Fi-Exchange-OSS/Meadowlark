@@ -295,19 +295,3 @@ export async function createStudentEdOrgAssociation(studentUniqueId: string, sch
     },
   });
 }
-
-export async function createeducationOrganizationCategoryDescriptor() {
-  return createResource(
-    {
-      endpoint: 'educationOrganizationCategoryDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'Other',
-        shortDescription: 'Other',
-        description: 'Other',
-        namespace: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor',
-      },
-    },
-    true,
-  );
-}
