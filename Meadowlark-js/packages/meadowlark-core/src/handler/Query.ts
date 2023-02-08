@@ -67,6 +67,18 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
+  if (response === 'QUERY_FAILURE_INVALID_QUERY' && result.failureMessage !== 'IndexNotFoundException') {
+    const invalidQueryHeaders = {
+      ...frontendRequest.middleware.headerMetadata,
+      [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
+    };
+    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 502);
+    return {
+      statusCode: 502,
+      body: documents,
+      headers: invalidQueryHeaders,
+    };
+  }
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
 
   const headers = {

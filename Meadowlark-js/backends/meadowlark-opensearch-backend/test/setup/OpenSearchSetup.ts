@@ -26,6 +26,7 @@ export async function setupOpenSearch() {
     Config.set('OPENSEARCH_ENDPOINT', `http://${host}:${port}`);
     Config.set('OPENSEARCH_USERNAME', 'admin');
     Config.set('OPENSEARCH_PASSWORD', 'admin');
+    Config.set('OPENSEARCH_REQUEST_TIMEOUT', 10000);
   } catch (e) {
     throw new Error(`Error setting up opensearch: ${e}`);
   }

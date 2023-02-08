@@ -19,6 +19,7 @@ export async function getNewClient(): Promise<Client> {
   const clientOpts: ClientOptions = {
     node: Config.get<string>('OPENSEARCH_ENDPOINT'),
     auth: { username: Config.get<string>('OPENSEARCH_USERNAME'), password: Config.get<string>('OPENSEARCH_PASSWORD') },
+    requestTimeout: Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT'),
     /* Might need to setup SSL here in the future */
   };
 

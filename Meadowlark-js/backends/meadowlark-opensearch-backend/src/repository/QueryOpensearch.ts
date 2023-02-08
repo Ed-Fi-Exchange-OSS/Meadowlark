@@ -7,6 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
+import { LogOpenSearchErrors } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
 
@@ -112,21 +113,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
-    const body = JSON.parse(e.meta.body);
-
-    switch (body?.error?.type) {
-      case 'IndexNotFoundException':
-        // No object has been uploaded for the requested type
-        Logger.debug(`${moduleName}.queryDocuments index not found`, traceId, e.meta.body);
-        return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
-      case 'SemanticAnalysisException':
-        // The query term is invalid
-        Logger.debug(`${moduleName}.queryDocuments invalid query terms`, traceId, e.meta.body);
-        return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [{ error: body.error.details }] };
-      default:
-        Logger.error(`${moduleName}.queryDocuments`, traceId, body ?? e);
-        return { response: 'UNKNOWN_FAILURE', documents: [] };
-    }
+    return LogOpenSearchErrors(e, `${moduleName}.queryDocuments`, traceId);
   }
 
   return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };
