@@ -71,9 +71,9 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 502);
     return {
       statusCode: 502,
+      body: documents,
       headers: frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: '0',
-      body: '[]',
     };
   }
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
