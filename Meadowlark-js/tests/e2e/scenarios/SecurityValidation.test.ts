@@ -95,7 +95,7 @@ describe('given the existance of two vendors and one host', () => {
   });
 
   // GET
-  describe('given that Vendor 1 creates a resource', () => {
+  describe('given a vendor API client has created a resource', () => {
     beforeEach(async () => {
       await baseURLRequest()
         .post(`/v3.3b/ed-fi/${resourceEndpoint}`)
