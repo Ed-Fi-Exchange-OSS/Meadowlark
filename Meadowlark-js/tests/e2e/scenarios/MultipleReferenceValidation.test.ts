@@ -15,7 +15,7 @@ describe('When querying for a resource that has multiple references to resources
         await baseURLRequest()
           .get('/v3.3b/ed-fi/studentSchoolAssociations')
           .auth(await getAccessToken('vendor'), { type: 'bearer' })
-          .expect(502)
+          .expect(200)
           .then((response) => {
             expect(response.body).toEqual([]);
           });

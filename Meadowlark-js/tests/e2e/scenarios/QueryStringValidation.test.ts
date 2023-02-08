@@ -14,7 +14,7 @@ describe('When retrieving information', () => {
       await baseURLRequest()
         .get('/v3.3b/ed-fi/schools')
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
-        .expect(502)
+        .expect(200)
         .then((response) => {
           expect(response.headers['total-count']).toEqual('0');
           expect(response.body).toMatchInlineSnapshot(`[]`);
