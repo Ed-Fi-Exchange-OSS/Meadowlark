@@ -1,4 +1,4 @@
-name: On Pull Request
+name: On Pull Request - Dockerfile
 
 on:
   push:
@@ -14,6 +14,7 @@ on:
 
 jobs:
   docker-testing:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
@@ -28,4 +29,3 @@ jobs:
         run: npm run docker:build
         with:
           working-directory: Meadowlark-js
-
