@@ -1,4 +1,4 @@
-import { Credentials, createClient } from '../helpers/Credentials';
+import { Credentials, createClient, getAccessToken } from '../helpers/Credentials';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
@@ -22,9 +22,9 @@ describe('given the existance of two vendors and one host', () => {
 
   let contentClassDescriptorLocation = '';
 
-  let educationContentLocation = '';
-  const educationContentEndpoint = 'EducationContents';
-  const educationContentBody = {
+  let resourceLocation = '';
+  const resourceEndpoint = 'EducationContents';
+  const resourceBody = {
     contentIdentifier: '933zsd4350',
     namespace: '43210',
     shortDescription: 'abc',
@@ -95,74 +95,80 @@ describe('given the existance of two vendors and one host', () => {
   });
 
   // GET
-  describe('given that Vendor 1 creates an educationContent', () => {
-    beforeAll(async () => {
+  describe('given that Vendor 1 creates a resource', () => {
+    beforeEach(async () => {
       await baseURLRequest()
-        .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .send(educationContentBody)
+        .post(`/v3.3b/ed-fi/${resourceEndpoint}`)
+        .send(resourceBody)
         .auth(vendor1DataAccessToken, { type: 'bearer' })
         .expect(201)
         .then((response) => {
           expect(response).not.toBe('');
-          educationContentLocation = response.headers.location;
+          resourceLocation = response.headers.location;
         });
 
-      expect(educationContentLocation).toBeTruthy();
+      expect(resourceLocation).toBeTruthy();
     });
 
-    it('Vendor 1 can get it', async () => {
-      await rootURLRequest()
-        .get(educationContentLocation)
-        .auth(vendor1DataAccessToken, { type: 'bearer' })
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toEqual(expect.objectContaining(educationContentBody));
-        });
+    describe('when the same vendor requests the resource', () => {
+      it('should receive the resource', async () => {
+        await rootURLRequest()
+          .get(resourceLocation)
+          .auth(vendor1DataAccessToken, { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual(expect.objectContaining(resourceBody));
+          });
+      });
     });
 
-    it('Vendor 1 can get all', async () => {
-      await baseURLRequest()
-        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .auth(vendor1DataAccessToken, { type: 'bearer' })
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(educationContentBody)]));
-        });
+    describe('when the same vendor requests all resources', () => {
+      it('should receive one resource', async () => {
+        await baseURLRequest()
+          .get(`/v3.3b/ed-fi/${resourceEndpoint}`)
+          .auth(vendor1DataAccessToken, { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
+          });
+      });
     });
 
-    it('Vendor 2 can not get it', async () => {
-      await rootURLRequest().get(educationContentLocation).auth(vendor2DataAccessToken, { type: 'bearer' }).expect(403);
+    describe('when a different vendor requests the resource', () => {
+      it('should be denied', async () => {
+        await rootURLRequest().get(resourceLocation).auth(vendor2DataAccessToken, { type: 'bearer' }).expect(403);
+      });
     });
 
-    it('Vendor 2 can not get all', async () => {
-      await rootURLRequest()
-        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .auth(vendor2DataAccessToken, { type: 'bearer' })
-        .expect(404);
+    describe('when a different vendor requests all resources', () => {
+      it('should be denied', async () => {
+        await rootURLRequest()
+          .get(`/v3.3b/ed-fi/${resourceEndpoint}`)
+          .auth(vendor2DataAccessToken, { type: 'bearer' })
+          .expect(404);
+      });
     });
 
-    it('Host 1 can get it', async () => {
-      await rootURLRequest().get(educationContentLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(200);
+    describe('when a host account requests the resource', () => {
+      it('should receive the resource', async () => {
+        await rootURLRequest().get(resourceLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(200);
+      });
     });
 
-    it('Vendor 1 can get all', async () => {
-      await baseURLRequest()
-        .get(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .auth(host1DataAccessToken, { type: 'bearer' })
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(educationContentBody)]));
-        });
+    describe('when a host account requests all resources', () => {
+      it('should receive one resource', async () => {
+        await baseURLRequest()
+          .get(`/v3.3b/ed-fi/${resourceEndpoint}`)
+          .auth(host1DataAccessToken, { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
+          });
+      });
     });
 
-    afterAll(async () => {
-      await deleteResourceByLocation(educationContentLocation);
-    });
-  });
-
-  // POST
-  describe('given that Vendor 1 creates an educationContent', () => {
-    const educationContentBodyPOSTUpdated = {
+    // POST
+    const resourceBodyPOSTUpdated = {
       contentIdentifier: '933zsd4350',
       namespace: '43210',
       shortDescription: 'abc_POST',
@@ -170,46 +176,22 @@ describe('given the existance of two vendors and one host', () => {
       learningResourceMetadataURI: '21430',
     };
 
-    beforeAll(async () => {
-      await baseURLRequest()
-        .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .send(educationContentBody)
-        .auth(vendor1DataAccessToken, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          expect(response).not.toBe('');
-          educationContentLocation = response.headers.location;
-        });
-
-      expect(educationContentLocation).toBeTruthy();
-    });
-
-    describe('given a POST by Vendor 1 to the educationContent created', () => {
+    describe('when the same vendor upserts the resource', () => {
       it('should return upsert success', async () => {
         await rootURLRequest()
-          .post(educationContentLocation)
+          .post(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .send(educationContentBodyPOSTUpdated)
+          .send(resourceBodyPOSTUpdated)
           .expect(200);
-      });
-
-      it('should return updated educationContent.', async () => {
-        await rootURLRequest()
-          .get(educationContentLocation)
-          .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBodyPOSTUpdated));
-          });
       });
     });
 
-    describe('given a POST by Vendor 2 to the educationContent created', () => {
+    describe('when a different vendor upserts the resource', () => {
       it('should return error', async () => {
         await rootURLRequest()
-          .post(educationContentLocation)
+          .post(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
-          .send(educationContentBodyPOSTUpdated)
+          .send(resourceBodyPOSTUpdated)
           .expect(403)
           .then((response) => {
             expect(response.body).toBe('');
@@ -217,34 +199,18 @@ describe('given the existance of two vendors and one host', () => {
       });
     });
 
-    describe('given a POST by Host 1 to the educationContent created', () => {
-      it('should return upsert success', async () => {
+    describe('when a host account upserts the resource', () => {
+      it('should return success', async () => {
         await rootURLRequest()
-          .post(educationContentLocation)
+          .post(resourceLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
-          .send(educationContentBody)
+          .send(resourceBody)
           .expect(200);
       });
-
-      it('should return updated educationContent.', async () => {
-        await rootURLRequest()
-          .get(educationContentLocation)
-          .auth(host1DataAccessToken, { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBody));
-          });
-      });
     });
 
-    afterAll(async () => {
-      await deleteResourceByLocation(educationContentLocation);
-    });
-  });
-
-  // PUT
-  describe('given that Vendor 1 creates an educationContent', () => {
-    const educationContentBodyPUTUpdated = {
+    // PUT
+    const resourceBodyPUTUpdated = {
       contentIdentifier: '933zsd4350',
       namespace: '43210',
       shortDescription: 'abc_PUT',
@@ -252,46 +218,22 @@ describe('given the existance of two vendors and one host', () => {
       learningResourceMetadataURI: '21430',
     };
 
-    beforeAll(async () => {
-      await baseURLRequest()
-        .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .send(educationContentBody)
-        .auth(vendor1DataAccessToken, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          expect(response).not.toBe('');
-          educationContentLocation = response.headers.location;
-        });
-
-      expect(educationContentLocation).toBeTruthy();
-    });
-
-    describe('given a PUT by Vendor 1 to the educationContent created', () => {
+    describe('when the same vendor updates the resource', () => {
       it('should return success', async () => {
         await rootURLRequest()
-          .put(educationContentLocation)
+          .put(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .send(educationContentBodyPUTUpdated)
+          .send(resourceBodyPUTUpdated)
           .expect(204);
-      });
-
-      it('should return updated educationContent.', async () => {
-        await rootURLRequest()
-          .get(educationContentLocation)
-          .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBodyPUTUpdated));
-          });
       });
     });
 
-    describe('given a PUT by Vendor 2 to the educationContent created', () => {
+    describe('when a different vendor updates the resource', () => {
       it('should return error', async () => {
         await rootURLRequest()
-          .put(educationContentLocation)
+          .put(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
-          .send(educationContentBodyPUTUpdated)
+          .send(resourceBodyPUTUpdated)
           .expect(403)
           .then((response) => {
             expect(response.body).toBe('');
@@ -299,74 +241,38 @@ describe('given the existance of two vendors and one host', () => {
       });
     });
 
-    describe('given a PUT by Host 1 to the educationContent created', () => {
-      it('should return upsert success', async () => {
+    describe('when a host account requests the resource', () => {
+      it('should return success', async () => {
         await rootURLRequest()
-          .put(educationContentLocation)
+          .put(resourceLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
-          .send(educationContentBodyPUTUpdated)
+          .send(resourceBodyPUTUpdated)
           .expect(204);
       });
-
-      it('should return updated educationContent.', async () => {
-        await rootURLRequest()
-          .get(educationContentLocation)
-          .auth(host1DataAccessToken, { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBodyPUTUpdated));
-          });
-      });
     });
 
-    afterAll(async () => {
-      await deleteResourceByLocation(educationContentLocation);
-    });
-  });
-
-  // DELETE
-  describe('given that Vendor 1 creates an educationContent', () => {
-    beforeEach(async () => {
-      await baseURLRequest()
-        .post(`/v3.3b/ed-fi/${educationContentEndpoint}`)
-        .send(educationContentBody)
-        .auth(vendor1DataAccessToken, { type: 'bearer' })
-        .then((response) => {
-          expect([200, 201].indexOf(response.status)).toBeGreaterThan(-1);
-          educationContentLocation = response.headers.location;
-        });
-
-      expect(educationContentLocation).toBeTruthy();
-    });
-
-    describe('given a DELETE by Vendor 1 to the educationContent created', () => {
-      it('should return delete success', async () => {
-        await rootURLRequest().delete(educationContentLocation).auth(vendor1DataAccessToken, { type: 'bearer' }).expect(204);
-      });
-    });
-
-    describe('given a DELETE by Vendor 2 to the educationContent created', () => {
-      it('should return error', async () => {
-        await rootURLRequest().delete(educationContentLocation).auth(vendor2DataAccessToken, { type: 'bearer' }).expect(403);
-      });
-
-      it('Vendor 1 can still see it', async () => {
-        await rootURLRequest()
-          .get(educationContentLocation)
-          .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            expect(response.body).toEqual(expect.objectContaining(educationContentBody));
-          });
-
-        await deleteResourceByLocation(educationContentLocation);
-      });
-    });
-
-    describe('given a DELETE by Host 1 to the educationContent created', () => {
+    describe('when the same vendor deletes the resource', () => {
       it('should return success', async () => {
-        await rootURLRequest().delete(educationContentLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(204);
+        await rootURLRequest().delete(resourceLocation).auth(vendor1DataAccessToken, { type: 'bearer' }).expect(204);
       });
+    });
+
+    describe('when a different vendor deletes the resource', () => {
+      it('should return error', async () => {
+        await rootURLRequest().delete(resourceLocation).auth(vendor2DataAccessToken, { type: 'bearer' }).expect(403);
+      });
+    });
+
+    describe('when a host account requests the resource', () => {
+      it('should return success', async () => {
+        await rootURLRequest().delete(resourceLocation).auth(host1DataAccessToken, { type: 'bearer' }).expect(204);
+      });
+    });
+
+    afterEach(async () => {
+      await rootURLRequest()
+        .delete(resourceLocation)
+        .auth(await getAccessToken('host'), { type: 'bearer' });
     });
   });
 });
