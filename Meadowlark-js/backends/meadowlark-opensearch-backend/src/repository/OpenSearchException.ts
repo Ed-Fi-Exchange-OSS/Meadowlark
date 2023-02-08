@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { QueryResult } from '@edfi/meadowlark-core';
 
 export async function LogOpenSearchErrors(
-  err: object,
+  err: OpenSearchClientError | Error,
   moduleName: string = '',
   traceId: string = '',
   openSearchRequestId: string = '',
@@ -46,6 +46,8 @@ export async function LogOpenSearchErrors(
             startPosition = startPosition > -1 ? startPosition : 0;
             if (position > -1) {
               responseException.message = responseException?.message?.substring(startPosition, position);
+            } else if (startPosition !== 0) {
+              responseException.message = responseException?.message?.substring(startPosition);
             }
             Logger.error(
               `${moduleName} ${documentProcessError}`,
@@ -90,5 +92,6 @@ export async function LogOpenSearchErrors(
       }
     }
   }
-  throw err;
+  Logger.error(`${moduleName} ${documentProcessError}`, traceId, err);
+  return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: err.message };
 }
