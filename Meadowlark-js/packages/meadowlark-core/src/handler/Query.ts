@@ -69,7 +69,12 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
 
   if (response === 'QUERY_FAILURE_INVALID_QUERY') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 502);
-    return { statusCode: 502, headers: frontendRequest.middleware.headerMetadata, [TOTAL_COUNT_HEADER_NAME]: '0' };
+    return {
+      statusCode: 502,
+      headers: frontendRequest.middleware.headerMetadata,
+      [TOTAL_COUNT_HEADER_NAME]: '0',
+      body: '[]',
+    };
   }
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
 
