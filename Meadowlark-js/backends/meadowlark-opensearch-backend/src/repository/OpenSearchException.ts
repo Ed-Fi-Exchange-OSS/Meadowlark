@@ -61,12 +61,8 @@ export async function LogOpenSearchErrors(
             switch (responseBody?.error?.type) {
               case 'IndexNotFoundException':
                 // No object has been uploaded for the requested type
-                Logger.error(
-                  `${moduleName} ${documentProcessError} index not found`,
-                  traceId,
-                  `(${openSearchClientError.name}) - ${responseBody.error.reason}`,
-                );
-                return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [] };
+                Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
+                return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: 'IndexNotFoundException' };
               case 'SemanticAnalysisException':
                 // The query term is invalid
                 Logger.error(
