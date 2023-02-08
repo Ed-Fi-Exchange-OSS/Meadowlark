@@ -92,6 +92,6 @@ export async function LogOpenSearchErrors(
       }
     }
   }
-  Logger.error(`${moduleName} ${documentProcessError}`, traceId, err);
+  Logger.error(`${moduleName} UNKNOWN_FAILURE`, traceId, err);
   return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: err.message };
 }
