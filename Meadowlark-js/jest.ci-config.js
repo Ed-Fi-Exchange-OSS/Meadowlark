@@ -5,15 +5,6 @@ module.exports = {
   ...defaultConfig,
   reporters: [
     'default',
-    [
-      'jest-junit',
-      {
-        ancestorSeparator: ' > ',
-        uniqueOutputName: false,
-        suiteNameTemplate: '{filepath}',
-        classNameTemplate: '{classname}',
-        titleTemplate: '{title}',
-      },
-    ],
+    'github-actions'
   ],
 };

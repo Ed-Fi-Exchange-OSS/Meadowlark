@@ -30,6 +30,7 @@ export type ConfigKeys =
   | 'OPENSEARCH_ENDPOINT'
   | 'OPENSEARCH_USERNAME'
   | 'OPENSEARCH_PASSWORD'
+  | 'OPENSEARCH_REQUEST_TIMEOUT'
   | 'LISTENER1_PLUGIN'
   | 'LISTENER2_PLUGIN'
   | 'QUERY_HANDLER_PLUGIN'
@@ -124,6 +125,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
     set('OPENSEARCH_ENDPOINT', await provider.getString('OPENSEARCH_ENDPOINT', ThrowIfNotFound));
     set('OPENSEARCH_USERNAME', await provider.getString('OPENSEARCH_USERNAME', 'x'));
     set('OPENSEARCH_PASSWORD', await provider.getString('OPENSEARCH_PASSWORD', 'y'));
+    set('OPENSEARCH_REQUEST_TIMEOUT', await provider.getInt('OPENSEARCH_REQUEST_TIMEOUT', 30000));
   }
 
   set('ALLOW_TYPE_COERCION', await provider.getBool('ALLOW_TYPE_COERCION', false));

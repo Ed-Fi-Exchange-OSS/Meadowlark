@@ -238,15 +238,6 @@ jobs:
           path: Meadowlark-js/coverage/lcov-report
           retention-days: 10
 
-      - name: Upload test results
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
-        with:
-          name: test-results
-          path: |
-            Meadowlark-js/${{matrix.tests.type}}-tests/junit.xml
-            Meadowlark-js/.prettierrc
-          retention-days: 1
-
   end-to-end:
     name: End to End tests for ${{ matrix.config.db }}
     needs: [lint, build]
@@ -303,21 +294,10 @@ jobs:
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
-          npm run test:e2e -- --ci --reporters="default" --reporters="jest-junit"
+          npm run test:e2e -- --ci
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
           MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
-
-      # Workaround for issue https://github.com/actions/upload-artifact/issues/174
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
-        with:
-          name: test-results
-          path: |
-            Meadowlark-js/${{matrix.config.db}}-e2e-tests/junit.xml
-            Meadowlark-js/.prettierrc
-          retention-days: 1
