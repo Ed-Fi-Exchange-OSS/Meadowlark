@@ -7,7 +7,7 @@ set -e -o pipefail
 # See the LICENSE and NOTICES files in the project root for more information.
 
 # Switch to the Meadowlark-js directory
-pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
+pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js > /dev/null
 { # simulate `try`
 
   if test -f .env-docker; then
@@ -102,7 +102,7 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
   echo "Done. Ready to run docker compose."
 
   # Return to original location
-  popd
+  popd > /dev/null
 
 } || { # simulate `catch`
 
@@ -112,5 +112,5 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
   else
     npm run compose:down
   fi
-  popd
+  popd > /dev/null
 }
