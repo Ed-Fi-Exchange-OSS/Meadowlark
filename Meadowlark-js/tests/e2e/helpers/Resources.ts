@@ -11,16 +11,18 @@ export async function createResource(
     endpoint,
     body,
     role = 'vendor',
+    accessToken = '',
   }: {
     endpoint: string;
     body: Object;
     role?: Role;
+    accessToken?: string;
   },
   upsert = false,
 ): Promise<string> {
   return baseURLRequest()
     .post(`/v3.3b/ed-fi/${endpoint}`)
-    .auth(await getAccessToken(role), { type: 'bearer' })
+    .auth(accessToken || (await getAccessToken(role)), { type: 'bearer' })
     .send(body)
     .then((response) => {
       if (response.body) {

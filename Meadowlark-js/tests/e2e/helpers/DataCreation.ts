@@ -19,16 +19,19 @@ export async function createContentClassDescriptor(): Promise<string> {
 }
 
 export async function createGradeLevelDescriptor(): Promise<string> {
-  return createResource({
-    endpoint: 'gradeLevelDescriptors',
-    role: 'host',
-    body: {
-      codeValue: 'Eighth',
-      description: 'Eight Grade',
-      shortDescription: '8°',
-      namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+  return createResource(
+    {
+      endpoint: 'gradeLevelDescriptors',
+      role: 'host',
+      body: {
+        codeValue: 'Eighth',
+        description: 'Eight Grade',
+        shortDescription: '8°',
+        namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+      },
     },
-  });
+    true,
+  );
 }
 
 export async function createAcademicSubjectDescriptor(): Promise<string> {
