@@ -1,7 +1,8 @@
 # Opensearch Backend for Meadowlark
 
-:exclamation: This solution should only be used on localhost with proper firewalls around
-external network access to the workstation. Not appropriate for production use.
+:exclamation: This solution should only be used on localhost with proper firewalls around external network access to the
+workstation. Not appropriate for production use - security has been disabled in the deployment, so that we don't need to
+worry about setting up SSL correctly.
 
 This Docker Compose file provisions a single node of the OpenSearch search
 engine and [OpenSearch Dashboard](http://localhost:5601/) (latest versions).
