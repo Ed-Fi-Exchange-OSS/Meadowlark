@@ -9,6 +9,7 @@ import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
+import { BlockingDocument } from '../../src/message/BlockingDocument';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -25,6 +26,12 @@ const frontendRequest: FrontendRequest = {
 
 describe('given persistence is going to throw a reference error on insert', () => {
   let response: FrontendResponse;
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
   let mockDocumentStore: any;
   const expectedError = 'Error message';
 
@@ -35,42 +42,7 @@ describe('given persistence is going to throw a reference error on insert', () =
         Promise.resolve({
           response: 'INSERT_FAILURE_REFERENCE',
           failureMessage: expectedError,
-        }),
-    });
-
-    // Act
-    response = await upsert(frontendRequest);
-  });
-
-  afterAll(() => {
-    mockDocumentStore.mockRestore();
-  });
-
-  it('returns status 400', () => {
-    expect(response.statusCode).toEqual(400);
-  });
-
-  it('returns an appropriate message', () => {
-    // it should NOT return the detailed message from the database - information leakage
-    expect(response.body).toMatchInlineSnapshot(`
-      {
-        "error": "Error message",
-      }
-    `);
-  });
-});
-
-describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
-  let response: FrontendResponse;
-  let mockDocumentStore: any;
-
-  beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
-      ...NoDocumentStorePlugin,
-      upsertDocument: async () =>
-        Promise.resolve({
-          response: 'UPDATE_FAILURE_REFERENCE',
-          failureMessage: 'Reference failure',
+          blockingDocuments: [expectedBlockingDocument],
         }),
     });
 
@@ -86,8 +58,65 @@ describe('given persistence is going to throw a reference error on update though
     expect(response.statusCode).toEqual(409);
   });
 
-  it('does not return a message body', () => {
-    expect(response.body).toBeUndefined();
+  it('returns an appropriate message', () => {
+    // it should NOT return the detailed message from the database - information leakage
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "blockingUris": [
+            "/v3.3b/ed-fi/resourceNames/documentId",
+          ],
+          "failureMessage": "Error message",
+        },
+      }
+    `);
+  });
+});
+
+describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
+  let response: FrontendResponse;
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
+  let mockDocumentStore: any;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: async () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILURE_REFERENCE',
+          failureMessage: 'Reference failure',
+          blockingDocuments: [expectedBlockingDocument],
+        }),
+    });
+
+    // Act
+    response = await upsert(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
+  });
+
+  it('returns an appropriate message', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": {
+          "blockingUris": [
+            "/v3.3b/ed-fi/resourceNames/documentId",
+          ],
+          "message": "Reference failure",
+        },
+      }
+    `);
   });
 });
 

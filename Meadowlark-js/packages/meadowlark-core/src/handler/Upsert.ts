@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import R from 'ramda';
 import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { documentIdForDocumentInfo } from '../model/DocumentInfo';
@@ -13,7 +12,7 @@ import type { UpsertRequest } from '../message/UpsertRequest';
 import type { UpsertResult } from '../message/UpsertResult';
 import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
-import { resourceUriFrom } from './UriBuilder';
+import { blockingDocumentsToUris, resourceUriFrom } from './UriBuilder';
 
 const moduleName = 'core.handler.Upsert';
 
@@ -61,15 +60,21 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409);
-      return { statusCode: 409, headers: headerMetadata };
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, blockingUris.join(','));
+      return {
+        body: { error: { message: failureMessage, blockingUris } },
+        statusCode: 409,
+        headers: headerMetadata,
+      };
     }
 
     if (response === 'INSERT_FAILURE_REFERENCE' || response === 'INSERT_FAILURE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 400, 'reference error');
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, blockingUris.join(','));
       return {
-        body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
-        statusCode: 400,
+        body: { error: { failureMessage, blockingUris } },
+        statusCode: 409,
         headers: headerMetadata,
       };
     }
