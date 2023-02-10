@@ -62,12 +62,10 @@ describe('given persistence is going to throw a reference error on insert', () =
     // it should NOT return the detailed message from the database - information leakage
     expect(response.body).toMatchInlineSnapshot(`
       {
-        "error": {
-          "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentId",
-          ],
-          "failureMessage": "Error message",
-        },
+        "blockingUris": [
+          "/v3.3b/ed-fi/resourceNames/documentId",
+        ],
+        "error": "Error message",
       }
     `);
   });
