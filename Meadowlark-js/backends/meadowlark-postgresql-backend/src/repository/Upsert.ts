@@ -10,6 +10,7 @@ import {
   DocumentReference,
   documentIdForDocumentReference,
   documentIdForSuperclassInfo,
+  BlockingDocument,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import {
@@ -20,6 +21,7 @@ import {
   insertAliasSql,
   findAliasIdsForDocumentSql,
   findAliasIdSql,
+  findReferringDocumentInfoForErrorReportingSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -53,10 +55,22 @@ export async function upsertDocument(
           traceId,
         );
 
+        const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
+
+        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+          resourceName: document.resource_name,
+          documentId: document.document_id,
+          projectName: document.project_name,
+          resourceVersion: document.resource_version,
+        }));
+
         await client.query('ROLLBACK');
         return {
           response: 'INSERT_FAILURE_CONFLICT',
           failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
+          blockingDocuments,
         };
       }
     }
@@ -78,10 +92,20 @@ export async function upsertDocument(
       if (failures.length > 0) {
         Logger.debug(`${moduleName}.upsertDocument: Inserting document id ${id} failed due to invalid references`, traceId);
 
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([id]));
+
+        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+          resourceName: document.resource_name,
+          documentId: document.document_id,
+          projectName: document.project_name,
+          resourceVersion: document.resource_version,
+        }));
+
         await client.query('ROLLBACK');
         return {
           response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
           failureMessage: { error: { message: 'Reference validation failed', failures } },
+          blockingDocuments,
         };
       }
     }

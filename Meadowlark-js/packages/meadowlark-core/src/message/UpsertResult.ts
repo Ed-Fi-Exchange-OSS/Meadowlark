@@ -8,7 +8,7 @@ import { BlockingDocument } from './BlockingDocument';
 export type UpsertFailureReference = {
   response: 'INSERT_FAILURE_REFERENCE' | 'INSERT_FAILURE_CONFLICT' | 'UPDATE_FAILURE_REFERENCE';
   failureMessage?: string | object;
-  blockingDocuments?: BlockingDocument[];
+  blockingDocuments: BlockingDocument[];
 };
 
 export type UpsertResult =
