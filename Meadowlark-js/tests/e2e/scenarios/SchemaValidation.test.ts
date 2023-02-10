@@ -108,7 +108,7 @@ describe('When creating a resource', () => {
           institutionTelephones: [],
           internationalAddresses: [],
         })
-        .expect(400)
+        .expect(409)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {
@@ -244,7 +244,7 @@ describe('When creating a resource', () => {
           institutionTelephones: [],
           internationalAddresses: [],
         })
-        .expect(400)
+        .expect(409)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {

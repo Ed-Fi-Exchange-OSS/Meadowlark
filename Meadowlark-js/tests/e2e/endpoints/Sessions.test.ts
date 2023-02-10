@@ -27,7 +27,7 @@ describe('Sessions', () => {
             schoolId: 99,
           },
         })
-        .expect(400)
+        .expect(409)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {

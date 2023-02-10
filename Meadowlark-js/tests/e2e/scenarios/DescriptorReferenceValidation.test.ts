@@ -22,7 +22,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
             birthDate: '2001-01-01',
             birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#AD3',
           })
-          .expect(400)
+          .expect(409)
           .then((response) => {
             expect(response.body).toMatchInlineSnapshot(
               `

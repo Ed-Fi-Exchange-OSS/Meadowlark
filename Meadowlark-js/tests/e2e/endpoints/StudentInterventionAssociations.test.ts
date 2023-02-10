@@ -22,7 +22,7 @@ describe('Student Intervention Association', () => {
             educationOrganizationId: 123,
           },
         })
-        .expect(400)
+        .expect(409)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {

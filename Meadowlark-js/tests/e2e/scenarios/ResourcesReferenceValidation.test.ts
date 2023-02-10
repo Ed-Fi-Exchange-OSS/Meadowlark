@@ -23,7 +23,7 @@ describe('When creating a resource that has a reference to another resource', ()
             maximumNumberOfSeats: 20,
             optimalNumberOfSeats: 10,
           })
-          .expect(400)
+          .expect(409)
           .then((response) => {
             expect(response.body).toMatchInlineSnapshot(`
               {
