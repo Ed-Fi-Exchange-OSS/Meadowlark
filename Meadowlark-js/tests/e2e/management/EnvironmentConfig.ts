@@ -5,7 +5,7 @@
 
 import path from 'path';
 
-import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
+import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
 import fs from 'fs-extra';
 
 let apiWriteStream: fs.WriteStream;
@@ -37,6 +37,14 @@ async function setLogTracing() {
   mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
 }
 
+async function setMongoUser(mongoContainer: StartedTestContainer) {
+  await mongoContainer.exec(['./scripts/mongo-rs-setup.sh']);
+  await new Promise((r) => {
+    setTimeout(r, 30 * 1000);
+  });
+  await mongoContainer.exec(['./scripts/mongo-user-setup.sh']);
+}
+
 export async function configure() {
   const composeFilePath = path.resolve(process.cwd(), './tests/e2e/setup/');
   const composeFile = 'docker-compose.yml';
@@ -46,14 +54,6 @@ export async function configure() {
     .up();
 
   await setLogTracing();
-
   const mongoContainer = environment.getContainer(mongoContainerName);
-
-  await mongoContainer.exec(['./scripts/mongo-rs-setup.sh']);
-
-  await new Promise((r) => {
-    setTimeout(r, 30 * 1000);
-  });
-
-  await mongoContainer.exec(['./scripts/mongo-user-setup.sh']);
+  await setMongoUser(mongoContainer);
 }
