@@ -8,7 +8,7 @@ services:
     container_name: meadowlark-api-test
     hostname: api-test
     ports:
-      - ${FASTIFY_PORT:-3001}:3000
+      - ${FASTIFY_PORT:-3001}:3001
     environment:
       OAUTH_SIGNING_KEY: ${OAUTH_SIGNING_KEY}
       OAUTH_HARD_CODED_CREDENTIALS_ENABLED: true
@@ -22,7 +22,7 @@ services:
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "@edfi/meadowlark-opensearch-backend"
       LISTENER1_PLUGIN: "@edfi/meadowlark-opensearch-backend"
-      MONGO_URL: ${MONGODB_URI:-mongodb://mongo:${MONGODB_PASS}==@mongo-t1:27020,mongo-t2:27021,mongo-t3:27022/?replicaSet=rs0}
+      MONGO_URL: ${MONGODB_URI:-mongodb://mongo:rVG3LRFZHfdZdg==@mongo-t1:27017,mongo-t2:27018/?replicaSet=testreplica}
       FASTIFY_RATE_LIMIT: false
       FASTIFY_PORT: ${FASTIFY_PORT:-3001}
       FASTIFY_NUM_THREADS: 10
@@ -61,7 +61,7 @@ services:
     container_name: mongo-test1
     hostname: mongo-t1
     ports:
-      - ${MONGO_PORT:-27020}:27017
+      - ${MONGO_PORT:-27027}:27017
     restart: unless-stopped
     environment:
       - ADMIN_USERNAME=mongo
@@ -77,7 +77,7 @@ services:
         "/usr/bin/mongod",
         "--bind_ip_all",
         "--replSet",
-        "rs0",
+        "testreplica",
         "--journal",
         "--dbpath",
         "/data/db",
@@ -89,7 +89,7 @@ services:
     volumes:
       - mongo-test-data1:/data/db
       - mongo-test-log1:/var/log/mongodb
-      - mongo-test-auth:/auth
+      - mongo-ml-local-auth:/auth
       - ./scripts:/scripts
 
   # Secondary MongoDB node
@@ -98,14 +98,14 @@ services:
     container_name: mongo-test2
     hostname: mongo-t2
     ports:
-      - ${MONGO_PORT:-27021}:27017
+      - ${MONGO_PORT:-27028}:27018
     restart: unless-stopped
     command:
       [
         "/usr/bin/mongod",
         "--bind_ip_all",
         "--replSet",
-        "rs0",
+        "testreplica",
         "--journal",
         "--dbpath",
         "/data/db",
@@ -119,36 +119,7 @@ services:
     volumes:
       - mongo-test-data2:/data/db
       - mongo-test-log2:/var/log/mongodb
-      - mongo-test-auth:/auth
-
-  # Secondary MongoDB node
-  mongo-t3:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
-    container_name: mongo-test3
-    hostname: mongo-t3
-    ports:
-      - ${MONGO_PORT:-27022}:27017
-    restart: unless-stopped
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--port",
-        "27019",
-        "--keyFile",
-        "/auth/file.key"
-      ]
-    volumes:
-      - mongo-test-data3:/data/db
-      - mongo-test-log3:/var/log/mongodb
-      - mongo-test-auth:/auth
+      - mongo-ml-local-auth:/auth
 
   postgres-test:
     container_name: postgres-test
@@ -175,13 +146,7 @@ volumes:
   mongo-test-log2:
     labels:
       edfi-test: local
-  mongo-test-data3:
-    labels:
-      edfi-test: local
-  mongo-test-log3:
-    labels:
-      edfi-test: local
-  mongo-test-auth:
+  mongo-ml-local-auth:
     external: true
   opensearch-test-data:
     labels:

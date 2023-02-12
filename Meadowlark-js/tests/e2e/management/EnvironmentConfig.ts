@@ -37,12 +37,25 @@ async function setLogTracing() {
   mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
 }
 
+async function executeCommand(container: StartedTestContainer, script: string[]) {
+  await container.exec(script).then((result) => {
+    console.log(result);
+
+    if (result.exitCode !== 0) {
+      console.error(result.output);
+      throw result.output;
+    }
+  });
+}
+
 async function setMongoUser(mongoContainer: StartedTestContainer) {
-  await mongoContainer.exec(['./scripts/mongo-rs-setup.sh']);
+  await executeCommand(mongoContainer, ['./scripts/mongo-rs-setup.sh']);
+
   await new Promise((r) => {
     setTimeout(r, 30 * 1000);
   });
-  await mongoContainer.exec(['./scripts/mongo-user-setup.sh']);
+
+  await executeCommand(mongoContainer, ['./scripts/mongo-user-setup.sh']);
 }
 
 export async function configure() {
@@ -53,7 +66,9 @@ export async function configure() {
     .withStartupTimeout(30 * 1000)
     .up();
 
+  console.debug('ℹ Setting log tracing');
   await setLogTracing();
   const mongoContainer = environment.getContainer(mongoContainerName);
+  console.debug('ℹ Setting up mongo user');
   await setMongoUser(mongoContainer);
 }
