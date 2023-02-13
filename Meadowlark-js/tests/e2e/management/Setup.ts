@@ -9,7 +9,7 @@ const dotenv = require('dotenv');
 const credentialManager = require('../helpers/Credentials');
 const setupEnvironment = require('./EnvironmentConfig');
 
-dotenv.config({ path: path.join(__dirname, '../setup/e2e.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 module.exports = async () => {
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;

@@ -169,7 +169,7 @@ jobs:
             {
               type: "Integration",
               command: "npm run test:integration -- --ci --config ./jest.ci-config.js",
-            }
+            },
           ]
 
     steps:
@@ -293,7 +293,7 @@ jobs:
 
       - name: End to End tests for ${{matrix.config.db}}
         run: |
-          cp ./tests/e2e/automation-setup/e2e.env ./tests/e2e/.env
+          cp ./tests/e2e/setup/e2e.env ./tests/e2e/.env
           npm run test:e2e -- --ci
         env:
           JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
