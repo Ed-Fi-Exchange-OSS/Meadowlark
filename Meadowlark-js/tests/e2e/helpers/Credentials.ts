@@ -149,7 +149,7 @@ async function createAdminClient(): Promise<{ key: string; secret: string }> {
       clientName: 'Admin Client',
       roles: ['admin'],
     })
-    .then(async (response) => {
+    .then((response) => {
       if (response.status === 401) {
         return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
       }

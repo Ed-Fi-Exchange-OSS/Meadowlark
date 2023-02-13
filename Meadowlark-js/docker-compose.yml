@@ -92,9 +92,6 @@ services:
     ports:
       - 27027:27017
     restart: unless-stopped
-    environment:
-      - ADMIN_USERNAME=mongo
-      - ADMIN_PASSWORD=${MONGODB_PASS}
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
       interval: 10s

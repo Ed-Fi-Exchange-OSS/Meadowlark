@@ -28,7 +28,7 @@ export async function serviceFactory(worker: number) {
   process.once('SIGTERM', closeGracefully);
 
   try {
-    const address: string = await service.listen(process.env.FASTIFY_PORT ?? 3000, '0.0.0.0');
+    const address: string = await service.listen(Config.get('FASTIFY_PORT'), '0.0.0.0');
     Logger.info(`🚀  Starting Meadowlark API at ${address}/${Config.get('MEADOWLARK_STAGE')} for worker ${worker}`, null);
   } catch (err) {
     service.log.error(err);
