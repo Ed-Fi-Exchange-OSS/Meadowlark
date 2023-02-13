@@ -1,0 +1,386 @@
+
+##### START AUTHENTICATION SETUP
+
+###
+@admin_client_id=meadowlark_admin_key_1
+@admin_client_secret=meadowlark_admin_secret_1
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
+# @name client1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
+}
+
+###
+@auth_header=Authorization: bearer {{client1.response.body.$.access_token}}
+
+# Setup: 
+## create a school and a student, also the descriptors
+## necessary to get there
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "All Levels",
+    "shortDescription": "All Levels",
+    "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/GradeLevelDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "First Grade",
+    "shortDescription": "First Grade",
+    "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Other",
+    "shortDescription": "Other",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+
+### 
+# @name school124
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+{{auth_header}}
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+###
+@schoolDocumentLocation = {{school124.response.headers.location}}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/countryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "US",
+    "shortDescription": "US",
+    "namespace": "uri://ed-fi.org/CountryDescriptor"
+}
+
+
+###
+# @name studentabc
+POST  http://localhost:3000/local/v3.3b/ed-fi/students/
+content-type: application/json
+{{auth_header}}
+
+{ 
+    "studentUniqueId": "abc124",
+    "firstName": "Hello",
+    "lastSurname": "World",
+    "birthDate": "2001-01-01",
+    "birthCountryDescriptor": "uri://ed-fi.org/CountryDescriptor#US"
+}
+
+# Scenario 1
+## Test: create a Local Education Agency with the same id as the school above.
+## Expect: 409
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/LocalEducationAgencyCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Independent",
+    "shortDescription": "Independent",
+    "namespace": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Local Education Agency",
+    "shortDescription": "Local Education Agency",
+    "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+### 
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
+content-type: application/json
+{{auth_header}}
+
+{
+    "localEducationAgencyId": 124,
+    "nameOfInstitution": "A LEA",
+    "categories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "something"
+        }
+    ],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+## Did the above get a 409 as desired??
+
+
+
+# Scenario 2
+## Test: Update the School to reference an LEA that doesn't exist. Try both PUT and POST
+## Expect: 409
+
+###
+PUT http://localhost:3000{{schoolDocumentLocation}}
+content-type: application/json
+{{auth_header}}
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ],
+    "localEducationAgencyReference": {
+        "localEducationAgencyId": 124
+    }
+}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+{{auth_header}}
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ],
+    "localEducationAgencyReference": {
+        "localEducationAgencyId": 124
+    }
+}
+
+# Scenario 3
+## Setup: Create an LEA with a proper ID and update the school to reference it.
+## Test: Delete the LEA
+## Expect: 409
+
+### 
+# @name lea12
+POST http://localhost:3000/local/v3.3b/ed-fi/localEducationAgencies
+content-type: application/json
+{{auth_header}}
+
+{
+    "localEducationAgencyId": 120,
+    "nameOfInstitution": "A LEA",
+    "categories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "localEducationAgencyCategoryDescriptor": "uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent"
+}
+
+###
+@leaDocumentLocation = {{lea12.response.headers.location}}
+
+###
+PUT http://localhost:3000{{schoolDocumentLocation}}
+content-type: application/json
+{{auth_header}}
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ],
+    "localEducationAgencyReference": {
+        "localEducationAgencyId": 120
+    }
+}
+
+
+### 
+DELETE http://localhost:3000{{leaDocumentLocation}}
+{{auth_header}}
+
+## Did that get a 409 as expected? Did it list the blocking URIs correctly?
+
+
+## Scenario 4
+## Test: Create a StudentEducationOrganizationAssociation where neither the student nor the edorg exists.
+## Expect: 409, and the message body mentions both the student and the edorg
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/SexDescriptors
+content-type: application/json
+{{auth_header}}
+
+{
+    "codeValue": "Female",
+    "shortDescription": "Female",
+    "namespace": "uri://ed-fi.org/SexDescriptor"
+}
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
+content-type: application/json
+{{auth_header}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "xxxxx"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 1
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+## Scenario 5
+## Test: Create a StudentEducationOrganizationAssociation where the student does not exist.
+## Expect: 409, and the message body mentions only the student 
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
+content-type: application/json
+{{auth_header}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc12"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 124
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
+
+## Scenario 5
+## Test: Create a StudentEducationOrganizationAssociation where the edorg does not exist.
+## Expect: 409, and the message body mentions only the edorg 
+
+
+####
+POST http://localhost:3000/local/v3.3b/ed-fi/studentEducationOrganizationAssociations
+content-type: application/json
+{{auth_header}}
+
+{ 
+    "studentReference": {
+        "studentUniqueId": "abc124"
+    },
+    "educationOrganizationReference": {
+        "educationOrganizationId": 1
+    },
+    "sexDescriptor": "uri://ed-fi.org/SexDescriptor#Female"
+}
