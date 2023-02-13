@@ -4,7 +4,11 @@ services:
   # Meadowlark API
   meadowlark-api-test:
     # requires a local build, `npm run docker:build`.
-    image: meadowlark:latest
+    # image: meadowlark:latest
+    # build the image
+    build:
+      context: ../../../
+      dockerfile: Dockerfile
     container_name: meadowlark-api-test
     hostname: api-test
     ports:
@@ -51,8 +55,6 @@ services:
       DISABLE_SECURITY_PLUGIN: "true"
     ports:
       - ${OPENSEARCH_PORT:-8200}:9200
-    volumes:
-      - opensearch-test-data:/usr/share/opensearch/data
     restart: unless-stopped
 
   # Primary MongoDB node

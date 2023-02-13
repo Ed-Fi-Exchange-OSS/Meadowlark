@@ -17,5 +17,4 @@ dynamodb_local_data/
 # jest-mongodb
 globalConfig.json
 
-mongo.log
-meadowlark-api.log
+*.log

@@ -10,10 +10,12 @@ import fs from 'fs-extra';
 
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
+let opSearchWriteStream: fs.WriteStream;
 let environment: StartedDockerComposeEnvironment;
 
 const mongoContainerName = 'mongo-test1';
 const apiContainerName = 'meadowlark-api-test';
+const opSearchContainerName = 'opensearch-test';
 
 export async function stop() {
   if (apiWriteStream) {
@@ -21,6 +23,9 @@ export async function stop() {
   }
   if (mongoWriteStream) {
     mongoWriteStream.end();
+  }
+  if (opSearchWriteStream) {
+    opSearchWriteStream.end();
   }
   await environment.down();
 }
@@ -35,12 +40,15 @@ async function setLogTracing() {
   mongoWriteStream = fs.createWriteStream('./tests/e2e/mongo.log');
 
   mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
+
+  const osStream = await environment.getContainer(opSearchContainerName).logs();
+  opSearchWriteStream = fs.createWriteStream('./tests/e2e/openSearch.log');
+
+  osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
 }
 
 async function executeCommand(container: StartedTestContainer, script: string[]) {
   await container.exec(script).then((result) => {
-    console.log(result);
-
     if (result.exitCode !== 0) {
       console.error(result.output);
       throw result.output;
