@@ -15,7 +15,7 @@ services:
       - ${FASTIFY_PORT:-3001}:3001
     environment:
       OAUTH_SIGNING_KEY: ${OAUTH_SIGNING_KEY}
-      OAUTH_HARD_CODED_CREDENTIALS_ENABLED: true
+      OAUTH_HARD_CODED_CREDENTIALS_ENABLED: 'true'
       OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH: meadowlark_verify-only_key_1
       OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH: meadowlark_verify-only_secret_1
       OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: http://localhost:${FASTIFY_PORT:-3001}/local/oauth/token
@@ -27,17 +27,17 @@ services:
       QUERY_HANDLER_PLUGIN: "@edfi/meadowlark-opensearch-backend"
       LISTENER1_PLUGIN: "@edfi/meadowlark-opensearch-backend"
       MONGO_URL: ${MONGODB_URI:-mongodb://mongo:rVG3LRFZHfdZdg==@mongo-t1:27017,mongo-t2:27018/?replicaSet=testreplica}
-      FASTIFY_RATE_LIMIT: false
+      FASTIFY_RATE_LIMIT: 'false'
       FASTIFY_PORT: ${FASTIFY_PORT:-3001}
       FASTIFY_NUM_THREADS: 10
       MEADOWLARK_STAGE: local
       LOG_LEVEL: info
-      IS_LOCAL: false
+      IS_LOCAL: 'false'
       AUTHORIZATION_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
       BEGIN_ALLOWED_SCHOOL_YEAR: 2022
       END_ALLOWED_SCHOOL_YEAR: 2034
-      ALLOW_TYPE_COERCION: true
-      ALLOW__EXT_PROPERTY: true
+      ALLOW_TYPE_COERCION: 'true'
+      ALLOW__EXT_PROPERTY: 'true'
     restart: unless-stopped
     healthcheck:
       test: curl -s http://localhost:${FASTIFY_PORT:-3001}/local >/dev/null || exit 1
