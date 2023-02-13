@@ -24,7 +24,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   /**
    * The identity elements extracted from the API document.
    */
-  documentIdentity: DocumentIdentity;
+  meadowlarkIdentity: DocumentIdentity;
 
   /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
@@ -52,7 +52,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * An array of ids extracted from the ODS/API document for all externally
    * referenced documents.
    */
-  outboundRefs: string[];
+  outboundRefs: object[];
 
   /**
    * An array of ids this document will satisfy when reference validation performs existence checks.

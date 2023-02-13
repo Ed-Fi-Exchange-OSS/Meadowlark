@@ -5,6 +5,7 @@
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
+import { v4 as uuidv4 } from 'uuid';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
@@ -76,4 +77,8 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
  */
 export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
   return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`;
+}
+
+export function getResourceId(): string {
+  return `${toHash(uuidv4().toString(), 28)}`;
 }

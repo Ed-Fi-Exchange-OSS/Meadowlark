@@ -6,7 +6,7 @@
 import R from 'ramda';
 import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { documentIdForDocumentInfo } from '../model/DocumentInfo';
+import { documentIdForDocumentInfo, getResourceIdForDocument } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
 import type { UpsertRequest } from '../message/UpsertRequest';
@@ -27,9 +27,11 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     writeRequestToLog(moduleName, frontendRequest, 'upsert');
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const resourceId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+    const resourceId = getResourceIdForDocument();
+    const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
     const request: UpsertRequest = {
       id: resourceId,
+      meadowlarkId,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,

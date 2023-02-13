@@ -3,8 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
+import { writeRequestToLog } from '../Logger';
+// import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ValidateResourceIdMiddleware';
@@ -23,7 +23,7 @@ export async function resourceIdValidation({
   // If no resource id in request, there is nothing to validate
   if (frontendRequest.middleware.pathComponents.resourceId == null) return { frontendRequest, frontendResponse: null };
 
-  if (
+  /* if (
     !isDocumentIdValidForResource(
       frontendRequest.middleware.pathComponents.resourceId,
       frontendRequest.middleware.resourceInfo,
@@ -42,6 +42,6 @@ export async function resourceIdValidation({
       frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },
     };
   }
-
+*/
   return { frontendRequest, frontendResponse: null };
 }
