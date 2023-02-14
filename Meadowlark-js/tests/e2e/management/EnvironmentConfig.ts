@@ -8,18 +8,18 @@ import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
 import fs from 'fs-extra';
 
-const mongoSetup = require('@shelf/jest-mongodb/lib/setup');
-
+let environment: StartedDockerComposeEnvironment;
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
 let opSearchWriteStream: fs.WriteStream;
-let environment: StartedDockerComposeEnvironment;
+let pgWriteStream: fs.WriteStream;
 
 const mongoContainerName = 'mongo-test1';
 const apiContainerName = 'meadowlark-api-test';
 const opSearchContainerName = 'opensearch-test';
+const pgContainerName = 'postgres-test';
 
-export async function stop() {
+function endLog() {
   if (apiWriteStream) {
     apiWriteStream.end();
   }
@@ -29,6 +29,15 @@ export async function stop() {
   if (opSearchWriteStream) {
     opSearchWriteStream.end();
   }
+  if (pgWriteStream) {
+    pgWriteStream.end();
+  }
+}
+
+export async function stop() {
+  endLog();
+  console.info('-- Tearing down environment --');
+  await environment.stop();
   await environment.down();
 }
 
@@ -47,6 +56,11 @@ async function setLogTracing() {
   opSearchWriteStream = fs.createWriteStream('./tests/e2e/logs/openSearch.log');
 
   osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+
+  const pgStream = await environment.getContainer(pgContainerName).logs();
+  pgWriteStream = fs.createWriteStream('./tests/e2e/logs/pg.log');
+
+  pgStream.on('data', (line) => pgWriteStream.write(line)).on('err', (line) => pgWriteStream.write(line));
 }
 
 async function executeCommand(container: StartedTestContainer, script: string[]): Promise<string> {
@@ -69,11 +83,7 @@ async function setMongoUser(mongoContainer: StartedTestContainer) {
   await executeCommand(mongoContainer, ['./scripts/mongo-user-setup.sh']);
 }
 
-export async function configure(_config) {
-  // This is required by the jest-mongodb preset although not used. This should be removed
-  // once we have separate projects to handle the configuration
-  await mongoSetup(_config);
-
+export async function configure() {
   const composeFilePath = path.resolve(process.cwd(), './tests/e2e/setup/');
   const composeFile = 'docker-compose.yml';
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
