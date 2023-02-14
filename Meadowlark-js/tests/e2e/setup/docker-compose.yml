@@ -3,8 +3,7 @@ version: '3.8'
 services:
   # Meadowlark API
   meadowlark-api-test:
-    # requires a local build, `npm run docker:build`.
-    # image: meadowlark:latest
+    # image: meadowlark:latest # requires a local build, `npm run docker:build`.
     # build the image
     build:
       context: ../../../
@@ -22,22 +21,18 @@ services:
       OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: http://localhost:${FASTIFY_PORT:-3001}/local/oauth/verify
       OPENSEARCH_USERNAME: admin
       OPENSEARCH_PASSWORD: admin
-      OPENSEARCH_ENDPOINT: http://opensearch:${OPENSEARCH_PORT:-8200}
+      OPENSEARCH_ENDPOINT: http://opensearch-test:9200
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
-      QUERY_HANDLER_PLUGIN: "@edfi/meadowlark-opensearch-backend"
-      LISTENER1_PLUGIN: "@edfi/meadowlark-opensearch-backend"
-      MONGO_URL: ${MONGODB_URI:-mongodb://mongo:rVG3LRFZHfdZdg==@mongo-t1:27017,mongo-t2:27018/?replicaSet=testreplica}
+      QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend'
+      LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend'
+      MONGO_URL: mongodb://mongo:${MONGODB_PASS}@mongo-t1:27017,mongo-t2:27018/?replicaSet=tr0
       FASTIFY_RATE_LIMIT: 'false'
       FASTIFY_PORT: ${FASTIFY_PORT:-3001}
-      FASTIFY_NUM_THREADS: 10
-      MEADOWLARK_STAGE: local
-      LOG_LEVEL: info
+      FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}
+      MEADOWLARK_STAGE: 'local'
+      LOG_LEVEL: ${LOG_LEVEL:-info}
       IS_LOCAL: 'false'
-      AUTHORIZATION_STORE_PLUGIN: "@edfi/meadowlark-mongodb-backend"
-      BEGIN_ALLOWED_SCHOOL_YEAR: 2022
-      END_ALLOWED_SCHOOL_YEAR: 2034
-      ALLOW_TYPE_COERCION: 'true'
-      ALLOW__EXT_PROPERTY: 'true'
+      AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend'
     restart: unless-stopped
     healthcheck:
       test: curl -s http://localhost:${FASTIFY_PORT:-3001}/local >/dev/null || exit 1
@@ -47,14 +42,25 @@ services:
 
   # OpenSearch backend
   opensearch-test:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf
     container_name: opensearch-test
+    hostname: opensearch-test
     environment:
       discovery.type: single-node
       DISABLE_INSTALL_DEMO_CONFIG: "true"
       DISABLE_SECURITY_PLUGIN: "true"
+    mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-test-data:/usr/share/opensearch/data
     ports:
-      - ${OPENSEARCH_PORT:-8200}:9200
+      - ${OPENSEARCH_PORT:-9200}:9200
     restart: unless-stopped
 
   # Primary MongoDB node
@@ -79,7 +85,7 @@ services:
         "/usr/bin/mongod",
         "--bind_ip_all",
         "--replSet",
-        "testreplica",
+        "tr0",
         "--journal",
         "--dbpath",
         "/data/db",
@@ -100,14 +106,14 @@ services:
     container_name: mongo-test2
     hostname: mongo-t2
     ports:
-      - ${MONGO_PORT:-27028}:27018
+      - 27028:27018
     restart: unless-stopped
     command:
       [
         "/usr/bin/mongod",
         "--bind_ip_all",
         "--replSet",
-        "testreplica",
+        "tr0",
         "--journal",
         "--dbpath",
         "/data/db",

@@ -74,9 +74,9 @@ export async function configure() {
     .withStartupTimeout(30 * 1000)
     .up();
 
-  console.debug('ℹ Setting log tracing');
+  console.debug('-- Setting log tracing --');
   await setLogTracing();
   const mongoContainer = environment.getContainer(mongoContainerName);
-  console.debug('ℹ Setting up mongo user');
+  console.debug('-- Setting up mongo user --');
   await setMongoUser(mongoContainer);
 }

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-mongo <<EOF
+mongo  <<EOF
 var cfg = {
-    "_id": "testreplica",
+    "_id": "tr0",
     "protocolVersion": 1,
     "version": 1,
     "members": [

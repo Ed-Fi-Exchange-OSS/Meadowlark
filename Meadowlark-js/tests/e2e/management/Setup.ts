@@ -17,13 +17,13 @@ module.exports = async () => {
   console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 
   try {
-    console.debug('ℹ Configuring environment');
+    console.debug('\n-- Configuring environment --');
     await setupEnvironment.configure();
   } catch (error) {
     throw new Error(`Unexpected error setting up environment.\n${error}`);
   }
 
-  console.debug('ℹ Authenticating Users');
+  console.debug('-- Authenticating Users --');
   await credentialManager.authenticateAdmin();
   await credentialManager.createAutomationUsers();
 };
