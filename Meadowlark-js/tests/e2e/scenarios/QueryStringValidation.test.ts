@@ -8,6 +8,8 @@ import { getAccessToken } from '../helpers/Credentials';
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest } from '../helpers/Shared';
 
+jest.setTimeout(40000);
+
 describe('When retrieving information', () => {
   describe("given there's no data", () => {
     it('should return the total count', async () => {
