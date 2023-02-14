@@ -19,18 +19,18 @@ export async function extractDocumentInfo(
   body: object,
   matchingMetaEdModel: TopLevelEntity,
 ): Promise<DocumentInfo> {
-  const documentIdentity: DocumentIdentity = extractDocumentIdentity(matchingMetaEdModel, body);
+  const meadowlarkIdentity: DocumentIdentity = extractDocumentIdentity(matchingMetaEdModel, body);
 
   let superclassInfo: SuperclassInfo | null = null;
   if (!resourceInfo.isDescriptor) {
     // We need to do this even if no body for deletes
-    superclassInfo = deriveSuperclassInfoFrom(matchingMetaEdModel, documentIdentity);
+    superclassInfo = deriveSuperclassInfoFrom(matchingMetaEdModel, meadowlarkIdentity);
   }
 
   return {
     documentReferences: extractDocumentReferences(matchingMetaEdModel, body),
     descriptorReferences: extractDescriptorValues(matchingMetaEdModel, body),
-    documentIdentity,
+    meadowlarkIdentity,
     superclassInfo,
   };
 }

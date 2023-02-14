@@ -238,7 +238,7 @@ function documentReferencesFromReferenceGroup(
 
   const result: DocumentReference[] = [];
 
-  documentIdentities.forEach((documentIdentity) => {
+  documentIdentities.forEach((meadowlarkIdentity) => {
     let resourceName = referenceGroup.sourceProperty.metaEdName;
     if (referenceGroup.sourceProperty.type === 'descriptor') {
       resourceName = normalizeDescriptorSuffix(resourceName);
@@ -247,7 +247,7 @@ function documentReferencesFromReferenceGroup(
     result.push({
       projectName: referenceGroup.sourceProperty.namespace.projectName,
       resourceName,
-      documentIdentity,
+      meadowlarkIdentity,
       isDescriptor: false,
     });
   });

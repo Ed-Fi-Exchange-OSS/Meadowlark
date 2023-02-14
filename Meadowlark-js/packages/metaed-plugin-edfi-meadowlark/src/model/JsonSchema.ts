@@ -68,7 +68,12 @@ export function newSchemaRoot(): SchemaRoot {
     title: '',
     description: '',
     type: 'object',
-    properties: {},
+    properties: {
+      id: {
+        type: 'string',
+        description: 'The item id',
+      },
+    },
     additionalProperties: false,
   };
 }

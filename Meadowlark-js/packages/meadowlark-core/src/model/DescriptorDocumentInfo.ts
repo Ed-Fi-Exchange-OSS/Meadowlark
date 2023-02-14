@@ -22,6 +22,6 @@ export function descriptorDocumentIdentityFrom(descriptorDocument: DescriptorDoc
 export function descriptorDocumentInfoFrom(descriptorDocument: DescriptorDocument): DocumentInfo {
   return {
     ...newDocumentInfo(),
-    documentIdentity: descriptorDocumentIdentityFrom(descriptorDocument),
+    meadowlarkIdentity: descriptorDocumentIdentityFrom(descriptorDocument),
   };
 }

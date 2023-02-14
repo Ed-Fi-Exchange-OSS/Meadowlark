@@ -65,7 +65,7 @@ export function findMissingReferences(
 
   return pickedDocumentReferencesOfMissing.map((reference) => ({
     resourceName: reference.resourceName,
-    identity: reference.documentIdentity,
+    identity: reference.meadowlarkIdentity,
   }));
 }
 

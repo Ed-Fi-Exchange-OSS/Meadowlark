@@ -39,7 +39,7 @@ function extractForDescriptorCollection(
         resourceVersion: collectedProperty.property.namespace.projectVersion,
         resourceName: apiMapping.metaEdName,
         isAssignableFrom: false,
-        documentIdentity: {
+        meadowlarkIdentity: {
           descriptor:
             bodyDescriptorObject[prefixedName(apiMapping.descriptorCollectionName, collectedProperty.propertyModifier)],
         },
@@ -64,7 +64,7 @@ function extractDescriptorValuesFromBody(
     {
       projectName: collectedProperty.property.namespace.projectName,
       resourceName: normalizeDescriptorSuffix(apiMapping.metaEdName),
-      documentIdentity: { descriptor: body[bodyDescriptorName] },
+      meadowlarkIdentity: { descriptor: body[bodyDescriptorName] },
       isDescriptor: true,
     },
   ];

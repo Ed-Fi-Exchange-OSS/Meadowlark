@@ -127,7 +127,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
 
       const upsertRequest: UpsertRequest = {
         id: getResourceIdForDocument(),
-        meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
+        meadowlarkIdentity: documentIdForDocumentInfo(resourceInfo, documentInfo),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,
@@ -141,7 +141,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       await afterUpsertDocument(upsertRequest, upsertResult);
 
       Logger.debug(
-        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
+        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.meadowlarkIdentity)}: ${
           upsertResult.failureMessage ?? 'OK'
         }`,
         '-',
@@ -150,7 +150,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       if (!(upsertResult.response === 'INSERT_SUCCESS' || upsertResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
           `Attempt to load descriptor ${descriptorName} with identity ${JSON.stringify(
-            documentInfo.documentIdentity,
+            documentInfo.meadowlarkIdentity,
           )} failed: ${upsertResult.failureMessage}`,
           'n/a',
         );

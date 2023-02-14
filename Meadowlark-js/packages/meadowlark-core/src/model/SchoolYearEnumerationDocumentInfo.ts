@@ -26,6 +26,6 @@ export function schoolYearEnumerationDocumentInfoFrom(
 ): DocumentInfo {
   return {
     ...newDocumentInfo(),
-    documentIdentity: schoolYearEnumerationDocumentIdentityFrom(schoolYearEnumerationDocument),
+    meadowlarkIdentity: schoolYearEnumerationDocumentIdentityFrom(schoolYearEnumerationDocument),
   };
 }

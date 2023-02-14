@@ -52,7 +52,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * An array of ids extracted from the ODS/API document for all externally
    * referenced documents.
    */
-  outboundRefs: object[];
+  outboundRefs: string[];
 
   /**
    * An array of ids this document will satisfy when reference validation performs existence checks.
@@ -116,7 +116,7 @@ export function meadowlarkDocumentFrom(
   }
 
   return {
-    documentIdentity: documentInfo.documentIdentity,
+    meadowlarkIdentity: documentInfo.meadowlarkIdentity,
     projectName: resourceInfo.projectName,
     resourceName: resourceInfo.resourceName,
     resourceVersion: resourceInfo.resourceVersion,

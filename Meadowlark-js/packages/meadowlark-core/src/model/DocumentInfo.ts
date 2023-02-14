@@ -16,7 +16,7 @@ export interface DocumentInfo {
   /**
    * The identity elements extracted from the API document
    */
-  documentIdentity: DocumentIdentity;
+  meadowlarkIdentity: DocumentIdentity;
 
   /**
    * A list of the document references extracted from the API document
@@ -39,7 +39,7 @@ export interface DocumentInfo {
  */
 export function newDocumentInfo(): DocumentInfo {
   return {
-    documentIdentity: NoDocumentIdentity,
+    meadowlarkIdentity: NoDocumentIdentity,
     superclassInfo: null,
     documentReferences: [],
     descriptorReferences: [],
@@ -64,5 +64,13 @@ export function getResourceIdForDocument(): string {
  * Returns the id of the given DocumentInfo, using the project name, resource name and identity of the API document.
  */
 export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
-  return documentIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  return documentIdForDocumentIdentity(resourceInfo, documentInfo.meadowlarkIdentity);
+}
+
+/**
+ * Returns the id from the body.
+ */
+export function documentIdForDocumentBody(parsedBody: object): string {
+  const jsonFromBody = JSON.parse(JSON.stringify(parsedBody));
+  return jsonFromBody.id;
 }

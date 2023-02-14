@@ -26,7 +26,7 @@ export type DocumentReference = {
   /**
    * The document identity representing this reference.
    */
-  documentIdentity: DocumentIdentity;
+  meadowlarkIdentity: DocumentIdentity;
 };
 
 /**
@@ -40,6 +40,6 @@ export function documentIdForDocumentReference(documentReference: DocumentRefere
       resourceName: documentReference.resourceName,
       isDescriptor: documentReference.isDescriptor,
     },
-    documentReference.documentIdentity,
+    documentReference.meadowlarkIdentity,
   );
 }
