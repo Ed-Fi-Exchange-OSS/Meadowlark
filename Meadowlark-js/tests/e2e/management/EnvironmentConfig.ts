@@ -32,27 +32,28 @@ export async function stop() {
 
 async function setLogTracing() {
   const apiStream = await environment.getContainer(apiContainerName).logs();
-  apiWriteStream = fs.createWriteStream('./tests/e2e/meadowlark-api.log');
+  apiWriteStream = fs.createWriteStream('./tests/e2e/logs/meadowlark-api.log');
 
   apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
 
   const mongoStream = await environment.getContainer(mongoContainerName).logs();
-  mongoWriteStream = fs.createWriteStream('./tests/e2e/mongo.log');
+  mongoWriteStream = fs.createWriteStream('./tests/e2e/logs/mongo.log');
 
   mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
 
   const osStream = await environment.getContainer(opSearchContainerName).logs();
-  opSearchWriteStream = fs.createWriteStream('./tests/e2e/openSearch.log');
+  opSearchWriteStream = fs.createWriteStream('./tests/e2e/logs/openSearch.log');
 
   osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
 }
 
-async function executeCommand(container: StartedTestContainer, script: string[]) {
-  await container.exec(script).then((result) => {
+async function executeCommand(container: StartedTestContainer, script: string[]): Promise<string> {
+  return container.exec(script).then((result) => {
     if (result.exitCode !== 0) {
       console.error(result.output);
       throw result.output;
     }
+    return result.output;
   });
 }
 

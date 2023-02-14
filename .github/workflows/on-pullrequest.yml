@@ -291,6 +291,9 @@ jobs:
         if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
         run: npm run build
 
+      - name: Create key file
+        run: ./tests/e2e/setup/scripts/auth-key-file-setup.sh
+
       - name: End to End tests for ${{matrix.config.db}}
         run: |
           cp ./tests/e2e/setup/e2e.env ./tests/e2e/.env
@@ -301,3 +304,12 @@ jobs:
           OPENSEARCH_USERNAME: admin
           OPENSEARCH_PASSWORD: admin
           MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
+
+      - name: Docker logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+        with:
+          name: docker-logs
+          path: |
+            Meadowlark-js/tests/e2e/logs/
+          retention-days: 10
