@@ -292,7 +292,9 @@ jobs:
         run: npm run build
 
       - name: Create key file
-        run: ./tests/e2e/setup/scripts/auth-key-file-setup.sh
+        run: |
+          chmod +x ./tests/e2e/setup/scripts/auth-key-file-setup.sh
+          ./tests/e2e/setup/scripts/auth-key-file-setup.sh
 
       - name: End to End tests for ${{matrix.config.db}}
         run: |
