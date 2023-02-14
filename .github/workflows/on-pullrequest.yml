@@ -301,11 +301,7 @@ jobs:
           cp ./tests/e2e/setup/e2e.env ./tests/e2e/.env
           npm run test:e2e -- --ci
         env:
-          JEST_JUNIT_OUTPUT_DIR: ${{matrix.config.db}}-e2e-tests
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
-          OPENSEARCH_USERNAME: admin
-          OPENSEARCH_PASSWORD: admin
-          MONGO_URL: "mongodb://127.0.0.1:42069/?replicaSet=rs0"
 
       - name: Docker logs
         if: ${{ failure() }}
