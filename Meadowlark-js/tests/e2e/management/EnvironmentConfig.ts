@@ -8,6 +8,8 @@ import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
 import fs from 'fs-extra';
 
+const mongoSetup = require('@shelf/jest-mongodb/lib/setup');
+
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
 let opSearchWriteStream: fs.WriteStream;
@@ -67,7 +69,11 @@ async function setMongoUser(mongoContainer: StartedTestContainer) {
   await executeCommand(mongoContainer, ['./scripts/mongo-user-setup.sh']);
 }
 
-export async function configure() {
+export async function configure(_config) {
+  // This is required by the jest-mongodb preset although not used. This should be removed
+  // once we have separate projects to handle the configuration
+  await mongoSetup(_config);
+
   const composeFilePath = path.resolve(process.cwd(), './tests/e2e/setup/');
   const composeFile = 'docker-compose.yml';
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
