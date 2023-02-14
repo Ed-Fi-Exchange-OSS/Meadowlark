@@ -71,6 +71,53 @@ describe('given persistence is going to throw a reference error on insert', () =
   });
 });
 
+describe('given persistence is going to throw a conflict error on insert', () => {
+  let response: FrontendResponse;
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
+  let mockDocumentStore: any;
+  const expectedError = 'Error message';
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: async () =>
+        Promise.resolve({
+          response: 'INSERT_FAILURE_CONFLICT',
+          failureMessage: expectedError,
+          blockingDocuments: [expectedBlockingDocument],
+        }),
+    });
+
+    // Act
+    response = await upsert(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
+  });
+
+  it('returns an appropriate message', () => {
+    // it should NOT return the detailed message from the database - information leakage
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "blockingUris": [
+          "/v3.3b/ed-fi/resourceNames/documentId",
+        ],
+        "error": "Error message",
+      }
+    `);
+  });
+});
+
 describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {

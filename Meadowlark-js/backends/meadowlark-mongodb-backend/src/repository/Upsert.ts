@@ -34,10 +34,9 @@ export async function upsertDocument(
       // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
       if (isInsert && documentInfo.superclassInfo != null) {
         const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-        const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-          { aliasIds: superclassAliasId },
-          onlyReturnId(session),
-        );
+        const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({
+          aliasIds: superclassAliasId,
+        });
 
         if (superclassAliasIdInUse) {
           Logger.warn(
