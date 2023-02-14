@@ -154,12 +154,10 @@ describe('given persistence is going to throw a reference error on update though
   it('returns an appropriate message', () => {
     expect(response.body).toMatchInlineSnapshot(`
       {
-        "error": {
-          "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentId",
-          ],
-          "message": "Reference failure",
-        },
+        "blockingUris": [
+          "/v3.3b/ed-fi/resourceNames/documentId",
+        ],
+        "error": "Reference failure",
       }
     `);
   });
