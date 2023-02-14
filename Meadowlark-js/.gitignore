@@ -17,4 +17,4 @@ dynamodb_local_data/
 # jest-mongodb
 globalConfig.json
 
-*.log
+logs/
