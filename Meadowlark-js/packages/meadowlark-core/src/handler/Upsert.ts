@@ -64,7 +64,8 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, blockingUris.join(','));
       return {
-        body: { error: { message: failureMessage, blockingUris } },
+        // body: { error: { message: failureMessage, blockingUris } },
+        body: R.is(String, failureMessage) ? { error: failureMessage, blockingUris } : failureMessage,
         statusCode: 409,
         headers: headerMetadata,
       };
