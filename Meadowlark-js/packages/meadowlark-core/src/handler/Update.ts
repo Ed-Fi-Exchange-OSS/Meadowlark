@@ -13,6 +13,7 @@ import { UpdateRequest } from '../message/UpdateRequest';
 import { UpdateResult } from '../message/UpdateResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
+import { blockingDocumentsToUris } from './UriBuilder';
 
 const moduleName = 'core.handler.Update';
 
@@ -65,10 +66,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, 'reference error');
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'reference error');
       return {
-        body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
-        statusCode: 400,
+        body: R.is(String, failureMessage) ? { error: failureMessage, blockingUris } : failureMessage,
+        statusCode: 409,
         headers: headerMetadata,
       };
     }

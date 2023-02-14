@@ -9,6 +9,7 @@ import {
   DocumentReference,
   documentIdForDocumentReference,
   documentIdForSuperclassInfo,
+  BlockingDocument,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
@@ -19,6 +20,7 @@ import {
   insertAliasSql,
   deleteOutboundReferencesOfDocumentSql,
   insertOutboundReferencesSql,
+  findReferringDocumentInfoForErrorReportingSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -42,7 +44,7 @@ export async function updateDocumentById(
     const recordExistsResult = await client.query(findAliasIdsForDocumentSql(id));
 
     if (recordExistsResult.rowCount === 0) {
-      updateResult.response = 'UPDATE_FAILURE_NOT_EXISTS';
+      updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
       return updateResult;
     }
 
@@ -57,9 +59,20 @@ export async function updateDocumentById(
       // Abort on validation failure
       if (failures.length > 0) {
         Logger.debug(`${moduleName}.updateDocument: Inserting document id ${id} failed due to invalid references`, traceId);
+
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([id]));
+
+        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+          resourceName: document.resource_name,
+          documentId: document.document_id,
+          projectName: document.project_name,
+          resourceVersion: document.resource_version,
+        }));
+
         updateResult = {
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: { error: { message: 'Reference validation failed', failures } },
+          blockingDocuments,
         };
         await client.query('ROLLBACK');
         return updateResult;
@@ -102,7 +115,14 @@ export async function updateDocumentById(
 
     await client.query('COMMIT');
 
-    updateResult.response = result.rowCount && result.rowCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+    updateResult =
+      result.rowCount && result.rowCount > 0
+        ? {
+            response: 'UPDATE_SUCCESS',
+          }
+        : {
+            response: 'UPDATE_FAILURE_NOT_EXISTS',
+          };
   } catch (e) {
     await client.query('ROLLBACK');
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);

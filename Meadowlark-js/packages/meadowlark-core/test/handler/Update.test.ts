@@ -9,6 +9,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { documentIdForDocumentInfo } from '../../src/model/DocumentInfo';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
+import { BlockingDocument } from '../../src/message/BlockingDocument';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -62,6 +63,12 @@ describe('given the requested document does not exist', () => {
 
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
+  const expectedBlockingDocument: BlockingDocument = {
+    resourceName: 'resourceName',
+    documentId: 'documentId',
+    projectName: 'Ed-Fi',
+    resourceVersion: '3.3.1-b',
+  };
   const expectedError = 'this is the message';
   let response: FrontendResponse;
 
@@ -72,6 +79,7 @@ describe('given the new document has an invalid reference ', () => {
         Promise.resolve({
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: expectedError,
+          blockingDocuments: [expectedBlockingDocument],
         }),
     });
 
@@ -83,16 +91,19 @@ describe('given the new document has an invalid reference ', () => {
     mockDocumentStore.mockRestore();
   });
 
-  it('returns status 400', () => {
-    expect(response.statusCode).toEqual(400);
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
   });
 
   it('returns an appropriate message', () => {
     // it should NOT return the detailed message from the database - information leakage
     expect(response.body).toMatchInlineSnapshot(`
-      {
-        "error": "this is the message",
-      }
+    {
+      "blockingUris": [
+        "/v3.3b/ed-fi/resourceNames/documentId",
+      ],
+      "error": "this is the message",
+    }
     `);
   });
 });

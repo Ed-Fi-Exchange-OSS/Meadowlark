@@ -3,12 +3,17 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type UpdateResult = {
-  response:
-    | 'UPDATE_SUCCESS'
-    | 'UPDATE_FAILURE_REFERENCE'
-    | 'UPDATE_FAILURE_NOT_EXISTS'
-    | 'UPDATE_FAILURE_AUTHORIZATION'
-    | 'UNKNOWN_FAILURE';
+import { BlockingDocument } from './BlockingDocument';
+
+export type UpdateFailureReference = {
+  response: 'UPDATE_FAILURE_REFERENCE';
   failureMessage?: string | object;
+  blockingDocuments: BlockingDocument[];
 };
+
+export type UpdateResult =
+  | UpdateFailureReference
+  | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_NOT_EXISTS'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
+  | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };
