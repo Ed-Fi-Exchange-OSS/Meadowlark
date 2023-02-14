@@ -293,7 +293,7 @@ jobs:
 
       - name: Create key file
         run: |
-          chmod +x ./tests/e2e/setup/scripts/auth-key-file-setup.sh
+          chmod -R +x ./tests/e2e/setup/scripts/
           ./tests/e2e/setup/scripts/auth-key-file-setup.sh
 
       - name: End to End tests for ${{matrix.config.db}}
