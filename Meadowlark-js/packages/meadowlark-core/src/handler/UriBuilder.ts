@@ -12,8 +12,8 @@ import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
 /**
  * Derives the resource URI from the pathComponents and resourceId
  */
-export function resourceUriFrom(pathComponents: PathComponents, resourceId: string): string {
-  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.resourceName}/${resourceId}`;
+export function resourceUriFrom(pathComponents: PathComponents, documentUuid: string): string {
+  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.resourceName}/${documentUuid}`;
 }
 
 /**

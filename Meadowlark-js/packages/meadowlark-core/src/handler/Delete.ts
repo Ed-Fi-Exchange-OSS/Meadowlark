@@ -27,13 +27,13 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
   try {
     writeRequestToLog(moduleName, frontendRequest, 'deleteIt');
 
-    if (frontendRequest.middleware.pathComponents.resourceId == null) {
+    if (frontendRequest.middleware.pathComponents.documentUuid == null) {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
       return { statusCode: 404 };
     }
 
     const request: DeleteRequest = {
-      id: frontendRequest.middleware.pathComponents.resourceId,
+      id: frontendRequest.middleware.pathComponents.documentUuid,
       resourceInfo: frontendRequest.middleware.resourceInfo,
       validate: frontendRequest.middleware.validateResources,
       security: frontendRequest.middleware.security,

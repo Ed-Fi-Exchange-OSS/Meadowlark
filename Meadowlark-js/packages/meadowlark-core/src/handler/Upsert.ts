@@ -6,7 +6,7 @@
 import R from 'ramda';
 import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { documentIdForDocumentInfo } from '../model/DocumentInfo';
+import { documentIdForDocumentInfo, getDocumentUuidForDocument } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
 import type { UpsertRequest } from '../message/UpsertRequest';
@@ -27,9 +27,11 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     writeRequestToLog(moduleName, frontendRequest, 'upsert');
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const resourceId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+    const documentUuid = getDocumentUuidForDocument();
+    const meadowlarkIdentity = documentIdForDocumentInfo(resourceInfo, documentInfo);
     const request: UpsertRequest = {
-      id: resourceId,
+      id: documentUuid,
+      meadowlarkIdentity,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
@@ -48,7 +50,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
       return {
         statusCode: 201,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuid) },
       };
     }
 
@@ -56,7 +58,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
       return {
         statusCode: 200,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, resourceId) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuid) },
       };
     }
 

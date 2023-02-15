@@ -35,7 +35,7 @@ export async function rejectByOwnershipSecurity(
   }
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-  let id = frontendRequest.middleware.pathComponents.resourceId;
+  let id = frontendRequest.middleware.pathComponents.documentUuid;
 
   if (id == null) id = extractIdIfUpsert(frontendRequest);
 

@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isDocumentIdWellFormed } from '../validation/DocumentIdValidator';
+import { isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
 import type { MiddlewareModel } from './MiddlewareModel';
 
@@ -15,20 +15,20 @@ function pathComponentsFrom(path: string): PathComponents | null {
   // /v3.3b/ed-fi/Sections
   // /v3.3b/ed-fi/Sections/
   // /v3.3b/ed-fi/Sections/idValue
-  const pathExpression = /\/(?<version>[^/]+)\/(?<namespace>[^/]+)\/(?<resource>[^/]+)(\/|$)((?<resourceId>[^/]*$))?/gm;
+  const pathExpression = /\/(?<version>[^/]+)\/(?<namespace>[^/]+)\/(?<resource>[^/]+)(\/|$)((?<documentUuid>[^/]*$))?/gm;
   const match = pathExpression.exec(path);
 
   if (match?.groups == null) {
     return null;
   }
 
-  const { resourceId } = match.groups ?? null;
+  const { documentUuid } = match.groups ?? null;
 
   return {
     version: match.groups.version,
     namespace: match.groups.namespace,
     resourceName: match.groups.resource,
-    resourceId,
+    documentUuid,
   };
 }
 
@@ -48,9 +48,9 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
   }
 
   // Check for properly formed document id, if there is one
-  const { resourceId } = pathComponents;
-  if (resourceId != null && !isDocumentIdWellFormed(resourceId)) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${resourceId}`);
+  const { documentUuid } = pathComponents;
+  if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid)) {
+    writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${documentUuid}`);
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }
 
