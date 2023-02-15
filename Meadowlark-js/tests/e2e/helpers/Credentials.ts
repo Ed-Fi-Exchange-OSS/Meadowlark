@@ -173,6 +173,7 @@ function setCredentials({ key, secret }: { key: string; secret: string }) {
 export async function createAutomationUsers(): Promise<void> {
   await getClientCredentials('vendor');
   await getClientCredentials('host');
+  console.debug('-- Automation Users Created --');
 }
 
 export async function authenticateAdmin(): Promise<void> {
@@ -183,6 +184,7 @@ export async function authenticateAdmin(): Promise<void> {
     } else {
       await getAdminAccessToken();
     }
+    console.debug('-- Admin Authenticated --');
   } catch (error) {
     console.error(error);
     process.exit(1);
