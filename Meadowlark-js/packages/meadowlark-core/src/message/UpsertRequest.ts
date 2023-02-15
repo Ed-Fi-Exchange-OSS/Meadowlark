@@ -9,7 +9,7 @@ import { Security } from '../security/Security';
 
 export type UpsertRequest = {
   id: string;
-  meadowlarkIdentity: string;
+  meadowlarkId: string;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   edfiDoc: object;
