@@ -3,12 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, ClientSession, MongoClient } from 'mongodb';
-import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo } from '@edfi/meadowlark-core';
+import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
+import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo, BlockingDocument } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
-import { validateReferences } from './ReferenceValidation';
+import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
+
+// MongoDB FindOption to return at most 5 documents
+const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 const moduleName: string = 'mongodb.repository.Upsert';
 
@@ -31,8 +34,9 @@ export async function upsertDocument(
       // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
       if (isInsert && documentInfo.superclassInfo != null) {
         const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-        const superclassAliasIdInUse: boolean =
-          (await mongoCollection.findOne({ aliasIds: superclassAliasId }, onlyReturnId(session))) != null;
+        const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({
+          aliasIds: superclassAliasId,
+        });
 
         if (superclassAliasIdInUse) {
           Logger.warn(
@@ -43,6 +47,15 @@ export async function upsertDocument(
           upsertResult = {
             response: 'INSERT_FAILURE_CONFLICT',
             failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
+            blockingDocuments: [
+              {
+                // eslint-disable-next-line no-underscore-dangle
+                documentId: superclassAliasIdInUse._id,
+                resourceName: superclassAliasIdInUse.resourceName,
+                projectName: superclassAliasIdInUse.projectName,
+                resourceVersion: superclassAliasIdInUse.resourceVersion,
+              },
+            ],
           };
 
           await session.abortTransaction();
@@ -63,9 +76,22 @@ export async function upsertDocument(
         if (failures.length > 0) {
           Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id} failed due to invalid references`, traceId);
 
+          const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
+            .find(onlyDocumentsReferencing([id]), limitFive(session))
+            .toArray();
+
+          const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+            // eslint-disable-next-line no-underscore-dangle
+            documentId: document._id,
+            resourceName: document.resourceName,
+            projectName: document.projectName,
+            resourceVersion: document.resourceVersion,
+          }));
+
           upsertResult = {
             response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
             failureMessage: { error: { message: 'Reference validation failed', failures } },
+            blockingDocuments,
           };
 
           await session.abortTransaction();

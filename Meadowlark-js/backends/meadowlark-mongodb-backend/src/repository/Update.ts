@@ -3,12 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { UpdateResult, UpdateRequest } from '@edfi/meadowlark-core';
+import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { Collection, ClientSession, MongoClient } from 'mongodb';
+import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, writeLockReferencedDocuments } from './Db';
-import { validateReferences } from './ReferenceValidation';
+import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
+
+// MongoDB FindOption to return at most 5 documents
+const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 const moduleName: string = 'mongodb.repository.Update';
 
@@ -41,9 +44,22 @@ export async function updateDocumentById(
             traceId,
           );
 
+          const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
+            .find(onlyDocumentsReferencing([id]), limitFive(session))
+            .toArray();
+
+          const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+            // eslint-disable-next-line no-underscore-dangle
+            documentId: document._id,
+            resourceName: document.resourceName,
+            projectName: document.projectName,
+            resourceVersion: document.resourceVersion,
+          }));
+
           updateResult = {
             response: 'UPDATE_FAILURE_REFERENCE',
             failureMessage: { message: 'Reference validation failed', failures },
+            blockingDocuments,
           };
 
           await session.abortTransaction();

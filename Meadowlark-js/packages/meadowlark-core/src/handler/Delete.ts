@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-meadowlark';
 import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { getDocumentStore } from '../plugin/PluginLoader';
@@ -12,34 +11,12 @@ import { DeleteRequest } from '../message/DeleteRequest';
 import { DeleteResult } from '../message/DeleteResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
-import { BlockingDocument } from '../message/BlockingDocument';
-import { resourceUriFrom } from './UriBuilder';
-import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
+import { blockingDocumentsToUris } from './UriBuilder';
 
 const moduleName = 'core.handler.Delete';
 
 const DELETE_FAILURE_REFERENCE_MESSAGE: string =
   'The resource cannot be deleted because it is a dependency of other documents';
-
-/**
- * For generating problem details when a document references the document to be deleted.
- */
-function blockingDocumentsToUris(frontendRequest: FrontendRequest, blockingDocuments: BlockingDocument[]): string[] {
-  const result: string[] = [];
-  blockingDocuments.forEach((document) => {
-    let uri = resourceUriFrom(
-      {
-        version: versionAbbreviationFor(document.resourceVersion),
-        namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
-        resourceName: uncapitalize(pluralize(document.resourceName)),
-      },
-      document.documentId,
-    );
-    if (frontendRequest.stage !== '') uri = `/${frontendRequest.stage}${uri}`;
-    result.push(uri);
-  });
-  return result;
-}
 
 /**
  * Entry point for all API DELETE requests, which are "by id"
