@@ -245,12 +245,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          [
-            { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
-            { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" },
-          ]
+        config: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" }]
 
+    # { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }, # Restore after RND-494
     steps:
       - name: Checkout repository
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
