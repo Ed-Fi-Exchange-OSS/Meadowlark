@@ -9,7 +9,7 @@ import { Security } from '../security/Security';
 
 export type UpdateRequest = {
   id: string;
-  meadowlarkIdentity: string;
+  meadowlarkId: string;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   edfiDoc: object;

@@ -28,10 +28,10 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
     const documentUuid = getDocumentUuidForDocument();
-    const meadowlarkIdentity = documentIdForDocumentInfo(resourceInfo, documentInfo);
+    const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
     const request: UpsertRequest = {
       id: documentUuid,
-      meadowlarkIdentity,
+      meadowlarkId,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
