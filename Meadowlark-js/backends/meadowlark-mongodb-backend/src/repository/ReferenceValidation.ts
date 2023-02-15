@@ -92,7 +92,7 @@ export async function validateReferences(
 ): Promise<MissingIdentity[]> {
   const failures: MissingIdentity[] = [];
 
-  const referencedDocumentIds: string[] = documentReferences.map((dr: DocumentReference) =>
+  const referencedMeadowlarkIds: string[] = documentReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
 
@@ -102,9 +102,9 @@ export async function validateReferences(
     onlyReturnAliasId(session),
   );
 
-  if (referencedDocumentIds.length !== referenceIdsInDb.length) {
+  if (referencedMeadowlarkIds.length !== referenceIdsInDb.length) {
     Logger.debug('mongodb.repository.WriteHelper.validateReferences: documentReferences not found', traceId);
-    failures.push(...findMissingReferences(referenceIdsInDb, referencedDocumentIds, documentReferences));
+    failures.push(...findMissingReferences(referenceIdsInDb, referencedMeadowlarkIds, documentReferences));
   }
 
   const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>

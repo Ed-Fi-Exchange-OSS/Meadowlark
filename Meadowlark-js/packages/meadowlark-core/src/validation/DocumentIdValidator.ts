@@ -10,6 +10,15 @@ import type { BaseResourceInfo } from '../model/ResourceInfo';
  * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
  * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
  */
+export function isDocumentUuidWellFormed(documentUuid: string): boolean {
+  const regex = /^[a-z,0-9,-]{36,36}$/;
+  return regex.test(documentUuid);
+}
+
+/**
+ * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
+ * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
+ */
 export function isDocumentIdWellFormed(documentId: string): boolean {
   return /^[^\s/+]{38}$/g.test(documentId);
 }

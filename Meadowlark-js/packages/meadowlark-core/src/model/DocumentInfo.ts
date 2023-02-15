@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { SuperclassInfo } from './SuperclassInfo';
-import { NoDocumentIdentity, documentIdForDocumentIdentity } from './DocumentIdentity';
+import { NoDocumentIdentity, documentIdForDocumentIdentity, getDocumentUuid } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { DocumentReference } from './DocumentReference';
 import { ResourceInfo } from './ResourceInfo';
@@ -54,8 +54,23 @@ export const NoDocumentInfo = Object.freeze({
 });
 
 /**
+ * Returns the id, using the uuid hash.
+ */
+export function getDocumentUuidForDocument(): string {
+  return getDocumentUuid();
+}
+
+/**
  * Returns the id of the given DocumentInfo, using the project name, resource name and identity of the API document.
  */
 export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
   return documentIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+}
+
+/**
+ * Returns the id from the body.
+ */
+export function documentUuidForDocumentBody(parsedBody: object): string {
+  const jsonFromBody = JSON.parse(JSON.stringify(parsedBody));
+  return jsonFromBody.id;
 }

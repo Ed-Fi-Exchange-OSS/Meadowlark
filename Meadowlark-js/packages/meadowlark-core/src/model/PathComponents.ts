@@ -19,7 +19,7 @@ export type PathComponents = {
   /**
    * Resource identifier
    */
-  resourceId?: string;
+  documentUuid?: string;
 };
 
 export function newPathComponents() {

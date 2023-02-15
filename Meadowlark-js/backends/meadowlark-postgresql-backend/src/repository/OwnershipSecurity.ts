@@ -33,7 +33,7 @@ export async function rejectByOwnershipSecurity(
     return 'NOT_APPLICABLE';
   }
 
-  let id = frontendRequest.middleware.pathComponents.resourceId;
+  let id = frontendRequest.middleware.pathComponents.documentUuid;
 
   if (id == null) id = extractIdIfUpsert(frontendRequest);
 

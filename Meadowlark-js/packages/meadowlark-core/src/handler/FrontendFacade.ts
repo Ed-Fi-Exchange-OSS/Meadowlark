@@ -169,10 +169,10 @@ export async function get(frontendRequest: FrontendRequest): Promise<FrontendRes
   try {
     // determine query or "by id"
     const afterParsePath: MiddlewareModel = await parsePath({ frontendRequest, frontendResponse: null });
-    const { resourceId } = afterParsePath.frontendRequest.middleware.pathComponents;
+    const { documentUuid } = afterParsePath.frontendRequest.middleware.pathComponents;
 
     // No resourceId in path means this is a query
-    if (resourceId == null) {
+    if (documentUuid == null) {
       return await query(frontendRequest);
     }
 
