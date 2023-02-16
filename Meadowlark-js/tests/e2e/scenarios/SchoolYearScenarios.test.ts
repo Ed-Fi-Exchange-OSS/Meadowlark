@@ -16,9 +16,9 @@ import {
 import { deleteResourceByLocation } from '../helpers/Resources';
 import { generateRandomId } from '../helpers/Shared';
 
-describe('When posting a resource that contains a SchoolYear enumeration', () => {
-  jest.setTimeout(10000);
+jest.setTimeout(40000);
 
+describe('When posting a resource that contains a SchoolYear enumeration', () => {
   /*
     There are several different ways of representing school years. Sometimes testing one way of storing it requires saving
     another "upstream" reference that also has a schoolYear. Thus if one wants to test a courseOffering, then one must upload

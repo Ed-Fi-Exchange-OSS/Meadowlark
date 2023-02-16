@@ -84,14 +84,11 @@ services:
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
     restart: unless-stopped
 
-
   # Primary MongoDB node
   mongo1:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo1-ml-local
     hostname: mongo1
-    # expose:
-    #   - 27027
     ports:
       - 27027:27017
     restart: unless-stopped
@@ -126,8 +123,6 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo2-ml-local
     hostname: mongo2
-    # expose:
-    #   - 27028
     ports:
       - 27028:27018
     restart: unless-stopped
@@ -163,8 +158,6 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo3-ml-local
     hostname: mongo3
-    # expose:
-    #   - 27029
     ports:
       - 27029:27019
     restart: unless-stopped

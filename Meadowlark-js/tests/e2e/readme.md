@@ -1,6 +1,11 @@
 # Running End to End tests
 
-There are two options to run the tests:
+To run the tests:
 
-1. With meadowlark-fastify already running: Specify .env for e2e based on .env.example
-2. Run tests directly: Confirm that meadowlark-fastify has an .env file or copy the values for fastify into the e2e .env file
+1. Create a .env file based on .env.example in this folder.
+2. Verify that Docker is running
+3. Run `npm run test:e2e`
+
+## Support
+
+Postgresql support is currently disabled and should be included again once Postgresql support is matched on main code.
