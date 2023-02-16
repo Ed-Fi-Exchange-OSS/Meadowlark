@@ -16,20 +16,20 @@ const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session 
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocument(
-  { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
+  { resourceInfo, documentInfo, documentUuid, id, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
-  Logger.info(`${moduleName}.updateDocumentById ${id}`, traceId);
+  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
 
+  const meadowlarkId = id;
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
-
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
     await session.withTransaction(async () => {
       // Check whether this is an insert or update
-      const isInsert: boolean = (await mongoCollection.findOne({ _id: id }, onlyReturnId(session))) == null;
+      const isInsert: boolean = (await mongoCollection.findOne({ documentUuid }, onlyReturnId(session))) == null;
 
       // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
       if (isInsert && documentInfo.superclassInfo != null) {
@@ -40,7 +40,7 @@ export async function upsertDocument(
 
         if (superclassAliasIdInUse) {
           Logger.warn(
-            `${moduleName}.upsertDocument Upserting document id ${id} failed due to another subclass with the same identity`,
+            `${moduleName}.upsertDocument Upserting document uuid ${documentUuid} failed due to another subclass with the same identity`,
             traceId,
           );
 
@@ -74,7 +74,10 @@ export async function upsertDocument(
 
         // Abort on validation failure
         if (failures.length > 0) {
-          Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id} failed due to invalid references`, traceId);
+          Logger.debug(
+            `${moduleName}.upsertDocument Upserting document uuid ${documentUuid} failed due to invalid references`,
+            traceId,
+          );
 
           const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
             .find(onlyDocumentsReferencing([id]), limitFive(session))
@@ -102,18 +105,22 @@ export async function upsertDocument(
       const document: MeadowlarkDocument = meadowlarkDocumentFrom(
         resourceInfo,
         documentInfo,
-        id,
+        documentUuid,
+        meadowlarkId,
         edfiDoc,
         validate,
         security.clientId,
       );
 
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
       // Perform the document upsert
-      Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
+      Logger.debug(`${moduleName}.upsertDocument Upserting document uuid ${documentUuid}`, traceId);
 
-      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
+      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne(
+        { documentUuid },
+        document,
+        asUpsert(session),
+      );
       if (acknowledged) {
         upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
       } else {

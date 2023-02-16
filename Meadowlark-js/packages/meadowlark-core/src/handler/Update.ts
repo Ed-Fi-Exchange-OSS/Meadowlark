@@ -43,8 +43,8 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     const request: UpdateRequest = {
-      id: pathComponents.documentUuid ?? '',
-      meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
+      id: documentIdForDocumentInfo(resourceInfo, documentInfo),
+      documentUuid: pathComponents.documentUuid ?? '',
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,

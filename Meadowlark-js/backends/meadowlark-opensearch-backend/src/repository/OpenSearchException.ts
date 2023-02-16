@@ -57,7 +57,7 @@ export async function LogOpenSearchErrors(
             return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
           }
           if (responseException?.body !== undefined) {
-            const responseBody = JSON.parse(responseException.body.toString());
+            const responseBody = JSON.parse(JSON.stringify(responseException.body));
             switch (responseBody?.error?.type) {
               case 'IndexNotFoundException':
                 // No object has been uploaded for the requested type

@@ -27,6 +27,11 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   documentIdentity: DocumentIdentity;
 
   /**
+   * The UUID for the document.
+   */
+  documentUuid: string;
+
+  /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
   projectName: string;
@@ -105,12 +110,13 @@ function referencedDocumentIdsFrom(documentInfo: DocumentInfo): string[] {
 export function meadowlarkDocumentFrom(
   resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
-  id: string,
+  documentUuid: string,
+  meadowlarkId: string,
   edfiDoc: object,
   validate: boolean,
   createdBy: string,
 ): MeadowlarkDocument {
-  const aliasIds: string[] = [id];
+  const aliasIds: string[] = [meadowlarkId];
   if (documentInfo.superclassInfo != null) {
     aliasIds.push(documentIdForSuperclassInfo(documentInfo.superclassInfo));
   }
@@ -121,7 +127,8 @@ export function meadowlarkDocumentFrom(
     resourceName: resourceInfo.resourceName,
     resourceVersion: resourceInfo.resourceVersion,
     isDescriptor: resourceInfo.isDescriptor,
-    _id: id,
+    documentUuid,
+    _id: meadowlarkId,
     edfiDoc,
     aliasIds,
     outboundRefs: referencedDocumentIdsFrom(documentInfo),

@@ -308,7 +308,7 @@ describe('given the delete of a document referenced by an existing document with
       client,
     );
 
-    deleteResult = await deleteDocumentById(
+    deleteResult = await (
       { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: false },
       client,
     );

@@ -19,6 +19,7 @@ export async function deleteDocumentById(
 ): Promise<DeleteResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
+  const documentUuid = id;
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
 
@@ -27,7 +28,7 @@ export async function deleteDocumentById(
       if (validate) {
         // Read for aliasIds to validate against
         const deleteCandidate: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-          { _id: id },
+          { documentUuid },
           onlyReturnAliasIds(session),
         );
 
@@ -43,7 +44,7 @@ export async function deleteDocumentById(
           // Abort on validation failure
           if (anyReferences) {
             Logger.debug(
-              `mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id} failed due to existing references`,
+              `mongodb.repository.Delete.deleteDocumentById: Deleting document uuid ${documentUuid} failed due to existing references`,
               traceId,
             );
 
@@ -71,7 +72,7 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
+      const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
       if (acknowledged) {
         deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
       } else {
