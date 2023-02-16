@@ -15,7 +15,7 @@ import { documentIdForDocumentInfo, DocumentInfo, getDocumentUuidForDocument } f
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
-import { ResourceInfo } from '../model/ResourceInfo';
+import { newResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
 import { UpsertRequest } from '../message/UpsertRequest';
@@ -116,6 +116,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       }
 
       const resourceInfo: ResourceInfo = {
+        ...newResourceInfo(),
         resourceName: descriptorName,
         projectName: 'Ed-Fi',
         resourceVersion: '3.3.1-b',
@@ -126,8 +127,8 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
       const upsertRequest: UpsertRequest = {
-        id: getDocumentUuidForDocument(),
-        meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
+        id: documentIdForDocumentInfo(resourceInfo, documentInfo),
+        documentUuid: getDocumentUuidForDocument(),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,

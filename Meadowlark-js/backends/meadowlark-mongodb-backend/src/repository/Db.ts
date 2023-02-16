@@ -45,6 +45,7 @@ export async function getNewClient(): Promise<MongoClient> {
     const documentCollection: Collection<MeadowlarkDocument> = newClient
       .db(databaseName)
       .collection(DOCUMENT_COLLECTION_NAME);
+    await documentCollection.createIndex({ documentUuid: 1 });
     await documentCollection.createIndex({ outboundRefs: 1 });
     await documentCollection.createIndex({ aliasIds: 1 });
 
