@@ -25,7 +25,7 @@ services:
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend'
       LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend'
-      MONGO_URL: mongodb://mongo:${MONGODB_PASS}@mongo-t1:27017,mongo-t2:27018/?replicaSet=tr0
+      MONGO_URL: mongodb://${MONGODB_USER:-mongo}:${MONGODB_PASS:-abcdefgh1!}@mongo-t1:27017,mongo-t2:27018/?replicaSet=tr0
       FASTIFY_RATE_LIMIT: 'false'
       FASTIFY_PORT: ${FASTIFY_PORT:-3001}
       FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}
@@ -72,8 +72,8 @@ services:
       - ${MONGO_PORT:-27027}:27017
     restart: unless-stopped
     environment:
-      - ADMIN_USERNAME=mongo
-      - ADMIN_PASSWORD=${MONGODB_PASS}
+      - ADMIN_USERNAME=${MONGODB_USER:-mongo}
+      - ADMIN_PASSWORD=${MONGODB_PASS:-abcdefgh1!}
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
       interval: 10s

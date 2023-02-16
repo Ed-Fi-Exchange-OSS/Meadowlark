@@ -288,15 +288,17 @@ jobs:
         if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
         run: npm run build
 
-      - name: Create key file
+      - name: Create .env file
         run: |
-          chmod -R +x ./tests/e2e/setup/scripts/
-          ./tests/e2e/setup/scripts/auth-key-file-setup.sh
+          touch .env
+          echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
+        working-directory: Meadowlark-js/tests/e2e/setup/
+
+      - name: Give permission for scripts
+        run: chmod -R +x ./tests/e2e/setup/scripts/
 
       - name: End to End tests for ${{matrix.config.db}}
-        run: |
-          cp ./tests/e2e/setup/e2e.env ./tests/e2e/.env
-          npm run test:e2e -- --ci
+        run: npm run test:e2e -- --ci
         env:
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
 

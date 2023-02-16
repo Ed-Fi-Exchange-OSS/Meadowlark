@@ -10,7 +10,7 @@ module.exports = {
     'github-actions'
   ],
   modulePathIgnorePatterns: ['dist*', 'docs*'],
-  globalSetup: './tests/e2e/management/Setup.ts',
-  globalTeardown: './tests/e2e/management/Teardown.ts',
+  globalSetup: './tests/e2e/setup/Setup.ts',
+  globalTeardown: './tests/e2e/setup/Teardown.ts',
   setupFiles: ['dotenv/config']
 }
