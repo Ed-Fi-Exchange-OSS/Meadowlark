@@ -164,11 +164,11 @@ jobs:
           [
             {
               type: "Unit",
-              command: "npm run test:unit:coverage -- --ci --config ./jest.ci-config.js",
+              command: "npm run test:unit:coverage -- --ci --config ./tests/config/unit/jest.config.js",
             },
             {
               type: "Integration",
-              command: "npm run test:integration -- --ci --config ./jest.ci-config.js",
+              command: "npm run test:integration -- --ci --config ./tests/config/integration/jest.config.js",
             },
           ]
 
