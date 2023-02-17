@@ -184,6 +184,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Load MongoDB binary cache
+        if: ${{ matrix.tests.type != 'Unit' }}
         id: cache-mongodb-binaries
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
         with:
@@ -258,13 +259,6 @@ jobs:
           node-version: "16"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-
-      - name: Load MongoDB binary cache
-        id: cache-mongodb-binaries
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
 
       - name: Node modules cache
         id: modules-cache
