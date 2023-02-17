@@ -10,8 +10,8 @@ module.exports = {
     'default',
     'github-actions'
   ],
-  globalSetup: './tests/e2e/management/Setup.ts',
-  globalTeardown: './tests/e2e/management/Teardown.ts',
+  globalSetup: './tests/e2e/setup/Setup.ts',
+  globalTeardown: './tests/e2e/setup/Teardown.ts',
   collectCoverageFrom: ['packages/**/src/**/*.ts', 'backends/**/src/**/*.ts', 'services/**/src/**/*.ts'],
   coverageThreshold: {
     global: {
