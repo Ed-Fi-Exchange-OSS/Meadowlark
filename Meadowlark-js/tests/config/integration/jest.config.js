@@ -1,12 +1,14 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const defaultConfig = require('./../jest.config.js');
+const { defaults: tsjPreset } = require('ts-jest/presets');
 
 module.exports = {
-  displayName: 'Unit Tests',
+  displayName: 'Integration Tests',
   ...defaultConfig,
-  rootDir: '../..',
-  testMatch: ['<rootDir>/**/*.(spec|test).[jt]s?(x)'],
-  testPathIgnorePatterns: ["integration|e2e"],
+  transform: tsjPreset.transform,
+  preset: '@shelf/jest-mongodb',
+  watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
+  testMatch: ['<rootDir>/**/integration/**/*.(spec|test).[jt]s?(x)'],
   collectCoverageFrom: ['<rootDir>/packages/**/src/**/*.ts', '<rootDir>/backends/**/src/**/*.ts', '<rootDir>/services/**/src/**/*.ts'],
   coverageThreshold: {
     global: {

@@ -4,7 +4,6 @@ const defaultConfig = require('./../jest.config.js');
 module.exports = {
   displayName: "E2E Tests",
   ...defaultConfig,
-  rootDir: '../..',
   testMatch: ['<rootDir>/**/e2e/**/*.(spec|test).[jt]s?(x)'],
   reporters: [
     'default',
