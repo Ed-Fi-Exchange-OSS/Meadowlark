@@ -26,6 +26,7 @@ jest.setTimeout(40000);
 
 const documentUuid = '6e44a19e-1964-4b3e-ab7b-4b6231174601';
 const newGetRequest = (): GetRequest => ({
+  meadowlarkId: '',
   documentUuid: '',
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },

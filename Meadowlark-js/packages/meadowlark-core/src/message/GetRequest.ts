@@ -8,6 +8,7 @@ import { Security } from '../security/Security';
 
 export type GetRequest = {
   documentUuid: string;
+  meadowlarkId: string;
   resourceInfo: ResourceInfo;
   security: Security;
   traceId: string;

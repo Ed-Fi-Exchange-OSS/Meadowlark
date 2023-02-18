@@ -56,8 +56,8 @@ export const NoDocumentInfo = Object.freeze({
 /**
  * Returns the id, using the uuid hash.
  */
-export function getDocumentUuidForDocument(documentUuid: string = ''): string {
-  return getDocumentUuid(documentUuid);
+export function getDocumentUuidForDocument(): string {
+  return getDocumentUuid();
 }
 
 /**

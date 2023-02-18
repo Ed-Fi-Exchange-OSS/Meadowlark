@@ -37,7 +37,8 @@ jest.setTimeout(10000);
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '0161d332-887e-4d7d-8503-241f684e0d79',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -90,7 +91,10 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     deleteClient = (await getSharedClient()) as PoolClient;
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, insertClient);
+    await upsertDocument(
+      { ...newUpsertRequest(), meadowlarkId: schoolDocumentId, documentInfo: schoolDocumentInfo },
+      insertClient,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
@@ -193,7 +197,10 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     deleteClient = (await getSharedClient()) as PoolClient;
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, insertClient);
+    await upsertDocument(
+      { ...newUpsertRequest(), documentUuid: schoolDocumentId, documentInfo: schoolDocumentInfo },
+      insertClient,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete

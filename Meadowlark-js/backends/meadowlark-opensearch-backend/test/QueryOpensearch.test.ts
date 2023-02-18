@@ -53,6 +53,7 @@ describe('when querying for students', () => {
       resourceName: 'student',
       isDescriptor: false,
       resourceVersion: '3.3.1-b',
+      allowIdentityUpdates: false,
     },
     queryParameters,
     paginationParameters,

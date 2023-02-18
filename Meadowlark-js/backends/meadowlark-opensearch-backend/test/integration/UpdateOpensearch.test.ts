@@ -32,12 +32,14 @@ const resourceInfo: ResourceInfo = {
   resourceName: 'student',
   isDescriptor: false,
   resourceVersion: '3.3.1-b',
+  allowIdentityUpdates: false,
 };
 
-const id = '1234a-5678b';
+const meadowlarkId = '1234a-5678b';
 
 const newUpsertRequest: UpsertRequest = {
-  id,
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -79,7 +81,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
+        { meadowlarkId, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -88,7 +90,7 @@ describe('given the upsert of a new document', () => {
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
     });
   });
 
@@ -106,7 +108,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
+        { meadowlarkId, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -115,7 +117,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
     });
   });
 
@@ -141,7 +143,7 @@ describe('given the upsert of a new document', () => {
     });
   });
 
-  describe('when updating by id is successful', () => {
+  describe('when updating by meadowlarkId is successful', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
         newUpsertRequest,
@@ -154,7 +156,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
+        { meadowlarkId, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -163,7 +165,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
     });
   });
 
@@ -186,7 +188,7 @@ describe('given the upsert of a new document', () => {
     );
   });
 
-  describe('when deleting by id', () => {
+  describe('when deleting by meadowlarkId', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
         newUpsertRequest,
@@ -199,7 +201,7 @@ describe('given the upsert of a new document', () => {
 
     it('should be able to delete document', async () => {
       await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
+        { meadowlarkId, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );

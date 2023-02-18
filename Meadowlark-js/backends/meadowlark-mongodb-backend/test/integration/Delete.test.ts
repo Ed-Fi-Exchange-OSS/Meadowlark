@@ -41,6 +41,7 @@ const newUpsertRequest = (): UpsertRequest => ({
 });
 
 const newDeleteRequest = (): DeleteRequest => ({
+  meadowlarkId: '',
   documentUuid,
   resourceInfo: NoResourceInfo,
   validate: false,

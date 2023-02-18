@@ -29,7 +29,8 @@ import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './T
 jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -50,7 +51,7 @@ describe('given the upsert of a new document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert1' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -58,7 +59,7 @@ describe('given the upsert of a new document', () => {
     client = await getSharedClient();
 
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), id, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      { ...newUpsertRequest(), meadowlarkId, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
       client,
     );
   });
@@ -70,7 +71,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result = await client.query(findAliasIdsForDocumentSql(id));
+    const result = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
 
     expect(result.rowCount).toBe(1);
   });
@@ -94,7 +95,7 @@ describe('given the upsert of an existing document twice', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -102,7 +103,7 @@ describe('given the upsert of an existing document twice', () => {
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      id,
+      meadowlarkId,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
@@ -143,12 +144,12 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert3' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, resourceInfo, documentInfo };
+    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), meadowlarkId, resourceInfo, documentInfo };
 
     client = await getSharedClient();
     await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one' } }, client);
@@ -163,7 +164,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   });
 
   it('should have the change in the db', async () => {
-    const result: any = await client.query(findDocumentByIdSql(id));
+    const result: any = await client.query(findDocumentByIdSql(meadowlarkId));
 
     expect(result.rows[0].edfi_doc.call).toBe('two');
   });
@@ -201,7 +202,7 @@ describe('given an upsert of a new document that references a non-existent docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: false,
@@ -267,7 +268,7 @@ describe('given an upsert of a new document that references an existing document
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: referencedDocumentId,
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -278,7 +279,7 @@ describe('given an upsert of a new document that references an existing document
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -351,7 +352,7 @@ describe('given an upsert of a new document with one existing and one non-existe
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: referencedDocumentId,
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -362,7 +363,7 @@ describe('given an upsert of a new document with one existing and one non-existe
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -449,7 +450,7 @@ describe('given an upsert of a subclass document when a different subclass has t
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: existingSubclassId,
+        meadowlarkId: existingSubclassId,
         resourceInfo: existingSubclassResourceInfo,
         documentInfo: existingSubclassDocumentInfo,
       },
@@ -460,7 +461,7 @@ describe('given an upsert of a subclass document when a different subclass has t
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: sameSuperclassIdentityId,
+        meadowlarkId: sameSuperclassIdentityId,
         resourceInfo: sameSuperclassIdentityResourceInfo,
         documentInfo: sameSuperclassIdentityDocumentInfo,
         validate: true,
@@ -521,7 +522,7 @@ describe('given an update of a document that references a non-existent document 
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: false,
@@ -534,7 +535,7 @@ describe('given an update of a document that references a non-existent document 
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: false,
@@ -607,7 +608,7 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: referencedDocumentId,
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -618,7 +619,7 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -631,7 +632,7 @@ describe('given an update of a document that references an existing document wit
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -712,7 +713,7 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: referencedDocumentId,
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -723,7 +724,7 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -736,7 +737,7 @@ describe('given an update of a document with one existing and one non-existent r
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -833,7 +834,7 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: referencedDocumentId,
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -844,7 +845,7 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
         validate: true,
@@ -857,7 +858,7 @@ describe('given an update of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
         validate: true,

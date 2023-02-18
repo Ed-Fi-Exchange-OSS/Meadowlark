@@ -28,7 +28,7 @@ import { validateReferences } from './ReferenceValidation';
 const moduleName = 'postgresql.repository.Upsert';
 
 export async function upsertDocument(
-  { documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
+  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: PoolClient,
 ): Promise<UpsertResult> {
   Logger.info(`${moduleName}.upsertDocument`, traceId);
@@ -39,7 +39,7 @@ export async function upsertDocument(
     await client.query('BEGIN');
 
     // Check whether this is an insert or update
-    const documentExistsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(documentUuid));
+    const documentExistsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
     const isInsert: boolean = documentExistsResult.rowCount === 0;
 
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
@@ -51,7 +51,7 @@ export async function upsertDocument(
 
       if (superclassAliasIdInUse) {
         Logger.debug(
-          `${moduleName}.upsertDocument: Upserting document documentUuid ${documentUuid} failed due to another subclass with the same identity`,
+          `${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId} failed due to another subclass with the same identity`,
           traceId,
         );
 
@@ -76,7 +76,7 @@ export async function upsertDocument(
     }
 
     const documentUpsertSql: string = documentInsertOrUpdateSql(
-      { id: documentUuid, resourceInfo, documentInfo, edfiDoc, validate, security },
+      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, security },
       isInsert,
     );
 
@@ -91,11 +91,11 @@ export async function upsertDocument(
       // Abort on validation failure
       if (failures.length > 0) {
         Logger.debug(
-          `${moduleName}.upsertDocument: Inserting document documentUuid ${documentUuid} failed due to invalid references`,
+          `${moduleName}.upsertDocument: Inserting document meadowlarkId ${meadowlarkId} failed due to invalid references`,
           traceId,
         );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([documentUuid]));
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([meadowlarkId]));
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
@@ -114,22 +114,22 @@ export async function upsertDocument(
     }
 
     // Perform the document upsert
-    Logger.debug(`${moduleName}.upsertDocument: Upserting document documentUuid ${documentUuid}`, traceId);
+    Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
     await client.query(documentUpsertSql);
 
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesForDocumentSql(documentUuid));
+    await client.query(deleteAliasesForDocumentSql(meadowlarkId));
 
     // Perform insert of alias ids
-    await client.query(insertAliasSql(documentUuid, documentUuid));
+    await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      await client.query(insertAliasSql(documentUuid, superclassAliasId));
+      await client.query(insertAliasSql(meadowlarkId, superclassAliasId));
     }
 
     // Delete existing references in references table
-    Logger.debug(`${moduleName}.upsertDocument: Deleting references for document documentUuid ${documentUuid}`, traceId);
-    await client.query(deleteOutboundReferencesOfDocumentSql(documentUuid));
+    Logger.debug(`${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${meadowlarkId}`, traceId);
+    await client.query(deleteOutboundReferencesOfDocumentSql(meadowlarkId));
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
@@ -140,8 +140,8 @@ export async function upsertDocument(
     // Perform insert of references to the references table
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
-      Logger.debug(`post${moduleName}.upsertDocument: Inserting reference id ${ref} for document id ${documentUuid}`, ref);
-      await client.query(insertOutboundReferencesSql(documentUuid, ref));
+      Logger.debug(`post${moduleName}.upsertDocument: Inserting reference id ${ref} for document id ${meadowlarkId}`, ref);
+      await client.query(insertOutboundReferencesSql(meadowlarkId, ref));
     }
 
     await client.query('COMMIT');

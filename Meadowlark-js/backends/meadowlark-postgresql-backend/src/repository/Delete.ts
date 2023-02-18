@@ -18,10 +18,10 @@ import {
 const moduleName = 'postgresql.repository.Delete';
 
 export async function deleteDocumentById(
-  { documentUuid, validate, traceId }: DeleteRequest,
+  { meadowlarkId, validate, traceId }: DeleteRequest,
   client: PoolClient,
 ): Promise<DeleteResult> {
-  Logger.debug(`${moduleName}.deleteDocumentById ${documentUuid}`, traceId);
+  Logger.debug(`${moduleName}.deleteDocumentById ${meadowlarkId}`, traceId);
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
 
@@ -30,12 +30,12 @@ export async function deleteDocumentById(
 
     if (validate) {
       // Find the alias ids for the document to be deleted
-      const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(documentUuid));
+      const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
 
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
       if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
         await client.query('ROLLBACK');
-        Logger.debug(`${moduleName}.deleteDocumentById: Document documentUuid ${documentUuid} does not exist`, traceId);
+        Logger.debug(`${moduleName}.deleteDocumentById: Document meadowlarkId ${meadowlarkId} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
       }
@@ -48,18 +48,18 @@ export async function deleteDocumentById(
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
-        const errorMessage = `${moduleName}.deleteDocumentById: Error determining documents referenced by ${documentUuid}, a null result set was returned`;
+        const errorMessage = `${moduleName}.deleteDocumentById: Error determining documents referenced by ${meadowlarkId}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
         Logger.error(errorMessage, traceId);
         return deleteResult;
       }
 
-      const references = referenceResult?.rows.filter((ref) => ref.document_id !== documentUuid);
+      const references = referenceResult?.rows.filter((ref) => ref.document_id !== meadowlarkId);
 
       // If this document is referenced, it's a validation failure
       if (references.length > 0) {
         Logger.debug(
-          `${moduleName}.deleteDocumentById: Deleting document documentUuid ${documentUuid} failed due to existing references`,
+          `${moduleName}.deleteDocumentById: Deleting document meadowlarkId ${meadowlarkId} failed due to existing references`,
           traceId,
         );
 
@@ -69,7 +69,7 @@ export async function deleteDocumentById(
 
         if (referringDocuments.rows == null) {
           await client.query('ROLLBACK');
-          const errorMessage = `${moduleName}.deleteDocumentById Error retrieving documents referenced by ${documentUuid}, a null result set was returned`;
+          const errorMessage = `${moduleName}.deleteDocumentById Error retrieving documents referenced by ${meadowlarkId}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
           Logger.error(errorMessage, traceId);
           return deleteResult;
@@ -92,12 +92,12 @@ export async function deleteDocumentById(
     }
 
     // Perform the document delete
-    Logger.debug(`${moduleName}.deleteDocumentById: Deleting document documentUuid ${documentUuid}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(documentUuid));
+    Logger.debug(`${moduleName}.deleteDocumentById: Deleting document meadowlarkId ${meadowlarkId}`, traceId);
+    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(meadowlarkId));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
       await client.query('ROLLBACK');
-      deleteResult.failureMessage = `deleteDocumentById: Failure deleting document ${documentUuid}, a null result was returned`;
+      deleteResult.failureMessage = `deleteDocumentById: Failure deleting document ${meadowlarkId}, a null result was returned`;
       return deleteResult;
     }
 
@@ -106,14 +106,14 @@ export async function deleteDocumentById(
 
     // Delete references where this is the parent document
     Logger.debug(
-      `${moduleName}.deleteDocumentById Deleting references with documentUuid ${documentUuid} as parent documentUuid`,
+      `${moduleName}.deleteDocumentById Deleting references with meadowlarkId ${meadowlarkId} as parent meadowlarkId`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentSql(documentUuid));
+    await client.query(deleteOutboundReferencesOfDocumentSql(meadowlarkId));
 
     // Delete this document from the aliases table
-    Logger.debug(`${moduleName}.deleteDocumentById Deleting alias entries with documentUuid ${documentUuid}`, traceId);
-    await client.query(deleteAliasesForDocumentSql(documentUuid));
+    Logger.debug(`${moduleName}.deleteDocumentById Deleting alias entries with meadowlarkId ${meadowlarkId}`, traceId);
+    await client.query(deleteAliasesForDocumentSql(meadowlarkId));
 
     await client.query('COMMIT');
   } catch (e) {

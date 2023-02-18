@@ -40,7 +40,7 @@ describe('given a previous middleware has created a response', () => {
   });
 });
 
-describe('given no resourceId in frontend request', () => {
+describe('given no documentUuid in frontend request', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   let resultChain: MiddlewareModel;
   let mockResourceIdValidator: any;
@@ -73,7 +73,7 @@ describe('given an invalid response from resourceIdValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   frontendRequest.middleware.pathComponents = {
     ...newPathComponents(),
-    resourceId: 'NonNullResourceId',
+    documentUuid: '00000000-0000-0000-0000-000000000000',
   };
   let resultChain: MiddlewareModel;
   let mockResourceIdValidator: any;
@@ -106,7 +106,7 @@ describe('given a valid response from resourceIdValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   frontendRequest.middleware.pathComponents = {
     ...newPathComponents(),
-    resourceId: 'NonNullResourceId',
+    documentUuid: '00000000-0000-0000-0000-000000000000',
   };
   let resultChain: MiddlewareModel;
   let mockResourceIdValidator: any;
