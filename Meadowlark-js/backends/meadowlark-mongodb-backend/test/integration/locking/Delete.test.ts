@@ -34,9 +34,12 @@ import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(10000);
 
+const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d';
+
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -81,6 +84,7 @@ const academicWeekDocumentId = documentIdForDocumentInfo(academicWeekResourceInf
 const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom(
   academicWeekResourceInfo,
   academicWeekDocumentInfo,
+  documentUuid,
   academicWeekDocumentId,
   {},
   true,
@@ -97,7 +101,10 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, client);
+    await upsertDocument(
+      { ...newUpsertRequest(), meadowlarkId: schoolDocumentId, documentInfo: schoolDocumentInfo },
+      client,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete

@@ -7,7 +7,7 @@ import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
 export type GetRequest = {
-  id: string;
+  documentUuid: string;
   resourceInfo: ResourceInfo;
   security: Security;
   traceId: string;

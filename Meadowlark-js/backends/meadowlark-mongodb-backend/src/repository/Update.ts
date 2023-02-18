@@ -17,14 +17,13 @@ const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session 
 const moduleName: string = 'mongodb.repository.Update';
 
 export async function updateDocumentById(
-  { id, documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
+  { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
 ): Promise<UpdateResult> {
   Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
-  const meadowlarkId = id;
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
@@ -46,12 +45,12 @@ export async function updateDocumentById(
           );
 
           const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
-            .find(onlyDocumentsReferencing([id]), limitFive(session))
+            .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
             .toArray();
 
           const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
             // eslint-disable-next-line no-underscore-dangle
-            documentId: document._id,
+            meadowlarkId: document._id,
             resourceName: document.resourceName,
             projectName: document.projectName,
             resourceVersion: document.resourceVersion,
@@ -86,14 +85,14 @@ export async function updateDocumentById(
       // if resourceInfo.allowIdentityUpdates is true, the process deletes de old document and inserts a new document.
       if (resourceInfo.allowIdentityUpdates) {
         const deleteResult = await deleteDocumentById(
-          { id: documentUuid, resourceInfo, security, validate: true, traceId },
+          { documentUuid, resourceInfo, security, validate: true, traceId },
           client,
         );
         // if the document was deleted, it should insert the new version.
         if (deleteResult.response === 'DELETE_SUCCESS') {
           // insert the updated document.
           const upsertResult = await upsertDocument(
-            { resourceInfo, documentInfo, documentUuid, id, edfiDoc, validate, traceId, security },
+            { resourceInfo, documentInfo, documentUuid, meadowlarkId, edfiDoc, validate, traceId, security },
             client,
           );
           if (upsertResult.response === 'INSERT_SUCCESS') {

@@ -14,12 +14,11 @@ import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidat
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 export async function deleteDocumentById(
-  { id, validate, traceId }: DeleteRequest,
+  { documentUuid, validate, traceId }: DeleteRequest,
   client: MongoClient,
 ): Promise<DeleteResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
-  const documentUuid = id;
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
 
@@ -55,7 +54,7 @@ export async function deleteDocumentById(
 
             const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
               // eslint-disable-next-line no-underscore-dangle
-              documentId: document._id,
+              meadowlarkId: document._id,
               resourceName: document.resourceName,
               projectName: document.projectName,
               resourceVersion: document.resourceVersion,
@@ -70,7 +69,7 @@ export async function deleteDocumentById(
       }
 
       // Perform the document delete
-      Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
+      Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document documentUuid ${documentUuid}`, traceId);
 
       const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
       if (acknowledged) {

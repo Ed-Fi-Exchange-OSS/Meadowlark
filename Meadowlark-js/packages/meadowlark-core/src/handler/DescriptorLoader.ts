@@ -127,7 +127,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
       const upsertRequest: UpsertRequest = {
-        id: documentIdForDocumentInfo(resourceInfo, documentInfo),
+        meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
         documentUuid: getDocumentUuidForDocument(),
         resourceInfo,
         documentInfo,

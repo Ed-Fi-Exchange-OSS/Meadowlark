@@ -7,7 +7,7 @@ import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
 export type DeleteRequest = {
-  id: string;
+  documentUuid: string;
   resourceInfo: ResourceInfo;
   validate: boolean;
   security: Security;

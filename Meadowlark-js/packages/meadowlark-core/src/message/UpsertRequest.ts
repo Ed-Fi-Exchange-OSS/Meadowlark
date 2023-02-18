@@ -8,7 +8,7 @@ import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
 export type UpsertRequest = {
-  id: string;
+  meadowlarkId: string;
   documentUuid: string;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;

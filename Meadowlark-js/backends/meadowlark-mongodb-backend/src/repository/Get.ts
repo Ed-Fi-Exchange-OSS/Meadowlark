@@ -11,13 +11,13 @@ import { getDocumentCollection } from './Db';
 
 const moduleName: string = 'mongodb.repository.get';
 
-export async function getDocumentById({ id, traceId }: GetRequest, client: MongoClient): Promise<GetResult> {
-  Logger.debug(`${moduleName}.getDocumentById ${id}`, traceId);
+export async function getDocumentById({ documentUuid, traceId }: GetRequest, client: MongoClient): Promise<GetResult> {
+  Logger.debug(`${moduleName}.getDocumentById ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 
   try {
-    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ documentUuid: id });
+    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ documentUuid });
     if (result === null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
     // eslint-disable-next-line no-underscore-dangle
     return { response: 'GET_SUCCESS', document: { id: result._id, ...result.edfiDoc } };

@@ -27,10 +27,10 @@ import { validateReferences } from './ReferenceValidation';
 const moduleName = 'postgresql.repository.Update';
 
 export async function updateDocumentById(
-  { id, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
+  { documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: PoolClient,
 ): Promise<UpdateResult> {
-  Logger.info(`${moduleName}.updateDocumentById ${id}`, traceId);
+  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
 
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -41,7 +41,7 @@ export async function updateDocumentById(
   try {
     await client.query('BEGIN');
 
-    const recordExistsResult = await client.query(findAliasIdsForDocumentSql(id));
+    const recordExistsResult = await client.query(findAliasIdsForDocumentSql(documentUuid));
 
     if (recordExistsResult.rowCount === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
@@ -58,13 +58,16 @@ export async function updateDocumentById(
       );
       // Abort on validation failure
       if (failures.length > 0) {
-        Logger.debug(`${moduleName}.updateDocument: Inserting document id ${id} failed due to invalid references`, traceId);
+        Logger.debug(
+          `${moduleName}.updateDocument: Inserting document documentUuid ${documentUuid} failed due to invalid references`,
+          traceId,
+        );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([id]));
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([documentUuid]));
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
-          documentId: document.document_id,
+          meadowlarkId: document.document_id,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
         }));
@@ -81,24 +84,24 @@ export async function updateDocumentById(
 
     // Perform the document update
     const documentSql: string = documentInsertOrUpdateSql(
-      { id, resourceInfo, documentInfo, edfiDoc, validate, security },
+      { id: documentUuid, resourceInfo, documentInfo, edfiDoc, validate, security },
       false,
     );
     const result: QueryResult = await client.query(documentSql);
 
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesForDocumentSql(id));
+    await client.query(deleteAliasesForDocumentSql(documentUuid));
 
     // Perform insert of alias ids
-    await client.query(insertAliasSql(id, id));
+    await client.query(insertAliasSql(documentUuid, documentUuid));
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-      await client.query(insertAliasSql(id, superclassAliasId));
+      await client.query(insertAliasSql(documentUuid, superclassAliasId));
     }
 
     // Delete existing references in references table
-    Logger.debug(`${moduleName}.upsertDocument: Deleting references for document id ${id}`, traceId);
-    await client.query(deleteOutboundReferencesOfDocumentSql(id));
+    Logger.debug(`${moduleName}.upsertDocument: Deleting references for document documentUuid ${documentUuid}`, traceId);
+    await client.query(deleteOutboundReferencesOfDocumentSql(documentUuid));
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
@@ -109,8 +112,11 @@ export async function updateDocumentById(
     // Perform insert of references to the references table
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
-      Logger.debug(`${moduleName}.upsertDocument: Inserting reference id ${ref} for document id ${id}`, ref);
-      await client.query(insertOutboundReferencesSql(id, ref));
+      Logger.debug(
+        `${moduleName}.upsertDocument: Inserting reference documentUuid ${ref} for document documentUuid ${documentUuid}`,
+        ref,
+      );
+      await client.query(insertOutboundReferencesSql(documentUuid, ref));
     }
 
     await client.query('COMMIT');
