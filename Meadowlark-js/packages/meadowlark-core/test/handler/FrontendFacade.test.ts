@@ -8,6 +8,8 @@ import { get } from '../../src/handler/FrontendFacade';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { setupMockConfiguration } from '../ConfigHelper';
 
+const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d';
+
 describe('given there is no resourceId in a get request', () => {
   const request: FrontendRequest = { ...newFrontendRequest(), path: '/1/2/3' };
 
@@ -31,7 +33,7 @@ describe('given there is no resourceId in a get request', () => {
 describe('given there is a resourceId in a get request', () => {
   const request: FrontendRequest = {
     ...newFrontendRequest(),
-    path: '/1/2/3/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA',
+    path: `/1/2/3/${documentUuid}`,
   };
 
   beforeAll(async () => {

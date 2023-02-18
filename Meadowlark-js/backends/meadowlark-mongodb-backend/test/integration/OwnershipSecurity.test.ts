@@ -17,10 +17,13 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { MongoClient } from 'mongodb';
+import crypto from 'node:crypto';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
+
+const documentUuid = '6e44a19e-1964-4b3e-ab7b-4b6231174601';
 
 jest.setTimeout(40000);
 
@@ -100,7 +103,7 @@ describe('given the getById of a non-existent document', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: 'DOESNOTEXIST' },
+      pathComponents: { ...newPathComponents(), documentUuid: '00000000-0000-0000-0000-000000000000' },
     },
   };
 
@@ -138,10 +141,11 @@ describe('given the getById of a document owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
-    id,
+    meadowlarkId,
+    documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -155,7 +159,7 @@ describe('given the getById of a document owned by the requestor', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
+      pathComponents: { ...newPathComponents(), documentUuid },
       security: { authorizationStrategy, clientId },
       validateResources: true,
     },
@@ -186,7 +190,7 @@ describe('given the getById of a document owned by the requestor', () => {
 describe('given the getById of a document not owned by the requestor', () => {
   let client;
   let result;
-
+  const testDocumentUuid = crypto.randomUUID();
   const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
 
   const resourceInfo: ResourceInfo = {
@@ -197,10 +201,11 @@ describe('given the getById of a document not owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
-    id,
+    documentUuid: testDocumentUuid,
+    meadowlarkId,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -214,7 +219,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
+      pathComponents: { ...newPathComponents(), documentUuid: testDocumentUuid },
       security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
       validateResources: true,
     },

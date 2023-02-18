@@ -18,7 +18,7 @@ const frontendRequest: FrontendRequest = {
       resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      resourceId: 'TBD',
+      documentUuid: '2edb604f-eab0-412c-a242-508d6529214d',
     },
   },
 };
@@ -117,7 +117,7 @@ describe('given the document to be deleted is referenced by other documents ', (
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    meadowlarkId: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };

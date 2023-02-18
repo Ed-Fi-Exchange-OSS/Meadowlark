@@ -10,6 +10,7 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -28,7 +29,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    meadowlarkId: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -75,7 +76,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    meadowlarkId: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -122,7 +123,7 @@ describe('given persistence is going to throw a reference error on update though
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    meadowlarkId: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -226,8 +227,8 @@ describe('given persistence succeeds as insert', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
-    expect(response.headers).toEqual({ Location: location });
+    const location = /\/v3.3b\/ed-fi\/academicWeeks\/[a-z,0-9,-]{36,36}/i;
+    expect(JSON.parse(JSON.stringify(response.headers)).Location).toMatch(location);
   });
 });
 
@@ -261,8 +262,13 @@ describe('given persistence succeeds as update', () => {
     expect(response.body).toBeUndefined();
   });
 
-  it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
-    expect(response.headers).toEqual({ Location: location });
+  it('returns Location header with resource and uuid', () => {
+    const location = JSON.parse(JSON.stringify(response.headers)).Location;
+
+    const expectedPrefix = '/v3.3b/ed-fi/academicWeeks/';
+    expect(location.startsWith(expectedPrefix)).toBe(true);
+
+    const uuidSuffix = location.slice(expectedPrefix.length);
+    expect(isDocumentUuidWellFormed(uuidSuffix)).toBe(true);
   });
 });

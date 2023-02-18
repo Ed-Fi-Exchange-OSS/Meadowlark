@@ -56,8 +56,8 @@ export const NoDocumentInfo = Object.freeze({
 /**
  * Returns the id, using the uuid hash.
  */
-export function getDocumentUuidForDocument(): string {
-  return getDocumentUuid();
+export function getDocumentUuidForDocument(documentUuid: string = ''): string {
+  return getDocumentUuid(documentUuid);
 }
 
 /**
@@ -72,5 +72,5 @@ export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentIn
  */
 export function documentUuidForDocumentBody(parsedBody: object): string {
   const jsonFromBody = JSON.parse(JSON.stringify(parsedBody));
-  return jsonFromBody.id;
+  return jsonFromBody.documentUuid;
 }

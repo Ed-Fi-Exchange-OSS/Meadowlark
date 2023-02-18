@@ -24,7 +24,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     return { statusCode: 404 };
   }
   const request: GetRequest = {
-    id: frontendRequest.middleware.pathComponents.documentUuid,
+    documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
     resourceInfo: frontendRequest.middleware.resourceInfo,
     security: frontendRequest.middleware.security,
     traceId: frontendRequest.traceId,

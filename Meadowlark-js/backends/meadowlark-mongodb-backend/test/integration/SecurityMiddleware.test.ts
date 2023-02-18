@@ -22,6 +22,8 @@ import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
+const documentUuid = '3318d452-a7b7-4f1c-aa91-26ccc48cf4b8';
+
 jest.setTimeout(40000);
 
 describe('given the upsert where no document id is specified', () => {
@@ -65,7 +67,7 @@ describe('given the getById of a non-existent document', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: 'DOESNOTEXIST' },
+      pathComponents: { ...newPathComponents(), documentUuid: '00000000-0000-0000-0000-000000000000' },
     },
   };
 
@@ -103,10 +105,11 @@ describe('given the getById of a document owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
-    id,
+    meadowlarkId,
+    documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -120,7 +123,7 @@ describe('given the getById of a document owned by the requestor', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
+      pathComponents: { ...newPathComponents(), documentUuid },
       security: { authorizationStrategy, clientId },
       validateResources: true,
     },
@@ -162,10 +165,11 @@ describe('given the getById of a document not owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   const upsertRequest = {
-    id,
+    meadowlarkId,
+    documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -179,7 +183,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
+      pathComponents: { ...newPathComponents(), documentUuid },
       security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
       validateResources: true,
     },

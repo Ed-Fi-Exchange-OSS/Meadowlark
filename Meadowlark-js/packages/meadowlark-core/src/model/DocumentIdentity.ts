@@ -5,6 +5,7 @@
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
+import { isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
@@ -78,6 +79,9 @@ export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, do
   return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`;
 }
 
-export function getDocumentUuid(): string {
+export function getDocumentUuid(documentUuid: string = ''): string {
+  if (documentUuid !== '' && isDocumentUuidWellFormed(documentUuid)) {
+    return documentUuid;
+  }
   return crypto.randomUUID();
 }

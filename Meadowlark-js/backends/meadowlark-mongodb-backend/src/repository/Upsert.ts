@@ -16,12 +16,11 @@ const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session 
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocument(
-  { resourceInfo, documentInfo, documentUuid, id, edfiDoc, validate, traceId, security }: UpsertRequest,
+  { resourceInfo, documentInfo, documentUuid, meadowlarkId, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
   Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
 
-  const meadowlarkId = id;
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
@@ -50,7 +49,7 @@ export async function upsertDocument(
             blockingDocuments: [
               {
                 // eslint-disable-next-line no-underscore-dangle
-                documentId: superclassAliasIdInUse._id,
+                meadowlarkId: superclassAliasIdInUse._id,
                 resourceName: superclassAliasIdInUse.resourceName,
                 projectName: superclassAliasIdInUse.projectName,
                 resourceVersion: superclassAliasIdInUse.resourceVersion,
@@ -80,12 +79,12 @@ export async function upsertDocument(
           );
 
           const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
-            .find(onlyDocumentsReferencing([id]), limitFive(session))
+            .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
             .toArray();
 
           const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
             // eslint-disable-next-line no-underscore-dangle
-            documentId: document._id,
+            meadowlarkId: document._id,
             resourceName: document.resourceName,
             projectName: document.projectName,
             resourceVersion: document.resourceVersion,

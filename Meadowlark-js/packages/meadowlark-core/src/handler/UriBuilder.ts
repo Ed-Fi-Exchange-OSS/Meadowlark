@@ -29,7 +29,7 @@ export function blockingDocumentsToUris(frontendRequest: FrontendRequest, blocki
           namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
           resourceName: uncapitalize(pluralize(document.resourceName)),
         },
-        document.documentId,
+        document.meadowlarkId,
       );
       if (frontendRequest.stage !== '') uri = `/${frontendRequest.stage}${uri}`;
       result.push(uri);

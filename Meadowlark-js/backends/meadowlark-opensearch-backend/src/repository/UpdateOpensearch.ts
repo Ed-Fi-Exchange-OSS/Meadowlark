@@ -30,7 +30,10 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   Logger.info(`${moduleName}.afterDeleteDocumentById`, request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
+  const opensearchRequest: OpensearchRequest = {
+    id: request.documentUuid,
+    index: indexFromResourceInfo(request.resourceInfo),
+  };
 
   try {
     Logger.debug(
@@ -47,7 +50,10 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  * Shared opensearch upsert logic
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
+  const opensearchRequest: OpensearchRequest = {
+    id: request.documentUuid,
+    index: indexFromResourceInfo(request.resourceInfo),
+  };
 
   Logger.debug(
     `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
