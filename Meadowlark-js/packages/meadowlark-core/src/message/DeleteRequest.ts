@@ -8,6 +8,7 @@ import { Security } from '../security/Security';
 
 export type DeleteRequest = {
   documentUuid: string;
+  meadowlarkId: string;
   resourceInfo: ResourceInfo;
   validate: boolean;
   security: Security;

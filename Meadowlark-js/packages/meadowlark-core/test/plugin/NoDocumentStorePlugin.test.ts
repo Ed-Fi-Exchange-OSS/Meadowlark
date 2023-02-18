@@ -17,7 +17,8 @@ import { UpdateResult } from '../../src/message/UpdateResult';
 import { DeleteResult } from '../../src/message/DeleteResult';
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -27,14 +28,16 @@ const newUpsertRequest = (): UpsertRequest => ({
 });
 
 const newGetRequest = (): GetRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
 const newUpdateRequest = (): UpdateRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -44,7 +47,8 @@ const newUpdateRequest = (): UpdateRequest => ({
 });
 
 const newDeleteRequest = (): DeleteRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: '',
   resourceInfo: NoResourceInfo,
   validate: false,
   security: { ...newSecurity() },

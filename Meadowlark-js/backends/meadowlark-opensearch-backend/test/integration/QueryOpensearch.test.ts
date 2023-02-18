@@ -28,6 +28,7 @@ const resourceInfo: ResourceInfo = {
   resourceName: 'student',
   isDescriptor: false,
   resourceVersion: '3.3.1-b',
+  allowIdentityUpdates: false,
 };
 
 const student1 = {
@@ -59,7 +60,8 @@ const setupUpsertRequest = (
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
-  id,
+  meadowlarkId: id,
+  documentUuid: '',
   resourceInfo: newResourceInfo,
   documentInfo,
   edfiDoc,
@@ -106,13 +108,13 @@ describe('When querying for documents', () => {
 
   afterAll(async () => {
     await afterDeleteDocumentById(
-      { id: student1.id, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student1.id, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
 
     await afterDeleteDocumentById(
-      { id: student2.id, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student2.id, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
@@ -235,6 +237,7 @@ describe('When querying for documents', () => {
         resourceName: 'countryDescriptor',
         isDescriptor: true,
         resourceVersion: '3.3.1-b',
+        allowIdentityUpdates: false,
       };
 
       const queryRequest: QueryRequest = {
@@ -248,7 +251,8 @@ describe('When querying for documents', () => {
       const descriptorId = 'desc-123';
 
       const descriptorUpsertRequest: UpsertRequest = {
-        id: descriptorId,
+        meadowlarkId: descriptorId,
+        documentUuid: '',
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
         edfiDoc: {},
@@ -269,7 +273,7 @@ describe('When querying for documents', () => {
 
       afterAll(async () => {
         await afterDeleteDocumentById(
-          { id: descriptorId, resourceInfo: descriptorResourceInfo } as DeleteRequest,
+          { meadowlarkId: descriptorId, resourceInfo: descriptorResourceInfo } as DeleteRequest,
           { response: 'DELETE_SUCCESS' } as DeleteResult,
           client,
         );

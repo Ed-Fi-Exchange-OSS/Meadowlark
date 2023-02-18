@@ -27,14 +27,16 @@ import { setupConfigForIntegration } from './Config';
 jest.setTimeout(40000);
 
 const newGetRequest = (): GetRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490',
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId',
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '',
+  documentUuid: 'eeb6ea15-fa93-4389-89a8-1428fb617490',
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -55,14 +57,14 @@ describe('given the get of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get1' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = await getSharedClient();
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), meadowlarkId, resourceInfo }, client);
   });
 
   afterAll(async () => {
@@ -72,7 +74,7 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result = await client.query(findDocumentByIdSql(id));
+    const result = await client.query(findDocumentByIdSql(meadowlarkId));
 
     expect(result.rowCount).toBe(0);
   });
@@ -94,18 +96,18 @@ describe('given the get of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = await getSharedClient();
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { inserted: 'yes' } };
+    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), meadowlarkId, documentInfo, edfiDoc: { inserted: 'yes' } };
 
     // insert the initial version
     await upsertDocument(upsertRequest, client);
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), meadowlarkId, resourceInfo }, client);
   });
 
   afterAll(async () => {
