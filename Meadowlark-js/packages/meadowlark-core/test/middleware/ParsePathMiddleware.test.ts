@@ -85,8 +85,8 @@ describe('given a valid path without resourceId', () => {
   it('adds pathComponents to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
       {
+        "documentUuid": undefined,
         "namespace": "2",
-        "resourceId": undefined,
         "resourceName": "3",
         "version": "1",
       }
@@ -103,7 +103,7 @@ describe('given a valid path with resourceId', () => {
   let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
-    frontendRequest.path = '/1/2/3/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA';
+    frontendRequest.path = '/1/2/3/7825fba8-0b3d-4fc9-ae72-5ad8194d3ce2';
 
     // Act
     resultChain = await parsePath({ frontendRequest, frontendResponse: null });
@@ -116,8 +116,8 @@ describe('given a valid path with resourceId', () => {
   it('adds pathComponents to frontendRequest', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
       {
+        "documentUuid": "7825fba8-0b3d-4fc9-ae72-5ad8194d3ce2",
         "namespace": "2",
-        "resourceId": "aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA",
         "resourceName": "3",
         "version": "1",
       }
