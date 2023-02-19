@@ -39,6 +39,7 @@ const student1 = {
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
   id: '1234a-5678a',
+  documentUuid: getDocumentUuidForDocument(),
 };
 
 const student2 = {
@@ -48,16 +49,17 @@ const student2 = {
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
   id: '1234a-5678b',
+  documentUuid: getDocumentUuidForDocument(),
 };
 
 const security: Security = {
   authorizationStrategy: { type: 'FULL_ACCESS' } as AuthorizationStrategy,
   clientId: '1',
 };
-const documentUuid = getDocumentUuidForDocument();
 
 const setupUpsertRequest = (
   id: string,
+  documentUuid: string,
   edfiDoc = {},
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
@@ -92,7 +94,7 @@ describe('When querying for documents', () => {
     client = await getNewClient();
 
     await afterUpsertDocument(
-      setupUpsertRequest(student1.id, student1),
+      setupUpsertRequest(student1.id, student1.documentUuid, student1),
       {
         response: 'INSERT_SUCCESS',
       } as UpsertResult,
@@ -100,7 +102,7 @@ describe('When querying for documents', () => {
     );
 
     await afterUpsertDocument(
-      setupUpsertRequest(student2.id, student2),
+      setupUpsertRequest(student2.id, student2.documentUuid, student2),
       {
         response: 'INSERT_SUCCESS',
       } as UpsertResult,
@@ -110,13 +112,13 @@ describe('When querying for documents', () => {
 
   afterAll(async () => {
     await afterDeleteDocumentById(
-      { meadowlarkId: student1.id, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student1.id, documentUuid: student1.documentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
 
     await afterDeleteDocumentById(
-      { meadowlarkId: student2.id, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student2.id, documentUuid: student2.documentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
@@ -241,7 +243,7 @@ describe('When querying for documents', () => {
         resourceVersion: '3.3.1-b',
         allowIdentityUpdates: false,
       };
-
+      const documentUuid = getDocumentUuidForDocument();
       const queryRequest: QueryRequest = {
         resourceInfo: descriptorResourceInfo,
         queryParameters: {},
@@ -254,7 +256,7 @@ describe('When querying for documents', () => {
 
       const descriptorUpsertRequest: UpsertRequest = {
         meadowlarkId: descriptorId,
-        documentUuid: '',
+        documentUuid,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
         edfiDoc: {},

@@ -92,7 +92,7 @@ describe('given the upsert of a new document', () => {
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
     });
   });
 
@@ -119,7 +119,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
     });
   });
 
@@ -158,7 +158,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, resourceInfo } as DeleteRequest,
+        { meadowlarkId, documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -167,7 +167,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ meadowlarkId })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
     });
   });
 
@@ -203,7 +203,7 @@ describe('given the upsert of a new document', () => {
 
     it('should be able to delete document', async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, resourceInfo } as DeleteRequest,
+        { meadowlarkId, documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
