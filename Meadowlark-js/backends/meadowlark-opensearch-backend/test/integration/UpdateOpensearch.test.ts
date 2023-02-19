@@ -15,6 +15,7 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
 import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
@@ -36,10 +37,11 @@ const resourceInfo: ResourceInfo = {
 };
 
 const meadowlarkId = '1234a-5678b';
+const documentUuid = getDocumentUuidForDocument();
 
 const newUpsertRequest: UpsertRequest = {
-  meadowlarkId: '',
-  documentUuid: '',
+  meadowlarkId,
+  documentUuid,
   resourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -108,7 +110,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, resourceInfo } as DeleteRequest,
+        { meadowlarkId, documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
