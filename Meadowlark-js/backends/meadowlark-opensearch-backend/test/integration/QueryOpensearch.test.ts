@@ -15,6 +15,7 @@ import {
   DeleteRequest,
   DeleteResult,
 } from '@edfi/meadowlark-core';
+import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
 import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
@@ -53,6 +54,7 @@ const security: Security = {
   authorizationStrategy: { type: 'FULL_ACCESS' } as AuthorizationStrategy,
   clientId: '1',
 };
+const documentUuid = getDocumentUuidForDocument();
 
 const setupUpsertRequest = (
   id: string,
@@ -61,7 +63,7 @@ const setupUpsertRequest = (
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
   meadowlarkId: id,
-  documentUuid: '',
+  documentUuid,
   resourceInfo: newResourceInfo,
   documentInfo,
   edfiDoc,
