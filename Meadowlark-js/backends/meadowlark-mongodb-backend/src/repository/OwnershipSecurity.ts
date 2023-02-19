@@ -35,30 +35,36 @@ export async function rejectByOwnershipSecurity(
   }
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-  let id = frontendRequest.middleware.pathComponents.documentUuid;
+  const { documentUuid } = frontendRequest.middleware.pathComponents;
+  const meadowlarkId = extractIdIfUpsert(frontendRequest);
 
-  if (id == null) id = extractIdIfUpsert(frontendRequest);
-
-  if (id == null) {
+  if (documentUuid == null && meadowlarkId == null) {
     Logger.error(`${functionName} - no id to secure against`, frontendRequest.traceId);
     return 'NOT_APPLICABLE';
   }
 
   try {
-    const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
-      { _id: id },
-      { projection: { createdBy: 1, _id: 0 } },
-    );
+    // if documentUuid is null, it uses _id
+    const result: WithId<MeadowlarkDocument> | null =
+      documentUuid != null
+        ? await mongoCollection.findOne({ documentUuid }, { projection: { createdBy: 1, _id: 0 } })
+        : await mongoCollection.findOne({ _id: meadowlarkId }, { projection: { createdBy: 1, _id: 0 } });
     if (result === null) {
-      Logger.debug(`${functionName} - document not found for id ${id}`, frontendRequest.traceId);
+      Logger.debug(`${functionName} - document not found for documentUuid ${documentUuid}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
     const { clientId } = frontendRequest.middleware.security;
     if (result.createdBy === clientId) {
-      Logger.debug(`${functionName} - access approved: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
+      Logger.debug(
+        `${functionName} - access approved: documentUuid ${documentUuid}, clientId ${clientId}`,
+        frontendRequest.traceId,
+      );
       return 'ACCESS_APPROVED';
     }
-    Logger.debug(`${functionName} - access denied: id ${id}, clientId ${clientId}`, frontendRequest.traceId);
+    Logger.debug(
+      `${functionName} - access denied: documentUuid ${documentUuid}, clientId ${clientId}`,
+      frontendRequest.traceId,
+    );
     return 'ACCESS_DENIED';
   } catch (e) {
     return 'UNKNOWN_FAILURE';

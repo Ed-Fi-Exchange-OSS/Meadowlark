@@ -317,7 +317,12 @@ describe('given the delete of a document referenced by an existing document with
 
     // The document that will be referenced
     await upsertDocument(
-      { ...newUpsertRequest(), documentUuid, meadowlarkId: referencedDocumentId, documentInfo: referencedDocumentInfo },
+      {
+        ...newUpsertRequest(),
+        documentUuid: documentUuidBackup,
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
       client,
     );
 
@@ -334,7 +339,7 @@ describe('given the delete of a document referenced by an existing document with
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), documentUuid, resourceInfo: referencedResourceInfo, validate: false },
+      { ...newDeleteRequest(), documentUuid: documentUuidBackup, resourceInfo: referencedResourceInfo, validate: false },
       client,
     );
   });

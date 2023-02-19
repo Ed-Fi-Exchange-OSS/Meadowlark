@@ -165,7 +165,7 @@ describe('given requesting abstract domain entity', () => {
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
-      body: '{"documentUuid": "da4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
+      body: '{"documentUuid": "db4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
       headers: { 'reference-validation': 'false' },
       middleware: {
         ...newFrontendRequestMiddleware(),
@@ -173,7 +173,7 @@ describe('given requesting abstract domain entity', () => {
           resourceName: 'educationOrganizations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          documentUuid: 'da4f71a9-30dd-407a-ace4-07a056f781a3',
+          documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3',
         },
       },
     };
@@ -201,7 +201,7 @@ describe('given requesting abstract association', () => {
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
-      body: '{"documentUuid": "da4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
+      body: '{"documentUuid": "df4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
       headers: { 'reference-validation': 'false' },
       middleware: {
         ...newFrontendRequestMiddleware(),
@@ -209,7 +209,7 @@ describe('given requesting abstract association', () => {
           resourceName: 'generalStudentProgramAssociations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          documentUuid: 'da4f71a9-30dd-407a-ace4-07a056f781a3',
+          documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3',
         },
       },
     };
