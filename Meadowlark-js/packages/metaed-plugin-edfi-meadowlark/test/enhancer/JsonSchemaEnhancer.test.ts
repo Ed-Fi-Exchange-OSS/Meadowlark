@@ -2267,6 +2267,10 @@ describe('when building a descriptor', () => {
             "description": "The descriptor description",
             "type": "string",
           },
+          "documentUuid": {
+            "description": "The item documentUuid.",
+            "type": "string",
+          },
           "namespace": {
             "description": "The descriptor namespace as a URI",
             "type": "string",

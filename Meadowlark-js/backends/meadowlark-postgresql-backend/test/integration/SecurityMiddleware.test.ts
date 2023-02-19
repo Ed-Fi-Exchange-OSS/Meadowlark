@@ -18,6 +18,7 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import type { PoolClient } from 'pg';
+import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -25,7 +26,6 @@ import { deleteAll } from './TestHelper';
 import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
-const documentUuid = '3618d452-a7b7-4f1c-aa91-26ccc48cf4b8';
 
 describe('given the upsert where no document id is specified', () => {
   let client: PoolClient;
@@ -109,6 +109,7 @@ describe('given the getById of a document owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = getDocumentUuidForDocument();
 
   const upsertRequest = {
     meadowlarkId,
@@ -170,6 +171,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = getDocumentUuidForDocument();
 
   const upsertRequest = {
     meadowlarkId,
@@ -187,7 +189,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), documentUuid },
+      pathComponents: { ...newPathComponents(), documentUuid: meadowlarkId },
       security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
       validateResources: true,
     },
