@@ -112,13 +112,13 @@ describe('When querying for documents', () => {
 
   afterAll(async () => {
     await afterDeleteDocumentById(
-      { meadowlarkId: student1.id, documentUuid: student1.documentUuid, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student1.id, documentUuid: student1.id, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
 
     await afterDeleteDocumentById(
-      { meadowlarkId: student2.id, documentUuid: student2.documentUuid, resourceInfo } as DeleteRequest,
+      { meadowlarkId: student2.id, documentUuid: student2.id, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
@@ -277,7 +277,7 @@ describe('When querying for documents', () => {
 
       afterAll(async () => {
         await afterDeleteDocumentById(
-          { meadowlarkId: descriptorId, resourceInfo: descriptorResourceInfo } as DeleteRequest,
+          { meadowlarkId: descriptorId, documentUuid: descriptorId, resourceInfo: descriptorResourceInfo } as DeleteRequest,
           { response: 'DELETE_SUCCESS' } as DeleteResult,
           client,
         );

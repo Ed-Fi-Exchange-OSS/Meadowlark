@@ -92,7 +92,7 @@ describe('given the upsert of a new document', () => {
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: documentUuid })]));
     });
   });
 
@@ -119,7 +119,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: documentUuid })]));
     });
   });
 
@@ -167,7 +167,7 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ documentUuid })]));
+      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: documentUuid })]));
     });
   });
 
