@@ -243,7 +243,7 @@ describe('When querying for documents', () => {
         resourceVersion: '3.3.1-b',
         allowIdentityUpdates: false,
       };
-      const documentUuid = getDocumentUuidForDocument();
+
       const queryRequest: QueryRequest = {
         resourceInfo: descriptorResourceInfo,
         queryParameters: {},
@@ -256,7 +256,7 @@ describe('When querying for documents', () => {
 
       const descriptorUpsertRequest: UpsertRequest = {
         meadowlarkId: descriptorId,
-        documentUuid,
+        documentUuid: descriptorId,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
         edfiDoc: {},
