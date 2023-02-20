@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
+import { isDocumentIdWellFormed, isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
 import type { MiddlewareModel } from './MiddlewareModel';
 
@@ -47,9 +47,11 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }
 
+  // TEMP: Validation is added to maintain compatibility with postgres versions.
+  // When the documentUuid is updated for postgres, the isDocumentIdWellFormed could be removed.
   // Check for properly formed document id, if there is one
   const { documentUuid } = pathComponents;
-  if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid)) {
+  if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid) && !isDocumentIdWellFormed(documentUuid)) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${documentUuid}`);
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }

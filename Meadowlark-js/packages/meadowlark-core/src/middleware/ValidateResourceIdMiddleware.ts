@@ -5,7 +5,6 @@
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
-// import { isDocumentIdValidForResource } from '../validation/DocumentIdValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ValidateResourceIdMiddleware';
@@ -24,24 +23,5 @@ export async function resourceIdValidation({
   // If no resource id in request, there is nothing to validate
   if (frontendRequest.middleware.pathComponents.documentUuid == null) return { frontendRequest, frontendResponse: null };
 
-  if (
-    !isDocumentIdValidForResource(
-      frontendRequest.middleware.pathComponents.documentUuid,
-      frontendRequest.middleware.resourceInfo,
-    )
-  ) {
-    const statusCode = 404;
-    writeDebugStatusToLog(
-      moduleName,
-      frontendRequest,
-      'resourceIdValidation',
-      statusCode,
-      `Invalid resource id ${frontendRequest.middleware.pathComponents.documentUuid} for resource ${frontendRequest.middleware.resourceInfo.resourceName}`,
-    );
-    return {
-      frontendRequest,
-      frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },
-    };
-  }
   return { frontendRequest, frontendResponse: null };
 }

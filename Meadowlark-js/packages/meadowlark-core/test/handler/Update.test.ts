@@ -40,7 +40,7 @@ describe('given the requested document does not exist', () => {
     });
 
     const frontendRequestTest = frontendRequest;
-    frontendRequestTest.middleware.parsedBody = { documentUuid };
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
     response = await update(frontendRequestTest);
   });
@@ -81,7 +81,7 @@ describe('given the new document has an invalid reference ', () => {
     });
 
     const frontendRequestTest = frontendRequest;
-    frontendRequestTest.middleware.parsedBody = { documentUuid };
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
     response = await update(frontendRequestTest);
   });
@@ -120,7 +120,7 @@ describe('given the update succeeds', () => {
         }),
     });
     const frontendRequestTest = frontendRequest;
-    frontendRequestTest.middleware.parsedBody = { documentUuid };
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
     response = await update(frontendRequestTest);
   });
