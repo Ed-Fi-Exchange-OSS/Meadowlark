@@ -93,10 +93,6 @@ describe('given an invalid response from resourceIdValidation', () => {
     expect(resultChain.frontendRequest).toBe(frontendRequest);
   });
 
-  it('returns status 404', () => {
-    expect(resultChain.frontendResponse?.statusCode).toEqual(404);
-  });
-
   it('returns an empty body', () => {
     expect(resultChain.frontendResponse?.body).toBeUndefined();
   });

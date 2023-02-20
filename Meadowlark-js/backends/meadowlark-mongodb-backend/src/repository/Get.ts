@@ -20,7 +20,7 @@ export async function getDocumentById({ documentUuid, traceId }: GetRequest, cli
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ documentUuid });
     if (result === null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
     // eslint-disable-next-line no-underscore-dangle
-    return { response: 'GET_SUCCESS', document: { id: result._id, ...result.edfiDoc } };
+    return { response: 'GET_SUCCESS', document: { id: documentUuid, meadowlarkId: result._id, ...result.edfiDoc } };
   } catch (e) {
     Logger.error(`${moduleName}.getDocumentById exception`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', document: {} };

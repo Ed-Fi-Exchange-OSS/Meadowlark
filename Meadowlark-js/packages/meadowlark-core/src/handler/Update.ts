@@ -31,6 +31,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
     const documentUuidFromBody = documentUuidForDocumentBody(parsedBody);
+
     if (documentUuidFromBody !== pathComponents.documentUuid) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);

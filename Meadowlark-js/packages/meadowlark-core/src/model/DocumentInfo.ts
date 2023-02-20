@@ -72,5 +72,5 @@ export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentIn
  */
 export function documentUuidForDocumentBody(parsedBody: object): string {
   const jsonFromBody = JSON.parse(JSON.stringify(parsedBody));
-  return jsonFromBody.documentUuid;
+  return jsonFromBody.id;
 }
