@@ -57,27 +57,37 @@ export async function LogOpenSearchErrors(
             return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
           }
           if (responseException?.body !== undefined) {
-            const responseBody = JSON.parse(JSON.stringify(responseException.body));
-            switch (responseBody?.error?.type) {
-              case 'IndexNotFoundException':
-                // No object has been uploaded for the requested type
-                Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
-                return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: 'IndexNotFoundException' };
-              case 'SemanticAnalysisException':
-                // The query term is invalid
-                Logger.error(
-                  `${moduleName} ${documentProcessError} invalid query terms`,
-                  traceId,
-                  `(${openSearchClientError.name}) - ${responseBody?.error?.reason}`,
-                );
-                return {
-                  response: 'QUERY_FAILURE_INVALID_QUERY',
-                  documents: [],
-                  failureMessage: responseBody?.error?.details,
-                };
-              default:
-                Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBody ?? err);
-                return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
+            const responseBody = JSON.parse(responseException.body.toString());
+            if (responseBody?.error?.type !== undefined) {
+              switch (responseBody?.error?.type) {
+                case 'IndexNotFoundException':
+                  // No object has been uploaded for the requested type
+                  Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
+                  return {
+                    response: 'QUERY_FAILURE_INVALID_QUERY',
+                    documents: [],
+                    failureMessage: 'IndexNotFoundException',
+                  };
+                case 'SemanticAnalysisException':
+                  // The query term is invalid
+                  Logger.error(
+                    `${moduleName} ${documentProcessError} invalid query terms`,
+                    traceId,
+                    `(${openSearchClientError.name}) - ${responseBody?.error?.reason}`,
+                  );
+                  return {
+                    response: 'QUERY_FAILURE_INVALID_QUERY',
+                    documents: [],
+                    failureMessage: responseBody?.error?.details,
+                  };
+                default:
+                  Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBody ?? err);
+                  return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
+              }
+            } else {
+              const responseBodyParsed = JSON.parse(JSON.stringify(responseException.body));
+              Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBodyParsed ?? err);
+              return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBodyParsed };
             }
           }
         }
