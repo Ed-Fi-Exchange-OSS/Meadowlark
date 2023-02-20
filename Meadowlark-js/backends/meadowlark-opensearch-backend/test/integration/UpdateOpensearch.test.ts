@@ -15,7 +15,6 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
 import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
