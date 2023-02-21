@@ -218,9 +218,10 @@ describe('given the existance of two vendors and one host', () => {
       contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
       learningResourceMetadataURI: '21430',
     };
-    resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
+
     describe('when the same vendor updates the resource', () => {
       it('should return success', async () => {
+        resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
@@ -231,6 +232,7 @@ describe('given the existance of two vendors and one host', () => {
 
     describe('when a different vendor updates the resource', () => {
       it('should return error', async () => {
+        resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
@@ -241,9 +243,10 @@ describe('given the existance of two vendors and one host', () => {
           });
       });
     });
-    resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
+
     describe('when a host account requests the resource', () => {
       it('should return success', async () => {
+        resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
         await rootURLRequest()
           .put(resourceLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
