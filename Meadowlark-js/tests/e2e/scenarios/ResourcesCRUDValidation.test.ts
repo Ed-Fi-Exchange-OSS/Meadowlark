@@ -11,7 +11,6 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
-    meadowlarkId: '',
   };
   const resourceBodyUpdated = {
     codeValue: 'Presentation',
