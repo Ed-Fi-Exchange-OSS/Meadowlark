@@ -68,6 +68,7 @@ describe('Education contents', () => {
         .put(educationContentLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
+          id: educationContentLocation.split('/').pop(),
           contentIdentifier,
           namespace: '43210',
           shortDescription: 'ShortDesc',

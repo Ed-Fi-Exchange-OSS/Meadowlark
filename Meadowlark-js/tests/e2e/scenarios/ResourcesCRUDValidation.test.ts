@@ -10,12 +10,14 @@ describe('when performing crud operations', () => {
     description: 'Presentation',
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
+    id: '',
   };
   const resourceBodyUpdated = {
     codeValue: 'Presentation',
     description: 'Presentation+',
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
+    id: '',
   };
 
   describe('when creating a new resource with empty body', () => {
@@ -98,6 +100,7 @@ describe('when performing crud operations', () => {
         .expect(200);
     });
 
+    resourceBodyUpdated.id = resourceResponse.headers.location.split('/').pop();
     it('returns updated resource on get', async () => {
       await rootURLRequest()
         .get(resourceResponse.headers.location)
@@ -117,6 +120,8 @@ describe('when performing crud operations', () => {
         .expect(400);
     });
   });
+
+  resourceBody.id = resourceResponse.headers.location.split('/').pop();
 
   describe('when updating a resource', () => {
     it('returns 204', async () => {
