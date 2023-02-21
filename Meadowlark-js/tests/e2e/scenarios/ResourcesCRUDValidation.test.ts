@@ -11,6 +11,7 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
+    meadowlarkId: 'DZ-2ZJQ7LRa5uvVub6dopCzvYxPbgALU2jLYqw',
   };
   const resourceBodyUpdated = {
     codeValue: 'Presentation',
@@ -18,6 +19,7 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
+    meadowlarkId: 'DZ-2ZJQ7LRa5uvVub6dopCzvYxPbgALU2jLYqw',
   };
 
   describe('when creating a new resource with empty body', () => {
@@ -50,6 +52,7 @@ describe('when performing crud operations', () => {
     describe('given the resource exists', () => {
       let getResponse;
       it('returns 200', async () => {
+        resourceBody.id = resourceResponse?.headers?.location?.split('/').pop();
         await rootURLRequest()
           .get(resourceResponse.headers.location)
           .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -100,8 +103,8 @@ describe('when performing crud operations', () => {
         .expect(200);
     });
 
-    resourceBodyUpdated.id = resourceResponse?.headers?.location?.split('/').pop();
     it('returns updated resource on get', async () => {
+      resourceBodyUpdated.id = resourceResponse?.headers?.location?.split('/').pop();
       await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -112,6 +115,7 @@ describe('when performing crud operations', () => {
   });
 
   describe('when updating a resource with empty body', () => {
+    resourceBody.id = resourceResponse?.headers?.location?.split('/').pop();
     it('returns 400', async () => {
       await rootURLRequest()
         .put(resourceResponse.headers.location)
@@ -125,6 +129,7 @@ describe('when performing crud operations', () => {
 
   describe('when updating a resource', () => {
     it('returns 204', async () => {
+      resourceBody.id = resourceResponse?.headers?.location?.split('/').pop();
       await rootURLRequest()
         .put(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -133,6 +138,7 @@ describe('when performing crud operations', () => {
     });
 
     it('returns updated resource on get', async () => {
+      resourceBody.id = resourceResponse?.headers?.location?.split('/').pop();
       await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })

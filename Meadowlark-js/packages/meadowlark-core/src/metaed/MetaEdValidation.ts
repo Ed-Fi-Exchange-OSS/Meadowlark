@@ -80,6 +80,10 @@ export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, bod
         type: 'string',
         description: 'The item documentUuid.',
       },
+      meadowlarkId: {
+        type: 'string',
+        description: 'The item meadowlarkId.',
+      },
     },
   };
 
