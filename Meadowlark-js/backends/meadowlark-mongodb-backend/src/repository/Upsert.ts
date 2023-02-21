@@ -7,7 +7,7 @@ import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mon
 import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo, BlockingDocument } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
+import { getDocumentCollection, writeLockReferencedDocuments, asUpsert } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 
 // MongoDB FindOption to return at most 5 documents
@@ -24,11 +24,12 @@ export async function upsertDocument(
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
-
+  let newDocumentUuid = documentUuid;
   try {
     await session.withTransaction(async () => {
+      const mongoDocument = await mongoCollection.findOne({ _id: meadowlarkId });
       // Check whether this is an insert or update
-      const isInsert: boolean = (await mongoCollection.findOne({ _id: meadowlarkId }, onlyReturnId(session))) == null;
+      const isInsert: boolean = mongoDocument == null;
 
       // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
       if (isInsert && documentInfo.superclassInfo != null) {
@@ -60,6 +61,8 @@ export async function upsertDocument(
           await session.abortTransaction();
           return;
         }
+      } else if (mongoDocument != null) {
+        newDocumentUuid = mongoDocument.documentUuid;
       }
 
       if (validate) {
@@ -74,7 +77,7 @@ export async function upsertDocument(
         // Abort on validation failure
         if (failures.length > 0) {
           Logger.debug(
-            `${moduleName}.upsertDocument Upserting document uuid ${documentUuid} failed due to invalid references`,
+            `${moduleName}.upsertDocument Upserting document uuid ${newDocumentUuid} failed due to invalid references`,
             traceId,
           );
 
@@ -104,7 +107,7 @@ export async function upsertDocument(
       const document: MeadowlarkDocument = meadowlarkDocumentFrom(
         resourceInfo,
         documentInfo,
-        documentUuid,
+        newDocumentUuid,
         meadowlarkId,
         edfiDoc,
         validate,
@@ -113,10 +116,10 @@ export async function upsertDocument(
 
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
       // Perform the document upsert
-      Logger.debug(`${moduleName}.upsertDocument Upserting document uuid ${documentUuid}`, traceId);
+      Logger.debug(`${moduleName}.upsertDocument Upserting document uuid ${newDocumentUuid}`, traceId);
 
       const { acknowledged, upsertedCount } = await mongoCollection.replaceOne(
-        { documentUuid },
+        { _id: meadowlarkId },
         document,
         asUpsert(session),
       );
