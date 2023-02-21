@@ -19,7 +19,6 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
-    meadowlarkId: '',
   };
 
   describe('when creating a new resource with empty body', () => {
