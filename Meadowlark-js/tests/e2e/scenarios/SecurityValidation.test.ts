@@ -211,6 +211,7 @@ describe('given the existance of two vendors and one host', () => {
 
     // PUT
     const resourceBodyPUTUpdated = {
+      id: resourceLocation.split('/').pop(),
       contentIdentifier: '933zsd4350',
       namespace: '43210',
       shortDescription: 'abc_PUT',

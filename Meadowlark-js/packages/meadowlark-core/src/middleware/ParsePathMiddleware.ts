@@ -10,7 +10,7 @@ import type { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ParsePathMiddleware';
 
-function pathComponentsFrom(path: string): PathComponents | null {
+export function pathComponentsFrom(path: string): PathComponents | null {
   // Matches all of the following sample expressions:
   // /v3.3b/ed-fi/Sections
   // /v3.3b/ed-fi/Sections/
