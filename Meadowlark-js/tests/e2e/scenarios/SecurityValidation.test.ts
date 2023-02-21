@@ -218,7 +218,7 @@ describe('given the existance of two vendors and one host', () => {
       contentClassDescriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
       learningResourceMetadataURI: '21430',
     };
-
+    resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
     describe('when the same vendor updates the resource', () => {
       it('should return success', async () => {
         await rootURLRequest()
@@ -241,7 +241,7 @@ describe('given the existance of two vendors and one host', () => {
           });
       });
     });
-
+    resourceBodyPUTUpdated.id = resourceLocation.split('/').pop();
     describe('when a host account requests the resource', () => {
       it('should return success', async () => {
         await rootURLRequest()

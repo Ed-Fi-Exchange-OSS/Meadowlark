@@ -93,6 +93,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
             .put(studentLocation)
             .auth(await getAccessToken('vendor'), { type: 'bearer' })
             .send({
+              id: studentLocation.split('/').pop(),
               studentUniqueId,
               firstName: 'First',
               lastSurname: 'Last',
