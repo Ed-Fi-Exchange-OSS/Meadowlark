@@ -111,6 +111,7 @@ describe('When querying for documents', () => {
   });
 
   afterAll(async () => {
+    client = await getNewClient();
     await afterDeleteDocumentById(
       { meadowlarkId: student1.id, documentUuid: student1.id, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,

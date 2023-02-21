@@ -11,6 +11,7 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
+    meadowlarkId: '',
   };
   const resourceBodyUpdated = {
     codeValue: 'Presentation',
@@ -18,6 +19,7 @@ describe('when performing crud operations', () => {
     shortDescription: 'Presentation',
     namespace: 'uri://ed-fi.org/ContentClassDescriptor',
     id: '',
+    meadowlarkId: '',
   };
 
   describe('when creating a new resource with empty body', () => {
@@ -45,6 +47,8 @@ describe('when performing crud operations', () => {
       expect(resourceResponse.statusCode).toBe(201);
     });
   });
+
+  resourceResponse.id = resourceResponse?.headers?.location?.split('/').pop();
 
   describe('when getting a resource by ID', () => {
     describe('given the resource exists', () => {
