@@ -16,7 +16,6 @@ export async function documentValidation({ frontendRequest, frontendResponse }: 
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'documentValidation');
-
   const error: object | null = await validateDocument(
     frontendRequest.middleware.parsedBody,
     frontendRequest.middleware.matchingMetaEdModel,
