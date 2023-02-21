@@ -31,7 +31,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   if (result.response !== 'DELETE_SUCCESS') return;
 
   const opensearchRequest: OpensearchRequest = {
-    id: request.documentUuid,
+    id: request.meadowlarkId,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -51,7 +51,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = {
-    id: request.documentUuid,
+    id: request.meadowlarkId,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
