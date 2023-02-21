@@ -28,7 +28,7 @@ export async function upsertDocument(
   try {
     await session.withTransaction(async () => {
       // Check whether this is an insert or update
-      const isInsert: boolean = (await mongoCollection.findOne({ _id:meadowlarkId }, onlyReturnId(session))) == null;
+      const isInsert: boolean = (await mongoCollection.findOne({ _id: meadowlarkId }, onlyReturnId(session))) == null;
 
       // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
       if (isInsert && documentInfo.superclassInfo != null) {
