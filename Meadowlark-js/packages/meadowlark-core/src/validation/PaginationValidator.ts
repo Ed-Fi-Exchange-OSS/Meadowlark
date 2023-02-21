@@ -7,8 +7,8 @@ import R from 'ramda';
 import { PaginationParameters } from '../message/PaginationParameters';
 import { createInvalidRequestResponse } from '../Utility';
 
-const isNotPositiveInteger = (value: string | number): Boolean =>
-  !Number(value) || (R.is(Number, value) ? value : Number.parseInt(value.toString(), 10)) < 1;
+const isNotPositiveInteger = (value: string | number): boolean =>
+  Number.isNaN(Number(value)) || (R.is(Number, value) ? value : Number.parseInt(value.toString(), 10)) < 0;
 
 /**
  * Validates the `limit` and `offset` parameters from a query string.
@@ -18,7 +18,7 @@ export function validatePaginationParameters(parameters: PaginationParameters): 
     if (parameters.limit != null) {
       if (isNotPositiveInteger(parameters.limit)) {
         // eslint-disable-next-line no-use-before-define
-        limitErrors.push('Must be set to a numeric value >= 1');
+        limitErrors.push('Must be set to a numeric value >= 0');
       }
     }
   }
@@ -27,7 +27,7 @@ export function validatePaginationParameters(parameters: PaginationParameters): 
     if (parameters.offset != null) {
       if (isNotPositiveInteger(parameters.offset)) {
         // eslint-disable-next-line no-use-before-define
-        offsetErrors.push('Must be set to a numeric value >= 1');
+        offsetErrors.push('Must be set to a numeric value >= 0');
       }
 
       // Can't have an offset without a limit (but reverse _is_ acceptable)
