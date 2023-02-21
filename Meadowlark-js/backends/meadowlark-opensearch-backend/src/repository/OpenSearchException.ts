@@ -59,8 +59,7 @@ export async function LogOpenSearchErrors(
             }
             if (responseException?.body !== undefined) {
               let responseBody = JSON.parse(responseException?.body?.toString());
-              if (responseBody?.error?.type === undefined) {
-                responseBody = JSON.parse(responseException.body.toString());
+              if (responseBody?.error?.type !== undefined) {
                 switch (responseBody?.error?.type) {
                   case 'IndexNotFoundException':
                     // No object has been uploaded for the requested type
