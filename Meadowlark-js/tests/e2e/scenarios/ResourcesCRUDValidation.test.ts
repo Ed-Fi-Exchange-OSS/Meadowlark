@@ -100,7 +100,7 @@ describe('when performing crud operations', () => {
         .expect(200);
     });
 
-    resourceBodyUpdated.id = resourceResponse.headers.location.split('/').pop();
+    resourceBodyUpdated.id = resourceResponse?.headers?.location?.split('/').pop();
     it('returns updated resource on get', async () => {
       await rootURLRequest()
         .get(resourceResponse.headers.location)
@@ -121,7 +121,7 @@ describe('when performing crud operations', () => {
     });
   });
 
-  resourceBody.id = resourceResponse.headers.location.split('/').pop();
+  resourceBody.id = resourceResponse?.headers?.location?.split('/').pop();
 
   describe('when updating a resource', () => {
     it('returns 204', async () => {

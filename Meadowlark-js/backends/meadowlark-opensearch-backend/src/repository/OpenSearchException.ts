@@ -57,8 +57,9 @@ export async function LogOpenSearchErrors(
             return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
           }
           if (responseException?.body !== undefined) {
-            const responseBody = JSON.parse(responseException.body.toString());
-            if (responseBody?.error?.type !== undefined) {
+            let responseBody = JSON.parse(JSON.stringify(responseException.body));
+            if (responseBody?.error?.type === undefined) {
+              responseBody = JSON.parse(responseException.body.toString());
               switch (responseBody?.error?.type) {
                 case 'IndexNotFoundException':
                   // No object has been uploaded for the requested type
@@ -85,9 +86,8 @@ export async function LogOpenSearchErrors(
                   return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
               }
             } else {
-              const responseBodyParsed = JSON.parse(JSON.stringify(responseException.body));
-              Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBodyParsed ?? err);
-              return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBodyParsed };
+              Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBody ?? err);
+              return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
             }
           }
         }

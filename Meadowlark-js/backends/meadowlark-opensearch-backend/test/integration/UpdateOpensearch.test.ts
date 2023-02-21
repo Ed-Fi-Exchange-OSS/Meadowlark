@@ -82,7 +82,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, resourceInfo } as DeleteRequest,
+        { meadowlarkId, documentUuid: meadowlarkId, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
