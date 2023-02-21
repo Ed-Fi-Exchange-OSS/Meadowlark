@@ -48,11 +48,10 @@ describe('when performing crud operations', () => {
     });
   });
 
-  resourceResponse.id = resourceResponse?.headers?.location?.split('/').pop();
-
   describe('when getting a resource by ID', () => {
     describe('given the resource exists', () => {
       let getResponse;
+      resourceResponse.id = resourceResponse?.headers?.location?.split('/').pop();
       it('returns 200', async () => {
         await rootURLRequest()
           .get(resourceResponse.headers.location)

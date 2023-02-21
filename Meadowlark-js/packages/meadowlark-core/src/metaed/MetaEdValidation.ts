@@ -72,7 +72,16 @@ export function matchResourceNameToMetaEd(
  * to the API endpoint.
  */
 export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): ValidationError[] | null {
-  const schema = metaEdModel.data.meadowlark.jsonSchema;
+  const schema = {
+    ...metaEdModel.data.meadowlark.jsonSchema,
+    properties: {
+      ...metaEdModel.data.meadowlark.jsonSchema.properties,
+      id: {
+        type: 'string',
+        description: 'The item documentUuid.',
+      },
+    },
+  };
 
   const validateFunction: ValidateFunction = ajv().compile(schema);
   const isValid: boolean = validateFunction(body);
