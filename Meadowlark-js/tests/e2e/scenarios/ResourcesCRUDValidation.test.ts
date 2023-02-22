@@ -3,6 +3,7 @@ import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('when performing crud operations', () => {
   let resourceResponse;
+  let itemId;
   const resource = 'contentClassDescriptors';
   const resourceEndpoint = `/v3.3b/ed-fi/${resource}`;
   const resourceBody = {
@@ -40,6 +41,7 @@ describe('when performing crud operations', () => {
         .send(resourceBody)
         .then((response) => {
           resourceResponse = response;
+          itemId = resourceResponse.headers.location.split('/').pop();
           resourceBody.id = resourceResponse.headers.location.split('/').pop();
           resourceBodyUpdated.id = resourceResponse.headers.location.split('/').pop();
         });
@@ -64,8 +66,11 @@ describe('when performing crud operations', () => {
       });
 
       it('returns its body successfully.', () => {
-        resourceBody.id = resourceBody.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBody.id;
-        expect(getResponse.body).toEqual(expect.objectContaining(resourceBody));
+        const responseResourceBody = {
+          ...resourceBody,
+          id: itemId,
+        };
+        expect(getResponse.body).toEqual(expect.objectContaining(responseResourceBody));
       });
     });
 
@@ -92,19 +97,24 @@ describe('when performing crud operations', () => {
     });
 
     it('returns one resource', async () => {
-      resourceBody.id = resourceBody.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBody.id;
-      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
+      const responseResourceBody = {
+        ...resourceBody,
+        id: itemId,
+      };
+      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(responseResourceBody)]));
     });
   });
 
   describe('when upserting a resource', () => {
     it('returns 200', async () => {
-      resourceBodyUpdated.id =
-        resourceBodyUpdated.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBodyUpdated.id;
+      const responseResourceBody = {
+        ...resourceBodyUpdated,
+        id: itemId,
+      };
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBodyUpdated)
+        .send(responseResourceBody)
         .expect(200);
     });
 
