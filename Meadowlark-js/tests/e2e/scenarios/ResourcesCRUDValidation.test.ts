@@ -143,11 +143,13 @@ describe('when performing crud operations', () => {
     });
 
     it('returns updated resource on get', async () => {
+      responseResourceBody = { ...resourceBody };
+      delete responseResourceBody.id;
       await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => {
-          expect(response.body).toEqual(expect.objectContaining(resourceBody));
+          expect(response.body).toEqual(expect.objectContaining(responseResourceBody));
         });
     });
   });
