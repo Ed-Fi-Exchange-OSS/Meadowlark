@@ -3,8 +3,9 @@
 To run the tests:
 
 1. Create a .env file based on .env.example in this folder.
-2. Verify that Docker is running
-3. Run `npm run test:e2e`
+2. Ensure that the shell scripts in `scripts` are set as executable.
+3. Verify that Docker is running
+5. Run `npm run test:e2e`
 
 ## Support
 

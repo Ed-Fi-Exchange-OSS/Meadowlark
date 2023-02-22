@@ -44,6 +44,7 @@ container is deleted. These commands should work on any operating system.
 docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
 docker exec mongo-temp mkdir /scripts
 docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
+docker exec mongo-temp chmod 777 /scripts/mongo-key-file-setup.sh
 docker exec mongo-temp /scripts/mongo-key-file-setup.sh
 docker rm -f mongo-temp
 ```
