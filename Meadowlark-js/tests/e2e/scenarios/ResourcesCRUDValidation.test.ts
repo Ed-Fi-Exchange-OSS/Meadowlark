@@ -64,6 +64,7 @@ describe('when performing crud operations', () => {
       });
 
       it('returns its body successfully.', () => {
+        resourceBody.id = resourceBody.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBody.id;
         expect(getResponse.body).toEqual(expect.objectContaining(resourceBody));
       });
     });
@@ -91,12 +92,15 @@ describe('when performing crud operations', () => {
     });
 
     it('returns one resource', async () => {
+      resourceBody.id = resourceBody.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBody.id;
       expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
     });
   });
 
   describe('when upserting a resource', () => {
     it('returns 200', async () => {
+      resourceBodyUpdated.id =
+        resourceBodyUpdated.id === '' ? resourceResponse.headers.location.split('/').pop() : resourceBodyUpdated.id;
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
