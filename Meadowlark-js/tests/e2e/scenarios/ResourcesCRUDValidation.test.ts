@@ -94,7 +94,7 @@ describe('when performing crud operations', () => {
     it('returns one resource', async () => {
       responseResourceBody = { ...resourceBody };
       delete responseResourceBody.id;
-      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
+      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(responseResourceBody)]));
     });
   });
 
@@ -131,10 +131,14 @@ describe('when performing crud operations', () => {
 
   describe('when updating a resource', () => {
     it('returns 204', async () => {
+      const resourceBodyPut = {
+        ...resourceBody,
+        id: resourceResponse.headers.location.split('/').pop(),
+      };
       await rootURLRequest()
         .put(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBody)
+        .send(resourceBodyPut)
         .expect(204);
     });
 
