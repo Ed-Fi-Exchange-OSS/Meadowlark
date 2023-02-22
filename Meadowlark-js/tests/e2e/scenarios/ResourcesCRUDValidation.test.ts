@@ -63,7 +63,7 @@ describe('when performing crud operations', () => {
       });
 
       it('returns its body successfully.', () => {
-        responseResourceBody = resourceBody;
+        responseResourceBody = { ...resourceBody };
         delete responseResourceBody.id;
         expect(getResponse.body).toEqual(expect.objectContaining(responseResourceBody));
       });
@@ -92,7 +92,7 @@ describe('when performing crud operations', () => {
     });
 
     it('returns one resource', async () => {
-      responseResourceBody = resourceBody;
+      responseResourceBody = { ...resourceBody };
       delete responseResourceBody.id;
       expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
     });
@@ -108,7 +108,7 @@ describe('when performing crud operations', () => {
     });
 
     it('returns updated resource on get', async () => {
-      responseResourceBody = resourceBodyUpdated;
+      responseResourceBody = { ...resourceBodyUpdated };
       delete responseResourceBody.id;
       await rootURLRequest()
         .get(resourceResponse.headers.location)
