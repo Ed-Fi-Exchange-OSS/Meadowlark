@@ -3,7 +3,7 @@ import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('when performing crud operations', () => {
   let resourceResponse;
-  let itemId;
+  let responseResourceBody;
   const resource = 'contentClassDescriptors';
   const resourceEndpoint = `/v3.3b/ed-fi/${resource}`;
   const resourceBody = {
@@ -41,9 +41,6 @@ describe('when performing crud operations', () => {
         .send(resourceBody)
         .then((response) => {
           resourceResponse = response;
-          itemId = resourceResponse.headers.location.split('/').pop();
-          resourceBody.id = resourceResponse.headers.location.split('/').pop();
-          resourceBodyUpdated.id = resourceResponse.headers.location.split('/').pop();
         });
     });
 
@@ -66,10 +63,8 @@ describe('when performing crud operations', () => {
       });
 
       it('returns its body successfully.', () => {
-        const responseResourceBody = {
-          ...resourceBody,
-          id: itemId,
-        };
+        responseResourceBody = resourceBody;
+        delete responseResourceBody.id;
         expect(getResponse.body).toEqual(expect.objectContaining(responseResourceBody));
       });
     });
@@ -97,33 +92,29 @@ describe('when performing crud operations', () => {
     });
 
     it('returns one resource', async () => {
-      const responseResourceBody = {
-        ...resourceBody,
-        id: itemId,
-      };
-      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(responseResourceBody)]));
+      responseResourceBody = resourceBody;
+      delete responseResourceBody.id;
+      expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
     });
   });
 
   describe('when upserting a resource', () => {
     it('returns 200', async () => {
-      const responseResourceBody = {
-        ...resourceBodyUpdated,
-        id: itemId,
-      };
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(responseResourceBody)
+        .send(resourceBodyUpdated)
         .expect(200);
     });
 
     it('returns updated resource on get', async () => {
+      responseResourceBody = resourceBodyUpdated;
+      delete responseResourceBody.id;
       await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => {
-          expect(response.body).toEqual(expect.objectContaining(resourceBodyUpdated));
+          expect(response.body).toEqual(expect.objectContaining(responseResourceBody));
         });
     });
   });
