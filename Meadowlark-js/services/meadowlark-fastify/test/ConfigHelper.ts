@@ -34,6 +34,8 @@ export const setupMockConfiguration = () => {
         return '@edfi/meadowlark-opensearch-backend';
       case 'LISTENER1_PLUGIN':
         return '@edfi/meadowlark-opensearch-backend';
+      case 'LISTENER2_PLUGIN':
+        return '';
       case 'AUTHORIZATION_STORE_PLUGIN':
         return '@edfi/meadowlark-mongodb-backend';
       case 'MONGO_URL':

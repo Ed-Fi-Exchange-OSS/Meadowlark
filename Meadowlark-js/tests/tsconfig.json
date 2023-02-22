@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./system",
+    "rootDir": "./e2e",
     "outDir": "./dist"
   },
   "include": [
-    "./system"
+    "./e2e"
   ]
 }
