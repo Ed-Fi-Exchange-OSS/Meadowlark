@@ -90,6 +90,7 @@ describe('when performing crud operations', () => {
     });
 
     it('returns one resource', async () => {
+      resourceBody.id = resourceResponse.headers.location.pop();
       expect(getAllResponse.body).toEqual(expect.arrayContaining([expect.objectContaining(resourceBody)]));
     });
   });
