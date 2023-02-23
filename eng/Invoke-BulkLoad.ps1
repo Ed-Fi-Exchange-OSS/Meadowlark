@@ -6,9 +6,9 @@
 #Requires -Version 7
 $ErrorActionPreference = "Stop"
 
-Import-Module ./Package-Management.psm1 -Force
-Import-Module ./Get-XSD.psm1 -Force
-Import-Module ./BulkLoad.psm1 -Force
+Import-Module ./modules/Package-Management.psm1 -Force
+Import-Module ./modules/Get-XSD.psm1 -Force
+Import-Module ./modules/BulkLoad.psm1 -Force
 
 $baseUrl = "http://localhost:3000/local"
 $adminKey = "meadowlark_admin_key_1"
