@@ -75,7 +75,7 @@ describe('Given the existance of a student, a school, a local education agency a
   });
 
   describe('when it associates the student and the program to a school education organization', () => {
-    it('it returns success', async () => {
+    it('returns success', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/studentProgramAssociations')
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -98,7 +98,7 @@ describe('Given the existance of a student, a school, a local education agency a
   });
 
   describe('when it associates the student and the program to a local education agency education organization', () => {
-    it('it returns success', async () => {
+    it('returns success', async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/studentProgramAssociations')
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -121,7 +121,7 @@ describe('Given the existance of a student, a school, a local education agency a
   });
 
   describe('when it tries to update an student program association with a different education organization', () => {
-    it('it returns error', async () => {
+    it('returns error', async () => {
       await rootURLRequest()
         .put(studentProgramAssociationSchoolLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -153,7 +153,7 @@ describe('Given the existance of a student, a school, a local education agency a
   });
 
   describe('when it tries to delete an education organization that is part of an association', () => {
-    it('it returns error', async () => {
+    it('returns error', async () => {
       await rootURLRequest()
         .delete(localEducationAgencyLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
