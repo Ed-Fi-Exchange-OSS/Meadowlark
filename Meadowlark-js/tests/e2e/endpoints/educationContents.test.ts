@@ -64,12 +64,10 @@ describe('Education contents', () => {
 
     it('should edit an education content', async () => {
       const uri = 'uri://ed-fi.org/fake-updated-uri';
-      const id = educationContentLocation.split('/').pop();
       await rootURLRequest()
         .put(educationContentLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
-          id,
           contentIdentifier,
           namespace: '43210',
           shortDescription: 'ShortDesc',

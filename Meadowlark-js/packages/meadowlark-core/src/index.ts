@@ -31,10 +31,14 @@ export type { FrontendRequest, Headers } from './handler/FrontendRequest';
 export { newFrontendRequest, newFrontendRequestMiddleware } from './handler/FrontendRequest';
 export type { FrontendResponse } from './handler/FrontendResponse';
 export { newFrontendResponse } from './handler/FrontendResponse';
-export { documentIdForDocumentIdentity } from './model/DocumentIdentity';
+export { meadowlarkIdForDocumentIdentity as documentIdForDocumentIdentity } from './model/DocumentIdentity';
 export { documentIdForDocumentReference } from './model/DocumentReference';
 export type { DocumentInfo } from './model/DocumentInfo';
-export { newDocumentInfo, documentIdForDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
+export {
+  newDocumentInfo,
+  meadowlarkIdForDocumentInfo as documentIdForDocumentInfo,
+  NoDocumentInfo,
+} from './model/DocumentInfo';
 export type { ResourceInfo } from './model/ResourceInfo';
 export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
 export type { SuperclassInfo } from './model/SuperclassInfo';

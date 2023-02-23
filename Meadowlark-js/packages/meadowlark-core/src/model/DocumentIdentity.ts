@@ -74,10 +74,10 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
  * The resulting Base64Url string is 38 characters long. The first 16 characters are the resource info hash and
  * the remaining 22 characters are the identity hash.
  */
-export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
+export function meadowlarkIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
   return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`;
 }
 
-export function getDocumentUuid(): string {
+export function generateDocumentUuid(): string {
   return crypto.randomUUID();
 }

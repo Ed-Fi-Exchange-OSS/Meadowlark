@@ -36,7 +36,7 @@ const resourceInfo: ResourceInfo = {
 };
 
 const meadowlarkId = '1234a-5678b';
-// const documentUuid = getDocumentUuidForDocument();
+// const documentUuid = generateDocumentUuid();
 // TEMPORAL: Using meadowlarkId as documentUuid
 const newUpsertRequest: UpsertRequest = {
   meadowlarkId,

@@ -10,7 +10,7 @@ import { afterGetDocumentById, beforeGetDocumentById } from '../plugin/listener/
 import { GetResult } from '../message/GetResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
-import { documentIdForDocumentInfo } from '../model/DocumentInfo';
+import { meadowlarkIdForDocumentInfo } from '../model/DocumentInfo';
 
 const moduleName = 'core.handler.GetById';
 
@@ -26,7 +26,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   }
   const request: GetRequest = {
     documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
-    meadowlarkId: documentIdForDocumentInfo(
+    meadowlarkId: meadowlarkIdForDocumentInfo(
       frontendRequest.middleware.resourceInfo,
       frontendRequest.middleware.documentInfo,
     ),

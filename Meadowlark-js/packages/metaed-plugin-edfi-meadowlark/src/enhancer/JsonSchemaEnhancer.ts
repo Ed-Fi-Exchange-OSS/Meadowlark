@@ -42,10 +42,6 @@ const descriptorSchema: SchemaRoot = {
   title: 'EdFi.Descriptor',
   description: 'An Ed-Fi Descriptor',
   properties: {
-    id: {
-      type: 'string',
-      description: 'The item documentUuid.',
-    },
     namespace: {
       type: 'string',
       description: 'The descriptor namespace as a URI',
