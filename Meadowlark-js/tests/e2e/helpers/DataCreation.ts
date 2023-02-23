@@ -86,6 +86,23 @@ export async function createSchool(schoolId: number): Promise<string> {
   });
 }
 
+export async function createLocalEducationAgency(localEducationAgencyId: number): Promise<string> {
+  return createResource({
+    endpoint: 'localEducationAgencies',
+    role: 'host',
+    body: {
+      localEducationAgencyId,
+      nameOfInstitution: 'Grand Bend School District',
+      localEducationAgencyCategoryDescriptor: 'uri://ed-fi.org/LocalEducationAgencyCategoryDescriptor#Independent',
+      categories: [
+        {
+          educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+        },
+      ],
+    },
+  });
+}
+
 export async function createStudent(studentUniqueId: string) {
   return createResource({
     endpoint: 'students',
@@ -294,4 +311,22 @@ export async function createStudentEdOrgAssociation(studentUniqueId: string, sch
       ],
     },
   });
+}
+
+export async function createProgram(programId: string, schoolId: number) {
+  return createResource(
+    {
+      endpoint: 'Programs',
+      role: 'host',
+      body: {
+        educationOrganizationReference: {
+          educationOrganizationId: schoolId,
+        },
+        programName: 'Gifted and Talented',
+        programTypeDescriptor: 'uri://ed-fi.org/ProgramTypeDescriptor#Athletics',
+        programId,
+      },
+    },
+    true,
+  );
 }
