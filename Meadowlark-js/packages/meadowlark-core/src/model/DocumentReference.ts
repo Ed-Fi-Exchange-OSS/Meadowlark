@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { documentIdForDocumentIdentity } from './DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 
 export type DocumentReference = {
@@ -34,7 +34,7 @@ export type DocumentReference = {
  * and identity of the API document.
  */
 export function documentIdForDocumentReference(documentReference: DocumentReference): string {
-  return documentIdForDocumentIdentity(
+  return meadowlarkIdForDocumentIdentity(
     {
       projectName: documentReference.projectName,
       resourceName: documentReference.resourceName,

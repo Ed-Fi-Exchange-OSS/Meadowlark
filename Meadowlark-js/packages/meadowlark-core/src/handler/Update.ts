@@ -6,10 +6,7 @@
 import { writeErrorToLog } from '@edfi/meadowlark-utilities';
 import R from 'ramda';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import {
-  documentUuidForDocumentBody,
-  documentIdForDocumentInfo /* , getResourceIdForDocument */,
-} from '../model/DocumentInfo';
+import { meadowlarkIdForDocumentInfo } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpdateDocumentById, beforeUpdateDocumentById } from '../plugin/listener/Publish';
 import { UpdateRequest } from '../message/UpdateRequest';
@@ -30,22 +27,15 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     writeRequestToLog(moduleName, frontendRequest, 'update');
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const documentUuidFromBody = documentUuidForDocumentBody(parsedBody);
-
-    if (documentUuidFromBody !== pathComponents.documentUuid) {
-      const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
-
-      return {
-        body: { error: failureMessage },
-        statusCode: 400,
-        headers: headerMetadata,
-      };
+    // Update must include the resourceId
+    if (pathComponents.documentUuid == null) {
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400);
+      return { statusCode: 400, headers: headerMetadata };
     }
 
     const request: UpdateRequest = {
-      meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
-      documentUuid: pathComponents.documentUuid ?? '',
+      meadowlarkId: meadowlarkIdForDocumentInfo(resourceInfo, documentInfo),
+      documentUuid: pathComponents.documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,

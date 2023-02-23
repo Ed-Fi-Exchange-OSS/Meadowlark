@@ -17,7 +17,7 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import type { PoolClient } from 'pg';
-import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
+import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteAll } from './TestHelper';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';
@@ -109,7 +109,7 @@ describe('given the getById of a document owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
-  const documentUuid = getDocumentUuidForDocument();
+  const documentUuid = generateDocumentUuid();
 
   const upsertRequest = {
     meadowlarkId,
@@ -171,7 +171,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
-  const documentUuid = getDocumentUuidForDocument();
+  const documentUuid = generateDocumentUuid();
 
   const upsertRequest = {
     meadowlarkId,

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { documentIdForDocumentIdentity } from '../../src/model/DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
 import { isDocumentIdValidForResource, isDocumentIdWellFormed } from '../../src/validation/DocumentIdValidator';
 
@@ -23,7 +23,7 @@ describe('given a valid id', () => {
     };
 
     // Act
-    id = documentIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
+    id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
   });
 
   it('should be well formed', () => {
@@ -57,7 +57,7 @@ describe('given a valid id with a mismatched resource info', () => {
     };
 
     // Act
-    id = documentIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
+    id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
   });
 
   it('should be well formed', () => {

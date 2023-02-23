@@ -11,7 +11,7 @@ import path from 'path';
 import xml2js from 'xml2js';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { ensurePluginsLoaded, getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
-import { documentIdForDocumentInfo, DocumentInfo, getDocumentUuidForDocument } from '../model/DocumentInfo';
+import { meadowlarkIdForDocumentInfo, DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
@@ -20,6 +20,7 @@ import { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
 import { UpsertRequest } from '../message/UpsertRequest';
 import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
+import { generateDocumentUuid } from '../model/DocumentIdentity';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -127,8 +128,8 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
       const upsertRequest: UpsertRequest = {
-        meadowlarkId: documentIdForDocumentInfo(resourceInfo, documentInfo),
-        documentUuid: getDocumentUuidForDocument(),
+        meadowlarkId: meadowlarkIdForDocumentInfo(resourceInfo, documentInfo),
+        documentUuid: generateDocumentUuid(),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,

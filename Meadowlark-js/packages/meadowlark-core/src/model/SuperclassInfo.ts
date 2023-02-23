@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { documentIdForDocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { BaseResourceInfo } from './ResourceInfo';
 
@@ -63,5 +63,5 @@ export function documentIdForSuperclassInfo(superclassInfo: SuperclassInfo): str
     isDescriptor: false, // Descriptors are never superclasses
   };
 
-  return documentIdForDocumentIdentity(resourceInfo, superclassInfo.documentIdentity);
+  return meadowlarkIdForDocumentIdentity(resourceInfo, superclassInfo.documentIdentity);
 }

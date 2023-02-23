@@ -15,7 +15,7 @@ import {
   DeleteRequest,
   DeleteResult,
 } from '@edfi/meadowlark-core';
-import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
+import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
@@ -39,7 +39,7 @@ const student1 = {
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
   id: '1234a-5678a',
-  documentUuid: getDocumentUuidForDocument(),
+  documentUuid: generateDocumentUuid(),
 };
 
 const student2 = {
@@ -49,7 +49,7 @@ const student2 = {
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
   id: '1234a-5678b',
-  documentUuid: getDocumentUuidForDocument(),
+  documentUuid: generateDocumentUuid(),
 };
 
 const security: Security = {

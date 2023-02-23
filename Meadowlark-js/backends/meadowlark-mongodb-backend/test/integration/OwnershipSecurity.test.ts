@@ -15,7 +15,7 @@ import {
   Security,
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
-import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
+import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { MongoClient } from 'mongodb';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
@@ -140,7 +140,7 @@ describe('given the getById of a document owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
-  const documentUuid = getDocumentUuidForDocument();
+  const documentUuid = generateDocumentUuid();
 
   const upsertRequest = {
     meadowlarkId,
@@ -200,7 +200,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
-  const documentUuid = getDocumentUuidForDocument();
+  const documentUuid = generateDocumentUuid();
   const upsertRequest = {
     documentUuid,
     meadowlarkId,

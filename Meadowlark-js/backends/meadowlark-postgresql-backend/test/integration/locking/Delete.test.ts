@@ -17,7 +17,7 @@ import {
   documentIdForDocumentReference,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
-import { getDocumentUuidForDocument } from '@edfi/meadowlark-core/src/model/DocumentInfo';
+import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
@@ -196,7 +196,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
     insertClient = (await getSharedClient()) as PoolClient;
     deleteClient = (await getSharedClient()) as PoolClient;
-    const documentUuid = getDocumentUuidForDocument();
+    const documentUuid = generateDocumentUuid();
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
     await upsertDocument(
