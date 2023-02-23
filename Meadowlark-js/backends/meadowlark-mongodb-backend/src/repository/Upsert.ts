@@ -50,7 +50,7 @@ export async function upsertDocument(
             blockingDocuments: [
               {
                 // eslint-disable-next-line no-underscore-dangle
-                meadowlarkId: superclassAliasIdInUse._id,
+                documentUuid: superclassAliasIdInUse.documentUuid,
                 resourceName: superclassAliasIdInUse.resourceName,
                 projectName: superclassAliasIdInUse.projectName,
                 resourceVersion: superclassAliasIdInUse.resourceVersion,
@@ -87,7 +87,7 @@ export async function upsertDocument(
 
           const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
             // eslint-disable-next-line no-underscore-dangle
-            meadowlarkId: document._id,
+            documentUuid: document._id,
             resourceName: document.resourceName,
             projectName: document.projectName,
             resourceVersion: document.resourceVersion,

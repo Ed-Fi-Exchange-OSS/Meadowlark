@@ -117,7 +117,7 @@ describe('given the document to be deleted is referenced by other documents ', (
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    meadowlarkId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
