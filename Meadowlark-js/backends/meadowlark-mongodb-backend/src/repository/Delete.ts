@@ -54,7 +54,7 @@ export async function deleteDocumentById(
 
             const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
               // eslint-disable-next-line no-underscore-dangle
-              meadowlarkId: document._id,
+              documentUuid: document._id,
               resourceName: document.resourceName,
               projectName: document.projectName,
               resourceVersion: document.resourceVersion,

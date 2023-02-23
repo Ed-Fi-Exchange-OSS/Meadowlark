@@ -29,7 +29,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    meadowlarkId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -76,7 +76,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    meadowlarkId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -123,7 +123,7 @@ describe('given persistence is going to throw a reference error on update though
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    meadowlarkId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };

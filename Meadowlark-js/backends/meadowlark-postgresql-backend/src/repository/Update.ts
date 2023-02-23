@@ -67,7 +67,7 @@ export async function updateDocumentById(
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
-          meadowlarkId: document.document_id,
+          documentUuid: document.document_id,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
         }));

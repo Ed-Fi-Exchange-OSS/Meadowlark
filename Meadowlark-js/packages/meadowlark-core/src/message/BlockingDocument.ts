@@ -10,5 +10,5 @@ export type BlockingDocument = {
   projectName: string;
   resourceVersion: string;
   resourceName: string;
-  meadowlarkId: string;
+  documentUuid: string;
 };
