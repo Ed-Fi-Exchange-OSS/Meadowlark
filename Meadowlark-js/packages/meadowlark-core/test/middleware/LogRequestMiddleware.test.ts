@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
-import { anonymizeAndLogRequestBody } from '../../src/middleware/LogAnonymizedRequestMiddleware';
+import { logRequestBody } from '../../src/middleware/LogRequestMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
 import { setupMockConfiguration } from '../ConfigHelper';
 
@@ -20,7 +20,7 @@ describe('given a previous middleware has created a response', () => {
     setupMockConfiguration();
 
     // Act
-    resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse });
+    resultChain = await logRequestBody({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -44,7 +44,7 @@ describe('given a null response', () => {
     setupMockConfiguration();
 
     // Act
-    resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse: null });
+    resultChain = await logRequestBody({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -94,7 +94,7 @@ describe('flat doc example - given previous middleware has created a response wi
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
       birthCountryDescriptor: null,
@@ -142,7 +142,7 @@ describe('nested doc example - given previous middleware has created a response 
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
       studentReference: {
@@ -201,7 +201,7 @@ describe('given previous middleware has created a response with info log level',
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toBeCalledTimes(0);
   });

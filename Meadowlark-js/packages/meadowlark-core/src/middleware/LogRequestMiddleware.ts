@@ -20,10 +20,7 @@ function anonymizeObject(object: Object): Object {
   return object;
 }
 
-export async function anonymizeAndLogRequestBody({
-  frontendRequest,
-  frontendResponse,
-}: MiddlewareModel): Promise<MiddlewareModel> {
+export async function logRequestBody({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
 
