@@ -118,7 +118,7 @@ describe('nested doc example - given previous middleware has created a response 
     jest.restoreAllMocks();
   });
 
-  it('An anonymized version of the body is logged', async () => {
+  it('logs an anonymized version of the request body', async () => {
     const traceId = 'traceid';
 
     const body = JSON.stringify({
@@ -204,5 +204,55 @@ describe('given previous middleware has created a response with info log level',
     await logRequestBody(resultChain);
 
     expect(loggerSpy).toBeCalledTimes(0);
+  });
+});
+
+describe('given anonymization is disabled', () => {
+  let loggerSpy: any;
+
+  beforeAll(() => {
+    setupMockConfiguration(true, true);
+    loggerSpy = jest.spyOn(Logger, 'debug');
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('logs an the original request body', async () => {
+    const traceId = 'traceid';
+
+    const body = JSON.stringify({
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+      interventionReference: {
+        interventionIdentificationCode: '111',
+        educationOrganizationId: 123,
+      },
+    });
+
+    const model: MiddlewareModel = {
+      frontendRequest: {
+        ...newFrontendRequest(),
+        body,
+        traceId,
+      },
+      frontendResponse: null,
+    };
+
+    const resultChain = await parseBody(model);
+
+    await logRequestBody(resultChain);
+
+    expect(loggerSpy).toHaveBeenCalledWith('Original request body:', traceId, {
+      interventionReference: {
+        educationOrganizationId: 123,
+        interventionIdentificationCode: '111',
+      },
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+    });
   });
 });

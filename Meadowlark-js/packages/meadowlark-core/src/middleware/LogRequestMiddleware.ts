@@ -5,7 +5,7 @@
 
 import * as R from 'ramda';
 
-import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
+import { Config, isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { MiddlewareModel } from './MiddlewareModel';
 
 function anonymizeObject(object: Object): Object {
@@ -25,8 +25,12 @@ export async function logRequestBody({ frontendRequest, frontendResponse }: Midd
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
 
   if (isDebugEnabled()) {
-    const anonymized = anonymizeObject({ ...frontendRequest.middleware.parsedBody });
-    Logger.debug('Anonymized request body:', frontendRequest.traceId, anonymized);
+    if (Config.get('DISABLE_LOG_ANONYMIZATION')) {
+      Logger.debug('Original request body:', frontendRequest.traceId, frontendRequest.middleware.parsedBody);
+    } else {
+      const anonymized = anonymizeObject({ ...frontendRequest.middleware.parsedBody });
+      Logger.debug('Anonymized request body:', frontendRequest.traceId, anonymized);
+    }
   }
 
   return { frontendRequest, frontendResponse: null };
