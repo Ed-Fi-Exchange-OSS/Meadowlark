@@ -287,13 +287,24 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
+          # General
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
           echo AUTHORIZATION_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
-          echo DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
+          echo QUERY_HANDLER_PLUGIN=@edfi/meadowlark-opensearch-backend >> .env
+          echo LISTENER1_PLUGIN=@edfi/meadowlark-opensearch-backend >> .env
+          # Auth
           echo OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 >> .env
           echo OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 >> .env
           echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3001/local/oauth/token >> .env
           echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3001/local/oauth/verify >> .env
+          # Open Search
+          echo OPENSEARCH_USERNAME=admin  >> .env
+          echo OPENSEARCH_PASSWORD=admin  >> .env
+          echo OPENSEARCH_ENDPOINT=http://localhost:8200  >> .env
+          # Fastify
+          echo FASTIFY_PORT=3001 >> env
+          # Mongo
+          echo MONGO_LOG_LEVEL=debug >> .env
         working-directory: Meadowlark-js/tests/e2e/setup/
 
       - name: End to End tests for ${{matrix.config.db}}
