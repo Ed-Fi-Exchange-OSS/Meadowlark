@@ -9,9 +9,6 @@ $ErrorActionPreference = "Stop"
 
 $bulkLoadVersion = "6.1"
 
-Import-Module ./Package-Management.psm1 -force
-Import-Module ./Get-XSD.psm1 -force
-
 <#
 .SYNOPSIS
   Create a vendor client using the admin key and secret.
@@ -77,11 +74,11 @@ function Initialize-ToolsAndDirectories {
   $bulkLoader = (Join-Path -Path (Get-BulkLoadClient $bulkLoadVersion).Trim() -ChildPath "tools/net*/any/EdFi.BulkLoadClient.Console.dll")
   $bulkLoader = Resolve-Path $bulkLoader
 
-  $xsdDirectory = (Resolve-Path "$($PSScriptRoot)/.packages/XSD")
+  $xsdDirectory = (Resolve-Path "$($PSScriptRoot)/../.packages/XSD")
   $null = Get-EdFiXsd -XsdDirectory $xsdDirectory
 
   return @{
-    WorkingDirectory = (New-Item -Path "$($PsScriptRoot)/.working" -Type Directory -Force)
+    WorkingDirectory = (New-Item -Path "$($PsScriptRoot)/../.working" -Type Directory -Force)
     XsdDirectory = $xsdDirectory
     SampleDataDirectory = (Get-SampleData $Version).Trim()
     BulkLoaderExe =  $bulkLoader
@@ -187,6 +184,44 @@ function Write-GrandBend {
     Key = $Key
     Secret = $Secret
     SampleDataDirectory = Join-Path -Path $Paths.SampleDataDirectory -ChildPath "Sample XML"
+    Paths = $Paths
+  }
+  Write-XmlFiles @parameters
+}
+
+function Write-PartialGrandBend {
+  [CmdletBinding()]
+  param (
+    [string]
+    [Parameter(Mandatory=$True)]
+    $BaseUrl,
+
+    [string]
+    [Parameter(Mandatory=$True)]
+    $Key,
+
+    [string]
+    [Parameter(Mandatory=$True)]
+    $Secret,
+
+    [hashtable]
+    [Parameter(Mandatory=$True)]
+    $Paths
+  )
+
+  $fullDir = Join-Path -Path $Paths.SampleDataDirectory -ChildPath "Sample XML"
+  $partialDir = Join-Path -Path $Paths.SampleDataDirectory -ChildPath "Partial"
+
+  New-Item -ItemType Directory $partialDir -Force | Out-Null
+  Copy-Item -Path $fullDir/Standards.xml -Destination $partialDir -Force | Out-Null
+  Copy-Item -Path $fullDir/EducationOrganization.xml -Destination $partialDir -Force | Out-Null
+  Copy-Item -Path $fullDir/EducationOrgCalendar.xml -Destination $partialDir -Force | Out-Null
+
+  $parameters = @{
+    BaseUrl = $BaseUrl
+    Key = $Key
+    Secret = $Secret
+    SampleDataDirectory = $partialDir
     Paths = $Paths
   }
   Write-XmlFiles @parameters
