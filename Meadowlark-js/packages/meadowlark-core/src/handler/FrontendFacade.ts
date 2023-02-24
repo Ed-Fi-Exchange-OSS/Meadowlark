@@ -22,7 +22,7 @@ import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
 import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
-import { logRequestBody } from '../middleware/LogRequestMiddleware';
+import { logRequestBody } from '../middleware/RequestLoggingMiddleware';
 import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;

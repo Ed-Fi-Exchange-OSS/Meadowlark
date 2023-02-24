@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
-import { logRequestBody } from '../../src/middleware/LogRequestMiddleware';
+import { logRequestBody } from '../../src/middleware/RequestLoggingMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
 import { setupMockConfiguration } from '../ConfigHelper';
 
