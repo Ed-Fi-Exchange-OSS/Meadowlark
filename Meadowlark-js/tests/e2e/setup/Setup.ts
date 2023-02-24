@@ -8,17 +8,20 @@ const dotenv = require('dotenv');
 
 const credentialManager = require('../helpers/Credentials');
 const setupEnvironment = require('./EnvironmentConfig');
+const setupServer = require('./ServerConfig');
 
 dotenv.config({ path: path.join(__dirname, './.env') });
 
-module.exports = async () => {
+module.exports = async (config) => {
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
   process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
   console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 
   try {
     console.debug('\n-- Configuring environment --');
-    await setupEnvironment.configure();
+    await setupEnvironment.configure(config);
+    console.debug('\n-- Configuring server --');
+    await setupServer.setup();
   } catch (error) {
     throw new Error(`Unexpected error setting up environment.\n${error}`);
   }

@@ -246,9 +246,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" }]
-
-    # { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }, # Restore after RND-494
+        config:
+          [
+            { db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
+            { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" },
+          ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
@@ -286,10 +288,13 @@ jobs:
         run: |
           touch .env
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
+          echo AUTHORIZATION_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
+          echo DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
+          echo OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 >> .env
+          echo OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 >> .env
+          echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3001/local/oauth/token >> .env
+          echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3001/local/oauth/verify >> .env
         working-directory: Meadowlark-js/tests/e2e/setup/
-
-      - name: Give permission for scripts
-        run: chmod -R +x ./tests/e2e/setup/scripts/
 
       - name: End to End tests for ${{matrix.config.db}}
         run: npm run test:e2e -- --ci

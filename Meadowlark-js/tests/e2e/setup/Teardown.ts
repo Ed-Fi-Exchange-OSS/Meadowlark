@@ -8,6 +8,8 @@ const environment = require('./EnvironmentConfig');
 async function endServer() {
   try {
     await environment.stop();
+    // Fix
+    process.exit(0);
   } catch (error) {
     console.info(error);
   }

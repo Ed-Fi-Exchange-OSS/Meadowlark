@@ -5,12 +5,12 @@
 
 import path from 'path';
 
-import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
+import { DockerComposeEnvironment, StartedDockerComposeEnvironment } from 'testcontainers';
 import { endLog, setLogTracing } from './LogConfig';
 
-let environment: StartedDockerComposeEnvironment;
+const mongoSetup = require('@shelf/jest-mongodb/lib/setup');
 
-const mongoContainerName = 'mongo-test1';
+let environment: StartedDockerComposeEnvironment;
 
 export async function stop() {
   endLog();
@@ -19,37 +19,13 @@ export async function stop() {
   await environment.down();
 }
 
-async function executeCommand(container: StartedTestContainer, script: string[]): Promise<string> {
-  return container.exec(script).then((result) => {
-    if (result.exitCode !== 0) {
-      console.error(result.output);
-      throw result.output;
-    }
-    return result.output;
-  });
-}
+export async function configure(_config) {
+  await mongoSetup(_config);
 
-async function setMongoUser(mongoContainer: StartedTestContainer) {
-  await executeCommand(mongoContainer, ['./scripts/mongo-rs-setup.sh']);
-
-  await new Promise((r) => {
-    setTimeout(r, 30 * 1000);
-  });
-
-  await executeCommand(mongoContainer, ['./scripts/mongo-user-setup.sh']);
-}
-
-export async function configure() {
   const composeFilePath = path.resolve(__dirname, './');
   const composeFile = 'docker-compose.yml';
-  environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
-    .withWaitStrategy(mongoContainerName, Wait.forHealthCheck())
-    .withStartupTimeout(30 * 1000)
-    .up();
+  environment = await new DockerComposeEnvironment(composeFilePath, composeFile).withStartupTimeout(30 * 1000).up();
 
   console.debug('-- Setting log tracing --');
   await setLogTracing(environment);
-  const mongoContainer = environment.getContainer(mongoContainerName);
-  console.debug('-- Setting up mongo user --');
-  await setMongoUser(mongoContainer);
 }

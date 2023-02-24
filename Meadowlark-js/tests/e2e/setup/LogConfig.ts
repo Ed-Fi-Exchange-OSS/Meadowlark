@@ -6,41 +6,31 @@
 import fs from 'fs-extra';
 import { StartedDockerComposeEnvironment } from 'testcontainers';
 
-let apiWriteStream: fs.WriteStream;
-let mongoWriteStream: fs.WriteStream;
-let opSearchWriteStream: fs.WriteStream;
+let postgresWriteStream: fs.WriteStream;
+let openSearchWriteStream: fs.WriteStream;
 
 const logFolder = './tests/e2e/logs';
 
-const mongoContainerName = 'mongo-test1';
-const apiContainerName = 'meadowlark-api-test';
-const opSearchContainerName = 'opensearch-test';
+const postgresContainerName = 'postgres-test';
+const openSearchContainerName = 'opensearch-test';
 
 export function endLog() {
-  if (apiWriteStream) {
-    apiWriteStream.end();
+  if (postgresWriteStream) {
+    postgresWriteStream.end();
   }
-  if (mongoWriteStream) {
-    mongoWriteStream.end();
-  }
-  if (opSearchWriteStream) {
-    opSearchWriteStream.end();
+  if (openSearchWriteStream) {
+    openSearchWriteStream.end();
   }
 }
 
 export async function setLogTracing(environment: StartedDockerComposeEnvironment) {
-  const apiStream = await environment.getContainer(apiContainerName).logs();
-  apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
+  const postgresStream = await environment.getContainer(postgresContainerName).logs();
+  postgresWriteStream = fs.createWriteStream(`${logFolder}/postgres.log`);
 
-  apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+  postgresStream.on('data', (line) => postgresWriteStream.write(line)).on('err', (line) => postgresWriteStream.write(line));
 
-  const mongoStream = await environment.getContainer(mongoContainerName).logs();
-  mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
+  const osStream = await environment.getContainer(openSearchContainerName).logs();
+  openSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
 
-  mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
-
-  const osStream = await environment.getContainer(opSearchContainerName).logs();
-  opSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
-
-  osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+  osStream.on('data', (line) => openSearchWriteStream.write(line)).on('err', (line) => openSearchWriteStream.write(line));
 }
