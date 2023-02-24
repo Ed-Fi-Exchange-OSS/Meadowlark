@@ -262,6 +262,14 @@ jobs:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
+      - name: Load MongoDB binary cache
+        if: ${{ matrix.tests.type != 'Unit' }}
+        id: cache-mongodb-binaries
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
+
       - name: Node modules cache
         id: modules-cache
         uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
@@ -302,7 +310,7 @@ jobs:
           echo OPENSEARCH_PASSWORD=admin  >> .env
           echo OPENSEARCH_ENDPOINT=http://localhost:8200  >> .env
           # Fastify
-          echo FASTIFY_PORT=3001 >> env
+          echo FASTIFY_PORT=3001 >> .env
           # Mongo
           echo MONGO_LOG_LEVEL=debug >> .env
         working-directory: Meadowlark-js/tests/e2e/setup/
