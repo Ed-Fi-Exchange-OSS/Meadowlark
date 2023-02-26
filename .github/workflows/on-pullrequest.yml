@@ -114,8 +114,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    outputs:
-      hashKey: ${{ steps.hash-key.outputs.hashKey }}
 
     steps:
       - name: Checkout repository
@@ -141,17 +139,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Calculate dist/ hash
-        id: hash-key
-        run: echo "hashKey=${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}" >> $GITHUB_OUTPUT
-
-      - name: Cache the build output
-        id: build-cache
-        uses: actions/cache/save@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
-        with:
-          path: "**/dist/**"
-          key: ${{ steps.hash-key.outputs.hashKey }}
 
   tests:
     name: ${{matrix.tests.type}} tests
@@ -241,7 +228,7 @@ jobs:
 
   end-to-end:
     name: End to End tests for ${{ matrix.config.db }}
-    needs: [lint, build]
+    needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -259,28 +246,6 @@ jobs:
           node-version: "16"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
-
-      - name: Restore build cache
-        id: build-cache
-        uses: actions/cache/restore@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 #v3.2.3
-        with:
-          path: "**/dist/**"
-          key: ${{ needs.build.outputs.hashKey }}
-
-      - name: Build
-        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
-        run: npm run build
 
       - name: Create .env file
         run: |
