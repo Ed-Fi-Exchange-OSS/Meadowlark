@@ -21,7 +21,7 @@ services:
       OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: http://localhost:${FASTIFY_PORT:-3001}/local/oauth/verify
       OPENSEARCH_USERNAME: admin
       OPENSEARCH_PASSWORD: admin
-      OPENSEARCH_ENDPOINT: http://opensearch-test:9200
+      OPENSEARCH_ENDPOINT: http://opensearch-test:8200
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend'
       LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend'
@@ -49,6 +49,7 @@ services:
       discovery.type: single-node
       DISABLE_INSTALL_DEMO_CONFIG: "true"
       DISABLE_SECURITY_PLUGIN: "true"
+      http.port: ${OPENSEARCH_PORT:-8200}
     mem_limit: 2g
     ulimits:
       memlock:
@@ -60,8 +61,13 @@ services:
     volumes:
       - opensearch-test-data:/usr/share/opensearch/data
     ports:
-      - ${OPENSEARCH_PORT:-9200}:9200
+      - ${OPENSEARCH_PORT:-8200}:8200
     restart: unless-stopped
+    healthcheck:
+      test: curl -s http://localhost:${OPENSEARCH_PORT:-8200}/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
 
   # Primary MongoDB node
   mongo-t1:
@@ -69,7 +75,7 @@ services:
     container_name: mongo-test1
     hostname: mongo-t1
     ports:
-      - ${MONGO_PORT:-27027}:27017
+      - ${MONGO_PORT:-27037}:27017
     restart: unless-stopped
     environment:
       - ADMIN_USERNAME=${MONGODB_USER:-mongo}
@@ -106,7 +112,7 @@ services:
     container_name: mongo-test2
     hostname: mongo-t2
     ports:
-      - 27028:27018
+      - 27038:27018
     restart: unless-stopped
     command:
       [
