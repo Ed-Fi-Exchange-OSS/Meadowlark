@@ -4,11 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { ClientSession, Collection, Filter, FindOptions, WithId } from 'mongodb';
+import { ClientSession, Collection, Filter, FindOptions } from 'mongodb';
 import { documentIdForDocumentReference, DocumentReference, MissingIdentity } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { MeadowlarkDocument, MeadowlarkDocumentId } from '../model/MeadowlarkDocument';
-import { onlyReturnId } from './Db';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { onlyReturnAliasId, onlyReturnId } from './Db';
 
 /**
  * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
@@ -23,11 +23,11 @@ async function findReferencedDocumentIdsById(
   referenceIds: string[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
-): Promise<MeadowlarkDocumentId[]> {
-  const referencedDocuments: WithId<MeadowlarkDocument>[] = await mongoDocuments
+): Promise<MeadowlarkDocument[]> {
+  const referencedDocuments: MeadowlarkDocument[] = await mongoDocuments
     .find({ aliasIds: { $in: referenceIds } }, findOptions)
     .toArray();
-  return referencedDocuments as MeadowlarkDocumentId[];
+  return referencedDocuments as MeadowlarkDocument[];
 }
 
 /**
@@ -39,12 +39,12 @@ async function findReferencedDocumentIdsById(
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
-  refsInDb: MeadowlarkDocumentId[],
+  refsInDb: MeadowlarkDocument[],
   documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
 ): MissingIdentity[] {
   // eslint-disable-next-line no-underscore-dangle
-  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => outRef._id);
+  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => (outRef.aliasIds.length > 0 ? outRef.aliasIds[0] : outRef._id));
   const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
 
   // Gets the array indexes of the missing references, for the documentOutboundRefs array
@@ -96,10 +96,10 @@ export async function validateReferences(
     documentIdForDocumentReference(dr),
   );
 
-  const referenceIdsInDb: MeadowlarkDocumentId[] = await findReferencedDocumentIdsById(
+  const referenceIdsInDb: MeadowlarkDocument[] = await findReferencedDocumentIdsById(
     referencedDocumentIds,
     mongoDocuments,
-    onlyReturnId(session),
+    onlyReturnAliasId(session),
   );
 
   if (referencedDocumentIds.length !== referenceIdsInDb.length) {

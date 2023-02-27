@@ -111,5 +111,8 @@ export async function writeLockReferencedDocuments(
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
 export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
+// MongoDB FindOption to return only the aliasId
+export const onlyReturnAliasId = (session: ClientSession): FindOptions => ({ projection: { 'aliasIds.$': 1 }, session });
+
 // MongoDB ReplaceOption that enables upsert (insert if not exists)
 export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });
