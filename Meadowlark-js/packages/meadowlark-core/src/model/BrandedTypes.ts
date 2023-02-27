@@ -13,4 +13,4 @@ export type DocumentUuid = Brand<string, 'DocumentUuid'>;
 export type MeadowlarkId = Brand<string, 'MeadowlarkId'>;
 
 // A string type branded as a traceId
-export type TraceId = Brand<string, 'MeadowlarkId'>;
+export type TraceId = Brand<string, 'TraceId'>;
