@@ -12,13 +12,13 @@ import {
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
-  entityPropertyMeadowlarkDataSetupEnhancer,
+  entityPropertyApiSchemaDataSetupEnhancer,
   apiEntityMappingEnhancer,
-  entityMeadowlarkDataSetupEnhancer,
+  entityApiSchemaDataSetupEnhancer,
   referenceComponentEnhancer,
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-meadowlark';
+} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentReferences } from '../../src/extraction/DocumentReferenceExtractor';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
@@ -98,8 +98,8 @@ describe('when comparing identities with references from domain entity referenci
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -211,8 +211,8 @@ describe('when comparing identities with references with three levels of identit
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -300,8 +300,8 @@ describe('when comparing identities with references with two levels of identitie
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);

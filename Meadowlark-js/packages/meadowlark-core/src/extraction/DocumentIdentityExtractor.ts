@@ -7,12 +7,12 @@ import R from 'ramda';
 import { invariant } from 'ts-invariant';
 import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import {
-  topLevelNameOnEntity,
+  topLevelApiNameOnEntity,
   ReferenceComponent,
   isReferenceElement,
-  EntityMeadowlarkData,
-  EntityPropertyMeadowlarkData,
-} from '@edfi/metaed-plugin-edfi-meadowlark';
+  EntityApiSchemaData,
+  EntityPropertyApiSchemaData,
+} from '@edfi/metaed-plugin-edfi-api-schema';
 import { decapitalize } from '../Utility';
 import { SuperclassInfo } from '../model/SuperclassInfo';
 import { DocumentIdentity } from '../model/DocumentIdentity';
@@ -31,7 +31,7 @@ type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
  * documentPath is a path in the JSON body as a string array with one path segment per array element.
  */
 function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentity {
-  const { apiMapping } = property.data.meadowlark as EntityPropertyMeadowlarkData;
+  const { apiMapping } = property.data.meadowlark as EntityPropertyApiSchemaData;
 
   let path: string[];
 
@@ -84,7 +84,7 @@ function documentIdentitiesFrom(
 
   const result: DocumentIdentity[] = [];
   identityReferenceComponent.referenceComponents.forEach((childComponent: ReferenceComponent) => {
-    const identityTopLevelName = topLevelNameOnEntity(entity, identityReferenceComponent.sourceProperty);
+    const identityTopLevelName = topLevelApiNameOnEntity(entity, identityReferenceComponent.sourceProperty);
     const newDocumentPath: string[] = documentPath.length > 0 ? documentPath : [identityTopLevelName];
     if (isReferenceElement(childComponent)) {
       result.push(singleIdentityFrom(childComponent.sourceProperty, body, newDocumentPath));
@@ -117,7 +117,7 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
   // identityReferenceComponents can represent a tree of identity information, thus the need to
   // flatmap into identities per top level component.
   const documentIdentities: DocumentIdentity[] = (
-    entity.data.meadowlark as EntityMeadowlarkData
+    entity.data.meadowlark as EntityApiSchemaData
   ).apiMapping.identityReferenceComponents.flatMap((identityReferenceComponent: ReferenceComponent) =>
     documentIdentitiesFrom(identityReferenceComponent, body, entity, []),
   );
@@ -137,7 +137,7 @@ export function extractDocumentIdentity(entity: TopLevelEntity, body: object): D
  *
  */
 export function deriveSuperclassInfoFrom(entity: TopLevelEntity, documentIdentity: DocumentIdentity): SuperclassInfo | null {
-  const { superclass }: NullableTopLevelEntity = (entity.data.meadowlark as EntityMeadowlarkData).apiMapping;
+  const { superclass }: NullableTopLevelEntity = (entity.data.meadowlark as EntityApiSchemaData).apiMapping;
   if (superclass == null) return null;
   const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
   if (identityRename == null) {

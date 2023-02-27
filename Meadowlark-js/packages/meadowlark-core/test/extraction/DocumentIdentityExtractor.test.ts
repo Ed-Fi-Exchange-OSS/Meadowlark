@@ -13,13 +13,13 @@ import {
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer, enumerationReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
-  entityPropertyMeadowlarkDataSetupEnhancer,
+  entityPropertyApiSchemaDataSetupEnhancer,
   apiEntityMappingEnhancer,
-  entityMeadowlarkDataSetupEnhancer,
+  entityApiSchemaDataSetupEnhancer,
   referenceComponentEnhancer,
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-meadowlark';
+} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
 
@@ -74,8 +74,8 @@ describe('when extracting natural key from domain entity referencing another ref
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -131,8 +131,8 @@ describe('when extracting natural key from domain entity with school year in ide
 
     enumerationReferenceEnhancer(metaEd);
 
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -183,8 +183,8 @@ describe('when extracting natural key from domain entity with school year that h
 
     enumerationReferenceEnhancer(metaEd);
 
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);

@@ -14,7 +14,7 @@ import {
   normalizeDescriptorSuffix,
   TopLevelEntity,
 } from '@edfi/metaed-core';
-import { pluralize } from '@edfi/metaed-plugin-edfi-meadowlark';
+import { pluralize } from '@edfi/metaed-plugin-edfi-api-schema';
 import { decapitalize } from '../Utility';
 
 /**
