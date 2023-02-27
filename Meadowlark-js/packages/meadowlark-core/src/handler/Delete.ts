@@ -12,7 +12,7 @@ import { DeleteResult } from '../message/DeleteResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris } from './UriBuilder';
-import { meadowlarkIdForDocumentInfo } from '../model/DocumentInfo';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Delete';
 
@@ -32,17 +32,13 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
       return { statusCode: 404 };
     }
-    const meadowlarkId = meadowlarkIdForDocumentInfo(
-      frontendRequest.middleware.resourceInfo,
-      frontendRequest.middleware.documentInfo,
-    );
+
     const request: DeleteRequest = {
       documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
-      meadowlarkId,
       resourceInfo: frontendRequest.middleware.resourceInfo,
       validate: frontendRequest.middleware.validateResources,
       security: frontendRequest.middleware.security,
-      traceId: frontendRequest.traceId,
+      traceId: frontendRequest.traceId as TraceId,
     };
 
     await beforeDeleteDocumentById(request);

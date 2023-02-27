@@ -8,7 +8,7 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   UpdateRequest,
   DocumentReference,
   NoResourceInfo,
@@ -16,6 +16,9 @@ import {
   newResourceInfo,
   newSuperclassInfo,
   SuperclassInfo,
+  DocumentUuid,
+  TraceId,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -25,17 +28,19 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
-const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8';
-const documentUuidBackup = '4218d452-a7b7-4f1c-aa91-26ccc48cf4b8';
+
+const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+const documentUuid2 = '4218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+
 const newUpdateRequest = (): UpdateRequest => ({
-  meadowlarkId: '',
+  meadowlarkId: '' as MeadowlarkId,
   documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the update of a non-existent document', () => {
@@ -50,7 +55,7 @@ describe('given the update of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update1' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -99,7 +104,7 @@ describe('given the update of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update2' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -150,7 +155,10 @@ describe('given an update of a document that references a non-existent document 
     documentIdentity: { natural: 'update4' },
   };
 
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
@@ -223,7 +231,10 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update5' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -240,7 +251,10 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update6' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -264,7 +278,7 @@ describe('given an update of a document that references an existing document wit
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesId,
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -278,7 +292,7 @@ describe('given an update of a document that references an existing document wit
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesId,
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -320,7 +334,10 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update7' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -344,7 +361,10 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update8' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -366,7 +386,7 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpdateRequest(),
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -380,7 +400,7 @@ describe('given an update of a document with one existing and one non-existent r
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -441,7 +461,10 @@ describe('given an update of a subclass document referenced by an existing docum
     documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const referenceAsSuperclass: DocumentReference = {
     projectName: superclassInfo.projectName,
@@ -458,9 +481,9 @@ describe('given an update of a subclass document referenced by an existing docum
     ...newDocumentInfo(),
     documentIdentity: { week: 'update6' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
-    documentWithReferenceDocumentInfo,
+    documentWithReferenceDocumentInfo.documentIdentity,
   );
 
   beforeAll(async () => {
@@ -483,7 +506,7 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpdateRequest(),
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
@@ -497,7 +520,7 @@ describe('given an update of a subclass document referenced by an existing docum
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        documentUuid: documentUuidBackup,
+        documentUuid: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,

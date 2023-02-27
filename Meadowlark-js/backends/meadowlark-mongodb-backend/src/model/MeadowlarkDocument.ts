@@ -9,7 +9,9 @@ import {
   documentIdForSuperclassInfo,
   DocumentInfo,
   DocumentReference,
+  MeadowlarkId,
   ResourceInfo,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 
 export interface MeadowlarkDocumentId {
@@ -17,7 +19,7 @@ export interface MeadowlarkDocumentId {
    * A string hash derived from the project name, resource name
    * and identity of the API document. This field replaces the built-in MongoDB _id.
    */
-  _id: string;
+  _id: MeadowlarkId;
 }
 
 export interface MeadowlarkDocument extends MeadowlarkDocumentId {
@@ -29,7 +31,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   /**
    * The UUID for the document.
    */
-  documentUuid: string;
+  documentUuid: DocumentUuid;
 
   /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
@@ -110,8 +112,8 @@ function referencedDocumentIdsFrom(documentInfo: DocumentInfo): string[] {
 export function meadowlarkDocumentFrom(
   resourceInfo: ResourceInfo,
   documentInfo: DocumentInfo,
-  documentUuid: string,
-  meadowlarkId: string,
+  documentUuid: DocumentUuid,
+  meadowlarkId: MeadowlarkId,
   edfiDoc: object,
   validate: boolean,
   createdBy: string,

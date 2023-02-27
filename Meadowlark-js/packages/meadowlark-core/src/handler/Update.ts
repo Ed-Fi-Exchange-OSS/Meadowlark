@@ -6,7 +6,7 @@
 import { writeErrorToLog } from '@edfi/meadowlark-utilities';
 import R from 'ramda';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { meadowlarkIdForDocumentInfo } from '../model/DocumentInfo';
+import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpdateDocumentById, beforeUpdateDocumentById } from '../plugin/listener/Publish';
 import { UpdateRequest } from '../message/UpdateRequest';
@@ -14,6 +14,7 @@ import { UpdateResult } from '../message/UpdateResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris } from './UriBuilder';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Update';
 
@@ -34,14 +35,14 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     const request: UpdateRequest = {
-      meadowlarkId: meadowlarkIdForDocumentInfo(resourceInfo, documentInfo),
+      meadowlarkId: meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity),
       documentUuid: pathComponents.documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
       validate: frontendRequest.middleware.validateResources,
       security,
-      traceId: frontendRequest.traceId,
+      traceId: frontendRequest.traceId as TraceId,
     };
 
     await beforeUpdateDocumentById(request);

@@ -9,7 +9,6 @@ import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
 import { resourceValidation } from '../middleware/ValidateResourceMiddleware';
-import { resourceIdValidation } from '../middleware/ValidateResourceIdMiddleware';
 import { documentValidation } from '../middleware/ValidateDocumentMiddleware';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
@@ -64,7 +63,6 @@ function putStack(): MiddlewareStack {
       R.andThen(parseBody),
       R.andThen(anonymizeAndLogRequestBody),
       R.andThen(resourceValidation),
-      R.andThen(resourceIdValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
       R.andThen(documentInfoExtraction),
@@ -81,7 +79,6 @@ function deleteStack(): MiddlewareStack {
       authorize,
       R.andThen(parsePath),
       R.andThen(resourceValidation),
-      R.andThen(resourceIdValidation),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
     ),
@@ -94,7 +91,6 @@ function getByIdStack(): MiddlewareStack {
     R.pipe(
       authorize,
       R.andThen(resourceValidation),
-      R.andThen(resourceIdValidation),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
     ),

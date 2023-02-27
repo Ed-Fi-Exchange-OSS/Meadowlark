@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { SuperclassInfo } from './SuperclassInfo';
-import { NoDocumentIdentity, meadowlarkIdForDocumentIdentity } from './DocumentIdentity';
+import { NoDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { DocumentReference } from './DocumentReference';
-import { ResourceInfo } from './ResourceInfo';
 
 /**
  * Complete information on a validated API document
@@ -52,10 +51,3 @@ export function newDocumentInfo(): DocumentInfo {
 export const NoDocumentInfo = Object.freeze({
   ...newDocumentInfo(),
 });
-
-/**
- * Returns the meadowlarkId of the given DocumentInfo, using the project name, resource name and identity of the API document.
- */
-export function meadowlarkIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
-  return meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
-}

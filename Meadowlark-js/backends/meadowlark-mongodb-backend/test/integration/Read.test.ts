@@ -8,12 +8,15 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   GetRequest,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  DocumentUuid,
+  TraceId,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -24,24 +27,24 @@ import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
-const documentUuid = '6e44a19e-1964-4b3e-ab7b-4b6231174601';
+const documentUuid = '6e44a19e-1964-4b3e-ab7b-4b6231174601' as DocumentUuid;
+
 const newGetRequest = (): GetRequest => ({
-  meadowlarkId: '',
-  documentUuid: '',
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  documentUuid: '',
-  meadowlarkId: '',
+  documentUuid: '' as DocumentUuid,
+  meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the get of a non-existent document', () => {
@@ -56,7 +59,7 @@ describe('given the get of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get1' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -94,7 +97,7 @@ describe('given the get of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();

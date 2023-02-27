@@ -6,9 +6,10 @@
 import {
   DocumentInfo,
   newDocumentInfo,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   ResourceInfo,
   newResourceInfo,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../src/model/MeadowlarkDocument';
 
@@ -24,8 +25,8 @@ describe('given non-superclass document info with no references', () => {
     documentIdentity: { natural: 'key' },
   };
 
-  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8';
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';
@@ -95,8 +96,8 @@ describe('given non-superclass document info with references', () => {
       },
     ],
   };
-  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8';
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';
@@ -135,8 +136,8 @@ describe('given superclass document info', () => {
     documentIdentity: { natural: 'key' },
     superclassInfo: { documentIdentity: { natural: 'key2' }, projectName: 'projectName', resourceName: 'resourceName' },
   };
-  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8';
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';

@@ -9,6 +9,7 @@ import { FrontendResponse, newFrontendResponse } from '../../src/handler/Fronten
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { newResourceInfo, NoResourceInfo } from '../../src/model/ResourceInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -173,7 +174,7 @@ describe('given requesting abstract domain entity', () => {
           resourceName: 'educationOrganizations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3',
+          documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };
@@ -209,7 +210,7 @@ describe('given requesting abstract association', () => {
           resourceName: 'generalStudentProgramAssociations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3',
+          documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };

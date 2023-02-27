@@ -83,9 +83,13 @@ export async function updateDocumentById(
       Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
 
       // if resourceInfo.allowIdentityUpdates is true, the process deletes de old document and inserts a new document.
+
+      // TODO ******
+      // /////////////////////////////////////////  this needs to be in the same transaction
+      //
       if (resourceInfo.allowIdentityUpdates) {
         const deleteResult = await deleteDocumentById(
-          { documentUuid, meadowlarkId, resourceInfo, security, validate: true, traceId },
+          { documentUuid, resourceInfo, security, validate: true, traceId },
           client,
         );
         // if the document was deleted, it should insert the new version.

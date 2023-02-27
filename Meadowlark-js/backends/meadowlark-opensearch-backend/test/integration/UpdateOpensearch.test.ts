@@ -6,11 +6,15 @@
 import {
   DeleteRequest,
   DeleteResult,
+  DocumentUuid,
+  generateDocumentUuid,
+  MeadowlarkId,
   newSecurity,
   NoDocumentInfo,
   PaginationParameters,
   QueryRequest,
   ResourceInfo,
+  TraceId,
   UpdateResult,
   UpsertRequest,
   UpsertResult,
@@ -35,18 +39,18 @@ const resourceInfo: ResourceInfo = {
   allowIdentityUpdates: false,
 };
 
-const meadowlarkId = '1234a-5678b';
-// const documentUuid = generateDocumentUuid();
-// TEMPORAL: Using meadowlarkId as documentUuid
+const meadowlarkId = '1234a-5678b' as MeadowlarkId;
+const documentUuid: DocumentUuid = generateDocumentUuid();
+
 const newUpsertRequest: UpsertRequest = {
   meadowlarkId,
-  documentUuid: meadowlarkId,
+  documentUuid,
   resourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 };
 
 const setupQueryRequest = (queryParameters: any, paginationParameters: PaginationParameters): QueryRequest => ({
@@ -54,7 +58,7 @@ const setupQueryRequest = (queryParameters: any, paginationParameters: Paginatio
   queryParameters,
   paginationParameters,
   security: { ...newSecurity() },
-  traceId: 'tracer',
+  traceId: 'tracer' as TraceId,
 });
 
 describe('given the upsert of a new document', () => {
@@ -82,7 +86,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, documentUuid: meadowlarkId, resourceInfo } as DeleteRequest,
+        { documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -91,13 +95,19 @@ describe('given the upsert of a new document', () => {
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: meadowlarkId })]));
+      expect(response.documents).toMatchInlineSnapshot(`
+        [
+          {
+            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
+          },
+        ]
+      `);
     });
   });
 
   describe('when update was successful', () => {
     beforeEach(async () => {
-      newUpsertRequest.traceId = 'tracer2';
+      newUpsertRequest.traceId = 'tracer2' as TraceId;
       await afterUpsertDocument(
         newUpsertRequest,
         {
@@ -109,7 +119,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, documentUuid: meadowlarkId, resourceInfo } as DeleteRequest,
+        { documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -118,7 +128,13 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: meadowlarkId })]));
+      expect(response.documents).toMatchInlineSnapshot(`
+        [
+          {
+            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
+          },
+        ]
+      `);
     });
   });
 
@@ -157,7 +173,7 @@ describe('given the upsert of a new document', () => {
 
     afterEach(async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, documentUuid: meadowlarkId, resourceInfo } as DeleteRequest,
+        { documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );
@@ -166,7 +182,13 @@ describe('given the upsert of a new document', () => {
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
 
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id: meadowlarkId })]));
+      expect(response.documents).toMatchInlineSnapshot(`
+        [
+          {
+            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
+          },
+        ]
+      `);
     });
   });
 
@@ -202,7 +224,7 @@ describe('given the upsert of a new document', () => {
 
     it('should be able to delete document', async () => {
       await afterDeleteDocumentById(
-        { meadowlarkId, documentUuid: meadowlarkId, resourceInfo } as DeleteRequest,
+        { documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );

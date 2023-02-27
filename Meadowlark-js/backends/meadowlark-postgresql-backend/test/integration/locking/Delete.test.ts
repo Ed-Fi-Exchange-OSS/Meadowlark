@@ -8,13 +8,16 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   DocumentReference,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
   documentIdForDocumentReference,
+  MeadowlarkId,
+  DocumentUuid,
+  TraceId,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
 import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
@@ -38,14 +41,14 @@ jest.setTimeout(10000);
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
-  meadowlarkId: '',
-  documentUuid: '0161d332-887e-4d7d-8503-241f684e0d79',
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuid: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const schoolResourceInfo: ResourceInfo = {
@@ -57,7 +60,7 @@ const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
   documentIdentity: { schoolId: '123' },
 };
-const schoolDocumentId = documentIdForDocumentInfo(schoolResourceInfo, schoolDocumentInfo);
+const schoolDocumentId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
 
 const referenceToSchool: DocumentReference = {
   projectName: schoolResourceInfo.projectName,
@@ -79,7 +82,10 @@ const academicWeekDocumentInfo: DocumentInfo = {
 
   documentReferences: [referenceToSchool],
 };
-const academicWeekDocumentId = documentIdForDocumentInfo(academicWeekResourceInfo, academicWeekDocumentInfo);
+const academicWeekDocumentId = meadowlarkIdForDocumentIdentity(
+  academicWeekResourceInfo,
+  academicWeekDocumentInfo.documentIdentity,
+);
 
 describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
   let insertClient: PoolClient;

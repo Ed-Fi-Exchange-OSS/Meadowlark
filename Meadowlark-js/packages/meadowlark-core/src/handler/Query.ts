@@ -12,6 +12,7 @@ import { afterQueryDocuments, beforeQueryDocuments } from '../plugin/listener/Pu
 import { QueryResult } from '../message/QueryResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Query';
 const TOTAL_COUNT_HEADER_NAME: string = 'total-count';
@@ -47,7 +48,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     resourceInfo: frontendRequest.middleware.resourceInfo,
     queryParameters: cleanQueryParameters,
     paginationParameters,
-    traceId: frontendRequest.traceId,
+    traceId: frontendRequest.traceId as TraceId,
     security: frontendRequest.middleware.security,
   };
 
