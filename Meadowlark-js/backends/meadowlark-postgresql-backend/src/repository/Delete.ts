@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi/meadowlark-utilities';
-import type { DeleteResult, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
+import type { DeleteResult, DeleteRequest, BlockingDocument, MeadowlarkId } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByIdSql,
@@ -18,9 +18,12 @@ import {
 const moduleName = 'postgresql.repository.Delete';
 
 export async function deleteDocumentById(
-  { meadowlarkId, validate, traceId }: DeleteRequest,
+  { documentUuid, validate, traceId }: DeleteRequest,
   client: PoolClient,
 ): Promise<DeleteResult> {
+  // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
+  const meadowlarkId: MeadowlarkId = documentUuid as unknown as MeadowlarkId;
+
   Logger.debug(`${moduleName}.deleteDocumentById ${meadowlarkId}`, traceId);
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };

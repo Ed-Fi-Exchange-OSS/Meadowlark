@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { DocumentUuid } from './BrandedTypes';
+
 export type PathComponents = {
   /**
    * Data standard version number
@@ -17,9 +19,9 @@ export type PathComponents = {
    */
   resourceName: string;
   /**
-   * Resource identifier
+   * The resource identifier, which is a document uuid
    */
-  documentUuid?: string;
+  documentUuid?: DocumentUuid;
 };
 
 export function newPathComponents() {

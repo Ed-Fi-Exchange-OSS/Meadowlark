@@ -11,16 +11,17 @@ import path from 'path';
 import xml2js from 'xml2js';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { ensurePluginsLoaded, getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
-import { meadowlarkIdForDocumentInfo, DocumentInfo } from '../model/DocumentInfo';
+import type { DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
 import { UpsertResult } from '../message/UpsertResult';
 import { decapitalize } from '../Utility';
 import { newResourceInfo, ResourceInfo } from '../model/ResourceInfo';
-import { DescriptorDocument } from '../model/DescriptorDocument';
+import type { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
-import { UpsertRequest } from '../message/UpsertRequest';
+import type { UpsertRequest } from '../message/UpsertRequest';
 import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
-import { generateDocumentUuid } from '../model/DocumentIdentity';
+import { generateDocumentUuid, meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
+import type { TraceId } from '../model/BrandedTypes';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -128,14 +129,14 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const documentInfo: DocumentInfo = descriptorDocumentInfoFrom(descriptorDocument);
 
       const upsertRequest: UpsertRequest = {
-        meadowlarkId: meadowlarkIdForDocumentInfo(resourceInfo, documentInfo),
+        meadowlarkId: meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity),
         documentUuid: generateDocumentUuid(),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,
         validate: true,
         security: { ...newSecurity(), authorizationStrategy: { type: 'FULL_ACCESS' } },
-        traceId: '-',
+        traceId: '-' as TraceId,
       };
 
       await beforeUpsertDocument(upsertRequest);

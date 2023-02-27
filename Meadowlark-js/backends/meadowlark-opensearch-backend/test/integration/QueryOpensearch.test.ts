@@ -15,6 +15,7 @@ import {
   DeleteRequest,
   DeleteResult,
 } from '@edfi/meadowlark-core';
+import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/BrandedTypes';
 import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
@@ -38,9 +39,10 @@ const student1 = {
   lastSurname: 'Student',
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
-  id: '1234a-5678a',
-  documentUuid: generateDocumentUuid(),
 };
+
+const student1DocumentUuid: DocumentUuid = generateDocumentUuid();
+const student1MeadowlarkId: MeadowlarkId = 'student1-123' as MeadowlarkId;
 
 const student2 = {
   studentUniqueId: '123fer58',
@@ -48,9 +50,10 @@ const student2 = {
   lastSurname: 'Student',
   birthDate: '2001-01-01',
   birthCountryDescriptor: 'uri://ed-fi.org/CountryDescriptor#US',
-  id: '1234a-5678b',
-  documentUuid: generateDocumentUuid(),
 };
+
+const student2DocumentUuid: DocumentUuid = generateDocumentUuid();
+const student2MeadowlarkId: MeadowlarkId = 'student2-456' as MeadowlarkId;
 
 const security: Security = {
   authorizationStrategy: { type: 'FULL_ACCESS' } as AuthorizationStrategy,
@@ -58,20 +61,20 @@ const security: Security = {
 };
 
 const setupUpsertRequest = (
-  id: string,
-  documentUuid: string,
+  documentUuid: DocumentUuid,
+  meadowlarkId: MeadowlarkId,
   edfiDoc = {},
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
-  meadowlarkId: id,
   documentUuid,
+  meadowlarkId,
   resourceInfo: newResourceInfo,
   documentInfo,
   edfiDoc,
   validate: false,
   security,
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const setupQueryRequest = (
@@ -83,7 +86,7 @@ const setupQueryRequest = (
   queryParameters,
   paginationParameters,
   security,
-  traceId: 'tracer',
+  traceId: 'tracer' as TraceId,
 });
 
 describe('When querying for documents', () => {
@@ -94,7 +97,7 @@ describe('When querying for documents', () => {
     client = await getNewClient();
 
     await afterUpsertDocument(
-      setupUpsertRequest(student1.id, student1.documentUuid, student1),
+      setupUpsertRequest(student1DocumentUuid, student1MeadowlarkId, student1),
       {
         response: 'INSERT_SUCCESS',
       } as UpsertResult,
@@ -102,7 +105,7 @@ describe('When querying for documents', () => {
     );
 
     await afterUpsertDocument(
-      setupUpsertRequest(student2.id, student2.documentUuid, student2),
+      setupUpsertRequest(student2DocumentUuid, student2MeadowlarkId, student2),
       {
         response: 'INSERT_SUCCESS',
       } as UpsertResult,
@@ -113,13 +116,13 @@ describe('When querying for documents', () => {
   afterAll(async () => {
     client = await getNewClient();
     await afterDeleteDocumentById(
-      { meadowlarkId: student1.id, documentUuid: student1.id, resourceInfo } as DeleteRequest,
+      { documentUuid: student1DocumentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
 
     await afterDeleteDocumentById(
-      { meadowlarkId: student2.id, documentUuid: student2.id, resourceInfo } as DeleteRequest,
+      { documentUuid: student2DocumentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
@@ -166,8 +169,8 @@ describe('When querying for documents', () => {
 
         expect(result.response).toEqual('QUERY_SUCCESS');
         expect(result.totalCount).toEqual(2);
-        expect(result.documents[0]).toEqual(student1);
-        expect(result.documents[1]).toEqual(student2);
+        expect(result.documents[0]).toEqual({ ...student1, id: student1DocumentUuid });
+        expect(result.documents[1]).toEqual({ ...student2, id: student2DocumentUuid });
       });
     });
 
@@ -177,7 +180,7 @@ describe('When querying for documents', () => {
 
         expect(result.response).toEqual('QUERY_SUCCESS');
         expect(result.totalCount).toEqual(1);
-        expect(result.documents[0]).toEqual(student1);
+        expect(result.documents[0]).toEqual({ ...student1, id: student1DocumentUuid });
       });
     });
 
@@ -188,7 +191,7 @@ describe('When querying for documents', () => {
         expect(result.response).toEqual('QUERY_SUCCESS');
         expect(result.totalCount).toEqual(2);
         expect(result.documents).toHaveLength(1);
-        expect(result.documents[0]).toEqual(student1);
+        expect(result.documents[0]).toEqual({ ...student1, id: student1DocumentUuid });
       });
     });
 
@@ -199,7 +202,7 @@ describe('When querying for documents', () => {
         expect(result.response).toEqual('QUERY_SUCCESS');
         expect(result.totalCount).toEqual(2);
         expect(result.documents).toHaveLength(1);
-        expect(result.documents[0]).toEqual(student2);
+        expect(result.documents[0]).toEqual({ ...student2, id: student2DocumentUuid });
       });
     });
 
@@ -250,20 +253,21 @@ describe('When querying for documents', () => {
         queryParameters: {},
         paginationParameters: {},
         security: ownershipSecurity,
-        traceId: 'tracer',
+        traceId: 'tracer' as TraceId,
       };
 
-      const descriptorId = 'desc-123';
+      const descriptorDocumentUuid: DocumentUuid = generateDocumentUuid();
+      const descriptorMeadowlarkId: MeadowlarkId = 'desc-123' as MeadowlarkId;
 
       const descriptorUpsertRequest: UpsertRequest = {
-        meadowlarkId: descriptorId,
-        documentUuid: descriptorId,
+        documentUuid: descriptorDocumentUuid,
+        meadowlarkId: descriptorMeadowlarkId,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
         edfiDoc: {},
         validate: false,
         security: ownershipSecurity,
-        traceId: 'traceId',
+        traceId: 'traceId' as TraceId,
       };
 
       beforeAll(async () => {
@@ -278,7 +282,7 @@ describe('When querying for documents', () => {
 
       afterAll(async () => {
         await afterDeleteDocumentById(
-          { meadowlarkId: descriptorId, documentUuid: descriptorId, resourceInfo: descriptorResourceInfo } as DeleteRequest,
+          { documentUuid: descriptorDocumentUuid, resourceInfo: descriptorResourceInfo } as DeleteRequest,
           { response: 'DELETE_SUCCESS' } as DeleteResult,
           client,
         );
@@ -289,7 +293,7 @@ describe('When querying for documents', () => {
 
         expect(result.response).toEqual('QUERY_SUCCESS');
         expect(result.totalCount).toEqual(1);
-        expect(result.documents[0]).toEqual({ id: descriptorId });
+        expect(result.documents[0]).toEqual({ id: descriptorDocumentUuid });
       });
     });
 
@@ -299,7 +303,7 @@ describe('When querying for documents', () => {
         queryParameters: {},
         paginationParameters: {},
         security: ownershipSecurity,
-        traceId: 'tracer',
+        traceId: 'tracer' as TraceId,
       };
 
       it('should return empty array for different client', async () => {

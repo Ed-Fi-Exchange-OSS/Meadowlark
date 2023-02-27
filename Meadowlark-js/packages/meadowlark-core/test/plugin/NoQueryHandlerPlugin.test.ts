@@ -9,6 +9,7 @@ import { AuthorizationStrategy } from '../../src/security/AuthorizationStrategy'
 import { PaginationParameters } from '../../src/message/PaginationParameters';
 import { QueryRequest } from '../../src/message/QueryRequest';
 import { QueryResult } from '../../src/message/QueryResult';
+import { TraceId } from '../../src/model/BrandedTypes';
 
 const setupQueryRequest = (
   authorizationStrategy: AuthorizationStrategy,
@@ -20,7 +21,7 @@ const setupQueryRequest = (
   queryParameters,
   paginationParameters,
   security: { authorizationStrategy, clientId },
-  traceId: 'tracer',
+  traceId: 'tracer' as TraceId,
 });
 
 describe('given query and no backend plugin has been configured', () => {

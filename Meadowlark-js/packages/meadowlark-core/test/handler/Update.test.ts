@@ -9,8 +9,9 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
-const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d';
+const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   body: '{}',

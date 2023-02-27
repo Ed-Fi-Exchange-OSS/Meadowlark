@@ -4,16 +4,19 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi/meadowlark-utilities';
-import { documentIdForDocumentInfo, FrontendRequest, writeRequestToLog } from '@edfi/meadowlark-core';
+import { meadowlarkIdForDocumentIdentity, FrontendRequest, writeRequestToLog, MeadowlarkId } from '@edfi/meadowlark-core';
 import { Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { SecurityResult } from '../security/SecurityResult';
 import { getDocumentCollection } from './Db';
 
-function extractIdIfUpsert(frontendRequest: FrontendRequest): string | undefined {
-  if (frontendRequest.action !== 'upsert') return undefined;
+function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | null {
+  if (frontendRequest.action !== 'upsert') return null;
 
-  return documentIdForDocumentInfo(frontendRequest.middleware.resourceInfo, frontendRequest.middleware.documentInfo);
+  return meadowlarkIdForDocumentIdentity(
+    frontendRequest.middleware.resourceInfo,
+    frontendRequest.middleware.documentInfo.documentIdentity,
+  );
 }
 
 export async function rejectByOwnershipSecurity(
@@ -36,35 +39,44 @@ export async function rejectByOwnershipSecurity(
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const { documentUuid } = frontendRequest.middleware.pathComponents;
-  const meadowlarkId = extractIdIfUpsert(frontendRequest);
 
-  if (documentUuid == null && meadowlarkId == null) {
-    Logger.error(`${functionName} - no id to secure against`, frontendRequest.traceId);
-    return 'NOT_APPLICABLE';
-  }
+  let result: WithId<MeadowlarkDocument> | null = null;
 
   try {
-    // if documentUuid is null, it uses _id
-    const result: WithId<MeadowlarkDocument> | null =
-      documentUuid != null
-        ? await mongoCollection.findOne({ documentUuid }, { projection: { createdBy: 1, _id: 0 } })
-        : await mongoCollection.findOne({ _id: meadowlarkId }, { projection: { createdBy: 1, _id: 0 } });
-    if (result === null) {
-      Logger.debug(`${functionName} - document not found for documentUuid ${documentUuid}`, frontendRequest.traceId);
-      return 'NOT_APPLICABLE';
+    if (documentUuid != null) {
+      // security by documentUuid if available
+      result = await mongoCollection.findOne({ documentUuid }, { projection: { createdBy: 1, _id: 0 } });
+
+      if (result === null) {
+        Logger.debug(`${functionName} - document not found for documentUuid ${documentUuid}`, frontendRequest.traceId);
+        return 'NOT_APPLICABLE';
+      }
+      Logger.debug(`${functionName} - document found for documentUuid ${documentUuid}`, frontendRequest.traceId);
+    } else {
+      // security by meadowlarkId if it's upsert - document body with no documentUuid
+      const meadowlarkId: MeadowlarkId | null = extractIdIfUpsert(frontendRequest);
+
+      if (meadowlarkId == null) {
+        Logger.error(`${functionName} - no documentUuid or meadowlarkId to secure against`, frontendRequest.traceId);
+        return 'NOT_APPLICABLE';
+      }
+
+      result = await mongoCollection.findOne({ _id: meadowlarkId }, { projection: { createdBy: 1, _id: 0 } });
+
+      if (result === null) {
+        Logger.debug(`${functionName} - document not found for meadowlarkId ${meadowlarkId}`, frontendRequest.traceId);
+        return 'NOT_APPLICABLE';
+      }
+      Logger.debug(`${functionName} - document found for meadowlarkId ${meadowlarkId}`, frontendRequest.traceId);
     }
+
     const { clientId } = frontendRequest.middleware.security;
     if (result.createdBy === clientId) {
-      Logger.debug(
-        `${functionName} - access approved: documentUuid ${documentUuid}, clientId ${clientId}`,
-        frontendRequest.traceId,
-      );
+      Logger.debug(`${functionName} - access approved for clientId ${clientId}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }
-    Logger.debug(
-      `${functionName} - access denied: documentUuid ${documentUuid}, clientId ${clientId}`,
-      frontendRequest.traceId,
-    );
+
+    Logger.debug(`${functionName} - access denied for clientId ${clientId}`, frontendRequest.traceId);
     return 'ACCESS_DENIED';
   } catch (e) {
     return 'UNKNOWN_FAILURE';

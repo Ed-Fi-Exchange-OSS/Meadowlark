@@ -8,12 +8,15 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   DocumentReference,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  DocumentUuid,
+  MeadowlarkId,
+  TraceId,
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
@@ -34,18 +37,18 @@ import { setupConfigForIntegration } from '../Config';
 
 jest.setTimeout(10000);
 
-const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d';
+const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
-  meadowlarkId: '',
-  documentUuid: '',
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const schoolResourceInfo: ResourceInfo = {
@@ -57,7 +60,7 @@ const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
   documentIdentity: { schoolId: '123' },
 };
-const schoolDocumentId = documentIdForDocumentInfo(schoolResourceInfo, schoolDocumentInfo);
+const schoolDocumentId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
 
 const referenceToSchool: DocumentReference = {
   projectName: schoolResourceInfo.projectName,
@@ -79,7 +82,10 @@ const academicWeekDocumentInfo: DocumentInfo = {
 
   documentReferences: [referenceToSchool],
 };
-const academicWeekDocumentId = documentIdForDocumentInfo(academicWeekResourceInfo, academicWeekDocumentInfo);
+const academicWeekDocumentId = meadowlarkIdForDocumentIdentity(
+  academicWeekResourceInfo,
+  academicWeekDocumentInfo.documentIdentity,
+);
 
 const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom(
   academicWeekResourceInfo,

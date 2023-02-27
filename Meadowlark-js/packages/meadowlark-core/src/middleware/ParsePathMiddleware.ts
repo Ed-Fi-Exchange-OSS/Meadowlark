@@ -6,6 +6,7 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { isDocumentIdWellFormed, isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
+import type { DocumentUuid } from '../model/BrandedTypes';
 import type { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ParsePathMiddleware';
@@ -28,7 +29,7 @@ export function pathComponentsFrom(path: string): PathComponents | null {
     version: match.groups.version,
     namespace: match.groups.namespace,
     resourceName: match.groups.resource,
-    documentUuid,
+    documentUuid: documentUuid as DocumentUuid,
   };
 }
 

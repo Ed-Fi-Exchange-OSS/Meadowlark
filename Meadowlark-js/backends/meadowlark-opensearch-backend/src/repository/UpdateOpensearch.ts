@@ -7,6 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import {
   DeleteRequest,
   DeleteResult,
+  DocumentUuid,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
@@ -14,14 +15,14 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QueryOpensearch';
-import { LogOpenSearchErrors } from './OpenSearchException';
+import { handleOpenSearchError } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.UpdateOpensearch';
 
 /**
  * Parameters for an OpenSearch request
  */
-type OpensearchRequest = { index: string; id: string };
+type OpensearchRequest = { index: string; id: DocumentUuid };
 
 /**
  * Listener for afterDeleteDocumentById events
@@ -31,7 +32,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   if (result.response !== 'DELETE_SUCCESS') return;
 
   const opensearchRequest: OpensearchRequest = {
-    id: request.meadowlarkId,
+    id: request.documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -42,7 +43,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
+    await handleOpenSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
   }
 }
 
@@ -51,7 +52,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = {
-    id: request.meadowlarkId,
+    id: request.documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -72,7 +73,7 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
       refresh: true,
     });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
+    await handleOpenSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
   }
 }
 

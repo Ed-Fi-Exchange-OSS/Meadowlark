@@ -8,13 +8,16 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   GetRequest,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
   GetResult,
+  DocumentUuid,
+  TraceId,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -27,22 +30,21 @@ import { setupConfigForIntegration } from './Config';
 jest.setTimeout(40000);
 
 const newGetRequest = (): GetRequest => ({
-  meadowlarkId: '',
-  documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490',
+  documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  meadowlarkId: '',
-  documentUuid: 'eeb6ea15-fa93-4389-89a8-1428fb617490',
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuid: 'eeb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
   validate: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the get of a non-existent document', () => {
@@ -57,14 +59,17 @@ describe('given the get of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get1' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = await getSharedClient();
 
-    getResult = await getDocumentById({ ...newGetRequest(), meadowlarkId, resourceInfo }, client);
+    getResult = await getDocumentById(
+      { ...newGetRequest(), documentUuid: meadowlarkId as unknown as DocumentUuid, resourceInfo },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -96,7 +101,7 @@ describe('given the get of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const meadowlarkId = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -107,7 +112,10 @@ describe('given the get of an existing document', () => {
     // insert the initial version
     await upsertDocument(upsertRequest, client);
 
-    getResult = await getDocumentById({ ...newGetRequest(), meadowlarkId, resourceInfo }, client);
+    getResult = await getDocumentById(
+      { ...newGetRequest(), documentUuid: meadowlarkId as unknown as DocumentUuid, resourceInfo },
+      client,
+    );
   });
 
   afterAll(async () => {

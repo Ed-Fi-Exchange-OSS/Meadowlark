@@ -6,7 +6,6 @@
 import R from 'ramda';
 import { LOCATION_HEADER_NAME, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { meadowlarkIdForDocumentInfo } from '../model/DocumentInfo';
 import { getDocumentStore } from '../plugin/PluginLoader';
 import { afterUpsertDocument, beforeUpsertDocument } from '../plugin/listener/Publish';
 import type { UpsertRequest } from '../message/UpsertRequest';
@@ -14,7 +13,8 @@ import type { UpsertResult } from '../message/UpsertResult';
 import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris, resourceUriFrom } from './UriBuilder';
-import { generateDocumentUuid } from '../model/DocumentIdentity';
+import { generateDocumentUuid, meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Upsert';
 
@@ -29,7 +29,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
     const documentUuid = generateDocumentUuid();
-    const meadowlarkId = meadowlarkIdForDocumentInfo(resourceInfo, documentInfo);
+    const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
     const request: UpsertRequest = {
       meadowlarkId,
       documentUuid,
@@ -38,7 +38,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       edfiDoc: parsedBody,
       validate: frontendRequest.middleware.validateResources,
       security,
-      traceId: frontendRequest.traceId,
+      traceId: frontendRequest.traceId as TraceId,
     };
 
     await beforeUpsertDocument(request);

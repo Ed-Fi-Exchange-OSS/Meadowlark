@@ -6,7 +6,7 @@ import { OpenSearchClientError, ResponseError } from '@opensearch-project/opense
 import { Logger } from '@edfi/meadowlark-utilities';
 import { QueryResult } from '@edfi/meadowlark-core';
 
-export async function LogOpenSearchErrors(
+export async function handleOpenSearchError(
   err: OpenSearchClientError | Error,
   moduleName: string = '',
   traceId: string = '',
