@@ -10,7 +10,7 @@ import { Security } from '../security/Security';
 
 export type UpsertRequest = {
   meadowlarkId: MeadowlarkId;
-  documentUuid: DocumentUuid;
+  documentUuidInserted: DocumentUuid;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   edfiDoc: object;

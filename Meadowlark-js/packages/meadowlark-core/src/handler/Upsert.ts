@@ -28,11 +28,11 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     writeRequestToLog(moduleName, frontendRequest, 'upsert');
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const documentUuid = generateDocumentUuid();
+    const documentUuidInserted = generateDocumentUuid();
     const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
     const request: UpsertRequest = {
       meadowlarkId,
-      documentUuid,
+      documentUuidInserted,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
@@ -51,7 +51,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
       return {
         statusCode: 201,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuid) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuidInserted) },
       };
     }
 
@@ -59,7 +59,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
       return {
         statusCode: 200,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuid) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, result.existingDocumentUuid) },
       };
     }
 

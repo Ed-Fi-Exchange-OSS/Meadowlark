@@ -11,7 +11,9 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
 import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
+import { DocumentUuid } from '../../dist';
 
+const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   body: '{}',
@@ -29,7 +31,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -64,7 +66,7 @@ describe('given persistence is going to throw a reference error on insert', () =
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Error message",
       }
@@ -76,7 +78,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -111,7 +113,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Error message",
       }
@@ -123,7 +125,7 @@ describe('given persistence is going to throw a reference error on update though
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -156,7 +158,7 @@ describe('given persistence is going to throw a reference error on update though
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Reference failure",
       }
@@ -243,6 +245,7 @@ describe('given persistence succeeds as update', () => {
         Promise.resolve({
           response: 'UPDATE_SUCCESS',
           failureMessage: null,
+          existingDocumentUuid: documentUuid,
         } as unknown as UpsertResult),
     });
 

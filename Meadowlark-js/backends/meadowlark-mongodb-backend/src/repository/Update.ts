@@ -85,7 +85,16 @@ export async function updateDocumentById(
         if (deleteResult.response === 'DELETE_SUCCESS') {
           // insert the updated document.
           const upsertResult = await upsertDocument(
-            { resourceInfo, documentInfo, documentUuid, meadowlarkId, edfiDoc, validate, traceId, security },
+            {
+              resourceInfo,
+              documentInfo,
+              documentUuidInserted: documentUuid,
+              meadowlarkId,
+              edfiDoc,
+              validate,
+              traceId,
+              security,
+            },
             client,
           );
           if (upsertResult.response === 'INSERT_SUCCESS') {

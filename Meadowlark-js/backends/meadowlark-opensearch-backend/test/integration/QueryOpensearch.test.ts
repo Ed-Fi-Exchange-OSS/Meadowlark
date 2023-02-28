@@ -67,7 +67,7 @@ const setupUpsertRequest = (
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
-  documentUuid,
+  documentUuidInserted: documentUuid,
   meadowlarkId,
   resourceInfo: newResourceInfo,
   documentInfo,
@@ -260,7 +260,7 @@ describe('When querying for documents', () => {
       const descriptorMeadowlarkId: MeadowlarkId = 'desc-123' as MeadowlarkId;
 
       const descriptorUpsertRequest: UpsertRequest = {
-        documentUuid: descriptorDocumentUuid,
+        documentUuidInserted: descriptorDocumentUuid,
         meadowlarkId: descriptorMeadowlarkId,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,

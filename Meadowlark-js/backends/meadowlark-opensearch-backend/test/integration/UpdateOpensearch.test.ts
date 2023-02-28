@@ -7,7 +7,6 @@ import {
   DeleteRequest,
   DeleteResult,
   DocumentUuid,
-  generateDocumentUuid,
   MeadowlarkId,
   newSecurity,
   NoDocumentInfo,
@@ -15,6 +14,7 @@ import {
   QueryRequest,
   ResourceInfo,
   TraceId,
+  UpdateRequest,
   UpdateResult,
   UpsertRequest,
   UpsertResult,
@@ -40,9 +40,20 @@ const resourceInfo: ResourceInfo = {
 };
 
 const meadowlarkId = '1234a-5678b' as MeadowlarkId;
-const documentUuid: DocumentUuid = generateDocumentUuid();
+const documentUuid: DocumentUuid = 'e6ce70aa-8216-46e9-b6a1-a3be70f72f36' as DocumentUuid;
 
 const newUpsertRequest: UpsertRequest = {
+  meadowlarkId,
+  documentUuidInserted: documentUuid,
+  resourceInfo,
+  documentInfo: NoDocumentInfo,
+  edfiDoc: {},
+  validate: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId' as TraceId,
+};
+
+const newUpdateRequest: UpdateRequest = {
   meadowlarkId,
   documentUuid,
   resourceInfo,
@@ -163,7 +174,7 @@ describe('given the upsert of a new document', () => {
   describe('when updating by meadowlarkId is successful', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
-        newUpsertRequest,
+        newUpdateRequest,
         {
           response: 'UPDATE_SUCCESS',
         } as UpdateResult,
@@ -197,7 +208,7 @@ describe('given the upsert of a new document', () => {
       'should not update when result is %s',
       async (response) => {
         await afterUpdateDocumentById(
-          newUpsertRequest,
+          newUpdateRequest,
           {
             response,
           } as UpdateResult,
@@ -214,7 +225,7 @@ describe('given the upsert of a new document', () => {
   describe('when deleting by meadowlarkId', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
-        newUpsertRequest,
+        newUpdateRequest,
         {
           response: 'UPDATE_SUCCESS',
         } as UpdateResult,

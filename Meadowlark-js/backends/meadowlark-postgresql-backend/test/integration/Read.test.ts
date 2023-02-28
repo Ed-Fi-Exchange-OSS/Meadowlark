@@ -38,7 +38,7 @@ const newGetRequest = (): GetRequest => ({
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid: 'eeb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
+  documentUuidInserted: 'eeb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},

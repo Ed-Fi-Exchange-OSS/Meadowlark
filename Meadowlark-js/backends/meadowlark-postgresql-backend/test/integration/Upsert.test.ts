@@ -33,7 +33,7 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid: '' as DocumentUuid,
+  documentUuidInserted: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},

@@ -22,6 +22,7 @@ import {
   MeadowlarkId,
   DocumentUuid,
   TraceId,
+  UpsertRequest,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -33,6 +34,17 @@ import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
+
+const newUpsertRequest = (): UpsertRequest => ({
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuidInserted: '' as DocumentUuid,
+  resourceInfo: NoResourceInfo,
+  documentInfo: NoDocumentInfo,
+  edfiDoc: {},
+  validate: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId' as TraceId,
+});
 
 const newUpdateRequest = (): UpdateRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -115,6 +127,13 @@ describe('given the update of an existing document', () => {
     await setupConfigForIntegration();
 
     client = await getSharedClient();
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
     const updateRequest: UpdateRequest = {
       ...newUpdateRequest(),
       meadowlarkId,
@@ -124,7 +143,7 @@ describe('given the update of an existing document', () => {
     };
 
     // insert the initial version
-    await upsertDocument(updateRequest, client);
+    await upsertDocument(upsertRequest, client);
 
     updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
   });
@@ -182,7 +201,7 @@ describe('given an update of a document that references a non-existent document 
     // Insert the original document with no reference
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -276,7 +295,7 @@ describe('given an update of a document that references an existing document wit
     // The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
@@ -287,7 +306,7 @@ describe('given an update of a document that references an existing document wit
     // The original document with no reference
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -386,7 +405,7 @@ describe('given an update of a document with one existing and one non-existent r
     //  The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
@@ -397,7 +416,7 @@ describe('given an update of a document with one existing and one non-existent r
     // The original document with no references
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -507,7 +526,7 @@ describe('given an update of a subclass document referenced by an existing docum
     //  The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
@@ -517,7 +536,7 @@ describe('given an update of a subclass document referenced by an existing docum
     // The original document with no reference
     await upsertDocument(
       {
-        ...newUpdateRequest(),
+        ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,

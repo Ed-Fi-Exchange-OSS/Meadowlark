@@ -36,7 +36,7 @@ const documentUuid2 = '4518d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid,
+  documentUuidInserted: documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -97,7 +97,12 @@ describe('given the delete of an existing document', () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), documentUuid, documentInfo, edfiDoc: { natural: 'key' } };
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      documentUuidInserted: documentUuid,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
 
     // insert the initial version
     await upsertDocument(upsertRequest, client);
@@ -167,7 +172,12 @@ describe('given the delete of a document referenced by an existing document with
 
     // The document that will be referenced
     await upsertDocument(
-      { ...newUpsertRequest(), documentUuid, meadowlarkId: referencedDocumentId, documentInfo: referencedDocumentInfo },
+      {
+        ...newUpsertRequest(),
+        documentUuidInserted: documentUuid,
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
       client,
     );
 
@@ -175,7 +185,7 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid: documentUuid2,
+        documentUuidInserted: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -251,7 +261,12 @@ describe('given an delete of a document with an outbound reference only, with va
 
     // The document that will be referenced
     await upsertDocument(
-      { ...newUpsertRequest(), documentUuid, meadowlarkId: referencedDocumentId, documentInfo: referencedDocumentInfo },
+      {
+        ...newUpsertRequest(),
+        documentUuidInserted: documentUuid,
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
       client,
     );
 
@@ -259,7 +274,7 @@ describe('given an delete of a document with an outbound reference only, with va
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid: documentUuid2,
+        documentUuidInserted: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -341,7 +356,7 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid: documentUuid2,
+        documentUuidInserted: documentUuid2,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -352,7 +367,7 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid,
+        documentUuidInserted: documentUuid,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
         validate: true,
@@ -441,7 +456,7 @@ describe('given the delete of a subclass document referenced by an existing docu
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid: referencedDocumentUuid,
+        documentUuidInserted: referencedDocumentUuid,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -452,7 +467,7 @@ describe('given the delete of a subclass document referenced by an existing docu
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuid: documentWithReferencesDocumentUuid,
+        documentUuidInserted: documentWithReferencesDocumentUuid,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferenceDocumentInfo,
         validate: true,

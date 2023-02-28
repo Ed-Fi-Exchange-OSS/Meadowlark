@@ -52,7 +52,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = {
-    id: request.documentUuid,
+    id: request.documentUuidInserted,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -92,5 +92,17 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: Client) {
   Logger.info(`${moduleName}.afterUpdateDocumentById`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
-  await upsertToOpensearch(request, client);
+  await upsertToOpensearch(
+    {
+      meadowlarkId: request.meadowlarkId,
+      documentUuidInserted: request.documentUuid,
+      resourceInfo: request.resourceInfo,
+      documentInfo: request.documentInfo,
+      edfiDoc: request.edfiDoc,
+      validate: request.validate,
+      security: request.security,
+      traceId: request.traceId,
+    },
+    client,
+  );
 }

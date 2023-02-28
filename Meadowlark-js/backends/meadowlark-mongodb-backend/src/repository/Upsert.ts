@@ -16,15 +16,13 @@ const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session 
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocument(
-  { resourceInfo, documentInfo, documentUuid, meadowlarkId, edfiDoc, validate, traceId, security }: UpsertRequest,
+  { resourceInfo, documentInfo, documentUuidInserted, meadowlarkId, edfiDoc, validate, traceId, security }: UpsertRequest,
   client: MongoClient,
 ): Promise<UpsertResult> {
-  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
-
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
-  let newDocumentUuid = documentUuid;
+  let documentUuid = documentUuidInserted;
   try {
     await session.withTransaction(async () => {
       const mongoDocument = await mongoCollection.findOne({ _id: meadowlarkId });
@@ -62,7 +60,7 @@ export async function upsertDocument(
           return;
         }
       } else if (mongoDocument != null) {
-        newDocumentUuid = mongoDocument.documentUuid;
+        documentUuid = mongoDocument.documentUuid;
       }
 
       if (validate) {
@@ -77,7 +75,7 @@ export async function upsertDocument(
         // Abort on validation failure
         if (failures.length > 0) {
           Logger.debug(
-            `${moduleName}.upsertDocument Upserting document uuid ${newDocumentUuid} failed due to invalid references`,
+            `${moduleName}.upsertDocument Upserting document uuid ${documentUuid} failed due to invalid references`,
             traceId,
           );
 
@@ -107,7 +105,7 @@ export async function upsertDocument(
       const document: MeadowlarkDocument = meadowlarkDocumentFrom(
         resourceInfo,
         documentInfo,
-        newDocumentUuid,
+        documentUuid,
         meadowlarkId,
         edfiDoc,
         validate,
@@ -116,7 +114,7 @@ export async function upsertDocument(
 
       await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
       // Perform the document upsert
-      Logger.debug(`${moduleName}.upsertDocument Upserting document uuid ${newDocumentUuid}`, traceId);
+      Logger.debug(`${moduleName}.upsertDocument Upserting document uuid ${documentUuid}`, traceId);
 
       const { acknowledged, upsertedCount } = await mongoCollection.replaceOne(
         { _id: meadowlarkId },
@@ -124,7 +122,10 @@ export async function upsertDocument(
         asUpsert(session),
       );
       if (acknowledged) {
-        upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+        upsertResult = {
+          response: upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS',
+          existingDocumentUuid: documentUuid,
+        };
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
