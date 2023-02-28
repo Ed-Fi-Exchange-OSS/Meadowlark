@@ -43,16 +43,16 @@ type DocumentElement = {
 // return value is arrays of document paths, grouped (with arrays) by path endings to line up with name array
 function extractRawDocumentPaths(referenceGroup: ReferenceGroup, document: object): string[][][] {
   const result: string[][][] = [];
-  const { apiMapping }: { apiMapping: ApiPropertyMapping } = referenceGroup.sourceProperty.data.meadowlark;
+  const { apiMapping }: { apiMapping: ApiPropertyMapping } = referenceGroup.sourceProperty.data.edfiApiSchema;
 
   const topLevelDocumentField: string = apiMapping.topLevelName;
   const { referencedEntity } = referenceGroup.sourceProperty as ReferentialProperty;
 
   // pathEndings are the property names of all the scalar identity fields
   const pathEndings: string[] = (
-    referencedEntity.data.meadowlark as EntityApiSchemaData
+    referencedEntity.data.edfiApiSchema as EntityApiSchemaData
   ).apiMapping.flattenedIdentityProperties.map(
-    (property) => (property.data.meadowlark as EntityPropertyApiSchemaData).apiMapping.fullName,
+    (property) => (property.data.edfiApiSchema as EntityPropertyApiSchemaData).apiMapping.fullName,
   );
 
   if (apiMapping.isReferenceCollection) {
@@ -106,7 +106,7 @@ function documentPathsFromSubReferenceComponent(
   subReferenceComponent: ReferenceComponent,
   referenceComponentTopLevelName: string,
 ): string[] {
-  const propertyMeadowlarkData: EntityPropertyApiSchemaData = subReferenceComponent.sourceProperty.data.meadowlark;
+  const propertyMeadowlarkData: EntityPropertyApiSchemaData = subReferenceComponent.sourceProperty.data.edfiApiSchema;
 
   if (isReferenceElement(subReferenceComponent)) {
     return [`${referenceComponentTopLevelName}.${propertyMeadowlarkData.apiMapping.fullName}`];
@@ -139,7 +139,7 @@ function documentPathsFromReferenceComponents(referenceComponents: ReferenceComp
           result.push('schoolYearTypeReference.schoolYear');
         }
       } else {
-        const propertyMeadowlarkData: EntityPropertyApiSchemaData = referenceComponent.sourceProperty.data.meadowlark;
+        const propertyMeadowlarkData: EntityPropertyApiSchemaData = referenceComponent.sourceProperty.data.edfiApiSchema;
         result.push(propertyMeadowlarkData.apiMapping.fullName);
       }
     } else {
@@ -261,7 +261,7 @@ function documentReferencesFromReferenceGroup(
 export function extractDocumentReferences(entity: TopLevelEntity, document: object): DocumentReference[] {
   const result: DocumentReference[] = [];
 
-  (entity.data.meadowlark as EntityApiSchemaData).apiMapping.referenceGroups.forEach((referenceGroup: ReferenceGroup) => {
+  (entity.data.edfiApiSchema as EntityApiSchemaData).apiMapping.referenceGroups.forEach((referenceGroup: ReferenceGroup) => {
     result.push(...documentReferencesFromReferenceGroup(referenceGroup, document, entity));
   });
   return result;

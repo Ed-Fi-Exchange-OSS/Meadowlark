@@ -12,7 +12,7 @@ const createModel = (): TopLevelEntity => ({
   metaEdName: 'Student',
   properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true }],
   data: {
-    meadowlark: {
+    edfiApiSchema: {
       jsonSchema: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
         additionalProperties: false,
