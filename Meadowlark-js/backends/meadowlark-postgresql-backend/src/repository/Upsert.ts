@@ -11,6 +11,8 @@ import {
   documentIdForDocumentReference,
   documentIdForSuperclassInfo,
   BlockingDocument,
+  generateDocumentUuid,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import {
@@ -34,7 +36,8 @@ export async function upsertDocument(
   Logger.info(`${moduleName}.upsertDocument`, traceId);
 
   const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-
+  let documentUuid: DocumentUuid;
+  documentUuid = generateDocumentUuid();
   try {
     await client.query('BEGIN');
 
@@ -73,6 +76,9 @@ export async function upsertDocument(
           blockingDocuments,
         };
       }
+    } else {
+      // TODO: TEMP, replace this with the proper documentUuid
+      documentUuid = meadowlarkId as unknown as DocumentUuid;
     }
 
     const documentUpsertSql: string = documentInsertOrUpdateSql(
@@ -145,7 +151,7 @@ export async function upsertDocument(
     }
 
     await client.query('COMMIT');
-    return { response: isInsert ? 'INSERT_SUCCESS' : 'UPDATE_SUCCESS' };
+    return isInsert ? { response: 'INSERT_SUCCESS' } : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
     await client.query('ROLLBACK');

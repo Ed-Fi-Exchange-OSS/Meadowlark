@@ -147,7 +147,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
   const upsertRequest: UpsertRequest = {
     meadowlarkId,
-    documentUuid,
+    documentUuidInserted: documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -205,7 +205,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const documentUuid = generateDocumentUuid();
   const upsertRequest: UpsertRequest = {
-    documentUuid,
+    documentUuidInserted: documentUuid,
     meadowlarkId,
     resourceInfo,
     documentInfo,

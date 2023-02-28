@@ -37,7 +37,7 @@ const newGetRequest = (): GetRequest => ({
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  documentUuid: '' as DocumentUuid,
+  documentUuidInserted: '' as DocumentUuid,
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
@@ -105,7 +105,7 @@ describe('given the get of an existing document', () => {
     client = (await getNewClient()) as MongoClient;
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuid,
+      documentUuidInserted: documentUuid,
       meadowlarkId,
       documentInfo,
       edfiDoc: { inserted: 'yes' },

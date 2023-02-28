@@ -42,7 +42,7 @@ jest.setTimeout(10000);
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
+  documentUuidInserted: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -206,7 +206,12 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
     await upsertDocument(
-      { ...newUpsertRequest(), documentUuid, meadowlarkId: schoolDocumentId, documentInfo: schoolDocumentInfo },
+      {
+        ...newUpsertRequest(),
+        documentUuidInserted: documentUuid,
+        meadowlarkId: schoolDocumentId,
+        documentInfo: schoolDocumentInfo,
+      },
       insertClient,
     );
 
