@@ -16,6 +16,79 @@ import { upsertDocumentTransaction } from './Upsert';
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 const moduleName: string = 'mongodb.repository.Update';
 
+async function updateDocumentByIdAllowIdentityUpdates(
+  { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
+  client: MongoClient,
+  session: ClientSession,
+): Promise<UpdateResult> {
+  let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
+  const deleteResult = await deleteDocumentByIdTransaction(
+    { documentUuid, resourceInfo, security, validate: true, traceId },
+    client,
+    session,
+  );
+  Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
+  // if the document was deleted, it should insert the new version.
+  if (deleteResult.response === 'DELETE_SUCCESS') {
+    // insert the updated document.
+    const upsertResult = await upsertDocumentTransaction(
+      {
+        resourceInfo,
+        documentInfo,
+        documentUuidInserted: documentUuid,
+        meadowlarkId,
+        edfiDoc,
+        validate,
+        traceId,
+        security,
+      },
+      client,
+      session,
+    );
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      updateResult = { response: 'UPDATE_SUCCESS' };
+    } else {
+      updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+    }
+  } else if (deleteResult.response === 'DELETE_FAILURE_NOT_EXISTS') {
+    updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+  }
+  return updateResult;
+}
+
+async function updateDocumentByIdNaturalKeyProtected(
+  { meadowlarkId, documentUuid, traceId }: UpdateRequest,
+  mongoCollection: Collection<MeadowlarkDocument>,
+  document: MeadowlarkDocument,
+  session: ClientSession,
+): Promise<UpdateResult> {
+  let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
+  // Perform the document update
+  Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
+  const documentToUpdate = await mongoCollection.findOne({ documentUuid }, { projection: { _id: 1 } });
+  // eslint-disable-next-line no-underscore-dangle
+  if (documentToUpdate !== null && documentToUpdate._id !== meadowlarkId) {
+    // This function cannot update a natural key.
+    updateResult = {
+      response: 'UPDATE_FAILURE_NATURAL_KEY',
+    };
+  } else {
+    const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: meadowlarkId, documentUuid }, document, {
+      session,
+    });
+    if (acknowledged) {
+      updateResult = {
+        response: matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS',
+      };
+    } else {
+      const msg =
+        'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+      Logger.error(`${moduleName}.updateDocumentById`, traceId, msg);
+    }
+  }
+  return updateResult;
+}
+
 export async function updateDocumentById(
   { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
   client: MongoClient,
@@ -27,113 +100,73 @@ export async function updateDocumentById(
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    if (validate) {
-      const failures = await validateReferences(
-        documentInfo.documentReferences,
-        documentInfo.descriptorReferences,
-        mongoCollection,
-        session,
-        traceId,
-      );
-
-      // Abort on validation failure
-      if (failures.length > 0) {
-        Logger.debug(
-          `${moduleName}.updateDocumentById: Updating document uuid ${documentUuid} failed due to invalid references`,
+    await session.withTransaction(async () => {
+      if (validate) {
+        const failures = await validateReferences(
+          documentInfo.documentReferences,
+          documentInfo.descriptorReferences,
+          mongoCollection,
+          session,
           traceId,
         );
 
-        const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
-          .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
-          .toArray();
-
-        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-          // eslint-disable-next-line no-underscore-dangle
-          documentUuid: document._id,
-          resourceName: document.resourceName,
-          projectName: document.projectName,
-          resourceVersion: document.resourceVersion,
-        }));
-
-        updateResult = {
-          response: 'UPDATE_FAILURE_REFERENCE',
-          failureMessage: { message: 'Reference validation failed', failures },
-          blockingDocuments,
-        };
-        return updateResult;
-      }
-    }
-    const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-      resourceInfo,
-      documentInfo,
-      documentUuid,
-      meadowlarkId,
-      edfiDoc,
-      validate,
-      security.clientId,
-    );
-    // if resourceInfo.allowIdentityUpdates is true, the process deletes de old document and inserts a new document.
-    if (resourceInfo.allowIdentityUpdates) {
-      const deleteResult = await deleteDocumentByIdTransaction(
-        { documentUuid, resourceInfo, security, validate: true, traceId },
-        client,
-        session,
-      );
-      // if the document was deleted, it should insert the new version.
-      if (deleteResult.response === 'DELETE_SUCCESS') {
-        // insert the updated document.
-        const upsertResult = await upsertDocumentTransaction(
-          {
-            resourceInfo,
-            documentInfo,
-            documentUuidInserted: documentUuid,
-            meadowlarkId,
-            edfiDoc,
-            validate,
+        // Abort on validation failure
+        if (failures.length > 0) {
+          Logger.debug(
+            `${moduleName}.updateDocumentById: Updating document uuid ${documentUuid} failed due to invalid references`,
             traceId,
-            security,
-          },
+          );
+
+          const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
+            .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
+            .toArray();
+
+          const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+            // eslint-disable-next-line no-underscore-dangle
+            documentUuid: document._id,
+            resourceName: document.resourceName,
+            projectName: document.projectName,
+            resourceVersion: document.resourceVersion,
+          }));
+
+          updateResult = {
+            response: 'UPDATE_FAILURE_REFERENCE',
+            failureMessage: { message: 'Reference validation failed', failures },
+            blockingDocuments,
+          };
+          return;
+        }
+      }
+      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+        resourceInfo,
+        documentInfo,
+        documentUuid,
+        meadowlarkId,
+        edfiDoc,
+        validate,
+        security.clientId,
+      );
+      await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+      if (resourceInfo.allowIdentityUpdates) {
+        updateResult = await updateDocumentByIdAllowIdentityUpdates(
+          { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validate, traceId, security } as UpdateRequest,
           client,
           session,
         );
-        if (upsertResult.response === 'INSERT_SUCCESS') {
-          updateResult = { response: 'UPDATE_SUCCESS' };
-        } else {
-          updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
-        }
-      } else if (deleteResult.response === 'DELETE_FAILURE_NOT_EXISTS') {
-        updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
-      }
-      return updateResult;
-    }
-    // Start update transaction
-    await session.withTransaction(async () => {
-      await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
-      // Perform the document update
-      Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
-      const { acknowledged, matchedCount } = await mongoCollection.replaceOne(
-        { _id: meadowlarkId, documentUuid },
-        document,
-        {
-          session,
-        },
-      );
-      if (acknowledged) {
-        updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
       } else {
-        const msg =
-          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-        Logger.error(`${moduleName}.updateDocumentById`, traceId, msg);
+        updateResult = await updateDocumentByIdNaturalKeyProtected(
+          { meadowlarkId, documentUuid, traceId } as UpdateRequest,
+          mongoCollection,
+          document,
+          session,
+        );
       }
     });
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
-
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }
-
   return updateResult;
 }

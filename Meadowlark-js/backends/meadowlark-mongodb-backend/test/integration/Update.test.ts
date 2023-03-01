@@ -622,7 +622,7 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   it('should return update error', async () => {
-    expect(updateResult.response).toBe('UPDATE_FAILURE_NOT_EXISTS');
+    expect(updateResult.response).toBe('UPDATE_FAILURE_NATURAL_KEY');
   });
 });
 

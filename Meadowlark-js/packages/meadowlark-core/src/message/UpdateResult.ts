@@ -16,4 +16,5 @@ export type UpdateResult =
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_NOT_EXISTS'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_NATURAL_KEY'; failureMessage?: string | object }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };
