@@ -19,7 +19,7 @@ const testModel = (): TopLevelEntity => ({
     { ...newEntityProperty(), metaEdName: 'someDecimalParameter', isPartOfIdentity: false },
   ],
   data: {
-    meadowlark: {
+    edfiApiSchema: {
       apiMapping: {
         identityReferenceComponents: [],
         referenceGroups: [],
@@ -66,7 +66,7 @@ const testSchoolModel = (): TopLevelEntity => ({
     { ...newEntityProperty(), metaEdName: 'someDecimalParameter', isPartOfIdentity: false },
   ],
   data: {
-    meadowlark: {
+    edfiApiSchema: {
       apiMapping: {
         identityReferenceComponents: [],
         referenceGroups: [],

@@ -72,7 +72,7 @@ export function matchResourceNameToMetaEd(
  * to the API endpoint.
  */
 export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): ValidationError[] | null {
-  const schema = metaEdModel.data.meadowlark.jsonSchema;
+  const schema = metaEdModel.data.edfiApiSchema.jsonSchema;
 
   const validateFunction: ValidateFunction = ajv().compile(schema);
   const isValid: boolean = validateFunction(body);
@@ -97,7 +97,7 @@ export function validateQueryParametersAgainstSchema(
   let errors: string[] = [];
 
   const schema = {
-    ...metaEdModel.data.meadowlark.jsonSchema,
+    ...metaEdModel.data.edfiApiSchema.jsonSchema,
     // Need to relax the validation such that no fields are "required"
     required: [],
   };

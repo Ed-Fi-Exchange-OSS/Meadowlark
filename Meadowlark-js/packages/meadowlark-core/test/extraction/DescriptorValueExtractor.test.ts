@@ -14,16 +14,16 @@ import {
 } from '@edfi/metaed-core';
 import { descriptorReferenceEnhancer, domainEntitySubclassBaseClassEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
-  entityPropertyMeadowlarkDataSetupEnhancer,
+  entityPropertyApiSchemaDataSetupEnhancer,
   apiEntityMappingEnhancer,
-  entityMeadowlarkDataSetupEnhancer,
+  entityApiSchemaDataSetupEnhancer,
   referenceComponentEnhancer,
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
   subclassPropertyNamingCollisionEnhancer,
   subclassPropertyCollectingEnhancer,
   subclassApiEntityMappingEnhancer,
-} from '@edfi/metaed-plugin-edfi-meadowlark';
+} from '@edfi/metaed-plugin-edfi-api-schema';
 
 import { extractDescriptorValues } from '../../src/extraction/DescriptorValueExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
@@ -58,8 +58,8 @@ describe('when extracting single descriptor value from domain entity', () => {
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     subclassPropertyNamingCollisionEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
@@ -118,8 +118,8 @@ describe('when extracting descriptor values from domain entity with the same nam
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     subclassPropertyNamingCollisionEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
@@ -187,8 +187,8 @@ describe('when extracting array of descriptor values from domain entity', () => 
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     subclassPropertyNamingCollisionEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
@@ -286,8 +286,8 @@ describe('when extracting collection from domain entity subclass with naming col
 
     descriptorReferenceEnhancer(metaEd);
     domainEntitySubclassBaseClassEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     subclassPropertyNamingCollisionEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
@@ -373,8 +373,8 @@ describe('when extracting collection from domain entity subclass with no naming 
 
     descriptorReferenceEnhancer(metaEd);
     domainEntitySubclassBaseClassEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     subclassPropertyNamingCollisionEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);

@@ -7,7 +7,7 @@
 import cluster from 'cluster';
 import os from 'os';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import { ServiceFactory } from './Factory';
+import { ServiceFactory } from './ServiceFactory';
 
 const CPUS = os.cpus().length;
 
