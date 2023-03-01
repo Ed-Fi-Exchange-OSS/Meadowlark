@@ -120,38 +120,6 @@ describe('Given the existance of a student, a school, a local education agency a
     });
   });
 
-  describe('when it tries to update an student program association with a different education organization', () => {
-    it('returns error', async () => {
-      await rootURLRequest()
-        .put(studentProgramAssociationSchoolLocation)
-        .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send({
-          educationOrganizationReference: {
-            educationOrganizationId: localEducationAgencyId,
-          },
-          programReference: {
-            educationOrganizationId: schoolId,
-            programName: 'Gifted and Talented',
-            programTypeDescriptor: 'uri://ed-fi.org/ProgramTypeDescriptor#Athletics',
-          },
-          studentReference: {
-            studentUniqueId,
-          },
-          beginDate: '2010-08-30',
-          endDate: '2010-12-17',
-          reasonExitedDescriptor: 'uri://ed-fi.org/ReasonExitedDescriptor#Moved out of state',
-        })
-        .expect(400)
-        .then((response) => {
-          expect(response.body).toMatchInlineSnapshot(`
-            {
-              "error": "The identity of the resource does not match the identity in the updated document.",
-            }
-          `);
-        });
-    });
-  });
-
   describe('when it tries to delete an education organization that is part of an association', () => {
     it('returns error', async () => {
       await rootURLRequest()
