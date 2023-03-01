@@ -4,12 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "Meadowlark-js/Dockerfile"
+      - ".github/workflows/on-pullrequest-dockerfile.yml"
   pull_request:
     branches:
       - main
     paths:
       - "Meadowlark-js/Dockerfile"
-      - ".github/workflws/on-pullrequest-dockerfile.yml"
+      - ".github/workflows/on-pullrequest-dockerfile.yml"
   workflow_dispatch:
 
 jobs:
@@ -27,5 +30,4 @@ jobs:
       - name: Build the Docker image
         # ...  to confirm no errors occur
         run: npm run docker:build
-        with:
-          working-directory: Meadowlark-js
+        working-directory: Meadowlark-js
