@@ -97,7 +97,7 @@ export async function validateReferences(
   );
 
   const referenceIdsInDb: MeadowlarkDocument[] = await findReferencedDocumentIdsById(
-    referencedDocumentIds,
+    referencedMeadowlarkIds,
     mongoDocuments,
     onlyReturnAliasId(session),
   );

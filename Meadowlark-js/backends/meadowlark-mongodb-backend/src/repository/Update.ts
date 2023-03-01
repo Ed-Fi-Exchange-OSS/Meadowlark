@@ -8,9 +8,9 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, writeLockReferencedDocuments } from './Db';
-import { deleteDocumentById } from './Delete';
+import { deleteDocumentByIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
-import { upsertDocument } from './Upsert';
+import { upsertDocumentTransaction } from './Upsert';
 
 // MongoDB FindOption to return at most 5 documents
 const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
@@ -72,64 +72,61 @@ export async function updateDocumentById(
       validate,
       security.clientId,
     );
-    // Start delete/upsert transaction
+    // if resourceInfo.allowIdentityUpdates is true, the process deletes de old document and inserts a new document.
     if (resourceInfo.allowIdentityUpdates) {
-      await session.withTransaction(async () => {
-        // if resourceInfo.allowIdentityUpdates is true, the process deletes de old document and inserts a new document.
-
-        const deleteResult = await deleteDocumentById(
-          { documentUuid, resourceInfo, security, validate: true, traceId },
-          client,
-        );
-        // if the document was deleted, it should insert the new version.
-        if (deleteResult.response === 'DELETE_SUCCESS') {
-          // insert the updated document.
-          const upsertResult = await upsertDocument(
-            {
-              resourceInfo,
-              documentInfo,
-              documentUuidInserted: documentUuid,
-              meadowlarkId,
-              edfiDoc,
-              validate,
-              traceId,
-              security,
-            },
-            client,
-          );
-          if (upsertResult.response === 'INSERT_SUCCESS') {
-            updateResult.response = 'UPDATE_SUCCESS';
-          } else {
-            updateResult.response = 'UPDATE_FAILURE_NOT_EXISTS';
-          }
-        } else if (deleteResult.response === 'DELETE_FAILURE_NOT_EXISTS') {
-          updateResult.response = 'UPDATE_FAILURE_NOT_EXISTS';
-        }
-        return updateResult;
-      });
-    } else {
-      // Start update transaction
-      await session.withTransaction(async () => {
-        await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
-        // Perform the document update
-        Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
-        const { acknowledged, matchedCount } = await mongoCollection.replaceOne(
-          { _id: meadowlarkId, documentUuid },
-          document,
+      const deleteResult = await deleteDocumentByIdTransaction(
+        { documentUuid, resourceInfo, security, validate: true, traceId },
+        client,
+        session,
+      );
+      // if the document was deleted, it should insert the new version.
+      if (deleteResult.response === 'DELETE_SUCCESS') {
+        // insert the updated document.
+        const upsertResult = await upsertDocumentTransaction(
           {
-            session,
+            resourceInfo,
+            documentInfo,
+            documentUuidInserted: documentUuid,
+            meadowlarkId,
+            edfiDoc,
+            validate,
+            traceId,
+            security,
           },
+          client,
+          session,
         );
-        if (acknowledged) {
-          updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+        if (upsertResult.response === 'INSERT_SUCCESS') {
+          updateResult = { response: 'UPDATE_SUCCESS' };
         } else {
-          const msg =
-            'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-          Logger.error(`${moduleName}.updateDocumentById`, traceId, msg);
+          updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
         }
-      });
+      } else if (deleteResult.response === 'DELETE_FAILURE_NOT_EXISTS') {
+        updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+      }
+      return updateResult;
     }
+    // Start update transaction
+    await session.withTransaction(async () => {
+      await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+
+      // Perform the document update
+      Logger.debug(`${moduleName}.updateDocumentById: Updating document uuid ${documentUuid}`, traceId);
+      const { acknowledged, matchedCount } = await mongoCollection.replaceOne(
+        { _id: meadowlarkId, documentUuid },
+        document,
+        {
+          session,
+        },
+      );
+      if (acknowledged) {
+        updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      } else {
+        const msg =
+          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+        Logger.error(`${moduleName}.updateDocumentById`, traceId, msg);
+      }
+    });
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
 

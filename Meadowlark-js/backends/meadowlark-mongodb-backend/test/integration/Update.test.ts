@@ -569,3 +569,115 @@ describe('given an update of a subclass document referenced by an existing docum
     `);
   });
 });
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates false,', () => {
+  let client;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: false,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update 2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      documentUuidInserted: documentUuid,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    const documentInfoUpdated: DocumentInfo = {
+      ...newDocumentInfo(),
+      documentIdentity: { natural: 'updated identity' },
+    };
+    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+    };
+    // insert the initial version
+    await upsertDocument(upsertRequest, client);
+    // change document identity
+    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return update error', async () => {
+    expect(updateResult.response).toBe('UPDATE_FAILURE_NOT_EXISTS');
+  });
+});
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates true,', () => {
+  let client;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: true,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'updated identity' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      documentUuidInserted: documentUuid,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    const documentInfoUpdated: DocumentInfo = {
+      ...newDocumentInfo(),
+      documentIdentity: { natural: 'update 2' },
+    };
+    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+    };
+    // insert the initial version
+    await upsertDocument(upsertRequest, client);
+    // change document identity
+    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return update success', async () => {
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
+  });
+});

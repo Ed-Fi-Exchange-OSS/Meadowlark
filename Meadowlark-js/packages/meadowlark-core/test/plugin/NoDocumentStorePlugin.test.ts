@@ -19,7 +19,7 @@ import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/BrandedType
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid: '' as DocumentUuid,
+  documentUuidInserted: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
