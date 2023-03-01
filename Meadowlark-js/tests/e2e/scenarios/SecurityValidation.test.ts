@@ -2,7 +2,7 @@ import { Credentials, createClient, getAccessToken } from '../helpers/Credential
 import { createResource, deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
-describe('given the existance of two vendors and one host', () => {
+describe('given the existence of two vendors and one host', () => {
   let vendor1Data: Credentials = {
     clientName: 'Vendor 1',
     roles: ['vendor'],

@@ -5,6 +5,7 @@
       "type": "node",
       "request": "launch",
       "runtimeArgs": ["--inspect", "--debug-port=9229"],
+      "env": {"FASTIFY_NUM_THREADS": "1", "OAUTH_HARD_CODED_CREDENTIALS_ENABLED": "true"},
       "program": "${workspaceFolder}/services/meadowlark-fastify/dist/index.js",
       "port": 9229,
       "console": "integratedTerminal",

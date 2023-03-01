@@ -10,7 +10,7 @@ import { baseURLRequest, generateRandomId, rootURLRequest } from '../helpers/Sha
 
 jest.setTimeout(40000);
 
-describe('Given the existance of a student, a school, a local education agency and a program', () => {
+describe('Given the existence of a student, a school, a local education agency and a program', () => {
   const schoolId = 100;
   const localEducationAgencyId = 101;
   const studentUniqueId = generateRandomId();
