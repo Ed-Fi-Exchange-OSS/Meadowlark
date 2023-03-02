@@ -9,6 +9,7 @@ import { validatePaginationParameters } from '../../src/validation/PaginationVal
 describe('when validating pagination parameters', () => {
   describe('given valid inputs', () => {
     it.each([
+      ['0', '0'],
       ['5', '1'],
       ['5', undefined],
     ])('limit = %s and offset = %s should be accepted', (limit, offset) => {
@@ -26,7 +27,7 @@ describe('when validating pagination parameters', () => {
   const errorNegativeLimit = {
     error: 'The request is invalid.',
     modelState: {
-      limit: ['Must be set to a numeric value >= 1'],
+      limit: ['Must be set to a numeric value >= 0'],
       offset: [],
     },
   };
@@ -34,20 +35,20 @@ describe('when validating pagination parameters', () => {
     error: 'The request is invalid.',
     modelState: {
       limit: [],
-      offset: ['Must be set to a numeric value >= 1'],
+      offset: ['Must be set to a numeric value >= 0'],
     },
   };
   const errorNegativeOffsetAndLimit = {
     error: 'The request is invalid.',
     modelState: {
-      limit: ['Must be set to a numeric value >= 1'],
-      offset: ['Must be set to a numeric value >= 1'],
+      limit: ['Must be set to a numeric value >= 0'],
+      offset: ['Must be set to a numeric value >= 0'],
     },
   };
   const errorAlphaLimit = {
     error: 'The request is invalid.',
     modelState: {
-      limit: ['Must be set to a numeric value >= 1'],
+      limit: ['Must be set to a numeric value >= 0'],
       offset: [],
     },
   };
@@ -55,14 +56,14 @@ describe('when validating pagination parameters', () => {
     error: 'The request is invalid.',
     modelState: {
       limit: [],
-      offset: ['Must be set to a numeric value >= 1'],
+      offset: ['Must be set to a numeric value >= 0'],
     },
   };
   const errorAlphaOffsetAndLimit = {
     error: 'The request is invalid.',
     modelState: {
-      limit: ['Must be set to a numeric value >= 1'],
-      offset: ['Must be set to a numeric value >= 1'],
+      limit: ['Must be set to a numeric value >= 0'],
+      offset: ['Must be set to a numeric value >= 0'],
     },
   };
   const errorOffsetWithoutLimit = {

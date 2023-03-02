@@ -9,6 +9,7 @@ import { logTheResponse } from '../../src/middleware/ResponseLoggingMiddleware';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { newFrontendRequest } from '../../src/handler/FrontendRequest';
+import { setupMockConfiguration } from '../ConfigHelper';
 
 describe('when logging the response', () => {
   describe('given a success status code', () => {
@@ -17,6 +18,7 @@ describe('when logging the response', () => {
     beforeEach(() => {
       loggerSpy = jest.spyOn(Logger, 'debug');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+      setupMockConfiguration();
     });
 
     afterAll(() => {
@@ -44,6 +46,7 @@ describe('when logging the response', () => {
     beforeEach(() => {
       loggerSpy = jest.spyOn(Logger, 'debug');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+      setupMockConfiguration();
     });
 
     afterAll(() => {
@@ -80,6 +83,7 @@ describe('when logging the response', () => {
     beforeEach(() => {
       loggerSpy = jest.spyOn(Logger, 'debug');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+      setupMockConfiguration();
     });
 
     afterAll(() => {
@@ -109,6 +113,7 @@ describe('when logging the response', () => {
     beforeEach(() => {
       loggerSpy = jest.spyOn(Logger, 'debug');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+      setupMockConfiguration();
     });
 
     afterAll(() => {
@@ -148,69 +153,124 @@ describe('when logging the response', () => {
   });
 
   describe('given a 400 with a body indicating reference validation problem, not descriptor', () => {
-    let loggerSpy: any;
+    describe('given logs will be anonymized (default)', () => {
+      let loggerSpy: any;
 
-    beforeEach(() => {
-      loggerSpy = jest.spyOn(Logger, 'debug');
-      jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
-    });
+      beforeEach(() => {
+        loggerSpy = jest.spyOn(Logger, 'debug');
+        jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+        setupMockConfiguration();
+      });
 
-    afterAll(() => {
-      jest.restoreAllMocks();
-    });
+      afterAll(() => {
+        jest.restoreAllMocks();
+      });
 
-    it('anonymizes the payload', async () => {
-      const traceId = 'traceId';
-      const body = {
-        error: {
-          message: 'Reference validation failed',
-          failures: [
-            {
-              resourceName: 'Intervention',
-              identity: {
-                'educationOrganizationReference.educationOrganizationId': 123,
-                interventionIdentificationCode: '111',
+      it('anonymizes the payload', async () => {
+        const traceId = 'traceId';
+        const body = {
+          error: {
+            message: 'Reference validation failed',
+            failures: [
+              {
+                resourceName: 'Intervention',
+                identity: {
+                  'educationOrganizationReference.educationOrganizationId': 123,
+                  interventionIdentificationCode: '111',
+                },
               },
-            },
-          ],
-        },
-      };
+            ],
+          },
+        };
 
-      // In the expectedBody, the object values have been anonymized
-      const expectedBody = {
-        error: {
-          message: 'Reference validation failed',
-          failures: [
-            {
-              resourceName: 'Intervention',
-              identity: {
-                'educationOrganizationReference.educationOrganizationId': '*',
-                interventionIdentificationCode: '*',
+        // In the expectedBody, the object values have been anonymized
+        const expectedBody = {
+          error: {
+            message: 'Reference validation failed',
+            failures: [
+              {
+                resourceName: 'Intervention',
+                identity: {
+                  'educationOrganizationReference.educationOrganizationId': '*',
+                  interventionIdentificationCode: '*',
+                },
               },
-            },
-          ],
-        },
-      };
+            ],
+          },
+        };
 
-      const model: MiddlewareModel = {
-        frontendRequest: {
-          ...newFrontendRequest(),
+        const model: MiddlewareModel = {
+          frontendRequest: {
+            ...newFrontendRequest(),
+            traceId,
+          },
+          frontendResponse: {
+            ...newFrontendResponse(),
+            body,
+            statusCode: 400,
+          },
+        };
+
+        await logTheResponse(model);
+
+        expect(loggerSpy).toHaveBeenCalledWith(
+          'core.middleware.ResponseLoggingMiddleware.logTheResponse 400',
           traceId,
-        },
-        frontendResponse: {
-          ...newFrontendResponse(),
+          expectedBody,
+        );
+      });
+    });
+
+    describe('given anonymization is disabled', () => {
+      let loggerSpy: any;
+
+      beforeEach(() => {
+        loggerSpy = jest.spyOn(Logger, 'debug');
+        jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+        setupMockConfiguration(true, true);
+      });
+
+      afterAll(() => {
+        jest.restoreAllMocks();
+      });
+
+      it('logs the original payload', async () => {
+        const traceId = 'traceId';
+        const body = {
+          error: {
+            message: 'Reference validation failed',
+            failures: [
+              {
+                resourceName: 'Intervention',
+                identity: {
+                  'educationOrganizationReference.educationOrganizationId': 123,
+                  interventionIdentificationCode: '111',
+                },
+              },
+            ],
+          },
+        };
+
+        const model: MiddlewareModel = {
+          frontendRequest: {
+            ...newFrontendRequest(),
+            traceId,
+          },
+          frontendResponse: {
+            ...newFrontendResponse(),
+            body,
+            statusCode: 400,
+          },
+        };
+
+        await logTheResponse(model);
+
+        expect(loggerSpy).toHaveBeenCalledWith(
+          'core.middleware.ResponseLoggingMiddleware.logTheResponse 400',
+          traceId,
           body,
-          statusCode: 400,
-        },
-      };
-
-      await logTheResponse(model);
-
-      expect(loggerSpy).toHaveBeenCalledWith(
-        'core.middleware.ResponseLoggingMiddleware.logTheResponse 400',
-        traceId,
-        expectedBody,
-      );
+        );
+      });
     });
   });
 
@@ -220,6 +280,7 @@ describe('when logging the response', () => {
     beforeEach(() => {
       loggerSpy = jest.spyOn(Logger, 'debug');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
+      setupMockConfiguration();
     });
 
     afterAll(() => {

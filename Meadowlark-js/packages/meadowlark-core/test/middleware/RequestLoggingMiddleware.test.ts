@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
-import { anonymizeAndLogRequestBody } from '../../src/middleware/LogAnonymizedRequestMiddleware';
+import { logRequestBody } from '../../src/middleware/RequestLoggingMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
 import { setupMockConfiguration } from '../ConfigHelper';
 
@@ -20,7 +20,7 @@ describe('given a previous middleware has created a response', () => {
     setupMockConfiguration();
 
     // Act
-    resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse });
+    resultChain = await logRequestBody({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -44,7 +44,7 @@ describe('given a null response', () => {
     setupMockConfiguration();
 
     // Act
-    resultChain = await anonymizeAndLogRequestBody({ frontendRequest, frontendResponse: null });
+    resultChain = await logRequestBody({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -94,7 +94,7 @@ describe('flat doc example - given previous middleware has created a response wi
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
       birthCountryDescriptor: null,
@@ -118,7 +118,7 @@ describe('nested doc example - given previous middleware has created a response 
     jest.restoreAllMocks();
   });
 
-  it('An anonymized version of the body is logged', async () => {
+  it('logs an anonymized version of the request body', async () => {
     const traceId = 'traceid';
 
     const body = JSON.stringify({
@@ -142,7 +142,7 @@ describe('nested doc example - given previous middleware has created a response 
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toHaveBeenCalledWith('Anonymized request body:', traceId, {
       studentReference: {
@@ -201,8 +201,58 @@ describe('given previous middleware has created a response with info log level',
 
     const resultChain = await parseBody(model);
 
-    await anonymizeAndLogRequestBody(resultChain);
+    await logRequestBody(resultChain);
 
     expect(loggerSpy).toBeCalledTimes(0);
+  });
+});
+
+describe('given anonymization is disabled', () => {
+  let loggerSpy: any;
+
+  beforeAll(() => {
+    setupMockConfiguration(true, true);
+    loggerSpy = jest.spyOn(Logger, 'debug');
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('logs the original request body', async () => {
+    const traceId = 'traceid';
+
+    const body = JSON.stringify({
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+      interventionReference: {
+        interventionIdentificationCode: '111',
+        educationOrganizationId: 123,
+      },
+    });
+
+    const model: MiddlewareModel = {
+      frontendRequest: {
+        ...newFrontendRequest(),
+        body,
+        traceId,
+      },
+      frontendResponse: null,
+    };
+
+    const resultChain = await parseBody(model);
+
+    await logRequestBody(resultChain);
+
+    expect(loggerSpy).toHaveBeenCalledWith('Original request body:', traceId, {
+      interventionReference: {
+        educationOrganizationId: 123,
+        interventionIdentificationCode: '111',
+      },
+      studentReference: {
+        studentUniqueId: 's0zf6d1123d3e',
+      },
+    });
   });
 });

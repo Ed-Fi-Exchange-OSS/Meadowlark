@@ -6,7 +6,7 @@
 import { Config } from '@edfi/meadowlark-utilities';
 import * as MeadowlarkUtilities from '@edfi/meadowlark-utilities';
 
-export const setupMockConfiguration = (isDebug: boolean = false) => {
+export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymization: boolean = false) => {
   jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
     switch (key) {
       case 'FASTIFY_RATE_LIMIT':
@@ -41,6 +41,8 @@ export const setupMockConfiguration = (isDebug: boolean = false) => {
         return 'mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
       case 'LOG_LEVEL':
         return isDebug ? 'DEBUG' : 'ERROR';
+      case 'DISABLE_LOG_ANONYMIZATION':
+        return disableAnonymization;
       default:
         throw new Error(`Key '${key}' not configured`);
     }

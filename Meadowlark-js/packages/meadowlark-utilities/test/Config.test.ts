@@ -73,6 +73,7 @@ describe('when initializing configuration', () => {
   const MEADOWLARK_STAGE = 'not-local';
   const FASTIFY_RATE_LIMIT = 932;
   const HTTP_PROTOCOL_AND_SERVER = 'https://example.com';
+  const DISABLE_LOG_ANONYMIZATION = true;
 
   // eslint-disable-next-line prefer-destructuring
   const env = process.env;
@@ -118,6 +119,7 @@ describe('when initializing configuration', () => {
     process.env.MEADOWLARK_STAGE = MEADOWLARK_STAGE;
     process.env.FASTIFY_RATE_LIMIT = FASTIFY_RATE_LIMIT.toString();
     process.env.HTTP_PROTOCOL_AND_SERVER = HTTP_PROTOCOL_AND_SERVER;
+    process.env.DISABLE_LOG_ANONYMIZATION = DISABLE_LOG_ANONYMIZATION.toString();
   };
 
   beforeEach(() => {
@@ -204,6 +206,7 @@ describe('when initializing configuration', () => {
       ['MEADOWLARK_STAGE', MEADOWLARK_STAGE],
       ['FASTIFY_RATE_LIMIT', FASTIFY_RATE_LIMIT],
       ['HTTP_PROTOCOL_AND_SERVER', HTTP_PROTOCOL_AND_SERVER],
+      ['DISABLE_LOG_ANONYMIZATION', DISABLE_LOG_ANONYMIZATION],
     ])('retrieves the value of %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
@@ -245,6 +248,7 @@ describe('when initializing configuration', () => {
       process.env.MEADOWLARK_STAGE = undefined;
       process.env.FASTIFY_RATE_LIMIT = undefined;
       process.env.HTTP_PROTOCOL_AND_SERVER = undefined;
+      process.env.DISABLE_LOG_ANONYMIZATION = undefined;
 
       Config = await import('../src/Config');
       const Environment = await import('../src/Environment');
@@ -284,6 +288,7 @@ describe('when initializing configuration', () => {
       ['OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000],
       ['FASTIFY_RATE_LIMIT', 0],
       ['HTTP_PROTOCOL_AND_SERVER', 'http://localhost'],
+      ['DISABLE_LOG_ANONYMIZATION', false],
     ])('retrieves default value for %s', (k, v) => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });

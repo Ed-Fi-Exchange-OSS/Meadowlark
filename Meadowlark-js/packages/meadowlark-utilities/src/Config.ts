@@ -46,7 +46,8 @@ export type ConfigKeys =
   | 'FASTIFY_PORT'
   | 'MEADOWLARK_STAGE'
   | 'FASTIFY_RATE_LIMIT'
-  | 'HTTP_PROTOCOL_AND_SERVER';
+  | 'HTTP_PROTOCOL_AND_SERVER'
+  | 'DISABLE_LOG_ANONYMIZATION';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -86,6 +87,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
     throw new Error('Must have a base-64 encoded signing key. Try creating a new one with `npm run createKey`');
   }
 
+  set('DISABLE_LOG_ANONYMIZATION', await provider.getBool('DISABLE_LOG_ANONYMIZATION', false));
   set('HTTP_PROTOCOL_AND_SERVER', await provider.getString('HTTP_PROTOCOL_AND_SERVER', 'http://localhost'));
   set('FASTIFY_RATE_LIMIT', await provider.getInt('FASTIFY_RATE_LIMIT', 0));
   set('MEADOWLARK_STAGE', await provider.getString('MEADOWLARK_STAGE', 'local'));

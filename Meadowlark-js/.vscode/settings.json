@@ -23,6 +23,7 @@
     "source.fixAll.eslint": true
   },
   "cSpell.words": [
+    "ANONYMIZATION",
     "arrayify",
     "builtins",
     "decapitalize",
