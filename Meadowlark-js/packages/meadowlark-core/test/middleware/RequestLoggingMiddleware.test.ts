@@ -219,7 +219,7 @@ describe('given anonymization is disabled', () => {
     jest.restoreAllMocks();
   });
 
-  it('logs an the original request body', async () => {
+  it('logs the original request body', async () => {
     const traceId = 'traceid';
 
     const body = JSON.stringify({
