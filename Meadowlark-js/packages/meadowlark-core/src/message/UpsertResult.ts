@@ -16,4 +16,5 @@ export type UpsertResult =
   | { response: 'INSERT_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPSERT_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
+  | { response: 'UPSERT_FAILURE_WRITE_CONFLICT'; failureMessage?: string | object }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

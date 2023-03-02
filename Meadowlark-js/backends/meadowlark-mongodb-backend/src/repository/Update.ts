@@ -6,6 +6,7 @@
 import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
+import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, writeLockReferencedDocuments } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
@@ -81,9 +82,32 @@ export async function updateDocumentById(
       // Perform the document update
       Logger.debug(`${moduleName}.updateDocumentById: Updating document id ${id}`, traceId);
 
-      const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
-      if (acknowledged) {
-        updateResult.response = matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
+      const maxNumberOfRetries = 2; /// ToDo: Configurable
+      // const numberOfRetries = 0;
+      const mongoUpdateResult = {
+        acknowledged: false,
+        matchedCount: 0,
+      };
+
+      await retry(
+        async () => {
+          const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: id }, document, { session });
+          mongoUpdateResult.acknowledged = acknowledged;
+          mongoUpdateResult.matchedCount = matchedCount;
+        },
+        {
+          retries: maxNumberOfRetries,
+          onRetry: (error) => {
+            // numberOfRetries += 1;
+            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
+            // Logger.info(`The error is: ${error}.`, traceId);
+
+            if (error !== '[MongoServerError: WriteConflict]') throw error;
+          },
+        },
+      );
+      if (mongoUpdateResult.acknowledged) {
+        updateResult.response = mongoUpdateResult.matchedCount > 0 ? 'UPDATE_SUCCESS' : 'UPDATE_FAILURE_NOT_EXISTS';
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
@@ -92,6 +116,10 @@ export async function updateDocumentById(
     });
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
+
+    if (e === '[MongoServerError: WriteConflict]') {
+      return { response: 'UPDATE_FAILURE_WRITE_CONFLICT' };
+    }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

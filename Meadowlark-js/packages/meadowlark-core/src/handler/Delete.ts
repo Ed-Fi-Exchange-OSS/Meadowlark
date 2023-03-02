@@ -68,6 +68,11 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       };
     }
 
+    if (result.response === 'DELETE_FAILURE_WRITE_CONFLICT') {
+      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
+      return { statusCode: 404, headers: frontendRequest.middleware.headerMetadata };
+    }
+
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, result.failureMessage);
     return {
       statusCode: 500,

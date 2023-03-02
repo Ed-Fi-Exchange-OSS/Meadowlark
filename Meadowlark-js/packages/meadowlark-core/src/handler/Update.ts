@@ -75,6 +75,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       };
     }
 
+    if (response === 'UPDATE_FAILURE_WRITE_CONFLICT') {
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409);
+      return { statusCode: 409, headers: headerMetadata };
+    }
+
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, failureMessage);
 
     return {

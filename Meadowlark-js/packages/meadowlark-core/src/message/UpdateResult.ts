@@ -15,5 +15,6 @@ export type UpdateResult =
   | UpdateFailureReference
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_NOT_EXISTS'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_WRITE_CONFLICT'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

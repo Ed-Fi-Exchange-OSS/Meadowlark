@@ -6,6 +6,7 @@
 import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
 import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo, BlockingDocument } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
+import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
@@ -113,9 +114,32 @@ export async function upsertDocument(
       // Perform the document upsert
       Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
 
-      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
-      if (acknowledged) {
-        upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
+      const maxNumberOfRetries = 2; /// ToDo: Configurable
+      // let numberOfRetries = 0;
+      const mongoUpsertResult = {
+        acknowledged: false,
+        upsertedCount: 0,
+      };
+
+      await retry(
+        async () => {
+          const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
+          mongoUpsertResult.acknowledged = acknowledged;
+          mongoUpsertResult.upsertedCount = upsertedCount;
+        },
+        {
+          retries: maxNumberOfRetries,
+          onRetry: (error) => {
+            // numberOfRetries += 1;
+            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
+            // Logger.info(`The error is: ${error}.`, traceId);
+
+            if (error !== '[MongoServerError: WriteConflict]') throw error;
+          },
+        },
+      );
+      if (mongoUpsertResult.acknowledged) {
+        upsertResult.response = mongoUpsertResult.upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
       } else {
         const msg =
           'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
@@ -124,6 +148,10 @@ export async function upsertDocument(
     });
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
+
+    if (e === '[MongoServerError: WriteConflict]') {
+      return { response: 'UPSERT_FAILURE_WRITE_CONFLICT' };
+    }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {

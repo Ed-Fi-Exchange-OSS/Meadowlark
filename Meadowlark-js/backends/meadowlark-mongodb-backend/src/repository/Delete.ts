@@ -6,6 +6,7 @@
 import { Logger } from '@edfi/meadowlark-utilities';
 import { DeleteResult, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
+import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId } from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
@@ -71,9 +72,31 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ _id: id }, { session });
-      if (acknowledged) {
-        deleteResult = deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
+      const maxNumberOfRetries = 2; /// ToDo: Configurable
+      // const numberOfRetries = 0;
+      let mongoDeleteResult = {
+        acknowledged: false,
+        deletedCount: 0,
+      };
+
+      await retry(
+        async () => {
+          mongoDeleteResult = await mongoCollection.deleteOne({ _id: id }, { session });
+        },
+        {
+          retries: maxNumberOfRetries,
+          onRetry: (error) => {
+            // numberOfRetries += 1;
+            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
+            // Logger.info(`The error is: ${error}.`, traceId);
+
+            if (error !== '[MongoServerError: WriteConflict]') throw error;
+          },
+        },
+      );
+      if (mongoDeleteResult.acknowledged) {
+        deleteResult =
+          mongoDeleteResult.deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
       } else {
         const msg =
           'mongoCollection.deleteOne returned acknowledged: false, indicating a problem with write concern configuration';
@@ -82,6 +105,10 @@ export async function deleteDocumentById(
     });
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, e);
+
+    if (e === '[MongoServerError: WriteConflict]') {
+      return { response: 'DELETE_FAILURE_WRITE_CONFLICT' };
+    }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
