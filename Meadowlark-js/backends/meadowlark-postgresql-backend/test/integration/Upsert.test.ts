@@ -33,11 +33,11 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: '' as DocumentUuid,
+  documentUuidForInsert: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -62,7 +62,14 @@ describe('given the upsert of a new document', () => {
     client = await getSharedClient();
 
     upsertResult = await upsertDocument(
-      { ...newUpsertRequest(), meadowlarkId, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      {
+        ...newUpsertRequest(),
+        meadowlarkId,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
       client,
     );
   });
@@ -211,7 +218,7 @@ describe('given an upsert of a new document that references a non-existent docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -294,7 +301,7 @@ describe('given an upsert of a new document that references an existing document
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -384,7 +391,7 @@ describe('given an upsert of a new document with one existing and one non-existe
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -485,7 +492,7 @@ describe('given an upsert of a subclass document when a different subclass has t
         meadowlarkId: sameSuperclassIdentityId,
         resourceInfo: sameSuperclassIdentityResourceInfo,
         documentInfo: sameSuperclassIdentityDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -549,7 +556,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -562,7 +569,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -652,7 +659,7 @@ describe('given an update of a document that references an existing document wit
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -665,7 +672,7 @@ describe('given an update of a document that references an existing document wit
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -763,7 +770,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -776,7 +783,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -887,7 +894,7 @@ describe('given an update of a subclass document referenced by an existing docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -900,7 +907,7 @@ describe('given an update of a subclass document referenced by an existing docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );

@@ -35,11 +35,11 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: '3ba39884-3f5e-40fa-be60-9f92b96608fc' as DocumentUuid,
+  documentUuidForInsert: '3ba39884-3f5e-40fa-be60-9f92b96608fc' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -47,7 +47,7 @@ const newUpsertRequest = (): UpsertRequest => ({
 const newDeleteRequest = (): DeleteRequest => ({
   documentUuid: '4ba39884-3f5e-40fa-be60-9f92b96608fc' as DocumentUuid,
   resourceInfo: NoResourceInfo,
-  validate: false,
+  validateNoReferencesToDocument: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -68,7 +68,10 @@ describe('given the delete of a non-existent document', () => {
 
     client = await getSharedClient();
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), documentUuid, resourceInfo, validate: false }, client);
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), documentUuid, resourceInfo, validateNoReferencesToDocument: false },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -103,7 +106,7 @@ describe('given the delete of an existing document', () => {
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       meadowlarkId,
       documentInfo,
       edfiDoc: { natural: 'key' },
@@ -190,7 +193,7 @@ describe('given an delete of a document referenced by an existing document with 
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -200,7 +203,7 @@ describe('given an delete of a document referenced by an existing document with 
         ...newDeleteRequest(),
         documentUuid: referencedDocumentId as unknown as DocumentUuid,
         resourceInfo: referencedResourceInfo,
-        validate: true,
+        validateNoReferencesToDocument: true,
       },
       client,
     );
@@ -278,7 +281,7 @@ describe('given an delete of a document with an outbound reference only, with va
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -288,7 +291,7 @@ describe('given an delete of a document with an outbound reference only, with va
         ...newDeleteRequest(),
         documentUuid: documentWithReferencesId as unknown as DocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
-        validate: true,
+        validateNoReferencesToDocument: true,
       },
       client,
     );
@@ -366,7 +369,7 @@ describe('given an delete of a document referenced by an existing document with 
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -376,7 +379,7 @@ describe('given an delete of a document referenced by an existing document with 
         ...newDeleteRequest(),
         documentUuid: referencedDocumentId as unknown as DocumentUuid,
         resourceInfo: referencedResourceInfo,
-        validate: false,
+        validateNoReferencesToDocument: false,
       },
       client,
     );
@@ -466,7 +469,7 @@ describe('given the delete of a subclass document referenced by an existing docu
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -475,7 +478,7 @@ describe('given the delete of a subclass document referenced by an existing docu
         ...newDeleteRequest(),
         documentUuid: referencedDocumentId as unknown as DocumentUuid,
         resourceInfo: referencedResourceInfo,
-        validate: true,
+        validateNoReferencesToDocument: true,
       },
       client,
     );

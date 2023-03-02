@@ -37,12 +37,12 @@ const newGetRequest = (): GetRequest => ({
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  documentUuidInserted: '' as DocumentUuid,
+  documentUuidForInsert: '' as DocumentUuid,
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -105,7 +105,7 @@ describe('given the get of an existing document', () => {
     client = (await getNewClient()) as MongoClient;
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       meadowlarkId,
       documentInfo,
       edfiDoc: { inserted: 'yes' },

@@ -52,7 +52,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  */
 async function upsertToOpensearch(request: UpsertRequest, client: Client) {
   const opensearchRequest: OpensearchRequest = {
-    id: request.documentUuidInserted,
+    id: request.documentUuidForInsert,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -95,11 +95,11 @@ export async function afterUpdateDocumentById(request: UpdateRequest, result: Up
   await upsertToOpensearch(
     {
       meadowlarkId: request.meadowlarkId,
-      documentUuidInserted: request.documentUuid,
+      documentUuidForInsert: request.documentUuid,
       resourceInfo: request.resourceInfo,
       documentInfo: request.documentInfo,
       edfiDoc: request.edfiDoc,
-      validate: request.validate,
+      validateDocumentReferencesExist: request.validateDocumentReferencesExist,
       security: request.security,
       traceId: request.traceId,
     },

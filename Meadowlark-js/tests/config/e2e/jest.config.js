@@ -20,5 +20,5 @@ module.exports = {
       statements: 60,
     },
   },
-  workerIdleMemoryLimit: '2000MB',
+  workerIdleMemoryLimit: '200MB',
 }

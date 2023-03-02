@@ -18,7 +18,7 @@ import {
 const moduleName = 'postgresql.repository.Delete';
 
 export async function deleteDocumentById(
-  { documentUuid, validate, traceId }: DeleteRequest,
+  { documentUuid, validateNoReferencesToDocument, traceId }: DeleteRequest,
   client: PoolClient,
 ): Promise<DeleteResult> {
   // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
@@ -31,7 +31,7 @@ export async function deleteDocumentById(
   try {
     await client.query('BEGIN');
 
-    if (validate) {
+    if (validateNoReferencesToDocument) {
       // Find the alias ids for the document to be deleted
       const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
 

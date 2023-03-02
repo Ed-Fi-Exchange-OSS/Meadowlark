@@ -147,11 +147,11 @@ describe('given the getById of a document owned by the requestor', () => {
 
   const upsertRequest: UpsertRequest = {
     meadowlarkId,
-    documentUuidInserted: documentUuid,
+    documentUuidForInsert: documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
-    validate: false,
+    validateDocumentReferencesExist: false,
     security: { authorizationStrategy, clientId } as Security,
     traceId: 'traceId' as TraceId,
   };
@@ -205,12 +205,12 @@ describe('given the getById of a document not owned by the requestor', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const documentUuid = generateDocumentUuid();
   const upsertRequest: UpsertRequest = {
-    documentUuidInserted: documentUuid,
+    documentUuidForInsert: documentUuid,
     meadowlarkId,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
-    validate: false,
+    validateDocumentReferencesExist: false,
     security: { authorizationStrategy, clientId: 'DocumentOwner' } as Security,
     traceId: 'traceId' as TraceId,
   };

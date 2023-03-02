@@ -44,11 +44,11 @@ const documentUuid: DocumentUuid = 'e6ce70aa-8216-46e9-b6a1-a3be70f72f36' as Doc
 
 const newUpsertRequest: UpsertRequest = {
   meadowlarkId,
-  documentUuidInserted: documentUuid,
+  documentUuidForInsert: documentUuid,
   resourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 };
@@ -59,7 +59,7 @@ const newUpdateRequest: UpdateRequest = {
   resourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 };

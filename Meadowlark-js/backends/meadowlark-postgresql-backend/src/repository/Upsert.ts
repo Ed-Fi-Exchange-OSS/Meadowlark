@@ -30,7 +30,7 @@ import { validateReferences } from './ReferenceValidation';
 const moduleName = 'postgresql.repository.Upsert';
 
 export async function upsertDocument(
-  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpsertRequest,
+  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
   client: PoolClient,
 ): Promise<UpsertResult> {
   Logger.info(`${moduleName}.upsertDocument`, traceId);
@@ -82,11 +82,11 @@ export async function upsertDocument(
     }
 
     const documentUpsertSql: string = documentInsertOrUpdateSql(
-      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, security },
+      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       isInsert,
     );
 
-    if (validate) {
+    if (validateDocumentReferencesExist) {
       const failures = await validateReferences(
         documentInfo.documentReferences,
         documentInfo.descriptorReferences,

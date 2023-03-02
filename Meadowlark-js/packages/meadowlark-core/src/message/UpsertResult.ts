@@ -6,15 +6,14 @@
 import { DocumentUuid } from '../model/BrandedTypes';
 import { BlockingDocument } from './BlockingDocument';
 
-export type UpsertFailureReference = {
+type UpsertFailureBlocked = {
   response: 'INSERT_FAILURE_REFERENCE' | 'INSERT_FAILURE_CONFLICT' | 'UPDATE_FAILURE_REFERENCE';
   failureMessage?: string | object;
   blockingDocuments: BlockingDocument[];
 };
 
 export type UpsertResult =
-  | UpsertFailureReference
+  | UpsertFailureBlocked
   | { response: 'INSERT_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object; existingDocumentUuid: DocumentUuid }
-  | { response: 'UPSERT_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

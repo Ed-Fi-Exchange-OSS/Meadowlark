@@ -19,11 +19,11 @@ import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/BrandedType
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: '' as DocumentUuid,
+  documentUuidForInsert: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -41,7 +41,7 @@ const newUpdateRequest = (): UpdateRequest => ({
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -49,7 +49,7 @@ const newUpdateRequest = (): UpdateRequest => ({
 const newDeleteRequest = (): DeleteRequest => ({
   documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
-  validate: false,
+  validateNoReferencesToDocument: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });

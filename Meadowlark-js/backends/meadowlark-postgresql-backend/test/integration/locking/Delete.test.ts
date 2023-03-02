@@ -42,11 +42,11 @@ jest.setTimeout(10000);
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
+  documentUuidForInsert: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -157,7 +157,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
         resourceInfo: academicWeekResourceInfo,
         documentInfo: academicWeekDocumentInfo,
         edfiDoc: {},
-        validate: true,
+        validateDocumentReferencesExist: true,
         security: newSecurity(),
       },
       true,
@@ -208,7 +208,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         meadowlarkId: schoolDocumentId,
         documentInfo: schoolDocumentInfo,
       },
@@ -267,7 +267,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
           resourceInfo: academicWeekResourceInfo,
           documentInfo: academicWeekDocumentInfo,
           edfiDoc: {},
-          validate: true,
+          validateDocumentReferencesExist: true,
           security: newSecurity(),
         },
         true,

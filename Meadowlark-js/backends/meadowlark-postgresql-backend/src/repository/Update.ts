@@ -27,7 +27,7 @@ import { validateReferences } from './ReferenceValidation';
 const moduleName = 'postgresql.repository.Update';
 
 export async function updateDocumentById(
-  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, traceId, security }: UpdateRequest,
+  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpdateRequest,
   client: PoolClient,
 ): Promise<UpdateResult> {
   Logger.info(`${moduleName}.updateDocumentById ${meadowlarkId}`, traceId);
@@ -48,7 +48,7 @@ export async function updateDocumentById(
       return updateResult;
     }
 
-    if (validate) {
+    if (validateDocumentReferencesExist) {
       const failures = await validateReferences(
         documentInfo.documentReferences,
         documentInfo.descriptorReferences,
@@ -84,7 +84,7 @@ export async function updateDocumentById(
 
     // Perform the document update
     const documentSql: string = documentInsertOrUpdateSql(
-      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validate, security },
+      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       false,
     );
     const result: QueryResult = await client.query(documentSql);

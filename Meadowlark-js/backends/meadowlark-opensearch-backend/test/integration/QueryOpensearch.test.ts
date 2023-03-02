@@ -67,12 +67,12 @@ const setupUpsertRequest = (
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
-  documentUuidInserted: documentUuid,
+  documentUuidForInsert: documentUuid,
   meadowlarkId,
   resourceInfo: newResourceInfo,
   documentInfo,
   edfiDoc,
-  validate: false,
+  validateDocumentReferencesExist: false,
   security,
   traceId: 'traceId' as TraceId,
 });
@@ -260,12 +260,12 @@ describe('When querying for documents', () => {
       const descriptorMeadowlarkId: MeadowlarkId = 'desc-123' as MeadowlarkId;
 
       const descriptorUpsertRequest: UpsertRequest = {
-        documentUuidInserted: descriptorDocumentUuid,
+        documentUuidForInsert: descriptorDocumentUuid,
         meadowlarkId: descriptorMeadowlarkId,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
         edfiDoc: {},
-        validate: false,
+        validateDocumentReferencesExist: false,
         security: ownershipSecurity,
         traceId: 'traceId' as TraceId,
       };

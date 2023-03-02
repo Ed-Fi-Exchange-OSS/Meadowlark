@@ -130,11 +130,11 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
 
       const upsertRequest: UpsertRequest = {
         meadowlarkId: meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity),
-        documentUuidInserted: generateDocumentUuid(),
+        documentUuidForInsert: generateDocumentUuid(),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,
-        validate: true,
+        validateDocumentReferencesExist: true,
         security: { ...newSecurity(), authorizationStrategy: { type: 'FULL_ACCESS' } },
         traceId: '-' as TraceId,
       };

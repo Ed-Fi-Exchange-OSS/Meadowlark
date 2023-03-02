@@ -14,7 +14,7 @@ export type UpdateRequest = {
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   edfiDoc: object;
-  validate: boolean;
+  validateDocumentReferencesExist: boolean;
   security: Security;
   traceId: TraceId;
 };

@@ -5,16 +5,16 @@
 
 import { BlockingDocument } from './BlockingDocument';
 
-export type UpdateFailureReference = {
-  response: 'UPDATE_FAILURE_REFERENCE';
+type UpdateFailureBlocked = {
+  response: 'UPDATE_FAILURE_REFERENCE' | 'UPDATE_FAILURE_CONFLICT';
   failureMessage?: string | object;
   blockingDocuments: BlockingDocument[];
 };
 
 export type UpdateResult =
-  | UpdateFailureReference
+  | UpdateFailureBlocked
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_NOT_EXISTS'; failureMessage?: string | object }
-  | { response: 'UPDATE_FAILURE_AUTHORIZATION'; failureMessage?: string | object }
-  | { response: 'UPDATE_FAILURE_NATURAL_KEY'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY'; failureMessage?: string | object }
+  | { response: 'UPDATE_CASCADE_REQUIRED' }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

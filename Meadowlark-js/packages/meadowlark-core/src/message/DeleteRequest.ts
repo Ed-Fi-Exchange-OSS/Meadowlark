@@ -10,7 +10,7 @@ import { Security } from '../security/Security';
 export type DeleteRequest = {
   documentUuid: DocumentUuid;
   resourceInfo: ResourceInfo;
-  validate: boolean;
+  validateNoReferencesToDocument: boolean;
   security: Security;
   traceId: TraceId;
 };

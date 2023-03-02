@@ -34,11 +34,11 @@ const documentUuid2 = '4118d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: documentUuid,
+  documentUuidForInsert: documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -66,11 +66,11 @@ describe('given the upsert of a new document', () => {
       {
         ...newUpsertRequest(),
         meadowlarkId,
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         resourceInfo,
         documentInfo,
         edfiDoc: { call: 'one' },
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -116,7 +116,7 @@ describe('given the upsert of an existing document twice', () => {
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
@@ -173,7 +173,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
     };
@@ -232,7 +232,7 @@ describe('given an upsert of a new document that references a non-existent docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -312,11 +312,11 @@ describe('given an upsert of a new document that references an existing document
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -403,11 +403,11 @@ describe('given an upsert of a new document with one existing and one non-existe
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -512,11 +512,11 @@ describe('given an upsert of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -603,11 +603,11 @@ describe('given an upsert of a subclass document when a different subclass has t
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: sameSuperclassIdentityId,
         resourceInfo: sameSuperclassIdentityResourceInfo,
         documentInfo: sameSuperclassIdentityDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -671,7 +671,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -684,7 +684,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -768,11 +768,11 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -782,11 +782,11 @@ describe('given an update of a document that references an existing document wit
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -877,11 +877,11 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -894,7 +894,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -998,11 +998,11 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -1012,11 +1012,11 @@ describe('given an update of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );

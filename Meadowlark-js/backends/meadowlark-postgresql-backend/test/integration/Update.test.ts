@@ -37,11 +37,11 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: '' as DocumentUuid,
+  documentUuidForInsert: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -52,7 +52,7 @@ const newUpdateRequest = (): UpdateRequest => ({
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -84,7 +84,14 @@ describe('given the update of a non-existent document', () => {
     client = await getSharedClient();
 
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), meadowlarkId, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      {
+        ...newUpdateRequest(),
+        meadowlarkId,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
       client,
     );
   });
@@ -205,7 +212,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -218,7 +225,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -310,7 +317,7 @@ describe('given an update of a document that references an existing document wit
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -323,7 +330,7 @@ describe('given an update of a document that references an existing document wit
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -420,7 +427,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -433,7 +440,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -540,7 +547,7 @@ describe('given an update of a subclass document referenced by an existing docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -552,7 +559,7 @@ describe('given an update of a subclass document referenced by an existing docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );

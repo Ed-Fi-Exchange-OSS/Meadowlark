@@ -36,11 +36,11 @@ const documentUuid2 = '4518d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: documentUuid,
+  documentUuidForInsert: documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -48,7 +48,7 @@ const newUpsertRequest = (): UpsertRequest => ({
 const newDeleteRequest = (): DeleteRequest => ({
   documentUuid,
   resourceInfo: NoResourceInfo,
-  validate: false,
+  validateNoReferencesToDocument: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -67,7 +67,10 @@ describe('given the delete of a non-existent document', () => {
 
     client = (await getNewClient()) as MongoClient;
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), documentUuid, resourceInfo, validate: false }, client);
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), documentUuid, resourceInfo, validateNoReferencesToDocument: false },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -99,7 +102,7 @@ describe('given the delete of an existing document', () => {
     client = (await getNewClient()) as MongoClient;
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       documentInfo,
       edfiDoc: { natural: 'key' },
     };
@@ -174,7 +177,7 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -185,16 +188,16 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), documentUuid, resourceInfo: referencedResourceInfo, validate: true },
+      { ...newDeleteRequest(), documentUuid, resourceInfo: referencedResourceInfo, validateNoReferencesToDocument: true },
       client,
     );
   });
@@ -263,7 +266,7 @@ describe('given an delete of a document with an outbound reference only, with va
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -274,10 +277,10 @@ describe('given an delete of a document with an outbound reference only, with va
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -287,7 +290,7 @@ describe('given an delete of a document with an outbound reference only, with va
         ...newDeleteRequest(),
         documentUuid: documentUuid2,
         resourceInfo: documentWithReferencesResourceInfo,
-        validate: true,
+        validateNoReferencesToDocument: true,
       },
       client,
     );
@@ -356,7 +359,7 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -367,16 +370,21 @@ describe('given the delete of a document referenced by an existing document with
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), documentUuid: documentUuid2, resourceInfo: referencedResourceInfo, validate: false },
+      {
+        ...newDeleteRequest(),
+        documentUuid: documentUuid2,
+        resourceInfo: referencedResourceInfo,
+        validateNoReferencesToDocument: false,
+      },
       client,
     );
   });
@@ -456,7 +464,7 @@ describe('given the delete of a subclass document referenced by an existing docu
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: referencedDocumentUuid,
+        documentUuidForInsert: referencedDocumentUuid,
         meadowlarkId: referencedDocumentId,
         documentInfo: referencedDocumentInfo,
       },
@@ -467,16 +475,21 @@ describe('given the delete of a subclass document referenced by an existing docu
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidInserted: documentWithReferencesDocumentUuid,
+        documentUuidForInsert: documentWithReferencesDocumentUuid,
         meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), documentUuid: referencedDocumentUuid, resourceInfo: referencedResourceInfo, validate: true },
+      {
+        ...newDeleteRequest(),
+        documentUuid: referencedDocumentUuid,
+        resourceInfo: referencedResourceInfo,
+        validateNoReferencesToDocument: true,
+      },
       client,
     );
   });

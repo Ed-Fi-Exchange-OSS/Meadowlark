@@ -39,18 +39,18 @@ const newUpdateRequest = (): UpdateRequest => ({
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidInserted: documentUuid,
+  documentUuidForInsert: documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
@@ -82,7 +82,7 @@ describe('given the update of a non-existent document', () => {
         resourceInfo,
         documentInfo,
         edfiDoc: { call: 'one' },
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -125,7 +125,7 @@ describe('given the update of an existing document', () => {
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
@@ -199,7 +199,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -212,7 +212,7 @@ describe('given an update of a document that references a non-existent document 
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -286,7 +286,7 @@ describe('given an update of a document that references an existing document wit
       {
         ...newUpsertRequest(),
         meadowlarkId: referencedDocumentId,
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -298,10 +298,10 @@ describe('given an update of a document that references an existing document wit
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -315,7 +315,7 @@ describe('given an update of a document that references an existing document wit
         documentUuid: documentUuid2,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -409,7 +409,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -423,7 +423,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -515,7 +515,7 @@ describe('given an update of a subclass document referenced by an existing docum
       {
         ...newUpsertRequest(),
         meadowlarkId: referencedDocumentId,
-        documentUuidInserted: documentUuid,
+        documentUuidForInsert: documentUuid,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -527,10 +527,10 @@ describe('given an update of a subclass document referenced by an existing docum
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
-        documentUuidInserted: documentUuid2,
+        documentUuidForInsert: documentUuid2,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -544,7 +544,7 @@ describe('given an update of a subclass document referenced by an existing docum
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -592,7 +592,7 @@ describe('given the update of an existing document changing meadowlarkId with al
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
@@ -622,7 +622,7 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   it('should return update error', async () => {
-    expect(updateResult.response).toBe('UPDATE_FAILURE_NATURAL_KEY');
+    expect(updateResult.response).toBe('UPDATE_FAILURE_IMMUTABLE_IDENTITY');
   });
 });
 
@@ -648,7 +648,7 @@ describe('given the update of an existing document changing meadowlarkId with al
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidInserted: documentUuid,
+      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
