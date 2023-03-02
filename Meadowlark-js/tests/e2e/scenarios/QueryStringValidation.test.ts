@@ -65,7 +65,7 @@ describe('When retrieving information', () => {
                     "error": "The request is invalid.",
                     "modelState": {
                       "limit": [
-                        "Must be set to a numeric value >= 1",
+                        "Must be set to a numeric value >= 0",
                       ],
                       "offset": [],
                     },
@@ -121,7 +121,7 @@ describe('When retrieving information', () => {
                     "modelState": {
                       "limit": [],
                       "offset": [
-                        "Must be set to a numeric value >= 1",
+                        "Must be set to a numeric value >= 0",
                       ],
                     },
                   }
