@@ -47,9 +47,6 @@ export const NoDocumentStorePlugin: DocumentStorePlugin = {
   },
 
   closeConnection: async (): Promise<void> => {
-    Logger.warn(
-      `${moduleName}.closeConnection No backend plugin has been configured`,
-      ''
-    );
+    Logger.warn(`${moduleName}.closeConnection No backend plugin has been configured`, '');
   },
 };
