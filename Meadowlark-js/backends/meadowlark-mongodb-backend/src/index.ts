@@ -17,6 +17,7 @@ import {
   getAllAuthorizationClientDocuments,
   resetAuthorizationClientSecret,
   tryCreateBootstrapAuthorizationAdminDocument,
+  closeConnection,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -26,6 +27,7 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     updateDocumentById,
     deleteDocumentById,
     securityMiddleware,
+    closeConnection,
   };
 }
 
@@ -41,5 +43,5 @@ export function initializeAuthorizationStore(): AuthorizationStorePlugin {
 }
 
 // Accessible for system testing - this may turn into a generic setup/teardown datastore interface
-export { getNewClient, getDocumentCollection, getAuthorizationCollection, resetSharedClient } from './repository/Db';
+export { getNewClient, getDocumentCollection, getAuthorizationCollection } from './repository/Db';
 export { systemTestSetup, systemTestTeardown } from './repository/SystemTestHelper';

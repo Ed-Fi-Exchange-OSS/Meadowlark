@@ -6,6 +6,7 @@
 import { FastifyInstance } from 'fastify';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { buildService } from './Service';
+import { closeConnection } from './handler/CrudHandler';
 
 export type ServiceFactory = (worker: number) => Promise<void>;
 /* istanbul ignore file */
@@ -14,11 +15,9 @@ export async function serviceFactory(worker: number) {
 
   const closeGracefully = async (signal: string | number | undefined) => {
     Logger.info(`Received signal to terminate: ${signal}`, null);
-
+    await closeConnection();
     await service.close();
-    // TODO RND-481: close database connections Initial thoughts: may need to
-    // have a global registry of backends to go through, manually closing any
-    // connections.
+    Logger.info('Service closed', null);
     process.kill(process.pid, signal);
   };
   // The code below works correctly, and is not a misuse of promises.

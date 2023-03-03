@@ -46,7 +46,7 @@ export { doNothingMiddleware } from './middleware/DoNothingMiddleware';
 export { writeRequestToLog } from './Logger';
 
 // Handlers
-export { upsert, deleteIt, get, update } from './handler/FrontendFacade';
+export { upsert, deleteIt, get, update, closeConnection } from './handler/FrontendFacade';
 export { loadDescriptors } from './handler/DescriptorLoader';
 export {
   apiVersion,

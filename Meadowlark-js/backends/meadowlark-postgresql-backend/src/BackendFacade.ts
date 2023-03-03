@@ -20,7 +20,7 @@ import * as Upsert from './repository/Upsert';
 import * as Delete from './repository/Delete';
 import * as Get from './repository/Get';
 import * as Update from './repository/Update';
-import { getSharedClient } from './repository/Db';
+import { getSharedClient, closeSharedConnection } from './repository/Db';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
@@ -66,4 +66,8 @@ export async function securityMiddleware(middlewareModel: MiddlewareModel): Prom
   } finally {
     poolClient.release();
   }
+}
+
+export async function closeConnection(): Promise<void> {
+  return closeSharedConnection();
 }

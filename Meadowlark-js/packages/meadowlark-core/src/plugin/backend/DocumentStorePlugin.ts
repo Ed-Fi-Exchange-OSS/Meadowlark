@@ -23,4 +23,6 @@ export interface DocumentStorePlugin {
   deleteDocumentById: (request: DeleteRequest) => Promise<DeleteResult>;
 
   securityMiddleware: (middlewareModel: MiddlewareModel) => Promise<MiddlewareModel>;
+
+  closeConnection: () => Promise<void>;
 }

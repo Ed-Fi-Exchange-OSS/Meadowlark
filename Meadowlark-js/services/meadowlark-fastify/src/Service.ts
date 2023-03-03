@@ -12,7 +12,7 @@ import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import { deleteIt, get, update, upsert } from './handler/CrudHandler';
+import { closeConnection, deleteIt, get, update, upsert } from './handler/CrudHandler';
 import {
   metaed,
   apiVersion,
@@ -77,7 +77,7 @@ export function buildService(): FastifyInstance {
 
     fastify.addHook('onClose', (_instance, done) => {
       Logger.info('Close signal received', null);
-
+      closeConnection();
       done();
     });
   }
@@ -120,7 +120,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metaed`, metaed);
 
     // API version handler
-    fastify.get(`/${stage}`, apiVersion);
+    fastify.get(`/${stage}`, closeConnection);
     fastify.get(`/${stage}/`, apiVersion);
 
     // Swagger handlers

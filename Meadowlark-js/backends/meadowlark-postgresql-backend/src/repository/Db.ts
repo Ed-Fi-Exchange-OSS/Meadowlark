@@ -138,3 +138,17 @@ export async function resetSharedClient() {
     }
   }
 }
+
+/**
+ * Nulls out the singleton pool, then closes it
+ */
+export async function closeSharedConnection() {
+  const savedDbPool: Pool | null = singletonDbPool;
+  if (singletonDbPool != null) {
+    singletonDbPool = null;
+    if (savedDbPool != null) {
+      await savedDbPool.end();
+    }
+  }
+  Logger.info(`Postgresql connection: closed`, null);
+}

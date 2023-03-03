@@ -8,4 +8,6 @@ import { QueryResult } from '../../message/QueryResult';
 
 export interface QueryHandlerPlugin {
   queryDocuments: (request: QueryRequest) => Promise<QueryResult>;
+
+  closeConnection: () => Promise<void>;
 }

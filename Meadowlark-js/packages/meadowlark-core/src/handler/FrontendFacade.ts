@@ -17,6 +17,7 @@ import * as Update from './Update';
 import * as Delete from './Delete';
 import * as Query from './Query';
 import * as GetById from './GetById';
+import * as Connection from './Connection';
 import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
@@ -251,5 +252,14 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
   } catch (e) {
     writeErrorToLog(moduleName, frontendRequest.traceId, 'deleteIt', 500, e);
     return { statusCode: 500 };
+  }
+}
+
+export async function closeConnection(): Promise<void> {
+  try {
+    await initialize();
+    await Connection.closeConnection();
+  } catch (e) {
+    writeErrorToLog(moduleName, '', 'closeConnection', 500, e);
   }
 }
