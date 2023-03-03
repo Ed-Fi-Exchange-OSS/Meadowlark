@@ -74,7 +74,12 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     if (response === 'UPDATE_CASCADE_REQUIRED') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'update cascade required');
       return {
-        body: 'This operation would change the identity of the document and require a cascading update of referencing documents. Not supported at this time.',
+        body: {
+          error: {
+            message:
+              'This operation would change the identity of the document and require a cascading update of referencing documents. Not supported at this time.',
+          },
+        },
         statusCode: 409,
         headers: headerMetadata,
       };
@@ -82,7 +87,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_FAILURE_IMMUTABLE_IDENTITY') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, 'modify immutable identity error');
-      return { body: 'The identity fields of the document cannot be modified', statusCode: 400, headers: headerMetadata };
+      return {
+        body: { error: { message: 'The identity fields of the document cannot be modified' } },
+        statusCode: 400,
+        headers: headerMetadata,
+      };
     }
 
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, result.failureMessage);

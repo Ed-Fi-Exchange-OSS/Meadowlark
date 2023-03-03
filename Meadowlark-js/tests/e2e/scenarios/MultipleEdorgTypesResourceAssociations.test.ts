@@ -169,7 +169,9 @@ describe('Given the existence of a student, a school, a local education agency a
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
             {
-              "error": "The identity of the resource does not match the identity in the updated document.",
+              "error": {
+                "message": "The identity fields of the document cannot be modified",
+              },
             }
           `);
         });
