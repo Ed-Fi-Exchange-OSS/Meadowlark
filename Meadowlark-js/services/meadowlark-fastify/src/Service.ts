@@ -120,7 +120,7 @@ export function buildService(): FastifyInstance {
     fastify.get(`/${stage}/metaed`, metaed);
 
     // API version handler
-    fastify.get(`/${stage}`, closeConnection);
+    fastify.get(`/${stage}`, apiVersion);
     fastify.get(`/${stage}/`, apiVersion);
 
     // Swagger handlers
