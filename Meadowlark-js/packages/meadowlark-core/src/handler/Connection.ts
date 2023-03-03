@@ -8,19 +8,19 @@ import { getDocumentStore, getQueryHandler } from '../plugin/PluginLoader';
 
 const moduleName = 'core.handler.Connection';
 async function closeSharedConnection(): Promise<void> {
-  try {
-    await getDocumentStore().closeConnection();
-  } catch (e) {
-    writeErrorToLog(moduleName, '', 'closeConnection', 500, e);
-  }
+  await getDocumentStore().closeConnection();
 }
 
 async function closeQueryConnection(): Promise<void> {
-  return getQueryHandler().closeConnection();
+  await getQueryHandler().closeConnection();
 }
 
 export async function closeConnection(): Promise<void> {
-  // close all connections
-  await closeQueryConnection();
-  await closeSharedConnection();
+  try {
+    // close all connections
+    await closeQueryConnection();
+    await closeSharedConnection();
+  } catch (e) {
+    writeErrorToLog(moduleName, '', 'closeConnection', 500, e);
+  }
 }

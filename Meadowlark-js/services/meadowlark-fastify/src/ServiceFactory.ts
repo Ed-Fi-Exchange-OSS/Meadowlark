@@ -6,7 +6,7 @@
 import { FastifyInstance } from 'fastify';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { buildService } from './Service';
-import { closeConnection } from './handler/CrudHandler';
+import { closeMeadowlarkConnection } from './handler/MeadowlarkConnection';
 
 export type ServiceFactory = (worker: number) => Promise<void>;
 /* istanbul ignore file */
@@ -15,7 +15,7 @@ export async function serviceFactory(worker: number) {
 
   const closeGracefully = async (signal: string | number | undefined) => {
     Logger.info(`Received signal to terminate: ${signal}`, null);
-    await closeConnection();
+    await closeMeadowlarkConnection();
     await service.close();
     Logger.info('Service closed', null);
     process.kill(process.pid, signal);

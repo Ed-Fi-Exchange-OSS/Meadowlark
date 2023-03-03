@@ -8,10 +8,8 @@ import {
   upsert as meadowlarkUpsert,
   get as meadowlarkGet,
   deleteIt as meadowlarkDelete,
-  closeConnection as meadowlarkCloseConnection,
 } from '@edfi/meadowlark-core';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { Logger } from '@edfi/meadowlark-utilities';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
 
 /**
@@ -40,12 +38,4 @@ export async function update(request: FastifyRequest, reply: FastifyReply): Prom
  */
 export async function deleteIt(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   respondWith(await meadowlarkDelete(fromRequest(request)), reply);
-}
-
-/**
- * Entry point for all API DELETE requests, which are "by id"
- */
-export async function closeConnection(): Promise<void> {
-  Logger.info(`Close connection.`, null);
-  await meadowlarkCloseConnection();
 }

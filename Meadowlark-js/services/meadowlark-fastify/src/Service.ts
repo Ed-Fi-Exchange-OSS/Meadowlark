@@ -12,7 +12,8 @@ import Fastify from 'fastify';
 import FastifyRateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyLoggerInstance } from 'fastify';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import { closeConnection, deleteIt, get, update, upsert } from './handler/CrudHandler';
+import { deleteIt, get, update, upsert } from './handler/CrudHandler';
+import { closeMeadowlarkConnection } from './handler/MeadowlarkConnection';
 import {
   metaed,
   apiVersion,
@@ -77,7 +78,7 @@ export function buildService(): FastifyInstance {
 
     fastify.addHook('onClose', (_instance, done) => {
       Logger.info('Close signal received', null);
-      closeConnection();
+      closeMeadowlarkConnection();
       done();
     });
   }
