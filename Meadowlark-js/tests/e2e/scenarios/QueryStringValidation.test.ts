@@ -54,7 +54,7 @@ describe('When retrieving information', () => {
 
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
-        it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('limit = %s', async (limit) => {
+        it.each([-1, 'zero', '5; select * from users', '0)', '1%27'])('limit = %s', async (limit) => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${limit}`)
             .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -65,7 +65,7 @@ describe('When retrieving information', () => {
                     "error": "The request is invalid.",
                     "modelState": {
                       "limit": [
-                        "Must be set to a numeric value >= 1",
+                        "Must be set to a numeric value >= 0",
                       ],
                       "offset": [],
                     },
@@ -109,7 +109,7 @@ describe('When retrieving information', () => {
 
       describe('when requesting with invalid values', () => {
         // Use the assessment1 credentials to bypass additional validations
-        it.each([0, 'zero', '5; select * from users', '0)', '1%27'])('offset = %s', async (offset) => {
+        it.each([-1, 'zero', '5; select * from users', '0)', '1%27'])('offset = %s', async (offset) => {
           await baseURLRequest()
             .get(`/v3.3b/ed-fi/schools?limit=${total}&offset=${offset}`)
             .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -121,7 +121,7 @@ describe('When retrieving information', () => {
                     "modelState": {
                       "limit": [],
                       "offset": [
-                        "Must be set to a numeric value >= 1",
+                        "Must be set to a numeric value >= 0",
                       ],
                     },
                   }

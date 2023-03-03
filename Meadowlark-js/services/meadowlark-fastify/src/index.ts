@@ -6,8 +6,8 @@
 /* istanbul ignore file */
 import dotenv from 'dotenv';
 import { initializeLogging, Config, CachedEnvironmentConfigProvider } from '@edfi/meadowlark-utilities';
-import { ClusterService } from './Cluster';
-import { serviceFactory } from './Factory';
+import { ClusterService } from './ClusterService';
+import { serviceFactory } from './ServiceFactory';
 
 dotenv.config();
 

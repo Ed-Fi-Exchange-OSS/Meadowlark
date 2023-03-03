@@ -13,13 +13,13 @@ import {
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer, enumerationReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import {
-  entityPropertyMeadowlarkDataSetupEnhancer,
+  entityPropertyApiSchemaDataSetupEnhancer,
   apiEntityMappingEnhancer,
-  entityMeadowlarkDataSetupEnhancer,
+  entityApiSchemaDataSetupEnhancer,
   referenceComponentEnhancer,
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-meadowlark';
+} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentReferences } from '../../src/extraction/DocumentReferenceExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
 
@@ -85,8 +85,8 @@ describe('when extracting document references from domain entity referencing one
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -164,8 +164,8 @@ describe('when extracting with optional reference in body', () => {
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -221,8 +221,8 @@ describe('when extracting with optional reference not in body', () => {
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -278,8 +278,8 @@ describe('when extracting optional collection in body', () => {
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -342,8 +342,8 @@ describe('when extracting optional collection not in body', () => {
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -420,8 +420,8 @@ describe('when extracting document references with two levels of identities on a
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -534,8 +534,8 @@ describe('when extracting document references with three levels of identities on
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -620,8 +620,8 @@ describe('when extracting with school year reference in body', () => {
 
     domainEntityReferenceEnhancer(metaEd);
     enumerationReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);
@@ -706,8 +706,8 @@ describe('when extracting with school year in a reference document', () => {
 
     domainEntityReferenceEnhancer(metaEd);
     enumerationReferenceEnhancer(metaEd);
-    entityPropertyMeadowlarkDataSetupEnhancer(metaEd);
-    entityMeadowlarkDataSetupEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
     referenceComponentEnhancer(metaEd);
     apiPropertyMappingEnhancer(metaEd);
     propertyCollectingEnhancer(metaEd);

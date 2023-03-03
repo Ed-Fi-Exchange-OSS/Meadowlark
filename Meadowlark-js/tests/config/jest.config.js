@@ -7,4 +7,5 @@ module.exports = {
   watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
   setupFiles: ['dotenv/config'],
   rootDir: '../../..',
+  workerIdleMemoryLimit: '200MB',
 };

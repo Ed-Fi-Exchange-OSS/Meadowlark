@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-meadowlark';
+import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-api-schema';
 import { PathComponents } from '../model/PathComponents';
 import { FrontendRequest } from './FrontendRequest';
 import { BlockingDocument } from '../message/BlockingDocument';

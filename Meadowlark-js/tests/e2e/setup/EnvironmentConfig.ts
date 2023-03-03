@@ -11,6 +11,7 @@ import { endLog, setLogTracing } from './LogConfig';
 let environment: StartedDockerComposeEnvironment;
 
 const mongoContainerName = 'mongo-test1';
+const openSearchContainerName = 'opensearch-test';
 
 export async function stop() {
   endLog();
@@ -44,7 +45,8 @@ export async function configure() {
   const composeFile = 'docker-compose.yml';
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
     .withWaitStrategy(mongoContainerName, Wait.forHealthCheck())
-    .withStartupTimeout(30 * 1000)
+    .withWaitStrategy(openSearchContainerName, Wait.forHealthCheck())
+    .withStartupTimeout(120_000)
     .up();
 
   console.debug('-- Setting log tracing --');
@@ -52,4 +54,5 @@ export async function configure() {
   const mongoContainer = environment.getContainer(mongoContainerName);
   console.debug('-- Setting up mongo user --');
   await setMongoUser(mongoContainer);
+  console.debug('-- Environment Ready --');
 }

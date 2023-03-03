@@ -45,21 +45,21 @@ See [Running on Localhost](LOCALHOST.md).
 Meadowlark is bundled with test scripts to exercise the API.
 
 * Run `npm run build` from the root `Meadowlark-js` directory.
-* cd into your chosen service (fastify or AWS Lambda)
-* Run `npm run build`
 * Run `npm run start:local`
-* Use a test/http/local.*.http file to make API calls.
+* Use a `test/http/local.*.http` file to make API calls.
 
 ## Load Ed-Fi Descriptors
 
-Meadowlark is packaged with the full set of Ed-Fi descriptors which, while not
-required, must be loaded in order for descriptors to validate successfully.
+Meadowlark is packaged with the full set of Ed-Fi descriptors for Data Standard
+3.3.1-b which, while not required, must be loaded in order for descriptors to
+validate successfully.
 
 * Run `npm run start:local` in one shell.
-* In a second shell, cd into /Meadowlark/eng and the run Invoke-Bulkload.ps1
-  script
-  * Note: This requires building the [Bulk Load Client
-    Utility](https://techdocs.ed-fi.org/display/ODSAPIS3V53/Bulk+Load+Client+Utility)
+* In a second shell, cd into the `eng`.
+* Open one of the `Invoke-Load?.ps1` PowerShell scripts; comment out the last
+  line of the script so that only descriptors run.
+
+This uses the ODS/API's dotnet-based client side bulk loader utility to open the descriptor XML files and load the resources one-by-one through the API. This is essentially how the ODS/API's minimal template is populated.
 
 ## Other Build Scripts
 

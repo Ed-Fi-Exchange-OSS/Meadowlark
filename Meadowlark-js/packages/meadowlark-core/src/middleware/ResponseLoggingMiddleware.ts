@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config } from '@edfi/meadowlark-utilities';
 import * as R from 'ramda';
 import { writeDebugObject } from '../Logger';
 import { MissingIdentity } from '../model/DocumentIdentity';
@@ -23,30 +24,31 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
     // TypeScript alone doesn't isolate this - need runtime code to detect if the body is in the specific shape.
 
     const responseBody = R.clone(frontendResponse?.body);
-    if (
-      frontendResponse != null &&
-      frontendResponse.body != null &&
-      // eslint-disable-next-line dot-notation
-      frontendResponse.body['error'] != null &&
-      // eslint-disable-next-line dot-notation
-      frontendResponse.body['error']['failures'] != null
-    ) {
-      const anonymizedBody = responseBody as ReferenceError;
 
-      // On a 404, we have a body.error that is just a string. Otherwise, body.error is an object and we want to anonymize
-      // and data values in it.
-      const notADescriptor = (x: MissingIdentity): boolean => !x.resourceName.endsWith('Descriptor');
+    if (!Config.get('DISABLE_LOG_ANONYMIZATION')) {
+      if (
+        frontendResponse != null &&
+        frontendResponse.body != null &&
+        // eslint-disable-next-line dot-notation
+        frontendResponse.body['error'] != null &&
+        // eslint-disable-next-line dot-notation
+        frontendResponse.body['error']['failures'] != null
+      ) {
+        const anonymizedBody = responseBody as ReferenceError;
 
-      anonymizedBody.error.failures.forEach((failure) => {
-        // Anonymize values for non-Descriptors
-        if (notADescriptor(failure)) {
-          Object.keys(failure.identity).forEach((identityKey) => {
-            failure.identity[identityKey] = '*';
-          });
-        }
-      });
+        // On a 404, we have a body.error that is just a string. Otherwise, body.error is an object and we want to anonymize
+        // and data values in it.
+        const notADescriptor = (x: MissingIdentity): boolean => !x.resourceName.endsWith('Descriptor');
 
-      // responseBody = anonymizedBody;
+        anonymizedBody.error.failures.forEach((failure) => {
+          // Anonymize values for non-Descriptors
+          if (notADescriptor(failure)) {
+            Object.keys(failure.identity).forEach((identityKey) => {
+              failure.identity[identityKey] = '*';
+            });
+          }
+        });
+      }
     }
 
     writeDebugObject(

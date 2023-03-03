@@ -21,7 +21,7 @@ import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
 import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
-import { anonymizeAndLogRequestBody } from '../middleware/LogAnonymizedRequestMiddleware';
+import { logRequestBody } from '../middleware/RequestLoggingMiddleware';
 import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
@@ -43,7 +43,7 @@ function postStack(): MiddlewareStack {
       authorize,
       R.andThen(parsePath),
       R.andThen(parseBody),
-      R.andThen(anonymizeAndLogRequestBody),
+      R.andThen(logRequestBody),
       R.andThen(resourceValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
@@ -61,7 +61,7 @@ function putStack(): MiddlewareStack {
       authorize,
       R.andThen(parsePath),
       R.andThen(parseBody),
-      R.andThen(anonymizeAndLogRequestBody),
+      R.andThen(logRequestBody),
       R.andThen(resourceValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),

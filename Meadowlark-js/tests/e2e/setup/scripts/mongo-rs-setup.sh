@@ -9,12 +9,6 @@ var cfg = {
         {
             "_id": 0,
             "host": "mongo-t1:27017",
-            "priority": 2
-        },
-        {
-            "_id": 1,
-            "host": "mongo-t2:27018",
-            "priority": 0
         }
     ],settings: {chainingAllowed: true}
 };
