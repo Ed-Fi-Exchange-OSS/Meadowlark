@@ -94,6 +94,16 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       };
     }
 
+    if (response === 'UPDATE_FAILURE_CONFLICT') {
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, blockingUris.join(','));
+      return {
+        body: { error: { message: result.failureMessage ?? '', blockingUris } },
+        statusCode: 409,
+        headers: headerMetadata,
+      };
+    }
+
     writeErrorToLog(moduleName, frontendRequest.traceId, 'update', 500, result.failureMessage);
 
     return {
