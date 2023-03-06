@@ -19,7 +19,6 @@ import {
   UpsertResult,
   DocumentIdentity,
   MeadowlarkId,
-  DocumentUuid,
   TraceId,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
@@ -33,7 +32,6 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidForInsert: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},

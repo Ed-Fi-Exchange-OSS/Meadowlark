@@ -16,9 +16,9 @@ import {
   DocumentUuid,
   UpsertRequest,
   TraceId,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { MongoClient } from 'mongodb';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
@@ -129,6 +129,7 @@ describe('given the getById of a non-existent document', () => {
 
 describe('given the getById of a document owned by the requestor', () => {
   let client;
+  let upsertResult: UpsertResult;
   let result;
 
   const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
@@ -143,11 +144,9 @@ describe('given the getById of a document owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
-  const documentUuid = generateDocumentUuid();
 
   const upsertRequest: UpsertRequest = {
     meadowlarkId,
-    documentUuidForInsert: documentUuid,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
@@ -156,24 +155,25 @@ describe('given the getById of a document owned by the requestor', () => {
     traceId: 'traceId' as TraceId,
   };
 
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), documentUuid },
-      security: { authorizationStrategy, clientId },
-      validateResources: true,
-    },
-  };
-
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
 
     // Insert owned document
-    await upsertDocument(upsertRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid: upsertResult.newDocumentUuid },
+        security: { authorizationStrategy, clientId },
+        validateResources: true,
+      },
+    };
 
     // Act
     result = await rejectByOwnershipSecurity(frontendRequest, client);
@@ -191,6 +191,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
 describe('given the getById of a document not owned by the requestor', () => {
   let client;
+  let upsertResult: UpsertResult;
   let result;
   const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
 
@@ -203,9 +204,7 @@ describe('given the getById of a document not owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
-  const documentUuid = generateDocumentUuid();
   const upsertRequest: UpsertRequest = {
-    documentUuidForInsert: documentUuid,
     meadowlarkId,
     resourceInfo,
     documentInfo,
@@ -215,24 +214,25 @@ describe('given the getById of a document not owned by the requestor', () => {
     traceId: 'traceId' as TraceId,
   };
 
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), documentUuid },
-      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
-      validateResources: true,
-    },
-  };
-
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
 
     // Insert non-owned document
-    await upsertDocument(upsertRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid: upsertResult.newDocumentUuid },
+        security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
+        validateResources: true,
+      },
+    };
 
     // Act
     result = await rejectByOwnershipSecurity(frontendRequest, client);

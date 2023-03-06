@@ -16,11 +16,9 @@ import {
   newResourceInfo,
   documentIdForDocumentReference,
   MeadowlarkId,
-  DocumentUuid,
   TraceId,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
@@ -42,7 +40,6 @@ jest.setTimeout(10000);
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidForInsert: '0161d332-887e-4d7d-8503-241f684e0d79' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -202,13 +199,11 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
     insertClient = (await getSharedClient()) as PoolClient;
     deleteClient = (await getSharedClient()) as PoolClient;
-    const documentUuid = generateDocumentUuid();
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid,
         meadowlarkId: schoolDocumentId,
         documentInfo: schoolDocumentInfo,
       },

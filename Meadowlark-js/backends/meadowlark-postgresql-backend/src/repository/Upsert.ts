@@ -151,7 +151,9 @@ export async function upsertDocument(
     }
 
     await client.query('COMMIT');
-    return isInsert ? { response: 'INSERT_SUCCESS' } : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
+    return isInsert
+      ? { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid }
+      : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
     await client.query('ROLLBACK');

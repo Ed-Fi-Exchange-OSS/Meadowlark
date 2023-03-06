@@ -20,7 +20,7 @@ import type { DescriptorDocument } from '../model/DescriptorDocument';
 import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
 import type { UpsertRequest } from '../message/UpsertRequest';
 import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
-import { generateDocumentUuid, meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
 import type { TraceId } from '../model/BrandedTypes';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
@@ -130,7 +130,6 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
 
       const upsertRequest: UpsertRequest = {
         meadowlarkId: meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity),
-        documentUuidForInsert: generateDocumentUuid(),
         resourceInfo,
         documentInfo,
         edfiDoc: descriptorDocument,

@@ -39,15 +39,16 @@ const resourceInfo: ResourceInfo = {
   allowIdentityUpdates: false,
 };
 
+const resourceIndex: string = 'ed-fi$3-3-1-b$student';
+
 const meadowlarkId = '1234a-5678b' as MeadowlarkId;
 const documentUuid: DocumentUuid = 'e6ce70aa-8216-46e9-b6a1-a3be70f72f36' as DocumentUuid;
 
 const newUpsertRequest: UpsertRequest = {
   meadowlarkId,
-  documentUuidForInsert: documentUuid,
   resourceInfo,
   documentInfo: NoDocumentInfo,
-  edfiDoc: {},
+  edfiDoc: { upsert: true },
   validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
@@ -58,7 +59,7 @@ const newUpdateRequest: UpdateRequest = {
   documentUuid,
   resourceInfo,
   documentInfo: NoDocumentInfo,
-  edfiDoc: {},
+  edfiDoc: { update: true },
   validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
@@ -90,29 +91,20 @@ describe('given the upsert of a new document', () => {
         newUpsertRequest,
         {
           response: 'INSERT_SUCCESS',
+          newDocumentUuid: documentUuid,
         } as UpsertResult,
         client,
       );
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { documentUuid, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toMatchInlineSnapshot(`
-        [
-          {
-            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
-          },
-        ]
-      `);
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).upsert).toBe(true);
     });
   });
 
@@ -129,23 +121,13 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { documentUuid, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toMatchInlineSnapshot(`
-        [
-          {
-            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
-          },
-        ]
-      `);
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).upsert).toBe(true);
     });
   });
 
@@ -183,23 +165,13 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { documentUuid, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toMatchInlineSnapshot(`
-        [
-          {
-            "id": "e6ce70aa-8216-46e9-b6a1-a3be70f72f36",
-          },
-        ]
-      `);
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).update).toBe(true);
     });
   });
 
@@ -231,6 +203,10 @@ describe('given the upsert of a new document', () => {
         } as UpdateResult,
         client,
       );
+    });
+
+    afterEach(async () => {
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be able to delete document', async () => {

@@ -13,7 +13,7 @@ import type { UpsertResult } from '../message/UpsertResult';
 import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris, resourceUriFrom } from './UriBuilder';
-import { generateDocumentUuid, meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
 import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Upsert';
@@ -28,11 +28,9 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     writeRequestToLog(moduleName, frontendRequest, 'upsert');
     const { resourceInfo, documentInfo, pathComponents, headerMetadata, parsedBody, security } = frontendRequest.middleware;
 
-    const documentUuidForInsert = generateDocumentUuid();
     const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
     const request: UpsertRequest = {
       meadowlarkId,
-      documentUuidForInsert,
       resourceInfo,
       documentInfo,
       edfiDoc: parsedBody,
@@ -51,7 +49,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
       return {
         statusCode: 201,
-        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, documentUuidForInsert) },
+        headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, result.newDocumentUuid) },
       };
     }
 

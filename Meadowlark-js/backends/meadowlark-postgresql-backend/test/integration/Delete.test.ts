@@ -35,7 +35,6 @@ jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidForInsert: '3ba39884-3f5e-40fa-be60-9f92b96608fc' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -106,7 +105,6 @@ describe('given the delete of an existing document', () => {
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuidForInsert: documentUuid,
       meadowlarkId,
       documentInfo,
       edfiDoc: { natural: 'key' },

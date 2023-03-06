@@ -12,6 +12,7 @@ import {
   documentIdForSuperclassInfo,
   BlockingDocument,
   DocumentUuid,
+  generateDocumentUuid,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
@@ -21,16 +22,7 @@ import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidat
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocumentTransaction(
-  {
-    resourceInfo,
-    documentInfo,
-    documentUuidForInsert,
-    meadowlarkId,
-    edfiDoc,
-    validateDocumentReferencesExist,
-    traceId,
-    security,
-  }: UpsertRequest,
+  { resourceInfo, documentInfo, meadowlarkId, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
   session: ClientSession,
   documentFromUpdate?: MeadowlarkDocument,
@@ -41,11 +33,11 @@ export async function upsertDocumentTransaction(
     onlyReturnDocumentUuid(session),
   );
 
-  // the documentUuid of the existing document if this is an update, or null if this is an insert
-  const existingDocumentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? null;
+  // the documentUuid of the existing document if this is an update, or a new one if this is an insert
+  const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();
 
   // Check whether this is an insert or update
-  const isInsert: boolean = existingDocumentUuid == null;
+  const isInsert: boolean = existingDocument == null;
 
   // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
   if (isInsert && documentInfo.superclassInfo != null) {
@@ -90,9 +82,7 @@ export async function upsertDocumentTransaction(
     // Abort on validation failure
     if (failures.length > 0) {
       Logger.debug(
-        `${moduleName}.upsertDocumentTransaction Upserting document uuid ${
-          existingDocumentUuid ?? documentUuidForInsert
-        } failed due to invalid references`,
+        `${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid} failed due to invalid references`,
         traceId,
       );
 
@@ -120,7 +110,7 @@ export async function upsertDocumentTransaction(
     meadowlarkDocumentFrom(
       resourceInfo,
       documentInfo,
-      existingDocumentUuid ?? documentUuidForInsert,
+      documentUuid,
       meadowlarkId,
       edfiDoc,
       validateDocumentReferencesExist,
@@ -129,10 +119,7 @@ export async function upsertDocumentTransaction(
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
   // Perform the document upsert
-  Logger.debug(
-    `${moduleName}.upsertDocumentTransaction Upserting document uuid ${existingDocumentUuid ?? documentUuidForInsert}`,
-    traceId,
-  );
+  Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
   const { acknowledged, upsertedCount, modifiedCount } = await mongoCollection.replaceOne(
     { _id: meadowlarkId },
@@ -149,17 +136,17 @@ export async function upsertDocumentTransaction(
   }
 
   // upsertedCount is the number of inserted documents
-  if (upsertedCount > 0) return { response: 'INSERT_SUCCESS' };
+  if (upsertedCount > 0) return { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid };
 
   // modifiedCount is the number of updated documents
-  if (modifiedCount === 0 || existingDocumentUuid == null) {
+  if (modifiedCount === 0) {
     // Something unexpected happened. This should have been an update
     const msg = `Expected document update, but was not for documentUuid ${document.documentUuid} and meadowlarkId ${document._id}`;
     Logger.error(`${moduleName}.upsertDocumentTransaction`, traceId, msg);
     return { response: 'UNKNOWN_FAILURE' };
   }
 
-  return { response: 'UPDATE_SUCCESS', existingDocumentUuid };
+  return { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
 }
 
 /**

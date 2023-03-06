@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 // SPDX-License-Identifier: Apache-2.0
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
@@ -18,8 +19,8 @@ import {
   SuperclassInfo,
   DocumentIdentity,
   MeadowlarkId,
-  DocumentUuid,
   TraceId,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -29,12 +30,8 @@ import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
-const documentUuid = '3118d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
-const documentUuid2 = '4118d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidForInsert: documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -45,7 +42,7 @@ const newUpsertRequest = (): UpsertRequest => ({
 
 describe('given the upsert of a new document', () => {
   let client;
-  let upsertResult;
+  let upsertResult: UpsertResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -66,7 +63,6 @@ describe('given the upsert of a new document', () => {
       {
         ...newUpsertRequest(),
         meadowlarkId,
-        documentUuidForInsert: documentUuid,
         resourceInfo,
         documentInfo,
         edfiDoc: { call: 'one' },
@@ -86,6 +82,9 @@ describe('given the upsert of a new document', () => {
     const result: any = await collection.findOne({ _id: meadowlarkId });
     expect(result.resourceName).toBe('School');
     expect(result.edfiDoc.call).toBe('one');
+
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult.newDocumentUuid);
   });
 
   it('should return insert success', async () => {
@@ -93,11 +92,11 @@ describe('given the upsert of a new document', () => {
   });
 });
 
-describe('given the upsert of an existing document twice', () => {
+describe('given the upsert of an existing document three times', () => {
   let client;
-  let upsertResult1;
-  let upsertResult2;
-  let upsertResult3;
+  let upsertResult1: UpsertResult;
+  let upsertResult2: UpsertResult;
+  let upsertResult3: UpsertResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -105,7 +104,7 @@ describe('given the upsert of an existing document twice', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert2' },
+    documentIdentity: { natural: 'key' },
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -113,18 +112,25 @@ describe('given the upsert of an existing document twice', () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = {
+    const upsertRequest1: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
     };
 
-    upsertResult1 = await upsertDocument(upsertRequest, client);
-    upsertResult2 = await upsertDocument(upsertRequest, client);
-    upsertResult3 = await upsertDocument(upsertRequest, client);
+    const upsertRequest2: UpsertRequest = {
+      ...upsertRequest1,
+    };
+
+    const upsertRequest3: UpsertRequest = {
+      ...upsertRequest1,
+    };
+
+    upsertResult1 = await upsertDocument(upsertRequest1, client);
+    upsertResult2 = await upsertDocument(upsertRequest2, client);
+    upsertResult3 = await upsertDocument(upsertRequest3, client);
   });
 
   afterAll(async () => {
@@ -140,25 +146,49 @@ describe('given the upsert of an existing document twice', () => {
     expect(upsertResult2.response).toBe('UPDATE_SUCCESS');
   });
 
-  it('should return same documentUuid inserted on 2nd upsert', async () => {
-    expect(upsertResult2.existingDocumentUuid).toBe(documentUuid);
+  it('should exist in the db on 2nd upsert', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result._id).toBe(meadowlarkId);
+
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult1.newDocumentUuid);
+  });
+
+  it('should return same documentUuid orignally inserted', async () => {
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    if (upsertResult2.response !== 'UPDATE_SUCCESS') throw new Error();
+    expect(upsertResult2.existingDocumentUuid).toBe(upsertResult1.newDocumentUuid);
   });
 
   it('should return update success on 3rd upsert', async () => {
-    expect(upsertResult3.response).toBe('UPDATE_SUCCESS');
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    if (upsertResult3.response !== 'UPDATE_SUCCESS') throw new Error();
+    expect(upsertResult3.existingDocumentUuid).toBe(upsertResult1.newDocumentUuid);
   });
 
-  it('should return same documentUuid inserted on 3rd upsert', async () => {
-    expect(upsertResult3.existingDocumentUuid).toBe(documentUuid);
+  it('should exist in the db on 3rd upsert', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result._id).toBe(meadowlarkId);
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult1.newDocumentUuid);
+  });
+
+  it('should have only one document in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(1);
   });
 });
 
-describe('given an upsert of an existing document that changes the edfiDoc', () => {
+describe('given an upsert of an existing non-identity-update supporting document, changing a non-identity portion of the edfiDoc', () => {
   let client;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
     resourceName: 'School',
+    allowIdentityUpdates: false,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -173,13 +203,12 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentUuidForInsert: documentUuid,
       resourceInfo,
       documentInfo,
     };
 
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one' } }, client);
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two' } }, client);
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
   });
 
   afterAll(async () => {
@@ -191,6 +220,207 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: meadowlarkId });
     expect(result.edfiDoc.call).toBe('two');
+  });
+
+  it('should have only one document in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(1);
+  });
+});
+
+describe('given an upsert of an existing identity-update supporting document, changing a non-identity portion of the edfiDoc', () => {
+  let client;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: true,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'upsert3' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+    };
+
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
+    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should have the change in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.edfiDoc.call).toBe('two');
+  });
+
+  it('should have only one document in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(1);
+  });
+});
+
+describe('given an upsert of an existing non-identity update supporting document, changing an identity portion of the edfiDoc', () => {
+  let client;
+  let upsertResult1: UpsertResult;
+  let upsertResult2: UpsertResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: false,
+  };
+  const documentInfo1: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'key1' },
+  };
+  const documentInfo2: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'key2' },
+  };
+
+  const meadowlarkId1 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo1.documentIdentity);
+  const meadowlarkId2 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo2.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest1: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId: meadowlarkId1,
+      resourceInfo,
+      documentInfo: documentInfo1,
+    };
+    const upsertRequest2: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId: meadowlarkId2,
+      resourceInfo,
+      documentInfo: documentInfo2,
+    };
+
+    upsertResult1 = await upsertDocument({ ...upsertRequest1, edfiDoc: { call: 'one', natural: 'key1' } }, client);
+    upsertResult2 = await upsertDocument({ ...upsertRequest2, edfiDoc: { call: 'one', natural: 'key2' } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should have insert success for both documents', async () => {
+    expect(upsertResult1.response).toBe('INSERT_SUCCESS');
+    expect(upsertResult2.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should have the 1st document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId1 });
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult1.newDocumentUuid);
+  });
+
+  it('should have the 2nd document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId2 });
+    if (upsertResult2.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult2.newDocumentUuid);
+  });
+
+  it('should have two documents in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(2);
+  });
+});
+
+describe('given an upsert of an existing identity update supporting document, changing an identity portion of the edfiDoc', () => {
+  let client;
+  let upsertResult1: UpsertResult;
+  let upsertResult2: UpsertResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: true,
+  };
+  const documentInfo1: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'key1' },
+  };
+  const documentInfo2: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'key2' },
+  };
+
+  const meadowlarkId1 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo1.documentIdentity);
+  const meadowlarkId2 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo2.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest1: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId: meadowlarkId1,
+      resourceInfo,
+      documentInfo: documentInfo1,
+    };
+    const upsertRequest2: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId: meadowlarkId2,
+      resourceInfo,
+      documentInfo: documentInfo2,
+    };
+
+    upsertResult1 = await upsertDocument({ ...upsertRequest1, edfiDoc: { call: 'one', natural: 'key1' } }, client);
+    upsertResult2 = await upsertDocument({ ...upsertRequest2, edfiDoc: { call: 'one', natural: 'key2' } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should have insert success for both documents', async () => {
+    expect(upsertResult1.response).toBe('INSERT_SUCCESS');
+    expect(upsertResult2.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should have the 1st document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId1 });
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult1.newDocumentUuid);
+  });
+
+  it('should have the 2nd document in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId2 });
+    if (upsertResult2.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult2.newDocumentUuid);
+  });
+
+  it('should have two documents in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(2);
   });
 });
 
@@ -312,7 +542,6 @@ describe('given an upsert of a new document that references an existing document
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -403,7 +632,6 @@ describe('given an upsert of a new document with one existing and one non-existe
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -512,7 +740,6 @@ describe('given an upsert of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
@@ -603,7 +830,6 @@ describe('given an upsert of a subclass document when a different subclass has t
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: sameSuperclassIdentityId,
         resourceInfo: sameSuperclassIdentityResourceInfo,
         documentInfo: sameSuperclassIdentityDocumentInfo,
@@ -768,7 +994,6 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -782,7 +1007,6 @@ describe('given an update of a document that references an existing document wit
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -877,7 +1101,6 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -998,7 +1221,6 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
@@ -1012,7 +1234,6 @@ describe('given an update of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        documentUuidForInsert: documentUuid2,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,

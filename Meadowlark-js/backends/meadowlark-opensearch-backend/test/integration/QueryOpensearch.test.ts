@@ -61,13 +61,11 @@ const security: Security = {
 };
 
 const setupUpsertRequest = (
-  documentUuid: DocumentUuid,
   meadowlarkId: MeadowlarkId,
   edfiDoc = {},
   newResourceInfo = resourceInfo,
   documentInfo = NoDocumentInfo,
 ): UpsertRequest => ({
-  documentUuidForInsert: documentUuid,
   meadowlarkId,
   resourceInfo: newResourceInfo,
   documentInfo,
@@ -97,17 +95,19 @@ describe('When querying for documents', () => {
     client = await getNewClient();
 
     await afterUpsertDocument(
-      setupUpsertRequest(student1DocumentUuid, student1MeadowlarkId, student1),
+      setupUpsertRequest(student1MeadowlarkId, student1),
       {
         response: 'INSERT_SUCCESS',
+        newDocumentUuid: student1DocumentUuid,
       } as UpsertResult,
       client,
     );
 
     await afterUpsertDocument(
-      setupUpsertRequest(student2DocumentUuid, student2MeadowlarkId, student2),
+      setupUpsertRequest(student2MeadowlarkId, student2),
       {
         response: 'INSERT_SUCCESS',
+        newDocumentUuid: student2DocumentUuid,
       } as UpsertResult,
       client,
     );
@@ -260,7 +260,6 @@ describe('When querying for documents', () => {
       const descriptorMeadowlarkId: MeadowlarkId = 'desc-123' as MeadowlarkId;
 
       const descriptorUpsertRequest: UpsertRequest = {
-        documentUuidForInsert: descriptorDocumentUuid,
         meadowlarkId: descriptorMeadowlarkId,
         resourceInfo: descriptorResourceInfo,
         documentInfo: NoDocumentInfo,
@@ -275,6 +274,7 @@ describe('When querying for documents', () => {
           descriptorUpsertRequest,
           {
             response: 'INSERT_SUCCESS',
+            newDocumentUuid: descriptorDocumentUuid,
           } as UpsertResult,
           client,
         );

@@ -50,9 +50,9 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
 /**
  * Shared opensearch upsert logic
  */
-async function upsertToOpensearch(request: UpsertRequest, client: Client) {
+async function upsertToOpensearch(request: UpsertRequest, documentUuid: DocumentUuid, client: Client) {
   const opensearchRequest: OpensearchRequest = {
-    id: request.documentUuidForInsert,
+    id: documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
@@ -69,6 +69,8 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
         info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
         createdBy: request.security.clientId,
+        meadowlarkId: request.meadowlarkId,
+        documentUuid,
       },
       refresh: true,
     });
@@ -83,7 +85,9 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
 export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult, client: Client) {
   Logger.info(`${moduleName}.afterUpsertDocument`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
-  await upsertToOpensearch(request, client);
+  const documentUuid: DocumentUuid =
+    result.response === 'UPDATE_SUCCESS' ? result.existingDocumentUuid : result.newDocumentUuid;
+  await upsertToOpensearch(request, documentUuid, client);
 }
 
 /**
@@ -95,7 +99,6 @@ export async function afterUpdateDocumentById(request: UpdateRequest, result: Up
   await upsertToOpensearch(
     {
       meadowlarkId: request.meadowlarkId,
-      documentUuidForInsert: request.documentUuid,
       resourceInfo: request.resourceInfo,
       documentInfo: request.documentInfo,
       edfiDoc: request.edfiDoc,
@@ -103,6 +106,7 @@ export async function afterUpdateDocumentById(request: UpdateRequest, result: Up
       security: request.security,
       traceId: request.traceId,
     },
+    request.documentUuid,
     client,
   );
 }

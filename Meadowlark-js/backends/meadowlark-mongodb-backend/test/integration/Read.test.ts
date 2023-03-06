@@ -14,9 +14,9 @@ import {
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
-  DocumentUuid,
   TraceId,
   MeadowlarkId,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -27,8 +27,6 @@ import { setupConfigForIntegration } from './Config';
 
 jest.setTimeout(40000);
 
-const documentUuid = '6e44a19e-1964-4b3e-ab7b-4b6231174601' as DocumentUuid;
-
 const newGetRequest = (): GetRequest => ({
   documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
@@ -37,7 +35,6 @@ const newGetRequest = (): GetRequest => ({
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  documentUuidForInsert: '' as DocumentUuid,
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
@@ -66,7 +63,7 @@ describe('given the get of a non-existent document', () => {
 
     client = (await getNewClient()) as MongoClient;
 
-    getResult = await getDocumentById({ ...newGetRequest(), documentUuid }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), documentUuid: '123' as DocumentUuid }, client);
   });
 
   afterAll(async () => {
@@ -105,16 +102,19 @@ describe('given the get of an existing document', () => {
     client = (await getNewClient()) as MongoClient;
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
-      documentUuidForInsert: documentUuid,
       meadowlarkId,
       documentInfo,
       edfiDoc: { inserted: 'yes' },
     };
 
     // insert the initial version
-    await upsertDocument(upsertRequest, client);
+    const upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
-    getResult = await getDocumentById({ ...newGetRequest(), documentUuid, resourceInfo }, client);
+    getResult = await getDocumentById(
+      { ...newGetRequest(), documentUuid: upsertResult.newDocumentUuid, resourceInfo },
+      client,
+    );
   });
 
   afterAll(async () => {

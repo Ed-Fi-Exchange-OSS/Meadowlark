@@ -208,6 +208,7 @@ describe('given persistence succeeds as insert', () => {
       upsertDocument: async () =>
         Promise.resolve({
           response: 'INSERT_SUCCESS',
+          newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
           failureMessage: null,
         } as unknown as UpsertResult),
     });

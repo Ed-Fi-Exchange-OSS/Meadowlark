@@ -42,7 +42,6 @@ const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuidForInsert: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},

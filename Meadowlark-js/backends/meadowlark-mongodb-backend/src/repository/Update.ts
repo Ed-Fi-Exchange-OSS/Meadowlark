@@ -23,7 +23,7 @@ const moduleName: string = 'mongodb.repository.Update';
  * This function expects Session to have an active transaction. Aborting the transaction on error is left to the caller.
  */
 async function insertUpdatedDocument(
-  { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, traceId, security }: UpdateRequest,
+  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, traceId, security }: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
   session: ClientSession,
   document: MeadowlarkDocument,
@@ -32,7 +32,6 @@ async function insertUpdatedDocument(
     {
       resourceInfo,
       documentInfo,
-      documentUuidForInsert: documentUuid,
       meadowlarkId,
       edfiDoc,
       validateDocumentReferencesExist: false,
