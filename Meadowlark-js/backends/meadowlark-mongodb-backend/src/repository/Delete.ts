@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { DeleteResult, DeleteRequest, BlockingDocument } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, FindOptions, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
@@ -72,8 +72,7 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const maxNumberOfRetries = 2; /// ToDo: Configurable
-      // const numberOfRetries = 0;
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
       let mongoDeleteResult = {
         acknowledged: false,
         deletedCount: 0,
@@ -84,17 +83,10 @@ export async function deleteDocumentById(
           mongoDeleteResult = await mongoCollection.deleteOne({ _id: id }, { session });
         },
         {
-          retries: maxNumberOfRetries,
-          onRetry: (error) => {
-            // numberOfRetries += 1;
-            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
-            // Logger.info(`The error is: ${error}.`, traceId);
-
-            if (error !== '[MongoServerError: WriteConflict]') throw error;
-          },
+          retries: numberOfRetries,
         },
       );
-      if (mongoDeleteResult.acknowledged) {
+      if (mongoDeleteResult && mongoDeleteResult.acknowledged) {
         deleteResult =
           mongoDeleteResult.deletedCount === 0 ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
       } else {
@@ -106,8 +98,11 @@ export async function deleteDocumentById(
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', traceId, e);
 
-    if (e === '[MongoServerError: WriteConflict]') {
-      return { response: 'DELETE_FAILURE_WRITE_CONFLICT' };
+    if (e.message === '[MongoServerError: WriteConflict]') {
+      return {
+        response: 'DELETE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict error returned',
+      };
     }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };

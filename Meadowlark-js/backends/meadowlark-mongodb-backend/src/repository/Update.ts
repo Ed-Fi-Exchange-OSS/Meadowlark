@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
@@ -82,8 +82,7 @@ export async function updateDocumentById(
       // Perform the document update
       Logger.debug(`${moduleName}.updateDocumentById: Updating document id ${id}`, traceId);
 
-      const maxNumberOfRetries = 2; /// ToDo: Configurable
-      // const numberOfRetries = 0;
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
       const mongoUpdateResult = {
         acknowledged: false,
         matchedCount: 0,
@@ -96,14 +95,7 @@ export async function updateDocumentById(
           mongoUpdateResult.matchedCount = matchedCount;
         },
         {
-          retries: maxNumberOfRetries,
-          onRetry: (error) => {
-            // numberOfRetries += 1;
-            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
-            // Logger.info(`The error is: ${error}.`, traceId);
-
-            if (error !== '[MongoServerError: WriteConflict]') throw error;
-          },
+          retries: numberOfRetries,
         },
       );
       if (mongoUpdateResult.acknowledged) {
@@ -117,8 +109,11 @@ export async function updateDocumentById(
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
 
-    if (e === '[MongoServerError: WriteConflict]') {
-      return { response: 'UPDATE_FAILURE_WRITE_CONFLICT' };
+    if (e.message === '[MongoServerError: WriteConflict]') {
+      return {
+        response: 'UPDATE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict error returned',
+      };
     }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };

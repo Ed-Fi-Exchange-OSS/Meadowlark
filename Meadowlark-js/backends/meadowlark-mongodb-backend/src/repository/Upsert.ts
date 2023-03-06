@@ -5,7 +5,7 @@
 
 import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
 import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo, BlockingDocument } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
@@ -114,8 +114,7 @@ export async function upsertDocument(
       // Perform the document upsert
       Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
 
-      const maxNumberOfRetries = 2; /// ToDo: Configurable
-      // let numberOfRetries = 0;
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
       const mongoUpsertResult = {
         acknowledged: false,
         upsertedCount: 0,
@@ -128,14 +127,7 @@ export async function upsertDocument(
           mongoUpsertResult.upsertedCount = upsertedCount;
         },
         {
-          retries: maxNumberOfRetries,
-          onRetry: (error) => {
-            // numberOfRetries += 1;
-            // Logger.info(`Number of Retries is: ${numberOfRetries}.`, traceId);
-            // Logger.info(`The error is: ${error}.`, traceId);
-
-            if (error !== '[MongoServerError: WriteConflict]') throw error;
-          },
+          retries: numberOfRetries,
         },
       );
       if (mongoUpsertResult.acknowledged) {
@@ -149,8 +141,11 @@ export async function upsertDocument(
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
 
-    if (e === '[MongoServerError: WriteConflict]') {
-      return { response: 'UPSERT_FAILURE_WRITE_CONFLICT' };
+    if (e.message === '[MongoServerError: WriteConflict]') {
+      return {
+        response: 'UPSERT_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict error returned',
+      };
     }
 
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };

@@ -51,6 +51,42 @@ describe('given there is no resourceId', () => {
   });
 });
 
+describe('given delete has write conflict failure', () => {
+  let response: FrontendResponse;
+  const expectedError = 'Write conflict error returned';
+  let mockDocumentStore: any;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      deleteDocumentById: async () =>
+        Promise.resolve({
+          response: 'DELETE_FAILURE_WRITE_CONFLICT',
+          failureMessage: expectedError,
+        }),
+    });
+
+    // Act
+    response = await deleteIt(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 404', () => {
+    expect(response.statusCode).toEqual(404);
+  });
+
+  it('has a failure message', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Write conflict error returned",
+      }
+    `);
+  });
+});
+
 describe('given delete has unknown failure', () => {
   let response: FrontendResponse;
   const expectedError = 'Error';

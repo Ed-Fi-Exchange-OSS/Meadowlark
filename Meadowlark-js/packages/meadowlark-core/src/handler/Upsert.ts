@@ -83,7 +83,11 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPSERT_FAILURE_WRITE_CONFLICT') {
       writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409);
-      return { statusCode: 409, headers: headerMetadata };
+      return {
+        statusCode: 409,
+        headers: headerMetadata,
+        body: R.is(String, failureMessage) ? { error: failureMessage } : failureMessage,
+      };
     }
 
     // Otherwise, it's a 500 error
