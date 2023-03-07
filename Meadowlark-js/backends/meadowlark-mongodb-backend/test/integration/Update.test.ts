@@ -8,7 +8,7 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   UpdateRequest,
   DocumentReference,
   NoResourceInfo,
@@ -16,6 +16,12 @@ import {
   newResourceInfo,
   newSuperclassInfo,
   SuperclassInfo,
+  TraceId,
+  MeadowlarkId,
+  UpsertRequest,
+  UpdateResult,
+  DocumentUuid,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -27,18 +33,29 @@ import { setupConfigForIntegration } from './Config';
 jest.setTimeout(40000);
 
 const newUpdateRequest = (): UpdateRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
+});
+
+const newUpsertRequest = (): UpsertRequest => ({
+  meadowlarkId: '' as MeadowlarkId,
+  resourceInfo: NoResourceInfo,
+  documentInfo: NoDocumentInfo,
+  edfiDoc: {},
+  validateDocumentReferencesExist: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the update of a non-existent document', () => {
   let client;
-  let updateResult;
+  let updateResult: UpdateResult;
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
@@ -48,7 +65,7 @@ describe('given the update of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update1' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -56,7 +73,15 @@ describe('given the update of a non-existent document', () => {
     client = (await getNewClient()) as MongoClient;
 
     updateResult = await updateDocumentById(
-      { ...newUpdateRequest(), id, resourceInfo, documentInfo, edfiDoc: { call: 'one' }, validate: false },
+      {
+        ...newUpdateRequest(),
+        meadowlarkId,
+        documentUuid: '123' as DocumentUuid,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
       client,
     );
   });
@@ -68,7 +93,7 @@ describe('given the update of a non-existent document', () => {
 
   it('should not exist in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: id });
+    const result: any = await collection.findOne({ documentUuid: '123' as DocumentUuid });
     expect(result).toBe(null);
   });
 
@@ -79,6 +104,7 @@ describe('given the update of a non-existent document', () => {
 
 describe('given the update of an existing document', () => {
   let client;
+  let upsertResult: UpsertResult;
   let updateResult;
 
   const resourceInfo: ResourceInfo = {
@@ -89,23 +115,32 @@ describe('given the update of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const updateRequest: UpdateRequest = {
-      ...newUpdateRequest(),
-      id,
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key' },
     };
 
     // insert the initial version
-    await upsertDocument(updateRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId,
+      documentUuid: upsertResult.newDocumentUuid,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
     updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
   });
 
@@ -120,7 +155,7 @@ describe('given the update of an existing document', () => {
 
   it('should have updated the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: id });
+    const result: any = await collection.findOne({ _id: meadowlarkId });
     expect(result.documentIdentity.natural).toBe('update2');
     expect(result.edfiDoc.changeToDoc).toBe(true);
   });
@@ -128,6 +163,7 @@ describe('given the update of an existing document', () => {
 
 describe('given an update of a document that references a non-existent document with validation off', () => {
   let client;
+  let upsertResult: UpsertResult;
   let updateResult;
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
@@ -139,7 +175,10 @@ describe('given an update of a document that references a non-existent document 
     documentIdentity: { natural: 'update4' },
   };
 
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
@@ -154,26 +193,29 @@ describe('given an update of a document that references a non-existent document 
     client = (await getNewClient()) as MongoClient;
 
     // Insert the original document with no reference
-    await upsertDocument(
+    upsertResult = await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
+
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        documentUuid: upsertResult.newDocumentUuid,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: false,
+        validateDocumentReferencesExist: false,
       },
       client,
     );
@@ -202,6 +244,7 @@ describe('given an update of a document that references a non-existent document 
 
 describe('given an update of a document that references an existing document with validation on', () => {
   let client;
+  let upsertResult: UpsertResult;
   let updateResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -212,7 +255,10 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update5' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -229,7 +275,10 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update6' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -239,8 +288,8 @@ describe('given an update of a document that references an existing document wit
     // The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: referencedDocumentId,
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -248,26 +297,28 @@ describe('given an update of a document that references an existing document wit
     );
 
     // The original document with no reference
-    await upsertDocument(
+    upsertResult = await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // The updated document with a valid reference
     documentWithReferencesInfo.documentReferences = [validReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
+        documentUuid: upsertResult.newDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -296,6 +347,7 @@ describe('given an update of a document that references an existing document wit
 
 describe('given an update of a document with one existing and one non-existent reference with validation on', () => {
   let client;
+  let upsertResult: UpsertResult;
   let updateResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -306,7 +358,10 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update7' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -330,7 +385,10 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update8' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -340,8 +398,8 @@ describe('given an update of a document with one existing and one non-existent r
     //  The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: referencedDocumentId,
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -349,26 +407,28 @@ describe('given an update of a document with one existing and one non-existent r
     );
 
     // The original document with no references
-    await upsertDocument(
+    upsertResult = await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // The updated document with both valid and invalid references
     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        documentUuid: upsertResult.newDocumentUuid,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -405,6 +465,7 @@ describe('given an update of a document with one existing and one non-existent r
 
 describe('given an update of a subclass document referenced by an existing document as a superclass', () => {
   let client;
+  let upsertResult: UpsertResult;
   let updateResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -425,7 +486,10 @@ describe('given an update of a subclass document referenced by an existing docum
     documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const referenceAsSuperclass: DocumentReference = {
     projectName: superclassInfo.projectName,
@@ -442,9 +506,9 @@ describe('given an update of a subclass document referenced by an existing docum
     ...newDocumentInfo(),
     documentIdentity: { week: 'update6' },
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
-    documentWithReferenceDocumentInfo,
+    documentWithReferenceDocumentInfo.documentIdentity,
   );
 
   beforeAll(async () => {
@@ -455,8 +519,8 @@ describe('given an update of a subclass document referenced by an existing docum
     //  The document that will be referenced
     await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: referencedDocumentId,
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -464,26 +528,28 @@ describe('given an update of a subclass document referenced by an existing docum
     );
 
     // The original document with no reference
-    await upsertDocument(
+    upsertResult = await upsertDocument(
       {
-        ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // The updated document with reference as superclass
     documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        id: documentWithReferencesId,
+        documentUuid: upsertResult.newDocumentUuid,
+        meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
@@ -506,5 +572,123 @@ describe('given an update of a subclass document referenced by an existing docum
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
+  });
+});
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates false,', () => {
+  let client;
+  let upsertResult: UpsertResult;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: false,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update 2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    const documentInfoUpdated: DocumentInfo = {
+      ...newDocumentInfo(),
+      documentIdentity: { natural: 'updated identity' },
+    };
+    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+
+    // insert the initial version
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid: upsertResult.newDocumentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+    };
+    // change document identity
+    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return update error', async () => {
+    expect(updateResult.response).toBe('UPDATE_FAILURE_IMMUTABLE_IDENTITY');
+  });
+});
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates true,', () => {
+  let client;
+  let upsertResult: UpsertResult;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: true,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'updated identity' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    const documentInfoUpdated: DocumentInfo = {
+      ...newDocumentInfo(),
+      documentIdentity: { natural: 'update 2' },
+    };
+    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+
+    // insert the initial version
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid: upsertResult.newDocumentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+    };
+    // change document identity
+    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return update success', async () => {
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
   });
 });

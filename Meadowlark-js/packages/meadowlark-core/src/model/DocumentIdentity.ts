@@ -5,6 +5,7 @@
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
+import { DocumentUuid, MeadowlarkId } from './BrandedTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
@@ -74,6 +75,13 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
  * The resulting Base64Url string is 38 characters long. The first 16 characters are the resource info hash and
  * the remaining 22 characters are the identity hash.
  */
-export function documentIdForDocumentIdentity(resourceInfo: BaseResourceInfo, documentIdentity: DocumentIdentity): string {
-  return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}`;
+export function meadowlarkIdForDocumentIdentity(
+  resourceInfo: BaseResourceInfo,
+  documentIdentity: DocumentIdentity,
+): MeadowlarkId {
+  return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}` as MeadowlarkId;
+}
+
+export function generateDocumentUuid(): DocumentUuid {
+  return crypto.randomUUID() as DocumentUuid;
 }

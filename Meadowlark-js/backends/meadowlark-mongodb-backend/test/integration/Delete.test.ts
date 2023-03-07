@@ -8,7 +8,7 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   DeleteRequest,
   DocumentReference,
   UpsertRequest,
@@ -17,6 +17,10 @@ import {
   newResourceInfo,
   newSuperclassInfo,
   SuperclassInfo,
+  DocumentUuid,
+  MeadowlarkId,
+  TraceId,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -28,21 +32,21 @@ import { setupConfigForIntegration } from './Config';
 jest.setTimeout(40000);
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newDeleteRequest = (): DeleteRequest => ({
-  id: '',
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
-  validate: false,
+  validateNoReferencesToDocument: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the delete of a non-existent document', () => {
@@ -53,18 +57,16 @@ describe('given the delete of a non-existent document', () => {
     ...newResourceInfo(),
     resourceName: 'School',
   };
-  const documentInfo: DocumentInfo = {
-    ...newDocumentInfo(),
-    documentIdentity: { natural: 'delete1' },
-  };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, resourceInfo, validate: false }, client);
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), documentUuid: '123' as DocumentUuid, resourceInfo, validateNoReferencesToDocument: false },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -79,6 +81,7 @@ describe('given the delete of a non-existent document', () => {
 
 describe('given the delete of an existing document', () => {
   let client;
+  let upsertResult: UpsertResult;
   let deleteResult;
 
   const resourceInfo: ResourceInfo = {
@@ -89,18 +92,25 @@ describe('given the delete of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'delete2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { natural: 'key' } };
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
 
     // insert the initial version
-    await upsertDocument(upsertRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
-    deleteResult = await deleteDocumentById({ ...newDeleteRequest(), id, resourceInfo }, client);
+    deleteResult = await deleteDocumentById(
+      { ...newDeleteRequest(), documentUuid: upsertResult.newDocumentUuid, resourceInfo },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -114,13 +124,15 @@ describe('given the delete of an existing document', () => {
 
   it('should have deleted the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: id });
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+    const result: any = await collection.findOne({ documentUuid: upsertResult.newDocumentUuid });
     expect(result).toBeNull();
   });
 });
 
 describe('given the delete of a document referenced by an existing document with validation on', () => {
   let client;
+  let upsertResult: UpsertResult;
   let deleteResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -132,7 +144,10 @@ describe('given the delete of a document referenced by an existing document with
     ...newDocumentInfo(),
     documentIdentity: { natural: 'delete5' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -150,7 +165,10 @@ describe('given the delete of a document referenced by an existing document with
     documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -158,16 +176,34 @@ describe('given the delete of a document referenced by an existing document with
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // The referencing document that should cause the delete to fail
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
+        documentInfo: documentWithReferencesInfo,
+        validateDocumentReferencesExist: true,
+      },
       client,
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
+      {
+        ...newDeleteRequest(),
+        documentUuid: upsertResult.newDocumentUuid,
+        resourceInfo: referencedResourceInfo,
+        validateNoReferencesToDocument: true,
+      },
       client,
     );
   });
@@ -190,6 +226,7 @@ describe('given the delete of a document referenced by an existing document with
 
 describe('given an delete of a document with an outbound reference only, with validation on', () => {
   let client;
+  let upsertResult2: UpsertResult;
   let deleteResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -201,7 +238,10 @@ describe('given an delete of a document with an outbound reference only, with va
     ...newDocumentInfo(),
     documentIdentity: { natural: 'delete15' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -219,7 +259,10 @@ describe('given an delete of a document with an outbound reference only, with va
     documentIdentity: { natural: 'delete16' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -227,20 +270,33 @@ describe('given an delete of a document with an outbound reference only, with va
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
-
-    // The referencing document that will be deleted
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
       client,
     );
+
+    // The referencing document that will be deleted
+    upsertResult2 = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
+        documentInfo: documentWithReferencesInfo,
+        validateDocumentReferencesExist: true,
+      },
+      client,
+    );
+    if (upsertResult2.response !== 'INSERT_SUCCESS') throw new Error();
 
     deleteResult = await deleteDocumentById(
       {
         ...newDeleteRequest(),
-        id: documentWithReferencesId,
+        documentUuid: upsertResult2.newDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
-        validate: true,
+        validateNoReferencesToDocument: true,
       },
       client,
     );
@@ -264,6 +320,7 @@ describe('given an delete of a document with an outbound reference only, with va
 
 describe('given the delete of a document referenced by an existing document with validation off', () => {
   let client;
+  let upsertResult: UpsertResult;
   let deleteResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -274,7 +331,10 @@ describe('given the delete of a document referenced by an existing document with
     ...newDocumentInfo(),
     documentIdentity: { natural: 'delete5' },
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const validReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
@@ -292,7 +352,10 @@ describe('given the delete of a document referenced by an existing document with
     documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(documentWithReferencesResourceInfo, documentWithReferencesInfo);
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+    documentWithReferencesResourceInfo,
+    documentWithReferencesInfo.documentIdentity,
+  );
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -300,16 +363,34 @@ describe('given the delete of a document referenced by an existing document with
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedDocumentId,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // The referencing document that should cause the delete to fail
     await upsertDocument(
-      { ...newUpsertRequest(), id: documentWithReferencesId, documentInfo: documentWithReferencesInfo, validate: true },
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: documentWithReferencesId,
+        documentInfo: documentWithReferencesInfo,
+        validateDocumentReferencesExist: true,
+      },
       client,
     );
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: false },
+      {
+        ...newDeleteRequest(),
+        documentUuid: upsertResult.newDocumentUuid,
+        resourceInfo: referencedResourceInfo,
+        validateNoReferencesToDocument: false,
+      },
       client,
     );
   });
@@ -332,6 +413,7 @@ describe('given the delete of a document referenced by an existing document with
 
 describe('given the delete of a subclass document referenced by an existing document as a superclass', () => {
   let client;
+  let upsertResult: UpsertResult;
   let deleteResult;
 
   const referencedResourceInfo: ResourceInfo = {
@@ -352,7 +434,10 @@ describe('given the delete of a subclass document referenced by an existing docu
     documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
-  const referencedDocumentId = documentIdForDocumentInfo(referencedResourceInfo, referencedDocumentInfo);
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
 
   const referenceAsSuperclass: DocumentReference = {
     projectName: superclassInfo.projectName,
@@ -370,9 +455,9 @@ describe('given the delete of a subclass document referenced by an existing docu
     documentIdentity: { week: 'delete6' },
     documentReferences: [referenceAsSuperclass],
   };
-  const documentWithReferencesId = documentIdForDocumentInfo(
+  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
-    documentWithReferenceDocumentInfo,
+    documentWithReferenceDocumentInfo.documentIdentity,
   );
 
   beforeAll(async () => {
@@ -381,21 +466,34 @@ describe('given the delete of a subclass document referenced by an existing docu
     client = (await getNewClient()) as MongoClient;
 
     // The document that will be referenced
-    await upsertDocument({ ...newUpsertRequest(), id: referencedDocumentId, documentInfo: referencedDocumentInfo }, client);
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedMeadowlarkId,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
 
     // The referencing document that should cause the delete to fail
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        id: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesId,
         documentInfo: documentWithReferenceDocumentInfo,
-        validate: true,
+        validateDocumentReferencesExist: true,
       },
       client,
     );
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     deleteResult = await deleteDocumentById(
-      { ...newDeleteRequest(), id: referencedDocumentId, resourceInfo: referencedResourceInfo, validate: true },
+      {
+        ...newDeleteRequest(),
+        documentUuid: upsertResult.newDocumentUuid,
+        resourceInfo: referencedResourceInfo,
+        validateNoReferencesToDocument: true,
+      },
       client,
     );
   });
@@ -411,7 +509,7 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: referencedDocumentId });
+    const result: any = await collection.findOne({ _id: referencedMeadowlarkId });
     expect(result.documentIdentity.schoolId).toBe('123');
   });
 });

@@ -3,12 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { DocumentUuid, TraceId } from '../model/BrandedTypes';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
 export type GetRequest = {
-  id: string;
+  documentUuid: DocumentUuid;
   resourceInfo: ResourceInfo;
   security: Security;
-  traceId: string;
+  traceId: TraceId;
 };

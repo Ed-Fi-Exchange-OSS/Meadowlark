@@ -5,7 +5,7 @@
 
 import { ApiError, ApiResponse, Client } from '@opensearch-project/opensearch';
 import Mock from '@short.io/opensearch-mock';
-import { PaginationParameters, QueryRequest, QueryResult, AuthorizationStrategy } from '@edfi/meadowlark-core';
+import { PaginationParameters, QueryRequest, QueryResult, AuthorizationStrategy, TraceId } from '@edfi/meadowlark-core';
 import {
   TransportRequestCallback,
   TransportRequestParams,
@@ -53,11 +53,12 @@ describe('when querying for students', () => {
       resourceName: 'student',
       isDescriptor: false,
       resourceVersion: '3.3.1-b',
+      allowIdentityUpdates: false,
     },
     queryParameters,
     paginationParameters,
     security: { authorizationStrategy, clientId },
-    traceId: 'tracer',
+    traceId: 'tracer' as TraceId,
   });
 
   describe('given there are no students', () => {

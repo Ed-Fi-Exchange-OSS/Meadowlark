@@ -7,7 +7,7 @@ import { AuthorizationClientRole, CreateAuthorizationClientRequest } from '@edfi
 
 export interface AuthorizationDocument {
   /**
-   * The clientId GUID. This field replaces the built-in MongoDB _id.
+   * The clientId uuid. This field replaces the built-in MongoDB _id.
    */
   _id: string;
 

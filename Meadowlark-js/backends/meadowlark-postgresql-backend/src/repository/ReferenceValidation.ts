@@ -95,13 +95,13 @@ export async function validateReferences(
   }
 
   // Validate descriptor references
-  const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
+  const descriptorReferenceMeadowlarkIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
     documentIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, traceId, client);
-  if (descriptorReferenceIds.length !== descriptorsInDb.length) {
+  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceMeadowlarkIds, traceId, client);
+  if (descriptorReferenceMeadowlarkIds.length !== descriptorsInDb.length) {
     Logger.debug(`${moduleName}.upsertDocument: descriptorReferences not found`, traceId);
-    failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceIds, descriptorReferences));
+    failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceMeadowlarkIds, descriptorReferences));
   }
   return failureMessages;
 }

@@ -10,6 +10,7 @@ import { afterGetDocumentById, beforeGetDocumentById } from '../plugin/listener/
 import { GetResult } from '../message/GetResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.GetById';
 
@@ -19,15 +20,15 @@ const moduleName = 'core.handler.GetById';
  * Forwards "get by id" request to datastore backend
  */
 export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  if (frontendRequest.middleware.pathComponents.resourceId == null) {
+  if (frontendRequest.middleware.pathComponents.documentUuid == null) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
     return { statusCode: 404 };
   }
   const request: GetRequest = {
-    id: frontendRequest.middleware.pathComponents.resourceId,
+    documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
     resourceInfo: frontendRequest.middleware.resourceInfo,
     security: frontendRequest.middleware.security,
-    traceId: frontendRequest.traceId,
+    traceId: frontendRequest.traceId as TraceId,
   };
 
   await beforeGetDocumentById(request);

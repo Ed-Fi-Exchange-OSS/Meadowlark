@@ -7,10 +7,11 @@ import { update } from '../../src/handler/Update';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
-import { documentIdForDocumentInfo } from '../../src/model/DocumentInfo';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
+const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   body: '{}',
@@ -20,15 +21,10 @@ const frontendRequest: FrontendRequest = {
       resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      resourceId: 'TBD',
+      documentUuid,
     },
   },
 };
-// resourceId must match id of document body
-frontendRequest.middleware.pathComponents.resourceId = documentIdForDocumentInfo(
-  frontendRequest.middleware.resourceInfo,
-  frontendRequest.middleware.documentInfo,
-);
 
 describe('given the requested document does not exist', () => {
   let response: FrontendResponse;
@@ -44,8 +40,10 @@ describe('given the requested document does not exist', () => {
         }),
     });
 
+    const frontendRequestTest = frontendRequest;
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
-    response = await update(frontendRequest);
+    response = await update(frontendRequestTest);
   });
 
   afterAll(() => {
@@ -65,7 +63,7 @@ describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -83,8 +81,10 @@ describe('given the new document has an invalid reference ', () => {
         }),
     });
 
+    const frontendRequestTest = frontendRequest;
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
-    response = await update(frontendRequest);
+    response = await update(frontendRequestTest);
   });
 
   afterAll(() => {
@@ -120,9 +120,10 @@ describe('given the update succeeds', () => {
           response: 'UPDATE_SUCCESS',
         }),
     });
-
+    const frontendRequestTest = frontendRequest;
+    frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
-    response = await update(frontendRequest);
+    response = await update(frontendRequestTest);
   });
 
   afterAll(() => {
@@ -135,53 +136,5 @@ describe('given the update succeeds', () => {
 
   it('does not return a message body', () => {
     expect(response.body).toBeUndefined();
-  });
-});
-
-describe('given the resourceId of the update does not match the id derived from the body', () => {
-  let mockDocumentStore: any;
-  let response: FrontendResponse;
-
-  const badFrontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    body: '{}',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: {
-        resourceName: 'academicWeeks',
-        namespace: 'ed-fi',
-        version: 'v3.3b',
-        resourceId: 'Will not match',
-      },
-    },
-  };
-
-  beforeAll(async () => {
-    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
-      ...NoDocumentStorePlugin,
-      updateDocumentById: async () =>
-        Promise.resolve({
-          response: 'UPDATE_SUCCESS',
-        }),
-    });
-
-    // Act
-    response = await update(badFrontendRequest);
-  });
-
-  afterAll(() => {
-    mockDocumentStore.mockRestore();
-  });
-
-  it('returns status 400', () => {
-    expect(response.statusCode).toEqual(400);
-  });
-
-  it('returns a failure message body', () => {
-    expect(response.body).toMatchInlineSnapshot(`
-      {
-        "error": "The identity of the resource does not match the identity in the updated document.",
-      }
-    `);
   });
 });

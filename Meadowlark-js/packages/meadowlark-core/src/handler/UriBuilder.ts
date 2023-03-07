@@ -12,8 +12,8 @@ import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
 /**
  * Derives the resource URI from the pathComponents and resourceId
  */
-export function resourceUriFrom(pathComponents: PathComponents, resourceId: string): string {
-  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.resourceName}/${resourceId}`;
+export function resourceUriFrom(pathComponents: PathComponents, documentUuid: string): string {
+  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.resourceName}/${documentUuid}`;
 }
 
 /**
@@ -29,7 +29,7 @@ export function blockingDocumentsToUris(frontendRequest: FrontendRequest, blocki
           namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
           resourceName: uncapitalize(pluralize(document.resourceName)),
         },
-        document.documentId,
+        document.documentUuid,
       );
       if (frontendRequest.stage !== '') uri = `/${frontendRequest.stage}${uri}`;
       result.push(uri);

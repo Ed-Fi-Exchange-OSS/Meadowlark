@@ -3,16 +3,17 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { MeadowlarkId, TraceId } from '../model/BrandedTypes';
 import { DocumentInfo } from '../model/DocumentInfo';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
 export type UpsertRequest = {
-  id: string;
+  meadowlarkId: MeadowlarkId;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
   edfiDoc: object;
-  validate: boolean;
+  validateDocumentReferencesExist: boolean;
   security: Security;
-  traceId: string;
+  traceId: TraceId;
 };

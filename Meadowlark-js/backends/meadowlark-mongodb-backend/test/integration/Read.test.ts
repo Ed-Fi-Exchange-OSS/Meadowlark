@@ -8,12 +8,15 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   GetRequest,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
+  TraceId,
+  MeadowlarkId,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -25,20 +28,20 @@ import { setupConfigForIntegration } from './Config';
 jest.setTimeout(40000);
 
 const newGetRequest = (): GetRequest => ({
-  id: '',
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given the get of a non-existent document', () => {
@@ -53,14 +56,14 @@ describe('given the get of a non-existent document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get1' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
 
-    getResult = await getDocumentById({ ...newGetRequest(), id }, client);
+    getResult = await getDocumentById({ ...newGetRequest(), documentUuid: '123' as DocumentUuid }, client);
   });
 
   afterAll(async () => {
@@ -70,7 +73,7 @@ describe('given the get of a non-existent document', () => {
 
   it('should not exist in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: id });
+    const result: any = await collection.findOne({ _id: meadowlarkId });
     expect(result).toBe(null);
   });
 
@@ -91,18 +94,27 @@ describe('given the get of an existing document', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = { ...newUpsertRequest(), id, documentInfo, edfiDoc: { inserted: 'yes' } };
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      documentInfo,
+      edfiDoc: { inserted: 'yes' },
+    };
 
     // insert the initial version
-    await upsertDocument(upsertRequest, client);
+    const upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
-    getResult = await getDocumentById({ ...newGetRequest(), id, resourceInfo }, client);
+    getResult = await getDocumentById(
+      { ...newGetRequest(), documentUuid: upsertResult.newDocumentUuid, resourceInfo },
+      client,
+    );
   });
 
   afterAll(async () => {

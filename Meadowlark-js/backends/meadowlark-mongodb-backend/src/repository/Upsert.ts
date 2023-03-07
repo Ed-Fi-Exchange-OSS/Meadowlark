@@ -3,132 +3,172 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, ClientSession, MongoClient, WithId, FindOptions } from 'mongodb';
-import { UpsertResult, UpsertRequest, documentIdForSuperclassInfo, BlockingDocument } from '@edfi/meadowlark-core';
+/* eslint-disable no-underscore-dangle */
+
+import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
+import {
+  UpsertResult,
+  UpsertRequest,
+  documentIdForSuperclassInfo,
+  BlockingDocument,
+  DocumentUuid,
+  generateDocumentUuid,
+} from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, onlyReturnId, writeLockReferencedDocuments, asUpsert } from './Db';
+import { writeLockReferencedDocuments, asUpsert, limitFive, getDocumentCollection, onlyReturnDocumentUuid } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
-
-// MongoDB FindOption to return at most 5 documents
-const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 const moduleName: string = 'mongodb.repository.Upsert';
 
-export async function upsertDocument(
-  { resourceInfo, documentInfo, id, edfiDoc, validate, traceId, security }: UpsertRequest,
-  client: MongoClient,
+export async function upsertDocumentTransaction(
+  { resourceInfo, documentInfo, meadowlarkId, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
+  mongoCollection: Collection<MeadowlarkDocument>,
+  session: ClientSession,
+  documentFromUpdate?: MeadowlarkDocument,
 ): Promise<UpsertResult> {
-  Logger.info(`${moduleName}.updateDocumentById ${id}`, traceId);
+  // Check whether this document exists in the db
+  const existingDocument: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+    { _id: meadowlarkId },
+    onlyReturnDocumentUuid(session),
+  );
 
-  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-  const session: ClientSession = client.startSession();
+  // the documentUuid of the existing document if this is an update, or a new one if this is an insert
+  const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();
 
-  let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
+  // Check whether this is an insert or update
+  const isInsert: boolean = existingDocument == null;
 
-  try {
-    await session.withTransaction(async () => {
-      // Check whether this is an insert or update
-      const isInsert: boolean = (await mongoCollection.findOne({ _id: id }, onlyReturnId(session))) == null;
+  // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
+  if (isInsert && documentInfo.superclassInfo != null) {
+    const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+    const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+      {
+        aliasIds: superclassAliasId,
+      },
+      { session },
+    );
 
-      // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
-      if (isInsert && documentInfo.superclassInfo != null) {
-        const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
-        const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({
-          aliasIds: superclassAliasId,
-        });
-
-        if (superclassAliasIdInUse) {
-          Logger.warn(
-            `${moduleName}.upsertDocument Upserting document id ${id} failed due to another subclass with the same identity`,
-            traceId,
-          );
-
-          upsertResult = {
-            response: 'INSERT_FAILURE_CONFLICT',
-            failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
-            blockingDocuments: [
-              {
-                // eslint-disable-next-line no-underscore-dangle
-                documentId: superclassAliasIdInUse._id,
-                resourceName: superclassAliasIdInUse.resourceName,
-                projectName: superclassAliasIdInUse.projectName,
-                resourceVersion: superclassAliasIdInUse.resourceVersion,
-              },
-            ],
-          };
-
-          await session.abortTransaction();
-          return;
-        }
-      }
-
-      if (validate) {
-        const failures = await validateReferences(
-          documentInfo.documentReferences,
-          documentInfo.descriptorReferences,
-          mongoCollection,
-          session,
-          traceId,
-        );
-
-        // Abort on validation failure
-        if (failures.length > 0) {
-          Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id} failed due to invalid references`, traceId);
-
-          const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
-            .find(onlyDocumentsReferencing([id]), limitFive(session))
-            .toArray();
-
-          const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-            // eslint-disable-next-line no-underscore-dangle
-            documentId: document._id,
-            resourceName: document.resourceName,
-            projectName: document.projectName,
-            resourceVersion: document.resourceVersion,
-          }));
-
-          upsertResult = {
-            response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
-            failureMessage: { error: { message: 'Reference validation failed', failures } },
-            blockingDocuments,
-          };
-
-          await session.abortTransaction();
-          return;
-        }
-      }
-
-      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-        resourceInfo,
-        documentInfo,
-        id,
-        edfiDoc,
-        validate,
-        security.clientId,
+    if (superclassAliasIdInUse) {
+      Logger.warn(
+        `${moduleName}.upsertDocumentTransaction insert failed due to another subclass with documentUuid ${superclassAliasIdInUse.documentUuid} and the same identity ${superclassAliasIdInUse._id}`,
+        traceId,
       );
 
-      await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+      return {
+        response: 'INSERT_FAILURE_CONFLICT',
+        failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
+        blockingDocuments: [
+          {
+            documentUuid: superclassAliasIdInUse.documentUuid,
+            resourceName: superclassAliasIdInUse.resourceName,
+            projectName: superclassAliasIdInUse.projectName,
+            resourceVersion: superclassAliasIdInUse.resourceVersion,
+          },
+        ],
+      };
+    }
+  }
 
-      // Perform the document upsert
-      Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
+  if (validateDocumentReferencesExist) {
+    const failures = await validateReferences(
+      documentInfo.documentReferences,
+      documentInfo.descriptorReferences,
+      mongoCollection,
+      session,
+      traceId,
+    );
 
-      const { acknowledged, upsertedCount } = await mongoCollection.replaceOne({ _id: id }, document, asUpsert(session));
-      if (acknowledged) {
-        upsertResult.response = upsertedCount === 0 ? 'UPDATE_SUCCESS' : 'INSERT_SUCCESS';
-      } else {
-        const msg =
-          'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
-        Logger.error(`${moduleName}.upsertDocument`, traceId, msg);
+    // Abort on validation failure
+    if (failures.length > 0) {
+      Logger.debug(
+        `${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid} failed due to invalid references`,
+        traceId,
+      );
+
+      const referringDocuments: WithId<MeadowlarkDocument>[] = await mongoCollection
+        .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
+        .toArray();
+
+      const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+        documentUuid: document._id,
+        resourceName: document.resourceName,
+        projectName: document.projectName,
+        resourceVersion: document.resourceVersion,
+      }));
+
+      return {
+        response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
+        failureMessage: { error: { message: 'Reference validation failed', failures } },
+        blockingDocuments,
+      };
+    }
+  }
+
+  const document: MeadowlarkDocument =
+    documentFromUpdate ??
+    meadowlarkDocumentFrom(
+      resourceInfo,
+      documentInfo,
+      documentUuid,
+      meadowlarkId,
+      edfiDoc,
+      validateDocumentReferencesExist,
+      security.clientId,
+    );
+
+  await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+  // Perform the document upsert
+  Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
+
+  const { acknowledged, upsertedCount, modifiedCount } = await mongoCollection.replaceOne(
+    { _id: meadowlarkId },
+    document,
+    asUpsert(session),
+  );
+
+  if (!acknowledged) {
+    const msg =
+      'mongoCollection.replaceOne returned acknowledged: false, indicating a problem with write concern configuration';
+    Logger.error(`${moduleName}.upsertDocumentTransaction`, traceId, msg);
+
+    return { response: 'UNKNOWN_FAILURE' };
+  }
+
+  // upsertedCount is the number of inserted documents
+  if (upsertedCount > 0) return { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid };
+
+  // modifiedCount is the number of updated documents
+  if (modifiedCount === 0) {
+    // Something unexpected happened. This should have been an update
+    const msg = `Expected document update, but was not for documentUuid ${document.documentUuid} and meadowlarkId ${document._id}`;
+    Logger.error(`${moduleName}.upsertDocumentTransaction`, traceId, msg);
+    return { response: 'UNKNOWN_FAILURE' };
+  }
+
+  return { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
+}
+
+/**
+ * Takes an UpsertResult and MongoClient from the BackendFacade, performs an upsert and returns the UpsertResult.
+ */
+export async function upsertDocument(upsertRequest: UpsertRequest, client: MongoClient): Promise<UpsertResult> {
+  const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+  const session: ClientSession = client.startSession();
+  let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
+  try {
+    await session.withTransaction(async () => {
+      upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, session);
+      if (upsertResult.response !== 'UPDATE_SUCCESS' && upsertResult.response !== 'INSERT_SUCCESS') {
+        await session.abortTransaction();
       }
     });
   } catch (e) {
-    Logger.error(`${moduleName}.upsertDocument`, traceId, e);
-
+    Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
+    await session.abortTransaction();
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }
-
   return upsertResult;
 }

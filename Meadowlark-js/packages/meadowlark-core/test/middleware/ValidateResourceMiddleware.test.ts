@@ -9,6 +9,7 @@ import { FrontendResponse, newFrontendResponse } from '../../src/handler/Fronten
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { newResourceInfo, NoResourceInfo } from '../../src/model/ResourceInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -165,7 +166,7 @@ describe('given requesting abstract domain entity', () => {
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
-      body: '{"id": "0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb", "body": "a body"}',
+      body: '{"documentUuid": "db4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
       headers: { 'reference-validation': 'false' },
       middleware: {
         ...newFrontendRequestMiddleware(),
@@ -173,7 +174,7 @@ describe('given requesting abstract domain entity', () => {
           resourceName: 'educationOrganizations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          resourceId: '0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb',
+          documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };
@@ -201,7 +202,7 @@ describe('given requesting abstract association', () => {
   beforeAll(async () => {
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
-      body: '{"id": "0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb", "body": "a body"}',
+      body: '{"documentUuid": "df4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
       headers: { 'reference-validation': 'false' },
       middleware: {
         ...newFrontendRequestMiddleware(),
@@ -209,7 +210,7 @@ describe('given requesting abstract association', () => {
           resourceName: 'generalStudentProgramAssociations',
           namespace: 'ed-fi',
           version: 'v3.3b',
-          resourceId: '0c48a5757d4a3589eada048f37bcf7cf832a77c1dc838152ff2dadcb',
+          documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };

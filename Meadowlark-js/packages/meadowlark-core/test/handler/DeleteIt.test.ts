@@ -9,6 +9,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -18,7 +19,7 @@ const frontendRequest: FrontendRequest = {
       resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      resourceId: 'TBD',
+      documentUuid: '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid,
     },
   },
 };
@@ -117,7 +118,7 @@ describe('given the document to be deleted is referenced by other documents ', (
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    documentUuid: 'documentId',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };

@@ -6,11 +6,15 @@
 import {
   DeleteRequest,
   DeleteResult,
+  DocumentUuid,
+  MeadowlarkId,
   newSecurity,
   NoDocumentInfo,
   PaginationParameters,
   QueryRequest,
   ResourceInfo,
+  TraceId,
+  UpdateRequest,
   UpdateResult,
   UpsertRequest,
   UpsertResult,
@@ -32,18 +36,33 @@ const resourceInfo: ResourceInfo = {
   resourceName: 'student',
   isDescriptor: false,
   resourceVersion: '3.3.1-b',
+  allowIdentityUpdates: false,
 };
 
-const id = '1234a-5678b';
+const resourceIndex: string = 'ed-fi$3-3-1-b$student';
+
+const meadowlarkId = '1234a-5678b' as MeadowlarkId;
+const documentUuid: DocumentUuid = 'e6ce70aa-8216-46e9-b6a1-a3be70f72f36' as DocumentUuid;
 
 const newUpsertRequest: UpsertRequest = {
-  id,
+  meadowlarkId,
   resourceInfo,
   documentInfo: NoDocumentInfo,
-  edfiDoc: {},
-  validate: false,
+  edfiDoc: { upsert: true },
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
+};
+
+const newUpdateRequest: UpdateRequest = {
+  meadowlarkId,
+  documentUuid,
+  resourceInfo,
+  documentInfo: NoDocumentInfo,
+  edfiDoc: { update: true },
+  validateDocumentReferencesExist: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId' as TraceId,
 };
 
 const setupQueryRequest = (queryParameters: any, paginationParameters: PaginationParameters): QueryRequest => ({
@@ -51,7 +70,7 @@ const setupQueryRequest = (queryParameters: any, paginationParameters: Paginatio
   queryParameters,
   paginationParameters,
   security: { ...newSecurity() },
-  traceId: 'tracer',
+  traceId: 'tracer' as TraceId,
 });
 
 describe('given the upsert of a new document', () => {
@@ -72,29 +91,26 @@ describe('given the upsert of a new document', () => {
         newUpsertRequest,
         {
           response: 'INSERT_SUCCESS',
+          newDocumentUuid: documentUuid,
         } as UpsertResult,
         client,
       );
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be created', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).upsert).toBe(true);
     });
   });
 
   describe('when update was successful', () => {
     beforeEach(async () => {
-      newUpsertRequest.traceId = 'tracer2';
+      newUpsertRequest.traceId = 'tracer2' as TraceId;
       await afterUpsertDocument(
         newUpsertRequest,
         {
@@ -105,17 +121,13 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).upsert).toBe(true);
     });
   });
 
@@ -141,10 +153,10 @@ describe('given the upsert of a new document', () => {
     });
   });
 
-  describe('when updating by id is successful', () => {
+  describe('when updating by meadowlarkId is successful', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
-        newUpsertRequest,
+        newUpdateRequest,
         {
           response: 'UPDATE_SUCCESS',
         } as UpdateResult,
@@ -153,17 +165,13 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
-        { response: 'DELETE_SUCCESS' } as DeleteResult,
-        client,
-      );
+      await client.indices.delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
       const response = await queryDocuments(setupQueryRequest({}, {}), client);
-
-      expect(response.documents).toEqual(expect.arrayContaining([expect.objectContaining({ id })]));
+      expect(response.documents).toHaveLength(1);
+      expect((response.documents[0] as any).update).toBe(true);
     });
   });
 
@@ -172,7 +180,7 @@ describe('given the upsert of a new document', () => {
       'should not update when result is %s',
       async (response) => {
         await afterUpdateDocumentById(
-          newUpsertRequest,
+          newUpdateRequest,
           {
             response,
           } as UpdateResult,
@@ -186,10 +194,10 @@ describe('given the upsert of a new document', () => {
     );
   });
 
-  describe('when deleting by id', () => {
+  describe('when deleting by meadowlarkId', () => {
     beforeEach(async () => {
       await afterUpdateDocumentById(
-        newUpsertRequest,
+        newUpdateRequest,
         {
           response: 'UPDATE_SUCCESS',
         } as UpdateResult,
@@ -197,9 +205,13 @@ describe('given the upsert of a new document', () => {
       );
     });
 
+    afterEach(async () => {
+      await client.indices.delete({ index: resourceIndex });
+    });
+
     it('should be able to delete document', async () => {
       await afterDeleteDocumentById(
-        { id, resourceInfo } as DeleteRequest,
+        { documentUuid, resourceInfo } as DeleteRequest,
         { response: 'DELETE_SUCCESS' } as DeleteResult,
         client,
       );

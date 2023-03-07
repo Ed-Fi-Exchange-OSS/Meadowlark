@@ -12,6 +12,7 @@ import { DeleteResult } from '../message/DeleteResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris } from './UriBuilder';
+import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Delete';
 
@@ -27,17 +28,17 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
   try {
     writeRequestToLog(moduleName, frontendRequest, 'deleteIt');
 
-    if (frontendRequest.middleware.pathComponents.resourceId == null) {
+    if (frontendRequest.middleware.pathComponents.documentUuid == null) {
       writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
       return { statusCode: 404 };
     }
 
     const request: DeleteRequest = {
-      id: frontendRequest.middleware.pathComponents.resourceId,
+      documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
       resourceInfo: frontendRequest.middleware.resourceInfo,
-      validate: frontendRequest.middleware.validateResources,
+      validateNoReferencesToDocument: frontendRequest.middleware.validateResources,
       security: frontendRequest.middleware.security,
-      traceId: frontendRequest.traceId,
+      traceId: frontendRequest.traceId as TraceId,
     };
 
     await beforeDeleteDocumentById(request);

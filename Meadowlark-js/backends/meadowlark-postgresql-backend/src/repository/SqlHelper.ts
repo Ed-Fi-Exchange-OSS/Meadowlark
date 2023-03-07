@@ -134,7 +134,7 @@ export function insertOutboundReferencesSql(documentId: string, referencedDocume
  * @returns SQL query string for inserting or updating provided document info
  */
 export function documentInsertOrUpdateSql(
-  { id, resourceInfo, documentInfo, edfiDoc, validate, security },
+  { id, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
   isInsert: boolean,
 ): string {
   const documentValues = [
@@ -144,7 +144,7 @@ export function documentInsertOrUpdateSql(
     resourceInfo.resourceName,
     resourceInfo.resourceVersion,
     resourceInfo.isDescriptor,
-    validate,
+    validateDocumentReferencesExist,
     security.clientId,
     edfiDoc,
   ];

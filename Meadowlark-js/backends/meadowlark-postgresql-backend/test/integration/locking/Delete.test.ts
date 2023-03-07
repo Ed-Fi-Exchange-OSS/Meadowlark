@@ -8,13 +8,15 @@ import {
   NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   DocumentReference,
   UpsertRequest,
   NoResourceInfo,
   ResourceInfo,
   newResourceInfo,
   documentIdForDocumentReference,
+  MeadowlarkId,
+  TraceId,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
@@ -37,13 +39,13 @@ jest.setTimeout(10000);
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const schoolResourceInfo: ResourceInfo = {
@@ -55,7 +57,7 @@ const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
   documentIdentity: { schoolId: '123' },
 };
-const schoolDocumentId = documentIdForDocumentInfo(schoolResourceInfo, schoolDocumentInfo);
+const schoolDocumentId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
 
 const referenceToSchool: DocumentReference = {
   projectName: schoolResourceInfo.projectName,
@@ -77,7 +79,10 @@ const academicWeekDocumentInfo: DocumentInfo = {
 
   documentReferences: [referenceToSchool],
 };
-const academicWeekDocumentId = documentIdForDocumentInfo(academicWeekResourceInfo, academicWeekDocumentInfo);
+const academicWeekDocumentId = meadowlarkIdForDocumentIdentity(
+  academicWeekResourceInfo,
+  academicWeekDocumentInfo.documentIdentity,
+);
 
 describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
   let insertClient: PoolClient;
@@ -90,7 +95,10 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     deleteClient = (await getSharedClient()) as PoolClient;
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, insertClient);
+    await upsertDocument(
+      { ...newUpsertRequest(), meadowlarkId: schoolDocumentId, documentInfo: schoolDocumentInfo },
+      insertClient,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
@@ -146,7 +154,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
         resourceInfo: academicWeekResourceInfo,
         documentInfo: academicWeekDocumentInfo,
         edfiDoc: {},
-        validate: true,
+        validateDocumentReferencesExist: true,
         security: newSecurity(),
       },
       true,
@@ -193,7 +201,14 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     deleteClient = (await getSharedClient()) as PoolClient;
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument({ ...newUpsertRequest(), id: schoolDocumentId, documentInfo: schoolDocumentInfo }, insertClient);
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: schoolDocumentId,
+        documentInfo: schoolDocumentInfo,
+      },
+      insertClient,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
@@ -247,7 +262,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
           resourceInfo: academicWeekResourceInfo,
           documentInfo: academicWeekDocumentInfo,
           edfiDoc: {},
-          validate: true,
+          validateDocumentReferencesExist: true,
           security: newSecurity(),
         },
         true,

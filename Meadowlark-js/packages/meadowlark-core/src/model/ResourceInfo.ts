@@ -31,6 +31,8 @@ export interface ResourceInfo extends BaseResourceInfo {
    * The MetaEd project version the entity belongs to.
    */
   resourceVersion: string;
+
+  allowIdentityUpdates: boolean;
 }
 
 /**
@@ -42,6 +44,7 @@ export function newResourceInfo(): ResourceInfo {
     isDescriptor: false,
     projectName: '',
     resourceVersion: '',
+    allowIdentityUpdates: false,
   };
 }
 

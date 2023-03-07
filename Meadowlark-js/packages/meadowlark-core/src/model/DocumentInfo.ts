@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { SuperclassInfo } from './SuperclassInfo';
-import { NoDocumentIdentity, documentIdForDocumentIdentity } from './DocumentIdentity';
+import { NoDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { DocumentReference } from './DocumentReference';
-import { ResourceInfo } from './ResourceInfo';
 
 /**
  * Complete information on a validated API document
@@ -52,10 +51,3 @@ export function newDocumentInfo(): DocumentInfo {
 export const NoDocumentInfo = Object.freeze({
   ...newDocumentInfo(),
 });
-
-/**
- * Returns the id of the given DocumentInfo, using the project name, resource name and identity of the API document.
- */
-export function documentIdForDocumentInfo(resourceInfo: ResourceInfo, documentInfo: DocumentInfo): string {
-  return documentIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
-}

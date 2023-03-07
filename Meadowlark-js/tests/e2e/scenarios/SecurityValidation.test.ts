@@ -210,7 +210,7 @@ describe('given the existence of two vendors and one host', () => {
     });
 
     // PUT
-    const resourceBodyPUTUpdated = {
+    const resourceBodyPutUpdated = {
       contentIdentifier: '933zsd4350',
       namespace: '43210',
       shortDescription: 'abc_PUT',
@@ -223,7 +223,7 @@ describe('given the existence of two vendors and one host', () => {
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPUTUpdated)
+          .send(resourceBodyPutUpdated)
           .expect(204);
       });
     });
@@ -233,7 +233,7 @@ describe('given the existence of two vendors and one host', () => {
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPUTUpdated)
+          .send(resourceBodyPutUpdated)
           .expect(403)
           .then((response) => {
             expect(response.body).toBe('');
@@ -246,7 +246,7 @@ describe('given the existence of two vendors and one host', () => {
         await rootURLRequest()
           .put(resourceLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPUTUpdated)
+          .send(resourceBodyPutUpdated)
           .expect(204);
       });
     });

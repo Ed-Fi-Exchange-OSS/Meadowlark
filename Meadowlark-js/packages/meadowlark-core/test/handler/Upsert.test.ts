@@ -10,7 +10,10 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
+import { DocumentUuid } from '../../src/model/BrandedTypes';
 
+const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   body: '{}',
@@ -28,7 +31,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -63,7 +66,7 @@ describe('given persistence is going to throw a reference error on insert', () =
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Error message",
       }
@@ -75,7 +78,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -110,7 +113,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Error message",
       }
@@ -122,7 +125,7 @@ describe('given persistence is going to throw a reference error on update though
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentId: 'documentId',
+    documentUuid,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -155,7 +158,7 @@ describe('given persistence is going to throw a reference error on update though
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/documentId",
+          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
         ],
         "error": "Reference failure",
       }
@@ -205,6 +208,7 @@ describe('given persistence succeeds as insert', () => {
       upsertDocument: async () =>
         Promise.resolve({
           response: 'INSERT_SUCCESS',
+          newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
           failureMessage: null,
         } as unknown as UpsertResult),
     });
@@ -226,8 +230,8 @@ describe('given persistence succeeds as insert', () => {
   });
 
   it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
-    expect(response.headers).toEqual({ Location: location });
+    const location = /\/v3.3b\/ed-fi\/academicWeeks\/[a-z,0-9,-]{36,36}/i;
+    expect(JSON.parse(JSON.stringify(response.headers)).Location).toMatch(location);
   });
 });
 
@@ -242,6 +246,7 @@ describe('given persistence succeeds as update', () => {
         Promise.resolve({
           response: 'UPDATE_SUCCESS',
           failureMessage: null,
+          existingDocumentUuid: documentUuid,
         } as unknown as UpsertResult),
     });
 
@@ -261,8 +266,13 @@ describe('given persistence succeeds as update', () => {
     expect(response.body).toBeUndefined();
   });
 
-  it('it returns headers', () => {
-    const location = `/v3.3b/ed-fi/academicWeeks/aquYJFOsedv9pkccRrndKwuojRMjOz_rdD7rJA`;
-    expect(response.headers).toEqual({ Location: location });
+  it('returns Location header with resource and uuid', () => {
+    const location = JSON.parse(JSON.stringify(response.headers)).Location;
+
+    const expectedPrefix = '/v3.3b/ed-fi/academicWeeks/';
+    expect(location.startsWith(expectedPrefix)).toBe(true);
+
+    const uuidSuffix = location.slice(expectedPrefix.length);
+    expect(isDocumentUuidWellFormed(uuidSuffix)).toBe(true);
   });
 });

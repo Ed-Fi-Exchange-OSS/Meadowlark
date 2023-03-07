@@ -6,9 +6,10 @@
 import {
   DocumentInfo,
   newDocumentInfo,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   ResourceInfo,
   newResourceInfo,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../src/model/MeadowlarkDocument';
 
@@ -23,13 +24,23 @@ describe('given non-superclass document info with no references', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
-    meadowlarkDocument = meadowlarkDocumentFrom(resourceInfo, documentInfo, id, edfiDoc, validate, createdBy);
+    meadowlarkDocument = meadowlarkDocumentFrom(
+      resourceInfo,
+      documentInfo,
+      documentUuid,
+      meadowlarkId,
+      edfiDoc,
+      validate,
+      createdBy,
+    );
   });
 
   it('should be a complete document, with no outbound refs and a single alias id', async () => {
@@ -43,6 +54,7 @@ describe('given non-superclass document info with no references', () => {
         "documentIdentity": {
           "natural": "key",
         },
+        "documentUuid": "3018d452-a7b7-4f1c-aa91-26ccc48cf4b8",
         "edfiDoc": {
           "edfi": "doc",
         },
@@ -84,13 +96,22 @@ describe('given non-superclass document info with references', () => {
       },
     ],
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
-    meadowlarkDocument = meadowlarkDocumentFrom(resourceInfo, documentInfo, id, edfiDoc, validate, createdBy);
+    meadowlarkDocument = meadowlarkDocumentFrom(
+      resourceInfo,
+      documentInfo,
+      documentUuid,
+      meadowlarkId,
+      edfiDoc,
+      validate,
+      createdBy,
+    );
   });
 
   it('should have outbound references', async () => {
@@ -115,13 +136,22 @@ describe('given superclass document info', () => {
     documentIdentity: { natural: 'key' },
     superclassInfo: { documentIdentity: { natural: 'key2' }, projectName: 'projectName', resourceName: 'resourceName' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const edfiDoc = { edfi: 'doc' };
   const validate = true;
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
-    meadowlarkDocument = meadowlarkDocumentFrom(resourceInfo, documentInfo, id, edfiDoc, validate, createdBy);
+    meadowlarkDocument = meadowlarkDocumentFrom(
+      resourceInfo,
+      documentInfo,
+      documentUuid,
+      meadowlarkId,
+      edfiDoc,
+      validate,
+      createdBy,
+    );
   });
 
   it('should have two alias ids', async () => {

@@ -15,40 +15,42 @@ import { DeleteRequest } from '../../src/message/DeleteRequest';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import { UpdateResult } from '../../src/message/UpdateResult';
 import { DeleteResult } from '../../src/message/DeleteResult';
+import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/BrandedTypes';
 
 const newUpsertRequest = (): UpsertRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newGetRequest = (): GetRequest => ({
-  id: '',
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newUpdateRequest = (): UpdateRequest => ({
-  id: '',
+  meadowlarkId: '' as MeadowlarkId,
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
-  validate: false,
+  validateDocumentReferencesExist: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 const newDeleteRequest = (): DeleteRequest => ({
-  id: '',
+  documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,
-  validate: false,
+  validateNoReferencesToDocument: false,
   security: { ...newSecurity() },
-  traceId: 'traceId',
+  traceId: 'traceId' as TraceId,
 });
 
 describe('given upsert and no backend plugin has been configured', () => {

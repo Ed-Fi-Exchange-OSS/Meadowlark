@@ -7,6 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import {
   DeleteRequest,
   DeleteResult,
+  DocumentUuid,
   UpdateRequest,
   UpdateResult,
   UpsertRequest,
@@ -14,14 +15,14 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QueryOpensearch';
-import { LogOpenSearchErrors } from './OpenSearchException';
+import { handleOpenSearchError } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.UpdateOpensearch';
 
 /**
  * Parameters for an OpenSearch request
  */
-type OpensearchRequest = { index: string; id: string };
+type OpensearchRequest = { index: string; id: DocumentUuid };
 
 /**
  * Listener for afterDeleteDocumentById events
@@ -30,7 +31,10 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   Logger.info(`${moduleName}.afterDeleteDocumentById`, request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
+  const opensearchRequest: OpensearchRequest = {
+    id: request.documentUuid,
+    index: indexFromResourceInfo(request.resourceInfo),
+  };
 
   try {
     Logger.debug(
@@ -39,15 +43,18 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
     );
     await client.delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
+    await handleOpenSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
   }
 }
 
 /**
  * Shared opensearch upsert logic
  */
-async function upsertToOpensearch(request: UpsertRequest, client: Client) {
-  const opensearchRequest: OpensearchRequest = { id: request.id, index: indexFromResourceInfo(request.resourceInfo) };
+async function upsertToOpensearch(request: UpsertRequest, documentUuid: DocumentUuid, client: Client) {
+  const opensearchRequest: OpensearchRequest = {
+    id: documentUuid,
+    index: indexFromResourceInfo(request.resourceInfo),
+  };
 
   Logger.debug(
     `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
@@ -62,11 +69,13 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
         info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
         createdBy: request.security.clientId,
+        meadowlarkId: request.meadowlarkId,
+        documentUuid,
       },
       refresh: true,
     });
   } catch (err) {
-    await LogOpenSearchErrors(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
+    await handleOpenSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
   }
 }
 
@@ -76,7 +85,9 @@ async function upsertToOpensearch(request: UpsertRequest, client: Client) {
 export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult, client: Client) {
   Logger.info(`${moduleName}.afterUpsertDocument`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
-  await upsertToOpensearch(request, client);
+  const documentUuid: DocumentUuid =
+    result.response === 'UPDATE_SUCCESS' ? result.existingDocumentUuid : result.newDocumentUuid;
+  await upsertToOpensearch(request, documentUuid, client);
 }
 
 /**
@@ -85,5 +96,17 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: Client) {
   Logger.info(`${moduleName}.afterUpdateDocumentById`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
-  await upsertToOpensearch(request, client);
+  await upsertToOpensearch(
+    {
+      meadowlarkId: request.meadowlarkId,
+      resourceInfo: request.resourceInfo,
+      documentInfo: request.documentInfo,
+      edfiDoc: request.edfiDoc,
+      validateDocumentReferencesExist: request.validateDocumentReferencesExist,
+      security: request.security,
+      traceId: request.traceId,
+    },
+    request.documentUuid,
+    client,
+  );
 }

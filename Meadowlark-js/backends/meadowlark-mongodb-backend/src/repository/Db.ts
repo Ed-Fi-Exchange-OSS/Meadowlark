@@ -45,6 +45,7 @@ export async function getNewClient(): Promise<MongoClient> {
     const documentCollection: Collection<MeadowlarkDocument> = newClient
       .db(databaseName)
       .collection(DOCUMENT_COLLECTION_NAME);
+    await documentCollection.createIndex({ documentUuid: 1 });
     await documentCollection.createIndex({ outboundRefs: 1 });
     await documentCollection.createIndex({ aliasIds: 1 });
 
@@ -95,6 +96,8 @@ export function getAuthorizationCollection(client: MongoClient): Collection<Auth
  * Write lock referenced documents as part of the upsert/update process. This will prevent the issue of
  * a concurrent delete operation removing a to-be referenced document in the middle of the transaction.
  * See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
+ *
+ * This function expects Session to have an active transaction. Aborting the transaction on error is left to the caller.
  */
 export async function writeLockReferencedDocuments(
   mongoCollection: Collection<MeadowlarkDocument>,
@@ -111,8 +114,17 @@ export async function writeLockReferencedDocuments(
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
 export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
+// MongoDB FindOption to return only the indexed documentUuid field, making this a covered query (MongoDB will optimize)
+export const onlyReturnDocumentUuid = (session: ClientSession): FindOptions => ({
+  projection: { documentUuid: 1 },
+  session,
+});
+
 // MongoDB FindOption to return only the aliasId
 export const onlyReturnAliasId = (session: ClientSession): FindOptions => ({ projection: { 'aliasIds.$': 1 }, session });
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)
 export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });
+
+// MongoDB FindOption to return at most 5 documents
+export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });

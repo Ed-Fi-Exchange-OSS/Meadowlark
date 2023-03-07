@@ -5,7 +5,7 @@
 
 import {
   AuthorizationStrategy,
-  documentIdForDocumentInfo,
+  meadowlarkIdForDocumentIdentity,
   DocumentInfo,
   FrontendRequest,
   newDocumentInfo,
@@ -13,6 +13,10 @@ import {
   newResourceInfo,
   ResourceInfo,
   Security,
+  DocumentUuid,
+  UpsertRequest,
+  TraceId,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
@@ -65,7 +69,7 @@ describe('given the getById of a non-existent document', () => {
     action: 'getById',
     middleware: {
       ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: 'DOESNOTEXIST' },
+      pathComponents: { ...newPathComponents(), documentUuid: '00000000-0000-0000-0000-000000000000' as DocumentUuid },
     },
   };
 
@@ -90,6 +94,7 @@ describe('given the getById of a non-existent document', () => {
 
 describe('given the getById of a document owned by the requestor', () => {
   let client;
+  let upsertResult: UpsertResult;
   let result;
 
   const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
@@ -103,27 +108,16 @@ describe('given the getById of a document owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
-  const upsertRequest = {
-    id,
+  const upsertRequest: UpsertRequest = {
+    meadowlarkId,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
-    validate: false,
+    validateDocumentReferencesExist: false,
     security: { authorizationStrategy, clientId } as Security,
-    traceId: 'traceId',
-  };
-
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientId },
-      validateResources: true,
-    },
+    traceId: 'traceId' as TraceId,
   };
 
   beforeAll(async () => {
@@ -132,7 +126,19 @@ describe('given the getById of a document owned by the requestor', () => {
     client = (await getNewClient()) as MongoClient;
 
     // Insert owned document
-    await upsertDocument(upsertRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid: upsertResult.newDocumentUuid },
+        security: { authorizationStrategy, clientId },
+        validateResources: true,
+      },
+    };
 
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);
@@ -150,6 +156,7 @@ describe('given the getById of a document owned by the requestor', () => {
 
 describe('given the getById of a document not owned by the requestor', () => {
   let client;
+  let upsertResult: UpsertResult;
   let result;
 
   const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
@@ -162,27 +169,16 @@ describe('given the getById of a document not owned by the requestor', () => {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
   };
-  const id = documentIdForDocumentInfo(resourceInfo, documentInfo);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
-  const upsertRequest = {
-    id,
+  const upsertRequest: UpsertRequest = {
+    meadowlarkId,
     resourceInfo,
     documentInfo,
     edfiDoc: {},
-    validate: false,
+    validateDocumentReferencesExist: false,
     security: { authorizationStrategy, clientId: 'DocumentOwner' } as Security,
-    traceId: 'traceId',
-  };
-
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), resourceId: id },
-      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
-      validateResources: true,
-    },
+    traceId: 'traceId' as TraceId,
   };
 
   beforeAll(async () => {
@@ -191,7 +187,19 @@ describe('given the getById of a document not owned by the requestor', () => {
     client = (await getNewClient()) as MongoClient;
 
     // Insert non-owned document
-    await upsertDocument(upsertRequest, client);
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid: upsertResult.newDocumentUuid },
+        security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
+        validateResources: true,
+      },
+    };
 
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);

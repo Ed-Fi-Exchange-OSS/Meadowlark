@@ -7,7 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { LogOpenSearchErrors } from './OpenSearchException';
+import { handleOpenSearchError } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
 
@@ -113,7 +113,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
-    return LogOpenSearchErrors(e, `${moduleName}.queryDocuments`, traceId);
+    return handleOpenSearchError(e, `${moduleName}.queryDocuments`, traceId);
   }
 
   return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };

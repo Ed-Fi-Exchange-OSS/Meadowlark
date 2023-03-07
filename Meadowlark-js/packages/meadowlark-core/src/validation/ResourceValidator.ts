@@ -83,6 +83,7 @@ export async function validateResource(pathComponents: PathComponents): Promise<
       resourceVersion: metaEdConfiguration.projects[0].projectVersion,
       resourceName: matchingMetaEdModel.metaEdName,
       isDescriptor,
+      allowIdentityUpdates: matchingMetaEdModel.allowPrimaryKeyUpdates,
     },
   };
 }

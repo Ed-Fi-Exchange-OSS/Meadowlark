@@ -4,20 +4,22 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { PoolClient, QueryResult } from 'pg';
-import { GetResult, GetRequest } from '@edfi/meadowlark-core';
+import { GetResult, GetRequest, MeadowlarkId } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByIdSql } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.Get';
 
-export async function getDocumentById({ id, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {
+export async function getDocumentById({ documentUuid, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {
+  // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
+  const meadowlarkId: MeadowlarkId = documentUuid as unknown as MeadowlarkId;
   try {
-    Logger.debug(`${moduleName}.getDocumentById ${id}`, traceId);
-    const queryResult: QueryResult = await client.query(findDocumentByIdSql(id));
+    Logger.debug(`${moduleName}.getDocumentById ${meadowlarkId}`, traceId);
+    const queryResult: QueryResult = await client.query(findDocumentByIdSql(meadowlarkId));
 
     // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
     if (queryResult.rows == null) {
-      const errorMessage = `Could not retrieve document ${id}
+      const errorMessage = `Could not retrieve document ${meadowlarkId}
       a null result set was returned, indicating system failure`;
       Logger.error(errorMessage, traceId);
       return {
@@ -35,7 +37,7 @@ export async function getDocumentById({ id, traceId }: GetRequest, client: PoolC
     };
     return response;
   } catch (e) {
-    Logger.error(`${moduleName}.getDocumentById Error retrieving document ${id}`, traceId, e);
+    Logger.error(`${moduleName}.getDocumentById Error retrieving document ${meadowlarkId}`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', document: [] };
   }
 }
