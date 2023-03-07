@@ -82,7 +82,7 @@ export async function updateDocumentById(
       // Perform the document update
       Logger.debug(`${moduleName}.updateDocumentById: Updating document id ${id}`, traceId);
 
-      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
       const mongoUpdateResult = {
         acknowledged: false,
         matchedCount: 0,
@@ -96,6 +96,9 @@ export async function updateDocumentById(
         },
         {
           retries: numberOfRetries,
+          onRetry: () => {
+            Logger.warn(`mongoCollection.replaceOne returned error. Retrying... Updating document id ${id}`, traceId);
+          },
         },
       );
       if (mongoUpdateResult.acknowledged) {

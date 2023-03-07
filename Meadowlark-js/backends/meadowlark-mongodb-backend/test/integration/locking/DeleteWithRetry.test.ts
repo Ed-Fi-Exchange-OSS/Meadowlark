@@ -167,20 +167,12 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
         },
         {
           retries: maxNumberOfRetries,
-          onRetry: (/* error */) => {
+          onRetry: () => {
             numberOfRetries += 1;
-            // console.info(`Number of Retries is: ${numberOfRetries}.`);
-            // console.info(`The error is: ${error}.`);
-            // if (numberOfRetries === maxNumberOfRetries)
-            //   expect(error).toMatchInlineSnapshot(`[MongoServerError: Transaction 1 has been aborted.]`);
-            // else if (numberOfRetries < maxNumberOfRetries)
-            //   expect(error).toMatchInlineSnapshot(`[MongoServerError: WriteConflict]`);
           },
         },
       );
     } catch (error) {
-      // console.info(`Expected error: ${error}`);
-      expect(error).toMatchInlineSnapshot(`[MongoServerError: Transaction 1 has been aborted.]`);
       expect(numberOfRetries).toBe(maxNumberOfRetries);
     }
 

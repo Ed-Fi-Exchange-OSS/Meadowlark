@@ -114,7 +114,7 @@ export async function upsertDocument(
       // Perform the document upsert
       Logger.debug(`${moduleName}.upsertDocument Upserting document id ${id}`, traceId);
 
-      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
       const mongoUpsertResult = {
         acknowledged: false,
         upsertedCount: 0,
@@ -128,6 +128,9 @@ export async function upsertDocument(
         },
         {
           retries: numberOfRetries,
+          onRetry: () => {
+            Logger.warn(`mongoCollection.replaceOne returned error. Retrying... Upserting document id ${id}`, traceId);
+          },
         },
       );
       if (mongoUpsertResult.acknowledged) {

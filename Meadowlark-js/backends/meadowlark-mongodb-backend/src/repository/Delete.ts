@@ -72,7 +72,7 @@ export async function deleteDocumentById(
       // Perform the document delete
       Logger.debug(`mongodb.repository.Delete.deleteDocumentById: Deleting document id ${id}`, traceId);
 
-      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES');
+      const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
       let mongoDeleteResult = {
         acknowledged: false,
         deletedCount: 0,
@@ -84,6 +84,9 @@ export async function deleteDocumentById(
         },
         {
           retries: numberOfRetries,
+          onRetry: () => {
+            Logger.warn(`mongoCollection.deleteOne returned error. Retrying... Deleting document id ${id}`, traceId);
+          },
         },
       );
       if (mongoDeleteResult && mongoDeleteResult.acknowledged) {
