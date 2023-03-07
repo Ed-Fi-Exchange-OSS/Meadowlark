@@ -203,6 +203,7 @@ describe('given an update of a document that references a non-existent document 
       },
       client,
     );
+
     if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
     // Update the document with an invalid reference
