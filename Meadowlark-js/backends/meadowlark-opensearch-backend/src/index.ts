@@ -4,11 +4,18 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { QueryHandlerPlugin, Subscribe } from '@edfi/meadowlark-core';
-import { afterDeleteDocumentById, afterUpdateDocumentById, afterUpsertDocument, queryDocuments } from './BackendFacade';
+import {
+  afterDeleteDocumentById,
+  afterUpdateDocumentById,
+  afterUpsertDocument,
+  queryDocuments,
+  closeConnection,
+} from './BackendFacade';
 
 export function initializeQueryHandler(): QueryHandlerPlugin {
   return {
     queryDocuments,
+    closeConnection,
   };
 }
 

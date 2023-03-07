@@ -12,4 +12,7 @@ export const NoQueryHandlerPlugin: QueryHandlerPlugin = {
     Logger.warn('core.plugin.backend.NoQueryHandlerPlugin.queryDocuments(): No backend plugin has been configured', traceId);
     return Promise.resolve({ response: 'UNKNOWN_FAILURE', documents: [] });
   },
+  closeConnection: async (): Promise<void> => {
+    Logger.warn('core.plugin.backend.NoQueryHandlerPlugin.closeConnection(): No backend plugin has been configured', null);
+  },
 };

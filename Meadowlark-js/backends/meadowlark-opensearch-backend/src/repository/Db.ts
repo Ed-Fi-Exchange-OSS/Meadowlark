@@ -44,3 +44,11 @@ export async function getSharedClient(): Promise<Client> {
 
   return singletonClient;
 }
+
+export async function closeSharedConnection(): Promise<void> {
+  if (singletonClient != null) {
+    await singletonClient.close();
+  }
+  singletonClient = null;
+  Logger.info(`Opensearch connection: closed`, null);
+}

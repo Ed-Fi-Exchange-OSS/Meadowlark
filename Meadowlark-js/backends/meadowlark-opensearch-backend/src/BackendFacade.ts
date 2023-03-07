@@ -15,7 +15,7 @@ import {
 } from '@edfi/meadowlark-core';
 import * as QueryOpensearch from './repository/QueryOpensearch';
 import * as UpdateOpensearch from './repository/UpdateOpensearch';
-import { getSharedClient } from './repository/Db';
+import { getSharedClient, closeSharedConnection } from './repository/Db';
 
 export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {
   return QueryOpensearch.queryDocuments(request, await getSharedClient());
@@ -31,4 +31,8 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult): Promise<void> {
   return UpdateOpensearch.afterUpdateDocumentById(request, result, await getSharedClient());
+}
+
+export async function closeConnection(): Promise<void> {
+  return closeSharedConnection();
 }

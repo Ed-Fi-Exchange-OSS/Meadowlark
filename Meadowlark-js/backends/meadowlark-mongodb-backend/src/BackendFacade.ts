@@ -37,7 +37,7 @@ import * as GetAllAuthorizationClients from './repository/authorization/GetAllAu
 import * as UpdateAuthorizationClient from './repository/authorization/UpdateAuthorizationClient';
 import * as ResetAuthorizationClientSecret from './repository/authorization/ResetAuthorizationClientSecret';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
-import { getSharedClient } from './repository/Db';
+import { getSharedClient, closeSharedConnection } from './repository/Db';
 
 // DocumentStore implementation
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
@@ -93,4 +93,8 @@ export async function resetAuthorizationClientSecret(
   request: ResetAuthorizationClientSecretRequest,
 ): Promise<ResetAuthorizationClientSecretResult> {
   return ResetAuthorizationClientSecret.resetAuthorizationClientSecret(request, await getSharedClient());
+}
+
+export async function closeConnection(): Promise<void> {
+  return closeSharedConnection();
 }

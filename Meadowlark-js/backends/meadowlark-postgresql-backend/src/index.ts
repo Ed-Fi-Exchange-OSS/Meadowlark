@@ -10,6 +10,7 @@ import {
   getDocumentById,
   updateDocumentById,
   securityMiddleware,
+  closeConnection,
 } from './BackendFacade';
 
 export function initializeDocumentStore(): DocumentStorePlugin {
@@ -19,6 +20,7 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     updateDocumentById,
     deleteDocumentById,
     securityMiddleware,
+    closeConnection,
   };
 }
 
