@@ -97,8 +97,11 @@ export async function initializeConfig(provider: ConfigPlugin) {
     'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES',
     await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000),
   );
-  set('AUTHORIZATION_STORE_PLUGIN', await provider.getString('AUTHORIZATION_STORE_PLUGIN', ThrowIfNotFound));
-  set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', ThrowIfNotFound));
+  set(
+    'AUTHORIZATION_STORE_PLUGIN',
+    await provider.getString('AUTHORIZATION_STORE_PLUGIN', '@edfi/meadowlark-mongodb-backend'),
+  );
+  set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', '@edfi/meadowlark-mongodb-backend'));
   set('MONGO_URI', await provider.getString('MONGO_URI', ''));
   set('MONGO_WRITE_CONCERN', await provider.getString('MONGO_WRITE_CONCERN', 'majority'));
   set('MONGO_READ_CONCERN', await provider.getString('MONGO_READ_CONCERN', 'majority'));
