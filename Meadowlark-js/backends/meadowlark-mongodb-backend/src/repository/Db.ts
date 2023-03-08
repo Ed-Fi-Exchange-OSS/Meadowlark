@@ -3,19 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import {
-  Collection,
-  MongoClient,
-  // We are deliberately using an old version of the MongoDB API, and therefore we are not concerned about this deprecation.
-  Logger as MongoLogger,
-  LoggerLevel,
-  ReadConcernLevel,
-  W,
-  ClientSession,
-  ObjectId,
-  FindOptions,
-  ReplaceOptions,
-} from 'mongodb';
+import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, ObjectId, FindOptions, ReplaceOptions } from 'mongodb';
 import { Logger, Config } from '@edfi//meadowlark-utilities';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { AuthorizationDocument } from '../model/AuthorizationDocument';
