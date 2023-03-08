@@ -29,7 +29,7 @@ let singletonClient: MongoClient | null = null;
  * Return a brand new client - which is a connection pool.
  */
 export async function getNewClient(): Promise<MongoClient> {
-  const mongoUrl: string = Config.get('MONGO_URL');
+  const mongoUrl: string = Config.get('MONGO_URI');
   const databaseName: string = Config.get('MEADOWLARK_DATABASE_NAME');
 
   try {
@@ -38,8 +38,6 @@ export async function getNewClient(): Promise<MongoClient> {
       readConcernLevel: Config.get<string>('MONGO_READ_CONCERN') as ReadConcernLevel,
     });
     await newClient.connect();
-
-    MongoLogger.setLevel(Config.get('MONGO_LOG_LEVEL') as LoggerLevel);
 
     // Create indexed documents collection if not exists
     const documentCollection: Collection<MeadowlarkDocument> = newClient

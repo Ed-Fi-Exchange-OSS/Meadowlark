@@ -10,7 +10,7 @@ Instructions for running a local "developer" environment:
 2. Review the `.env` file and update any important settings. Pay attention, in particular to:
    * `DOCUMENT_STORE_PLUGIN` - The backend document store that Meadowlark will use
      * If using MongoDB set the value to `@edfi/meadowlark-mongodb-backend`
-       * Update `MONGO_URL` to the location of your Mongo Instance
+       * Update `MONGO_URI` to the location of your Mongo Instance
      * If using PostgreSQL set the value to `@edfi/meadowlark-postgresql-backend`
        * Update `POSTGRES_USERNAME` and `POSTGRES_PASSWORD`
        * If your PostgreSQL instance is not running on the default port (5432), you can set `POSTGRES_PORT` to

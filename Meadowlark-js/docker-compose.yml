@@ -23,7 +23,7 @@ services:
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
       LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
-      MONGO_URL: ${MONGODB_URI}
+      MONGO_URI: ${MONGODB_URI}
       FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
       FASTIFY_PORT: ${FASTIFY_PORT:-3000}
       FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}

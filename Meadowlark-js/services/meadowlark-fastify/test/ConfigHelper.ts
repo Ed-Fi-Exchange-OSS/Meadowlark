@@ -38,7 +38,7 @@ export const setupMockConfiguration = () => {
         return '';
       case 'AUTHORIZATION_STORE_PLUGIN':
         return '@edfi/meadowlark-mongodb-backend';
-      case 'MONGO_URL':
+      case 'MONGO_URI':
         return 'mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
       default:
         throw new Error(`Key '${key}' not configured`);
