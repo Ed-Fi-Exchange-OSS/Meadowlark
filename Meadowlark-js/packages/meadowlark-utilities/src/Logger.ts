@@ -8,6 +8,30 @@ import * as Config from './Config';
 
 const timestampFormat: string = 'YYYY-MM-DD HH:mm:ss.SSS';
 
+/*
+ * Function to remove sensitive from mongoDb connection string.
+ */
+function removeSensitiveDataFromMongoDbConnection(message: string): string {
+  const patternToProtect = /mongodb:\/\/.+:.+@/im;
+  const safeReplacementText = 'mongodb://*****:*****@';
+  return message.replace(patternToProtect, safeReplacementText);
+}
+/*
+ * Function to remove any sensitive information from the message being logged
+ */
+function removeSensitiveData(message: string): string {
+  let messageToProtect: string;
+  if (message === undefined) {
+    return message;
+  }
+  if (typeof message === 'object') {
+    messageToProtect = JSON.stringify(message);
+  } else {
+    messageToProtect = message;
+  }
+  return removeSensitiveDataFromMongoDbConnection(messageToProtect);
+}
+
 const convertErrorToString = (err) => {
   // Preserve any dictionary, but otherwise convert to string
   if (err != null && err.constructor !== Object) {
@@ -87,20 +111,20 @@ export const Logger = {
   // Fastify, so long as it continues to have definitions for: fatal, error, warn, info, debug, trace, child.
 
   fatal: (message: string, err?: any | null) => {
-    logger.error({ message, err: convertErrorToString(err) });
+    logger.error({ message: removeSensitiveData(message), err: convertErrorToString(err) });
     process.exit(1);
   },
   error: (message: string, traceId: string | null, err?: any | null) => {
-    logger.error({ message, error: convertErrorToString(err), traceId });
+    logger.error({ message: removeSensitiveData(message), error: convertErrorToString(err), traceId });
   },
   warn: (message: string, traceId: string | null) => {
-    logger.warn({ message, traceId });
+    logger.warn({ message: removeSensitiveData(message), traceId });
   },
   info: (message: string, traceId: string | null, extra?: any | null) => {
-    logger.info({ message, traceId, extra });
+    logger.info({ message: removeSensitiveData(message), traceId, extra });
   },
   debug: (message: string, traceId: string | null, extra?: any | null) => {
-    logger.debug({ message, traceId, extra });
+    logger.debug({ message: removeSensitiveData(message), traceId, extra });
   },
   trace: (message: string) => {
     logger.debug({ message: JSON.stringify(message) });
