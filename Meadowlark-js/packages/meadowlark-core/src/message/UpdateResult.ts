@@ -15,6 +15,7 @@ export type UpdateResult =
   | UpdateFailureBlocked
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_NOT_EXISTS'; failureMessage?: string | object }
+  | { response: 'UPDATE_FAILURE_WRITE_CONFLICT'; failureMessage?: string | object }
   | { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY'; failureMessage?: string | object }
   | { response: 'UPDATE_CASCADE_REQUIRED' }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

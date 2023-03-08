@@ -6,8 +6,9 @@
 /* eslint-disable no-underscore-dangle */
 
 import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
+import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, limitFive, onlyReturnId, writeLockReferencedDocuments } from './Db';
 import { deleteDocumentByIdTransaction } from './Delete';
@@ -276,42 +277,65 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: M
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    await session.withTransaction(async () => {
-      if (validateDocumentReferencesExist) {
-        const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
-          updateRequest,
-          mongoCollection,
-          session,
-        );
-        if (invalidReferenceResult !== null) {
-          updateResult = invalidReferenceResult;
-          return; // exit transaction block
-        }
-      }
+    const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
 
-      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-        resourceInfo,
-        documentInfo,
-        documentUuid,
-        meadowlarkId,
-        edfiDoc,
-        validateDocumentReferencesExist,
-        security.clientId,
-      );
+    await retry(
+      async () => {
+        await session.withTransaction(async () => {
+          if (validateDocumentReferencesExist) {
+            const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
+              updateRequest,
+              mongoCollection,
+              session,
+            );
+            if (invalidReferenceResult !== null) {
+              updateResult = invalidReferenceResult;
+              return; // exit transaction block
+            }
+          }
 
-      if (resourceInfo.allowIdentityUpdates) {
-        updateResult = await updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
-      } else {
-        updateResult = await updateDisallowingIdentityChange(document, updateRequest, mongoCollection, session);
-      }
+          const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+            resourceInfo,
+            documentInfo,
+            documentUuid,
+            meadowlarkId,
+            edfiDoc,
+            validateDocumentReferencesExist,
+            security.clientId,
+          );
 
-      if (updateResult.response !== 'UPDATE_SUCCESS') {
-        await session.abortTransaction();
-      }
-    });
+          if (resourceInfo.allowIdentityUpdates) {
+            updateResult = await updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
+          } else {
+            updateResult = await updateDisallowingIdentityChange(document, updateRequest, mongoCollection, session);
+          }
+
+          if (updateResult.response !== 'UPDATE_SUCCESS') {
+            await session.abortTransaction();
+          }
+        });
+      },
+      {
+        retries: numberOfRetries,
+        onRetry: () => {
+          Logger.warn(
+            `mongoCollection.replaceOne returned Write Conflict error. Document documentUuid ${updateRequest.documentUuid}. Retrying...`,
+            updateRequest.traceId,
+          );
+        },
+      },
+    );
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
     await session.abortTransaction();
+
+    if (e.codeName === 'WriteConflict') {
+      return {
+        response: 'UPDATE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict error returned',
+      };
+    }
+
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();

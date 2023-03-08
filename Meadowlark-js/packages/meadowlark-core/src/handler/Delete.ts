@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import R from 'ramda';
 import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { getDocumentStore } from '../plugin/PluginLoader';
@@ -66,6 +67,15 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
         body: { error: { message: DELETE_FAILURE_REFERENCE_MESSAGE, blockingUris } },
         statusCode: 409,
         headers: frontendRequest.middleware.headerMetadata,
+      };
+    }
+
+    if (result.response === 'DELETE_FAILURE_WRITE_CONFLICT') {
+      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
+      return {
+        statusCode: 404,
+        headers: frontendRequest.middleware.headerMetadata,
+        body: R.is(String, result.failureMessage) ? { error: result.failureMessage } : result.failureMessage,
       };
     }
 

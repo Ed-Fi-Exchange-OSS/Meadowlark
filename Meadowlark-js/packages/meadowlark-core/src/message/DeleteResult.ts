@@ -14,4 +14,5 @@ export type DeleteResult =
   | DeleteFailureReference
   | { response: 'DELETE_SUCCESS' }
   | { response: 'DELETE_FAILURE_NOT_EXISTS' }
+  | { response: 'DELETE_FAILURE_WRITE_CONFLICT'; failureMessage: string }
   | { response: 'UNKNOWN_FAILURE'; failureMessage: string };

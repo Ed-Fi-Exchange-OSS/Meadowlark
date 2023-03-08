@@ -5,9 +5,10 @@
 
 /* eslint-disable no-underscore-dangle */
 
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { DeleteResult, DeleteRequest, BlockingDocument, DocumentUuid, TraceId } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
+import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, limitFive, onlyReturnId } from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
@@ -112,16 +113,43 @@ export async function deleteDocumentById(deleteRequest: DeleteRequest, client: M
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   try {
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    await session.withTransaction(async () => {
-      deleteResult = await deleteDocumentByIdTransaction(deleteRequest, mongoCollection, session);
-      if (deleteResult.response !== 'DELETE_SUCCESS') {
-        await session.abortTransaction();
-      }
-    });
+
+    const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
+
+    await retry(
+      async () => {
+        await session.withTransaction(async () => {
+          deleteResult = await deleteDocumentByIdTransaction(deleteRequest, mongoCollection, session);
+          if (deleteResult.response !== 'DELETE_SUCCESS') {
+            await session.abortTransaction();
+          }
+        });
+      },
+      {
+        retries: numberOfRetries,
+        onRetry: () => {
+          Logger.warn(
+            `mongoCollection.deleteOne returned Write Conflict error. Document documentUuid ${deleteRequest.documentUuid}. Retrying...`,
+            deleteRequest.traceId,
+          );
+        },
+      },
+    );
   } catch (e) {
     Logger.error('mongodb.repository.Delete.deleteDocumentById', deleteRequest.traceId, e);
+
+    let response: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
+
+    if (e.codeName === 'WriteConflict') {
+      response = {
+        response: 'DELETE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict error returned',
+      };
+    }
+
     await session.abortTransaction();
-    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
+
+    return response;
   } finally {
     await session.endSession();
   }
