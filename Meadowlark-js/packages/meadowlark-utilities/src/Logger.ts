@@ -12,7 +12,7 @@ const timestampFormat: string = 'YYYY-MM-DD HH:mm:ss.SSS';
  * Function to remove sensitive from mongoDb connection string.
  */
 function removeSensitiveDataFromMongoDbConnection(message: string): string {
-  const patternToProtect = /mongodb:\/\/[\w!@#$%\^&*)(+=.-]+:[\w!@#$%\^&*)(+=.-]+@/gis;
+  const patternToProtect = /mongodb:\/\/[\w!@#$%^&*)(+=.-]+:[\w!@#$%^&*)(+=.-]+@/gis;
   const safeReplacementText = 'mongodb://*****:*****@';
   return message.replace(patternToProtect, safeReplacementText);
 }
