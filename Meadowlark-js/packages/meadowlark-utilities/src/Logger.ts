@@ -111,25 +111,20 @@ export const Logger = {
   // Fastify, so long as it continues to have definitions for: fatal, error, warn, info, debug, trace, child.
 
   fatal: (message: string, err?: any | null) => {
-    message = removeSensitiveData(message);
-    logger.error({ message, err: convertErrorToString(err) });
+    logger.error({ message: removeSensitiveData(message), err: convertErrorToString(err) });
     process.exit(1);
   },
   error: (message: string, traceId: string | null, err?: any | null) => {
-    message = removeSensitiveData(message);
-    logger.error({ message, error: convertErrorToString(err), traceId });
+    logger.error({ message: removeSensitiveData(message), error: convertErrorToString(err), traceId });
   },
   warn: (message: string, traceId: string | null) => {
-    message = removeSensitiveData(message);
-    logger.warn({ message, traceId });
+    logger.warn({ message: removeSensitiveData(message), traceId });
   },
   info: (message: string, traceId: string | null, extra?: any | null) => {
-    message = removeSensitiveData(message);
-    logger.info({ message, traceId, extra });
+    logger.info({ message: removeSensitiveData(message), traceId, extra });
   },
   debug: (message: string, traceId: string | null, extra?: any | null) => {
-    message = removeSensitiveData(message);
-    logger.debug({ message, traceId, extra });
+    logger.debug({ message: removeSensitiveData(message), traceId, extra });
   },
   trace: (message: string) => {
     logger.debug({ message: JSON.stringify(message) });
