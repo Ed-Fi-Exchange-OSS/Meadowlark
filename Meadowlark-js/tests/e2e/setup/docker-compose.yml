@@ -25,7 +25,7 @@ services:
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend'
       LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend'
-      MONGO_URL: mongodb://${MONGODB_USER:-mongo}:${MONGODB_PASS:-abcdefgh1!}@mongo-t1:27017/?replicaSet=tr0
+      MONGO_URI: mongodb://${MONGODB_USER:-mongo}:${MONGODB_PASS:-abcdefgh1!}@mongo-t1:27017/?replicaSet=tr0
       FASTIFY_RATE_LIMIT: 'false'
       FASTIFY_PORT: ${FASTIFY_PORT:-3001}
       FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}

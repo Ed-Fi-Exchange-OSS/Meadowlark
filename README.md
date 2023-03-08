@@ -19,6 +19,7 @@ information on the background and design decisions for this project.
 ## Getting Started
 
 * [Running on Localhost](docs/LOCALHOST.md)
+* [Configuration](docs/CONFIGURATION.md)
 * [Developer getting started notes](docs/README.md)
 * [Additional technical details](docs/TECHNICAL.md)
 * [How to Submit an Issue](https://techdocs.ed-fi.org/x/Y8uIBg) (Tech Docs)

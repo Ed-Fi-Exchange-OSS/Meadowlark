@@ -36,8 +36,7 @@ describe('when initializing configuration', () => {
   const CpuCount = os.cpus().length;
   const OAUTH_SIGNING_KEY = 'aGVsbG8gd29yZAo=';
   const DOCUMENT_STORE_PLUGIN = 'a1';
-  const MONGO_LOG_LEVEL = 'a2';
-  const MONGO_URL = 'a3';
+  const MONGO_URI = 'a3';
   const MONGO_WRITE_CONCERN = 'a4';
   const MONGO_READ_CONCERN = 'a5';
   const POSTGRES_HOST = 'a6';
@@ -108,8 +107,7 @@ describe('when initializing configuration', () => {
     process.env.POSTGRES_HOST = POSTGRES_HOST;
     process.env.MONGO_READ_CONCERN = MONGO_READ_CONCERN;
     process.env.MONGO_WRITE_CONCERN = MONGO_WRITE_CONCERN;
-    process.env.MONGO_URL = MONGO_URL;
-    process.env.MONGO_LOG_LEVEL = MONGO_LOG_LEVEL;
+    process.env.MONGO_URI = MONGO_URI;
     process.env.DOCUMENT_STORE_PLUGIN = DOCUMENT_STORE_PLUGIN;
     process.env.OAUTH_SIGNING_KEY = OAUTH_SIGNING_KEY;
     process.env.AUTHORIZATION_STORE_PLUGIN = AUTHORIZATION_STORE_PLUGIN;
@@ -171,8 +169,7 @@ describe('when initializing configuration', () => {
       ['IS_LOCAL', IS_LOCAL],
       ['LOG_LEVEL', LOG_LEVEL],
       ['DOCUMENT_STORE_PLUGIN', DOCUMENT_STORE_PLUGIN],
-      ['MONGO_LOG_LEVEL', MONGO_LOG_LEVEL],
-      ['MONGO_URL', MONGO_URL],
+      ['MONGO_URI', MONGO_URI],
       ['MONGO_WRITE_CONCERN', MONGO_WRITE_CONCERN],
       ['MONGO_READ_CONCERN', MONGO_READ_CONCERN],
       ['POSTGRES_HOST', POSTGRES_HOST],
@@ -217,8 +214,7 @@ describe('when initializing configuration', () => {
 
     beforeAll(async () => {
       setAllValues();
-      process.env.MONGO_LOG_LEVEL = undefined;
-      process.env.MONGO_URL = undefined;
+      process.env.MONGO_URI = undefined;
       process.env.MONGO_WRITE_CONCERN = undefined;
       process.env.MONGO_READ_CONCERN = undefined;
       process.env.POSTGRES_HOST = undefined;
@@ -263,8 +259,7 @@ describe('when initializing configuration', () => {
       ['FASTIFY_PORT', 3000],
       ['IS_LOCAL', true],
       ['LOG_LEVEL', 'info'],
-      ['MONGO_LOG_LEVEL', 'error'],
-      ['MONGO_URL', 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0'],
+      ['MONGO_URI', ''],
       ['MONGO_WRITE_CONCERN', 'majority'],
       ['MONGO_READ_CONCERN', 'majority'],
       ['POSTGRES_HOST', 'localhost'],

@@ -26,6 +26,8 @@ export const setupConfigForIntegration = async () => {
 
   dotenv.config({ path });
 
+  // eslint-disable-next-line no-underscore-dangle
+  process.env.MONGO_URI = global.__MONGO_URI__;
   await Config.initializeConfig(CachedEnvironmentConfigProvider);
 
   hasRunAlready = true;

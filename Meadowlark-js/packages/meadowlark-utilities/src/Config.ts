@@ -23,8 +23,7 @@ export type ConfigKeys =
   | 'ALLOW__EXT_PROPERTY'
   | 'FASTIFY_NUM_THREADS'
   | 'MEADOWLARK_DATABASE_NAME'
-  | 'MONGO_URL'
-  | 'MONGO_LOG_LEVEL'
+  | 'MONGO_URI'
   | 'MONGO_WRITE_CONCERN'
   | 'MONGO_READ_CONCERN'
   | 'OPENSEARCH_ENDPOINT'
@@ -98,13 +97,12 @@ export async function initializeConfig(provider: ConfigPlugin) {
     'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES',
     await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES', 1000),
   );
-  set('AUTHORIZATION_STORE_PLUGIN', await provider.getString('AUTHORIZATION_STORE_PLUGIN', ThrowIfNotFound));
-  set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', ThrowIfNotFound));
-  set('MONGO_LOG_LEVEL', await provider.getString('MONGO_LOG_LEVEL', 'error'));
   set(
-    'MONGO_URL',
-    await provider.getString('MONGO_URL', 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0'),
+    'AUTHORIZATION_STORE_PLUGIN',
+    await provider.getString('AUTHORIZATION_STORE_PLUGIN', '@edfi/meadowlark-mongodb-backend'),
   );
+  set('DOCUMENT_STORE_PLUGIN', await provider.getString('DOCUMENT_STORE_PLUGIN', '@edfi/meadowlark-mongodb-backend'));
+  set('MONGO_URI', await provider.getString('MONGO_URI', ''));
   set('MONGO_WRITE_CONCERN', await provider.getString('MONGO_WRITE_CONCERN', 'majority'));
   set('MONGO_READ_CONCERN', await provider.getString('MONGO_READ_CONCERN', 'majority'));
 
