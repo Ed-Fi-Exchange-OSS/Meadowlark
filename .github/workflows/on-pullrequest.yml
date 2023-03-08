@@ -213,7 +213,6 @@ jobs:
           echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3000/local/oauth/token >> .env
           echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3000/local/oauth/verify >> .env
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
-          echo MONGO_URI=mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0 >> .env
 
       - name: Run ${{matrix.tests.type}} Tests
         run: ${{matrix.tests.command}}
