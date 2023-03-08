@@ -259,7 +259,7 @@ describe('when initializing configuration', () => {
       ['FASTIFY_PORT', 3000],
       ['IS_LOCAL', true],
       ['LOG_LEVEL', 'info'],
-      ['MONGO_URI', 'mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0'],
+      ['MONGO_URI', ''],
       ['MONGO_WRITE_CONCERN', 'majority'],
       ['MONGO_READ_CONCERN', 'majority'],
       ['POSTGRES_HOST', 'localhost'],
