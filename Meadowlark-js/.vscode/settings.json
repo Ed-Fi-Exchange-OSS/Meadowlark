@@ -98,5 +98,9 @@
       "markdown",
       "batch"
     ]
-  }
+  },
+  "jest.autoRun": {
+    "watch": false
+  },
+  "jest.jestCommandLine": "\"./node_modules/.bin/jest\" --runInBand",
 }
