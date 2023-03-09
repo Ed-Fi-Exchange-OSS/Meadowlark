@@ -173,7 +173,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
         retries: numberOfRetries,
         onRetry: () => {
           Logger.warn(
-            `mongoCollection.replaceOne returned Write Conflict error. Document meadowlarkId ${upsertRequest.meadowlarkId}. Retrying...`,
+            `${moduleName}.upsertDocument got write conflict error for meadowlarkId ${upsertRequest.meadowlarkId}. Retrying...`,
             upsertRequest.traceId,
           );
         },
@@ -183,6 +183,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
     await session.abortTransaction();
 
+    // If this is a MongoError, it has a codeName
     if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPSERT_FAILURE_WRITE_CONFLICT',

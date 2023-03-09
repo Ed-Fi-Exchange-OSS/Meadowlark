@@ -13,6 +13,8 @@ import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, limitFive, onlyReturnId } from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
 
+const moduleName: string = 'mongodb.repository.Delete';
+
 /**
  * Checks for any existing references to the document. If found, provide a DeleteResult with information on the errors.
  *
@@ -44,7 +46,7 @@ async function checkForReferencesToDocument(
 
   // Abort on validation failure
   Logger.debug(
-    `mongodb.repository.Delete.checkForReferencesToDocument: Deleting document uuid ${documentUuid} failed due to existing references`,
+    `${moduleName}.checkForReferencesToDocument: Deleting document uuid ${documentUuid} failed due to existing references`,
     traceId,
   );
 
@@ -85,17 +87,14 @@ export async function deleteDocumentByIdTransaction(
   }
 
   // Perform the document delete
-  Logger.debug(
-    `mongodb.repository.Delete.deleteDocumentByIdTransaction: Deleting document documentUuid ${documentUuid}`,
-    traceId,
-  );
+  Logger.debug(`${moduleName}.deleteDocumentByIdTransaction: Deleting document documentUuid ${documentUuid}`, traceId);
 
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
 
   if (!acknowledged) {
     const msg =
       'mongoCollection.deleteOne returned acknowledged: false, indicating a problem with write concern configuration';
-    Logger.error('mongodb.repository.Delete.deleteDocumentByIdTransaction', traceId, msg);
+    Logger.error(`${moduleName}.deleteDocumentByIdTransaction`, traceId, msg);
     return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   }
 
@@ -129,17 +128,18 @@ export async function deleteDocumentById(deleteRequest: DeleteRequest, client: M
         retries: numberOfRetries,
         onRetry: () => {
           Logger.warn(
-            `mongoCollection.deleteOne returned Write Conflict error. Document documentUuid ${deleteRequest.documentUuid}. Retrying...`,
+            `${moduleName}.deleteDocumentById got write conflict error for documentUuid ${deleteRequest.documentUuid}. Retrying...`,
             deleteRequest.traceId,
           );
         },
       },
     );
   } catch (e) {
-    Logger.error('mongodb.repository.Delete.deleteDocumentById', deleteRequest.traceId, e);
+    Logger.error(`${moduleName}.deleteDocumentById`, deleteRequest.traceId, e);
 
     let response: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
 
+    // If this is a MongoError, it has a codeName
     if (e.codeName === 'WriteConflict') {
       response = {
         response: 'DELETE_FAILURE_WRITE_CONFLICT',
