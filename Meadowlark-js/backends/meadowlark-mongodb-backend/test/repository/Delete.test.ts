@@ -9,9 +9,12 @@ describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;
   let mongoClienttMock = {};
   let deleteOneMock = jest.fn();
+  const error = {
+    codeName: 'WriteConflict',
+  };
 
   beforeAll(() => {
-    deleteOneMock = jest.fn().mockImplementation(async () => Promise.reject(new Error('[MongoServerError: WriteConflict]')));
+    deleteOneMock = jest.fn().mockImplementation(async () => Promise.reject(error));
 
     jest.spyOn(DB, 'getDocumentCollection').mockReturnValue({
       deleteOne: deleteOneMock,
