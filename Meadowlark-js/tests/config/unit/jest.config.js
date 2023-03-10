@@ -6,7 +6,6 @@ module.exports = {
   ...defaultConfig,
   testMatch: ['<rootDir>/**/*.(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ["integration|e2e"],
-  collectCoverageFrom: ['<rootDir>/packages/**/src/**/*.ts', '<rootDir>/backends/**/src/**/*.ts', '<rootDir>/services/**/src/**/*.ts'],
   coverageThreshold: {
     global: {
       branches: 52,
