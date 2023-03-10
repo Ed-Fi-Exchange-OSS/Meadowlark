@@ -6,5 +6,4 @@ module.exports = {
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['dotenv/config'],
   rootDir: '../../..',
-  workerIdleMemoryLimit: '200MB',
 };

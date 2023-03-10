@@ -6,4 +6,13 @@ module.exports = {
   ...defaultConfig,
   testMatch: ['<rootDir>/**/*.(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ["integration|e2e"],
+  coverageThreshold: {
+    global: {
+      branches: 52,
+      functions: 58,
+      lines: 60,
+      statements: 60,
+    },
+  },
+  workerIdleMemoryLimit: '200MB',
 }

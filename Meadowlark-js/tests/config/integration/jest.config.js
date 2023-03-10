@@ -7,4 +7,14 @@ module.exports = {
   ...defaultConfig,
   preset: '@shelf/jest-mongodb',
   testMatch: ['<rootDir>/**/integration/**/*.(spec|test).[jt]s?(x)'],
+  watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
+  coverageThreshold: {
+    global: {
+      branches: 52,
+      functions: 58,
+      lines: 60,
+      statements: 60,
+    },
+  },
+  workerIdleMemoryLimit: '200MB',
 }
