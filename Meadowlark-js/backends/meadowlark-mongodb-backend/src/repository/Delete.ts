@@ -113,7 +113,7 @@ export async function deleteDocumentById(deleteRequest: DeleteRequest, client: M
   try {
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 
-    const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
+    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES') ?? 1;
 
     await retry(
       async () => {

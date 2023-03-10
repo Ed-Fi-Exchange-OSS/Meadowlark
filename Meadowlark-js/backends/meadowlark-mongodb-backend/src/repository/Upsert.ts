@@ -158,7 +158,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
   try {
-    const numberOfRetries: number = Config.get('MAX_NUMBER_OF_RETRIES') ?? 1;
+    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES') ?? 1;
 
     await retry(
       async () => {

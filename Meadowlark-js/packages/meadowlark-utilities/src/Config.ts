@@ -47,7 +47,7 @@ export type ConfigKeys =
   | 'FASTIFY_RATE_LIMIT'
   | 'HTTP_PROTOCOL_AND_SERVER'
   | 'DISABLE_LOG_ANONYMIZATION'
-  | 'MAX_NUMBER_OF_RETRIES';
+  | 'MONGODB_MAX_NUMBER_OF_RETRIES';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -157,5 +157,5 @@ export async function initializeConfig(provider: ConfigPlugin) {
 
   set('BEGIN_ALLOWED_SCHOOL_YEAR', await provider.getInt('BEGIN_ALLOWED_SCHOOL_YEAR', 1900));
   set('END_ALLOWED_SCHOOL_YEAR', await provider.getInt('END_ALLOWED_SCHOOL_YEAR', 2100));
-  set('MAX_NUMBER_OF_RETRIES', await provider.getInt('MAX_NUMBER_OF_RETRIES', 1));
+  set('MONGODB_MAX_NUMBER_OF_RETRIES', await provider.getInt('MONGODB_MAX_NUMBER_OF_RETRIES', 1));
 }
