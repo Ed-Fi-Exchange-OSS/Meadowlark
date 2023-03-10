@@ -2,7 +2,7 @@
 const defaultConfig = require('./../jest.config.js');
 
 module.exports = {
-  displayName: "E2E Tests",
+  displayName: 'E2E Tests',
   ...defaultConfig,
   testMatch: ['<rootDir>/**/e2e/**/*.(spec|test).[jt]s?(x)'],
   globalSetup: './tests/e2e/setup/Setup.ts',
@@ -16,4 +16,4 @@ module.exports = {
     },
   },
   workerIdleMemoryLimit: '200MB',
-}
+};
