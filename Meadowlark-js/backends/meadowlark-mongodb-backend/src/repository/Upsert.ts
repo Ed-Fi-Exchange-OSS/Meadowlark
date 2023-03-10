@@ -187,7 +187,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPSERT_FAILURE_WRITE_CONFLICT',
-        failureMessage: 'Write conflict error returned',
+        failureMessage: 'Write conflict due to concurrent access to this or related resources',
       };
     }
 

@@ -77,7 +77,7 @@ describe('given persistence is going to throw a reference error on insert', () =
 describe('given upsert has write conflict failure', () => {
   let response: FrontendResponse;
   let mockDocumentStore: any;
-  const expectedError = 'Write conflict error returned';
+  const expectedError = 'Write conflict due to concurrent access to this or related resources';
 
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
@@ -104,7 +104,7 @@ describe('given upsert has write conflict failure', () => {
   it('has a failure message', () => {
     expect(response.body).toMatchInlineSnapshot(`
       {
-        "error": "Write conflict error returned",
+        "error": "Write conflict due to concurrent access to this or related resources",
       }
     `);
   });

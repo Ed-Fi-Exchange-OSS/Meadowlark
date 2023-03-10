@@ -143,7 +143,7 @@ export async function deleteDocumentById(deleteRequest: DeleteRequest, client: M
     if (e.codeName === 'WriteConflict') {
       response = {
         response: 'DELETE_FAILURE_WRITE_CONFLICT',
-        failureMessage: 'Write conflict error returned',
+        failureMessage: 'Write conflict due to concurrent access to this or related resources',
       };
     }
 

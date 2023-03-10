@@ -62,7 +62,7 @@ describe('given delete has write conflict failure', () => {
       deleteDocumentById: async () =>
         Promise.resolve({
           response: 'DELETE_FAILURE_WRITE_CONFLICT',
-          failureMessage: 'Write conflict error returned',
+          failureMessage: 'Write conflict due to concurrent access to this or related resources',
         }),
     });
 
@@ -81,7 +81,7 @@ describe('given delete has write conflict failure', () => {
   it('has a failure message', () => {
     expect(response.body).toMatchInlineSnapshot(`
       {
-        "error": "Write conflict error returned",
+        "error": "Write conflict due to concurrent access to this or related resources",
       }
     `);
   });

@@ -110,7 +110,7 @@ describe('given the new document has an invalid reference ', () => {
 
 describe('given update has write conflict failure', () => {
   let mockDocumentStore: any;
-  const expectedError = 'Write conflict error returned';
+  const expectedError = 'Write conflict due to concurrent access to this or related resources';
   let response: FrontendResponse;
 
   beforeAll(async () => {
@@ -138,7 +138,7 @@ describe('given update has write conflict failure', () => {
   it('has a failure message', () => {
     expect(response.body).toMatchInlineSnapshot(`
       {
-        "error": "Write conflict error returned",
+        "error": "Write conflict due to concurrent access to this or related resources",
       }
     `);
   });
