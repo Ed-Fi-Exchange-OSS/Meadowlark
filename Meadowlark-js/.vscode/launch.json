@@ -42,6 +42,17 @@
     },
     {
       "type": "node",
+      "name": "vscode-jest-tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceRoot}/node_modules/jest-cli/bin/jest.js",
+      "args": [
+        "jest",
+        "--runInBand",
+      ]
+    },
+    {
+      "type": "node",
       "name": "MongoDb Integration Tests",
       "request": "launch",
       "console": "integratedTerminal",
