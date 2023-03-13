@@ -108,6 +108,42 @@ describe('given the new document has an invalid reference ', () => {
   });
 });
 
+describe('given update has write conflict failure', () => {
+  let mockDocumentStore: any;
+  const expectedError = 'Write conflict due to concurrent access to this or related resources';
+  let response: FrontendResponse;
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      updateDocumentById: async () =>
+        Promise.resolve({
+          response: 'UPDATE_FAILURE_WRITE_CONFLICT',
+          failureMessage: expectedError,
+        }),
+    });
+
+    // Act
+    response = await update(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
+  });
+
+  it('has a failure message', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Write conflict due to concurrent access to this or related resources",
+      }
+    `);
+  });
+});
+
 describe('given the update succeeds', () => {
   let mockDocumentStore: any;
   let response: FrontendResponse;

@@ -14,7 +14,8 @@ import {
   DocumentUuid,
   generateDocumentUuid,
 } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
+import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { writeLockReferencedDocuments, asUpsert, limitFive, getDocumentCollection, onlyReturnDocumentUuid } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
@@ -157,15 +158,39 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
   try {
-    await session.withTransaction(async () => {
-      upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, session);
-      if (upsertResult.response !== 'UPDATE_SUCCESS' && upsertResult.response !== 'INSERT_SUCCESS') {
-        await session.abortTransaction();
-      }
-    });
+    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES');
+
+    await retry(
+      async () => {
+        await session.withTransaction(async () => {
+          upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, session);
+          if (upsertResult.response !== 'UPDATE_SUCCESS' && upsertResult.response !== 'INSERT_SUCCESS') {
+            await session.abortTransaction();
+          }
+        });
+      },
+      {
+        retries: numberOfRetries,
+        onRetry: () => {
+          Logger.warn(
+            `${moduleName}.upsertDocument got write conflict error for meadowlarkId ${upsertRequest.meadowlarkId}. Retrying...`,
+            upsertRequest.traceId,
+          );
+        },
+      },
+    );
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
     await session.abortTransaction();
+
+    // If this is a MongoError, it has a codeName
+    if (e.codeName === 'WriteConflict') {
+      return {
+        response: 'UPSERT_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict due to concurrent access to this or related resources',
+      };
+    }
+
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();

@@ -6,8 +6,9 @@
 /* eslint-disable no-underscore-dangle */
 
 import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
+import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, limitFive, onlyReturnId, writeLockReferencedDocuments } from './Db';
 import { deleteDocumentByIdTransaction } from './Delete';
@@ -254,21 +255,47 @@ async function checkForInvalidReferences(
   };
 }
 
+async function updateDocumentByIdTransaction(
+  updateRequest: UpdateRequest,
+  mongoCollection: Collection<MeadowlarkDocument>,
+  session: ClientSession,
+): Promise<UpdateResult> {
+  const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
+    updateRequest;
+
+  if (validateDocumentReferencesExist) {
+    const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
+      updateRequest,
+      mongoCollection,
+      session,
+    );
+    if (invalidReferenceResult !== null) {
+      return invalidReferenceResult;
+    }
+  }
+
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+    resourceInfo,
+    documentInfo,
+    documentUuid,
+    meadowlarkId,
+    edfiDoc,
+    validateDocumentReferencesExist,
+    security.clientId,
+  );
+
+  if (resourceInfo.allowIdentityUpdates) {
+    return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
+  }
+  return updateDisallowingIdentityChange(document, updateRequest, mongoCollection, session);
+}
+
 /**
  * Takes an UpdateRequest and MongoClient from the BackendFacade and performs an update by documentUuid
  * and returns the UpdateResult.
  */
 export async function updateDocumentById(updateRequest: UpdateRequest, client: MongoClient): Promise<UpdateResult> {
-  const {
-    meadowlarkId,
-    documentUuid,
-    resourceInfo,
-    documentInfo,
-    edfiDoc,
-    validateDocumentReferencesExist,
-    traceId,
-    security,
-  } = updateRequest;
+  const { documentUuid, traceId } = updateRequest;
   Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
@@ -276,42 +303,39 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: M
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    await session.withTransaction(async () => {
-      if (validateDocumentReferencesExist) {
-        const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
-          updateRequest,
-          mongoCollection,
-          session,
-        );
-        if (invalidReferenceResult !== null) {
-          updateResult = invalidReferenceResult;
-          return; // exit transaction block
-        }
-      }
+    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES');
 
-      const document: MeadowlarkDocument = meadowlarkDocumentFrom(
-        resourceInfo,
-        documentInfo,
-        documentUuid,
-        meadowlarkId,
-        edfiDoc,
-        validateDocumentReferencesExist,
-        security.clientId,
-      );
-
-      if (resourceInfo.allowIdentityUpdates) {
-        updateResult = await updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
-      } else {
-        updateResult = await updateDisallowingIdentityChange(document, updateRequest, mongoCollection, session);
-      }
-
-      if (updateResult.response !== 'UPDATE_SUCCESS') {
-        await session.abortTransaction();
-      }
-    });
+    await retry(
+      async () => {
+        await session.withTransaction(async () => {
+          updateResult = await updateDocumentByIdTransaction(updateRequest, mongoCollection, session);
+          if (updateResult.response !== 'UPDATE_SUCCESS') {
+            await session.abortTransaction();
+          }
+        });
+      },
+      {
+        retries: numberOfRetries,
+        onRetry: () => {
+          Logger.warn(
+            `${moduleName}.updateDocumentById got write conflict error for documentUuid ${updateRequest.documentUuid}. Retrying...`,
+            updateRequest.traceId,
+          );
+        },
+      },
+    );
   } catch (e) {
     Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
     await session.abortTransaction();
+
+    // If this is a MongoError, it has a codeName
+    if (e.codeName === 'WriteConflict') {
+      return {
+        response: 'UPDATE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict due to concurrent access to this or related resources.',
+      };
+    }
+
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();

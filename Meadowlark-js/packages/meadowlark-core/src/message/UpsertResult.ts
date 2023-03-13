@@ -16,4 +16,5 @@ export type UpsertResult =
   | UpsertFailureBlocked
   | { response: 'INSERT_SUCCESS'; failureMessage?: string | object; newDocumentUuid: DocumentUuid }
   | { response: 'UPDATE_SUCCESS'; failureMessage?: string | object; existingDocumentUuid: DocumentUuid }
+  | { response: 'UPSERT_FAILURE_WRITE_CONFLICT'; failureMessage?: string | object }
   | { response: 'UNKNOWN_FAILURE'; failureMessage?: string | object };

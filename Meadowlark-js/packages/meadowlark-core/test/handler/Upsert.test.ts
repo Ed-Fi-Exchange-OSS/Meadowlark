@@ -74,6 +74,42 @@ describe('given persistence is going to throw a reference error on insert', () =
   });
 });
 
+describe('given upsert has write conflict failure', () => {
+  let response: FrontendResponse;
+  let mockDocumentStore: any;
+  const expectedError = 'Write conflict due to concurrent access to this or related resources';
+
+  beforeAll(async () => {
+    mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      upsertDocument: async () =>
+        Promise.resolve({
+          response: 'UPSERT_FAILURE_WRITE_CONFLICT',
+          failureMessage: expectedError,
+        }),
+    });
+
+    // Act
+    response = await upsert(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockDocumentStore.mockRestore();
+  });
+
+  it('returns status 409', () => {
+    expect(response.statusCode).toEqual(409);
+  });
+
+  it('has a failure message', () => {
+    expect(response.body).toMatchInlineSnapshot(`
+      {
+        "error": "Write conflict due to concurrent access to this or related resources",
+      }
+    `);
+  });
+});
+
 describe('given persistence is going to throw a conflict error on insert', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: BlockingDocument = {
