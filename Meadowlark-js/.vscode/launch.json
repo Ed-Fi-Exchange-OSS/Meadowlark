@@ -50,7 +50,7 @@
         "jest",
         "--runInBand",
         "--config",
-        "${workspaceRoot}\\jest.integration-config.js",
+        "${workspaceRoot}\\tests\\config\\integration\\jest.config.js",
         "backends/meadowlark-mongodb-backend/test/integration"
       ]
     }
