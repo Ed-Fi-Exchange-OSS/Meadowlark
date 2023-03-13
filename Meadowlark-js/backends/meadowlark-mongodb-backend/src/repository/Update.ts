@@ -303,7 +303,7 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: M
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   try {
-    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES') ?? 1;
+    const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES');
 
     await retry(
       async () => {

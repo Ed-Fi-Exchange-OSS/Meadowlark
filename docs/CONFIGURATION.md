@@ -55,7 +55,7 @@ release 0.3.0.
 | -------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | MEADOWLARK_DATABASE_NAME   | meadowlark | For both MongoDB and PostgreSQL                                                                                                        |
 | **MONGO_URI**                  | (none)     | [Connection string URI](https://www.mongodb.com/docs/v4.0/reference/connection-string/) for accessing a MongoDB 4.0-compatible service |
-| MONGODB_MAX_NUMBER_OF_RETRIES  | 1     | Meadowlark can be configured to retry on MongoDB failure, for example when two concurrent transactions attempt to access the same resource. By default, Meadowlark will retry once. This can be changed with the MAX_NUMBER_OF_RETRIES environment variable. |
+| MONGODB_MAX_NUMBER_OF_RETRIES  | 1     | Meadowlark can be configured to retry on MongoDB failure, for example when two concurrent transactions attempt to access the same resource. By default, Meadowlark will retry once. This can be changed with the MONGODB_MAX_NUMBER_OF_RETRIES environment variable. |
 | MONGO_WRITE_CONCERN        | majority   | See [MongoDB: Write Concern](https://www.mongodb.com/docs/v4.0/reference/write-concern/)                                               |
 | MONGO_READ_CONCERN         | majority   | See [MongoDB: Read Concern](https://www.mongodb.com/docs/v4.0/reference/read-concern/)                                                 |
 | **OPENSEARCH_ENDPOINT**    | (none)     | Only required when the OpenSearch listener is configured for Fastify. Example: "http://localhost:9200"                                 |
