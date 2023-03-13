@@ -5,7 +5,7 @@ module.exports = {
       skipMD5: true,
     },
     autoStart: false,
-    instance: {},
+    instance: { dbName: 'meadowlark' },
     replSet: {
       count: 3,
       storageEngine: 'wiredTiger',
