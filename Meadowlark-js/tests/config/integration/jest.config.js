@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const defaultConfig = require('./../jest.config.js');
-const { defaults: tsjPreset } = require('ts-jest/presets');
 
 module.exports = {
   displayName: 'Integration Tests',
@@ -17,4 +16,4 @@ module.exports = {
     },
   },
   workerIdleMemoryLimit: '200MB',
-}
+};
