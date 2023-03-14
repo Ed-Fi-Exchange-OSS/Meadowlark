@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+name: On Pre-Release
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Name'
+        required: false
+        default: 'Name'
+  # release:
+  #   types:
+  #     - prereleased
+
+env:
+  # GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
+  ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
+
+jobs:
+  publish:
+    name: Publish Meadowlark mongodb
+    runs-on: ubuntu-latest
+    outputs:
+      hash-code: ${{ steps.hash-code.outputs.hash-code }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+
+      - name: Create .npmrc file for mongodb.
+        run: |
+          touch ./backends/meadowlark-mongodb-backend/.npmrc
+          echo registry=https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/  >> .npmrc
+          echo ; begin auth token >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=${{ env.ARTIFACTS_API_KEY | base64 -w 0 }} >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=npm requires email to be set but doesn't use the value >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:username=ed-fi-alliance >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:_password=${{ env.ARTIFACTS_API_KEY | base64 -w 0 }} >> .npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:email=npm requires email to be set but doesn't use the value >> .npmrc
+          echo ; end auth token >> .npmrc
+
+      - name: Setup Node
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        with:
+          node-version: "16"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Node modules cache
+        id: modules-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        working-directory: Meadowlark-js
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: npm install
+
+      - name: Load prior build from cache if available
+        id: build-cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: "**/dist/**"
+          key: ${{ runner.os }}-build-${{ hashFiles('**/dist/**') }}
+
+      - name: Build Typescript
+        working-directory: Meadowlark-js
+        if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
+        run: npm run build
+
+      - name: Publish
+        working-directory: Meadowlark-js/backends/meadowlark-mongodb-backend
+        run: npm publish
