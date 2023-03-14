@@ -5,7 +5,7 @@
 import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment } from 'testcontainers';
 import dotenv from 'dotenv';
-import { Logger } from 'packages/meadowlark-utilities';
+import { Logger } from '@edfi//meadowlark-utilities';
 
 const containerName = 'opensearch-integration-test';
 const envFilePath = path.join(__dirname, '.env');
