@@ -12,11 +12,12 @@ import { getOpenSearchClient } from '../../src/repository/Db';
 const containerName = 'opensearch-integration-test';
 const envFilePath = path.join(__dirname, '.env');
 const moduleName = 'opensearch.repository.Db';
+const port = 8200;
 let environment: StartedDockerComposeEnvironment;
+let host: string;
 dotenv.config({ path: envFilePath });
 
 export async function start() {
-  const port = 8200;
   const composeFile = 'docker-compose.yml';
   const composeFilePath = path.resolve(__dirname, './');
   Logger.info('-- Setup OpenSearch environment --', null);
@@ -25,7 +26,7 @@ export async function start() {
     .withStartupTimeout(120_000)
     .up();
   const container = await environment.getContainer(containerName);
-  const host = await container.getHost();
+  host = await container.getHost();
   process.env.OPENSEARCH_ENDPOINT = `http://${host}:${port}`;
   process.env.OPENSEARCH_USERNAME = 'admin';
   process.env.OPENSEARCH_PASSWORD = 'admin';
@@ -42,8 +43,10 @@ export async function stop() {
  */
 export async function getNewTestClient(): Promise<Client> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
-  const node = process.env.OPENSEARCH_ENDPOINT ?? '';
-  const auth = { username: process.env.OPENSEARCH_USERNAME ?? '', password: process.env.OPENSEARCH_PASSWORD ?? '' };
-  const requestTimeout = Number(process.env.OPENSEARCH_REQUEST_TIMEOUT ?? '3000');
+  const username = 'admin';
+  const password = 'admin';
+  const node = process.env.OPENSEARCH_ENDPOINT;
+  const auth = { username, password };
+  const requestTimeout = 10000;
   return getOpenSearchClient(node, auth, requestTimeout);
 }
