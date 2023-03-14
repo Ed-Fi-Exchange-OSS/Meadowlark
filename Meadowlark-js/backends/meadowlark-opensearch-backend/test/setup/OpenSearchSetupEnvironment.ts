@@ -6,9 +6,12 @@ import path from 'path';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment } from 'testcontainers';
 import dotenv from 'dotenv';
 import { Logger } from '@edfi//meadowlark-utilities';
+import { Client } from '@opensearch-project/opensearch/.';
+import { getOpenSearchClient } from '../../src/repository/Db';
 
 const containerName = 'opensearch-integration-test';
 const envFilePath = path.join(__dirname, '.env');
+const moduleName = 'opensearch.repository.Db';
 let environment: StartedDockerComposeEnvironment;
 dotenv.config({ path: envFilePath });
 
@@ -32,4 +35,15 @@ export async function start() {
 export async function stop() {
   Logger.info('-- Tearing down OpenSearch environment --', null);
   await environment.getContainer(containerName).stop();
+}
+
+/**
+ * Create and return an OpenSearch connection object
+ */
+export async function getNewTestClient(): Promise<Client> {
+  Logger.debug(`${moduleName}.getNewClient creating local client`, null);
+  const node = process.env.OPENSEARCH_ENDPOINT ?? '';
+  const auth = { username: process.env.OPENSEARCH_USERNAME ?? '', password: process.env.OPENSEARCH_PASSWORD ?? '' };
+  const requestTimeout = Number(process.env.OPENSEARCH_REQUEST_TIMEOUT ?? '3000');
+  return getOpenSearchClient(node, auth, requestTimeout);
 }
