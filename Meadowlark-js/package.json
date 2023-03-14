@@ -3,6 +3,7 @@
   "description": "The Ed-Fi Meadowlark project",
   "private": true,
   "devDependencies": {
+    "@shelf/jest-mongodb": "^4.1.6",
     "@types/eslint": "^8.4.10",
     "@types/jest": "^29.4.1",
     "@types/node": "16.18.3",
@@ -22,6 +23,7 @@
     "jest": "^29.5.0",
     "jest-environment-node": "^29.2.2",
     "lerna": "^6.0.2",
+    "mongodb": "^4.11.0",
     "pg": "^8.8.0",
     "pg-format": "^1.0.4",
     "prettier": "2.7.1",
