@@ -27,7 +27,6 @@ import {
   afterUpdateDocumentById,
   afterUpsertDocument,
 } from '../../src/repository/UpdateOpensearch';
-import { setupOpenSearch, teardownOpenSearch } from '../setup/OpenSearchSetup';
 
 jest.setTimeout(120_000);
 
@@ -77,12 +76,7 @@ describe('given the upsert of a new document', () => {
   let client: Client;
 
   beforeAll(async () => {
-    await setupOpenSearch();
     client = await getNewClient();
-  });
-
-  afterAll(async () => {
-    await teardownOpenSearch();
   });
 
   describe('when insert was successful', () => {

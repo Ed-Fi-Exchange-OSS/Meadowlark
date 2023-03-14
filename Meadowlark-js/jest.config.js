@@ -3,6 +3,7 @@ module.exports = {
     '<rootDir>/tests/config/unit/jest.config.js',
     '<rootDir>/tests/config/integration/jest.config.js',
     '<rootDir>/tests/config/e2e/jest.config.js',
+    '<rootDir>/backends/meadowlark-opensearch-backend/test/jest.config.js',
   ],
   coverageThreshold: {
     global: {

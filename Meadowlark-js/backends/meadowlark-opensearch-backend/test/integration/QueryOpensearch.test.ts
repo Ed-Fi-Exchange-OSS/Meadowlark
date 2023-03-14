@@ -21,7 +21,6 @@ import { Client } from '@opensearch-project/opensearch/.';
 import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
 import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateOpensearch';
-import { setupOpenSearch, teardownOpenSearch } from '../setup/OpenSearchSetup';
 
 jest.setTimeout(120_000);
 
@@ -91,7 +90,6 @@ describe('When querying for documents', () => {
   let client: Client;
 
   beforeAll(async () => {
-    await setupOpenSearch();
     client = await getNewClient();
 
     await afterUpsertDocument(
@@ -126,8 +124,6 @@ describe('When querying for documents', () => {
       { response: 'DELETE_SUCCESS' } as DeleteResult,
       client,
     );
-
-    await teardownOpenSearch();
   });
 
   describe('when querying with parameters', () => {

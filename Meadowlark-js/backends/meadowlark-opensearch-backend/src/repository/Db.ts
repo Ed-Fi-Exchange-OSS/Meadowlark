@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Client, ClientOptions } from '@opensearch-project/opensearch';
-import { Config, Logger } from '@edfi/meadowlark-utilities';
+import { Logger } from '@edfi/meadowlark-utilities';
 
 let singletonClient: Client | null = null;
 
@@ -15,11 +15,10 @@ const moduleName = 'opensearch.repository.Db';
  */
 export async function getNewClient(): Promise<Client> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
-
   const clientOpts: ClientOptions = {
-    node: Config.get<string>('OPENSEARCH_ENDPOINT'),
-    auth: { username: Config.get<string>('OPENSEARCH_USERNAME'), password: Config.get<string>('OPENSEARCH_PASSWORD') },
-    requestTimeout: Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT'),
+    node: process.env.OPENSEARCH_ENDPOINT,
+    auth: { username: process.env.OPENSEARCH_USERNAME ?? '', password: process.env.OPENSEARCH_PASSWORD ?? '' },
+    requestTimeout: Number(process.env.OPENSEARCH_REQUEST_TIMEOUT ?? '3000'),
     /* Might need to setup SSL here in the future */
   };
 
