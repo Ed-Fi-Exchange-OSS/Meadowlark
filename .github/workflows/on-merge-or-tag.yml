@@ -19,7 +19,7 @@ on:
 
 env:
   API_URL: https://api.github.com/repos/${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.EDFI_BUILD_AGENT_PAT }}
+  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 jobs:
   create-pre-releases:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create Meadowlark Pre-Release
         run: |
-          $version = ${{ github.event.inputs.version }}
+          $version = "${{ github.event.inputs.version }}"
           $tag = $version -replace "v","Pre-Release-v"
           $body = @{
             tag_name = "$tag"
