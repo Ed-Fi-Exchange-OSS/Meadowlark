@@ -5,6 +5,7 @@
 
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
+import * as MeadowlarkConnection from '../../src/handler/MeadowlarkConnection';
 import { buildService } from '../../src/Service';
 import { setupMockConfiguration } from '../ConfigHelper';
 
@@ -28,6 +29,7 @@ describe('given a POST to request a new token', () => {
   beforeAll(async () => {
     setupMockConfiguration();
     mockUpsert = jest.spyOn(AuthorizationServer, 'requestToken');
+    jest.spyOn(MeadowlarkConnection, 'closeMeadowlarkConnection').mockResolvedValue();
     service = buildService();
     await service.ready();
 
