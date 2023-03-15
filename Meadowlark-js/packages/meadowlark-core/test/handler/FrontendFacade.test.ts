@@ -7,48 +7,70 @@ import { initializeLogging } from '@edfi/meadowlark-utilities';
 import { get } from '../../src/handler/FrontendFacade';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { setupMockConfiguration } from '../ConfigHelper';
+import * as AuthorizationMiddleware from '../../src/middleware/AuthorizationMiddleware';
+import * as PluginLoader from '../../src/plugin/PluginLoader';
+import type { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
+import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d';
 
-describe('given there is no resourceId in a get request', () => {
-  const request: FrontendRequest = { ...newFrontendRequest(), path: '/1/2/3' };
+describe('given environment is set', () => {
+  let middlewareMock: any;
 
   beforeAll(async () => {
     setupMockConfiguration();
     initializeLogging();
 
-    // Act
-    await get(request);
+    jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(NoDocumentStorePlugin);
+  });
+
+  afterEach(() => {
+    middlewareMock.mockClear();
   });
 
   afterAll(() => {
     jest.restoreAllMocks();
   });
 
-  it('sets the action to query', () => {
-    expect(request.action).toEqual('query');
-  });
-});
+  describe('given there is no resourceId in a get request', () => {
+    const frontendRequest: FrontendRequest = { ...newFrontendRequest(), path: '/1/2/3' };
 
-describe('given there is a resourceId in a get request', () => {
-  const request: FrontendRequest = {
-    ...newFrontendRequest(),
-    path: `/1/2/3/${documentUuid}`,
-  };
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: { statusCode: 200 },
+      };
 
-  beforeAll(async () => {
-    setupMockConfiguration();
-    initializeLogging();
+      middlewareMock = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
 
-    // Act
-    await get(request);
-  });
+      // Act
+      await get(frontendRequest);
+    });
 
-  afterAll(() => {
-    jest.restoreAllMocks();
+    it('sets the action to query', () => {
+      expect(frontendRequest.action).toEqual('query');
+    });
   });
 
-  it('sets the action to getById', () => {
-    expect(request.action).toEqual('getById');
+  describe('given there is a resourceId in a get request', () => {
+    const frontendRequest = {
+      ...newFrontendRequest(),
+      path: `/1/2/3/${documentUuid}`,
+    };
+
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: { statusCode: 200 },
+      };
+
+      middlewareMock = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
+      // Act
+      await get(frontendRequest);
+    });
+
+    it('sets the action to getById', () => {
+      expect(frontendRequest.action).toEqual('getById');
+    });
   });
 });
