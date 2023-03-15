@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-authz-server",
   "main": "dist/index.js",
-  "version": "0.3.0-dev.0",
+  "version": "0.4.0-dev.0",
   "description": "Meadowlark authorization server",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
-    "@edfi/meadowlark-utilities": "0.3.0-dev.0",
+    "@edfi/meadowlark-utilities": "^0.4.0-dev.0",
     "ajv": "^8.11.0",
     "dotenv": "^16.0.3",
     "fast-memoize": "^2.5.2",

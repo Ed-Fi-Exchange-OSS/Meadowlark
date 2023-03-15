@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-mongodb-backend",
   "main": "dist/index.js",
-  "version": "0.3.0-dev.0",
+  "version": "0.4.0-dev.0",
   "description": "Meadowlark backend plugin for MongoDB",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -19,9 +19,9 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "0.3.0-dev.0",
-    "@edfi/meadowlark-core": "0.3.0-dev.0",
-    "@edfi/meadowlark-utilities": "0.3.0-dev.0",
+    "@edfi/meadowlark-authz-server": "^0.4.0-dev.0",
+    "@edfi/meadowlark-core": "^0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^0.4.0-dev.0",
     "async-retry": "^1.3.3",
     "mongodb": "^4.11.0",
     "ramda": "0.27.2",

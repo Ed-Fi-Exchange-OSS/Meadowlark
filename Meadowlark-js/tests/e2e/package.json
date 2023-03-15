@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-e2e-tests",
   "main": "dist/index.js",
-  "version": "0.3.0-dev.0",
+  "version": "0.4.0-dev.0",
   "description": "Meadowlark Ed-Fi API end to end tests",
   "license": "Apache-2.0",
   "private": true,
@@ -10,10 +10,10 @@
   },
   "files": [],
   "devDependencies": {
-    "@types/fs-extra": "^8.1.2",
-    "@edfi/meadowlark-fastify": "0.3.0-dev.0",
-    "@edfi/meadowlark-utilities": "0.3.0-dev.0",
+    "@edfi/meadowlark-fastify": "^0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^0.4.0-dev.0",
     "@types/chance": "^1.1.3",
+    "@types/fs-extra": "^8.1.2",
     "@types/supertest": "^2.0.12",
     "chance": "^1.1.9",
     "dotenv": "^16.0.3",

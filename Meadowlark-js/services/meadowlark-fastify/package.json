@@ -1,6 +1,6 @@
 {
   "name": "@edfi/meadowlark-fastify",
-  "version": "0.3.0-dev.0",
+  "version": "0.4.0-dev.0",
   "description": "Meadowlark service using Fastify",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -12,9 +12,9 @@
     "/package.json"
   ],
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "0.3.0-dev.0",
-    "@edfi/meadowlark-core": "0.3.0-dev.0",
-    "@edfi/meadowlark-utilities": "0.3.0-dev.0",
+    "@edfi/meadowlark-authz-server": "^0.4.0-dev.0",
+    "@edfi/meadowlark-core": "^0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^0.4.0-dev.0",
     "@fastify/rate-limit": "^6.0.1",
     "dotenv": "^16.0.3",
     "fastify": "^3.29.3"
