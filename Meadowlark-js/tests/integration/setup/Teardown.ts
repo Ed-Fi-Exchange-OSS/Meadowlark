@@ -6,7 +6,6 @@ const openSearchEnvironmentTeardown = require('../../../backends/meadowlark-open
 
 module.exports = async () => {
   try {
-    console.log('****************--------------***********');
     // Setup openSearch environment for integration tests.
     await openSearchEnvironmentTeardown.teardownOpenSearch();
   } catch (error) {
