@@ -4,7 +4,7 @@
   "description": "Meadowlark service using Fastify",
   "license": "Apache-2.0",
   "publishConfig": {
-    "registry": "https://www.myget.org/F/ed-fi/npm/"
+    "registry": "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/"
   },
   "files": [
     "/dist",
