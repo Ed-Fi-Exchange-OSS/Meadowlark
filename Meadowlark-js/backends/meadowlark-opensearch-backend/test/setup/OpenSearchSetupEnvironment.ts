@@ -17,7 +17,7 @@ let environment: StartedDockerComposeEnvironment;
 let host: string;
 dotenv.config({ path: envFilePath });
 
-export async function start() {
+export async function setupOpenSearch() {
   const composeFile = 'docker-compose.yml';
   const composeFilePath = path.resolve(__dirname, './');
   Logger.info('-- Setup OpenSearch environment --', null);
@@ -33,7 +33,7 @@ export async function start() {
   process.env.OPENSEARCH_REQUEST_TIMEOUT = '10000';
 }
 
-export async function stop() {
+export async function teardownOpenSearch() {
   Logger.info('-- Tearing down OpenSearch environment --', null);
   await environment.getContainer(containerName).stop();
 }
