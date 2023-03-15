@@ -6,7 +6,7 @@
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { initializeLogging } from '@edfi/meadowlark-utilities';
-import { newFrontendResponse } from '@edfi/meadowlark-core';
+import { newFrontendResponseSuccess } from '@edfi/meadowlark-core';
 import * as MeadowlarkConnection from '../src/handler/MeadowlarkConnection';
 import { buildService } from '../src/Service';
 import { setupMockConfiguration } from './ConfigHelper';
@@ -33,7 +33,7 @@ describe('given a POST of a school', () => {
     setupMockConfiguration();
     initializeLogging();
 
-    mockUpsert = jest.spyOn(MeadowlarkCore, 'upsert').mockResolvedValue({ ...newFrontendResponse(), statusCode: 200 });
+    mockUpsert = jest.spyOn(MeadowlarkCore, 'upsert').mockResolvedValue(newFrontendResponseSuccess());
     jest.spyOn(MeadowlarkConnection, 'closeMeadowlarkConnection').mockResolvedValue();
     service = buildService();
     await service.ready();

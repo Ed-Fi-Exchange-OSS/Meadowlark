@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, FrontendResponse, newFrontendRequest, newFrontendResponse } from '@edfi/meadowlark-core';
+import { FrontendRequest, FrontendResponse, newFrontendRequest, newFrontendResponseSuccess } from '@edfi/meadowlark-core';
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
@@ -24,10 +24,7 @@ describe('given the upsert where response already posted', () => {
     },
   };
 
-  const frontendResponse: FrontendResponse = {
-    ...newFrontendResponse(),
-    statusCode: 200,
-  };
+  const frontendResponse: FrontendResponse = newFrontendResponseSuccess();
 
   beforeAll(async () => {
     result = await securityMiddleware({ frontendRequest, frontendResponse }, mongoClientMock as any);

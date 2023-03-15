@@ -6,7 +6,7 @@
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import * as MeadowlarkCore from '@edfi/meadowlark-core';
 import { initializeLogging } from '@edfi/meadowlark-utilities';
-import { newFrontendResponse } from '@edfi/meadowlark-core';
+import { newFrontendResponseSuccess } from '@edfi/meadowlark-core';
 import * as MeadowlarkConnection from '../src/handler/MeadowlarkConnection';
 import { buildService } from '../src/Service';
 import { setupMockConfiguration } from './ConfigHelper';
@@ -26,7 +26,7 @@ describe('given a DELETE of a school by id', () => {
   beforeAll(async () => {
     setupMockConfiguration();
     initializeLogging();
-    mockDeleteIt = jest.spyOn(MeadowlarkCore, 'deleteIt').mockResolvedValue({ ...newFrontendResponse(), statusCode: 200 });
+    mockDeleteIt = jest.spyOn(MeadowlarkCore, 'deleteIt').mockResolvedValue(newFrontendResponseSuccess());
     jest.spyOn(MeadowlarkConnection, 'closeMeadowlarkConnection').mockResolvedValue();
     service = buildService();
     await service.ready();

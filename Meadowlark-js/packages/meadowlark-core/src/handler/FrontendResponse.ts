@@ -16,3 +16,11 @@ export function newFrontendResponse(): FrontendResponse {
     body: {},
   };
 }
+
+export function newFrontendResponseSuccess(): FrontendResponse {
+  return {
+    statusCode: 200,
+    headers: {},
+    body: {},
+  };
+}
