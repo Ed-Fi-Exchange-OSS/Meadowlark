@@ -150,10 +150,13 @@ jobs:
       matrix:
         tests:
           [
-            { type: "Unit", command: "npm run test:unit:coverage -- --ci" },
+            {
+              type: "Unit",
+              command: "npm run test:unit:coverage -- --ci --maxWorkers=2",
+            },
             {
               type: "Integration",
-              command: "npm run test:integration -- --ci ",
+              command: "npm run test:integration -- --ci",
             },
           ]
 
