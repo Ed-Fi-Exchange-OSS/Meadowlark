@@ -152,7 +152,7 @@ jobs:
           [
             {
               type: "Unit",
-              command: "npm run test:unit:coverage -- --ci",
+              command: "npm run test:unit:coverage -- --ci --maxWorkers=2",
             },
             {
               type: "Integration",
