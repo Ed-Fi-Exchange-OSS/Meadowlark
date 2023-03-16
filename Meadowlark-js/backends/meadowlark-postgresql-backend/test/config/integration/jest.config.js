@@ -13,5 +13,6 @@ module.exports = {
       statements: 60,
     },
   },
+  rootDir: '../../../../../',
   workerIdleMemoryLimit: '200MB',
 };

@@ -16,4 +16,5 @@ module.exports = {
     },
   },
   workerIdleMemoryLimit: '200MB',
+  rootDir: '../../../../../',
 };
