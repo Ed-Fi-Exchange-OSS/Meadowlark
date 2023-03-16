@@ -5,27 +5,22 @@
 
 name: On Merge to Main or Releasable Tag
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version'
-        required: false
-        default: 'v1'
-  # push:
-  #   branches:
-  #     - main
-  #   tags:
-  #     - "v*.*.*"
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
 
 env:
   API_URL: https://api.github.com/repos/${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
 
 jobs:
   create-pre-releases:
     name: Create Pre-Releases
+    # TODO: might not need this in Meadowlark. Remove or uncomment before final commit.
     # Was not successful filtering out alpha in on.push.tags, so try filtering at the job level
-    if: "! contains(github.ref_name, 'alpha')"
+    # if: "! contains(github.ref_name, 'alpha')"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -36,10 +31,9 @@ jobs:
 
       - name: Create Meadowlark Pre-Release
         run: |
-          $version = "${{ github.event.inputs.version }}"
-          $tag = $version -replace "v","Pre-Release-v"
+          $version = $(git describe --first-parent)
           $body = @{
-            tag_name = "$tag"
+            tag_name = "$version"
             target_commitish = "main"
             name = $version
             body = ""
