@@ -152,7 +152,7 @@ jobs:
           [
             {
               type: "Unit",
-              command: "npm run test:unit:coverage -- --ci --config ./tests/config/unit/jest.config.js",
+              command: "npm run test:unit:coverage -- --ci",
             },
             {
               type: "Integration",
