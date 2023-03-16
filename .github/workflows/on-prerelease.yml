@@ -13,6 +13,9 @@ env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
 
+defaults:
+  run:
+    working-directory: Meadowlark-js
 
 jobs:
   azure-publish:
@@ -22,8 +25,7 @@ jobs:
       hash-code: ${{ steps.hash-code.outputs.hash-code }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
@@ -32,20 +34,16 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Install dependencies
-        working-directory: Meadowlark-js
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm install
 
       - name: Update version to match tag
-        working-directory: Meadowlark-js
         run: node ./version.js
 
       - name: Transpile to JS
-        working-directory: Meadowlark-js
         run: npm build
 
       - name: Create .npmrc for Azure Artifacts publishing
-        working-directory: Meadowlark-js
         run: |
           set +x  # disable echo to shell so that the base64-encoded API key never escapes into the log.
 
@@ -62,7 +60,6 @@ jobs:
           echo "; end auth token" >> $HOME/.npmrc
 
       - name: Publish
-        working-directory: Meadowlark-js
         run: npm publish --workspaces
 
       # NOTE: there are uncommitted version number changes in package.json. No
