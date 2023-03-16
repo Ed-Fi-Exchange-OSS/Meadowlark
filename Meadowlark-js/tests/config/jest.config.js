@@ -5,4 +5,5 @@ module.exports = {
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['dotenv/config'],
   rootDir: '../../..',
+  maxWorkers: '80%',
 };
