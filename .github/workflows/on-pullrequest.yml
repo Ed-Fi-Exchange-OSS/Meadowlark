@@ -156,7 +156,7 @@ jobs:
             },
             {
               type: "Integration",
-              command: "npm run test:integration",
+              command: "npm run test:integration -- --ci ",
             },
           ]
 
