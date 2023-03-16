@@ -1,5 +1,3 @@
-const { defaults: tsjPreset } = require('ts-jest/presets');
-
 module.exports = {
   projects: [
     '<rootDir>/tests/config/unit/jest.config.js',
