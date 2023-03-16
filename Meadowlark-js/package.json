@@ -51,6 +51,7 @@
     "test:integration:opensearch": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-opensearch-backend/test/config/integration --runInBand",
     "test:integration:postgresql": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-postgresql-backend/test/config/integration --runInBand",
     "test:unit:coverage": "rimraf coverage.unit/ && npm run test:unit",
+    "test:unit:coverage:ci": "rimraf coverage.unit/ && npm run test:unit -- --maxWorkers=2 --ci",
     "test:integration:coverage": "rimraf coverage.integration/ && npm run test:integration -- --collectCoverage",
     "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects tests/config/e2e --runInBand",
     "start:local": "lerna run start:local",
