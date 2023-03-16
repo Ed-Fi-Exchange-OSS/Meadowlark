@@ -3,8 +3,8 @@ const defaultConfig = require('../../../../../tests/config/jest.config');
 
 module.exports = {
   displayName: 'Integration Tests: OpenSearch',
-  globalSetup: '<rootDir>/backends/meadowlark-opensearch-backend/test/setup/Setup.ts',
-  globalTeardown: '<rootDir>/backends/meadowlark-opensearch-backend/test/setup/Teardown.ts',
+  globalSetup: './test/setup/Setup.ts',
+  globalTeardown: './test/setup/Teardown.ts',
   ...defaultConfig,
   testMatch: ['**/meadowlark-opensearch-backend/test/integration/**/*.(spec|test).[jt]s?(x)'],
   coverageThreshold: {
@@ -15,6 +15,5 @@ module.exports = {
       statements: 60,
     },
   },
-  rootDir: '../../../../../',
   workerIdleMemoryLimit: '200MB',
 };
