@@ -20,14 +20,13 @@ import {
   UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Client } from '@opensearch-project/opensearch/.';
-import { getNewClient } from '../../src/repository/Db';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
 import {
   afterDeleteDocumentById,
   afterUpdateDocumentById,
   afterUpsertDocument,
 } from '../../src/repository/UpdateOpensearch';
-import { setupOpenSearch, teardownOpenSearch } from '../setup/OpenSearchSetup';
+import { getNewTestClient } from '../setup/OpenSearchSetupEnvironment';
 
 jest.setTimeout(120_000);
 
@@ -77,12 +76,7 @@ describe('given the upsert of a new document', () => {
   let client: Client;
 
   beforeAll(async () => {
-    await setupOpenSearch();
-    client = await getNewClient();
-  });
-
-  afterAll(async () => {
-    await teardownOpenSearch();
+    client = await getNewTestClient();
   });
 
   describe('when insert was successful', () => {
