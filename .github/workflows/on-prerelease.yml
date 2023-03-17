@@ -45,7 +45,7 @@ jobs:
         run: node ./version.js
 
       - name: Transpile to JS
-        run: npm build
+        run: npm run build --workspaces
 
       - name: Create .npmrc for Azure Artifacts publishing
         run: |
