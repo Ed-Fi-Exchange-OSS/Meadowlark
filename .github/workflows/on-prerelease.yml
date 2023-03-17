@@ -52,14 +52,14 @@ jobs:
           set +x  # disable echo to shell so that the base64-encoded API key never escapes into the log.
 
           # Create the user .npmrc file with proper settings
-          API_KEY = ${{ env.ARTIFACTS_API_KEY }} | base64
+          API_KEY=`echo "${{ env.ARTIFACTS_API_KEY }}" -n | base64`
           touch $HOME/.npmrc
           echo "; begin auth token" >> .npmrc
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=${{ env.ARTIFACTS_API_KEY }} >> $HOME/.npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=$API_KEY >> $HOME/.npmrc
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=techsupport@ed-fi.org >> $HOME/.npmrc
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:username=ed-fi-alliance >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:_password=${{ env.ARTIFACTS_API_KEY }} >> $HOME/.npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:_password=$API_KEY >> $HOME/.npmrc
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/:email=techsupport@ed-fi.org >> $HOME/.npmrc
           echo "; end auth token" >> $HOME/.npmrc
 
