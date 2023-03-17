@@ -1,13 +1,12 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-const defaultConfig = require('../jest.config.js');
+const defaultConfig = require('../../../../../tests/config/jest.config');
 
 module.exports = {
-  displayName: 'Integration Tests',
+  displayName: 'Integration Tests: Mongodb ',
   ...defaultConfig,
   preset: '@shelf/jest-mongodb',
-  testMatch: ['<rootDir>/**/integration/**/*.(spec|test).[jt]s?(x)'],
+  testMatch: ['**/meadowlark-mongodb-backend/test/integration/**/*.(spec|test).[jt]s?(x)'],
   watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
-  testPathIgnorePatterns: ['meadowlark-opensearch-backend|meadowlark-opensearch-backend|meadowlark-postgresql-backend'],
   coverageThreshold: {
     global: {
       branches: 52,

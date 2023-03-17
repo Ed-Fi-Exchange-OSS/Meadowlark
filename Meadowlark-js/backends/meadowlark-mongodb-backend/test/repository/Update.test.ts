@@ -15,7 +15,7 @@ jest.setTimeout(40000);
 
 describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;
-  let mongoClienttMock = {};
+  let mongoClientMock = {};
   let replaceOneMock = jest.fn();
   const error = {
     codeName: 'WriteConflict',
@@ -29,7 +29,7 @@ describe('given a transaction on a resource', () => {
       updateMany: jest.fn(),
     } as any);
 
-    mongoClienttMock = {
+    mongoClientMock = {
       startSession: jest.fn().mockReturnValue({
         withTransaction: async (cb: any) => {
           await cb();
@@ -57,7 +57,7 @@ describe('given a transaction on a resource', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(retryNumberOfTimes);
-        result = await updateDocumentById(newUpdateRequest(), mongoClienttMock as any);
+        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('returns error', async () => {
@@ -77,7 +77,7 @@ describe('given a transaction on a resource', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(0);
-        result = await updateDocumentById(newUpdateRequest(), mongoClienttMock as any);
+        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {
@@ -92,7 +92,7 @@ describe('given a transaction on a resource', () => {
     describe('given that a number of retries was not configured', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
-        result = await updateDocumentById(newUpdateRequest(), mongoClienttMock as any);
+        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {

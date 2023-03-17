@@ -5,7 +5,7 @@
 
 import { Config } from '@edfi/meadowlark-utilities';
 
-export const setupMockConfiguration = () => {
+export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymization: boolean = false) => {
   jest.spyOn(Config, 'get').mockImplementation((key: Config.ConfigKeys) => {
     switch (key) {
       case 'FASTIFY_RATE_LIMIT':
@@ -18,8 +18,6 @@ export const setupMockConfiguration = () => {
         return true;
       case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
         return 'https://a/b/oauth/token';
-      case 'LOG_LEVEL':
-        return 'ERROR';
       case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL':
         return 10;
       case 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES':
@@ -40,6 +38,16 @@ export const setupMockConfiguration = () => {
         return '@edfi/meadowlark-mongodb-backend';
       case 'MONGO_URI':
         return 'mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0';
+      case 'LOG_LEVEL':
+        return isDebug ? 'DEBUG' : 'ERROR';
+      case 'DISABLE_LOG_ANONYMIZATION':
+        return disableAnonymization;
+      case 'MEADOWLARK_DATABASE_NAME':
+        return 'meadowlark-test';
+      case 'MONGO_WRITE_CONCERN':
+        return 'mwc';
+      case 'MONGO_READ_CONCERN':
+        return 'mrc';
       default:
         throw new Error(`Key '${key}' not configured`);
     }
