@@ -3,13 +3,11 @@
 # The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 # See the LICENSE and NOTICES files in the project root for more information.
 
-name: On Merge to Main or Releasable Tag
+name: On Merge to Main
 on:
   push:
     branches:
       - main
-    tags:
-      - "v*.*.*"
 
 env:
   API_URL: https://api.github.com/repos/${{ github.repository }}
