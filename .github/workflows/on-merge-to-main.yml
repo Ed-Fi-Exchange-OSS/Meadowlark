@@ -33,7 +33,11 @@ jobs:
 
       - name: Create Meadowlark Pre-Release
         run: |
-          $version = $(git describe --first-parent --tags)
+          $version = $(node ./version.js)
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to retrieve version number'
+          }
+
           "Creating pre-release $version" | Out-Host
           $body = @{
             tag_name = "$version"
