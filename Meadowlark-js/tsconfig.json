@@ -20,7 +20,7 @@
     "outDir": "dist",
   },
   "paths": {
-    "~/*": ["packages/*"]
+    "~/*": ["packages/*", "version.js"],
   },
   "exclude": [
     "node_modules",

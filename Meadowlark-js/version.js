@@ -8,7 +8,7 @@ const { execSync } = require('child_process');
 const callShellCommand = (cmd) => {
   console.info(`executing: ${cmd}`);
   return execSync(cmd).toString().replace('\n', '');
-}
+};
 
 // `git describe` returns the last tag plus the commit depth and the short hash for the most recent commit
 // Example: last tag was v1.0.0, there have been four more commits, and the most recent has hash abcdef. Then
