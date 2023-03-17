@@ -16,5 +16,5 @@ const callShellCommand = (cmd) => {
 // `git describe` returns the last tag plus the commit depth and the short hash for the most recent commit
 // Example: last tag was v1.0.0, there have been four more commits, and the most recent has hash abcdef. Then
 // the output will be v1.0.0-4-abcdef
-const version = callShellCommand('git describe --first-parent');
+const version = callShellCommand('git describe --first-parent --tags');
 callShellCommand(`npm version ${version} --allow-same-version --workspaces true`);

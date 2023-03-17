@@ -35,7 +35,7 @@ jobs:
 
       - name: Create Meadowlark Pre-Release
         run: |
-          $version = $(git describe --first-parent)
+          $version = $(git describe --first-parent --tags)
           $body = @{
             tag_name = "$version"
             target_commitish = "main"
