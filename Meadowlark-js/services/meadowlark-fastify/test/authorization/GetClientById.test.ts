@@ -5,6 +5,7 @@
 
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fastify';
 import * as AuthorizationServer from '@edfi/meadowlark-authz-server';
+import * as MeadowlarkConnection from '../../src/handler/MeadowlarkConnection';
 import { buildService } from '../../src/Service';
 import { setupMockConfiguration } from '../ConfigHelper';
 
@@ -32,8 +33,8 @@ describe('given a GET by ID request', () => {
 
   beforeAll(async () => {
     setupMockConfiguration();
-    mockAuthServer = jest.spyOn(AuthorizationServer, 'getClientById');
-    mockAuthServer.mockReturnValue(clientResponse);
+    mockAuthServer = jest.spyOn(AuthorizationServer, 'getClientById').mockResolvedValue(clientResponse);
+    jest.spyOn(MeadowlarkConnection, 'closeMeadowlarkConnection').mockResolvedValue();
     service = buildService();
     await service.ready();
 

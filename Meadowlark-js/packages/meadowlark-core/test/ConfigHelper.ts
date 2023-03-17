@@ -43,6 +43,12 @@ export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymiz
         return isDebug ? 'DEBUG' : 'ERROR';
       case 'DISABLE_LOG_ANONYMIZATION':
         return disableAnonymization;
+      case 'MEADOWLARK_DATABASE_NAME':
+        return 'meadowlark-test';
+      case 'MONGO_WRITE_CONCERN':
+        return 'mwc';
+      case 'MONGO_READ_CONCERN':
+        return 'mrc';
       default:
         throw new Error(`Key '${key}' not configured`);
     }

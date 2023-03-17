@@ -150,13 +150,10 @@ jobs:
       matrix:
         tests:
           [
-            {
-              type: "Unit",
-              command: "npm run test:unit:coverage -- --ci",
-            },
+            { type: "Unit", command: "npm run test:unit:coverage:ci" },
             {
               type: "Integration",
-              command: "npm run test:integration -- --ci ",
+              command: "npm run test:integration -- --ci",
             },
           ]
 
@@ -189,6 +186,13 @@ jobs:
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm install
+
+      - name: Jest cache
+        id: cache-jest
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: /tmp/jest_rt
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
       - name: Configure postgres
         if: ${{ matrix.tests.type != 'Unit' }}
@@ -250,6 +254,13 @@ jobs:
 
       - name: Install required dependencies
         run: npm install -D cross-env
+
+      - name: Jest cache
+        id: cache-jest
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: /tmp/jest_rt
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
       - name: Create .env file
         run: |
