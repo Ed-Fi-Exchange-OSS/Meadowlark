@@ -52,7 +52,7 @@ jobs:
           set +x  # disable echo to shell so that the base64-encoded API key never escapes into the log.
 
           # Create the user .npmrc file with proper settings
-          API_KEY=`echo "${{ env.ARTIFACTS_API_KEY }}" -n | base64`
+          API_KEY=`echo -n "${{ env.ARTIFACTS_API_KEY }}" | base64`
           touch $HOME/.npmrc
           echo "; begin auth token" >> $HOME/.npmrc
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> $HOME/.npmrc
