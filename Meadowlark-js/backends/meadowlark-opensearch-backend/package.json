@@ -21,7 +21,7 @@
   "dependencies": {
     "@edfi/meadowlark-core": "^0.4.0-dev.0",
     "@edfi/meadowlark-utilities": "^0.4.0-dev.0",
-    "@edfi/metaed-core": "3.2.1-dev.13",
+    "@edfi/metaed-core": "^4.0.0",
     "@opensearch-project/opensearch": "^2.1.0"
   },
   "devDependencies": {
