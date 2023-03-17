@@ -26,6 +26,7 @@ jobs:
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
   analyze-code:
+    # This Action will fail if run on anything other than a pull request
     if: github.event_name == 'pull_request'
     name: Analyze Code Dependencies
     runs-on: ubuntu-latest
