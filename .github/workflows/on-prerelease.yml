@@ -60,8 +60,6 @@ jobs:
           echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=techsupport@ed-fi.org >> $HOME/.npmrc
           echo "; end auth token" >> $HOME/.npmrc
 
-          cat $HOME/.npmrc | base64
-
       - name: Publish
         run: npm publish --workspaces
 
