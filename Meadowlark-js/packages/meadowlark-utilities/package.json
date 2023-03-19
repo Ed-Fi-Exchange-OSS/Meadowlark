@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-utilities",
   "main": "dist/index.js",
-  "version": "0.4.0-dev.0",
+  "version": "0.3.0-pre-36",
   "description": "Meadowlark shared utilities",
   "license": "Apache-2.0",
   "publishConfig": {
