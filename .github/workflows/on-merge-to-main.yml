@@ -23,7 +23,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        working-directory: Meadowlark-js
+        working-directory: eng
     steps:
       - name: Checkout the Repo
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
@@ -33,7 +33,8 @@ jobs:
 
       - name: Create Meadowlark Pre-Release
         run: |
-          $version = $(node ./version.js)
+          npm install
+          $version = $(node ./index.js)
           if ($LASTEXITCODE -ne 0) {
             throw 'Unable to retrieve version number'
           }

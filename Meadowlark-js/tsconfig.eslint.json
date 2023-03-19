@@ -4,7 +4,6 @@
     "**/src/**/*.ts",
     "**/test/**/*.ts",
     "**/tests/**/*.ts",
-    "**/index.ts",
-    "version.js"
+    "**/index.ts"
   ]
 }
