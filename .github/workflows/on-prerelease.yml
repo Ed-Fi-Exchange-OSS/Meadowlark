@@ -19,7 +19,7 @@ defaults:
 
 jobs:
   azure-publish:
-    name: Publish Meadowlark mongodb
+    name: Publish to Azure Artifacts
     runs-on: ubuntu-latest
     outputs:
       hash-code: ${{ steps.hash-code.outputs.hash-code }}
@@ -57,7 +57,7 @@ jobs:
           echo "6"
           git describe main --first-parent --tags
           echo "7"
-          
+
           npm install
           node ./index.js --update
 
