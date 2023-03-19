@@ -25,6 +25,7 @@ const callShellCommand = (cmd, options) => execSync(cmd, options).toString().rep
  * `v0.3.1-1-g1636c72`
  */
 const gitDescribe = callShellCommand('git describe --first-parent --tags');
+console.debug('***>>>', gitDescribe);
 
 const version = calculateNextVersion(gitDescribe);
 if (version === null) {
