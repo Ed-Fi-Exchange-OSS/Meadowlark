@@ -12,9 +12,9 @@
     "/package.json"
   ],
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "^v0.3.0-pre-36",
-    "@edfi/meadowlark-core": "^v0.3.0-pre-36",
-    "@edfi/meadowlark-utilities": "^v0.3.0-pre-36",
+    "@edfi/meadowlark-authz-server": "^v0.3.0-pre-35",
+    "@edfi/meadowlark-core": "^v0.3.0-pre-35",
+    "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
     "@fastify/rate-limit": "^6.0.1",
     "dotenv": "^16.0.3",
     "fastify": "^3.29.3"

@@ -33,9 +33,9 @@
     "typescript": "4.8.4"
   },
   "workspaces": [
-    "@edfi/meadowlark-utilities",
-    "@edfi/meadowlark-core",    
-    "@edfi/meadowlark-authz-server",
+    "packages/meadowlark-utilities",
+    "packages/meadowlark-core",    
+    "packages/meadowlark-authz-server",
     "backends/*",
     "services/*",
     "tests/*"
