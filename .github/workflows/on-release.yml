@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+# Doesn't do anything yet
+
+
+name: On Release
+on:
+  release:
+    types:
+      - released
+
+env:
+  ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
+  ARTIFACTS_FEED_URL: ${{ secrets.AZURE_ARTIFACTS_FEED_URL }}
+  ARTIFACTS_PACKAGES_URL: ${{ secrets.ARTIFACTS_PACKAGES_URL }}
+  ARTIFACTS_USERNAME: ${{ secrets.AZURE_ARTIFACTS_USER_NAME }}
