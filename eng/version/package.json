@@ -1,13 +1,14 @@
 {
-  "name": "version",
+  "name": "edfi-version",
   "version": "1.0.0",
-  "description": "",
+  "description": "Uses git to determine the version number",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
-  "author": "",
+  "author": "Ed-Fi Alliance, LLC, and contributors",
   "license": "Apache-2.0",
+  "private": true,
   "devDependencies": {
     "jest": "^29.5.0"
   }
