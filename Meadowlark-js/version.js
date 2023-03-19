@@ -27,24 +27,37 @@ const callShellCommand = (cmd) => execSync(cmd).toString().replace('\n', '');
 
 const gitDescribe = callShellCommand('git describe --first-parent --tags');
 
-// Retrieve the base version number
-const versionExpr = /^v([^-]+)/;
-const versionMatch = gitDescribe.match(versionExpr);
-if (!versionMatch) {
-  // eslint-disable-next-line no-console
-  console.error(`Unable to extract a base version number from ${gitDescribe}`);
-  process.exit(1);
+let version = gitDescribe;
+
+// Is this already a proper tag? That occurs when running again and there has
+// not been another commit since the last tag.
+const properTagExpr = /^v[^-]+(?:-pre-\d+)$/;
+if (!gitDescribe.match(properTagExpr)) {
+  // No, it is not the final form already - so calculate a pre-release version.
+
+  // Retrieve the base version number
+  const versionExpr = /^v([^-]+)/;
+  const versionMatch = gitDescribe.match(versionExpr);
+  if (!versionMatch) {
+    // eslint-disable-next-line no-console
+    console.error(`Unable to extract a base version number from ${gitDescribe}`);
+    process.exit(1);
+  }
+
+  // Parse out the depth markers, and add them together
+  const depthExpr = /-(\d+)-.{8}/gm;
+  let depth = 0;
+  [...gitDescribe.matchAll(depthExpr)].forEach((match) => {
+    depth += Number.parseInt(match[1], 10);
+  });
+
+  // Build the new version string
+  [version] = versionMatch;
+  if (depth > 0) {
+    version += `-pre-${depth.toString()}`;
+  }
 }
 
-// Parse out the depth markers, and add them together
-const depthExpr = /-(\d+)-.{8}/gm;
-let depth = 0;
-[...gitDescribe.matchAll(depthExpr)].forEach((match) => {
-  depth += Number.parseInt(match[1], 10);
-});
-
-// Build the new version string
-const version = `${versionMatch[0]}-pre${depth > 0 ? depth.toString() : ''}`;
 // eslint-disable-next-line no-console
 console.info(version);
 
