@@ -16,9 +16,6 @@ env:
 jobs:
   create-pre-releases:
     name: Create Pre-Releases
-    # TODO: might not need this in Meadowlark. Remove or uncomment before final commit.
-    # Was not successful filtering out alpha in on.push.tags, so try filtering at the job level
-    # if: "! contains(github.ref_name, 'alpha')"
     runs-on: ubuntu-latest
     defaults:
       run:
