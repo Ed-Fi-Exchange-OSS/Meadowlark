@@ -42,7 +42,7 @@ jobs:
         run: npm install
 
       - name: Update version to match tag
-        working-directory: eng/
+        working-directory: eng/version
         run: |
           npm install
           node ./index.js --update
