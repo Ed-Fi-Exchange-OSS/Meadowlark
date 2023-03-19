@@ -49,11 +49,7 @@ jobs:
           echo "3"
           git describe --contains
           echo "4"
-          git describe main --tags
-          echo "5"
-          git describe main --first-parent
-          echo "6"
-          git describe main --first-parent --tags
+          git describe --first-parent --tags
           echo "7"
 
           npm install
