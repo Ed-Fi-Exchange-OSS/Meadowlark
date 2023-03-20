@@ -64,7 +64,7 @@ jobs:
           echo "; end auth token" >> $HOME/.npmrc
 
       - name: Publish
-        run: npm publish --workspaces
+        run: npm publish --workspaces --tag dev
 
       # NOTE: there are uncommitted version number changes in package.json. No
       # problem! Our strategy is to rely on the tag history for version numbers,
