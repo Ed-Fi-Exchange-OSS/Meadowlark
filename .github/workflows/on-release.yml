@@ -14,7 +14,7 @@ on:
 
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
-  ARTIFACTS_USERNAME: ${{ secrets.AZURE_ARTIFACTS_USER_NAME }}
+  ARTIFACTS_USERNAME: ${{ vars.AZURE_ARTIFACTS_USER_NAME }}
 
 jobs:
   promote-Azure-artifact:
