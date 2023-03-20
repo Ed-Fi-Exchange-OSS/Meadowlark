@@ -19,7 +19,7 @@ param(
 
 $urlTemplate = "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_apis/packaging/feeds/EdFi/npm/@edfi/{PACKAGE}/versions/{VERSION}?api-version=7.1-preview.1"
 
-Push-Location ../Meadowlark-Js
+Push-Location ../Meadowlark-js
 $packages = $(npm ls --workspaces --parseable --package-lock-only) -Split [Environment]::NewLine |
                     ForEach-Object { $_.replace("\", "/") } | # Standardize for all OS's
                     Where-Object { $_.contains("@edfi/meadowlark") -and -not $_.contains("e2e") } |
