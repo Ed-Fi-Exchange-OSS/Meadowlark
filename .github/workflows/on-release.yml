@@ -14,6 +14,17 @@ on:
 
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
-  ARTIFACTS_FEED_URL: ${{ secrets.AZURE_ARTIFACTS_FEED_URL }}
-  ARTIFACTS_PACKAGES_URL: ${{ secrets.ARTIFACTS_PACKAGES_URL }}
-  ARTIFACTS_USERNAME: ${{ secrets.AZURE_ARTIFACTS_USER_NAME }}
+  # ARTIFACTS_USERNAME: ${{ secrets.AZURE_ARTIFACTS_USER_NAME }}
+
+promote-Azure-artifact:
+  name: Promote Azure Artifact
+  runs-on: ubuntu-latest
+  steps:
+    - name: Promote Package
+      shell: pwsh
+      working-directory: eng
+      run: |
+        ./promote-packages.ps1 `
+            -Version ${{ github.ref_name }} `
+            -Username ${{ env.ARTIFACTS_USERNAME }} `
+            -PersonalAccessToken ${{ env.ARTIFACTS_API_KEY}}
