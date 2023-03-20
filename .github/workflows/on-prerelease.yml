@@ -44,14 +44,6 @@ jobs:
       - name: Update version to match tag
         working-directory: eng/version
         run: |
-          echo "2"
-          git describe --tags
-          echo "3"
-          git describe --contains
-          echo "4"
-          git describe --first-parent --tags
-          echo "7"
-
           npm install
           node ./index.js --update
 
