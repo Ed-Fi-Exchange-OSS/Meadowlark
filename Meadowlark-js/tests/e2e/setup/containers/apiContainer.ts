@@ -4,9 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { resolve } from 'path';
-import { GenericContainer } from 'testcontainers';
+import { GenericContainer, Wait } from 'testcontainers';
+import { setAPILog } from '../LogConfig';
 
-export async function setupAPIContainer() {
+async function generateContainerWithImage(): Promise<GenericContainer> {
   let apiContainer: GenericContainer;
 
   console.time('API Image Setup');
@@ -14,11 +15,52 @@ export async function setupAPIContainer() {
     console.info('Skipping image generation. Build image locally (npm run docker:build) or pull from Docker Hub');
     apiContainer = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark');
   } else {
-    // This is not working on this version since there's no way to define a name for the built image
     console.info('Building image');
     apiContainer = await GenericContainer.fromDockerfile(resolve(process.cwd())).build();
   }
   console.timeEnd('API Image Setup');
 
-  console.info(`Image: ${apiContainer.image} Ready`);
+  return apiContainer;
+}
+
+export async function setupAPIContainer() {
+  const container = await generateContainerWithImage();
+
+  const fastifyPort = process.env.FASTIFY_PORT ?? '3001';
+
+  container
+    .withName('meadowlark-api-test')
+    .withExposedPorts({
+      container: parseInt(fastifyPort, 10),
+      host: parseInt(fastifyPort, 10),
+    })
+    .withEnvironment({
+      OAUTH_SIGNING_KEY: process.env.OAUTH_SIGNING_KEY ?? '',
+      OAUTH_HARD_CODED_CREDENTIALS_ENABLED: 'true',
+      OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH: 'meadowlark_verify-only_key_1',
+      OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH: 'meadowlark_verify-only_secret_1',
+      OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: `http://localhost:${fastifyPort}/local/oauth/token`,
+      OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: `http://localhost:${fastifyPort}/local/oauth/verify`,
+      OPENSEARCH_USERNAME: 'admin',
+      OPENSEARCH_PASSWORD: 'admin',
+      OPENSEARCH_ENDPOINT: 'http://opensearch-test:8200',
+      DOCUMENT_STORE_PLUGIN: process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend',
+      QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend',
+      LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend',
+      MONGO_URI:
+        process.env.MONGO_URI ??
+        `mongodb://${process.env.MONGODB_USER ?? 'mongo'}:${
+          process.env.MONGODB_PASS ?? 'abcdefgh1!'
+        }@mongo-t1:27017/?replicaSet=tr0`,
+      FASTIFY_RATE_LIMIT: 'false',
+      FASTIFY_PORT: fastifyPort,
+      FASTIFY_NUM_THREADS: process.env.FASTIFY_NUM_THREADS ?? '10',
+      MEADOWLARK_STAGE: 'local',
+      LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
+      IS_LOCAL: 'false',
+      AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
+    })
+    .withWaitStrategy(Wait.forHttp('/local', parseInt(fastifyPort, 10)));
+
+  await setAPILog(await container.start());
 }

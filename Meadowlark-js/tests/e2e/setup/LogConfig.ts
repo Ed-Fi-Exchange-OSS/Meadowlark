@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import fs from 'fs-extra';
-import { StartedDockerComposeEnvironment } from 'testcontainers';
+import { StartedDockerComposeEnvironment, StartedTestContainer } from 'testcontainers';
 
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
@@ -13,7 +13,6 @@ let opSearchWriteStream: fs.WriteStream;
 const logFolder = './tests/e2e/logs';
 
 const mongoContainerName = 'mongo-test1';
-// const apiContainerName = 'meadowlark-api-test';
 const opSearchContainerName = 'opensearch-test';
 
 export function endLog() {
@@ -28,12 +27,14 @@ export function endLog() {
   }
 }
 
+export async function setAPILog(container: StartedTestContainer) {
+  const apiStream = await container.logs();
+  apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
+
+  apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+}
+
 export async function setLogTracing(environment: StartedDockerComposeEnvironment) {
-  // const apiStream = await environment.getContainer(apiContainerName).logs();
-  // apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
-
-  // apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
-
   const mongoStream = await environment.getContainer(mongoContainerName).logs();
   mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
 
