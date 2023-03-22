@@ -45,7 +45,7 @@ jobs:
         working-directory: eng/version
         run: |
           npm install
-          node ./index.js --update
+          node ./set.js ${{ gitub.ref_name }}
 
       - name: Transpile to JS
         run: npm run build --workspaces
