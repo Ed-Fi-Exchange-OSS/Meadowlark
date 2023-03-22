@@ -31,7 +31,7 @@ jobs:
       - name: Create Meadowlark Pre-Release
         run: |
           npm install
-          $version = $(node ./index.js)
+          $version = $(node ./bump.js)
           if ($LASTEXITCODE -ne 0) {
             throw 'Unable to retrieve version number'
           }
