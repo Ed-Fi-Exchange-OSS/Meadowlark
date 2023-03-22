@@ -13,7 +13,7 @@ let opSearchWriteStream: fs.WriteStream;
 const logFolder = './tests/e2e/logs';
 
 const mongoContainerName = 'mongo-test1';
-const apiContainerName = 'meadowlark-api-test';
+// const apiContainerName = 'meadowlark-api-test';
 const opSearchContainerName = 'opensearch-test';
 
 export function endLog() {
@@ -29,10 +29,10 @@ export function endLog() {
 }
 
 export async function setLogTracing(environment: StartedDockerComposeEnvironment) {
-  const apiStream = await environment.getContainer(apiContainerName).logs();
-  apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
+  // const apiStream = await environment.getContainer(apiContainerName).logs();
+  // apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
 
-  apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+  // apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
 
   const mongoStream = await environment.getContainer(mongoContainerName).logs();
   mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);

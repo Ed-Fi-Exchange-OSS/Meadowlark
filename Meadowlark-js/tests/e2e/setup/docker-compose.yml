@@ -3,11 +3,7 @@ version: '3.8'
 services:
   # Meadowlark API
   meadowlark-api-test:
-    # image: meadowlark:latest # requires a local build, `npm run docker:build`.
-    # build the image
-    build:
-      context: ../../../
-      dockerfile: Dockerfile
+    image: meadowlark:latest
     container_name: meadowlark-api-test
     hostname: api-test
     ports:

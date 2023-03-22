@@ -6,6 +6,7 @@
 import path from 'path';
 
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
+import { setupAPIContainer } from './containers/apiContainer';
 import { endLog, setLogTracing } from './LogConfig';
 
 let environment: StartedDockerComposeEnvironment;
@@ -43,6 +44,9 @@ async function setMongoUser(mongoContainer: StartedTestContainer) {
 export async function configure() {
   const composeFilePath = path.resolve(__dirname, './');
   const composeFile = 'docker-compose.yml';
+
+  await setupAPIContainer();
+
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
     .withWaitStrategy(mongoContainerName, Wait.forHealthCheck())
     .withWaitStrategy(openSearchContainerName, Wait.forHealthCheck())
