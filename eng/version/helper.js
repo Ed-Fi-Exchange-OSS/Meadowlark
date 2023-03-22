@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+const { execSync } = require('child_process');
 
 /* Cases that this code must handle:
  * 1. Last tag was a release version and there have been no commits: then keep
@@ -40,6 +41,11 @@ function calculateNextVersion(gitDescribe) {
   return version;
 }
 
+function callShellCommand(cmd, options) {
+  return execSync(cmd, options).toString().replace('\n', '');
+}
+
 module.exports = {
-  calculateNextVersion
+  calculateNextVersion,
+  callShellCommand
 };
