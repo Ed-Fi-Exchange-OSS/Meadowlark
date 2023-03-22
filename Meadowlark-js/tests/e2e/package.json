@@ -17,7 +17,7 @@
     "fast-memoize": "^2.5.2",
     "fs-extra": "^10.1.0",
     "supertest": "^6.3.1",
-    "testcontainers": "^9.1.2"
+    "testcontainers": "^9.3.0"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
