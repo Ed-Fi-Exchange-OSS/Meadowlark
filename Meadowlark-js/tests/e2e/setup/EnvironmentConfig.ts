@@ -1,19 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-// Licensed to the Ed-Fi Alliance under one or more agreements.
-// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
-// See the LICENSE and NOTICES files in the project root for more information.
 
-import path from 'path';
-
-import { DockerComposeEnvironment, Network, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
+import { Network, StartedDockerComposeEnvironment } from 'testcontainers';
 import { setupAPIContainer } from './containers/apiContainer';
 import { setupMongoContainer } from './containers/mongoContainer';
+import { setupOpenSearchContainer } from './containers/openSearchContainer';
 import { endLog } from './LogConfig';
 
 let environment: StartedDockerComposeEnvironment;
-
-const mongoContainerName = 'mongo-test1';
-const openSearchContainerName = 'opensearch-test';
 
 export async function stop() {
   endLog();
@@ -23,24 +16,12 @@ export async function stop() {
 }
 
 export async function configure() {
-  const composeFilePath = path.resolve(__dirname, './');
-  const composeFile = 'docker-compose.yml';
+  const network = await new Network().start();
+  await setupMongoContainer(network);
 
-  environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
-    .withWaitStrategy(mongoContainerName, Wait.forHealthCheck())
-    .withWaitStrategy(openSearchContainerName, Wait.forHealthCheck())
-    .withStartupTimeout(120_000)
-    .up();
+  await setupAPIContainer(network);
 
-  const net = await new Network().start();
-  await setupMongoContainer(net);
+  await setupOpenSearchContainer(network);
 
-  await setupAPIContainer(net);
-
-  console.debug('-- Setting log tracing --');
-  // await setLogTracing(environment);
-  // const mongoContainer = environment.getContainer(mongoContainerName);
-  // console.debug('-- Setting up mongo user --');
-  // await setMongoUser(mongoContainer);
-  // console.debug('-- Environment Ready --');
+  console.debug('-- Environment Ready --');
 }
