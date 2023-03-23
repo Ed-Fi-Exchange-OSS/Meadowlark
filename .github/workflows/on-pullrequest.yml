@@ -269,9 +269,6 @@ jobs:
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
         working-directory: Meadowlark-js/tests/e2e/setup/
 
-      - name: Give permission for scripts
-        run: chmod -R +x ./tests/e2e/setup/scripts/
-
       - name: End to End tests for ${{matrix.config.db}}
         run: npm run test:e2e -- --ci
         env:
