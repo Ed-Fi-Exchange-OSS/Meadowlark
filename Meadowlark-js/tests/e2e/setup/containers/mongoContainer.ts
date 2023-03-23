@@ -24,8 +24,4 @@ export async function setupMongoContainer(network: StartedNetwork) {
     .start();
 
   await setMongoLog(container);
-
-  const conn = `mongodb://mongo-t1:${container.getFirstMappedPort()}/?directConnection=true`;
-  process.env.MONGO_URI = conn;
-  console.log(process.env.MONGO_URI);
 }

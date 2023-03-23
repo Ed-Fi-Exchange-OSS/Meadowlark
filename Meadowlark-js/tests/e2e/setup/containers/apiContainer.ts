@@ -48,11 +48,7 @@ export async function setupAPIContainer(network: StartedNetwork) {
       DOCUMENT_STORE_PLUGIN: process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend',
       QUERY_HANDLER_PLUGIN: '@edfi/meadowlark-opensearch-backend',
       LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend',
-      MONGO_URI:
-        process.env.MONGO_URI ??
-        `mongodb://${process.env.MONGODB_USER ?? 'mongo'}:${
-          process.env.MONGODB_PASS ?? 'abcdefgh1!'
-        }@mongo-t1:27017/?replicaSet=tr0`,
+      MONGO_URI: process.env.MONGO_URI ?? 'mongodb://mongo-t1:27017/?directConnection=true',
       FASTIFY_RATE_LIMIT: 'false',
       FASTIFY_PORT: fastifyPort,
       FASTIFY_NUM_THREADS: process.env.FASTIFY_NUM_THREADS ?? '10',
@@ -62,5 +58,6 @@ export async function setupAPIContainer(network: StartedNetwork) {
       AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
     });
 
-  await setAPILog(await container.start());
+  const startedContainer = await container.start();
+  await setAPILog(startedContainer);
 }
