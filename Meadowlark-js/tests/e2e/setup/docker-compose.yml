@@ -28,35 +28,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 50
-
-  # Primary MongoDB node
-  mongo-t1:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
-    container_name: mongo-test1
-    hostname: mongo-t1
-    ports:
-      - ${MONGO_PORT:-27037}:27017
-    restart: unless-stopped
-    environment:
-      - ADMIN_USERNAME=${MONGODB_USER:-mongo}
-      - ADMIN_PASSWORD=${MONGODB_PASS:-abcdefgh1!}
-    healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "tr0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true"
-      ]
-    volumes:
-      - ./scripts:/scripts

@@ -5,9 +5,10 @@
 
 import path from 'path';
 
-import { DockerComposeEnvironment, StartedDockerComposeEnvironment, StartedTestContainer, Wait } from 'testcontainers';
+import { DockerComposeEnvironment, Network, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
 import { setupAPIContainer } from './containers/apiContainer';
-import { endLog, setLogTracing } from './LogConfig';
+import { setupMongoContainer } from './containers/mongoContainer';
+import { endLog } from './LogConfig';
 
 let environment: StartedDockerComposeEnvironment;
 
@@ -21,31 +22,9 @@ export async function stop() {
   await environment.down();
 }
 
-async function executeCommand(container: StartedTestContainer, script: string[]): Promise<string> {
-  return container.exec(script).then((result) => {
-    if (result.exitCode !== 0) {
-      console.error(result.output);
-      throw result.output;
-    }
-    return result.output;
-  });
-}
-
-async function setMongoUser(mongoContainer: StartedTestContainer) {
-  await executeCommand(mongoContainer, ['./scripts/mongo-rs-setup.sh']);
-
-  await new Promise((r) => {
-    setTimeout(r, 30 * 1000);
-  });
-
-  await executeCommand(mongoContainer, ['./scripts/mongo-user-setup.sh']);
-}
-
 export async function configure() {
   const composeFilePath = path.resolve(__dirname, './');
   const composeFile = 'docker-compose.yml';
-
-  await setupAPIContainer();
 
   environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
     .withWaitStrategy(mongoContainerName, Wait.forHealthCheck())
@@ -53,10 +32,15 @@ export async function configure() {
     .withStartupTimeout(120_000)
     .up();
 
+  const net = await new Network().start();
+  await setupMongoContainer(net);
+
+  await setupAPIContainer(net);
+
   console.debug('-- Setting log tracing --');
-  await setLogTracing(environment);
-  const mongoContainer = environment.getContainer(mongoContainerName);
-  console.debug('-- Setting up mongo user --');
-  await setMongoUser(mongoContainer);
-  console.debug('-- Environment Ready --');
+  // await setLogTracing(environment);
+  // const mongoContainer = environment.getContainer(mongoContainerName);
+  // console.debug('-- Setting up mongo user --');
+  // await setMongoUser(mongoContainer);
+  // console.debug('-- Environment Ready --');
 }

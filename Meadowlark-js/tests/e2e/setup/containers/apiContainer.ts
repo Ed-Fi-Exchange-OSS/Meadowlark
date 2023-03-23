@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { resolve } from 'path';
-import { GenericContainer, Wait } from 'testcontainers';
+import { GenericContainer, StartedNetwork } from 'testcontainers';
 import { setAPILog } from '../LogConfig';
 
 async function generateContainerWithImage(): Promise<GenericContainer> {
@@ -23,13 +23,14 @@ async function generateContainerWithImage(): Promise<GenericContainer> {
   return apiContainer;
 }
 
-export async function setupAPIContainer() {
+export async function setupAPIContainer(network: StartedNetwork) {
   const container = await generateContainerWithImage();
 
   const fastifyPort = process.env.FASTIFY_PORT ?? '3001';
 
   container
     .withName('meadowlark-api-test')
+    .withNetwork(network)
     .withExposedPorts({
       container: parseInt(fastifyPort, 10),
       host: parseInt(fastifyPort, 10),
@@ -59,8 +60,7 @@ export async function setupAPIContainer() {
       LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
       IS_LOCAL: 'false',
       AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
-    })
-    .withWaitStrategy(Wait.forHttp('/local', parseInt(fastifyPort, 10)));
+    });
 
   await setAPILog(await container.start());
 }
