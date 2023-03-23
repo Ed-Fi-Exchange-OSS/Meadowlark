@@ -43,7 +43,6 @@ jobs:
           fi
 
       - name: Build
+        working-directory: docker
         run: |
           docker build --build-arg ML_VERSION=${NPM_VERSION} ${TAG_ARGS} .
-        with:
-          working-directory: docker
