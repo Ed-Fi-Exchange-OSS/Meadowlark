@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+name: Testing Docker build
+on:
+  workflow-dispatch
+
+env:
+  DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+  # REF: ${{ github.ref_name }}
+  REF: v0.3.6-pre-0
+
+jobs:
+  docker-publish:
+    name: Publish to Azure Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: Wait 20s
+        # Give Azure Artifacts caching a moment to catch up
+        run: sleep 20
+
+      - name: Prepare Tags
+        run: |
+          BASE="edfialliance/meadowlark-ed-fi-api"
+
+          REF="${{ env.REF }}"
+          NPM_VERSION=${REF:1}  # strip off the leading 'v'
+
+          if [[ $REF =~ "pre" ]]
+          then
+            TAG_ARGS="--tag ${BASE}:${REF} --tag ${BASE}:pre"
+          else
+            MINOR=`echo ${REF} | awk -F"." '{print $1"."$2}'`
+            MAJOR=`echo ${REF} | awk -F"." '{print $1}'`
+            TAG_ARGS="--tag ${BASE}:${REF} --tag ${BASE}:${MINOR} --tag ${BASE}:${MAJOR}"
+            # NOTE: not tagging as `latest` at this point, because there could be patch
+            # releases on older releases that would then take over as "latest".
+          fi
+
+      - name: Build
+        run: |
+          docker build --build-arg ML_VERSION=${NPM_VERSION} ${TAG_ARGS} .
+        with:
+          working-directory: docker
