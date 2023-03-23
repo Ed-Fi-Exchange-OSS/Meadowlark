@@ -17,8 +17,8 @@ jobs:
     name: Publish to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      # - name: Checkout repository
+      #   uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
       - name: Wait 20s
         # Give Azure Artifacts caching a moment to catch up
@@ -33,16 +33,38 @@ jobs:
 
           if [[ $REF =~ "pre" ]]
           then
-            TAG_ARGS="--tag ${BASE}:${REF} --tag ${BASE}:pre"
+            TAGS="${REF},pre"
           else
             MINOR=`echo ${REF} | awk -F"." '{print $1"."$2}'`
             MAJOR=`echo ${REF} | awk -F"." '{print $1}'`
-            TAG_ARGS="--tag ${BASE}:${REF} --tag ${BASE}:${MINOR} --tag ${BASE}:${MAJOR}"
+            TAGS="${REF},${MINOR},${MAJOR}"
             # NOTE: not tagging as `latest` at this point, because there could be patch
             # releases on older releases that would then take over as "latest".
           fi
 
-      - name: Build
-        working-directory: docker
-        run: |
-          docker build --build-arg ML_VERSION=${NPM_VERSION} ${TAG_ARGS} .
+      # - name: Build
+      #   working-directory: docker
+      #   run: |
+      #     docker build --build-arg ML_VERSION=${NPM_VERSION} ${TAG_ARGS} .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a  # v2.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96  # v4.3.0
+        with:
+          images: edfialliance/meadowlark-ed-fi-api
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          # push: true
+          tags: edfialliance/meadowlark-ed-fi-api:${{ env.REF }}
+          build-args: ML_VERSION=${NPM_VERSION}
+          file: docker/Dockerfile
+          tags: ${{ env.TAGS }}
+          labels: ${{ steps.meta.outputs.labels }}
