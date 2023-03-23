@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+name: On Pre-Release
+on:
+  release:
+    types:
+      - prereleased
+
+env:
+  ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
+
+defaults:
+  run:
+    working-directory: Meadowlark-js
+
+jobs:
+  azure-publish:
+    name: Publish to Azure Artifacts
+    runs-on: ubuntu-latest
+    outputs:
+      hash-code: ${{ steps.hash-code.outputs.hash-code }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          # Need full Git history for calculating the version number
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        with:
+          node-version: "16"
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install dependencies
+        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        run: npm install
+
+      - name: Update version to match tag
+        working-directory: eng/version
+        run: |
+          npm install
+          node ./set.js ${{ github.ref_name }}
+
+      - name: Transpile to JS
+        run: npm run build --workspaces
+
+      - name: Create .npmrc for Azure Artifacts publishing
+        run: |
+          set +x  # disable echo to shell so that the base64-encoded API key never escapes into the log.
+
+          # Create the user .npmrc file with proper settings
+          API_KEY=`echo -n "${{ env.ARTIFACTS_API_KEY }}" | base64`
+          touch $HOME/.npmrc
+          echo "; begin auth token" >> $HOME/.npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> $HOME/.npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=$API_KEY >> $HOME/.npmrc
+          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=techsupport@ed-fi.org >> $HOME/.npmrc
+          echo "; end auth token" >> $HOME/.npmrc
+
+      - name: Publish
+        run: npm publish --workspaces --tag dev
+
+      # NOTE: there are uncommitted version number changes in package.json. No
+      # problem! Our strategy is to rely on the tag history for version numbers,
+      # not on package.json.

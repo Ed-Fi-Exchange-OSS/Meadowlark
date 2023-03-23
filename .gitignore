@@ -2,3 +2,4 @@
 .env.*
 !.env.example
 Meadowlark-js/.env-docker
+**/node_modules/

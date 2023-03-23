@@ -26,6 +26,7 @@ jobs:
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
   analyze-code:
+    # This Action will fail if run on anything other than a pull request
     if: github.event_name == 'pull_request'
     name: Analyze Code Dependencies
     runs-on: ubuntu-latest
@@ -159,7 +160,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -243,7 +244,7 @@ jobs:
     # { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }, # Restore after RND-494
     steps:
       - name: Checkout repository
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1

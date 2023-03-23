@@ -1,10 +1,10 @@
 {
   "name": "@edfi/meadowlark-fastify",
-  "version": "0.3.0-dev.0",
+  "version": "0.3.0-pre-36",
   "description": "Meadowlark service using Fastify",
   "license": "Apache-2.0",
   "publishConfig": {
-    "registry": "https://www.myget.org/F/ed-fi/npm/"
+    "registry": "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/"
   },
   "files": [
     "/dist",
@@ -12,9 +12,9 @@
     "/package.json"
   ],
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "0.3.0-dev.0",
-    "@edfi/meadowlark-core": "0.3.0-dev.0",
-    "@edfi/meadowlark-utilities": "0.3.0-dev.0",
+    "@edfi/meadowlark-authz-server": "^v0.3.0-pre-35",
+    "@edfi/meadowlark-core": "^v0.3.0-pre-35",
+    "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
     "@fastify/rate-limit": "^6.0.1",
     "dotenv": "^16.0.3",
     "fastify": "^3.29.3"
