@@ -5,7 +5,7 @@
 
 name: Testing Docker build
 on:
-  workflow-dispatch
+  workflow_dispatch:
 
 env:
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
