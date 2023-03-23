@@ -14,7 +14,7 @@ env:
 
 jobs:
   docker-publish:
-    name: Publish to Azure Artifacts
+    name: Publish to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
