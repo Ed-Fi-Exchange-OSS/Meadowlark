@@ -1,7 +1,5 @@
 module.exports = {
-  transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: 'tsconfig.spec.json' }],
-  },
+  preset: 'ts-jest',
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['dotenv/config'],
   rootDir: '../../..',
