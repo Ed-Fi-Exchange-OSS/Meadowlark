@@ -9,9 +9,10 @@ on:
 
 env:
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-  DOCKER_USERNAME: edfi
+  DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
   # REF: ${{ github.ref_name }}
   REF: v0.3.6-pre-0
+  IMAGE_NAME: ${{ vars.MEADOWLARK_IMAGE_NAME }}
 
 jobs:
   docker-publish:
@@ -25,7 +26,7 @@ jobs:
       - name: Prepare Tags
         id: prepare-tags
         run: |
-          BASE="edfialliance/meadowlark-ed-fi-api"
+          BASE="${{ env.IMAGE_NAME }"
 
           REF="${{ env.REF }}"
           NPM_VERSION=${REF:1}  # strip off the leading 'v'
@@ -58,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96  # v4.3.0
         with:
-          images: edfialliance/meadowlark-ed-fi-api
+          images: ${{ env.IMAGE_NAME }
 
       - name: Build and push
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671  # v4.0.0
@@ -66,6 +67,6 @@ jobs:
           context: "{{defaultContext}}:docker"
           build-args: ML_VERSION=${{ steps.prepare-tags.outputs.NPM_VERSION }}
           file: Dockerfile
-          tags: ${{ steps.prepare-tags.outputs.TAGS }}
+          tags: ${{ env.IMAGE_NAME }:${{ steps.prepare-tags.outputs.TAGS }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
