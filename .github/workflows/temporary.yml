@@ -34,13 +34,13 @@ jobs:
           if [[ $REF =~ "pre" ]]
           then
             # Pre-releases get the version and the tag "pre"
-            TAGS="${REF},pre"
+            TAGS="${{ env.IMAGE_NAME }}:${REF},${{ env.IMAGE_NAME }}:pre"
           else
             # Releases get the version, plus shortened form for minor release.
             # We are not using shortened form for major or using "latest"
             # because they are too imprecise.
             MINOR=`echo ${REF} | awk -F"." '{print $1"."$2}'`
-            TAGS="${REF},${MINOR}"
+            TAGS="${{ env.IMAGE_NAME }}:${REF},${{ env.IMAGE_NAME }}:${MINOR}"
           fi
 
           echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
@@ -67,6 +67,6 @@ jobs:
           context: "{{defaultContext}}:docker"
           build-args: ML_VERSION=${{ steps.prepare-tags.outputs.NPM_VERSION }}
           file: Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:${{ steps.prepare-tags.outputs.TAGS }}
+          tags: ${{ steps.prepare-tags.outputs.TAGS }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
