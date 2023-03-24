@@ -16,6 +16,7 @@ env:
   DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
   REF: ${{ github.ref_name }}
   IMAGE_NAME: ${{ vars.MEADOWLARK_IMAGE_NAME }}
+  NPM_REGISTRY: $${{ vars.NPM_REGISTRY }}
 
 defaults:
   run:
@@ -62,9 +63,9 @@ jobs:
           API_KEY=`echo -n "${{ env.ARTIFACTS_API_KEY }}" | base64`
           touch $HOME/.npmrc
           echo "; begin auth token" >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=$API_KEY >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=techsupport@ed-fi.org >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:username=ed-fi-alliance >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:_password=$API_KEY >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:email=techsupport@ed-fi.org >> $HOME/.npmrc
           echo "; end auth token" >> $HOME/.npmrc
 
       - name: Publish
