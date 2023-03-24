@@ -62,7 +62,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          # push: true
+          push: true
           tags: edfialliance/meadowlark-ed-fi-api:${{ env.REF }}
           build-args: ML_VERSION=${NPM_VERSION}
           file: docker/Dockerfile
