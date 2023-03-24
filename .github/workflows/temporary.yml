@@ -17,9 +17,6 @@ jobs:
     name: Publish to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout repository
-      #   uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-
       - name: Wait 20s
         # Give Azure Artifacts caching a moment to catch up
         run: sleep 20
@@ -33,19 +30,15 @@ jobs:
 
           if [[ $REF =~ "pre" ]]
           then
+            # Pre-releases get the version and the tag "pre"
             TAGS="${REF},pre"
           else
+            # Releases get the version, plus shortened form for minor release.
+            # We are not using shortened form for major or using "latest"
+            # because they are too imprecise.
             MINOR=`echo ${REF} | awk -F"." '{print $1"."$2}'`
-            MAJOR=`echo ${REF} | awk -F"." '{print $1}'`
-            TAGS="${REF},${MINOR},${MAJOR}"
-            # NOTE: not tagging as `latest` at this point, because there could be patch
-            # releases on older releases that would then take over as "latest".
+            TAGS="${REF},${MINOR}"
           fi
-
-      # - name: Build
-      #   working-directory: docker
-      #   run: |
-      #     docker build --build-arg ML_VERSION=${NPM_VERSION} ${TAG_ARGS} .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a  # v2.1.0
@@ -60,7 +53,7 @@ jobs:
           images: edfialliance/meadowlark-ed-fi-api
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671  # v4.0.0
         with:
           push: true
           tags: edfialliance/meadowlark-ed-fi-api:${{ env.REF }}
