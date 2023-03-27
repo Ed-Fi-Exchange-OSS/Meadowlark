@@ -12,6 +12,11 @@ on:
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
+  DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+  DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+  REF: ${{ github.ref_name }}
+  IMAGE_NAME: ${{ vars.MEADOWLARK_IMAGE_NAME }}
+  NPM_REGISTRY: $${{ vars.NPM_REGISTRY }}
 
 defaults:
   run:
@@ -45,7 +50,7 @@ jobs:
         working-directory: eng/version
         run: |
           npm install
-          node ./set.js ${{ github.ref_name }}
+          node ./set.js ${{ env.REF }}
 
       - name: Transpile to JS
         run: npm run build --workspaces
@@ -58,14 +63,73 @@ jobs:
           API_KEY=`echo -n "${{ env.ARTIFACTS_API_KEY }}" | base64`
           touch $HOME/.npmrc
           echo "; begin auth token" >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:username=ed-fi-alliance >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:_password=$API_KEY >> $HOME/.npmrc
-          echo //pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/:email=techsupport@ed-fi.org >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:username=ed-fi-alliance >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:_password=$API_KEY >> $HOME/.npmrc
+          echo ${{ env.NPM_REGISTRY }}:email=techsupport@ed-fi.org >> $HOME/.npmrc
           echo "; end auth token" >> $HOME/.npmrc
 
       - name: Publish
         run: npm publish --workspaces --tag dev
+        # NOTE: there are uncommitted version number changes in package.json. No
+        # problem! Our strategy is to rely on the tag history for version numbers,
+        # not on package.json.
 
-      # NOTE: there are uncommitted version number changes in package.json. No
-      # problem! Our strategy is to rely on the tag history for version numbers,
-      # not on package.json.
+  docker-publish:
+    name: Publish to Docker Hub
+    runs-on: ubuntu-latest
+    needs:
+      - azure-publish
+    steps:
+      - name: Wait 20s
+        # Give Azure Artifacts caching a moment to catch up
+        run: sleep 20
+
+      - name: Prepare Tags
+        id: prepare-tags
+        run: |
+          BASE="${{ env.IMAGE_NAME }}"
+
+          REF="${{ env.REF }}"
+          NPM_VERSION=${REF:1}  # strip off the leading 'v'
+
+          if [[ $REF =~ "pre" ]]
+          then
+            # Pre-releases get the version and the tag "pre"
+            TAGS="${{ env.IMAGE_NAME }}:${REF},${{ env.IMAGE_NAME }}:pre"
+          else
+            # Releases get the version, plus shortened form for minor release.
+            # We are not using shortened form for major or using "latest"
+            # because they are too imprecise.
+            MINOR=`echo ${REF} | awk -F"." '{print $1"."$2}'`
+            TAGS="${{ env.IMAGE_NAME }}:${REF},${{ env.IMAGE_NAME }}:${MINOR}"
+          fi
+
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+          echo "NPM_VERSION=$NPM_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4b4e9c3e2d4531116a6f8ba8e71fc6e2cb6e6c8c  # v2.5.0
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a  # v2.1.0
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96  # v4.3.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+
+      - name: Build and push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671  # v4.0.0
+        with:
+          context: "{{defaultContext}}:docker"
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:pre
+          cache-to: type=inline
+          build-args: ML_VERSION=${{ steps.prepare-tags.outputs.NPM_VERSION }}
+          file: Dockerfile
+          tags: ${{ steps.prepare-tags.outputs.TAGS }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
