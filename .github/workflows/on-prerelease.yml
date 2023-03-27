@@ -18,14 +18,13 @@ env:
   IMAGE_NAME: ${{ vars.MEADOWLARK_IMAGE_NAME }}
   NPM_REGISTRY: ${{ vars.NPM_REGISTRY }}
 
-defaults:
-  run:
-    working-directory: Meadowlark-js
-
 jobs:
   azure-publish:
     name: Publish to Azure Artifacts
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Meadowlark-js
     outputs:
       hash-code: ${{ steps.hash-code.outputs.hash-code }}
     steps:
