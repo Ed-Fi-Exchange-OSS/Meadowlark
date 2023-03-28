@@ -4,8 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { resolve } from 'path';
-import { GenericContainer, StartedNetwork } from 'testcontainers';
+import { GenericContainer, StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { setAPILog } from '../LogConfig';
+
+let startedContainer: StartedTestContainer;
 
 async function generateContainerWithImage(): Promise<GenericContainer> {
   let apiContainer: GenericContainer;
@@ -23,7 +25,7 @@ async function generateContainerWithImage(): Promise<GenericContainer> {
   return apiContainer;
 }
 
-export async function setupAPIContainer(network: StartedNetwork) {
+export async function setup(network: StartedNetwork) {
   const container = await generateContainerWithImage();
 
   const fastifyPort = process.env.FASTIFY_PORT ?? '3001';
@@ -58,6 +60,12 @@ export async function setupAPIContainer(network: StartedNetwork) {
       AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
     });
 
-  const startedContainer = await container.start();
+  startedContainer = await container.start();
   await setAPILog(startedContainer);
+
+  process.env.ROOT_URL = `http://localhost:${fastifyPort}`;
+}
+
+export async function stop(): Promise<void> {
+  await startedContainer.stop();
 }

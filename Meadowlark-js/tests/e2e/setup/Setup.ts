@@ -22,13 +22,10 @@ module.exports = async () => {
 
   console.debug('-- Authenticating Admin --');
   await credentialManager.authenticateAdmin();
-  console.debug('-- Creating Automation Users --');
 
+  console.debug('-- Creating Automation Users --');
   await credentialManager.createAutomationUsers();
   console.timeEnd('Setup Time');
-
-  console.log(process.env.ROOT_URL);
-  console.log(process.env.DOCUMENT_STORE_PLUGIN);
 
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
   process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';

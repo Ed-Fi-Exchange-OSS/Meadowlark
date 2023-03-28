@@ -3,11 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MongoDBContainer, StartedNetwork, Wait } from 'testcontainers';
+import { MongoDBContainer, StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { setMongoLog } from '../LogConfig';
 
-export async function setupMongoContainer(network: StartedNetwork) {
-  const container = await new MongoDBContainer(
+let startedContainer: StartedTestContainer;
+
+export async function setup(network: StartedNetwork) {
+  startedContainer = await new MongoDBContainer(
     'mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644',
   )
     .withNetwork(network)
@@ -22,8 +24,11 @@ export async function setupMongoContainer(network: StartedNetwork) {
       '--enableMajorityReadConcern',
       'true',
     ])
-    .withWaitStrategy(Wait.forHealthCheck())
     .start();
 
-  await setMongoLog(container);
+  await setMongoLog(startedContainer);
+}
+
+export async function stop(): Promise<void> {
+  await startedContainer.stop();
 }
