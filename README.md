@@ -21,10 +21,10 @@ information on the background and design decisions for this project.
 
 ## Getting Started
 
-* [Running on Localhost](docs/LOCALHOST.md)
-* [Configuration](docs/CONFIGURATION.md)
-* [Developer getting started notes](docs/README.md)
-* [Additional technical details](docs/TECHNICAL.md)
+* [Running on Localhost](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/LOCALHOST.md)
+* [Configuration](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/CONFIGURATION.md)
+* [Developer getting started notes](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/README.md)
+* [Additional technical details](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/TECHNICAL.md)
 * [How to Submit an Issue](https://techdocs.ed-fi.org/x/Y8uIBg) (Tech Docs)
 * [How Submit a Feature Request](https://techdocs.ed-fi.org/x/0YADAQ) (Tech
   Docs)
@@ -41,8 +41,8 @@ capabilities on Azure, the preferred platform for our first pilot project.
 ## Contributing
 
 The Ed-Fi Alliance welcomes code contributions from the community. Please read
-the [Contributor's Guide](docs/CONTRIBUTING.md) for detailed information on how
-to contribute source code.
+the [Contributor's Guide](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/CONTRIBUTING.md)
+for detailed information on how to contribute source code.
 
 Looking for an easy way to get started? Review [Meadowlark up-for-grabs
 tickets](https://tracker.ed-fi.org/issues/?filter=15400) for a list of useful
@@ -53,15 +53,15 @@ thus won't be addressed in upcoming sprints.
 
 Copyright (c) 2023 Ed-Fi Alliance, LLC and contributors.
 
-Licensed under the [Apache License, Version 2.0](LICENSE) (the "License").
+Licensed under the [Apache License, Version 2.0](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/LICENSE) (the "License").
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
-See [NOTICES](NOTICES.md) for additional copyright and license notifications.
-See [CONTRIBUTORS](CONTRIBUTORS.md) for a list of external contributors to the
+See [NOTICES](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/NOTICES.md) for additional copyright and license notifications.
+See [CONTRIBUTORS](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/CONTRIBUTORS.md) for a list of external contributors to the
 project.
 
 Meadowlark image: Copyright &copy; Joel Chamberlain, [some rights
