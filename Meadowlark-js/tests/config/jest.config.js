@@ -1,5 +1,8 @@
+const { defaults: tsjPreset } = require('ts-jest/presets');
+
 module.exports = {
-  preset: 'ts-jest',
+  transform: tsjPreset.transform,
+  transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['dotenv/config'],
   rootDir: '../../..',
