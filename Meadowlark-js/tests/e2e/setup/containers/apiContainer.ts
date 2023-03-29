@@ -28,14 +28,14 @@ async function generateContainerWithImage(): Promise<GenericContainer> {
 export async function setup(network: StartedNetwork) {
   const container = await generateContainerWithImage();
 
-  const fastifyPort = process.env.FASTIFY_PORT ?? '3001';
+  const fastifyPort = parseInt(process.env.FASTIFY_PORT ?? '3001', 10);
 
   container
     .withName('meadowlark-api-test')
     .withNetwork(network)
     .withExposedPorts({
-      container: parseInt(fastifyPort, 10),
-      host: parseInt(fastifyPort, 10),
+      container: fastifyPort,
+      host: fastifyPort,
     })
     .withEnvironment({
       OAUTH_SIGNING_KEY: process.env.OAUTH_SIGNING_KEY ?? '',
@@ -52,7 +52,7 @@ export async function setup(network: StartedNetwork) {
       LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend',
       MONGO_URI: process.env.MONGO_URI ?? 'mongodb://mongo-t1:27017/?directConnection=true',
       FASTIFY_RATE_LIMIT: 'false',
-      FASTIFY_PORT: fastifyPort,
+      FASTIFY_PORT: `${fastifyPort}`,
       FASTIFY_NUM_THREADS: process.env.FASTIFY_NUM_THREADS ?? '10',
       MEADOWLARK_STAGE: 'local',
       LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
