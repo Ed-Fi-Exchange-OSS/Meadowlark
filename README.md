@@ -1,8 +1,8 @@
 # Ed-Fi-Meadowlark
 
 <img alt="Meadowlark photo (c) Joel Chamberlain"
- src="images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png" align="right"
- width="300">
+ src="https://raw.githubusercontent.com/Ed-Fi-Exchange-OSS/Meadowlark/main/images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png"
+ align="right" width="300">
 
 Project Meadowlark is a research and development effort to explore potential for
 use of new technologies, including managed cloud services, for starting up a
