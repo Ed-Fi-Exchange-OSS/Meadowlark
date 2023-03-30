@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Network } from 'testcontainers';
+import { Network, StartedNetwork } from 'testcontainers';
 import * as ApiContainer from './containers/ApiContainer';
 import * as MongoContainer from './containers/MongoContainer';
 import * as OpenSearchContainer from './containers/OpenSearchContainer';
@@ -16,7 +16,13 @@ export async function stop() {
 }
 
 export async function configure() {
-  const network = await new Network().start();
+  let network: StartedNetwork;
+  try {
+    network = await new Network().start();
+  } catch (error) {
+    throw new Error(`\n${error}`);
+  }
+
   await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
 
   console.debug('-- Environment Ready --');

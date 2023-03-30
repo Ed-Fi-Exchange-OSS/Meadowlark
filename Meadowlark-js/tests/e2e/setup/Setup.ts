@@ -13,12 +13,9 @@ dotenv.config({ path: path.join(__dirname, './.env') });
 
 module.exports = async () => {
   console.time('Setup Time');
-  try {
-    console.debug('\n-- Configuring environment --');
-    await setupEnvironment.configure();
-  } catch (error) {
-    throw new Error(`Unexpected error setting up environment.\n${error}`);
-  }
+
+  console.debug('-- Configuring Environment --');
+  await setupEnvironment.configure();
 
   console.debug('-- Authenticating Admin --');
   await credentialManager.authenticateAdmin();

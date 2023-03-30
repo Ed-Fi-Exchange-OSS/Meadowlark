@@ -25,22 +25,34 @@ export function endLog() {
 }
 
 export async function setMongoLog(container: StartedTestContainer) {
-  const mongoStream = await container.logs();
-  mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
+  try {
+    const mongoStream = await container.logs();
+    mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
 
-  mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
+    mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up mongo logs:\n${error}`);
+  }
 }
 
 export async function setAPILog(container: StartedTestContainer) {
-  const apiStream = await container.logs();
-  apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
+  try {
+    const apiStream = await container.logs();
+    apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
 
-  apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+    apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up api logs:\n${error}`);
+  }
 }
 
 export async function setOpenSearchLog(container: StartedTestContainer) {
-  const osStream = await container.logs();
-  opSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
+  try {
+    const osStream = await container.logs();
+    opSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
 
-  osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+    osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up open search logs:\n${error}`);
+  }
 }
