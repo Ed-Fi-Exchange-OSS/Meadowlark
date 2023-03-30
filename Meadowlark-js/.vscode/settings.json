@@ -33,6 +33,7 @@
     "FASTIFY",
     "metaed",
     "opensearch",
+    "opensearchproject",
     "teamcity",
     "testcontainers",
     "uncapitalize"
