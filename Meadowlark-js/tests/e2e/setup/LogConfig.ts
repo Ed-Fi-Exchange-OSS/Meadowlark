@@ -4,17 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import fs from 'fs-extra';
-import { StartedDockerComposeEnvironment } from 'testcontainers';
+import { StartedTestContainer } from 'testcontainers';
 
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
 let opSearchWriteStream: fs.WriteStream;
 
 const logFolder = './tests/e2e/logs';
-
-const mongoContainerName = 'mongo-test1';
-const apiContainerName = 'meadowlark-api-test';
-const opSearchContainerName = 'opensearch-test';
 
 export function endLog() {
   if (apiWriteStream) {
@@ -28,19 +24,35 @@ export function endLog() {
   }
 }
 
-export async function setLogTracing(environment: StartedDockerComposeEnvironment) {
-  const apiStream = await environment.getContainer(apiContainerName).logs();
-  apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
+export async function setMongoLog(container: StartedTestContainer) {
+  try {
+    const mongoStream = await container.logs();
+    mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
 
-  apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+    mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up mongo logs:\n${error}`);
+  }
+}
 
-  const mongoStream = await environment.getContainer(mongoContainerName).logs();
-  mongoWriteStream = fs.createWriteStream(`${logFolder}/mongo.log`);
+export async function setAPILog(container: StartedTestContainer) {
+  try {
+    const apiStream = await container.logs();
+    apiWriteStream = fs.createWriteStream(`${logFolder}/meadowlark-api.log`);
 
-  mongoStream.on('data', (line) => mongoWriteStream.write(line)).on('err', (line) => mongoWriteStream.write(line));
+    apiStream.on('data', (line) => apiWriteStream.write(line)).on('err', (line) => apiWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up api logs:\n${error}`);
+  }
+}
 
-  const osStream = await environment.getContainer(opSearchContainerName).logs();
-  opSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
+export async function setOpenSearchLog(container: StartedTestContainer) {
+  try {
+    const osStream = await container.logs();
+    opSearchWriteStream = fs.createWriteStream(`${logFolder}/openSearch.log`);
 
-  osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+    osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up open search logs:\n${error}`);
+  }
 }

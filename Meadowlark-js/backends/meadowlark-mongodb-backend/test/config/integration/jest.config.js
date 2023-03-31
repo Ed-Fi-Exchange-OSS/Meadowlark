@@ -2,7 +2,7 @@
 const defaultConfig = require('../../../../../tests/config/jest.config');
 
 module.exports = {
-  displayName: 'Integration Tests: Mongodb ',
+  displayName: 'Integration Tests: Mongodb',
   ...defaultConfig,
   preset: '@shelf/jest-mongodb',
   testMatch: ['**/meadowlark-mongodb-backend/test/integration/**/*.(spec|test).[jt]s?(x)'],

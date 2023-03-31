@@ -26,7 +26,7 @@ export async function createResource(
     .send(body)
     .then((response) => {
       if (response.body) {
-        console.error(`Error on ${endpoint}:\n${response.body}`);
+        console.error(`Error on ${endpoint}:\n${JSON.stringify(response.body)}`);
         expect(response.body).toMatchInlineSnapshot(`undefined`);
       }
       if (upsert) {
