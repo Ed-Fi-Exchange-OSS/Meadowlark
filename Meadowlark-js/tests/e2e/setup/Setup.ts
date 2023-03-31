@@ -14,7 +14,7 @@ dotenv.config({ path: path.join(__dirname, './.env') });
 module.exports = async () => {
   console.time('Setup Time');
 
-  console.debug('-- Configuring Environment --');
+  console.debug('\n-- Configuring Environment --');
   await setupEnvironment.configure();
 
   console.debug('-- Authenticating Admin --');
