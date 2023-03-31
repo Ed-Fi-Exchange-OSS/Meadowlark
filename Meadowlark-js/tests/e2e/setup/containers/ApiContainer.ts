@@ -13,6 +13,8 @@ export async function setup(network: StartedNetwork) {
 
   const fastifyPort = parseInt(process.env.FASTIFY_PORT ?? '3001', 10);
 
+  console.info(`Building API Image: ${process.env.API_IMAGE_NAME ?? 'meadowlark'}`);
+
   try {
     container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark')
       .withName('meadowlark-api-test')
