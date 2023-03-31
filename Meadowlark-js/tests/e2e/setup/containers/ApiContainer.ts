@@ -3,39 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { resolve } from 'path';
 import { GenericContainer, StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { setAPILog } from '../LogConfig';
 
 let startedContainer: StartedTestContainer;
 
-async function generateContainerWithImage(): Promise<GenericContainer> {
-  let container: GenericContainer;
-
-  try {
-    console.time('API Image Setup');
-    if (process.env.USE_EXISTING_API_IMAGE) {
-      console.info('Skipping image generation. Build image locally (npm run docker:build) or pull from Docker Hub');
-      container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark');
-    } else {
-      console.info('Building image...');
-      container = await GenericContainer.fromDockerfile(resolve(process.cwd())).build();
-    }
-    console.timeEnd('API Image Setup');
-  } catch (error) {
-    throw new Error(`\nUnexpected error building Meadowlark image:\n${error}`);
-  }
-
-  return container;
-}
-
 export async function setup(network: StartedNetwork) {
-  const container = await generateContainerWithImage();
+  let container: GenericContainer;
 
   const fastifyPort = parseInt(process.env.FASTIFY_PORT ?? '3001', 10);
 
   try {
-    container
+    container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark')
       .withName('meadowlark-api-test')
       .withNetwork(network)
       .withExposedPorts({
@@ -67,6 +46,12 @@ export async function setup(network: StartedNetwork) {
 
     startedContainer = await container.start();
   } catch (error) {
+    if (error.statusCode === 404) {
+      throw new Error(
+        "\nAPI Image not found. Verify it exists or do an automatic generation of the 'meadowlark' image with `npm run test:e2e:build`\n",
+      );
+    }
+
     throw new Error(`\nUnexpected error setting up API container:\n${error}`);
   }
   await setAPILog(startedContainer);

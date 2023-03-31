@@ -270,7 +270,7 @@ jobs:
         working-directory: Meadowlark-js/tests/e2e/setup/
 
       - name: End to End tests for ${{matrix.config.db}}
-        run: npm run test:e2e -- --ci
+        run: npm run test:e2e:build -- --ci
         env:
           DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
 
