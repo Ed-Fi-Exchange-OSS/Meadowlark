@@ -99,7 +99,6 @@ Run `test:e2e:dev:setup`, this will generate docker containers with the -test pr
 Run the tests with `npm run test:e2e:jest`. Notice that you *could* use `npm run test:e2e:build` but the generated image will be ignored because the tests are already running.
 
 > **Note**
-> Notes regarding this mode:
 >
 > * This will use a locally built image or the image provided in the `API_IMAGE_NAME`.
 > * This will generate an `ADMIN_KEY` and `ADMIN_SECRET` that can only be generated once, therefore, after the first run, this must be added to the .env variables.
