@@ -71,3 +71,36 @@ delete from meadowlark.references;
 delete from meadowlark.aliases;
 delete from meadowlark.authorization;
 ```
+
+## Running E2E Tests
+
+### Setup
+
+1. Create a .env file based on .env.example in this folder.
+2. Verify that Docker is running
+
+There are multiple ways of running e2e tests, depending on your scenario:
+
+### Building local image
+
+If you're adding new features to Meadowlark, and want to test the changes in an isolated environment, run `npm run test:e2e:build`.
+This will build the Docker image and run the tests against that image, cleaning the environment afterwards.
+
+### Using published image
+
+If you want to run the tests against and existing Docker image, set the variable `API_IMAGE_NAME` in the .env file.
+Run the tests with `npm run test:e2e:jest`.
+This will pull the image and run the tests.
+
+### Developer Mode
+
+If you're adding new e2e tests or want to test in an environment without clearing the test images set the variable `DEVELOPER_MODE` to true in the .env file.
+Run `test:e2e:dev:setup`, this will generate docker containers with the -test prefix that are used for testing.
+Run the tests with `npm run test:e2e:jest`. Notice that you *could* use `npm run test:e2e:build` but the generated image will be ignored because the tests are already running.
+
+:information: Notes regarding this mode:
+
+* This will use a locally built image or the image provided in the `API_IMAGE_NAME`.
+* This will generate an `ADMIN_KEY` and `ADMIN_SECRET` that can only be generated once, therefore, after the first run, this must be added to the .env variables.
+
+To exit this mode, run `test:e2e:dev:exit`. This will stop and delete the docker containers generated.
