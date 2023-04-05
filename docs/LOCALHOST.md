@@ -98,9 +98,10 @@ If you're adding new e2e tests or want to test in an environment without clearin
 Run `test:e2e:dev:setup`, this will generate docker containers with the -test prefix that are used for testing.
 Run the tests with `npm run test:e2e:jest`. Notice that you *could* use `npm run test:e2e:build` but the generated image will be ignored because the tests are already running.
 
-:information: Notes regarding this mode:
-
-* This will use a locally built image or the image provided in the `API_IMAGE_NAME`.
-* This will generate an `ADMIN_KEY` and `ADMIN_SECRET` that can only be generated once, therefore, after the first run, this must be added to the .env variables.
-
-To exit this mode, run `test:e2e:dev:exit`. This will stop and delete the docker containers generated.
+> **Note**
+> Notes regarding this mode:
+>
+> * This will use a locally built image or the image provided in the `API_IMAGE_NAME`.
+> * This will generate an `ADMIN_KEY` and `ADMIN_SECRET` that can only be generated once, therefore, after the first run, this must be added to the .env variables.
+>
+> To exit this mode, run `test:e2e:dev:exit`. This will stop and delete the docker containers generated.
