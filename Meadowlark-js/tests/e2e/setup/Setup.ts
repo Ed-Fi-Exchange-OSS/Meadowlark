@@ -17,13 +17,14 @@ module.exports = async () => {
   console.debug('\n-- Configuring Environment --');
   await setupEnvironment.configure();
 
+  process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
+  process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
+  console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
+
   console.debug('-- Authenticating Admin --');
   await credentialManager.authenticateAdmin();
 
   console.debug('-- Creating Automation Users --');
   await credentialManager.createAutomationUsers();
   console.timeEnd('Setup Time');
-
-  process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
-  console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 };

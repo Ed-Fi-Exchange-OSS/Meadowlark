@@ -13,7 +13,7 @@ export async function setup(network: StartedNetwork) {
 
   const fastifyPort = parseInt(process.env.FASTIFY_PORT ?? '3001', 10);
 
-  console.info(`Building API Image: ${process.env.API_IMAGE_NAME ?? 'meadowlark'}`);
+  console.info(`Configuring Meadowlark API with docker image: ${process.env.API_IMAGE_NAME ?? 'meadowlark'}`);
 
   try {
     container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark')
@@ -23,6 +23,7 @@ export async function setup(network: StartedNetwork) {
         container: fastifyPort,
         host: fastifyPort,
       })
+      .withReuse()
       .withEnvironment({
         OAUTH_SIGNING_KEY: process.env.OAUTH_SIGNING_KEY ?? '',
         OAUTH_HARD_CODED_CREDENTIALS_ENABLED: 'true',
@@ -57,8 +58,6 @@ export async function setup(network: StartedNetwork) {
     throw new Error(`\nUnexpected error setting up API container:\n${error}`);
   }
   await setAPILog(startedContainer);
-
-  process.env.ROOT_URL = `http://localhost:${fastifyPort}`;
 }
 
 export async function stop(): Promise<void> {

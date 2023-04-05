@@ -181,6 +181,11 @@ export async function authenticateAdmin(): Promise<void> {
     if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
       const credentials = await createAdminClient();
       setCredentials(credentials);
+      if (process.env.DEVELOPER_MODE) {
+        console.info('INFO ℹ️: Add following values to .env file. Since those cannot be regenerated on current environment');
+        console.info(`ADMIN_KEY=${credentials.key}`);
+        console.info(`ADMIN_SECRET=${credentials.secret}`);
+      }
     } else {
       await getAdminAccessToken();
     }
