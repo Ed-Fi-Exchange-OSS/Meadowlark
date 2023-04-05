@@ -178,16 +178,16 @@ export async function createAutomationUsers(): Promise<void> {
 
 export async function authenticateAdmin(): Promise<void> {
   try {
-    if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
+    if (process.env.DEVELOPER_MODE && process.env.ADMIN_KEY && process.env.ADMIN_SECRET) {
+      await getAdminAccessToken();
+    } else {
       const credentials = await createAdminClient();
-      setCredentials(credentials);
-      if (process.env.DEVELOPER_MODE) {
+      if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
         console.info('INFO ℹ️: Add following values to .env file. Since those cannot be regenerated on current environment');
         console.info(`ADMIN_KEY=${credentials.key}`);
         console.info(`ADMIN_SECRET=${credentials.secret}`);
       }
-    } else {
-      await getAdminAccessToken();
+      setCredentials(credentials);
     }
     console.debug('-- Admin Authenticated --');
   } catch (error) {
