@@ -24,7 +24,9 @@ export async function configure() {
   }
 
   if (process.env.DEVELOPER_MODE) {
-    console.warn('WARNING: Containers should be already be started, if not, setup with `test:e2e:dev:setup`');
+    console.warn(
+      '⚠️ WARNING: Running in DEVELOPER MODE. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
+    );
   } else {
     process.env.ALREADY_SET = 'true';
     console.info('-- Setting up containers --');
