@@ -10,12 +10,13 @@ let startedContainer: StartedTestContainer;
 
 export async function setup(network: StartedNetwork) {
   try {
-    startedContainer = await new MongoDBContainer(
+    const container = new MongoDBContainer(
       'mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644',
     )
       .withNetwork(network)
       .withNetworkAliases('mongo-t1')
       .withName('mongo-test')
+      .withReuse()
       .withCommand([
         '/usr/bin/mongod',
         '--bind_ip_all',
@@ -24,8 +25,9 @@ export async function setup(network: StartedNetwork) {
         '/data/db',
         '--enableMajorityReadConcern',
         'true',
-      ])
-      .start();
+      ]);
+
+    startedContainer = await container.start();
   } catch (error) {
     throw new Error(`\nUnexpected error setting up mongo container:\n${error}`);
   }

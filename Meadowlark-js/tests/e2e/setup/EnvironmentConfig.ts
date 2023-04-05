@@ -23,7 +23,15 @@ export async function configure() {
     throw new Error(`\n${error}`);
   }
 
-  await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
+  if (process.env.DEVELOPER_MODE) {
+    console.warn(
+      '⚠️ WARNING: Running in DEVELOPER MODE. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
+    );
+  } else {
+    process.env.ALREADY_SET = 'true';
+    console.info('-- Setting up containers --');
+    await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
+  }
 
   console.debug('-- Environment Ready --');
 }

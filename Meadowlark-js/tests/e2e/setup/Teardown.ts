@@ -7,7 +7,9 @@ const environment = require('./EnvironmentConfig');
 
 async function endServer() {
   try {
-    await environment.stop();
+    if (!process.env.DEVELOPER_MODE) {
+      await environment.stop();
+    }
   } catch (error) {
     console.info(error);
   }

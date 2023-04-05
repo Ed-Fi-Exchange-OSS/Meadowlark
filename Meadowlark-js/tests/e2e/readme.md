@@ -12,6 +12,16 @@ To run the tests:
 
 Postgresql support is currently disabled and should be included again once Postgresql support is matched on main code.
 
+## Developer Mode
+
+This is a special mode to use when adding new e2e tests or in situations where it is not necessary to use a clean environment.
+
+- To setup, run: `npm run test:e2e:dev:setup`. This will configure the test containers
+- Set the environment variable `DEVELOPER_MODE=true`
+- Run `npm run test:e2e:jest` to run the tests. Save the Admin Key and Secret (as specified in [.env.example](./setup/.env.example)) to be able to run the tests
+without cleaning the environment
+- When done, run: `npm run test:e2e:dev:exit` to clean the environment
+
 ## Troubleshooting
 
 `API Image not found`

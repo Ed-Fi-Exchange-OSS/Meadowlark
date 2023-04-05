@@ -11,11 +11,12 @@ let startedContainer: StartedTestContainer;
 export async function setup(network: StartedNetwork) {
   try {
     const openSearchPort = parseInt(process.env.OPENSEARCH_PORT ?? '8200', 10);
-    startedContainer = await new GenericContainer(
+    const container = new GenericContainer(
       'opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf',
     )
       .withName('opensearch-test')
       .withNetwork(network)
+      .withReuse()
       .withExposedPorts({
         container: openSearchPort,
         host: openSearchPort,
@@ -26,8 +27,9 @@ export async function setup(network: StartedNetwork) {
         DISABLE_SECURITY_PLUGIN: 'true',
         'http.port': `${openSearchPort}`,
       })
-      .withStartupTimeout(120_000)
-      .start();
+      .withStartupTimeout(120_000);
+
+    startedContainer = await container.start();
   } catch (error) {
     throw new Error(`\nUnexpected error setting up open search container:\n${error}`);
   }
