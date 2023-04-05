@@ -183,7 +183,9 @@ export async function authenticateAdmin(): Promise<void> {
     } else {
       const credentials = await createAdminClient();
       if (!process.env.ADMIN_KEY && !process.env.ADMIN_SECRET) {
-        console.info('INFO ℹ️: Add following values to .env file. Since those cannot be regenerated on current environment');
+        console.info(
+          'INFO ℹ️: Add the following values to the .env file. \nIf not saved, tests cannot be executed again until cleaning the environment',
+        );
         console.info(`ADMIN_KEY=${credentials.key}`);
         console.info(`ADMIN_SECRET=${credentials.secret}`);
       }
