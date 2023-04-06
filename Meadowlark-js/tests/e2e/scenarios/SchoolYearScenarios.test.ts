@@ -16,8 +16,6 @@ import {
 import { deleteResourceByLocation } from '../helpers/Resources';
 import { generateRandomId } from '../helpers/Shared';
 
-
-
 describe('When posting a resource that contains a SchoolYear enumeration', () => {
   /*
     There are several different ways of representing school years. Sometimes testing one way of storing it requires saving

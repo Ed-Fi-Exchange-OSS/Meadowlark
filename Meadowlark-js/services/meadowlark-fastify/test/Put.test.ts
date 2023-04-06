@@ -11,8 +11,6 @@ import { buildService } from '../src/Service';
 import { setupMockConfiguration } from './ConfigHelper';
 import * as MeadowlarkConnection from '../src/handler/MeadowlarkConnection';
 
-
-
 const schoolPutRequest: InjectOptions = {
   method: 'PUT',
   url: '/local/v3.3b/ed-fi/schools',

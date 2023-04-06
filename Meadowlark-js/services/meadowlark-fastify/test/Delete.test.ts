@@ -11,8 +11,6 @@ import * as MeadowlarkConnection from '../src/handler/MeadowlarkConnection';
 import { buildService } from '../src/Service';
 import { setupMockConfiguration } from './ConfigHelper';
 
-
-
 describe('given a DELETE of a school by id', () => {
   const schoolDeleteByIdRequest: InjectOptions = {
     method: 'DELETE',

@@ -28,8 +28,6 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 
-
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,

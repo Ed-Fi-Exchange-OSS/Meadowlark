@@ -10,8 +10,6 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { setupMockConfiguration } from '../ConfigHelper';
 
-
-
 const newAxiosResponse = () => ({ status: 0, data: {}, headers: {}, config: {}, statusText: '' });
 
 describe('given a previous middleware has created a response', () => {

@@ -33,8 +33,6 @@ import { getDocumentById } from '../../src/repository/Get';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { setupConfigForIntegration } from './Config';
 
-
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,

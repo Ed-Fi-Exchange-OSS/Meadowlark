@@ -3,8 +3,6 @@ import * as utilities from '@edfi/meadowlark-utilities';
 import { upsertDocument } from '../../src/repository/Upsert';
 import * as DB from '../../src/repository/Db';
 
-
-
 describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;
   let mongoClientMock = {};

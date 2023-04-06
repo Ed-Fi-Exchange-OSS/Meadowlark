@@ -27,8 +27,6 @@ import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-
-
 const newGetRequest = (): GetRequest => ({
   documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
   resourceInfo: NoResourceInfo,

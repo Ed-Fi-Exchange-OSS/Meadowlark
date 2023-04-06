@@ -9,8 +9,6 @@ import * as MeadowlarkConnection from '../../src/handler/MeadowlarkConnection';
 import { buildService } from '../../src/Service';
 import { setupMockConfiguration } from '../ConfigHelper';
 
-
-
 const updateClientRequest: InjectOptions = {
   method: 'PUT',
   url: '/local/oauth/clients/890',
