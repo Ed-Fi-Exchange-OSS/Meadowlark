@@ -25,7 +25,7 @@ jobs:
     name: Scan Actions
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
-  analyze-code:
+  analyze-dependencies:
     # This Action will fail if run on anything other than a pull request
     if: github.event_name == 'pull_request'
     name: Analyze Code Dependencies
@@ -42,7 +42,7 @@ jobs:
       - name: Dependency Review ("Dependabot on PR")
         uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
 
-  analyze:
+  analyze-code:
     name: Analyze Code
     runs-on: ubuntu-latest
     env:
