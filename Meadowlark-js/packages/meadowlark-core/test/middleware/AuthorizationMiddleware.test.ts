@@ -10,7 +10,7 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { setupMockConfiguration } from '../ConfigHelper';
 
-jest.setTimeout(40000);
+
 
 const newAxiosResponse = () => ({ status: 0, data: {}, headers: {}, config: {}, statusText: '' });
 

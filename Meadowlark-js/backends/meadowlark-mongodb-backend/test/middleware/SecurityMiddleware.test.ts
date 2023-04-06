@@ -9,7 +9,7 @@ import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponent
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import * as OwnershipSecurity from '../../src/repository/OwnershipSecurity';
 
-jest.setTimeout(40000);
+
 
 describe('given the upsert where response already posted', () => {
   let result;

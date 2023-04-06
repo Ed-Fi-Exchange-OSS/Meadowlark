@@ -35,8 +35,6 @@ import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
 import { setupConfigForIntegration } from '../Config';
 
-jest.setTimeout(10000);
-
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,

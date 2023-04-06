@@ -8,7 +8,7 @@ import { createLocalEducationAgency, createProgram, createSchool, createStudent 
 import { deleteResourceByLocation } from '../helpers/Resources';
 import { baseURLRequest, generateRandomId, rootURLRequest } from '../helpers/Shared';
 
-jest.setTimeout(40000);
+
 
 describe('Given the existence of a student, a school, a local education agency and a program', () => {
   const schoolId = 100;

@@ -11,7 +11,7 @@ import * as utilities from '@edfi/meadowlark-utilities';
 import { updateDocumentById } from '../../src/repository/Update';
 import * as DB from '../../src/repository/Db';
 
-jest.setTimeout(40000);
+
 
 describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;

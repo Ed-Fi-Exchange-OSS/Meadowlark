@@ -28,8 +28,6 @@ import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,

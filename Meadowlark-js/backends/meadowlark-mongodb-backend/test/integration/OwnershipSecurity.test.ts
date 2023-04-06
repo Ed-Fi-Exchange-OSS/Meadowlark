@@ -26,8 +26,6 @@ import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurit
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
-
 describe('given the getById where resource info is a Descriptor', () => {
   let client;
   let result;

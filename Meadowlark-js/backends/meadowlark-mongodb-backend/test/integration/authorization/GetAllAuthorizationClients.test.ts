@@ -10,8 +10,6 @@ import { createAuthorizationClientDocument } from '../../../src/repository/autho
 import { getAllAuthorizationClientDocuments } from '../../../src/repository/authorization/GetAllAuthorizationClients';
 import { setupConfigForIntegration } from '../Config';
 
-jest.setTimeout(40000);
-
 const clientId = 'clientId';
 
 const TRACE_ID = 'traceId';

@@ -11,7 +11,7 @@ import { buildService } from '../src/Service';
 import { setupMockConfiguration } from './ConfigHelper';
 import * as MeadowlarkConnection from '../src/handler/MeadowlarkConnection';
 
-jest.setTimeout(40000);
+
 
 const schoolPutRequest: InjectOptions = {
   method: 'PUT',

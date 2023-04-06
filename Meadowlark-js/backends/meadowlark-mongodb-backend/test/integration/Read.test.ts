@@ -25,8 +25,6 @@ import { getDocumentById } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
-
 const newGetRequest = (): GetRequest => ({
   documentUuid: '' as DocumentUuid,
   resourceInfo: NoResourceInfo,

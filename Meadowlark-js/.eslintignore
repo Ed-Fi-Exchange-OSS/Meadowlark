@@ -7,3 +7,4 @@ jest.ci-config.js
 jest.e2e-config.js
 jest-mongodb-config.js
 jest.config.js
+global-setup.js

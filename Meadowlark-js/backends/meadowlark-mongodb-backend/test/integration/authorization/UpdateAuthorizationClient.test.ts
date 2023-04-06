@@ -11,8 +11,6 @@ import { updateAuthorizationClientDocument } from '../../../src/repository/autho
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { setupConfigForIntegration } from '../Config';
 
-jest.setTimeout(40000);
-
 const clientIdSame = 'clientIdSame';
 const clientIdDifferent = 'clientIdDifferent';
 

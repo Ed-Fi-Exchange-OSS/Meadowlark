@@ -10,8 +10,6 @@ import { getAuthorizationCollection, getNewClient } from '../../../src/repositor
 import { tryCreateBootstrapAuthorizationAdminDocument } from '../../../src/repository/authorization/TryCreateBootstrapAuthorizationAdmin';
 import { setupConfigForIntegration } from '../Config';
 
-jest.setTimeout(40000);
-
 const clientId = 'clientId';
 
 const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest => ({

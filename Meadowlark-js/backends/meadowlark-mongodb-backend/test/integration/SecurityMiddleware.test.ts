@@ -26,8 +26,6 @@ import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
-
 describe('given the upsert where no document id is specified', () => {
   let client;
   let result;

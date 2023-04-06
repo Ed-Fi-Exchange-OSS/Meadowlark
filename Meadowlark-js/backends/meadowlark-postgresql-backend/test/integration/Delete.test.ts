@@ -31,7 +31,7 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
+
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,

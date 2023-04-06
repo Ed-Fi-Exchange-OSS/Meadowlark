@@ -16,7 +16,7 @@ import {
 import { deleteResourceByLocation } from '../helpers/Resources';
 import { generateRandomId } from '../helpers/Shared';
 
-jest.setTimeout(40000);
+
 
 describe('When posting a resource that contains a SchoolYear enumeration', () => {
   /*
