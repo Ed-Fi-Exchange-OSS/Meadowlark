@@ -13,6 +13,8 @@ import {
   State,
   MetaEdConfiguration,
 } from '@edfi/metaed-core';
+import { initialize as edfiApiSchema } from '@edfi/metaed-plugin-edfi-api-schema';
+import { initialize as edfiUnified } from '@edfi/metaed-plugin-edfi-unified';
 
 import { findMetaEdProjectMetadata, MetaEdProjectMetadata } from './MetaEdProjectMetadata';
 
@@ -71,8 +73,6 @@ function getStateCache(packageName: string): State | undefined {
 
 /**
  * Entry point for loading a MetaEd project, building a MetaEd internal model and running enhancers.
- *
- * Similar to the behavior of the atom-metaed package for the Atom editor.
  */
 export async function loadMetaEdState(projectNpmPackageName: string): Promise<State> {
   const cachedState: State | undefined = getStateCache(projectNpmPackageName);
@@ -90,8 +90,7 @@ export async function loadMetaEdState(projectNpmPackageName: string): Promise<St
       runValidators: true,
       runEnhancers: true,
     }),
-    // Load all @edfi MetaEd plugins
-    pluginScanDirectory: `${nodeModules}/@edfi`,
+    metaEdPlugins: [edfiUnified(), edfiApiSchema()],
   };
 
   // run MetaEd with downloaded packages
