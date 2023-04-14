@@ -5,9 +5,11 @@
 const postgreSQLContainerTeardown = require('./PostgresqlContainer');
 
 module.exports = async () => {
-  try {
-    await postgreSQLContainerTeardown.stop();
-  } catch (error) {
-    throw new Error(`Teardown Error: ${error}`);
+  if (!process.env.CI) {
+    try {
+      await postgreSQLContainerTeardown.stop();
+    } catch (error) {
+      throw new Error(`Teardown Error: ${error}`);
+    }
   }
 };

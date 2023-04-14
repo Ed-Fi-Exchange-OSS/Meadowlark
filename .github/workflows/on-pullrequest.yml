@@ -195,6 +195,13 @@ jobs:
           path: /tmp/jest_rt
           key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Configure postgres
+        if: ${{ matrix.tests.type != 'Unit' }}
+        run: |
+            sudo systemctl start postgresql.service
+            sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
+
+
       - name: Create .env file
         run: |
           # Create a .env file with proper settings

@@ -6,10 +6,12 @@
 const postgreSQLContainer = require('./PostgresqlContainer');
 
 async function setupPostgresIntegrationTestEnvironment() {
-  try {
-    await postgreSQLContainer.setup();
-  } catch (error) {
-    throw new Error(`Error setting up integration test environment: ${error}`);
+  if (!process.env.CI) {
+    try {
+      await postgreSQLContainer.setup();
+    } catch (error) {
+      throw new Error(`Error setting up integration test environment: ${error}`);
+    }
   }
 }
 
