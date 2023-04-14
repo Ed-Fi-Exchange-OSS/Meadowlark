@@ -198,9 +198,8 @@ jobs:
       - name: Configure postgres
         if: ${{ matrix.tests.type != 'Unit' }}
         run: |
-            sudo systemctl start postgresql.service
-            sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
-
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
 
       - name: Create .env file
         run: |
