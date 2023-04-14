@@ -29,7 +29,6 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
-import { setupConfigForIntegration } from './Config';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -61,8 +60,6 @@ describe('given the delete of a non-existent document', () => {
   const documentUuid = generateDocumentUuid();
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     deleteResult = await deleteDocumentById(
@@ -98,8 +95,6 @@ describe('given the delete of an existing document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
@@ -173,8 +168,6 @@ describe('given an delete of a document referenced by an existing document with 
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // The document that will be referenced
@@ -261,8 +254,6 @@ describe('given an delete of a document with an outbound reference only, with va
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // The document that will be referenced
@@ -349,8 +340,6 @@ describe('given an delete of a document referenced by an existing document with 
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // The document that will be referenced
@@ -451,8 +440,6 @@ describe('given the delete of a subclass document referenced by an existing docu
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
     // The document that will be referenced
     await upsertDocument(
