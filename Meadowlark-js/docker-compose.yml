@@ -35,6 +35,7 @@ services:
       END_ALLOWED_SCHOOL_YEAR: ${END_ALLOWED_SCHOOL_YEAR:-2034}
       ALLOW_TYPE_COERCION: ${ALLOW_TYPE_COERCION:-true}
       ALLOW__EXT_PROPERTY: ${ALLOW__EXT_PROPERTY:-true}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
     restart: unless-stopped
     healthcheck:
       test: curl -s http://localhost:3000/local >/dev/null || exit 1
@@ -153,7 +154,7 @@ services:
       - mongo-ml-local-log2:/var/log/mongodb
       - mongo-ml-local-auth:/auth
 
-  # Secondary MongoDB node
+  # Tertiary MongoDB node
   mongo3:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: mongo3-ml-local
@@ -188,6 +189,19 @@ services:
       - mongo-ml-local-log3:/var/log/mongodb
       - mongo-ml-local-auth:/auth
 
+  postgres:
+    image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
+    container_name: postgres-ml
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-abcdefgh1!}
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - pgsql-ml-data:/var/lib/postgresql/data
+
 volumes:
   mongo-ml-local-data1:
     labels:
@@ -212,6 +226,8 @@ volumes:
   opensearch-ml-local-data:
     labels:
       edfi-ml: local
+  pgsql-ml-data:
+    driver: local
   # zookeeper-ml-local-logs:
   #   labels:
   #     edfi-ml: local
