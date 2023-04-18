@@ -26,7 +26,6 @@ import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from './TestHelper';
-import { setupConfigForIntegration } from './Config';
 
 describe('given the upsert where no document id is specified', () => {
   let client: PoolClient;
@@ -42,8 +41,6 @@ describe('given the upsert where no document id is specified', () => {
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // Act
@@ -75,8 +72,6 @@ describe('given the getById of a non-existent document', () => {
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // Act
@@ -134,8 +129,6 @@ describe('given the getById of a document owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // Insert owned document
@@ -194,8 +187,6 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // Insert non-owned document

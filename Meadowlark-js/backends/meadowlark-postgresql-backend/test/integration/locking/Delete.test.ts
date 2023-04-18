@@ -33,7 +33,6 @@ import {
 } from '../../../src/repository/SqlHelper';
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
-import { setupConfigForIntegration } from '../Config';
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
@@ -87,8 +86,6 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   let deleteClient: PoolClient;
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     insertClient = (await getSharedClient()) as PoolClient;
     deleteClient = (await getSharedClient()) as PoolClient;
 
@@ -193,8 +190,6 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
   let deleteClient: PoolClient;
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     insertClient = (await getSharedClient()) as PoolClient;
     deleteClient = (await getSharedClient()) as PoolClient;
 

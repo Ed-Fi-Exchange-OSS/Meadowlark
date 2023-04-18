@@ -31,6 +31,7 @@
     "@types/pg-format": "^1.0.2",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "testcontainers": "^9.4.0"
   }
 }

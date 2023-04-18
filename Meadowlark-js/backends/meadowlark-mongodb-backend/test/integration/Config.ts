@@ -6,7 +6,7 @@
 import { existsSync } from 'fs';
 import dotenv from 'dotenv';
 import { CachedEnvironmentConfigProvider, Config } from '@edfi/meadowlark-utilities';
-import { join, resolve } from 'path';
+import { join } from 'path';
 
 let hasRunAlready = false;
 
@@ -15,8 +15,7 @@ export const setupConfigForIntegration = async () => {
     return;
   }
 
-  // Backup to the root directory to find a .env file
-  const path = resolve(join(__dirname, '..', '..', '..', '..', '.env'));
+  const path = join(process.cwd(), '.env');
 
   if (!existsSync(path)) {
     // eslint-disable-next-line no-console
