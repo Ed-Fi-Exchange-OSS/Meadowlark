@@ -3,8 +3,6 @@ import * as utilities from '@edfi/meadowlark-utilities';
 import { deleteDocumentById } from '../../src/repository/Delete';
 import * as DB from '../../src/repository/Db';
 
-jest.setTimeout(40000);
-
 describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;
   let mongoClientMock = {};

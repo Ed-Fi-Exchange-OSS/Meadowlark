@@ -9,8 +9,6 @@ import * as MeadowlarkConnection from '../../src/handler/MeadowlarkConnection';
 import { buildService } from '../../src/Service';
 import { setupMockConfiguration } from '../ConfigHelper';
 
-jest.setTimeout(40000);
-
 const verifyTokenRequest: InjectOptions = {
   method: 'POST',
   url: '/local/oauth/verify',

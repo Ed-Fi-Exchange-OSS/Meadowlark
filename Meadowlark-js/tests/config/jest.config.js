@@ -5,5 +5,6 @@ module.exports = {
   transformIgnorePatterns: ['<rootDir>.*(node_modules)(?!.*meadowlark-.*).*$'],
   modulePathIgnorePatterns: ['dist*', 'docs*'],
   setupFiles: ['dotenv/config'],
+  setupFilesAfterEnv: ['<rootDir>/tests/config/global-setup.js'],
   rootDir: '../../..',
 };

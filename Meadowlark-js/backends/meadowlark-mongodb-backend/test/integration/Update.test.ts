@@ -30,8 +30,6 @@ import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 
-jest.setTimeout(40000);
-
 const newUpdateRequest = (): UpdateRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   documentUuid: '' as DocumentUuid,

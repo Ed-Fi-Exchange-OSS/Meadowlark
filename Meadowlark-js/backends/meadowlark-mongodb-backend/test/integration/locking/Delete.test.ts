@@ -35,8 +35,6 @@ import {
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { setupConfigForIntegration } from '../Config';
 
-jest.setTimeout(10000);
-
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 
 // A bunch of setup stuff

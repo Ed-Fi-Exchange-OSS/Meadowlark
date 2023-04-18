@@ -28,8 +28,6 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 
-jest.setTimeout(40000);
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
