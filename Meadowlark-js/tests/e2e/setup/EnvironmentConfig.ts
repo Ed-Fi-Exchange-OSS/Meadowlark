@@ -7,12 +7,17 @@ import { Network, StartedNetwork } from 'testcontainers';
 import * as ApiContainer from './containers/ApiContainer';
 import * as MongoContainer from './containers/MongoContainer';
 import * as OpenSearchContainer from './containers/OpenSearchContainer';
+import * as PostgreSqlContainer from './containers/PostgresqlContainer';
 import { endLog } from './LogConfig';
 
 export async function stop() {
   endLog();
   console.info('-- Tearing down environment --');
   await Promise.all([MongoContainer.stop(), ApiContainer.stop(), OpenSearchContainer.stop()]);
+  if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
+    console.info('-- Tearing down postgres --');
+    await PostgreSqlContainer.stop();
+  }
 }
 
 export async function configure() {
@@ -28,9 +33,15 @@ export async function configure() {
       '⚠️ WARNING: Running in DEVELOPER MODE. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
     );
   } else {
+    console.log(process.env.DOCUMENT_STORE_PLUGIN);
     process.env.ALREADY_SET = 'true';
     console.info('-- Setting up containers --');
     await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
+
+    if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
+      console.info('-- Setting up postgres --');
+      await PostgreSqlContainer.setup(network);
+    }
   }
 
   console.debug('-- Environment Ready --');
