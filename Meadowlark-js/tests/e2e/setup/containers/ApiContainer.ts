@@ -45,6 +45,7 @@ export async function setup(network: StartedNetwork) {
         LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
         IS_LOCAL: 'false',
         AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
+        POSTGRES_HOST: 'pg-test',
       });
 
     startedContainer = await container.start();
