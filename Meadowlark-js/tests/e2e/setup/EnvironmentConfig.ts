@@ -20,7 +20,7 @@ export async function stop() {
   }
 }
 
-export async function configure() {
+export async function configure(initialize = true) {
   let network: StartedNetwork;
   try {
     network = await new Network().start();
@@ -28,9 +28,9 @@ export async function configure() {
     throw new Error(`\n${error}`);
   }
 
-  if (process.env.DEVELOPER_MODE) {
+  if (!initialize) {
     console.warn(
-      '⚠️ WARNING: Running in DEVELOPER MODE. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
+      '⚠️ WARNING: Skipping initialization. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
     );
   } else {
     console.log(process.env.DOCUMENT_STORE_PLUGIN);
