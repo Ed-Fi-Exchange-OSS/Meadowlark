@@ -25,7 +25,8 @@ export async function setup(network: StartedNetwork) {
       .withReuse()
       .withDatabase(process.env.MEADOWLARK_DATABASE_NAME)
       .withUsername(process.env.POSTGRES_USER)
-      .withPassword(process.env.POSTGRES_PASSWORD);
+      .withPassword(process.env.POSTGRES_PASSWORD)
+      .withStartupTimeout(120_000);
 
     startedContainer = await container.start();
 
