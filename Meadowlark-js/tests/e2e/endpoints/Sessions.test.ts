@@ -110,9 +110,9 @@ describe('Sessions', () => {
     });
 
     afterEach(async () => {
-      await deleteResourceByLocation(sessionLocation);
-      await deleteResourceByLocation(termDescriptorLocation);
-      await deleteResourceByLocation(schoolLocation);
+      await deleteResourceByLocation(sessionLocation, 'session');
+      await deleteResourceByLocation(termDescriptorLocation, 'termDescriptor');
+      await deleteResourceByLocation(schoolLocation, 'school');
     });
   });
 });

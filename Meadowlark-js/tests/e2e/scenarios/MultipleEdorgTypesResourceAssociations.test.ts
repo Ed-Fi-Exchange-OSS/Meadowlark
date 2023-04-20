@@ -61,14 +61,14 @@ describe('Given the existence of a student, a school, a local education agency a
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(programLocation);
-    await deleteResourceByLocation(studentLocation);
-    await deleteResourceByLocation(schoolLocation);
-    await deleteResourceByLocation(localEducationAgencyLocation);
+    await deleteResourceByLocation(programLocation, 'program');
+    await deleteResourceByLocation(studentLocation, 'student');
+    await deleteResourceByLocation(schoolLocation, 'school');
+    await deleteResourceByLocation(localEducationAgencyLocation, 'localEducationAgency');
   });
 
   describe('when it associates the student and the program to a school education organization', () => {
-    let studentProgramAssociationSchoolLocation: string;
+    let studentProgramAssociationLocation: string;
 
     it('returns success', async () => {
       await baseURLRequest()
@@ -77,13 +77,13 @@ describe('Given the existence of a student, a school, a local education agency a
         .send(schoolStudentProgramAssociationBody)
         .expect(201)
         .then((response) => {
-          studentProgramAssociationSchoolLocation = response.headers.location;
+          studentProgramAssociationLocation = response.headers.location;
         });
     });
 
     it('returns the student program association on get', async () => {
       await rootURLRequest()
-        .get(studentProgramAssociationSchoolLocation)
+        .get(studentProgramAssociationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
@@ -92,12 +92,12 @@ describe('Given the existence of a student, a school, a local education agency a
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(studentProgramAssociationSchoolLocation);
+      await deleteResourceByLocation(studentProgramAssociationLocation, 'studentProgramAssociation');
     });
   });
 
   describe('when it associates the student and the program to a local education agency education organization', () => {
-    let studentProgramAssociationLEALocation: string;
+    let studentProgramAssociationLocation: string;
 
     it('returns success', async () => {
       await baseURLRequest()
@@ -106,13 +106,13 @@ describe('Given the existence of a student, a school, a local education agency a
         .send(leaStudentProgramAssociationBody)
         .expect(201)
         .then((response) => {
-          studentProgramAssociationLEALocation = response.headers.location;
+          studentProgramAssociationLocation = response.headers.location;
         });
     });
 
     it('returns the student program association on get', async () => {
       await rootURLRequest()
-        .get(studentProgramAssociationLEALocation)
+        .get(studentProgramAssociationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
@@ -121,12 +121,12 @@ describe('Given the existence of a student, a school, a local education agency a
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(studentProgramAssociationLEALocation);
+      await deleteResourceByLocation(studentProgramAssociationLocation, 'studentProgramAssociation');
     });
   });
 
   describe('when it tries to update an student program association with a different education organization', () => {
-    let studentProgramAssociationSchoolLocation: string;
+    let studentProgramAssociationLocation: string;
 
     beforeAll(async () => {
       await baseURLRequest()
@@ -135,17 +135,17 @@ describe('Given the existence of a student, a school, a local education agency a
         .send(schoolStudentProgramAssociationBody)
         .expect(201)
         .then((response) => {
-          studentProgramAssociationSchoolLocation = response.headers.location;
+          studentProgramAssociationLocation = response.headers.location;
         });
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(studentProgramAssociationSchoolLocation);
+      await deleteResourceByLocation(studentProgramAssociationLocation, 'studentProgramAssociation');
     });
 
     it('returns error', async () => {
       await rootURLRequest()
-        .put(studentProgramAssociationSchoolLocation)
+        .put(studentProgramAssociationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
           educationOrganizationReference: {
@@ -177,7 +177,7 @@ describe('Given the existence of a student, a school, a local education agency a
   });
 
   describe('when it tries to delete an education organization that is part of an association', () => {
-    let studentProgramAssociationLEALocation: string;
+    let studentProgramAssociationLocation: string;
     beforeAll(async () => {
       await baseURLRequest()
         .post('/v3.3b/ed-fi/studentProgramAssociations')
@@ -185,12 +185,12 @@ describe('Given the existence of a student, a school, a local education agency a
         .send(leaStudentProgramAssociationBody)
         .expect(201)
         .then((response) => {
-          studentProgramAssociationLEALocation = response.headers.location;
+          studentProgramAssociationLocation = response.headers.location;
         });
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(studentProgramAssociationLEALocation);
+      await deleteResourceByLocation(studentProgramAssociationLocation, 'studentProgramAssociation');
     });
 
     it('returns error', async () => {
@@ -202,7 +202,7 @@ describe('Given the existence of a student, a school, a local education agency a
 
     it('returns the student program association on get', async () => {
       await rootURLRequest()
-        .get(studentProgramAssociationLEALocation)
+        .get(studentProgramAssociationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {

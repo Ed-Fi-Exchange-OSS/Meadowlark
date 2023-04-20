@@ -31,9 +31,9 @@ export async function createSchoolsInBulk(total: number): Promise<Resources> {
   } as Resources;
 }
 
-export async function deleteListOfResources(locations: Array<string>): Promise<void> {
+export async function deleteListOfResources(locations: Array<string>, resourceName: string): Promise<void> {
   // eslint-disable-next-line no-restricted-syntax
   for (const location of locations) {
-    await deleteResourceByLocation(location);
+    await deleteResourceByLocation(location, resourceName);
   }
 }

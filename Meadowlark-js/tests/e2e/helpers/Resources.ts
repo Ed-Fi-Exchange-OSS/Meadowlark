@@ -40,7 +40,7 @@ export async function createResource(
     });
 }
 
-export async function deleteResourceByLocation(location: string): Promise<void> {
+export async function deleteResourceByLocation(location: string, resourceName = 'resource'): Promise<void> {
   if (location) {
     await rootURLRequest()
       .delete(location)
@@ -51,5 +51,7 @@ export async function deleteResourceByLocation(location: string): Promise<void> 
         }
         expect(response.status).toEqual(204);
       });
+  } else {
+    console.warn(`⚠️ Unable to delete ${resourceName}. Location not found. Verify that resource was created correctly ⚠️`);
   }
 }

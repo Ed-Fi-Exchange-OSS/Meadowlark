@@ -91,7 +91,7 @@ describe('given the existence of two vendors and one host', () => {
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(contentClassDescriptorLocation);
+    await deleteResourceByLocation(contentClassDescriptorLocation, 'contentClassDescriptor');
   });
 
   // GET

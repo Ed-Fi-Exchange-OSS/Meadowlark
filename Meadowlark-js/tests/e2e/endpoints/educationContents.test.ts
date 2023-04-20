@@ -87,10 +87,10 @@ describe('Education contents', () => {
   });
 
   afterEach(async () => {
-    await deleteResourceByLocation(educationContentLocation);
+    await deleteResourceByLocation(educationContentLocation, 'educationContent');
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(contentClassDescriptorLocation);
+    await deleteResourceByLocation(contentClassDescriptorLocation, 'contentClass');
   });
 });

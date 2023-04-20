@@ -172,12 +172,12 @@ describe('When retrieving information', () => {
     });
 
     afterAll(async () => {
-      await deleteListOfResources(schools);
+      await deleteListOfResources(schools, 'schools');
     });
   });
 
   describe('when querying by data types', () => {
-    let resourceLocation: string;
+    let academicWeekLocation: string;
     const data = {
       weekIdentifier: '12d3e5$',
       schoolReference: {
@@ -189,7 +189,7 @@ describe('When retrieving information', () => {
     };
 
     beforeAll(async () => {
-      resourceLocation = await createResource({
+      academicWeekLocation = await createResource({
         endpoint: 'academicWeeks',
         role: 'host',
         body: data,
@@ -283,7 +283,7 @@ describe('When retrieving information', () => {
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(resourceLocation);
+      await deleteResourceByLocation(academicWeekLocation, 'academicWeek');
     });
   });
 });
