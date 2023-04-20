@@ -33,8 +33,6 @@ export async function configure(initialize = true) {
       '⚠️ WARNING: Skipping initialization. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
     );
   } else {
-    console.log(process.env.DOCUMENT_STORE_PLUGIN);
-    process.env.ALREADY_SET = 'true';
     console.info('-- Setting up containers --');
     await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
 
