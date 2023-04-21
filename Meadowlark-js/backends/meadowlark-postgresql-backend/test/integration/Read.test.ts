@@ -25,7 +25,6 @@ import { deleteAll } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { setupConfigForIntegration } from './Config';
 
 const newGetRequest = (): GetRequest => ({
   documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
@@ -59,8 +58,6 @@ describe('given the get of a non-existent document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     getResult = await getDocumentById(
@@ -101,8 +98,6 @@ describe('given the get of an existing document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), meadowlarkId, documentInfo, edfiDoc: { inserted: 'yes' } };
 

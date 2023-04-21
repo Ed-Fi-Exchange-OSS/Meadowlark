@@ -31,7 +31,6 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
-import { setupConfigForIntegration } from './Config';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -76,8 +75,6 @@ describe('given the update of a non-existent document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     updateResult = await updateDocumentById(
@@ -128,8 +125,6 @@ describe('given the update of an existing document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
@@ -198,8 +193,6 @@ describe('given an update of a document that references a non-existent document 
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // Insert the original document with no reference
@@ -292,8 +285,6 @@ describe('given an update of a document that references an existing document wit
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // The document that will be referenced
@@ -402,8 +393,6 @@ describe('given an update of a document with one existing and one non-existent r
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The document that will be referenced
@@ -524,8 +513,6 @@ describe('given an update of a subclass document referenced by an existing docum
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
     //  The document that will be referenced
     await upsertDocument(

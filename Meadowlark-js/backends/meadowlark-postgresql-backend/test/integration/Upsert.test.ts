@@ -25,7 +25,6 @@ import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { findDocumentByIdSql, findAliasIdsForDocumentSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { setupConfigForIntegration } from './Config';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 
 const newUpsertRequest = (): UpsertRequest => ({
@@ -53,8 +52,6 @@ describe('given the upsert of a new document', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     upsertResult = await upsertDocument(
@@ -104,8 +101,6 @@ describe('given the upsert of an existing document twice', () => {
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
@@ -153,8 +148,6 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     const upsertRequest: UpsertRequest = { ...newUpsertRequest(), meadowlarkId, resourceInfo, documentInfo };
 
     client = await getSharedClient();
@@ -203,8 +196,6 @@ describe('given an upsert of a new document that references a non-existent docum
   documentWithReferencesInfo.documentReferences = [invalidReference];
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = await getSharedClient();
 
     // The new document with an invalid reference
@@ -275,8 +266,6 @@ describe('given an upsert of a new document that references an existing document
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The document that will be referenced
@@ -365,8 +354,6 @@ describe('given an upsert of a new document with one existing and one non-existe
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The document that will be referenced
@@ -466,8 +453,6 @@ describe('given an upsert of a subclass document when a different subclass has t
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The existing subclass
@@ -541,8 +526,6 @@ describe('given an update of a document that references a non-existent document 
   };
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // Insert the original document with no reference
@@ -633,8 +616,6 @@ describe('given an update of a document that references an existing document wit
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     // The document that will be referenced
@@ -744,8 +725,6 @@ describe('given an update of a document with one existing and one non-existent r
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The document that will be referenced
@@ -868,8 +847,6 @@ describe('given an update of a subclass document referenced by an existing docum
   );
 
   beforeAll(async () => {
-    await setupConfigForIntegration();
-
     client = (await getSharedClient()) as PoolClient;
 
     //  The document that will be referenced
