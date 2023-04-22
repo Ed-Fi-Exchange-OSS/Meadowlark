@@ -6,20 +6,19 @@
 import { Role, getAccessToken } from './Credentials';
 import { baseURLRequest, rootURLRequest } from './Shared';
 
-export async function createResource(
-  {
-    endpoint,
-    body,
-    role = 'vendor',
-    accessToken = '',
-  }: {
-    endpoint: string;
-    body: Object;
-    role?: Role;
-    accessToken?: string;
-  },
-  upsert = false,
-): Promise<string> {
+export async function createResource({
+  endpoint,
+  body,
+  role = 'vendor',
+  accessToken = '',
+  upsert = true,
+}: {
+  endpoint: string;
+  body: Object;
+  role?: Role;
+  accessToken?: string;
+  upsert?: boolean;
+}): Promise<string> {
   return baseURLRequest()
     .post(`/v3.3b/ed-fi/${endpoint}`)
     .auth(accessToken || (await getAccessToken(role)), { type: 'bearer' })
