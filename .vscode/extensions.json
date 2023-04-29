@@ -16,6 +16,7 @@
         "davidanson.vscode-markdownlint",
         "stkb.rewrap",
         "bierner.markdown-emoji",
-        "Orta.vscode-jest"
+        "Orta.vscode-jest",
+        "bierner.markdown-mermaid"
     ]
 }
