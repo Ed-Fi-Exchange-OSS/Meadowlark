@@ -194,11 +194,14 @@ Document 2
 ## Online and Offline Transactions for Cascading
 
 All of the changes shown above can be accomplished in a single transaction
-scope. However, we need to strike a balance between the needs of referential
-integrity and the needs for access to the records. This can be accomplished
-through a combination of _online_ and _offline_ processing:
+scope. However, we need to strike a balance between the need for referential
+integrity and the need for availability. In other words, if there are 1000
+documents that reference a changed one, we don't want to (a) lock those 1000
+records while waiting to process them all, and (b) prevent the API from
+responding to the client (and then handling the next incoming request). This can
+be accomplished through a combination of _online_ and _offline_ processing:
 
-1. Online: update the main document's properties and all reference values.
+1. Online: update the main document's properties and all _reference_ values.
 2. Offline: update the affected documents' properties.
 
 The offline process can be handled through a work queue and an external handler,
@@ -254,9 +257,8 @@ Data Stores](https://techdocs.ed-fi.org/x/UgWgBw).
     2. START CASCADE **UNIT OF WORK**:
         1. Start atomic transaction
         2. Update the document as requested, including the new Meadowlark ID.
-        3. Update all incoming references to hold the new Meadowlark ID.
-
-            **Psuedo Code**
+        3. Update all incoming references to hold the new Meadowlark ID, with
+           code something like:
 
             ```none
             # MongoDB
@@ -270,17 +272,17 @@ Data Stores](https://techdocs.ed-fi.org/x/UgWgBw).
               }
             )
 
-            # SQL
-            update references set parent_document_id = <NEW VALUE> where parent_document_id = <OLD VALUE>
+            # PostgreSQL
+            update references set parent_document_id = '<NEW VALUE>'
+              where parent_document_id = '<OLD VALUE>';
             ```
 
-        4. Write a record to a new Outbox collection/table, like:
+        4. Write a record to the new Outbox collection/table, like:
 
               ```json
               {
                 "eventType": "key-update",
                 "event": {
-                  "documentUuid": <UUID of changed document>,
                   "oldMeadowlarkId": <OLD VALUE>,
                   "newMeadowlarkId": <NEW VALUE>,
                   "newIdentity": {
@@ -401,3 +403,12 @@ To resolve, we can record _two_ timestamps: `identityLastModifiedAt` and
       "grandchildren" of the original change will also receive the update.
    5. Create a `document-update` event for the child document, for updating
       OpenSearch (details forthcoming).
+
+## Tasks
+
+1. Modify upsert to use optimistic lock based on `lastModifiedAt` timestamp. API
+   must set that timestamp immediately on receipt of the message.
+2. Create online Unit of Work, updating `outboundRefs` (MongoDB) / `references`
+   (PostgreSQL) and writing to a new `outbox` collection or table.
+3. Build offline handler: continuously running, monitoring event stream and
+   performing key updates.
