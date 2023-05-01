@@ -31,12 +31,23 @@ Whether using [MongoDB](https://techdocs.ed-fi.org/x/yARqBw) or
 [PostgreSQL](https://techdocs.ed-fi.org/x/ygRqBw), the Meadowlark handles
 reference validation on POST, PUT, and DELETE requests through custom coding:
 
-1. POST and PUT requests: if the document has references to other documents, do those references exist? Simple to lookup because Meadowlark uses a deterministic algorithm to hash the natural key (the [Meadowlark ID](https://techdocs.ed-fi.org/x/SwqgBw)), and it can then perform a query on that hash value to see if the referenced document exists.
-2. DELETE requests: when requesting to delete a document, the Meadowlark API must reject the request if there is an _incoming reference_ to the document. Thus it must check for the existence of these incoming references.
-    1. MongoDB: each document has an collection called `outboundRefs` containing Meadowlark ID that _this document_ references. There is an index on this collection, making it easy to query for any `outboundRefs` values that contain the document-to-be-deleted.
-    2. PostgreSQL: the outbound references are instead in a separate table, simply called `References`. 
+1. POST and PUT requests: if the document has references to other documents, do
+   those references exist? Simple to lookup because Meadowlark uses a
+   deterministic algorithm to hash the natural key (the [Meadowlark
+   ID](https://techdocs.ed-fi.org/x/SwqgBw)), and it can then perform a query on
+   that hash value to see if the referenced document exists.
+2. DELETE requests: when requesting to delete a document, the Meadowlark API
+   must reject the request if there is an _incoming reference_ to the document.
+   Thus it must check for the existence of these incoming references.
+    1. MongoDB: each document has an collection called `outboundRefs` containing
+       Meadowlark ID that _this document_ references. There is an index on this
+       collection, making it easy to query for any `outboundRefs` values that
+       contain the document-to-be-deleted.
+    2. PostgreSQL: the outbound references are instead in a separate table,
+       simply called `References`.
 
-→ [Meadowlark - Referential Integrity in Document Databases](https://techdocs.ed-fi.org/x/SwqgBw)
+→ [Meadowlark - Referential Integrity in Document
+Databases](https://techdocs.ed-fi.org/x/SwqgBw)
 
 ## Illustrating the Problem
 
@@ -60,9 +71,12 @@ For referential integrity, we need to update all of these references.
 ## Requirements
 
 1. Allow PUT requests to make natural key changes for all resources.
-    1. POST request upserts _cannot_ make natural key changes, because they do not contain the unique ID string for the item.
-2. _Cascade_ the key change to dependent resources for all eligible resources _and no other_.
-3. Ensure that references are never out of sync, such that referential integrity would be temporarily (or permanently) broken.
+    1. POST request upserts _cannot_ make natural key changes, because they do
+       not contain the unique ID string for the item.
+2. _Cascade_ the key change to dependent resources for all eligible
+   resources _and no other_.
+3. Ensure that references are never out of sync, such that referential integrity
+   would be temporarily (or permanently) broken.
 
 ## Introduce a Unique Resource ID
 
@@ -386,18 +400,32 @@ Combine the two scenarios, with the following timestamps:
    1682730047.
 2. Receive `classPeriod` at API instance 2 (which is fast) second update at
    1682730049. Eventually updates `section` to also have 1682730049.
-3. Receive `section` update at 1682730050. Does this overwrite the update
-   performed above?
+3. Receive `section` update at 1682730050, before the offline cascade takes
+   effect. If coming from the same source system, and therefore has the new
+   identity already:
+   1. If it is a POST request, it will be treated as a new document to store,
+      making the original obsolete. If we process the `key-update` event, it
+      would change the old record to match the identity of the new record,
+      resulting in a duplicate.
+   2. If it is a PUT request, then it will be rejected because the record to
+      update does not yet exist.
 
-To resolve, we can record _two_ timestamps: `identityLastModifiedAt` and
-`lastModifiedAt` (or better name?)
+In the POST scenario, the offline handler must be able to gracefully fail to do
+anything when it encounters a possible duplicate. The optimistic locking
+mechanism already accounts for this: the POST to `section` would have a
+timestamp in between that of the update to `classPeriod` and the offline
+process, therefore the offline process would see that the `lastModifiedAt` for
+the POST `section` is newer and the `key-update` event should ignore the record.
+For the PUT request, the client would receive a 404 response and have to try
+again.
 
 #### Consolidated Offline Process
 
 1. For each document that references the `event.documentUuid` ("child document"):
    1. If `event.lastModifiedAt` < `childDocument.identityLastModifiedAt`, then
       stop processing the event (event is out of date).
-   2. For each component of `event.newIdentity`: replace child document's value for matching key.
+   2. For each component of `event.newIdentity`: replace child document's value
+      for matching key.
    3. Calculate the child document's new Meadowlark ID and update the document.
    4. Create a `key-update` event _for the child document_, so that any
       "grandchildren" of the original change will also receive the update.
