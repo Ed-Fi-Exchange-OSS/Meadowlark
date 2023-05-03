@@ -54,6 +54,10 @@ jobs:
       - name: Transpile to JS
         run: npm run build --workspaces
 
+      - name: Create packages
+        # Explicit step is not required for publishing, but it allows us to upload artifacts
+        run: npm pack --workspaces
+
       - name: Create .npmrc for Azure Artifacts publishing
         run: |
           echo "Configuring .npmrc for ${{ env.NPM_REGISTRY }}"
@@ -73,6 +77,21 @@ jobs:
         # NOTE: there are uncommitted version number changes in package.json. No
         # problem! Our strategy is to rely on the tag history for version numbers,
         # not on package.json.
+
+      - name: Generate hash codes for npm tarballs
+        id: hash-code
+        shell: bash
+        run: |
+          echo "hash-code=$(sha256sum *.tgz | base64 -w0)" >> $GITHUB_OUTPUT
+
+      - name: Upload packages as artifacts
+        if: success()
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: npm
+          path: Meadowlark-js/*.tgz
+          if-no-files-found: error
+          retention-days: 30
 
   docker-publish:
     name: Publish to Docker Hub
