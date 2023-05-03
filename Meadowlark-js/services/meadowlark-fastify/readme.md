@@ -11,8 +11,9 @@ Instructions for running a local "developer" environment:
    * `DOCUMENT_STORE_PLUGIN` - The backend document store that Meadowlark will use
      * If using MongoDB set the value to `@edfi/meadowlark-mongodb-backend`
        * Update `MONGO_URI` to the location of your Mongo Instance
-         * According to the configuration indicated in the documentation, the default value for mongo credentials is
-        `mongodb://admin:admin@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0`
+         * If running MongoDB via the local [docker compose configuration](../../docker-compose.yml),
+           the default value for `MONGO_URI` is 
+           `mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0`
      * If using PostgreSQL set the value to `@edfi/meadowlark-postgresql-backend`
        * Update `POSTGRES_USERNAME` and `POSTGRES_PASSWORD`
        * If your PostgreSQL instance is not running on the default port (5432), you can set `POSTGRES_PORT` to
