@@ -43,12 +43,12 @@ jobs:
 
       - name: Install dependencies
         if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+        run: npm ci --omit dev
 
       - name: Update version to match tag
         working-directory: eng/version
         run: |
-          npm install
+          npm ci --omit dev
           node ./set.js ${{ env.REF }}
 
       - name: Transpile to JS
