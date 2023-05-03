@@ -8,6 +8,7 @@ on:
   release:
     types:
       - prereleased
+  workflow_dispatch:
 
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
@@ -48,7 +49,7 @@ jobs:
       - name: Update version to match tag
         working-directory: eng/version
         run: |
-          npm install
+          npm ci --omit dev
           node ./set.js ${{ env.REF }}
 
       - name: Transpile to JS
