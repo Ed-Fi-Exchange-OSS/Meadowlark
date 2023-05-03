@@ -3,3 +3,4 @@
 !.env.example
 Meadowlark-js/.env-docker
 **/node_modules/
+Meadowlark-js/sbom
