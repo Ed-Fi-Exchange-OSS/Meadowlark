@@ -76,9 +76,9 @@ release 0.3.0.
 | OAUTH_TOKEN_ISSUER       | edfi-meadowlark-issuer   | Token issuer                                        |
 | OAUTH_TOKEN_AUDIENCE     | edfi-meadowlark-audience | Token audience                                      |
 
-To create a new key, try running the application and accessing endpoint
-`/{stage}/createSigningKey`, or run `openssl rand -base64 256` from a terminal
-shell.
+To create a new key:
+* Try running the application and accessing endpoint `/{stage}/createSigningKey`
+* Or run `openssl rand -base64 256` from a bash terminal shell.
 
 ### Fastify API
 
