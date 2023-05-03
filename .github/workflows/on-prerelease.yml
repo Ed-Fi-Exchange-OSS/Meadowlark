@@ -199,3 +199,42 @@ jobs:
         shell: bash
         run: |
           echo sbom-hash-code=$(iconv -f UTF-16 -t ASCII ./sbom/_manifest/spdx_2.2/manifest.spdx.json.sha256) >> $GITHUB_OUTPUT
+
+  sbom-attach:
+    name: Attach SBOM file
+    runs-on: ubuntu-latest
+    needs:
+      - sbom-create
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Download the SBOM
+        uses: slsa-framework/slsa-github-generator/.github/actions/secure-download-artifact@7f4fdb871876c23e455853d694197440c5a91506 #v1.5.0
+        with:
+          name: meadowlark-SBOM
+          path: _manifest/spdx_2.2/manifest.spdx.json
+          sha256: "${{ needs.sbom-create.outputs.sbom-hash-code }}"
+
+      - name: Attach to release
+        shell: pwsh
+        run: |
+          $release = "${{ env.REF }}"
+          $repo = "${{ github.repository }}"
+          $token = "${{ secrets.GITHUB_TOKEN }}"
+          $file = "_manifest/spdx_2.2/manifest.spdx.json"
+          $uploadName = "meadowlark-SBOM.zip"
+          $url = "https://api.github.com/repos/$repo/releases/tags/$release"
+          $gh_headers = @{
+              "Accept"        = "application/vnd.github+json"
+              "Authorization" = "Bearer $token"
+          }
+          $response = Invoke-RestMethod -Uri $url -Headers $gh_headers
+          $releaseId = $response.id
+          $url = "https://uploads.github.com/repos/$repo/releases/$releaseId/assets"
+          Compress-Archive $file -DestinationPath $uploadName
+          $gh_headers["Content-Type"] = "application/octet"
+          Invoke-RestMethod -Method POST `
+              -Uri "$($url)?name=$($uploadName)" `
+              -Headers $gh_headers `
+              -InFile $uploadName
