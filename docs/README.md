@@ -6,7 +6,9 @@ deployment.
 
 ## Required Toolkit
 
-* NodeJs 16
+* NodeJs 16.
+  * The project will fail with Node 18+.
+  * It is recommended to use [NVM](https://github.com/nvm-sh/nvm) to manage this installation of Node 16.
 * Docker Desktop or equivalent
 * Visual Studio Code (recommended)
 
