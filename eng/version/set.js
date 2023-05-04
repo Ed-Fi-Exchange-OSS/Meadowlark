@@ -20,4 +20,4 @@ if (version[0] == 'v') {
   version = version.substring(1);
 }
 
-callShellCommand(`npm version ${version} --allow-same-version --workspaces true`, { cwd: '../../Meadowlark-js'});
+callShellCommand(`npm version ${version} --allow-same-version --workspaces true --workspaces-update false`, { cwd: '../../Meadowlark-js'});
