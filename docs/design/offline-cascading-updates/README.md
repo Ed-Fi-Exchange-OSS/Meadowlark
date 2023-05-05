@@ -1,4 +1,4 @@
-# Design for Offline Cascading Deletes
+# Design for Offline Cascading Updates
 
 ## Overview
 
@@ -19,7 +19,7 @@ the supported resources are:
 
 Cascading updates are not difficult in the ODS/API, because of its use of
 relational database management systems that have strong support for this kind of
-key change.
+key change. _Note: neither the ODS/API nor Meadowlark support cascading deletes_.
 
 The Meadowlark Ed-Fi API, on the other hand, uses document storage with no
 inherent referential integrity. Therefore, if cascading updates are to be
@@ -227,12 +227,12 @@ transaction.
 
 ```mermaid
 flowchart TD
-    A[Client Application] -->|1. Put /sections/id| B[Meadowlark API]
-    B --> |2. Update document store| C[(Documents)]
+    A[Client Application] -->|1. Put /classPeriods/id| B[Meadowlark API]
+    B --> |2. Update classPeriod item and incoming references| C[(Documents)]
     B --> |2. new key-update event| C
     C --> |3. Change data capture| D[(Event Stream)]
     E[Offline Key-Update Handler] -->| 4. Detect new event| D
-    E --> |5. update all referencing docs| C
+    E --> |5. update all remaining properties in child docs| C
 ```
 
 ### Outbox Table
