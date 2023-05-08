@@ -2,4 +2,4 @@
 
 ## Contents
 
-* [Support for Offline Cascading Deletes](offline-cascading-deletes/)
+* [Support for Offline Cascading Updates](offline-cascading-updates/)
