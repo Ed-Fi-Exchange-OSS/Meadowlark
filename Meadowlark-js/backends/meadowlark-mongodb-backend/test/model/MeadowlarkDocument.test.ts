@@ -32,6 +32,8 @@ describe('given non-superclass document info with no references', () => {
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
+    const createdAt = new Date('2023-01-16').getTime();
+    const lastModifiedAt = new Date('2023-02-23').getTime();
     meadowlarkDocument = meadowlarkDocumentFrom(
       resourceInfo,
       documentInfo,
@@ -40,6 +42,8 @@ describe('given non-superclass document info with no references', () => {
       edfiDoc,
       validate,
       createdBy,
+      createdAt,
+      lastModifiedAt,
     );
   });
 
@@ -50,6 +54,7 @@ describe('given non-superclass document info with no references', () => {
         "aliasIds": [
           "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
         ],
+        "createdAt": 1673827200000,
         "createdBy": "createdBy",
         "documentIdentity": {
           "natural": "key",
@@ -59,6 +64,7 @@ describe('given non-superclass document info with no references', () => {
           "edfi": "doc",
         },
         "isDescriptor": false,
+        "lastModifiedAt": 1677110400000,
         "outboundRefs": [],
         "projectName": "",
         "resourceName": "School",
@@ -103,6 +109,8 @@ describe('given non-superclass document info with references', () => {
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
+    const createdAt = new Date('2023-02-11').getTime();
+    const lastModifiedAt = new Date('2023-02-27').getTime();
     meadowlarkDocument = meadowlarkDocumentFrom(
       resourceInfo,
       documentInfo,
@@ -111,6 +119,8 @@ describe('given non-superclass document info with references', () => {
       edfiDoc,
       validate,
       createdBy,
+      createdAt,
+      lastModifiedAt,
     );
   });
 
@@ -143,6 +153,8 @@ describe('given superclass document info', () => {
   const createdBy = 'createdBy';
 
   beforeAll(async () => {
+    const createdAt = new Date('2023-01-21').getTime();
+    const lastModifiedAt = new Date('2023-01-31').getTime();
     meadowlarkDocument = meadowlarkDocumentFrom(
       resourceInfo,
       documentInfo,
@@ -151,6 +163,8 @@ describe('given superclass document info', () => {
       edfiDoc,
       validate,
       createdBy,
+      createdAt,
+      lastModifiedAt,
     );
   });
 

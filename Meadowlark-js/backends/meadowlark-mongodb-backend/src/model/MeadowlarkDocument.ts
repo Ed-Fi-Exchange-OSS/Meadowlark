@@ -95,6 +95,21 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    */
   createdBy: string;
 
+  /*
+   * Creation date as  as Unix timestamp.
+   */
+  createdAt?: number | undefined;
+
+  /*
+   * Last modified date as  as Unix timestamp.
+   */
+  lastModifiedAt?: number | undefined;
+
+  /*
+   * Last modified date (UTC Format).
+   */
+  _lastModifiedDate?: string | undefined;
+
   /**
    * An ObjectId managed by Meadowlark transactions for read locking. Optional because it does not need to be
    * set in code. See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
@@ -117,6 +132,8 @@ export function meadowlarkDocumentFrom(
   edfiDoc: object,
   validate: boolean,
   createdBy: string,
+  createdAt: number,
+  lastModifiedAt: number,
 ): MeadowlarkDocument {
   const aliasIds: string[] = [meadowlarkId];
   if (documentInfo.superclassInfo != null) {
@@ -136,5 +153,7 @@ export function meadowlarkDocumentFrom(
     outboundRefs: referencedDocumentIdsFrom(documentInfo),
     validated: validate,
     createdBy,
+    createdAt,
+    lastModifiedAt,
   };
 }

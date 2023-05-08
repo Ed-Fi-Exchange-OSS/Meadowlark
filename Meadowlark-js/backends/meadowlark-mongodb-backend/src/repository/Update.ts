@@ -10,7 +10,7 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, limitFive, onlyReturnId, writeLockReferencedDocuments } from './Db';
+import { getDocumentCollection, limitFive, onlyReturnDocumentUuid, onlyReturnId, writeLockReferencedDocuments } from './Db';
 import { deleteDocumentByIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { upsertDocumentTransaction } from './Upsert';
@@ -92,9 +92,16 @@ async function tryUpdateByReplacement(
   session: ClientSession,
 ): Promise<UpdateResult | null> {
   // Try to update - for a matching documentUuid and matching identity (via meadowlarkId)
-  const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: meadowlarkId, documentUuid }, document, {
-    session,
-  });
+  const { acknowledged, matchedCount } = await mongoCollection.replaceOne(
+    {
+      _id: meadowlarkId,
+      documentUuid,
+    },
+    document,
+    {
+      session,
+    },
+  );
 
   // Check for general MongoDB problems
   if (!acknowledged) {
@@ -262,7 +269,8 @@ async function updateDocumentByIdTransaction(
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
     updateRequest;
-
+  // last modified date as an Unix timestamp.
+  const lastModifiedAt: number = Date.now();
   if (validateDocumentReferencesExist) {
     const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
       updateRequest,
@@ -273,7 +281,11 @@ async function updateDocumentByIdTransaction(
       return invalidReferenceResult;
     }
   }
-
+  // Get createdAt from the document.
+  const existingDocument: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+    { _id: meadowlarkId },
+    onlyReturnDocumentUuid(session),
+  );
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(
     resourceInfo,
     documentInfo,
@@ -282,8 +294,9 @@ async function updateDocumentByIdTransaction(
     edfiDoc,
     validateDocumentReferencesExist,
     security.clientId,
+    existingDocument?.createdAt ?? Date.now(),
+    lastModifiedAt,
   );
-
   if (resourceInfo.allowIdentityUpdates) {
     return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
   }

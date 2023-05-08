@@ -92,6 +92,8 @@ const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom(
   {},
   true,
   '',
+  Date.now(),
+  Date.now(),
 );
 
 describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
