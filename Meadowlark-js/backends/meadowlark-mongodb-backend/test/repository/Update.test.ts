@@ -25,6 +25,7 @@ describe('given a transaction on a resource', () => {
     jest.spyOn(DB, 'getDocumentCollection').mockReturnValue({
       replaceOne: replaceOneMock,
       updateMany: jest.fn(),
+      findOne: jest.fn(),
     } as any);
 
     mongoClientMock = {
