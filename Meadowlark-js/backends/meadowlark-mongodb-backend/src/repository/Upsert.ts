@@ -36,7 +36,10 @@ export async function upsertDocumentTransaction(
 
   // the documentUuid of the existing document if this is an update, or a new one if this is an insert
   const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();
-
+  // Unix timestamp
+  const createdAt: number = existingDocument?.createdAt ?? Date.now();
+  // last modified date as an Unix timestamp.
+  const lastModifiedAt: number = Date.now();
   // Check whether this is an insert or update
   const isInsert: boolean = existingDocument == null;
 
@@ -116,6 +119,8 @@ export async function upsertDocumentTransaction(
       edfiDoc,
       validateDocumentReferencesExist,
       security.clientId,
+      createdAt,
+      lastModifiedAt,
     );
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);

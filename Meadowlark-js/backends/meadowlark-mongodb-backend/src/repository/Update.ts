@@ -92,9 +92,29 @@ async function tryUpdateByReplacement(
   session: ClientSession,
 ): Promise<UpdateResult | null> {
   // Try to update - for a matching documentUuid and matching identity (via meadowlarkId)
-  const { acknowledged, matchedCount } = await mongoCollection.replaceOne({ _id: meadowlarkId, documentUuid }, document, {
-    session,
-  });
+  const { acknowledged, matchedCount } = await mongoCollection.updateOne(
+    {
+      _id: meadowlarkId,
+      documentUuid,
+    },
+    {
+      $set: {
+        documentIdentity: document.documentIdentity,
+        projectName: document.projectName,
+        resourceName: document.resourceName,
+        resourceVersion: document.resourceVersion,
+        isDescriptor: document.isDescriptor,
+        edfiDoc: document.edfiDoc,
+        aliasIds: document.aliasIds,
+        outboundRefs: document.outboundRefs,
+        validated: document.validated,
+        lastModifiedAt: document.lastModifiedAt,
+      },
+    },
+    {
+      session,
+    },
+  );
 
   // Check for general MongoDB problems
   if (!acknowledged) {
@@ -262,7 +282,8 @@ async function updateDocumentByIdTransaction(
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
     updateRequest;
-
+  // last modified date as an Unix timestamp.
+  const lastModifiedAt: number = Date.now();
   if (validateDocumentReferencesExist) {
     const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
       updateRequest,
@@ -273,7 +294,6 @@ async function updateDocumentByIdTransaction(
       return invalidReferenceResult;
     }
   }
-
   const document: MeadowlarkDocument = meadowlarkDocumentFrom(
     resourceInfo,
     documentInfo,
@@ -282,8 +302,9 @@ async function updateDocumentByIdTransaction(
     edfiDoc,
     validateDocumentReferencesExist,
     security.clientId,
+    Date.now(),
+    lastModifiedAt,
   );
-
   if (resourceInfo.allowIdentityUpdates) {
     return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
   }
