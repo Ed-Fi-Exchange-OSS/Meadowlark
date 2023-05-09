@@ -14,18 +14,18 @@ import * as DB from '../../src/repository/Db';
 describe('given a transaction on a resource', () => {
   const retryNumberOfTimes = 2;
   let mongoClientMock = {};
-  let replaceOneMock = jest.fn();
+  let updateOneMock = jest.fn();
   const error = {
     codeName: 'WriteConflict',
   };
 
   beforeAll(() => {
-    replaceOneMock = jest.fn().mockImplementation(async () => Promise.reject(error));
+    updateOneMock = jest.fn().mockImplementation(async () => Promise.reject(error));
 
     jest.spyOn(DB, 'getDocumentCollection').mockReturnValue({
-      replaceOne: replaceOneMock,
       updateMany: jest.fn(),
       findOne: jest.fn(),
+      updateOne: updateOneMock,
     } as any);
 
     mongoClientMock = {
@@ -64,7 +64,7 @@ describe('given a transaction on a resource', () => {
       });
 
       it('should retry a number of times based on configuration', () => {
-        expect(replaceOneMock).toHaveBeenCalledTimes(retryNumberOfTimes + 1);
+        expect(updateOneMock).toHaveBeenCalledTimes(retryNumberOfTimes + 1);
       });
 
       afterAll(() => {
@@ -80,7 +80,7 @@ describe('given a transaction on a resource', () => {
       });
 
       it('should not retry', () => {
-        expect(replaceOneMock).toHaveBeenCalledTimes(1);
+        expect(updateOneMock).toHaveBeenCalledTimes(1);
       });
 
       afterAll(() => {
@@ -95,7 +95,7 @@ describe('given a transaction on a resource', () => {
       });
 
       it('should not retry', () => {
-        expect(replaceOneMock).toHaveBeenCalledTimes(1);
+        expect(updateOneMock).toHaveBeenCalledTimes(1);
       });
 
       afterAll(() => {

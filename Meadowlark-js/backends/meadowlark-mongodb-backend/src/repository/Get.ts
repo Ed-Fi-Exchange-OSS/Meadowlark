@@ -20,7 +20,9 @@ export async function getDocumentById({ documentUuid, traceId }: GetRequest, cli
     const result: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne({ documentUuid });
     if (result === null) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
     // eslint-disable-next-line no-underscore-dangle
-    const documentLastModifiedDate: string = result.lastModifiedAt ? new Date(result.lastModifiedAt).toISOString() : '';
+    const documentLastModifiedDate: string | null = result.lastModifiedAt
+      ? new Date(result.lastModifiedAt).toISOString()
+      : null;
     return {
       response: 'GET_SUCCESS',
       document: { id: documentUuid, ...result.edfiDoc, _lastModifiedDate: documentLastModifiedDate },
