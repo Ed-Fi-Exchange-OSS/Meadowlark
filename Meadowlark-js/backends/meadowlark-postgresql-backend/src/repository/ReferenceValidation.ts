@@ -4,10 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { MissingIdentity, documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import { MeadowlarkId, MissingIdentity, documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
-import { MeadowlarkId } from 'packages/meadowlark-core/dist';
 import { validateReferenceExistenceSql } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.ReferenceValidation';

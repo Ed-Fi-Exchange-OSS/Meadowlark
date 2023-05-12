@@ -13,9 +13,9 @@ import {
   BlockingDocument,
   generateDocumentUuid,
   DocumentUuid,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { MeadowlarkId } from 'packages/meadowlark-core/dist';
 import {
   deleteOutboundReferencesOfDocumentSql,
   documentInsertOrUpdateSql,
