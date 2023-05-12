@@ -96,7 +96,7 @@ export async function deleteDocumentById(
 
     // Perform the document delete
     Logger.debug(`${moduleName}.deleteDocumentById: Deleting document meadowlarkId ${meadowlarkId}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(meadowlarkId));
+    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(documentUuid));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
       await client.query('ROLLBACK');

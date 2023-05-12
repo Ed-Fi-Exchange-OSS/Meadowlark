@@ -26,12 +26,18 @@ import { validateReferences } from './ReferenceValidation';
 
 const moduleName = 'postgresql.repository.Update';
 
-export async function updateDocumentById(
-  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpdateRequest,
-  client: PoolClient,
-): Promise<UpdateResult> {
-  Logger.info(`${moduleName}.updateDocumentById ${meadowlarkId}`, traceId);
-
+export async function updateDocumentById(updateRequest: UpdateRequest, client: PoolClient): Promise<UpdateResult> {
+  const {
+    meadowlarkId,
+    documentUuid,
+    resourceInfo,
+    documentInfo,
+    edfiDoc,
+    validateDocumentReferencesExist,
+    traceId,
+    security,
+  } = updateRequest;
+  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   const outboundRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
@@ -84,7 +90,7 @@ export async function updateDocumentById(
 
     // Perform the document update
     const documentSql: string = documentInsertOrUpdateSql(
-      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+      { id: meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       false,
     );
     const result: QueryResult = await client.query(documentSql);

@@ -2,6 +2,7 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
+import { DocumentUuid } from 'packages/meadowlark-core';
 import format from 'pg-format';
 
 // SQL for Selects
@@ -55,10 +56,24 @@ export function findAliasIdSql(documentId: string): string {
 export function findDocumentByIdSql(documentId: string): string {
   return format(
     `
-    SELECT document_id, document_identity, edfi_doc
+    SELECT document_uuid, document_id, document_identity, edfi_doc
        FROM meadowlark.documents
        WHERE document_id = %L;`,
     [documentId],
+  );
+}
+
+/**
+ * Returns the SQL statement for retrieving a document (with identity)
+ * @param documentUuid The unique identifier of the document to retrieve
+ * @returns SQL query string to retrieve a document
+ */
+export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
+  return format(
+    `
+    SELECT document_uuid, document_id, document_identity, edfi_doc
+       FROM meadowlark.documents
+       WHERE document_uuid = '${[documentUuid]};'`,
   );
 }
 
@@ -134,11 +149,12 @@ export function insertOutboundReferencesSql(documentId: string, referencedDocume
  * @returns SQL query string for inserting or updating provided document info
  */
 export function documentInsertOrUpdateSql(
-  { id, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+  { id, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
   isInsert: boolean,
 ): string {
   const documentValues = [
     id,
+    documentUuid,
     JSON.stringify(documentInfo.documentIdentity),
     resourceInfo.projectName,
     resourceInfo.resourceName,
@@ -155,10 +171,10 @@ export function documentInsertOrUpdateSql(
     documentSql = format(
       `
       INSERT INTO meadowlark.documents
-        (document_id, document_identity, project_name, resource_name, resource_version, is_descriptor,
+        (document_id, document_uuid, document_identity, project_name, resource_name, resource_version, is_descriptor,
         validated, created_by, edfi_doc)
         VALUES (%L)
-        RETURNING document_id;`,
+        RETURNING document_uuid;`,
       documentValues,
     );
   } else {
@@ -175,7 +191,7 @@ export function documentInsertOrUpdateSql(
         validated = %L,
         created_by = %L,
         edfi_doc = %L
-        WHERE meadowlark.documents.document_id = %1$L;`,
+        WHERE meadowlark.documents.document_uuid = %L;`,
       documentValues[0],
       documentValues[1],
       documentValues[2],
@@ -185,6 +201,7 @@ export function documentInsertOrUpdateSql(
       documentValues[6],
       documentValues[7],
       documentValues[8],
+      documentValues[9],
     );
   }
   return documentSql;
@@ -197,10 +214,10 @@ export function documentInsertOrUpdateSql(
  * @param documentId the document to delete from the documents table
  * @returns SQL query string to delete the document
  */
-export function deleteDocumentByIdSql(documentId: string): string {
+export function deleteDocumentByIdSql(documentUuid: DocumentUuid): string {
   return format(
-    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
-    [documentId],
+    'with del as (DELETE FROM meadowlark.documents WHERE document_uuid = %L RETURNING id) SELECT COUNT(*) FROM del;',
+    [documentUuid],
   );
 }
 
@@ -252,6 +269,7 @@ export const createDocumentTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.documents(
   id bigserial PRIMARY KEY,
   document_id VARCHAR(56) NOT NULL,
+  document_uuid uuid,
   document_identity JSONB NOT NULL,
   project_name VARCHAR NOT NULL,
   resource_name VARCHAR NOT NULL,
@@ -264,6 +282,10 @@ export const createDocumentTableSql = `
 // All queries are on document_id, which must be unique
 export const createDocumentTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(document_id)';
+
+// All queries are on document_uuid, which must be unique
+export const createDocumentUuidTableUniqueIndexSql =
+  'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documentUuid ON meadowlark.documents(document_Uuid)';
 
 /**
  * SQL query string to create the references table

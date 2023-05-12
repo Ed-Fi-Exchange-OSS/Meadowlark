@@ -21,9 +21,9 @@ import {
   insertOutboundReferencesSql,
   deleteAliasesForDocumentSql,
   insertAliasSql,
-  findAliasIdsForDocumentSql,
   findAliasIdSql,
   findReferringDocumentInfoForErrorReportingSql,
+  findDocumentByIdSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -36,15 +36,14 @@ export async function upsertDocument(
   Logger.info(`${moduleName}.upsertDocument`, traceId);
 
   const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
-  let documentUuid: DocumentUuid;
-  documentUuid = generateDocumentUuid();
   try {
     await client.query('BEGIN');
 
     // Check whether this is an insert or update
-    const documentExistsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
+    const documentExistsResult: QueryResult = await client.query(findDocumentByIdSql(meadowlarkId));
     const isInsert: boolean = documentExistsResult.rowCount === 0;
-
+    const documentUuid: DocumentUuid =
+      documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].fields[0] : generateDocumentUuid();
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
       const superclassAliasIdInUseResult = await client.query(
@@ -64,7 +63,7 @@ export async function upsertDocument(
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
-          documentUuid: document.document_id,
+          documentUuid: document.document_uuid,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
         }));
@@ -76,13 +75,10 @@ export async function upsertDocument(
           blockingDocuments,
         };
       }
-    } else {
-      // TODO: TEMP, replace this with the proper documentUuid
-      documentUuid = meadowlarkId as unknown as DocumentUuid;
     }
 
     const documentUpsertSql: string = documentInsertOrUpdateSql(
-      { id: meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+      { id: meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       isInsert,
     );
 
