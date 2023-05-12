@@ -17,6 +17,7 @@ import {
   documentIdForDocumentReference,
   MeadowlarkId,
   TraceId,
+  DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
@@ -141,11 +142,12 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       await deleteClient.query('ROLLBACK');
       expect(e1.message.indexOf('could not obtain lock on row')).toBeGreaterThanOrEqual(0);
     }
-
+    const documentUuid: DocumentUuid = '9ad5c9fa-82d1-494c-8d54-6aa1457f4364' as DocumentUuid;
     // Perform the insert of AcademicWeek document, adding a reference to to to-be-deleted document
     const documentUpsertSql = documentInsertOrUpdateSql(
       {
         id: academicWeekDocumentId,
+        documentUuid,
         resourceInfo: academicWeekResourceInfo,
         documentInfo: academicWeekDocumentInfo,
         edfiDoc: {},
@@ -158,8 +160,8 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const insertResult = await insertClient.query(documentUpsertSql);
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
-      await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
-      await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
+      await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref as MeadowlarkId));
+      await insertClient.query(insertAliasSql(academicWeekDocumentId, ref as MeadowlarkId));
     }
 
     // **** The insert of AcademicWeek document should have been successful
@@ -207,7 +209,6 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
     // ----
     await deleteClient.query('BEGIN');
-
     // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
@@ -248,10 +249,11 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
       // Should be no reference validation failures for AcademicWeek document
       expect(upsertFailures).toHaveLength(0);
-
+      const documentUuid: DocumentUuid = '9ad5c9fa-82d1-494c-8d54-6aa1457f4365' as DocumentUuid;
       const documentUpsertSql = documentInsertOrUpdateSql(
         {
           id: academicWeekDocumentId,
+          documentUuid,
           resourceInfo: academicWeekResourceInfo,
           documentInfo: academicWeekDocumentInfo,
           edfiDoc: {},
@@ -265,8 +267,8 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       expect(insertResult.rowCount).toEqual(0);
       // eslint-disable-next-line no-restricted-syntax
       for (const ref of outboundRefs) {
-        await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref));
-        await insertClient.query(insertAliasSql(academicWeekDocumentId, ref));
+        await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref as MeadowlarkId));
+        await insertClient.query(insertAliasSql(academicWeekDocumentId, ref as MeadowlarkId));
       }
       await insertClient.query('COMMIT');
     } catch (e1) {

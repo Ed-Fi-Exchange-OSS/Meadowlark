@@ -7,6 +7,7 @@ import R from 'ramda';
 import { MissingIdentity, documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
+import { MeadowlarkId } from 'packages/meadowlark-core/dist';
 import { validateReferenceExistenceSql } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.ReferenceValidation';
@@ -29,7 +30,7 @@ async function findReferencedDocumentIdsById(
     return [];
   }
 
-  const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds));
+  const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds as MeadowlarkId[]));
 
   if (referenceExistenceResult.rows == null) {
     Logger.error(`${moduleName}.findReferencedDocumentIdsById Database error parsing references`, traceId);

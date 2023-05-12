@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import {
+  MeadowlarkId,
   UpdateResult,
   UpdateRequest,
   DocumentReference,
@@ -101,7 +102,7 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: P
     // Perform insert of alias ids
     await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
-      const superclassAliasId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
       await client.query(insertAliasSql(meadowlarkId, superclassAliasId));
     }
 
@@ -122,7 +123,7 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: P
         `${moduleName}.upsertDocument: Inserting reference meadowlarkId ${ref} for document meadowlarkId ${meadowlarkId}`,
         ref,
       );
-      await client.query(insertOutboundReferencesSql(meadowlarkId, ref));
+      await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
     }
 
     await client.query('COMMIT');

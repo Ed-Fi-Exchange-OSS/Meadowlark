@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { DeleteResult, DeleteRequest, BlockingDocument, MeadowlarkId } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
-  deleteDocumentByIdSql,
+  deleteDocumentByDocumentUuIdSql,
   deleteOutboundReferencesOfDocumentSql,
   findReferringDocumentInfoForErrorReportingSql,
   deleteAliasesForDocumentSql,
@@ -96,7 +96,7 @@ export async function deleteDocumentById(
 
     // Perform the document delete
     Logger.debug(`${moduleName}.deleteDocumentById: Deleting document meadowlarkId ${meadowlarkId}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByIdSql(documentUuid));
+    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByDocumentUuIdSql(documentUuid));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
       await client.query('ROLLBACK');

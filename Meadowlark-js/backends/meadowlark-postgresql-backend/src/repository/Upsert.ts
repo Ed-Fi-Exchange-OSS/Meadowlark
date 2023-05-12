@@ -15,6 +15,7 @@ import {
   DocumentUuid,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
+import { MeadowlarkId } from 'packages/meadowlark-core/dist';
 import {
   deleteOutboundReferencesOfDocumentSql,
   documentInsertOrUpdateSql,
@@ -47,7 +48,7 @@ export async function upsertDocument(
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
       const superclassAliasIdInUseResult = await client.query(
-        findAliasIdSql(documentIdForSuperclassInfo(documentInfo.superclassInfo)),
+        findAliasIdSql(documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId),
       );
       const superclassAliasIdInUse: boolean = superclassAliasIdInUseResult.rowCount !== 0;
 
@@ -57,7 +58,7 @@ export async function upsertDocument(
           traceId,
         );
 
-        const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+        const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
 
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
 
@@ -125,7 +126,7 @@ export async function upsertDocument(
     // Perform insert of alias ids
     await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
-      const superclassAliasId = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+      const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
       await client.query(insertAliasSql(meadowlarkId, superclassAliasId));
     }
 
@@ -143,7 +144,7 @@ export async function upsertDocument(
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
       Logger.debug(`post${moduleName}.upsertDocument: Inserting reference id ${ref} for document id ${meadowlarkId}`, ref);
-      await client.query(insertOutboundReferencesSql(meadowlarkId, ref));
+      await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
     }
 
     await client.query('COMMIT');

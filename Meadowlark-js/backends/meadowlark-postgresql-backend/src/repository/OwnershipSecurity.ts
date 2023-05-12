@@ -13,7 +13,7 @@ import {
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
-import { findOwnershipForDocumentSql } from './SqlHelper';
+import { findOwnershipForDocumentByDocumentUuidSql } from './SqlHelper';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | null {
   if (frontendRequest.action !== 'upsert') return null;
@@ -53,7 +53,7 @@ export async function rejectByOwnershipSecurity(
   }
 
   try {
-    const result: QueryResult = await client.query(findOwnershipForDocumentSql(id));
+    const result: QueryResult = await client.query(findOwnershipForDocumentByDocumentUuidSql(id));
 
     if (result.rows == null) {
       Logger.error(`${functionName} Unknown Error determining access`, frontendRequest.traceId);

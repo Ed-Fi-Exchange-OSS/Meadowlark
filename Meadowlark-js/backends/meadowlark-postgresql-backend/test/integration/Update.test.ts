@@ -2,7 +2,6 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-
 import {
   DocumentInfo,
   NoDocumentInfo,
@@ -23,6 +22,7 @@ import {
   DocumentUuid,
   TraceId,
   UpsertRequest,
+  UpsertResult,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -30,7 +30,9 @@ import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentById } from '../../src/repository/Get';
-import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
+import { findDocumentByDocumentUuidSql, findDocumentByIdSql } from '../../src/repository/SqlHelper';
+
+const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -44,7 +46,7 @@ const newUpsertRequest = (): UpsertRequest => ({
 
 const newUpdateRequest = (): UpdateRequest => ({
   meadowlarkId: '' as MeadowlarkId,
-  documentUuid: '' as DocumentUuid,
+  documentUuid,
   resourceInfo: NoResourceInfo,
   documentInfo: NoDocumentInfo,
   edfiDoc: {},
@@ -54,7 +56,7 @@ const newUpdateRequest = (): UpdateRequest => ({
 });
 
 const newGetRequest = (): GetRequest => ({
-  documentUuid: '' as DocumentUuid,
+  documentUuid,
   resourceInfo: NoResourceInfo,
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
@@ -76,10 +78,11 @@ describe('given the update of a non-existent document', () => {
 
   beforeAll(async () => {
     client = await getSharedClient();
-
+    const nonExistentDocumentUuid: DocumentUuid = 'documentUuid' as DocumentUuid;
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
+        documentUuid: nonExistentDocumentUuid,
         meadowlarkId,
         resourceInfo,
         documentInfo,
@@ -97,10 +100,7 @@ describe('given the update of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result: GetResult = await getDocumentById(
-      { ...newGetRequest(), documentUuid: meadowlarkId as unknown as DocumentUuid },
-      client,
-    );
+    const result: GetResult = await getDocumentById({ ...newGetRequest(), documentUuid }, client);
 
     expect(result.response).toBe('GET_FAILURE_NOT_EXISTS');
   });
@@ -135,6 +135,7 @@ describe('given the update of an existing document', () => {
     };
     const updateRequest: UpdateRequest = {
       ...newUpdateRequest(),
+      documentUuid,
       meadowlarkId,
       resourceInfo,
       documentInfo,
@@ -142,9 +143,13 @@ describe('given the update of an existing document', () => {
     };
 
     // insert the initial version
-    await upsertDocument(upsertRequest, client);
-
-    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+    const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
+    const upsertDocumentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
+    updateResult = await updateDocumentById(
+      { ...updateRequest, documentUuid: upsertDocumentUuid, edfiDoc: { changeToDoc: true } },
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -158,7 +163,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(findDocumentByIdSql(meadowlarkId));
+    const result: any = await client.query(findDocumentByDocumentUuidSql(documentUuid));
     // await getDocumentById({ ...newGetRequest(), meadowlarkId }, client);
 
     expect(result.rows[0].document_identity.natural).toBe('update2');
@@ -196,7 +201,7 @@ describe('given an update of a document that references a non-existent document 
     client = await getSharedClient();
 
     // Insert the original document with no reference
-    await upsertDocument(
+    const upsertResult: UpsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
@@ -206,12 +211,14 @@ describe('given an update of a document that references a non-existent document 
       },
       client,
     );
-
+    const upsertDocumentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
+        documentUuid: upsertDocumentUuid,
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -299,7 +306,7 @@ describe('given an update of a document that references an existing document wit
     );
 
     // The original document with no reference
-    await upsertDocument(
+    const upsertResult: UpsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
@@ -309,13 +316,15 @@ describe('given an update of a document that references an existing document wit
       },
       client,
     );
-
+    const upsertDocumentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // The updated document with a valid reference
     documentWithReferencesInfo.documentReferences = [validReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesId,
+        documentUuid: upsertDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
@@ -407,7 +416,7 @@ describe('given an update of a document with one existing and one non-existent r
     );
 
     // The original document with no references
-    await upsertDocument(
+    const upsertResult: UpsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
@@ -417,13 +426,15 @@ describe('given an update of a document with one existing and one non-existent r
       },
       client,
     );
-
+    const upsertDocumentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // The updated document with both valid and invalid references
     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesId,
+        documentUuid: upsertDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
@@ -525,7 +536,7 @@ describe('given an update of a subclass document referenced by an existing docum
       client,
     );
     // The original document with no reference
-    await upsertDocument(
+    const upsertResult: UpsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
@@ -535,12 +546,15 @@ describe('given an update of a subclass document referenced by an existing docum
       },
       client,
     );
+    const upsertDocumentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // The updated document with reference as superclass
     documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesId,
+        documentUuid: upsertDocumentUuid,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
         validateDocumentReferencesExist: true,
