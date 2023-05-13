@@ -3,26 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import {
-  meadowlarkIdForDocumentIdentity,
-  FrontendRequest,
-  writeRequestToLog,
-  MeadowlarkId,
-  DocumentUuid,
-} from '@edfi/meadowlark-core';
+import { FrontendRequest, writeRequestToLog, DocumentUuid } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
 import { findOwnershipForDocumentByDocumentUuidSql } from './SqlHelper';
-
-function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | null {
-  if (frontendRequest.action !== 'upsert') return null;
-
-  return meadowlarkIdForDocumentIdentity(
-    frontendRequest.middleware.resourceInfo,
-    frontendRequest.middleware.documentInfo.documentIdentity,
-  );
-}
 
 export async function rejectByOwnershipSecurity(
   frontendRequest: FrontendRequest,
@@ -42,10 +27,7 @@ export async function rejectByOwnershipSecurity(
     return 'NOT_APPLICABLE';
   }
 
-  let id: DocumentUuid | undefined = frontendRequest.middleware.pathComponents.documentUuid;
-
-  // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
-  if (id == null) id = extractIdIfUpsert(frontendRequest) as unknown as DocumentUuid;
+  const id: DocumentUuid | undefined = frontendRequest.middleware.pathComponents.documentUuid;
 
   if (id == null) {
     Logger.error(`${functionName} no id to secure against`, frontendRequest.traceId);

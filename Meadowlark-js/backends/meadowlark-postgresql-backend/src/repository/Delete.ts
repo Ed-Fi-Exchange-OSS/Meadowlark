@@ -11,8 +11,8 @@ import {
   deleteOutboundReferencesOfDocumentSql,
   findReferringDocumentInfoForErrorReportingSql,
   deleteAliasesForDocumentSql,
-  findAliasIdsForDocumentSql,
   findReferencingDocumentIdsSql,
+  findAliasIdsForDocumentByDocumentUuidSql,
 } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.Delete';
@@ -21,28 +21,26 @@ export async function deleteDocumentById(
   { documentUuid, validateNoReferencesToDocument, traceId }: DeleteRequest,
   client: PoolClient,
 ): Promise<DeleteResult> {
-  // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
-  const meadowlarkId: MeadowlarkId = documentUuid as unknown as MeadowlarkId;
-
-  Logger.debug(`${moduleName}.deleteDocumentById ${meadowlarkId}`, traceId);
+  Logger.debug(`${moduleName}.deleteDocumentById ${documentUuid}`, traceId);
 
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
+  let meadowlarkId: MeadowlarkId = '' as MeadowlarkId;
 
   try {
     await client.query('BEGIN');
 
     if (validateNoReferencesToDocument) {
       // Find the alias ids for the document to be deleted
-      const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
+      const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
 
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
       if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
         await client.query('ROLLBACK');
-        Logger.debug(`${moduleName}.deleteDocumentById: Document meadowlarkId ${meadowlarkId} does not exist`, traceId);
+        Logger.debug(`${moduleName}.deleteDocumentById: Document meadowlarkId ${documentUuid} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
       }
-
+      meadowlarkId = documentAliasIdsResult.rows[0].document_id;
       // Extract from the query result
       const documentAliasIds: string[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
 
@@ -51,7 +49,7 @@ export async function deleteDocumentById(
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
-        const errorMessage = `${moduleName}.deleteDocumentById: Error determining documents referenced by ${meadowlarkId}, a null result set was returned`;
+        const errorMessage = `${moduleName}.deleteDocumentById: Error determining documents referenced by ${documentUuid}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
         Logger.error(errorMessage, traceId);
         return deleteResult;
@@ -95,12 +93,12 @@ export async function deleteDocumentById(
     }
 
     // Perform the document delete
-    Logger.debug(`${moduleName}.deleteDocumentById: Deleting document meadowlarkId ${meadowlarkId}`, traceId);
+    Logger.debug(`${moduleName}.deleteDocumentById: Deleting document documentUuid ${documentUuid}`, traceId);
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByDocumentUuIdSql(documentUuid));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
       await client.query('ROLLBACK');
-      deleteResult.failureMessage = `deleteDocumentById: Failure deleting document ${meadowlarkId}, a null result was returned`;
+      deleteResult.failureMessage = `deleteDocumentById: Failure deleting document ${documentUuid}, a null result was returned`;
       return deleteResult;
     }
 
@@ -109,7 +107,7 @@ export async function deleteDocumentById(
 
     // Delete references where this is the parent document
     Logger.debug(
-      `${moduleName}.deleteDocumentById Deleting references with meadowlarkId ${meadowlarkId} as parent meadowlarkId`,
+      `${moduleName}.deleteDocumentById Deleting references with documentUuid ${documentUuid} as parent meadowlarkId`,
       traceId,
     );
     await client.query(deleteOutboundReferencesOfDocumentSql(meadowlarkId));

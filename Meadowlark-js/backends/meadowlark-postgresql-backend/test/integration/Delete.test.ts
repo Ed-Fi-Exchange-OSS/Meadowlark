@@ -450,12 +450,12 @@ describe('given the delete of a subclass document referenced by an existing docu
   beforeAll(async () => {
     client = (await getSharedClient()) as PoolClient;
     // The document that will be referenced
-    await upsertDocument(
+    const referencedDocumentUpsertResult: UpsertResult = await upsertDocument(
       { ...newUpsertRequest(), meadowlarkId: referencedDocumentId, documentInfo: referencedDocumentInfo },
       client,
     );
     // The referencing document that should cause the delete to fail
-    const referencedDocumentUpsertResult: UpsertResult = await upsertDocument(
+    await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
@@ -464,10 +464,13 @@ describe('given the delete of a subclass document referenced by an existing docu
       },
       client,
     );
-    const referencedDocumentUuid: DocumentUuid =
-      referencedDocumentUpsertResult.response === 'INSERT_SUCCESS'
-        ? referencedDocumentUpsertResult?.newDocumentUuid
-        : ('' as DocumentUuid);
+    let referencedDocumentUuid: DocumentUuid = '' as DocumentUuid;
+    if (referencedDocumentUpsertResult.response === 'INSERT_SUCCESS') {
+      referencedDocumentUuid = referencedDocumentUpsertResult.newDocumentUuid;
+    } else if (referencedDocumentUpsertResult.response === 'UPDATE_SUCCESS') {
+      referencedDocumentUuid = referencedDocumentUpsertResult.existingDocumentUuid;
+    }
+
     deleteResult = await deleteDocumentById(
       {
         ...newDeleteRequest(),

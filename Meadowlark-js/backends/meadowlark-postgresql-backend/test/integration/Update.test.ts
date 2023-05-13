@@ -33,6 +33,7 @@ import { getDocumentById } from '../../src/repository/Get';
 import { findDocumentByDocumentUuidSql, findDocumentByIdSql } from '../../src/repository/SqlHelper';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
+let resultDocumentUuid: DocumentUuid;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -144,10 +145,15 @@ describe('given the update of an existing document', () => {
 
     // insert the initial version
     const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
-    const upsertDocumentUuid: DocumentUuid =
-      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      resultDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      resultDocumentUuid = upsertResult.existingDocumentUuid;
+    } else {
+      resultDocumentUuid = '' as DocumentUuid;
+    }
     updateResult = await updateDocumentById(
-      { ...updateRequest, documentUuid: upsertDocumentUuid, edfiDoc: { changeToDoc: true } },
+      { ...updateRequest, documentUuid: resultDocumentUuid, edfiDoc: { changeToDoc: true } },
       client,
     );
   });
@@ -163,7 +169,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(findDocumentByDocumentUuidSql(documentUuid));
+    const result: any = await client.query(findDocumentByDocumentUuidSql(resultDocumentUuid));
     // await getDocumentById({ ...newGetRequest(), meadowlarkId }, client);
 
     expect(result.rows[0].document_identity.natural).toBe('update2');

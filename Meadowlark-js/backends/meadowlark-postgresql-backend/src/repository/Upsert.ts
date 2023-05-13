@@ -44,7 +44,7 @@ export async function upsertDocument(
     const documentExistsResult: QueryResult = await client.query(findDocumentByIdSql(meadowlarkId));
     const isInsert: boolean = documentExistsResult.rowCount === 0;
     const documentUuid: DocumentUuid =
-      documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].fields[0] : generateDocumentUuid();
+      documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].document_uuid : generateDocumentUuid();
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
       const superclassAliasIdInUseResult = await client.query(
@@ -118,11 +118,10 @@ export async function upsertDocument(
 
     // Perform the document upsert
     Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
-    await client.query(documentUpsertSql);
-
+    const insertResult = await client.query(documentUpsertSql);
+    Logger.debug(`${moduleName}.upsertDocument: insert ${insertResult}`, traceId);
     // Delete existing values from the aliases table
     await client.query(deleteAliasesForDocumentSql(meadowlarkId));
-
     // Perform insert of alias ids
     await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {

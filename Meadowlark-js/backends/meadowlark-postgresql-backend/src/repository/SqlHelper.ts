@@ -35,6 +35,27 @@ export function findAliasIdsForDocumentSql(documentId: MeadowlarkId): string {
 }
 
 /**
+ * Returns the SQL query to find the alias ids for a given document. Alias ids include the document id
+ * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ *
+ * This has a secondary function of read-for-write locking this row for proper updating and deleting.
+ *
+ * @param documentId the id of the document to find aliases for
+ * @returns a SQL query to find the alias ids of the given document
+ */
+export function findAliasIdsForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
+  return format(
+    `SELECT alias_id, aliases.document_id 
+  FROM meadowlark.aliases
+  INNER JOIN meadowlark.documents
+  ON aliases.document_id = documents.document_id
+  WHERE document_uuid = %L FOR SHARE NOWAIT`,
+    documentUuid,
+  );
+}
+
+/**
  * Returns the SQL query to find the existence of an alias id. Alias ids include the document id
  * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
  * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
@@ -65,7 +86,7 @@ export function findDocumentByIdSql(documentId: MeadowlarkId): string {
 
 /**
  * Returns the SQL statement for retrieving a document (with identity)
- * @param documentUuid The unique identifier of the document to retrieve
+ * @param documentId The identifier of the document to retrieve
  * @returns SQL query string to retrieve a document
  */
 export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
@@ -73,7 +94,8 @@ export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): strin
     `
     SELECT document_uuid, document_id, document_identity, edfi_doc
        FROM meadowlark.documents
-       WHERE document_uuid = '${[documentUuid]};'`,
+       WHERE document_uuid = %L;`,
+    [documentUuid],
   );
 }
 
@@ -83,7 +105,7 @@ export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): strin
  * @returns SQL query string to retrieve ownership
  */
 export function findOwnershipForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
-  return format('SELECT created_by FROM meadowlark.documents WHERE documentUuid = %L;', [documentUuid]);
+  return format('SELECT created_by FROM meadowlark.documents WHERE document_uuid = %L;', [documentUuid]);
 }
 
 /**
@@ -105,6 +127,21 @@ export function findOwnershipForDocumentSql(documentId: MeadowlarkId): string {
  */
 export function validateReferenceExistenceSql(documentIds: MeadowlarkId[]): string {
   return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id IN (%L) FOR NO KEY UPDATE NOWAIT`, documentIds);
+}
+
+/**
+ * Returns the SQL statement for retrieving alias ids from the aliases table for the given
+ * documents. This allows for checking for the existence of documents from the aliases table for deletes
+ * and general reference validation.
+ *
+ * @param documentIds the id of the document we're checking references for
+ * @returns SQL query string to retrieve existing alias ids
+ */
+export function validateReferenceExistenceByDocumentUuidSql(documentUuids: DocumentUuid[]): string {
+  return format(
+    `SELECT alias_id FROM meadowlark.aliases WHERE document_uuid IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    documentUuids,
+  );
 }
 
 /**
@@ -202,7 +239,6 @@ export function documentInsertOrUpdateSql(
         edfi_doc = %L
         WHERE meadowlark.documents.document_uuid = %L;`,
       documentValues[0],
-      documentValues[1],
       documentValues[2],
       documentValues[3],
       documentValues[4],
@@ -211,6 +247,7 @@ export function documentInsertOrUpdateSql(
       documentValues[7],
       documentValues[8],
       documentValues[9],
+      documentValues[1],
     );
   }
   return documentSql;
@@ -237,7 +274,7 @@ export function deleteDocumentByDocumentUuIdSql(documentUuid: DocumentUuid): str
  */
 export function deleteDocumentByIdSql(documentId: MeadowlarkId): string {
   return format(
-    'with del as (DELETE FROM meadowlark.documents WHERE document_uuid = %L RETURNING id) SELECT COUNT(*) FROM del;',
+    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
     [documentId],
   );
 }

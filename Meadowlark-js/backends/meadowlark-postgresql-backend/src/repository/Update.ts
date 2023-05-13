@@ -95,9 +95,9 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: P
       false,
     );
     const result: QueryResult = await client.query(documentSql);
-
+    const deleteAliaseSql = deleteAliasesForDocumentSql(meadowlarkId);
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesForDocumentSql(meadowlarkId));
+    await client.query(deleteAliaseSql);
 
     // Perform insert of alias ids
     await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
