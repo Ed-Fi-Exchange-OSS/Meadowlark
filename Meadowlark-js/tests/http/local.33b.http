@@ -167,6 +167,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Strict validation is disabled
+# @name students
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -181,12 +182,12 @@ authorization: bearer {{authToken4}}
 
 
 ### 403 deleting with wrong owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/{{students.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
 ### 204 deleting with correct owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+DELETE http://localhost:3000/local/v3.3b/ed-fi/students/{{students.response.headers.location}}
 authorization: bearer {{authToken4}}
 
 ###
