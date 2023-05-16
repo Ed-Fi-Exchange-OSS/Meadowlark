@@ -18,7 +18,8 @@ services:
       OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: ${OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION:-http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/verify}
       OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME:-admin}
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASS:-admin}
-      OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://opensearch:9200}
+      OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://meadowlark.southcentralus.azurecontainer.io:9200}
+      OPENSEARCH_REQUEST_TIMEOUT: '10000'
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
       LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
@@ -45,7 +46,7 @@ services:
     image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
     container_name: ml-mongo1
     domainname: meadowlark
-    hostname: meadowlark
+    hostname: ml-mongo1
     ports:
       - 27017:27017
     restart: unless-stopped
@@ -61,15 +62,32 @@ services:
         '--replSet',
         'rs0'
       ]
-    # volumes:
-    #   - mongo-ml-local-data1:/data/db
-    #   - mongo-ml-local-log1:/var/log/mongodb
 
-# volumes:
-#   mongo-ml-local-data1:
-#     labels:
-#       edfi-ml: local
-#   mongo-ml-local-log1:
-#     labels:
-#       edfi-ml: local
-
+  opensearch:
+    image: opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf
+    container_name: ml-opensearch1
+    domainname: meadowlark
+    hostname: ml-opeansearch1
+    environment:
+      'cluster.name': opensearch-cluster-ml-local
+      'bootstrap.memory_lock': "true" # along with the memlock settings below, disables swapping
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      'discovery.type': single-node
+      DISABLE_INSTALL_DEMO_CONFIG: "true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      DISABLE_SECURITY_PLUGIN: "true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+    mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    ports:
+      - 9200:9200
+    restart: unless-stopped
+    healthcheck:
+      test: curl -s http://meadowlark.southcentralus.azurecontainer.io:9200/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
