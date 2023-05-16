@@ -24,7 +24,7 @@ import {
   insertAliasSql,
   findAliasIdSql,
   findReferringDocumentInfoForErrorReportingSql,
-  findDocumentByIdSql,
+  findDocumentByMeadowlarkIdSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 
@@ -41,7 +41,7 @@ export async function upsertDocument(
     await client.query('BEGIN');
 
     // Check whether this is an insert or update
-    const documentExistsResult: QueryResult = await client.query(findDocumentByIdSql(meadowlarkId));
+    const documentExistsResult: QueryResult = await client.query(findDocumentByMeadowlarkIdSql(meadowlarkId));
     const isInsert: boolean = documentExistsResult.rowCount === 0;
     const documentUuid: DocumentUuid =
       documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].document_uuid : generateDocumentUuid();
@@ -123,10 +123,10 @@ export async function upsertDocument(
     // Delete existing values from the aliases table
     await client.query(deleteAliasesForDocumentSql(meadowlarkId));
     // Perform insert of alias ids
-    await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
+    await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
-      await client.query(insertAliasSql(meadowlarkId, superclassAliasId));
+      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
     }
 
     // Delete existing references in references table

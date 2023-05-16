@@ -16,7 +16,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   documentInsertOrUpdateSql,
-  findAliasIdsForDocumentSql,
+  findAliasIdsForDocumentByMeadowlarkIdSql,
   deleteAliasesForDocumentSql,
   insertAliasSql,
   deleteOutboundReferencesOfDocumentSql,
@@ -48,7 +48,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   try {
     await client.query('BEGIN');
 
-    const recordExistsResult = await client.query(findAliasIdsForDocumentSql(meadowlarkId));
+    const recordExistsResult = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
 
     if (recordExistsResult.rowCount === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
@@ -100,10 +100,10 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     await client.query(deleteAliaseSql);
 
     // Perform insert of alias ids
-    await client.query(insertAliasSql(meadowlarkId, meadowlarkId));
+    await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
-      await client.query(insertAliasSql(meadowlarkId, superclassAliasId));
+      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
     }
 
     // Delete existing references in references table

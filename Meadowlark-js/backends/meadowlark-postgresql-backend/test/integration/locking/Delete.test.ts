@@ -25,9 +25,9 @@ import { validateReferences } from '../../../src/repository/ReferenceValidation'
 import {
   findReferencingDocumentIdsSql,
   deleteAliasesForDocumentSql,
-  findDocumentByIdSql,
+  findDocumentByMeadowlarkIdSql,
   documentInsertOrUpdateSql,
-  findAliasIdsForDocumentSql,
+  findAliasIdsForDocumentByMeadowlarkIdSql,
   insertAliasSql,
   insertOutboundReferencesSql,
   deleteDocumentByDocumentUuIdSql,
@@ -133,7 +133,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       // Get the alias ids for the document we're trying to delete, because the update transaction is trying
       // to use our school, this is where the code will throw a locking error. This is technically the last line
       // of code in this try block that should execute
-      const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentSql(schoolDocumentId));
+      const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentByMeadowlarkIdSql(schoolDocumentId));
 
       const validDocIds = aliasIdResult.rows.map((ref) => ref.alias_id);
       const referenceResult = await deleteClient.query(findReferencingDocumentIdsSql(validDocIds));
@@ -167,7 +167,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // eslint-disable-next-line no-restricted-syntax
     for (const ref of outboundRefs) {
       await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref as MeadowlarkId));
-      await insertClient.query(insertAliasSql(academicWeekDocumentId, ref as MeadowlarkId));
+      await insertClient.query(insertAliasSql(documentUuid, academicWeekDocumentId, ref as MeadowlarkId));
     }
 
     // **** The insert of AcademicWeek document should have been successful
@@ -188,7 +188,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const docResult: any = await insertClient.query(findDocumentByIdSql(schoolDocumentId));
+    const docResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(schoolDocumentId));
     expect(docResult.rows[0].document_identity.schoolId).toBe('123');
   });
 });
@@ -223,7 +223,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
-    const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentSql(schoolDocumentId));
+    const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentByMeadowlarkIdSql(schoolDocumentId));
 
     // The school is in the database
     expect(aliasIdResult.rowCount).toEqual(1);
@@ -279,7 +279,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       // eslint-disable-next-line no-restricted-syntax
       for (const ref of outboundRefs) {
         await insertClient.query(insertOutboundReferencesSql(academicWeekDocumentId, ref as MeadowlarkId));
-        await insertClient.query(insertAliasSql(academicWeekDocumentId, ref as MeadowlarkId));
+        await insertClient.query(insertAliasSql(documentUuid, academicWeekDocumentId, ref as MeadowlarkId));
       }
       await insertClient.query('COMMIT');
     } catch (e1) {
@@ -299,8 +299,8 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const schoolDocResult: any = await insertClient.query(findDocumentByIdSql(schoolDocumentId));
-    const awDocResult: any = await insertClient.query(findDocumentByIdSql(academicWeekDocumentId));
+    const schoolDocResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(schoolDocumentId));
+    const awDocResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(academicWeekDocumentId));
     expect(schoolDocResult.rowCount).toEqual(0);
     expect(awDocResult.rowCount).toEqual(0);
   });

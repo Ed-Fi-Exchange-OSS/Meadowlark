@@ -30,7 +30,7 @@ import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByDocumentIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
-import { findDocumentByDocumentUuidSql, findDocumentByIdSql } from '../../src/repository/SqlHelper';
+import { findDocumentByDocumentUuidSql, findDocumentByMeadowlarkIdSql } from '../../src/repository/SqlHelper';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
@@ -244,7 +244,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
@@ -349,7 +349,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: any = await client.query(findDocumentByIdSql(documentWithReferencesId));
+    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByDocumentIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
