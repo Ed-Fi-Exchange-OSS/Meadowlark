@@ -27,7 +27,7 @@ import { validateReferences } from './ReferenceValidation';
 
 const moduleName = 'postgresql.repository.Update';
 
-export async function updateDocumentById(updateRequest: UpdateRequest, client: PoolClient): Promise<UpdateResult> {
+export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest, client: PoolClient): Promise<UpdateResult> {
   const {
     meadowlarkId,
     documentUuid,

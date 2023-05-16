@@ -27,7 +27,7 @@ import {
 import type { PoolClient } from 'pg';
 import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import { deleteDocumentById } from '../../src/repository/Delete';
+import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { findDocumentByDocumentUuidSql, findDocumentByIdSql } from '../../src/repository/SqlHelper';
 
@@ -63,7 +63,7 @@ describe('given the delete of a non-existent document', () => {
   beforeAll(async () => {
     client = await getSharedClient();
 
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       { ...newDeleteRequest(), documentUuid, resourceInfo, validateNoReferencesToDocument: false },
       client,
     );
@@ -107,7 +107,7 @@ describe('given the delete of an existing document', () => {
     const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
     const upsertDocumentUuid: DocumentUuid =
       upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       { ...newDeleteRequest(), documentUuid: upsertDocumentUuid, resourceInfo },
       client,
     );
@@ -189,7 +189,7 @@ describe('given an delete of a document referenced by an existing document with 
     );
     const referencedDocumentUuid: DocumentUuid =
       referencedUpsertResult.response === 'INSERT_SUCCESS' ? referencedUpsertResult?.newDocumentUuid : ('' as DocumentUuid);
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       {
         ...newDeleteRequest(),
         documentUuid: referencedDocumentUuid,
@@ -278,7 +278,7 @@ describe('given an delete of a document with an outbound reference only, with va
       documentWithReferenceUpsertResult.response === 'INSERT_SUCCESS'
         ? documentWithReferenceUpsertResult?.newDocumentUuid
         : ('' as DocumentUuid);
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       {
         ...newDeleteRequest(),
         documentUuid: documentWithReferencesDocumentUuid,
@@ -367,7 +367,7 @@ describe('given an delete of a document referenced by an existing document with 
       referencedDocumentUpsertResult.response === 'INSERT_SUCCESS'
         ? referencedDocumentUpsertResult?.newDocumentUuid
         : ('' as DocumentUuid);
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       {
         ...newDeleteRequest(),
         documentUuid: referencedDocumentUuid,
@@ -471,7 +471,7 @@ describe('given the delete of a subclass document referenced by an existing docu
       referencedDocumentUuid = referencedDocumentUpsertResult.existingDocumentUuid;
     }
 
-    deleteResult = await deleteDocumentById(
+    deleteResult = await deleteDocumentByDocumentUuid(
       {
         ...newDeleteRequest(),
         documentUuid: referencedDocumentUuid,

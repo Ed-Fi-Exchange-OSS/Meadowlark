@@ -22,7 +22,7 @@ import {
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { deleteAll } from './TestHelper';
-import { getDocumentById } from '../../src/repository/Get';
+import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import { findDocumentByIdSql } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 
@@ -60,7 +60,7 @@ describe('given the get of a non-existent document', () => {
   beforeAll(async () => {
     client = await getSharedClient();
 
-    getResult = await getDocumentById(
+    getResult = await getDocumentByDocumentUuid(
       { ...newGetRequest(), documentUuid: meadowlarkId as unknown as DocumentUuid, resourceInfo },
       client,
     );
@@ -104,7 +104,7 @@ describe('given the get of an existing document', () => {
     // insert the initial version
     await upsertDocument(upsertRequest, client);
 
-    getResult = await getDocumentById(
+    getResult = await getDocumentByDocumentUuid(
       { ...newGetRequest(), documentUuid: meadowlarkId as unknown as DocumentUuid, resourceInfo },
       client,
     );

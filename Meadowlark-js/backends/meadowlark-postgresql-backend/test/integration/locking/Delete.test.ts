@@ -24,13 +24,13 @@ import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
   findReferencingDocumentIdsSql,
-  deleteDocumentByIdSql,
   deleteAliasesForDocumentSql,
   findDocumentByIdSql,
   documentInsertOrUpdateSql,
   findAliasIdsForDocumentSql,
   insertAliasSql,
   insertOutboundReferencesSql,
+  deleteDocumentByDocumentUuIdSql,
 } from '../../../src/repository/SqlHelper';
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
@@ -89,13 +89,19 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   beforeAll(async () => {
     insertClient = (await getSharedClient()) as PoolClient;
     deleteClient = (await getSharedClient()) as PoolClient;
-
+    let resultDocumentUuid: DocumentUuid;
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument(
+    const upsertResult = await upsertDocument(
       { ...newUpsertRequest(), meadowlarkId: schoolDocumentId, documentInfo: schoolDocumentInfo },
       insertClient,
     );
-
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      resultDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      resultDocumentUuid = upsertResult.existingDocumentUuid;
+    } else {
+      resultDocumentUuid = '' as DocumentUuid;
+    }
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
     // ----
@@ -135,7 +141,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
       expect(anyReferences.length).toEqual(0);
 
-      await deleteClient.query(deleteDocumentByIdSql(schoolDocumentId));
+      await deleteClient.query(deleteDocumentByDocumentUuIdSql(resultDocumentUuid));
       await deleteClient.query(deleteAliasesForDocumentSql(schoolDocumentId));
       await deleteClient.query('COMMIT');
     } catch (e1) {
@@ -196,7 +202,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     deleteClient = (await getSharedClient()) as PoolClient;
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
-    await upsertDocument(
+    const upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
         meadowlarkId: schoolDocumentId,
@@ -204,7 +210,12 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       },
       insertClient,
     );
-
+    let resultDocumentUuid: DocumentUuid = '' as DocumentUuid;
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      resultDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      resultDocumentUuid = upsertResult.existingDocumentUuid;
+    }
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
     // ----
@@ -225,7 +236,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     expect(anyReferences.length).toEqual(0);
 
     // Delete the document
-    await deleteClient.query(deleteDocumentByIdSql(schoolDocumentId));
+    await deleteClient.query(deleteDocumentByDocumentUuIdSql(resultDocumentUuid));
     await deleteClient.query(deleteAliasesForDocumentSql(schoolDocumentId));
 
     // Start the insert

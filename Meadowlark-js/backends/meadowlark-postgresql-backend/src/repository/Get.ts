@@ -10,7 +10,10 @@ import { findDocumentByIdSql } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.Get';
 
-export async function getDocumentById({ documentUuid, traceId }: GetRequest, client: PoolClient): Promise<GetResult> {
+export async function getDocumentByDocumentUuid(
+  { documentUuid, traceId }: GetRequest,
+  client: PoolClient,
+): Promise<GetResult> {
   // TODO *** cast to unknown is an invalid mixing of meadowlarkId and documentUuid
   const meadowlarkId: MeadowlarkId = documentUuid as unknown as MeadowlarkId;
   try {

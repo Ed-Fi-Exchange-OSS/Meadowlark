@@ -110,7 +110,7 @@ content-type: application/json
 
 ###
 @contentClassDescriptorLocation = {{contentClassDescriptor.response.headers.location}}
-GET http://localhost:3000{{contentClassDescriptorLocation}}
+GET http://localhost:3000/{{contentClassDescriptorLocation}}
 authorization: bearer {{authToken1}}
 
 

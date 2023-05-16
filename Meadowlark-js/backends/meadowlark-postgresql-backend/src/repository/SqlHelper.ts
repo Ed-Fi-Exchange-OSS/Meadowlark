@@ -46,7 +46,7 @@ export function findAliasIdsForDocumentSql(documentId: MeadowlarkId): string {
  */
 export function findAliasIdsForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
   return format(
-    `SELECT alias_id, aliases.document_id 
+    `SELECT alias_id, aliases.document_id
   FROM meadowlark.aliases
   INNER JOIN meadowlark.documents
   ON aliases.document_id = documents.document_id
@@ -264,18 +264,6 @@ export function deleteDocumentByDocumentUuIdSql(documentUuid: DocumentUuid): str
   return format(
     'with del as (DELETE FROM meadowlark.documents WHERE document_uuid = %L RETURNING id) SELECT COUNT(*) FROM del;',
     [documentUuid],
-  );
-}
-
-/**
- * Returns the SQL query for deleting a document from the database
- * @param documentId the document to delete from the documents table
- * @returns SQL query string to delete the document
- */
-export function deleteDocumentByIdSql(documentId: MeadowlarkId): string {
-  return format(
-    'with del as (DELETE FROM meadowlark.documents WHERE document_id = %L RETURNING id) SELECT COUNT(*) FROM del;',
-    [documentId],
   );
 }
 
