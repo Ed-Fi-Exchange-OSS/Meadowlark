@@ -4,7 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { MeadowlarkId, MissingIdentity, getMeadowlarkIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import {
+  MeadowlarkId,
+  MissingIdentity,
+  getMeadowlarkIdForDocumentReference,
+  DocumentReference,
+} from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { validateReferenceExistenceSql } from './SqlHelper';

@@ -12,7 +12,6 @@ import {
   MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { onlyReturnAliasId, onlyReturnId } from './Db';
 
 /**
@@ -44,7 +43,7 @@ async function findReferencedMeadowlarkIdsByMeadowlarkId(
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
-  refsInDb: MeadowlarkDocument[],
+  refsInDb: MeadowlarkId[],
   documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
 ): MissingIdentity[] {

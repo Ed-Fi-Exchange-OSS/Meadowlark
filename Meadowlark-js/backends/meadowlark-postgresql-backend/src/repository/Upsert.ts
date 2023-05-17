@@ -36,7 +36,9 @@ export async function upsertDocument(
 ): Promise<UpsertResult> {
   Logger.info(`${moduleName}.upsertDocument`, traceId);
 
-  const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => getMeadowlarkIdForDocumentReference(dr));
+  const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) =>
+    getMeadowlarkIdForDocumentReference(dr),
+  );
   try {
     await client.query('BEGIN');
 
@@ -58,7 +60,9 @@ export async function upsertDocument(
           traceId,
         );
 
-        const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
+        const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(
+          documentInfo.superclassInfo,
+        ) as MeadowlarkId;
 
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
 
