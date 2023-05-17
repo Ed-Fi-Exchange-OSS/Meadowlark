@@ -100,7 +100,7 @@ describe('given the new document has an invalid reference ', () => {
     expect(response.body).toMatchInlineSnapshot(`
     {
       "blockingUris": [
-        "/v3.3b/ed-fi/resourceNames/documentId",
+        "/v3.3b/ed-fi/resourceNames/documentUuid",
       ],
       "error": "this is the message",
     }

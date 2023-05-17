@@ -186,7 +186,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       {
         "error": {
           "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentId",
+            "/v3.3b/ed-fi/resourceNames/documentUuid",
           ],
           "message": "The resource cannot be deleted because it is a dependency of other documents",
         },
