@@ -685,7 +685,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Solved in RND-426
-PUT http://localhost:3000{{students.response.headers.location}}
+PUT http://localhost:3000{{twoDifferentSchoolYears.response.headers.location}}
 content-type: application/json
 authorization: bearer {{authToken1}}
 
