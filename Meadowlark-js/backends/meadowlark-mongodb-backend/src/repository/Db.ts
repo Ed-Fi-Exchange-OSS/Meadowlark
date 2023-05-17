@@ -5,7 +5,7 @@
 
 import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, ObjectId, FindOptions, ReplaceOptions } from 'mongodb';
 import { Logger, Config } from '@edfi//meadowlark-utilities';
-import { MeadowlarkId } from 'packages/meadowlark-core/dist';
+import { MeadowlarkId } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
