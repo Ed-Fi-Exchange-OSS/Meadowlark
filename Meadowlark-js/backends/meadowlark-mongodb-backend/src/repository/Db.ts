@@ -5,6 +5,7 @@
 
 import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, ObjectId, FindOptions, ReplaceOptions } from 'mongodb';
 import { Logger, Config } from '@edfi//meadowlark-utilities';
+import { MeadowlarkId } from 'packages/meadowlark-core/dist';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
@@ -97,11 +98,11 @@ export function getAuthorizationCollection(client: MongoClient): Collection<Auth
  */
 export async function writeLockReferencedDocuments(
   mongoCollection: Collection<MeadowlarkDocument>,
-  referencedDocumentIds: string[],
+  referencedMeadowlarkIds: MeadowlarkId[],
   session: ClientSession,
 ): Promise<void> {
   await mongoCollection.updateMany(
-    { aliasIds: { $in: referencedDocumentIds } },
+    { aliasIds: { $in: referencedMeadowlarkIds } },
     { $set: { lock: new ObjectId() } },
     { session },
   );

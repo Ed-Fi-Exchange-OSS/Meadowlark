@@ -63,7 +63,7 @@ describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid: 'documentUuid',
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };

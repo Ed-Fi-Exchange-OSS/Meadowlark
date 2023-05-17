@@ -9,10 +9,11 @@ import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import {
   UpsertResult,
   UpsertRequest,
-  documentIdForSuperclassInfo,
+  getMeadowlarkIdForSuperclassInfo,
   BlockingDocument,
   DocumentUuid,
   generateDocumentUuid,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
@@ -45,7 +46,7 @@ export async function upsertDocumentTransaction(
 
   // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
   if (isInsert && documentInfo.superclassInfo != null) {
-    const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+    const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo);
     const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
       {
         aliasIds: superclassAliasId,

@@ -11,7 +11,7 @@ import {
   deleteOutboundReferencesOfDocumentSql,
   findReferringDocumentInfoForErrorReportingSql,
   deleteAliasesForDocumentSql,
-  findReferencingDocumentIdsSql,
+  findReferencingMeadowlarkIdsSql,
   findAliasIdsForDocumentByDocumentUuidSql,
 } from './SqlHelper';
 
@@ -45,7 +45,7 @@ export async function deleteDocumentByDocumentUuid(
       const documentAliasIds: string[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
 
       // Find any documents that reference this document, either it's own id or an alias
-      const referenceResult: QueryResult<any> = await client.query(findReferencingDocumentIdsSql(documentAliasIds));
+      const referenceResult: QueryResult<any> = await client.query(findReferencingMeadowlarkIdsSql(documentAliasIds));
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');

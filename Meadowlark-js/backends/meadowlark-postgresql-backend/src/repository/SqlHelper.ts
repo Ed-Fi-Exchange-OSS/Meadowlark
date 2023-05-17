@@ -10,13 +10,13 @@ import format from 'pg-format';
 /**
  * Returns the SQL query that does a reverse lookup to find the ids of documents that reference the given ids.
  *
- * @param referencedDocumentIds the ids of the documents that are being referenced
+ * @param referencedMeadowlarkIds the ids of the documents that are being referenced
  * @returns a SQL query to find the ids of the documents referencing the given ids
  */
-export function findReferencingDocumentIdsSql(referencedDocumentIds: string[]): string {
+export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: string[]): string {
   return format(
     `SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`,
-    referencedDocumentIds,
+    referencedMeadowlarkIds,
   );
 }
 
@@ -118,11 +118,11 @@ export function findOwnershipForDocumentSql(meadowlarkId: MeadowlarkId): string 
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param documentIds the id of the document we're checking references for
+ * @param meadowlarkIds the id of the document we're checking references for
  * @returns SQL query string to retrieve existing alias ids
  */
-export function validateReferenceExistenceSql(documentIds: MeadowlarkId[]): string {
-  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id IN (%L) FOR NO KEY UPDATE NOWAIT`, documentIds);
+export function validateReferenceExistenceSql(meadowlarkIds: MeadowlarkId[]): string {
+  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id IN (%L) FOR NO KEY UPDATE NOWAIT`, meadowlarkIds);
 }
 
 /**
@@ -130,7 +130,7 @@ export function validateReferenceExistenceSql(documentIds: MeadowlarkId[]): stri
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param documentIds the id of the document we're checking references for
+ * @param meadowlarkIds the id of the document we're checking references for
  * @returns SQL query string to retrieve existing alias ids
  */
 export function validateReferenceExistenceByDocumentUuidSql(documentUuids: DocumentUuid[]): string {
@@ -144,13 +144,13 @@ export function validateReferenceExistenceByDocumentUuidSql(documentUuids: Docum
  * Returns the SQL statement to find up to five documents that reference this document.
  * This is for error reporting when an attempt is made to delete the document.
  *
- * @param referringDocumentIds The referring documents
+ * @param referringMeadowlarkIds The referring documents
  * @returns SQL query string to retrieve the document_id and resource_name of the referring documents
  */
-export function findReferringDocumentInfoForErrorReportingSql(referringDocumentIds: MeadowlarkId[]): string {
+export function findReferringDocumentInfoForErrorReportingSql(referringMeadowlarkIds: MeadowlarkId[]): string {
   return format(
     `SELECT project_name, resource_name, resource_version, document_id FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
-    referringDocumentIds,
+    referringMeadowlarkIds,
   );
 }
 
@@ -174,13 +174,13 @@ export function insertAliasSql(documentUuid: DocumentUuid, meadowlarkId: Meadowl
 /**
  * Returns the SQL statement to insert an outbound reference for a document into the references table
  * @param meadowlarkId The parent document of the reference
- * @param referencedDocumentId The document that is referenced
+ * @param referencedMeadowlarkId The document that is referenced
  * @returns SQL query string to insert reference into references table
  */
-export function insertOutboundReferencesSql(meadowlarkId: MeadowlarkId, referencedDocumentId: MeadowlarkId): string {
+export function insertOutboundReferencesSql(meadowlarkId: MeadowlarkId, referencedMeadowlarkId: MeadowlarkId): string {
   return format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
     meadowlarkId,
-    referencedDocumentId,
+    referencedMeadowlarkId,
   ]);
 }
 

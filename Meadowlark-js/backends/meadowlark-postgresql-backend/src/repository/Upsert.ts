@@ -8,8 +8,8 @@ import {
   UpsertResult,
   UpsertRequest,
   DocumentReference,
-  documentIdForDocumentReference,
-  documentIdForSuperclassInfo,
+  getMeadowlarkIdForDocumentReference,
+  getMeadowlarkIdForSuperclassInfo,
   BlockingDocument,
   generateDocumentUuid,
   DocumentUuid,
@@ -36,7 +36,7 @@ export async function upsertDocument(
 ): Promise<UpsertResult> {
   Logger.info(`${moduleName}.upsertDocument`, traceId);
 
-  const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => documentIdForDocumentReference(dr));
+  const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) => getMeadowlarkIdForDocumentReference(dr));
   try {
     await client.query('BEGIN');
 
@@ -48,7 +48,7 @@ export async function upsertDocument(
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
       const superclassAliasIdInUseResult = await client.query(
-        findAliasIdSql(documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId),
+        findAliasIdSql(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId),
       );
       const superclassAliasIdInUse: boolean = superclassAliasIdInUseResult.rowCount !== 0;
 
@@ -58,7 +58,7 @@ export async function upsertDocument(
           traceId,
         );
 
-        const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
+        const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
 
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
 
@@ -125,7 +125,7 @@ export async function upsertDocument(
     // Perform insert of alias ids
     await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
-      const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
+      const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
       await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
     }
 
@@ -135,7 +135,7 @@ export async function upsertDocument(
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
-      documentIdForDocumentReference(dr),
+      getMeadowlarkIdForDocumentReference(dr),
     );
     outboundRefs.push(...descriptorOutboundRefs);
 

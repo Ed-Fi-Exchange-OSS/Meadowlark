@@ -33,13 +33,13 @@ export { newFrontendRequest, newFrontendRequestMiddleware } from './handler/Fron
 export type { FrontendResponse } from './handler/FrontendResponse';
 export { newFrontendResponse, newFrontendResponseSuccess } from './handler/FrontendResponse';
 export { meadowlarkIdForDocumentIdentity, generateDocumentUuid } from './model/DocumentIdentity';
-export { documentIdForDocumentReference } from './model/DocumentReference';
+export { getMeadowlarkIdForDocumentReference } from './model/DocumentReference';
 export type { DocumentInfo } from './model/DocumentInfo';
 export { newDocumentInfo, NoDocumentInfo } from './model/DocumentInfo';
 export type { ResourceInfo } from './model/ResourceInfo';
 export { newResourceInfo, NoResourceInfo } from './model/ResourceInfo';
 export type { SuperclassInfo } from './model/SuperclassInfo';
-export { newSuperclassInfo, documentIdForSuperclassInfo } from './model/SuperclassInfo';
+export { newSuperclassInfo, getMeadowlarkIdForSuperclassInfo } from './model/SuperclassInfo';
 export * as PluginLoader from './plugin/PluginLoader';
 export type { MiddlewareModel } from './middleware/MiddlewareModel';
 export { doNothingMiddleware } from './middleware/DoNothingMiddleware';

@@ -25,7 +25,7 @@ import {
   UpsertResult,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
-import { deleteAll, retrieveReferencesByDocumentIdSql } from './TestHelper';
+import { deleteAll, retrieveReferencesByMeadowlarkIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -394,7 +394,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should not be the parent document in the references table', async () => {
-    const docResult: any = await client.query(retrieveReferencesByDocumentIdSql(referencedDocumentId));
+    const docResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(referencedDocumentId));
     expect(docResult.rowCount).toEqual(0);
   });
 });

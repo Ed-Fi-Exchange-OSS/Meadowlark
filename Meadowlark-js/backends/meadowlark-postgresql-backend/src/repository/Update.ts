@@ -8,8 +8,8 @@ import {
   UpdateResult,
   UpdateRequest,
   DocumentReference,
-  documentIdForDocumentReference,
-  documentIdForSuperclassInfo,
+  getMeadowlarkIdForDocumentReference,
+  getMeadowlarkIdForSuperclassInfo,
   BlockingDocument,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
@@ -42,7 +42,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   const outboundRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
-    documentIdForDocumentReference(dr),
+    getMeadowlarkIdForDocumentReference(dr),
   );
 
   try {
@@ -102,7 +102,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     // Perform insert of alias ids
     await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
-      const superclassAliasId: MeadowlarkId = documentIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
+      const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
       await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
     }
 
@@ -112,7 +112,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
-      documentIdForDocumentReference(dr),
+      getMeadowlarkIdForDocumentReference(dr),
     );
     outboundRefs.push(...descriptorOutboundRefs);
 

@@ -3,12 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { MeadowlarkId } from '../../src/model/BrandedTypes';
 import { meadowlarkIdForDocumentIdentity } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
-import { isDocumentIdValidForResource, isDocumentIdWellFormed } from '../../src/validation/DocumentIdValidator';
+import { isMeadowlarkIdValidForResource, isMeadowlarkIdWellFormed } from '../../src/validation/DocumentIdValidator';
 
 describe('given a valid id', () => {
-  let id: string;
+  let id: MeadowlarkId;
   let validResourceInfo: BaseResourceInfo;
 
   beforeAll(async () => {
@@ -27,16 +28,16 @@ describe('given a valid id', () => {
   });
 
   it('should be well formed', () => {
-    expect(isDocumentIdWellFormed(id)).toEqual(true);
+    expect(isMeadowlarkIdWellFormed(id)).toEqual(true);
   });
 
   it('should be valid for the provided resource info', () => {
-    expect(isDocumentIdValidForResource(id, validResourceInfo)).toEqual(true);
+    expect(isMeadowlarkIdValidForResource(id, validResourceInfo)).toEqual(true);
   });
 });
 
 describe('given a valid id with a mismatched resource info', () => {
-  let id: string;
+  let id: MeadowlarkId;
   let mismatchedResourceInfo: BaseResourceInfo;
 
   beforeAll(async () => {
@@ -61,16 +62,16 @@ describe('given a valid id with a mismatched resource info', () => {
   });
 
   it('should be well formed', () => {
-    expect(isDocumentIdWellFormed(id)).toEqual(true);
+    expect(isMeadowlarkIdWellFormed(id)).toEqual(true);
   });
 
   it('should be invalid for the mismatched resource info', () => {
-    expect(isDocumentIdValidForResource(id, mismatchedResourceInfo)).toEqual(false);
+    expect(isMeadowlarkIdValidForResource(id, mismatchedResourceInfo)).toEqual(false);
   });
 });
 
 describe('given an invalid id', () => {
-  const invalidId = 'NotAValidId';
+  const invalidId: MeadowlarkId = 'NotAValidId' as MeadowlarkId;
   const mismatchedResourceInfo: BaseResourceInfo = {
     isDescriptor: false,
     projectName: 'MismatchedProjectName',
@@ -78,10 +79,10 @@ describe('given an invalid id', () => {
   };
 
   it('should not be well formed', () => {
-    expect(isDocumentIdWellFormed(invalidId)).toEqual(false);
+    expect(isMeadowlarkIdWellFormed(invalidId)).toEqual(false);
   });
 
   it('should be invalid for the mismatched resource info', () => {
-    expect(isDocumentIdValidForResource(invalidId, mismatchedResourceInfo)).toEqual(false);
+    expect(isMeadowlarkIdValidForResource(invalidId, mismatchedResourceInfo)).toEqual(false);
   });
 });

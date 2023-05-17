@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { MeadowlarkId } from './BrandedTypes';
 import { meadowlarkIdForDocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { BaseResourceInfo } from './ResourceInfo';
@@ -56,7 +57,7 @@ export function newSuperclassInfo(): SuperclassInfo {
  * Returns the id of the given DocumentInfo superclass, using the project name, resource name
  * and identity of the superclass document.
  */
-export function documentIdForSuperclassInfo(superclassInfo: SuperclassInfo): string {
+export function getMeadowlarkIdForSuperclassInfo(superclassInfo: SuperclassInfo): MeadowlarkId {
   const resourceInfo: BaseResourceInfo = {
     projectName: superclassInfo.projectName,
     resourceName: superclassInfo.resourceName,
