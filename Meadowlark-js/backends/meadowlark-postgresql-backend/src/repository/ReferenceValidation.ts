@@ -24,7 +24,7 @@ const moduleName = 'postgresql.repository.ReferenceValidation';
  * @returns The subset of the given reference ids that are actually documents in the db
  */
 async function findReferencedMeadowlarkIdsByMeadowlarkId(
-  referenceIds: string[],
+  referenceIds: MeadowlarkId[],
   traceId: string,
   client: PoolClient,
 ): Promise<string[]> {
