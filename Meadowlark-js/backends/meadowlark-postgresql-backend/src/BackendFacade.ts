@@ -26,7 +26,7 @@ import * as SecurityMiddleware from './security/SecurityMiddleware';
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
   const poolClient: PoolClient = await getSharedClient();
   try {
-    return Delete.deleteDocumentById(request, poolClient);
+    return Delete.deleteDocumentByDocumentUuid(request, poolClient);
   } finally {
     poolClient.release();
   }
@@ -35,7 +35,7 @@ export async function deleteDocumentById(request: DeleteRequest): Promise<Delete
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
   const poolClient: PoolClient = await getSharedClient();
   try {
-    return Get.getDocumentById(request, poolClient);
+    return Get.getDocumentByDocumentUuid(request, poolClient);
   } finally {
     poolClient.release();
   }
@@ -53,7 +53,7 @@ export async function upsertDocument(request: UpsertRequest): Promise<UpsertResu
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
   const poolClient: PoolClient = await getSharedClient();
   try {
-    return Update.updateDocumentById(request, poolClient);
+    return Update.updateDocumentByDocumentUuid(request, poolClient);
   } finally {
     poolClient.release();
   }

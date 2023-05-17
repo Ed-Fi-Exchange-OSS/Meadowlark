@@ -5,27 +5,32 @@
 
 import R from 'ramda';
 import { ClientSession, Collection, Filter, FindOptions } from 'mongodb';
-import { documentIdForDocumentReference, DocumentReference, MissingIdentity } from '@edfi/meadowlark-core';
+import {
+  getMeadowlarkIdForDocumentReference,
+  DocumentReference,
+  MissingIdentity,
+  MeadowlarkId,
+} from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { onlyReturnAliasId, onlyReturnId } from './Db';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 /**
  * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
  * array for this existence check.
  *
- * @param referenceIds The reference ids to check for existence in the db
+ * @param referenceMeadowlarkIds The reference ids to check for existence in the db
  * @param mongoDocuments The MongoDb collection the documents are in
  * @param findOptions MongoDb findOptions for the query
  * @returns The subset of the given reference ids that are actually documents in the db
  */
-async function findReferencedDocumentIdsById(
-  referenceIds: string[],
+async function findReferencedMeadowlarkIdsByMeadowlarkId(
+  referenceMeadowlarkIds: MeadowlarkId[],
   mongoDocuments: Collection<MeadowlarkDocument>,
   findOptions: FindOptions,
 ): Promise<MeadowlarkDocument[]> {
   const referencedDocuments: MeadowlarkDocument[] = await mongoDocuments
-    .find({ aliasIds: { $in: referenceIds } }, findOptions)
+    .find({ aliasIds: { $in: referenceMeadowlarkIds } }, findOptions)
     .toArray();
   return referencedDocuments as MeadowlarkDocument[];
 }
@@ -44,7 +49,10 @@ export function findMissingReferences(
   documentReferences: DocumentReference[],
 ): MissingIdentity[] {
   // eslint-disable-next-line no-underscore-dangle
-  const idsOfRefsInDb: string[] = refsInDb.map((outRef) => (outRef.aliasIds.length > 0 ? outRef.aliasIds[0] : outRef._id));
+  const idsOfRefsInDb: MeadowlarkId[] = refsInDb.map((outRef) =>
+    // eslint-disable-next-line no-underscore-dangle
+    outRef.aliasIds.length > 0 ? outRef.aliasIds[0] : outRef._id,
+  );
   const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
 
   // Gets the array indexes of the missing references, for the documentOutboundRefs array
@@ -69,7 +77,7 @@ export const onlyReturnAliasIds = (session: ClientSession): FindOptions => ({
 });
 
 // MongoDB Filter on documents with the given aliasIds in their outboundRefs list
-export const onlyDocumentsReferencing = (aliasIds: string[]): Filter<MeadowlarkDocument> => ({
+export const onlyDocumentsReferencing = (aliasIds: MeadowlarkId[]): Filter<MeadowlarkDocument> => ({
   outboundRefs: { $in: aliasIds },
 });
 
@@ -92,11 +100,11 @@ export async function validateReferences(
 ): Promise<MissingIdentity[]> {
   const failures: MissingIdentity[] = [];
 
-  const referencedMeadowlarkIds: string[] = documentReferences.map((dr: DocumentReference) =>
-    documentIdForDocumentReference(dr),
-  );
+  const referencedMeadowlarkIds: MeadowlarkId[] = documentReferences.map((dr: DocumentReference) =>
+    getMeadowlarkIdForDocumentReference(dr),
+  ) as MeadowlarkId[];
 
-  const referenceIdsInDb: MeadowlarkDocument[] = await findReferencedDocumentIdsById(
+  const referenceIdsInDb: MeadowlarkDocument[] = await findReferencedMeadowlarkIdsByMeadowlarkId(
     referencedMeadowlarkIds,
     mongoDocuments,
     onlyReturnAliasId(session),
@@ -107,11 +115,15 @@ export async function validateReferences(
     failures.push(...findMissingReferences(referenceIdsInDb, referencedMeadowlarkIds, documentReferences));
   }
 
-  const descriptorReferenceIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
-    documentIdForDocumentReference(dr),
-  );
+  const descriptorReferenceIds: MeadowlarkId[] = descriptorReferences.map((dr: DocumentReference) =>
+    getMeadowlarkIdForDocumentReference(dr),
+  ) as MeadowlarkId[];
 
-  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceIds, mongoDocuments, onlyReturnId(session));
+  const descriptorsInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(
+    descriptorReferenceIds,
+    mongoDocuments,
+    onlyReturnId(session),
+  );
 
   if (descriptorReferenceIds.length !== descriptorsInDb.length) {
     Logger.debug('mongodb.repository.WriteHelper.validateReferences: descriptorReferences not found', traceId);

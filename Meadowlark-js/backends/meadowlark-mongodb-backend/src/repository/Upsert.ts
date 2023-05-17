@@ -9,10 +9,11 @@ import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import {
   UpsertResult,
   UpsertRequest,
-  documentIdForSuperclassInfo,
+  getMeadowlarkIdForSuperclassInfo,
   BlockingDocument,
   DocumentUuid,
   generateDocumentUuid,
+  MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
@@ -45,7 +46,7 @@ export async function upsertDocumentTransaction(
 
   // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
   if (isInsert && documentInfo.superclassInfo != null) {
-    const superclassAliasId: string = documentIdForSuperclassInfo(documentInfo.superclassInfo);
+    const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo);
     const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
       {
         aliasIds: superclassAliasId,
@@ -65,6 +66,7 @@ export async function upsertDocumentTransaction(
         blockingDocuments: [
           {
             documentUuid: superclassAliasIdInUse.documentUuid,
+            meadowlarkId: superclassAliasIdInUse._id,
             resourceName: superclassAliasIdInUse.resourceName,
             projectName: superclassAliasIdInUse.projectName,
             resourceVersion: superclassAliasIdInUse.resourceVersion,
@@ -95,7 +97,8 @@ export async function upsertDocumentTransaction(
         .toArray();
 
       const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-        documentUuid: document._id,
+        documentUuid: document.documentUuid,
+        meadowlarkId: document._id,
         resourceName: document.resourceName,
         projectName: document.projectName,
         resourceVersion: document.resourceVersion,

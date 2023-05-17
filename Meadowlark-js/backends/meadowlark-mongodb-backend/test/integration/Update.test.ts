@@ -173,7 +173,7 @@ describe('given an update of a document that references a non-existent document 
     documentIdentity: { natural: 'update4' },
   };
 
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -194,7 +194,7 @@ describe('given an update of a document that references a non-existent document 
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: false,
@@ -210,7 +210,7 @@ describe('given an update of a document that references a non-existent document 
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: false,
@@ -230,7 +230,7 @@ describe('given an update of a document that references a non-existent document 
 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
     expect(result.documentIdentity.natural).toBe('update4');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
@@ -253,7 +253,7 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update5' },
   };
-  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
     referencedDocumentInfo.documentIdentity,
   );
@@ -273,7 +273,7 @@ describe('given an update of a document that references an existing document wit
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update6' },
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId: MeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -287,7 +287,7 @@ describe('given an update of a document that references an existing document wit
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: referencedDocumentId,
+        meadowlarkId: referencedMeadowlarkId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -298,7 +298,7 @@ describe('given an update of a document that references an existing document wit
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
@@ -312,7 +312,7 @@ describe('given an update of a document that references an existing document wit
     updateResult = await updateDocumentById(
       {
         ...newUpdateRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         documentUuid: upsertResult.newDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
@@ -333,7 +333,7 @@ describe('given an update of a document that references an existing document wit
 
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
     expect(result.documentIdentity.natural).toBe('update6');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
@@ -356,7 +356,7 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update7' },
   };
-  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
     referencedDocumentInfo.documentIdentity,
   );
@@ -383,7 +383,7 @@ describe('given an update of a document with one existing and one non-existent r
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update8' },
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -397,7 +397,7 @@ describe('given an update of a document with one existing and one non-existent r
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: referencedDocumentId,
+        meadowlarkId: referencedMeadowlarkId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -408,7 +408,7 @@ describe('given an update of a document with one existing and one non-existent r
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
@@ -423,7 +423,7 @@ describe('given an update of a document with one existing and one non-existent r
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
@@ -456,7 +456,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   it('should not have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
     expect(result.outboundRefs).toHaveLength(0);
   });
 });
@@ -484,7 +484,7 @@ describe('given an update of a subclass document referenced by an existing docum
     documentIdentity: { schoolId: '123' },
     superclassInfo,
   };
-  const referencedDocumentId = meadowlarkIdForDocumentIdentity(
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
     referencedDocumentInfo.documentIdentity,
   );
@@ -504,7 +504,7 @@ describe('given an update of a subclass document referenced by an existing docum
     ...newDocumentInfo(),
     documentIdentity: { week: 'update6' },
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
     documentWithReferenceDocumentInfo.documentIdentity,
   );
@@ -518,7 +518,7 @@ describe('given an update of a subclass document referenced by an existing docum
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: referencedDocumentId,
+        meadowlarkId: referencedMeadowlarkId,
         resourceInfo: referencedResourceInfo,
         documentInfo: referencedDocumentInfo,
       },
@@ -529,7 +529,7 @@ describe('given an update of a subclass document referenced by an existing docum
     upsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
         validateDocumentReferencesExist: true,
@@ -544,7 +544,7 @@ describe('given an update of a subclass document referenced by an existing docum
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferenceResourceInfo,
         documentInfo: documentWithReferenceDocumentInfo,
         validateDocumentReferencesExist: true,
@@ -564,7 +564,7 @@ describe('given an update of a subclass document referenced by an existing docum
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: documentWithReferencesId });
+    const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",

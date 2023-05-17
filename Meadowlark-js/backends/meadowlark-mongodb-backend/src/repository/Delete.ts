@@ -56,7 +56,8 @@ async function checkForReferencesToDocument(
     .toArray();
 
   const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-    documentUuid: document._id,
+    documentUuid: document.documentUuid,
+    meadowlarkId: document._id,
     resourceName: document.resourceName,
     projectName: document.projectName,
     resourceVersion: document.resourceVersion,

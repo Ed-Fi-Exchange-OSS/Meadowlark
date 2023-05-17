@@ -21,7 +21,6 @@ import {
 import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
 import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import type { PoolClient } from 'pg';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
@@ -105,7 +104,6 @@ describe('given the getById of a document owned by the requestor', () => {
     documentIdentity: { natural: 'get2' },
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
-  const documentUuid = generateDocumentUuid();
 
   const upsertRequest: UpsertRequest = {
     meadowlarkId,
@@ -117,23 +115,23 @@ describe('given the getById of a document owned by the requestor', () => {
     traceId: 'traceId' as TraceId,
   };
 
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), documentUuid },
-      security: { authorizationStrategy, clientId },
-      validateResources: true,
-    },
-  };
-
   beforeAll(async () => {
     client = await getSharedClient();
 
     // Insert owned document
-    await upsertDocument(upsertRequest, client);
-
+    const upsertResult = await upsertDocument(upsertRequest, client);
+    const documentUuidResult: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult.newDocumentUuid : ('' as DocumentUuid);
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid: documentUuidResult },
+        security: { authorizationStrategy, clientId },
+        validateResources: true,
+      },
+    };
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);
   });
@@ -175,22 +173,24 @@ describe('given the getById of a document not owned by the requestor', () => {
     traceId: 'traceId' as TraceId,
   };
 
-  const frontendRequest: FrontendRequest = {
-    ...newFrontendRequest(),
-    action: 'getById',
-    middleware: {
-      ...newFrontendRequestMiddleware(),
-      pathComponents: { ...newPathComponents(), documentUuid: meadowlarkId as unknown as DocumentUuid },
-      security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
-      validateResources: true,
-    },
-  };
-
   beforeAll(async () => {
     client = await getSharedClient();
 
     // Insert non-owned document
-    await upsertDocument(upsertRequest, client);
+    const upsertResult = await upsertDocument(upsertRequest, client);
+
+    const documentUuid: DocumentUuid =
+      upsertResult.response === 'INSERT_SUCCESS' ? upsertResult.newDocumentUuid : ('' as DocumentUuid);
+    const frontendRequest: FrontendRequest = {
+      ...newFrontendRequest(),
+      action: 'getById',
+      middleware: {
+        ...newFrontendRequestMiddleware(),
+        pathComponents: { ...newPathComponents(), documentUuid },
+        security: { authorizationStrategy, clientId: 'NotTheDocumentOwner' },
+        validateResources: true,
+      },
+    };
 
     // Act
     result = await securityMiddleware({ frontendRequest, frontendResponse: null }, client);

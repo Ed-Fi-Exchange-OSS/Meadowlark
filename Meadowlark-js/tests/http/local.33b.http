@@ -167,6 +167,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Strict validation is disabled
+# @name students
 POST http://localhost:3000/local/v3.3b/ed-fi/students
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -181,12 +182,12 @@ authorization: bearer {{authToken4}}
 
 
 ### 403 deleting with wrong owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+DELETE http://localhost:3000{{students.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
 ### 204 deleting with correct owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/WhT14ozRv-M80122ZFtMigb_5VtptJfuO4KRKA
+DELETE http://localhost:3000{{students.response.headers.location}}
 authorization: bearer {{authToken4}}
 
 ###
@@ -334,6 +335,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create school 123 without validation
+# @name school_123
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -638,6 +640,7 @@ content-type: application/json
 authorization: bearer {{authToken1}}
 
 #### Contains two different school years
+# @name twoDifferentSchoolYears
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -682,7 +685,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Solved in RND-426
-PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations/uJ8Rk-JjLZuoSnnSQUUuG2-LY9kz5QrrD0_UyQ
+PUT http://localhost:3000{{twoDifferentSchoolYears.response.headers.location}}
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -733,6 +736,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/GeneralStudentProgramAssociations
 authorization: bearer {{authToken1}}
 
 ### This test covers the scenario previously seen in RND-149
+# @name accountPosted
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -861,20 +865,32 @@ authorization: bearer {{authToken4}}
 }
 
 ### delete the record above
-DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/maSXphjSRux6PX3WbbQKovXlVJEmso06cecAZw
+DELETE http://localhost:3000{{accountPosted.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ###
-DELETE http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+# @name schoolCategoryDescriptors
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+    "codeValue": "All Levels Http Test",
+    "shortDescription": "All Levels Http Test",
+    "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+DELETE http://localhost:3000{{schoolCategoryDescriptors.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+GET http://localhost:3000{{schoolCategoryDescriptors.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
 ### Try to delete school 123. Should be denied (409) because there are references to it. Solved in RND-327.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ
+DELETE http://localhost:3000{{school_123.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
@@ -937,8 +953,6 @@ content-type: application/json
       }
     ]
 }
-
-
 
 #
 ## PostSecondaryInstitutions

@@ -9,7 +9,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
-import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -153,7 +153,8 @@ describe('given the document to be deleted is referenced by other documents ', (
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid: 'documentUuid' as DocumentUuid,
+    meadowlarkId: 'meadowlarkId' as MeadowlarkId,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -186,7 +187,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       {
         "error": {
           "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentId",
+            "/v3.3b/ed-fi/resourceNames/documentUuid",
           ],
           "message": "The resource cannot be deleted because it is a dependency of other documents",
         },

@@ -4,7 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { MissingIdentity, documentIdForDocumentReference, DocumentReference } from '@edfi/meadowlark-core';
+import {
+  MeadowlarkId,
+  MissingIdentity,
+  getMeadowlarkIdForDocumentReference,
+  DocumentReference,
+} from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { validateReferenceExistenceSql } from './SqlHelper';
@@ -18,22 +23,22 @@ const moduleName = 'postgresql.repository.ReferenceValidation';
  * @param client The PostgreSQL client used for querying the database
  * @returns The subset of the given reference ids that are actually documents in the db
  */
-async function findReferencedDocumentIdsById(
-  referenceIds: string[],
+async function findReferencedMeadowlarkIdsByMeadowlarkId(
+  referenceIds: MeadowlarkId[],
   traceId: string,
   client: PoolClient,
 ): Promise<string[]> {
-  Logger.info(`${moduleName}.findReferencedDocumentIdsById`, traceId);
+  Logger.info(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId`, traceId);
 
   if (referenceIds.length === 0) {
     return [];
   }
 
-  const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds));
+  const referenceExistenceResult = await client.query(validateReferenceExistenceSql(referenceIds as MeadowlarkId[]));
 
   if (referenceExistenceResult.rows == null) {
-    Logger.error(`${moduleName}.findReferencedDocumentIdsById Database error parsing references`, traceId);
-    throw new Error(`${moduleName}.findReferencedDocumentIdsById Database error parsing references`);
+    Logger.error(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId Database error parsing references`, traceId);
+    throw new Error(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId Database error parsing references`);
   }
 
   return referenceExistenceResult.rows.map((val) => val.alias_id);
@@ -82,23 +87,23 @@ export function findMissingReferences(
 export async function validateReferences(
   documentReferences: DocumentReference[],
   descriptorReferences: DocumentReference[],
-  outboundRefs: string[],
+  outboundRefs: MeadowlarkId[],
   client: PoolClient,
   traceId: string,
 ): Promise<MissingIdentity[]> {
   const failureMessages: MissingIdentity[] = [];
 
-  const referencesInDb = await findReferencedDocumentIdsById(outboundRefs, traceId, client);
+  const referencesInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(outboundRefs, traceId, client);
   if (outboundRefs.length !== referencesInDb.length) {
     Logger.debug(`${moduleName}.validateReferences documentReferences not found`, traceId);
     failureMessages.push(...findMissingReferences(referencesInDb, outboundRefs, documentReferences));
   }
 
   // Validate descriptor references
-  const descriptorReferenceMeadowlarkIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
-    documentIdForDocumentReference(dr),
+  const descriptorReferenceMeadowlarkIds: MeadowlarkId[] = descriptorReferences.map((dr: DocumentReference) =>
+    getMeadowlarkIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencedDocumentIdsById(descriptorReferenceMeadowlarkIds, traceId, client);
+  const descriptorsInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(descriptorReferenceMeadowlarkIds, traceId, client);
   if (descriptorReferenceMeadowlarkIds.length !== descriptorsInDb.length) {
     Logger.debug(`${moduleName}.upsertDocument: descriptorReferences not found`, traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceMeadowlarkIds, descriptorReferences));

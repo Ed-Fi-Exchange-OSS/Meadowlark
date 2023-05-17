@@ -9,7 +9,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { BlockingDocument } from '../../src/message/BlockingDocument';
-import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -63,7 +63,8 @@ describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
-    documentUuid: 'documentId',
+    documentUuid: 'documentUuid' as DocumentUuid,
+    meadowlarkId: 'meadowlarkId' as MeadowlarkId,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -100,7 +101,7 @@ describe('given the new document has an invalid reference ', () => {
     expect(response.body).toMatchInlineSnapshot(`
     {
       "blockingUris": [
-        "/v3.3b/ed-fi/resourceNames/documentId",
+        "/v3.3b/ed-fi/resourceNames/documentUuid",
       ],
       "error": "this is the message",
     }
