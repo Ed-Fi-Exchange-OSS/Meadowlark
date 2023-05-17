@@ -335,6 +335,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Create school 123 without validation
+# @name school_123
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -868,16 +869,28 @@ DELETE http://localhost:3000{{accountPosted.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ###
-DELETE http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+# @name schoolCategoryDescriptors
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+    "codeValue": "All Levels Http Test",
+    "shortDescription": "All Levels Http Test",
+    "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+DELETE http://localhost:3000{{schoolCategoryDescriptors.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ###
-GET http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors/gPVEJ4PgrhnDa-eMNdqix4aoE8oeVAt8E9opyQ
+GET http://localhost:3000{{schoolCategoryDescriptors.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
 ### Try to delete school 123. Should be denied (409) because there are references to it. Solved in RND-327.
-DELETE http://localhost:3000/local/v3.3b/ed-fi/Schools/LZRuhjvR1UiLz9Tat_4HOBmlPt_xB_pA20fKyQ
+DELETE http://localhost:3000{{school_123.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
@@ -940,8 +953,6 @@ content-type: application/json
       }
     ]
 }
-
-
 
 #
 ## PostSecondaryInstitutions

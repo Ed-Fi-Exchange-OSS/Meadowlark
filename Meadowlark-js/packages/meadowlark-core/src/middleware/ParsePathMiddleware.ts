@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
-import { isMeadowlarkIdWellFormed, isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
+import { isDocumentUuidWellFormed } from '../validation/DocumentIdValidator';
 import type { PathComponents } from '../model/PathComponents';
 import type { DocumentUuid } from '../model/BrandedTypes';
 import type { MiddlewareModel } from './MiddlewareModel';
