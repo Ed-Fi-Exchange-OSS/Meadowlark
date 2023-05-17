@@ -46,6 +46,9 @@ export async function setup(network: StartedNetwork) {
         IS_LOCAL: 'false',
         AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
         POSTGRES_HOST: 'pg-test',
+        POSTGRES_USER: process.env.POSTGRES_USER ?? 'postgres',
+        POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD ?? 'abcdefgh1!',
+        MEADOWLARK_DATABASE_NAME: process.env.MEADOWLARK_DATABASE_NAME ?? 'postgres',
       });
 
     startedContainer = await container.start();

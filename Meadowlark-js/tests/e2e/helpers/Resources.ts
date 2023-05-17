@@ -29,7 +29,7 @@ export async function createResource({
         expect(response.body).toMatchInlineSnapshot(`undefined`);
       }
       if (upsert) {
-        expect([200, 201].indexOf(response.status)).toBeGreaterThan(-1);
+        expect([200, 201]).toContain(response.status);
       } else {
         expect(response.status).toEqual(201);
       }
