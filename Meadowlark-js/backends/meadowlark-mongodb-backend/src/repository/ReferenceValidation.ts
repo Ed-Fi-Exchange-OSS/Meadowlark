@@ -13,6 +13,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { onlyReturnAliasId, onlyReturnId } from './Db';
+import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 /**
  * Finds whether the given reference ids are actually documents in the db. Uses the aliasIds
@@ -43,12 +44,13 @@ async function findReferencedMeadowlarkIdsByMeadowlarkId(
  * @returns Failure message listing out the resource name and identity of missing document references.
  */
 export function findMissingReferences(
-  refsInDb: MeadowlarkId[],
+  refsInDb: MeadowlarkDocument[],
   documentOutboundRefs: string[],
   documentReferences: DocumentReference[],
 ): MissingIdentity[] {
   // eslint-disable-next-line no-underscore-dangle
   const idsOfRefsInDb: MeadowlarkId[] = refsInDb.map((outRef) =>
+    // eslint-disable-next-line no-underscore-dangle
     outRef.aliasIds.length > 0 ? outRef.aliasIds[0] : outRef._id,
   );
   const outRefIdsNotInDb: string[] = R.difference(documentOutboundRefs, idsOfRefsInDb);
