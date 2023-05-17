@@ -41,7 +41,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
-  const outboundRefs: string[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
+  const outboundRefs: MeadowlarkId[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
     getMeadowlarkIdForDocumentReference(dr),
   );
 

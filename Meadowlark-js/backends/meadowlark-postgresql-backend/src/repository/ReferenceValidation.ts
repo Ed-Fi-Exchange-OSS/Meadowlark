@@ -87,7 +87,7 @@ export function findMissingReferences(
 export async function validateReferences(
   documentReferences: DocumentReference[],
   descriptorReferences: DocumentReference[],
-  outboundRefs: string[],
+  outboundRefs: MeadowlarkId[],
   client: PoolClient,
   traceId: string,
 ): Promise<MissingIdentity[]> {
@@ -100,7 +100,7 @@ export async function validateReferences(
   }
 
   // Validate descriptor references
-  const descriptorReferenceMeadowlarkIds: string[] = descriptorReferences.map((dr: DocumentReference) =>
+  const descriptorReferenceMeadowlarkIds: MeadowlarkId[] = descriptorReferences.map((dr: DocumentReference) =>
     getMeadowlarkIdForDocumentReference(dr),
   );
   const descriptorsInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(descriptorReferenceMeadowlarkIds, traceId, client);
