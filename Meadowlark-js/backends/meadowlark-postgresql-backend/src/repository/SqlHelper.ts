@@ -149,7 +149,7 @@ export function validateReferenceExistenceByDocumentUuidSql(documentUuids: Docum
  */
 export function findReferringDocumentInfoForErrorReportingSql(referringMeadowlarkIds: MeadowlarkId[]): string {
   return format(
-    `SELECT project_name, resource_name, resource_version, document_id FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
+    `SELECT project_name, resource_name, resource_version, document_id, document_uuid FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
     referringMeadowlarkIds,
   );
 }

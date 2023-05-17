@@ -48,11 +48,8 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }
 
-  // TEMP: Validation is added to maintain compatibility with postgres versions.
-  // When the documentUuid is updated for postgres, the isMeadowlarkIdWellFormed could be removed.
-  // Check for properly formed document id, if there is one
   const { documentUuid } = pathComponents;
-  if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid) && !isMeadowlarkIdWellFormed(documentUuid)) {
+  if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid)) {
     writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${documentUuid}`);
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }

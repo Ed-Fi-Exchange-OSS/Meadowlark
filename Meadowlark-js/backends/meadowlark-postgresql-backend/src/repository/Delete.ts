@@ -77,8 +77,9 @@ export async function deleteDocumentByDocumentUuid(
         }
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+          documentUuid: document.documentUuid,
+          meadowlarkId: document.document_id,
           resourceName: document.resource_name,
-          documentUuid: document.document_id,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
         }));

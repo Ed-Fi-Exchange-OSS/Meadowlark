@@ -110,7 +110,7 @@ content-type: application/json
 
 ###
 @contentClassDescriptorLocation = {{contentClassDescriptor.response.headers.location}}
-GET http://localhost:3000/{{contentClassDescriptorLocation}}
+GET http://localhost:3000{{contentClassDescriptorLocation}}
 authorization: bearer {{authToken1}}
 
 
@@ -182,12 +182,12 @@ authorization: bearer {{authToken4}}
 
 
 ### 403 deleting with wrong owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/{{students.response.headers.location}}
+DELETE http://localhost:3000{{students.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 
 ### 204 deleting with correct owner
-DELETE http://localhost:3000/local/v3.3b/ed-fi/students/{{students.response.headers.location}}
+DELETE http://localhost:3000{{students.response.headers.location}}
 authorization: bearer {{authToken4}}
 
 ###
@@ -639,6 +639,7 @@ content-type: application/json
 authorization: bearer {{authToken1}}
 
 #### Contains two different school years
+# @name twoDifferentSchoolYears
 POST http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations
 content-type: application/json
 authorization: bearer {{authToken1}}
@@ -683,7 +684,7 @@ authorization: bearer {{authToken1}}
 }
 
 ### Solved in RND-426
-PUT http://localhost:3000/local/v3.3b/ed-fi/studentSchoolAssociations/uJ8Rk-JjLZuoSnnSQUUuG2-LY9kz5QrrD0_UyQ
+PUT http://localhost:3000{{students.response.headers.location}}
 content-type: application/json
 authorization: bearer {{authToken1}}
 
@@ -734,6 +735,7 @@ GET http://localhost:3000/local/v3.3b/ed-fi/GeneralStudentProgramAssociations
 authorization: bearer {{authToken1}}
 
 ### This test covers the scenario previously seen in RND-149
+# @name accountPosted
 POST http://localhost:3000/local/v3.3b/ed-fi/accounts
 content-type: application/json
 authorization: bearer {{authToken4}}
@@ -862,7 +864,7 @@ authorization: bearer {{authToken4}}
 }
 
 ### delete the record above
-DELETE http://localhost:3000/local/v3.3b/ed-fi/accounts/maSXphjSRux6PX3WbbQKovXlVJEmso06cecAZw
+DELETE http://localhost:3000{{accountPosted.response.headers.location}}
 authorization: bearer {{authToken1}}
 
 ###

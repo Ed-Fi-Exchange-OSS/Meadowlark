@@ -12,6 +12,7 @@ import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStoreP
 import { BlockingDocument } from '../../src/message/BlockingDocument';
 import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
 import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { MeadowlarkId } from '../../dist/model/BrandedTypes';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -32,6 +33,7 @@ describe('given persistence is going to throw a reference error on insert', () =
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
     documentUuid,
+    meadowlarkId: 'meadowlarkId' as MeadowlarkId,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -115,6 +117,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
     documentUuid,
+    meadowlarkId: 'meadowlarkId' as MeadowlarkId,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };
@@ -162,6 +165,7 @@ describe('given persistence is going to throw a reference error on update though
   const expectedBlockingDocument: BlockingDocument = {
     resourceName: 'resourceName',
     documentUuid,
+    meadowlarkId: 'meadowlarkId' as MeadowlarkId,
     projectName: 'Ed-Fi',
     resourceVersion: '3.3.1-b',
   };

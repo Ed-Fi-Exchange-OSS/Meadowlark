@@ -66,6 +66,7 @@ export async function upsertDocumentTransaction(
         blockingDocuments: [
           {
             documentUuid: superclassAliasIdInUse.documentUuid,
+            meadowlarkId: superclassAliasIdInUse._id,
             resourceName: superclassAliasIdInUse.resourceName,
             projectName: superclassAliasIdInUse.projectName,
             resourceVersion: superclassAliasIdInUse.resourceVersion,
@@ -96,7 +97,8 @@ export async function upsertDocumentTransaction(
         .toArray();
 
       const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-        documentUuid: document._id,
+        documentUuid: document.documentUuid,
+        meadowlarkId: document._id,
         resourceName: document.resourceName,
         projectName: document.projectName,
         resourceVersion: document.resourceVersion,
