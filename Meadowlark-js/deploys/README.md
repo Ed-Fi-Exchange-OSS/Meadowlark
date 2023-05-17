@@ -22,4 +22,6 @@ For Azure CLI, it's necessary to specify all environment variables in the comman
 3. Initialize mongodb replica set `az container exec --resource-group {resource group name} -n meadowlark --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'`
 4. Create meadowlark container `az container create --resource-group {resource group name} -n meadowlark --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 --environment-variables {specify all environment variables required}`
 
-:warning: Not ready for production usage. This example is using a single mongo node with a simulated replica set and bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials. :warning:
+:warning: Not ready for production usage. This example is using a single mongo node with a simulated replica set and bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials.
+The current configuration is initializing the mongo replica manually, and this is not saved. Therefore, if the container instance is stopped, it's necessary to reinitialize the replica set.
+:warning:
