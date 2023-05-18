@@ -14,7 +14,7 @@ export async function setup(network: StartedNetwork) {
 
   process.env.POSTGRES_USER = process.env.POSTGRES_USER ?? 'postgres';
   process.env.POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD ?? 'abcdefgh1!';
-  process.env.MEADOWLARK_DATABASE_NAME = process.env.MEADOWLARK_DATABASE_NAME ?? 'meadowlark-test';
+  process.env.MEADOWLARK_DATABASE_NAME = process.env.MEADOWLARK_DATABASE_NAME ?? 'postgres';
   const image = 'postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf';
 
   try {
