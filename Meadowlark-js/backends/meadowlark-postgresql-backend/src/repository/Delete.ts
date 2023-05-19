@@ -31,7 +31,7 @@ export async function deleteDocumentByDocumentUuid(
     // Find the alias ids for the document to be deleted
     const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
     meadowlarkId =
-      documentAliasIdsResult?.rowCount == null && documentAliasIdsResult.rowCount > 0
+      documentAliasIdsResult?.rowCount != null && documentAliasIdsResult.rowCount > 0
         ? documentAliasIdsResult.rows[0].document_id
         : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
