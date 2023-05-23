@@ -30,8 +30,8 @@ az acr login --name edfimeadowlark
 docker compose -p meadowlark --file ./azure-docker-compose.yml up -d
 
 # Initialize replica set
-az container exec --resource-group {resource group name} -n meadowlark
---container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
+az container exec --resource-group {resource group name} -n meadowlark `
+   --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
 
 ```
 
@@ -48,23 +48,23 @@ az login
 az acr login --name edfimeadowlark
 
 # Create the mongo container
-az container create --resource-group {resource group name} -n ml-mongo
---image mongo:4.0.28 --ports 27017 --dns-name-label mlmongo1
---command-line "mongod --replSet rs0"
+az container create --resource-group {resource group name} -n ml-mongo `
+    --image mongo:4.0.28 --ports 27017 --dns-name-label mlmongo1 `
+    --command-line "mongod --replSet rs0"
 
 # Initialize mongodb replica set
-az container exec --resource-group {resource group name} -n meadowlark
---container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
+az container exec --resource-group {resource group name} -n meadowlark `
+    --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
 
 # Create OpenSearch container
-az container create --resource-group {resource group name} -n meadowlark
---image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest --dns-name-label ml-opensearch1
+az container create --resource-group {resource group name} -n meadowlark `
+    --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest
+    --dns-name-label ml-opensearch1
 
 # Create meadowlark container
-az container create --resource-group {resource group name} -n meadowlark
---image edfialliance/meadowlark-ed-fi-api:pre --ports 80 --environment-variables {specify all env variables required}
-
-
+az container create --resource-group {resource group name} -n meadowlark `
+    --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 `
+    --environment-variables {specify all env variables required}
 ```
 
 :warning: Not ready for production usage. This example is using a single mongo
