@@ -13,33 +13,26 @@ CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 - [Create an ACI Docker
   context](https://docs.docker.com/cloud/aci-integration/#create-an-aci-context)
 
-- Switch to the ACI Context
-
-```Shell
-docker context use myacicontext
-```
-
-- Login to Azure Container Registry
-
-```Shell
-az acr login --name edfimeadowlark
-```
-
-- Browse to the deploys folder `cd ../eng/deploy/azure`
+- Browse to `../eng/deploy/azure`
 
 - Create a .env file. Update URLs to match your correct Azure region.
 
-- Deploy containers
+- Execute the following script:
 
 ```Shell
+
+# Switch to the ACI Context
+docker context use myacicontext
+
+# Login to Azure Container Registry
+az acr login --name edfimeadowlark
+
 docker compose -p meadowlark --file ./azure-docker-compose.yml up -d
-```
 
-- Initialize mongodb replica set
-
-```Shell
+# Initialize replica set
 az container exec --resource-group {resource group name} -n meadowlark
 --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
+
 ```
 
 ## Deploy with Azure CLI
@@ -47,45 +40,31 @@ az container exec --resource-group {resource group name} -n meadowlark
 For Azure CLI, it's necessary to specify all environment variables in the
 command line since it is not possible to read a .env file.
 
-- Login to Azure
-
 ```Shell
+# Login to Azure
 az login
-```
 
-- Login to Azure Container Registry
-
-```Shell
+# Login to Azure Container Registry
 az acr login --name edfimeadowlark
-```
 
-- Create the mongo container
-
-```Shell
+# Create the mongo container
 az container create --resource-group {resource group name} -n ml-mongo
 --image mongo:4.0.28 --ports 27017 --dns-name-label mlmongo1
 --command-line "mongod --replSet rs0"
-```
 
-- Initialize mongodb replica set
-
-```Shell
+# Initialize mongodb replica set
 az container exec --resource-group {resource group name} -n meadowlark
 --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
-```
 
-- Create OpenSearch container
-
-```Shell
+# Create OpenSearch container
 az container create --resource-group {resource group name} -n meadowlark
 --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest --dns-name-label ml-opensearch1
-```
 
-- Create meadowlark container
-
-```Shell
+# Create meadowlark container
 az container create --resource-group {resource group name} -n meadowlark
 --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 --environment-variables {specify all env variables required}
+
+
 ```
 
 :warning: Not ready for production usage. This example is using a single mongo
