@@ -64,8 +64,7 @@ services:
       ]
 
   opensearch:
-    # Requires image to be published and tracking Ed-Fi Azure Container Registry
-    image: meadowlark-opensearch
+    image: edfimeadowlark.azurecr.io/meadowlark-opensearch:latest
     container_name: ml-opensearch1
     domainname: meadowlark
     hostname: ml-opeansearch1
