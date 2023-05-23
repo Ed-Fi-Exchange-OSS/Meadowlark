@@ -22,7 +22,7 @@ For Azure CLI, it's necessary to specify all environment variables in the comman
 2. Login to Azure Container Registry `az acr login --name edfimeadowlark`
 3. Create the mongo container `az container create --resource-group {resource group name} -n ml-mongo --image mongo:4.0.28 --ports 27017 --dns-name-label mlmongo1 --command-line "mongod --replSet rs0"`
 4. Initialize mongodb replica set `az container exec --resource-group {resource group name} -n meadowlark --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'`
-5. Create opensearch container `az container create --resource-group {resource group name} -n meadowlark --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest`
+5. Create opensearch container `az container create --resource-group {resource group name} -n meadowlark --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest --dns-name-label ml-opensearch1`
 6. Create meadowlark container `az container create --resource-group {resource group name} -n meadowlark --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 --environment-variables {specify all environment variables required}`
 
 :warning: Not ready for production usage. This example is using a single mongo node with a simulated replica set and bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials.

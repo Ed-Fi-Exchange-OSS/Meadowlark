@@ -67,7 +67,7 @@ services:
     image: edfimeadowlark.azurecr.io/meadowlark-opensearch:latest
     container_name: ml-opensearch1
     domainname: meadowlark
-    hostname: ml-opeansearch1
+    hostname: ml-opensearch1
     environment:
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
       DISABLE_INSTALL_DEMO_CONFIG: "true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
