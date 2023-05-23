@@ -20,7 +20,7 @@ This is a special mode to use when adding new e2e tests or in situations where i
 - Set the environment variable `DEVELOPER_MODE=true`
 - Run `npm run test:e2e:jest` to run the tests. Save the Admin Key and Secret (as specified in [.env.example](./setup/.env.example)) to be able to run the tests
 without cleaning the environment
-- When done, run: `npm run test:e2e:dev:exit` to clean the environment
+- When done, run: `npm run test:e2e:dev:exit` or execute the `exit-dev-containers.ps1` script to clean the environment
 
 ## Troubleshooting
 
