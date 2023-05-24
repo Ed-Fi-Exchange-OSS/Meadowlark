@@ -21,6 +21,15 @@ export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: Meadowl
 }
 
 /**
+ * Returns the SQL query to find the ids of documents that referenced by the given ids.
+ *
+ * @param parentDocumentId the ids of the documents that are being referenced
+ * @returns a SQL query to find the ids of the documents referencing the given ids by parent id
+ */
+export function findParentReferenceByMeadowlarkIdSql(parentDocumentId: MeadowlarkId): string {
+  return format(`SELECT parent_document_id FROM meadowlark.references WHERE parent_document_id = %L`, parentDocumentId);
+}
+/**
  * Returns the SQL query to find the alias ids for a given document. Alias ids include the document id
  * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
  * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.

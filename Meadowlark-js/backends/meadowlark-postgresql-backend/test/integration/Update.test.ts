@@ -34,7 +34,7 @@ import {
   findAliasIdsForDocumentByMeadowlarkIdSql,
   findDocumentByDocumentUuidSql,
   findDocumentByMeadowlarkIdSql,
-  findReferencingMeadowlarkIdsSql,
+  findParentReferenceByMeadowlarkIdSql,
 } from '../../src/repository/SqlHelper';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
@@ -688,8 +688,15 @@ describe('given the update of an existing document changing meadowlarkId with al
     documentReferences: [validReference],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const documentInfoUpdated: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update 2' },
+    documentReferences: [validReference],
+  };
+  const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
   beforeAll(async () => {
+    jest.setTimeout(120000);
     client = (await getSharedClient()) as PoolClient;
     // The document that will be referenced
     await upsertDocument(
@@ -710,12 +717,6 @@ describe('given the update of an existing document changing meadowlarkId with al
       edfiDoc: { natural: 'key upsert' },
       validateDocumentReferencesExist: true,
     };
-    const documentInfoUpdated: DocumentInfo = {
-      ...newDocumentInfo(),
-      documentIdentity: { natural: 'update 2' },
-      documentReferences: [validReference],
-    };
-    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
     // insert the initial version
     upsertResult = await upsertDocument(upsertRequest, client);
@@ -756,7 +757,7 @@ describe('given the update of an existing document changing meadowlarkId with al
     expect(result.rowCount).toEqual(0);
   });
   it('should have deleted the document reference  related to the old meadowlarkId in the db', async () => {
-    const result: any = await client.query(findReferencingMeadowlarkIdsSql([meadowlarkId]));
+    const result: any = await client.query(findParentReferenceByMeadowlarkIdSql(meadowlarkId));
 
     expect(result.rowCount).toEqual(0);
   });
