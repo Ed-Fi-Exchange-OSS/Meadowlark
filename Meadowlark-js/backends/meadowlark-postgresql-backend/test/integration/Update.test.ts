@@ -696,7 +696,6 @@ describe('given the update of an existing document changing meadowlarkId with al
   const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
   beforeAll(async () => {
-    jest.setTimeout(120000);
     client = (await getSharedClient()) as PoolClient;
     // The document that will be referenced
     await upsertDocument(
