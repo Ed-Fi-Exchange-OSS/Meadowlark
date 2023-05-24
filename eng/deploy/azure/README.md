@@ -59,7 +59,7 @@ az container exec --resource-group {resource group name} -n meadowlark `
 # Create OpenSearch container
 az container create --resource-group {resource group name} -n meadowlark `
     --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest `
-    --dns-name-label ml-opensearch1
+    --dns-name-label ml-opensearch1 --ports 9200
 
 # Create meadowlark container
 az container create --resource-group {resource group name} -n meadowlark `
