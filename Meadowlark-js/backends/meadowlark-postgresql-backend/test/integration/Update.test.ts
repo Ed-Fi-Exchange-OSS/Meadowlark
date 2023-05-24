@@ -30,7 +30,12 @@ import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
-import { findDocumentByDocumentUuidSql, findDocumentByMeadowlarkIdSql } from '../../src/repository/SqlHelper';
+import {
+  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findDocumentByDocumentUuidSql,
+  findDocumentByMeadowlarkIdSql,
+  findReferencingMeadowlarkIdsSql,
+} from '../../src/repository/SqlHelper';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
@@ -652,6 +657,26 @@ describe('given the update of an existing document changing meadowlarkId with al
   let upsertResult: UpsertResult;
   let updateResult;
 
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update5' },
+  };
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
+
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
     resourceName: 'School Identity update',
@@ -660,22 +685,35 @@ describe('given the update of an existing document changing meadowlarkId with al
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'updated identity allow identity updates' },
+    documentReferences: [validReference],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
   beforeAll(async () => {
-    jest.setTimeout(120000);
     client = (await getSharedClient()) as PoolClient;
+    // The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedMeadowlarkId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
       documentInfo,
       edfiDoc: { natural: 'key upsert' },
+      validateDocumentReferencesExist: true,
     };
     const documentInfoUpdated: DocumentInfo = {
       ...newDocumentInfo(),
       documentIdentity: { natural: 'update 2' },
+      documentReferences: [validReference],
     };
     const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
@@ -696,6 +734,7 @@ describe('given the update of an existing document changing meadowlarkId with al
       resourceInfo,
       documentInfo: documentInfoUpdated,
       edfiDoc: { natural: 'key' },
+      validateDocumentReferencesExist: true,
     };
     // change document identity
     updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
@@ -709,5 +748,16 @@ describe('given the update of an existing document changing meadowlarkId with al
 
   it('should return update success', async () => {
     expect(updateResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
+    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
+
+    expect(result.rowCount).toEqual(0);
+  });
+  it('should have deleted the document reference  related to the old meadowlarkId in the db', async () => {
+    const result: any = await client.query(findReferencingMeadowlarkIdsSql([meadowlarkId]));
+
+    expect(result.rowCount).toEqual(0);
   });
 });
