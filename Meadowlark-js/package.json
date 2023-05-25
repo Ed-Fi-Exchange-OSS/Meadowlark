@@ -37,7 +37,8 @@
     "packages/meadowlark-core",
     "packages/meadowlark-authz-server",
     "backends/*",
-    "services/*"
+    "services/*",
+    "tests/*"
   ],
   "scripts": {
     "build": "lerna run build --stream",
