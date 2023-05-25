@@ -35,17 +35,29 @@ az container exec --resource-group {resource group name} -n meadowlark `
 
 ```
 
+> **Note** Not all functionality available in a Docker Compose file is available
+> when deploying to ACI. To review the available features, check [the
+> documentation](https://docs.docker.com/cloud/aci-compose-features/) .
+
+### Removing the containers
+
+Given that `docker compose down` is not available. To remove all the containers
+in the group, execute:
+
+```Shell
+az container delete --resource-group {resource group name} -n meadowlark
+```
+
 ## Deploy with Azure CLI
 
 For Azure CLI, it's necessary to specify all environment variables in the
-command line since it is not possible to read a .env file.
+command line since it is not possible to read a .env file. Additionally, it is
+not possible to add all containers into the same container group, it must be one
+container per group.
 
 ```Shell
 # Login to Azure
 az login
-
-# Login to Azure Container Registry
-az acr login --name edfimeadowlark
 
 # Create the mongo container
 az container create --resource-group {resource group name} -n ml-mongo `
@@ -53,23 +65,28 @@ az container create --resource-group {resource group name} -n ml-mongo `
     --command-line "mongod --replSet rs0"
 
 # Initialize mongodb replica set
-az container exec --resource-group {resource group name} -n meadowlark `
-    --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
+az container exec --resource-group {resource group name} -n ml-mongo `
+    --container-name ml-mongo --exec-command 'mongo --eval rs.initiate()'
+
+# Get the azure registry password
+$acrPassword = az acr credential show -n edfimeadowlark --query "passwords[0].value"  -o tsv
 
 # Create OpenSearch container
-az container create --resource-group {resource group name} -n meadowlark `
+az container create --resource-group {resource group name} -n ml-opensearch `
     --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest `
-    --dns-name-label ml-opensearch1 --ports 9200
+    --registry-username "edfimeadowlark" `
+    --registry-password "$acrPassword" `
+    --dns-name-label ml-opensearch --ports 9200
 
 # Create meadowlark container
-az container create --resource-group {resource group name} -n meadowlark `
+az container create --resource-group {resource group name} -n ml-api `
     --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 `
     --environment-variables {specify all env variables required}
 ```
 
-:warning: Not ready for production usage. This example is using a single mongo
-node with a simulated replica set and bypassing security with a direct
-connection, also, it's using the OAUTH hardcoded credentials. The current
-configuration is initializing the mongo replica manually, and this is not saved.
-Therefore, if the container instance is stopped, it's necessary to reinitialize
-the replica set. :warning:
+> **Warning** Not ready for production usage. This example is using a single
+> mongo node with a simulated replica set and bypassing security with a direct
+> connection, also, it's using the OAUTH hardcoded credentials. The current
+> configuration is initializing the mongo replica manually, and this is not
+> saved. Therefore, if the container instance is stopped, it's necessary to
+> reinitialize the replica set.
