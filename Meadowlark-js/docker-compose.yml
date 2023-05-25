@@ -192,18 +192,18 @@ services:
       - mongo-ml-local-log3:/var/log/mongodb
       - mongo-ml-local-auth:/auth
 
-  postgres:
-    image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
-    container_name: postgres-ml
-    hostname: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abcdefgh1!}
-    ports:
-      - ${POSTGRES_PORT:-5432}:5432
-    volumes:
-      - pgsql-ml-data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
+  #   container_name: postgres-ml
+  #   hostname: postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abcdefgh1!}
+  #   ports:
+  #     - ${POSTGRES_PORT:-5432}:5432
+  #   volumes:
+  #     - pgsql-ml-data:/var/lib/postgresql/data
 
 volumes:
   mongo-ml-local-data1:
@@ -229,8 +229,8 @@ volumes:
   opensearch-ml-local-data:
     labels:
       edfi-ml: local
-  pgsql-ml-data:
-    driver: local
+  # pgsql-ml-data:
+  #   driver: local
   # zookeeper-ml-local-logs:
   #   labels:
   #     edfi-ml: local
