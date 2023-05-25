@@ -30,13 +30,15 @@ export async function deleteDocumentByDocumentUuid(
     await client.query('BEGIN');
     // Find the alias ids for the document to be deleted
     const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
+    // Each row contains documentUuid and corresponding meadowlarkId (document_id),
+    // we just need the first row to return the document_id
     meadowlarkId =
       documentAliasIdsResult?.rowCount != null && documentAliasIdsResult.rowCount > 0
         ? documentAliasIdsResult.rows[0].document_id
         : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
-      if (meadowlarkId.length === 0) {
+      if (meadowlarkId === '') {
         await client.query('ROLLBACK');
         Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: DocumentUuid ${documentUuid} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };

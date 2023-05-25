@@ -49,13 +49,15 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     await client.query('BEGIN');
 
     const recordExistsResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
-
-    if (recordExistsResult.rowCount === 0) {
+    // if this record doesn't exist, this function returns a failure
+    if ((recordExistsResult?.rowCount ?? 0) === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
       return updateResult;
     }
-    const existingMeadowlardId: MeadowlarkId = recordExistsResult.rows[0].document_id;
-    if (!resourceInfo.allowIdentityUpdates && existingMeadowlardId !== meadowlarkId) {
+    // Each row contains documentUuid and corresponding meadowlarkId (document_id),
+    // we just need the first row to return the document_id
+    const existingMeadowlarkId: MeadowlarkId = recordExistsResult.rows[0].document_id;
+    if (!resourceInfo.allowIdentityUpdates && existingMeadowlarkId !== meadowlarkId) {
       updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
       return updateResult;
     }
@@ -75,7 +77,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           traceId,
         );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([existingMeadowlardId]));
+        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([existingMeadowlarkId]));
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
@@ -102,7 +104,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     );
     const result: QueryResult = await client.query(documentSql);
     // Delete existing alias using the old meadowlarkId
-    const deleteAliaseSql = deleteAliasesForDocumentSql(existingMeadowlardId);
+    const deleteAliaseSql = deleteAliasesForDocumentSql(existingMeadowlarkId);
     // Delete existing values from the aliases table
     await client.query(deleteAliaseSql);
 
@@ -115,10 +117,10 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
 
     // Delete existing references in references table (by old meadowlarkId)
     Logger.debug(
-      `${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${existingMeadowlardId}`,
+      `${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${existingMeadowlarkId}`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentSql(existingMeadowlardId));
+    await client.query(deleteOutboundReferencesOfDocumentSql(existingMeadowlarkId));
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
