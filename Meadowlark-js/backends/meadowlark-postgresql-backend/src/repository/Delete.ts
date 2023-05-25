@@ -30,13 +30,15 @@ export async function deleteDocumentByDocumentUuid(
     await client.query('BEGIN');
     // Find the alias ids for the document to be deleted
     const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
+    // Each row contains documentUuid and corresponding meadowlarkId (document_id),
+    // we just need the first row to return the document_id
     meadowlarkId =
       documentAliasIdsResult?.rowCount != null && documentAliasIdsResult.rowCount > 0
         ? documentAliasIdsResult.rows[0].document_id
         : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
       // All documents have alias ids. If no alias ids were found, the document doesn't exist
-      if (documentAliasIdsResult.rowCount == null || documentAliasIdsResult.rowCount === 0) {
+      if (meadowlarkId === '') {
         await client.query('ROLLBACK');
         Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: DocumentUuid ${documentUuid} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
@@ -44,7 +46,7 @@ export async function deleteDocumentByDocumentUuid(
       }
 
       // Extract from the query result
-      const documentAliasIds: string[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
+      const documentAliasIds: MeadowlarkId[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
 
       // Find any documents that reference this document, either it's own id or an alias
       const referenceResult: QueryResult<any> = await client.query(findReferencingMeadowlarkIdsSql(documentAliasIds));

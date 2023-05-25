@@ -29,7 +29,12 @@ import { deleteAll, retrieveReferencesByMeadowlarkIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { findDocumentByDocumentUuidSql, findDocumentByMeadowlarkIdSql } from '../../src/repository/SqlHelper';
+import {
+  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findDocumentByDocumentUuidSql,
+  findDocumentByMeadowlarkIdSql,
+  findReferencingMeadowlarkIdsSql,
+} from '../../src/repository/SqlHelper';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -301,6 +306,17 @@ describe('given an delete of a document with an outbound reference only, with va
 
   it('should have deleted the document in the db', async () => {
     const result: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
+
+    expect(result.rowCount).toEqual(0);
+  });
+
+  it('should have deleted the document alias in the db', async () => {
+    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(documentWithReferencesId));
+
+    expect(result.rowCount).toEqual(0);
+  });
+  it('should have deleted the document reference in the db', async () => {
+    const result: any = await client.query(findReferencingMeadowlarkIdsSql([referencedDocumentId]));
 
     expect(result.rowCount).toEqual(0);
   });
