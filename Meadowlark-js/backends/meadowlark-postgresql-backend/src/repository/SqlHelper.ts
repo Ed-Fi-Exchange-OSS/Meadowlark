@@ -13,7 +13,7 @@ import format from 'pg-format';
  * @param referencedMeadowlarkIds the ids of the documents that are being referenced
  * @returns a SQL query to find the ids of the documents referencing the given ids
  */
-export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: string[]): string {
+export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: MeadowlarkId[]): string {
   return format(
     `SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`,
     referencedMeadowlarkIds,

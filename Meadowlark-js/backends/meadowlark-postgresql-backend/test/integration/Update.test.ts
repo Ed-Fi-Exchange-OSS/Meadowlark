@@ -24,13 +24,18 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import format from 'pg-format';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
-import { findDocumentByDocumentUuidSql, findDocumentByMeadowlarkIdSql } from '../../src/repository/SqlHelper';
+import {
+  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findDocumentByDocumentUuidSql,
+  findDocumentByMeadowlarkIdSql,
+} from '../../src/repository/SqlHelper';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
@@ -79,7 +84,7 @@ describe('given the update of a non-existent document', () => {
 
   beforeAll(async () => {
     client = await getSharedClient();
-    const nonExistentDocumentUuid: DocumentUuid = 'documentUuid' as DocumentUuid;
+    const nonExistentDocumentUuid: DocumentUuid = '00000000-0000-0000-0000-000000000000' as DocumentUuid;
     updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
@@ -586,5 +591,177 @@ describe('given an update of a subclass document referenced by an existing docum
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
+  });
+});
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates false,', () => {
+  let client;
+  let upsertResult: UpsertResult;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+    allowIdentityUpdates: false,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update 2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    const documentInfoUpdated: DocumentInfo = {
+      ...newDocumentInfo(),
+      documentIdentity: { natural: 'updated identity' },
+    };
+    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+
+    // insert the initial version
+    upsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
+
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid: upsertResult.newDocumentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+    };
+    // change document identity
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return update error', async () => {
+    expect(updateResult.response).toBe('UPDATE_FAILURE_IMMUTABLE_IDENTITY');
+  });
+});
+
+describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates true,', () => {
+  let client;
+  let upsertResult: UpsertResult;
+  let updateResult;
+
+  const referencedResourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const referencedDocumentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update5' },
+  };
+  const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
+    referencedResourceInfo,
+    referencedDocumentInfo.documentIdentity,
+  );
+
+  const validReference: DocumentReference = {
+    projectName: referencedResourceInfo.projectName,
+    resourceName: referencedResourceInfo.resourceName,
+    documentIdentity: referencedDocumentInfo.documentIdentity,
+    isDescriptor: false,
+  };
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School Identity update',
+    allowIdentityUpdates: true,
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'updated identity allow identity updates' },
+    documentReferences: [validReference],
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const documentInfoUpdated: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update 2' },
+    documentReferences: [validReference],
+  };
+  const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+    // The document that will be referenced
+    await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId: referencedMeadowlarkId,
+        resourceInfo: referencedResourceInfo,
+        documentInfo: referencedDocumentInfo,
+      },
+      client,
+    );
+
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo,
+      edfiDoc: { natural: 'key upsert' },
+      validateDocumentReferencesExist: true,
+    };
+
+    // insert the initial version
+    upsertResult = await upsertDocument(upsertRequest, client);
+    let upsertDocumentUuid: DocumentUuid = '' as DocumentUuid;
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      upsertDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      upsertResult.existingDocumentUuid;
+    } else {
+      throw new Error();
+    }
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId: meadowlarkIdUpdated,
+      documentUuid: upsertDocumentUuid,
+      resourceInfo,
+      documentInfo: documentInfoUpdated,
+      edfiDoc: { natural: 'key' },
+      validateDocumentReferencesExist: true,
+    };
+    // change document identity
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return update success', async () => {
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
+    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
+
+    expect(result.rowCount).toEqual(0);
+  });
+  it('should have deleted the document reference  related to the old meadowlarkId in the db', async () => {
+    const findParentReferenceByMeadowlarkIdSql = format(
+      `SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`,
+      meadowlarkId,
+    );
+    const result: any = await client.query(findParentReferenceByMeadowlarkIdSql);
+
+    expect(result.rowCount).toEqual(0);
   });
 });
