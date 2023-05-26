@@ -6,20 +6,19 @@
 import { Role, getAccessToken } from './Credentials';
 import { baseURLRequest, rootURLRequest } from './Shared';
 
-export async function createResource(
-  {
-    endpoint,
-    body,
-    role = 'vendor',
-    accessToken = '',
-  }: {
-    endpoint: string;
-    body: Object;
-    role?: Role;
-    accessToken?: string;
-  },
-  upsert = false,
-): Promise<string> {
+export async function createResource({
+  endpoint,
+  body,
+  role = 'vendor',
+  accessToken = '',
+  upsert = true,
+}: {
+  endpoint: string;
+  body: Object;
+  role?: Role;
+  accessToken?: string;
+  upsert?: boolean;
+}): Promise<string> {
   return baseURLRequest()
     .post(`/v3.3b/ed-fi/${endpoint}`)
     .auth(accessToken || (await getAccessToken(role)), { type: 'bearer' })
@@ -30,7 +29,7 @@ export async function createResource(
         expect(response.body).toMatchInlineSnapshot(`undefined`);
       }
       if (upsert) {
-        expect([200, 201].indexOf(response.status)).toBeGreaterThan(-1);
+        expect([200, 201]).toContain(response.status);
       } else {
         expect(response.status).toEqual(201);
       }
@@ -40,7 +39,7 @@ export async function createResource(
     });
 }
 
-export async function deleteResourceByLocation(location: string): Promise<void> {
+export async function deleteResourceByLocation(location: string, resourceName = 'resource'): Promise<void> {
   if (location) {
     await rootURLRequest()
       .delete(location)
@@ -51,5 +50,7 @@ export async function deleteResourceByLocation(location: string): Promise<void> 
         }
         expect(response.status).toEqual(204);
       });
+  } else {
+    console.warn(`⚠️ Unable to delete ${resourceName}. Location not found. Verify that resource was created correctly ⚠️`);
   }
 }

@@ -17,12 +17,10 @@
     "fast-memoize": "^2.5.2",
     "fs-extra": "^10.1.0",
     "supertest": "^6.3.1",
-    "testcontainers": "^9.4.0"
+    "testcontainers": "^9.8.0"
   },
   "scripts": {
-    "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
-    "build:clean": "rimraf dist",
-    "build:dist": "tsc",
-    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+    "build": "npm run build:clean",
+    "build:clean": "rimraf dist"
   }
 }

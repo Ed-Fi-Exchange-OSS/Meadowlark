@@ -56,10 +56,10 @@ describe('When querying for a resource that has multiple references to resources
       });
 
       afterAll(async () => {
-        await deleteResourceByLocation(studentLocation);
-        await deleteResourceByLocation(studentAssociationLocation);
-        await deleteResourceByLocation(schoolLocation);
-        await deleteResourceByLocation(entryGradeLevelDescriptorLocation);
+        await deleteResourceByLocation(studentLocation, 'student');
+        await deleteResourceByLocation(studentAssociationLocation, 'studentAssociation');
+        await deleteResourceByLocation(schoolLocation, 'school');
+        await deleteResourceByLocation(entryGradeLevelDescriptorLocation, 'entryGradeLevelDescriptor');
       });
 
       describe('when filtering by valid reference', () => {

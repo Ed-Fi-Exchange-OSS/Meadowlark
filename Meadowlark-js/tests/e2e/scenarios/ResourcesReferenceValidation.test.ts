@@ -74,9 +74,9 @@ describe('When creating a resource that has a reference to another resource', ()
       });
 
       afterAll(async () => {
-        await deleteResourceByLocation(location);
+        await deleteResourceByLocation(location, 'location');
 
-        await deleteResourceByLocation(schoolLocation);
+        await deleteResourceByLocation(schoolLocation, 'schoolLocation');
       });
     });
   });
@@ -114,7 +114,7 @@ describe('When creating a resource that has a reference to another resource', ()
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(location);
+      await deleteResourceByLocation(location, 'location');
     });
   });
 });

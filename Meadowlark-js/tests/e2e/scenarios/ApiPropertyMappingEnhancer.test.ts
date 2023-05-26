@@ -17,9 +17,9 @@ describe('When mapping a resource that meets requirements for prefix removal', (
   });
 
   afterAll(async () => {
-    await deleteResourceByLocation(learningObjectiveLocation);
-    await deleteResourceByLocation(gradeLevelDescriptorLocation);
-    await deleteResourceByLocation(academicSubjectDescriptorLocation);
+    await deleteResourceByLocation(learningObjectiveLocation, 'learningObjective');
+    await deleteResourceByLocation(gradeLevelDescriptorLocation, 'gradeLevelDescriptor');
+    await deleteResourceByLocation(academicSubjectDescriptorLocation, 'academicSubjectDescriptor');
   });
 
   describe('given a LearningObjective entity with GradeLevel descriptor with role name Objective', () => {

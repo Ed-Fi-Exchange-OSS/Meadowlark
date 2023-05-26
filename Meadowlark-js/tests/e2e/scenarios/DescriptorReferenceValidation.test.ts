@@ -120,11 +120,11 @@ describe('When creating a resource that has a reference to a descriptor', () => 
       });
 
       afterEach(async () => {
-        await deleteResourceByLocation(studentLocation);
+        await deleteResourceByLocation(studentLocation, 'student');
       });
 
       afterAll(async () => {
-        await deleteResourceByLocation(countryLocation);
+        await deleteResourceByLocation(countryLocation, 'country');
       });
     });
   });
@@ -152,7 +152,7 @@ describe('When creating a resource that has a reference to a descriptor', () => 
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(studentLocation);
+      await deleteResourceByLocation(studentLocation, 'student');
     });
   });
 });

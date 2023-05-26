@@ -15,7 +15,10 @@ module.exports = async () => {
   console.time('Setup Time');
 
   console.debug('\n-- Configuring Environment --');
-  await setupEnvironment.configure();
+
+  const initialize = process.env.DEVELOPER_MODE !== 'true';
+
+  await setupEnvironment.configure(initialize);
 
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
   process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';

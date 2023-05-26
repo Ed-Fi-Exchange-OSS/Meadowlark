@@ -51,10 +51,10 @@ describe('Student Intervention Association', () => {
   });
 
   describe('without strict validation', () => {
-    let location: string;
+    let associationLocation: string;
 
     it('should add the association', async () => {
-      location = await createResource({
+      associationLocation = await createResource({
         endpoint: 'StudentInterventionAssociations',
         role: 'host',
         body: {
@@ -69,7 +69,7 @@ describe('Student Intervention Association', () => {
       });
 
       await rootURLRequest()
-        .get(location)
+        .get(associationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
@@ -84,7 +84,7 @@ describe('Student Intervention Association', () => {
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(location);
+      await deleteResourceByLocation(associationLocation, 'StudentInterventionAssociations');
     });
   });
 });

@@ -94,10 +94,10 @@ describe('Sections', () => {
   });
 
   describe('without strict validation', () => {
-    let location: string;
+    let sectionLocation: string;
 
     it('should add the section', async () => {
-      location = await createResource({
+      sectionLocation = await createResource({
         endpoint: 'sections',
         role: 'host',
         body: {
@@ -131,7 +131,7 @@ describe('Sections', () => {
       });
 
       await rootURLRequest()
-        .get(location)
+        .get(sectionLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(200)
         .then((response) => {
@@ -144,7 +144,7 @@ describe('Sections', () => {
     });
 
     afterAll(async () => {
-      await deleteResourceByLocation(location);
+      await deleteResourceByLocation(sectionLocation, 'section');
     });
   });
 });

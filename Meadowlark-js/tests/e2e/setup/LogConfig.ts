@@ -9,6 +9,7 @@ import { StartedTestContainer } from 'testcontainers';
 let apiWriteStream: fs.WriteStream;
 let mongoWriteStream: fs.WriteStream;
 let opSearchWriteStream: fs.WriteStream;
+let pgWriteStream: fs.WriteStream;
 
 const logFolder = './tests/e2e/logs';
 
@@ -21,6 +22,9 @@ export function endLog() {
   }
   if (opSearchWriteStream) {
     opSearchWriteStream.end();
+  }
+  if (pgWriteStream) {
+    pgWriteStream.end();
   }
 }
 
@@ -54,5 +58,16 @@ export async function setOpenSearchLog(container: StartedTestContainer) {
     osStream.on('data', (line) => opSearchWriteStream.write(line)).on('err', (line) => opSearchWriteStream.write(line));
   } catch (error) {
     throw new Error(`\nUnexpected error setting up open search logs:\n${error}`);
+  }
+}
+
+export async function setPostgresLog(container: StartedTestContainer) {
+  try {
+    const pgStream = await container.logs();
+    pgWriteStream = fs.createWriteStream(`${logFolder}/postgres.log`);
+
+    pgStream.on('data', (line) => pgWriteStream.write(line)).on('err', (line) => pgWriteStream.write(line));
+  } catch (error) {
+    throw new Error(`\nUnexpected error setting up postgres logs:\n${error}`);
   }
 }

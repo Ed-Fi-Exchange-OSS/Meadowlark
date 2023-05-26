@@ -19,19 +19,16 @@ export async function createContentClassDescriptor(): Promise<string> {
 }
 
 export async function createGradeLevelDescriptor(): Promise<string> {
-  return createResource(
-    {
-      endpoint: 'gradeLevelDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'Eighth',
-        description: 'Eight Grade',
-        shortDescription: '8°',
-        namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
-      },
+  return createResource({
+    endpoint: 'gradeLevelDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'Eighth',
+      description: 'Eight Grade',
+      shortDescription: '8°',
+      namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
     },
-    true,
-  );
+  });
 }
 
 export async function createAcademicSubjectDescriptor(): Promise<string> {
@@ -117,19 +114,16 @@ export async function createStudent(studentUniqueId: string) {
 }
 
 export async function createCourse(courseCode: string, educationOrganizationId: number) {
-  await createResource(
-    {
-      endpoint: 'CourseIdentificationSystemDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'LEA course code',
-        shortDescription: 'LEA course code',
-        description: 'LEA course code',
-        namespace: 'uri://ed-fi.org/CourseIdentificationSystemDescriptor',
-      },
+  await createResource({
+    endpoint: 'CourseIdentificationSystemDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'LEA course code',
+      shortDescription: 'LEA course code',
+      description: 'LEA course code',
+      namespace: 'uri://ed-fi.org/CourseIdentificationSystemDescriptor',
     },
-    true,
-  );
+  });
 
   return createResource({
     endpoint: 'courses',
@@ -153,19 +147,16 @@ export async function createCourse(courseCode: string, educationOrganizationId: 
 }
 
 export async function createSession(schoolId: number, schoolYear: number, sessionName: string) {
-  await createResource(
-    {
-      endpoint: 'TermDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'Spring',
-        shortDescription: 'Spring',
-        description: 'Spring',
-        namespace: 'uri://ed-fi.org/TermDescriptor',
-      },
+  await createResource({
+    endpoint: 'TermDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'Spring',
+      shortDescription: 'Spring',
+      description: 'Spring',
+      namespace: 'uri://ed-fi.org/TermDescriptor',
     },
-    true,
-  );
+  });
 
   return createResource({
     endpoint: 'sessions',
@@ -264,33 +255,27 @@ export async function createStudentSectionAssociation(
 }
 
 export async function createStudentEdOrgAssociation(studentUniqueId: string, schoolId: number) {
-  await createResource(
-    {
-      endpoint: 'SexDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'NotSelected',
-        shortDescription: 'Not Selected',
-        description: 'Not Selected',
-        namespace: 'uri://ed-fi.org/SexDescriptor#NotSelected',
-      },
+  await createResource({
+    endpoint: 'SexDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'NotSelected',
+      shortDescription: 'Not Selected',
+      description: 'Not Selected',
+      namespace: 'uri://ed-fi.org/SexDescriptor#NotSelected',
     },
-    true,
-  );
+  });
 
-  await createResource(
-    {
-      endpoint: 'CohortYearTypeDescriptors',
-      role: 'host',
-      body: {
-        codeValue: 'Twelfth grade',
-        shortDescription: 'Twelfth grade',
-        description: 'Twelfth grade',
-        namespace: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
-      },
+  await createResource({
+    endpoint: 'CohortYearTypeDescriptors',
+    role: 'host',
+    body: {
+      codeValue: 'Twelfth grade',
+      shortDescription: 'Twelfth grade',
+      description: 'Twelfth grade',
+      namespace: 'uri://ed-fi.org/CohortYearTypeDescriptor#Twelfth grade',
     },
-    true,
-  );
+  });
 
   return createResource({
     endpoint: 'StudentEducationOrganizationAssociations',
@@ -314,19 +299,16 @@ export async function createStudentEdOrgAssociation(studentUniqueId: string, sch
 }
 
 export async function createProgram(programId: string, schoolId: number) {
-  return createResource(
-    {
-      endpoint: 'Programs',
-      role: 'host',
-      body: {
-        educationOrganizationReference: {
-          educationOrganizationId: schoolId,
-        },
-        programName: 'Gifted and Talented',
-        programTypeDescriptor: 'uri://ed-fi.org/ProgramTypeDescriptor#Athletics',
-        programId,
+  return createResource({
+    endpoint: 'Programs',
+    role: 'host',
+    body: {
+      educationOrganizationReference: {
+        educationOrganizationId: schoolId,
       },
+      programName: 'Gifted and Talented',
+      programTypeDescriptor: 'uri://ed-fi.org/ProgramTypeDescriptor#Athletics',
+      programId,
     },
-    true,
-  );
+  });
 }

@@ -7,15 +7,20 @@ import { Network, StartedNetwork } from 'testcontainers';
 import * as ApiContainer from './containers/ApiContainer';
 import * as MongoContainer from './containers/MongoContainer';
 import * as OpenSearchContainer from './containers/OpenSearchContainer';
+import * as PostgreSqlContainer from './containers/PostgresqlContainer';
 import { endLog } from './LogConfig';
 
 export async function stop() {
   endLog();
   console.info('-- Tearing down environment --');
   await Promise.all([MongoContainer.stop(), ApiContainer.stop(), OpenSearchContainer.stop()]);
+  if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
+    console.info('-- Tearing down postgres --');
+    await PostgreSqlContainer.stop();
+  }
 }
 
-export async function configure() {
+export async function configure(initialize = true) {
   let network: StartedNetwork;
   try {
     network = await new Network().start();
@@ -23,14 +28,19 @@ export async function configure() {
     throw new Error(`\n${error}`);
   }
 
-  if (process.env.DEVELOPER_MODE) {
+  if (!initialize) {
     console.warn(
-      '⚠️ WARNING: Running in DEVELOPER MODE. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
+      '⚠️ WARNING: Skipping initialization. Containers should be already be started, if not, setup with `test:e2e:dev:setup`⚠️',
     );
   } else {
-    process.env.ALREADY_SET = 'true';
     console.info('-- Setting up containers --');
+    // Starting Mongo container since it's required for Authentication
     await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network), OpenSearchContainer.setup(network)]);
+
+    if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
+      console.info('-- Setting up postgres --');
+      await PostgreSqlContainer.setup(network);
+    }
   }
 
   console.debug('-- Environment Ready --');

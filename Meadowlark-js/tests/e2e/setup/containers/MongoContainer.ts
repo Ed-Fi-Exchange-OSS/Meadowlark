@@ -25,7 +25,8 @@ export async function setup(network: StartedNetwork) {
         '/data/db',
         '--enableMajorityReadConcern',
         'true',
-      ]);
+      ])
+      .withStartupTimeout(120_000);
 
     startedContainer = await container.start();
   } catch (error) {
