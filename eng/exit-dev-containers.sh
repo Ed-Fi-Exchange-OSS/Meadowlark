@@ -11,7 +11,7 @@ if [[ $(grep Microsoft /proc/version) ]]; then
 # Running under WSL1, need to reference docker.exe instead of docker. Simple
 # alias doesn't work, sadly. This variable helps in the context of this
 # script, but need to use "wsl1" commands with npm.
-docker=docker.exe
+  docker=docker.exe
 fi
 
 for container in "mongo-test" "postgres-test" "opensearch-test" "meadowlark-api-test"
