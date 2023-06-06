@@ -58,22 +58,18 @@ az login
 
 # Create the mongo container
 az container create --resource-group {resource group name} -n ml-mongo `
-    --image mongo:4.0.28 --ports 27017 --dns-name-label mlmongo1 `
+    --image edfialliance/meadowlark-mongo:latest `
+    --ports 27017 --dns-name-label mlmongo1 `
     --command-line "mongod --replSet rs0"
 
 # Initialize mongodb replica set
 az container exec --resource-group {resource group name} -n ml-mongo `
     --container-name ml-mongo --exec-command 'mongo --eval rs.initiate()'
 
-# Get the azure registry password
-$acrPassword = az acr credential show -n edfimeadowlark --query "passwords[0].value"  -o tsv
-
 # Create OpenSearch container
 az container create --resource-group {resource group name} -n ml-opensearch `
-    --image edfimeadowlark.azurecr.io/meadowlark-opensearch:latest `
-    --registry-username "edfimeadowlark" `
-    --registry-password "$acrPassword" `
-    --dns-name-label ml-opensearch --ports 9200
+    --image edfialliance/meadowlark-opensearch:latest `
+    --ports 9200 --dns-name-label ml-opensearch
 
 # Create meadowlark container
 az container create --resource-group {resource group name} -n ml-api `
