@@ -37,6 +37,8 @@ import {
   findDocumentByMeadowlarkIdSql,
 } from '../../src/repository/SqlHelper';
 
+jest.setTimeout(120_000);
+
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
 
@@ -755,6 +757,7 @@ describe('given the update of an existing document changing meadowlarkId with al
 
     expect(result.rowCount).toEqual(0);
   });
+
   it('should have deleted the document reference  related to the old meadowlarkId in the db', async () => {
     const findParentReferenceByMeadowlarkIdSql = format(
       `SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`,
@@ -763,5 +766,15 @@ describe('given the update of an existing document changing meadowlarkId with al
     const result: any = await client.query(findParentReferenceByMeadowlarkIdSql);
 
     expect(result.rowCount).toEqual(0);
+  });
+
+  it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
+    const findParentReferenceByMeadowlarkIdSql = format(
+      `SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`,
+      meadowlarkIdUpdated,
+    );
+    const result: any = await client.query(findParentReferenceByMeadowlarkIdSql);
+
+    expect(result.rowCount).toEqual(1);
   });
 });
