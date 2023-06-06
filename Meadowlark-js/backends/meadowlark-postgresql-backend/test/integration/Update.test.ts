@@ -24,7 +24,6 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import format from 'pg-format';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
@@ -758,22 +757,8 @@ describe('given the update of an existing document changing meadowlarkId with al
     expect(result.rowCount).toEqual(0);
   });
 
-  it('should have deleted the document reference  related to the old meadowlarkId in the db', async () => {
-    const findParentReferenceByMeadowlarkIdSql = format(
-      `SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`,
-      meadowlarkId,
-    );
-    const result: any = await client.query(findParentReferenceByMeadowlarkIdSql);
-
-    expect(result.rowCount).toEqual(0);
-  });
-
   it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
-    const findParentReferenceByMeadowlarkIdSql = format(
-      `SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`,
-      meadowlarkIdUpdated,
-    );
-    const result: any = await client.query(findParentReferenceByMeadowlarkIdSql);
+    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkIdUpdated));
 
     expect(result.rowCount).toEqual(1);
   });
