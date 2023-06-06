@@ -43,7 +43,7 @@ services:
       retries: 50
 
   mongo1:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    image: edfialliance/meadowlark-mongo:latest
     container_name: ml-mongo1
     domainname: meadowlark
     hostname: ml-mongo1
@@ -64,7 +64,7 @@ services:
       ]
 
   opensearch:
-    image: edfimeadowlark.azurecr.io/meadowlark-opensearch:latest
+    image: edfialliance/meadowlark-opensearch:latest
     container_name: ml-opensearch1
     domainname: meadowlark
     hostname: ml-opensearch1
