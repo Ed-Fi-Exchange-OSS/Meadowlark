@@ -36,8 +36,6 @@ import {
   findDocumentByMeadowlarkIdSql,
 } from '../../src/repository/SqlHelper';
 
-jest.setTimeout(120_000);
-
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
 
