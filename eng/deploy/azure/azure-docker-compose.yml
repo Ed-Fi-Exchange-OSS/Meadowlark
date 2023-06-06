@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Meadowlark API
+  meadowlark-ed-fi-api:
+    image: edfialliance/meadowlark-ed-fi-api:pre
+    container_name: ml-api
+    domainname: meadowlark
+    ports:
+      - 3000:3000
+    environment:
+      OAUTH_SIGNING_KEY: ${OAUTH_SIGNING_KEY}
+      # Next three settings should not be used as such in production environment
+      OAUTH_HARD_CODED_CREDENTIALS_ENABLED: ${OAUTH_HARD_CODED_CREDENTIALS_ENABLED:-true}
+      OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH: ${OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH:-meadowlark_verify-only_key_1}
+      OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH: ${OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH:-meadowlark_verify-only_secret_1}
+      OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: ${OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST:-http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/token}
+      OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: ${OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION:-http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/verify}
+      OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME:-admin}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASS:-admin}
+      OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://meadowlark.southcentralus.azurecontainer.io:9200}
+      OPENSEARCH_REQUEST_TIMEOUT: '10000'
+      DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
+      QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
+      LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
+      MONGO_URI: ${MONGODB_URI:-mongodb://meadowlark.southcentralus.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true}
+      FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
+      FASTIFY_PORT: ${FASTIFY_PORT:-3000}
+      FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}
+      MEADOWLARK_STAGE: ${MEADOWLARK_STAGE:-local}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      IS_LOCAL: ${IS_LOCAL:-false}
+      AUTHORIZATION_STORE_PLUGIN: "${AUTHORIZATION_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
+      BEGIN_ALLOWED_SCHOOL_YEAR: ${BEGIN_ALLOWED_SCHOOL_YEAR:-2022}
+      END_ALLOWED_SCHOOL_YEAR: ${END_ALLOWED_SCHOOL_YEAR:-2034}
+      ALLOW_TYPE_COERCION: ${ALLOW_TYPE_COERCION:-true}
+      ALLOW__EXT_PROPERTY: ${ALLOW__EXT_PROPERTY:-true}
+    restart: unless-stopped
+    healthcheck:
+      test: curl -s http://meadowlark.southcentralus.azurecontainer.io:3000/local >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  mongo1:
+    image: edfialliance/meadowlark-mongo:latest
+    container_name: ml-mongo1
+    domainname: meadowlark
+    hostname: ml-mongo1
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    command:
+      [
+        '/usr/bin/mongod',
+        '--bind_ip_all',
+        '--journal',
+        '--dbpath',
+        '/data/db',
+        '--enableMajorityReadConcern',
+        'true',
+        '--replSet',
+        'rs0'
+      ]
+
+  opensearch:
+    image: edfialliance/meadowlark-opensearch:latest
+    container_name: ml-opensearch1
+    domainname: meadowlark
+    hostname: ml-opensearch1
+    environment:
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      DISABLE_INSTALL_DEMO_CONFIG: "true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      DISABLE_SECURITY_PLUGIN: "true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+    mem_limit: 2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    ports:
+      - 9200:9200
+    restart: unless-stopped
+    healthcheck:
+      test: curl -s http://meadowlark.southcentralus.azurecontainer.io:9200/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
