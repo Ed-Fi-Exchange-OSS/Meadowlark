@@ -24,9 +24,6 @@ CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 # Switch to the ACI Context
 docker context use myacicontext
 
-# Login to Azure Container Registry
-az acr login --name edfimeadowlark
-
 docker compose -p meadowlark --file ./azure-docker-compose.yml up -d
 
 # Initialize replica set
