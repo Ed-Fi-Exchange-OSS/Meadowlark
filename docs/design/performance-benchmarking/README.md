@@ -24,11 +24,11 @@ The generated csv files display the results of the execution.
 
 Results example:
 
-| Resource |                         URL                         | PageNumber | PageSize | NumberOfRecords | NumberOfRecords |
-|----------|-----------------------------------------------------|------------|----------|-----------------|-----------------|
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |   0.020013055   |
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  2         |    100   |       100       |   0.040413055   |
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |   0.089013055   |
+| Resource |                         URL                         | PageNumber | PageSize | NumberOfRecords | ElapsedTime | StatusCode |
+|----------|-----------------------------------------------------|------------|----------|-----------------|-------------|------------|
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       | 0.020013055 |     200    |
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  2         |    100   |       100       | 0.040413055 |     200    |
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       | 0.089013055 |     200    |
 
 ### Comparing with ODS/API
 
