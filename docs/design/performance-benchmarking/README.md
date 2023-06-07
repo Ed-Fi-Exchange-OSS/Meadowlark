@@ -14,7 +14,7 @@ To do the performance tests to retrieve endpoints, use the
 - Install [python](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation).
 - Go to /src/edfi_paging_test folder and run `poetry install`.
 - Create a .env file based on /src/edfi_paging_test/edfi_paging_test/.env.example.
-- Add the desired endpoints or comment line to get all (get all functionality blocked by RND-577).
+- Add the desired endpoints or comment line to get all (get all functionality blocked by PERF-294).
 - Run `poetry run python edfi_paging_test`
 - Verify results located in the specified path or in the /out folder in CSV format.
 
