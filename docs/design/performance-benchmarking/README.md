@@ -21,7 +21,7 @@ To do the performance tests to retrieve endpoints, use the
 - Create a .env file based on
   /src/edfi_paging_test/edfi_paging_test/.env.example.
 - Add the desired endpoints or comment line to get all (get all functionality
-  blocked by RND-XXX).
+  blocked by RND-577).
 - Run `poetry run python edfi_paging_test`
 - Verify results located in the specified path or in the /out folder in CSV
   format.
@@ -32,8 +32,12 @@ The generated csv files display the results of the execution.
 
 Results example:
 
-| Resource |                         URL                         | PageNumber | PageSize | NumberOfRecords |
-|----------|-----------------------------------------------------|------------|----------|-----------------|
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  2         |    100   |       100       |
-| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |
+| Resource |                         URL                         | PageNumber | PageSize | NumberOfRecords | NumberOfRecords |
+|----------|-----------------------------------------------------|------------|----------|-----------------|-----------------|
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |   0.020013055   |
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  2         |    100   |       100       |   0.040413055   |
+| accounts | http://{meadowlark_url}/accounts?offset=0&limit=100 |  1         |    100   |       100       |   0.089013055   |
+
+### Comparing with ODS/API
+
+Run the same tests against and ODS/API instance with the same data set and filtering out the tpdm, sample and homograph resources since those are not handled by Meadowlark. Changing the url and variables in the .env file inside edfi_paging_test.
