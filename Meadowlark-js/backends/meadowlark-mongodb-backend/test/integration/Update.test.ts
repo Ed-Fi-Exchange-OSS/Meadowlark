@@ -23,12 +23,13 @@ import {
   DocumentUuid,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { Collection, MongoClient } from 'mongodb';
+import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { updateDocumentById } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
+import { onlyReturnAliasIds } from '../../src/repository/ReferenceValidation';
 
 const newUpdateRequest = (): UpdateRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -634,6 +635,7 @@ describe('given the update of an existing document changing meadowlarkId with al
 
 describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates true,', () => {
   let client;
+  let session: ClientSession;
   let upsertResult: UpsertResult;
   let updateResult;
 
@@ -647,11 +649,16 @@ describe('given the update of an existing document changing meadowlarkId with al
     documentIdentity: { natural: 'updated identity' },
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  let meadowlarkIdUpdated: MeadowlarkId;
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
+
+    session = client.startSession();
+    session.startTransaction();
+
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
@@ -663,7 +670,7 @@ describe('given the update of an existing document changing meadowlarkId with al
       ...newDocumentInfo(),
       documentIdentity: { natural: 'update 2' },
     };
-    const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
+    meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
     // insert the initial version
     upsertResult = await upsertDocument(upsertRequest, client);
@@ -682,11 +689,27 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   afterAll(async () => {
+    await session.abortTransaction();
     await getDocumentCollection(client).deleteMany({});
     await client.close();
   });
 
   it('should return update success', async () => {
     expect(updateResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
+    const documents: any = await getDocumentCollection(client).findOne({ _id: meadowlarkId }, onlyReturnAliasIds(session));
+
+    expect(documents).toBeNull();
+  });
+
+  it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
+    const documents: any = await getDocumentCollection(client).findOne(
+      { _id: meadowlarkIdUpdated },
+      onlyReturnAliasIds(session),
+    );
+
+    expect(documents.aliasIds.length).toEqual(1);
   });
 });
