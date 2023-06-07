@@ -5,7 +5,7 @@
 
 import { Logger } from '@edfi//meadowlark-utilities';
 import { Client } from '@opensearch-project/opensearch/.';
-import * as OpenSearchContainer from './OpenSearchContainer';
+import * as OpenSearchContainer from './SearchContainer';
 import { getOpenSearchClient } from '../../src/repository/Db';
 
 const moduleName = 'opensearch.repository.Db';

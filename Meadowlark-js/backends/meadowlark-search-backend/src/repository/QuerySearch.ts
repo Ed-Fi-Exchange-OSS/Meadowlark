@@ -7,7 +7,7 @@ import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { handleOpenSearchError } from './OpenSearchException';
+import { handleOpenSearchError } from './SearchException';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
 

@@ -13,8 +13,8 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import * as QueryOpensearch from './repository/QueryOpensearch';
-import * as UpdateOpensearch from './repository/UpdateOpensearch';
+import * as QueryOpensearch from './repository/QuerySearch';
+import * as UpdateOpensearch from './repository/UpdateSearch';
 import { getSharedClient, closeSharedConnection } from './repository/Db';
 
 export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {

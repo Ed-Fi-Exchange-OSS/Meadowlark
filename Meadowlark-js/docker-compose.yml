@@ -21,8 +21,8 @@ services:
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASS:-admin}
       OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://opensearch:9200}
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
-      QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
-      LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
+      QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-search-backend}"
+      LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-search-backend}"
       MONGO_URI: ${MONGODB_URI}
       FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
       FASTIFY_PORT: ${FASTIFY_PORT:-3000}

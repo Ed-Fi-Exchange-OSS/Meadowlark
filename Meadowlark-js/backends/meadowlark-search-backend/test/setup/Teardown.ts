@@ -2,16 +2,13 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
+const openSearchEnvironmentTeardown = require('./SearchSetupEnvironment');
 
-const openSearchEnvironmentSetup = require('./OpenSearchSetupEnvironment');
-
-async function setupIntegrationTestEnvironment() {
+module.exports = async () => {
   try {
     // Setup openSearch environment for integration tests.
-    await openSearchEnvironmentSetup.setupOpenSearch();
+    await openSearchEnvironmentTeardown.teardownOpenSearch();
   } catch (error) {
-    throw new Error(`Error setting up integration test environment: ${error}`);
+    throw new Error(`Error Teardown: ${error}`);
   }
-}
-
-module.exports = async () => setupIntegrationTestEnvironment();
+};

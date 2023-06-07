@@ -14,8 +14,8 @@ import {
   UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { indexFromResourceInfo } from './QueryOpensearch';
-import { handleOpenSearchError } from './OpenSearchException';
+import { indexFromResourceInfo } from './QuerySearch';
+import { handleOpenSearchError } from './SearchException';
 
 const moduleName = 'opensearch.repository.UpdateOpensearch';
 

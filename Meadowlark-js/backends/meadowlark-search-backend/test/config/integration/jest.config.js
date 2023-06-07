@@ -4,10 +4,10 @@ const defaultConfig = require(`${rootDir}/tests/config/jest.config`);
 
 module.exports = {
   displayName: 'Integration Tests: OpenSearch',
-  globalSetup: '<rootDir>/backends/meadowlark-opensearch-backend/test/setup/Setup.ts',
-  globalTeardown: '<rootDir>/backends/meadowlark-opensearch-backend/test/setup/Teardown.ts',
+  globalSetup: '<rootDir>/backends/meadowlark-search-backend/test/setup/Setup.ts',
+  globalTeardown: '<rootDir>/backends/meadowlark-search-backend/test/setup/Teardown.ts',
   ...defaultConfig,
-  testMatch: ['**/meadowlark-opensearch-backend/test/integration/**/*.(spec|test).[jt]s?(x)'],
+  testMatch: ['**/meadowlark-search-backend/test/integration/**/*.(spec|test).[jt]s?(x)'],
   coverageThreshold: {
     global: {
       branches: 52,

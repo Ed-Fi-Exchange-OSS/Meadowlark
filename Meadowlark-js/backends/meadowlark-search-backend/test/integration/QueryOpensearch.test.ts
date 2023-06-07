@@ -18,9 +18,9 @@ import {
 import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/BrandedTypes';
 import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@opensearch-project/opensearch/.';
-import { queryDocuments } from '../../src/repository/QueryOpensearch';
-import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateOpensearch';
-import { getNewTestClient } from '../setup/OpenSearchSetupEnvironment';
+import { queryDocuments } from '../../src/repository/QuerySearch';
+import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateSearch';
+import { getNewTestClient } from '../setup/SearchSetupEnvironment';
 
 jest.setTimeout(120_000);
 
