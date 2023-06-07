@@ -90,7 +90,7 @@ describe('When querying for documents', () => {
   let client: Client;
 
   beforeAll(async () => {
-    client = await getNewTestClient();
+    client = (await getNewTestClient()) as Client;
 
     await afterUpsertDocument(
       setupUpsertRequest(student1MeadowlarkId, student1),
@@ -112,7 +112,7 @@ describe('When querying for documents', () => {
   });
 
   afterAll(async () => {
-    client = await getNewTestClient();
+    client = (await getNewTestClient()) as Client;
     await afterDeleteDocumentById(
       { documentUuid: student1DocumentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,

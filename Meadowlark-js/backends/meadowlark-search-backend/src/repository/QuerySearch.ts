@@ -8,6 +8,7 @@ import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { handleOpenSearchError } from './SearchException';
+import { ClientSearch } from './ClientSearch';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
 
@@ -51,12 +52,15 @@ function whereConditionsFrom(queryParameters: object): string {
 /**
  * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
  */
-async function performSqlQuery(client: Client, query: string): Promise<any> {
-  return client.transport.request({
-    method: 'POST',
-    path: '/_opendistro/_sql',
-    body: { query },
-  });
+async function performSqlQuery(client: ClientSearch, query: string): Promise<any> {
+  if ((client as Client) != null) {
+    return (client as Client).transport.request({
+      method: 'POST',
+      path: '/_opendistro/_sql',
+      body: { query },
+    });
+  }
+  return null;
 }
 
 /**
@@ -70,7 +74,7 @@ function appendedWhereClause(existingWhereClause: string, newWhereClause: string
 /**
  * Entry point for querying with OpenSearch
  */
-export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
+export async function queryDocuments(request: QueryRequest, client: ClientSearch): Promise<QueryResult> {
   const { resourceInfo, queryParameters, paginationParameters, traceId } = request;
 
   Logger.debug(`${moduleName}.queryDocuments Building query`, traceId);

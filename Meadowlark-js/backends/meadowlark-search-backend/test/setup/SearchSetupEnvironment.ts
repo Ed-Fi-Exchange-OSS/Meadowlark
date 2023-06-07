@@ -4,9 +4,9 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi//meadowlark-utilities';
-import { Client } from '@opensearch-project/opensearch/.';
 import * as OpenSearchContainer from './SearchContainer';
 import { getOpenSearchClient } from '../../src/repository/Db';
+import { ClientSearch } from '../../src/repository/ClientSearch';
 
 const moduleName = 'opensearch.repository.Db';
 
@@ -23,7 +23,7 @@ export async function teardownOpenSearch() {
 /**
  * Create and return an OpenSearch connection object
  */
-export async function getNewTestClient(): Promise<Client> {
+export async function getNewTestClient(): Promise<ClientSearch> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
   const username = 'admin';
   const password = 'admin';

@@ -6,12 +6,13 @@
 import { Client, ClientOptions } from '@opensearch-project/opensearch';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { BasicAuth } from '@opensearch-project/opensearch/lib/pool';
+import { ClientSearch } from './ClientSearch';
 
-let singletonClient: Client | null = null;
+let singletonClient: ClientSearch | null = null;
 
 const moduleName = 'opensearch.repository.Db';
 
-export async function getOpenSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): Promise<Client> {
+export async function getOpenSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): Promise<ClientSearch> {
   Logger.debug(`${moduleName}.getOpenSearchClient creating local client`, null);
   const clientOpts: ClientOptions = {
     node,
@@ -33,7 +34,7 @@ export async function getOpenSearchClient(node?: string, auth?: BasicAuth, reque
 /**
  * Create and return an OpenSearch connection object
  */
-export async function getNewClient(): Promise<Client> {
+export async function getNewClient(): Promise<ClientSearch> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
   const node = Config.get<string>('OPENSEARCH_ENDPOINT');
   const auth = { username: Config.get<string>('OPENSEARCH_USERNAME'), password: Config.get<string>('OPENSEARCH_PASSWORD') };
@@ -44,7 +45,7 @@ export async function getNewClient(): Promise<Client> {
 /**
  * Return the shared client
  */
-export async function getSharedClient(): Promise<Client> {
+export async function getSharedClient(): Promise<ClientSearch> {
   if (singletonClient == null) {
     singletonClient = await getNewClient();
   }

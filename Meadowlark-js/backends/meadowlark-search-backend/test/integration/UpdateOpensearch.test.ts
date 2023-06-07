@@ -72,7 +72,7 @@ describe('given the upsert of a new document', () => {
   let client: Client;
 
   beforeAll(async () => {
-    client = await getNewTestClient();
+    client = (await getNewTestClient()) as Client;
   });
 
   describe('when insert was successful', () => {
