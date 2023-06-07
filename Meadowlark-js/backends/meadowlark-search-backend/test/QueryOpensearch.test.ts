@@ -11,7 +11,7 @@ import {
   TransportRequestParams,
   TransportRequestOptions,
 } from '@opensearch-project/opensearch/lib/Transport';
-import { queryDocuments } from '../src/repository/QueryOpensearch';
+import { queryDocuments } from '../src/repository/QuerySearch';
 
 describe('when querying for students', () => {
   const setupMockRequestHappyPath = (uniqueIds: string[]): Client => {
