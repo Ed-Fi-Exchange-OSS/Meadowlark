@@ -231,7 +231,7 @@ describe('given the existence of two vendors and one host', () => {
     describe('when a different vendor tries to insert an existing resource', () => {
       it('should return error', async () => {
         await rootURLRequest()
-          .post(`/v3.3b/ed-fi/${resourceEndpoint}`)
+          .post(resourceLocation.slice(0, resourceLocation.lastIndexOf('/')))
           .auth(vendor2DataAccessToken, { type: 'bearer' })
           .send(resourceBodyPutUpdated)
           .expect(403)
