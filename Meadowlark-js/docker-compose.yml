@@ -48,7 +48,7 @@ services:
 
   # OpenSearch backend
   opensearch-ml-local:
-    image: opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf
+    image: opensearchproject/opensearch:2.7.0@sha256:55f1f67e7d3645aa838b63a589bce5645154ba275814e52d4638d371ca0f8cb5
     container_name: opensearch-ml-local-node1
     hostname: opensearch
     environment:
@@ -79,7 +79,7 @@ services:
       retries: 50
 
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.5.0@sha256:1661c0ee4640e022e87416814f17196f009de627ff0504b8549a1ff6be90240e
+    image: opensearchproject/opensearch-dashboards:2.7.0@sha256:b08ba384fd2751fcccb95da4d65b0444694e4df4bf3079251ef9c7dfe6044a85
     container_name: opensearch-dashboards-ml-local
     ports:
       - 5602:5601
