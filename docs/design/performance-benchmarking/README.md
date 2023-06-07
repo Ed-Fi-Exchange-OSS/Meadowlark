@@ -35,14 +35,19 @@ Results example:
 Run the same tests against and ODS/API instance with the same data set and filtering out the tpdm, sample and homograph
 resources since those are not handled by Meadowlark. Changing the url and variables in the .env file inside edfi_paging_test.
 
-### Running MongoDB profiler to analyze information
+### Profiler
+
+<details>
+  <summary>Running MongoDB profiler</summary>
 
 MongoDB comes with a built in profiler, disabled by default.
 
 To enable, connect to the docker container with `mongosh` and execute `db.setProfilingLevel(2)` to track all traffic.
 
 This must be done before running the paging tests to track the next instructions. To see the latest tracked data, run `show
-profile`. This will display something similar to:
+profile`.
+
+This will display something similar to:
 
 ```json
 query   meadowlark.documents 1ms Wed Jun 07 2023 15:20:33
@@ -72,3 +77,5 @@ command:{
 ```
 
 From the results, you can analyze the timeStamp and the number of docs and keys examined to get the results. [Read more](https://www.mongodb.com/docs/manual/reference/database-profiler/).
+
+</details>
