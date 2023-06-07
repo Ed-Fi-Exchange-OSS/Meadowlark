@@ -124,8 +124,7 @@ export async function upsertDocument(
 
     // Perform the document upsert
     Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
-    const insertResult = await client.query(documentUpsertSql);
-    Logger.debug(`${moduleName}.upsertDocument: insert ${insertResult}`, traceId);
+    await client.query(documentUpsertSql);
     // Delete existing values from the aliases table
     await client.query(deleteAliasesForDocumentSql(meadowlarkId));
     // Perform insert of alias ids
