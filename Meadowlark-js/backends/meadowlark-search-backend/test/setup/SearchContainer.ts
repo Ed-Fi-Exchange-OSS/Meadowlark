@@ -25,6 +25,7 @@ async function setupElasticSearch() {
     .withStartupTimeout(120_000)
     .start();
 
+  process.env.SEARCH_API = 'ElasticSearch';
   process.env.ELASTICSEARCH_ENDPOINT = `http://localhost:${elasticSearchPort}`;
   process.env.ELASTICSEARCH_USERNAME = 'admin';
   process.env.ELASTICSEARCH_PASSWORD = 'admin';
@@ -50,6 +51,7 @@ async function setupOpenSeach() {
     .withStartupTimeout(120_000)
     .start();
 
+  process.env.SEARCH_API = 'OpenSearch';
   process.env.OPENSEARCH_ENDPOINT = `http://localhost:${openSearchPort}`;
   process.env.OPENSEARCH_USERNAME = 'admin';
   process.env.OPENSEARCH_PASSWORD = 'admin';

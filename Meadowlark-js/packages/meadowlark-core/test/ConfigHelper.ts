@@ -30,9 +30,9 @@ export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymiz
       case 'OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH':
         return 'meadowlark_verify-only_secret_1';
       case 'QUERY_HANDLER_PLUGIN':
-        return '@edfi/meadowlark-opensearch-backend';
+        return '@edfi/meadowlark-search-backend';
       case 'LISTENER1_PLUGIN':
-        return '@edfi/meadowlark-opensearch-backend';
+        return '@edfi/meadowlark-search-backend';
       case 'LISTENER2_PLUGIN':
         return '';
       case 'AUTHORIZATION_STORE_PLUGIN':

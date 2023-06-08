@@ -3,11 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { handleOpenSearchError } from './SearchException';
+import { handleSearchError } from './SearchException';
 import { ClientSearch } from './ClientSearch';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
@@ -53,14 +52,11 @@ function whereConditionsFrom(queryParameters: object): string {
  * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
  */
 async function performSqlQuery(client: ClientSearch, query: string): Promise<any> {
-  if ((client as Client) != null) {
-    return (client as Client).transport.request({
-      method: 'POST',
-      path: '/_opendistro/_sql',
-      body: { query },
-    });
-  }
-  return null;
+  return (client as any).transport.request({
+    method: 'POST',
+    path: '/_opendistro/_sql',
+    body: { query },
+  });
 }
 
 /**
@@ -117,7 +113,7 @@ export async function queryDocuments(request: QueryRequest, client: ClientSearch
       Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
-    return handleOpenSearchError(e, `${moduleName}.queryDocuments`, traceId);
+    return handleSearchError(e, `${moduleName}.queryDocuments`, traceId);
   }
 
   return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };

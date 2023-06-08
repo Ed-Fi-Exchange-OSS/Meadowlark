@@ -3,7 +3,7 @@ module.exports = {
     '<rootDir>/tests/config/unit/jest.config.js',
     '<rootDir>/tests/config/e2e/jest.config.js',
     '<rootDir>/backends/meadowlark-mongodb-backend/test/config/integration/jest.config.js',
-    '<rootDir>/backends/meadowlark-opensearch-backend/test/config/integration/jest.config.js',
+    '<rootDir>/backends/meadowlark-search-backend/test/config/integration/jest.config.js',
     '<rootDir>/backends/meadowlark-postgresql-backend/test/config/integration/jest.config.js',
   ],
   coverageThreshold: {

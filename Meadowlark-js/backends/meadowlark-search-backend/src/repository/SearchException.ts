@@ -2,18 +2,18 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { OpenSearchClientError, ResponseError } from '@opensearch-project/opensearch/lib/errors';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { QueryResult } from '@edfi/meadowlark-core';
+import { ErrorSearch, ResponseErrorSearch } from './ErrorSearchTypes';
 
-export async function handleOpenSearchError(
-  err: OpenSearchClientError | Error,
+export async function handleSearchError(
+  err: ErrorSearch | Error,
   moduleName: string = '',
   traceId: string = '',
   openSearchRequestId: string = '',
 ): Promise<QueryResult> {
   try {
-    const openSearchClientError = err as OpenSearchClientError;
+    const openSearchClientError = err as ErrorSearch;
     const documentProcessError = `OpenSearch Error${
       openSearchRequestId ? ` processing the object '${openSearchRequestId}'` : ''
     }:`;
@@ -39,7 +39,7 @@ export async function handleOpenSearchError(
           break;
         }
         case 'ResponseError': {
-          const responseException = err as ResponseError;
+          const responseException = err as ResponseErrorSearch;
           if (responseException?.message !== undefined) {
             if (responseException.message !== 'Response Error') {
               let startPosition = responseException?.message?.indexOf('Reason:');

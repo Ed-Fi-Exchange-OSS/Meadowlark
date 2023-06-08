@@ -30,6 +30,10 @@ export type ConfigKeys =
   | 'OPENSEARCH_USERNAME'
   | 'OPENSEARCH_PASSWORD'
   | 'OPENSEARCH_REQUEST_TIMEOUT'
+  | 'ELASTICSEARCH_ENDPOINT'
+  | 'ELASTICSEARCH_USERNAME'
+  | 'ELASTICSEARCH_PASSWORD'
+  | 'ELASTICSEARCH_REQUEST_TIMEOUT'
   | 'LISTENER1_PLUGIN'
   | 'LISTENER2_PLUGIN'
   | 'QUERY_HANDLER_PLUGIN'
@@ -47,7 +51,8 @@ export type ConfigKeys =
   | 'FASTIFY_RATE_LIMIT'
   | 'HTTP_PROTOCOL_AND_SERVER'
   | 'DISABLE_LOG_ANONYMIZATION'
-  | 'MONGODB_MAX_NUMBER_OF_RETRIES';
+  | 'MONGODB_MAX_NUMBER_OF_RETRIES'
+  | 'SEARCH_API';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -117,16 +122,25 @@ export async function initializeConfig(provider: ConfigPlugin) {
   set('LISTENER2_PLUGIN', await provider.getString('LISTENER2_PLUGIN', ''));
   set('QUERY_HANDLER_PLUGIN', await provider.getString('QUERY_HANDLER_PLUGIN', ''));
 
+  set('SEARCH_API', await provider.getString('SEARCH_API', 'OpenSearch'));
+
   // should only be required if enabled...
   if (
-    get<string>('LISTENER1_PLUGIN') === '@edfi/meadowlark-opensearch-backend' ||
-    get<string>('LISTENER2_PLUGIN') === '@edfi/meadowlark-opensearch-backend' ||
-    get<string>('QUERY_HANDLER_PLUGIN') === '@edfi/meadowlark-opensearch-backend'
+    get<string>('LISTENER1_PLUGIN') === '@edfi/meadowlark-search-backend' ||
+    get<string>('LISTENER2_PLUGIN') === '@edfi/meadowlark-search-backend' ||
+    get<string>('QUERY_HANDLER_PLUGIN') === '@edfi/meadowlark-search-backend'
   ) {
-    set('OPENSEARCH_ENDPOINT', await provider.getString('OPENSEARCH_ENDPOINT', ThrowIfNotFound));
-    set('OPENSEARCH_USERNAME', await provider.getString('OPENSEARCH_USERNAME', 'x'));
-    set('OPENSEARCH_PASSWORD', await provider.getString('OPENSEARCH_PASSWORD', 'y'));
-    set('OPENSEARCH_REQUEST_TIMEOUT', await provider.getInt('OPENSEARCH_REQUEST_TIMEOUT', 30000));
+    if (get<string>('SEARCH_API') === 'OpenSearch') {
+      set('OPENSEARCH_ENDPOINT', await provider.getString('OPENSEARCH_ENDPOINT', ThrowIfNotFound));
+      set('OPENSEARCH_USERNAME', await provider.getString('OPENSEARCH_USERNAME', 'x'));
+      set('OPENSEARCH_PASSWORD', await provider.getString('OPENSEARCH_PASSWORD', 'y'));
+      set('OPENSEARCH_REQUEST_TIMEOUT', await provider.getInt('OPENSEARCH_REQUEST_TIMEOUT', 30000));
+    } else {
+      set('ELASTICSEARCH_ENDPOINT', await provider.getString('ELASTICSEARCH_ENDPOINT', ThrowIfNotFound));
+      set('ELASTICSEARCH_USERNAME', await provider.getString('ELASTICSEARCH_USERNAME', 'x'));
+      set('ELASTICSEARCH_PASSWORD', await provider.getString('ELASTICSEARCH_PASSWORD', 'y'));
+      set('ELASTICSEARCH_REQUEST_TIMEOUT', await provider.getInt('ELASTICSEARCH_REQUEST_TIMEOUT', 30000));
+    }
   }
 
   set('ALLOW_TYPE_COERCION', await provider.getBool('ALLOW_TYPE_COERCION', false));

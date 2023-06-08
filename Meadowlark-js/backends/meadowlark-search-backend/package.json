@@ -1,5 +1,5 @@
 {
-  "name": "@edfi/meadowlark-opensearch-backend",
+  "name": "@edfi/meadowlark-search-backend",
   "main": "dist/index.js",
   "version": "0.3.0-pre-36",
   "description": "Meadowlark backend plugin for OpenSearch",
@@ -23,7 +23,8 @@
     "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
     "@edfi/metaed-core": "^4.0.1-dev.13",
     "@opensearch-project/opensearch": "^2.1.0",
-    "@elastic/elasticsearch": "^8.8.0"
+    "@elastic/elasticsearch": "^8.8.0",
+    "@elastic/transport": "^8.3.2"
   },
   "devDependencies": {
     "@short.io/opensearch-mock": "^0.3.1",

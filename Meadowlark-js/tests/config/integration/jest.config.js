@@ -7,7 +7,7 @@ module.exports = {
   preset: '@shelf/jest-mongodb',
   testMatch: ['<rootDir>/**/integration/**/*.(spec|test).[jt]s?(x)'],
   watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
-  testPathIgnorePatterns: ['meadowlark-opensearch-backend|meadowlark-opensearch-backend|meadowlark-postgresql-backend'],
+  testPathIgnorePatterns: ['meadowlark-search-backend|meadowlark-search-backend|meadowlark-postgresql-backend'],
   coverageThreshold: {
     global: {
       branches: 52,

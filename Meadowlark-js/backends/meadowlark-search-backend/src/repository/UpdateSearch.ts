@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@opensearch-project/opensearch';
+// import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
+// import { Client as ElasticSearchClient } from '@elastic/elasticsearch';
 import {
   DeleteRequest,
   DeleteResult,
@@ -15,7 +16,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { indexFromResourceInfo } from './QuerySearch';
-import { handleOpenSearchError } from './SearchException';
+import { handleSearchError } from './SearchException';
 import { ClientSearch } from './ClientSearch';
 
 const moduleName = 'opensearch.repository.UpdateOpensearch';
@@ -23,7 +24,7 @@ const moduleName = 'opensearch.repository.UpdateOpensearch';
 /**
  * Parameters for an OpenSearch request
  */
-type OpensearchRequest = { index: string; id: DocumentUuid };
+type SearchRequest = { index: string; id: DocumentUuid };
 
 /**
  * Listener for afterDeleteDocumentById events
@@ -32,7 +33,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   Logger.info(`${moduleName}.afterDeleteDocumentById`, request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const opensearchRequest: OpensearchRequest = {
+  const opensearchRequest: SearchRequest = {
     id: request.documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
@@ -42,9 +43,9 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
       `${moduleName}.afterDeleteDocumentById removing ${opensearchRequest.id} from index ${opensearchRequest.index}`,
       request.traceId,
     );
-    await (client as Client).delete({ ...opensearchRequest, refresh: true });
+    await (client as any).delete({ ...opensearchRequest, refresh: true });
   } catch (err) {
-    await handleOpenSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
+    await handleSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
   }
 }
 
@@ -52,7 +53,7 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
  * Shared opensearch upsert logic
  */
 async function upsertToOpensearch(request: UpsertRequest, documentUuid: DocumentUuid, client: ClientSearch) {
-  const opensearchRequest: OpensearchRequest = {
+  const opensearchRequest: SearchRequest = {
     id: documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
@@ -63,7 +64,7 @@ async function upsertToOpensearch(request: UpsertRequest, documentUuid: Document
   );
 
   try {
-    await (client as Client).index({
+    await (client as any).index({
       ...opensearchRequest,
       body: {
         id: opensearchRequest.id,
@@ -76,7 +77,7 @@ async function upsertToOpensearch(request: UpsertRequest, documentUuid: Document
       refresh: true,
     });
   } catch (err) {
-    await handleOpenSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
+    await handleSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
   }
 }
 

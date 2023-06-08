@@ -4,20 +4,20 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi//meadowlark-utilities';
-import * as OpenSearchContainer from './SearchContainer';
-import { getOpenSearchClient } from '../../src/repository/Db';
+import * as searchContainer from './SearchContainer';
+import { getSearchClient } from '../../src/repository/Db';
 import { ClientSearch } from '../../src/repository/ClientSearch';
 
 const moduleName = 'opensearch.repository.Db';
 
 export async function setupOpenSearch() {
   Logger.info('-- Setup OpenSearch environment --', null);
-  await OpenSearchContainer.setup();
+  await searchContainer.setup();
 }
 
 export async function teardownOpenSearch() {
   Logger.info('-- Tearing down OpenSearch environment --', null);
-  await OpenSearchContainer.stop();
+  await searchContainer.stop();
 }
 
 /**
@@ -30,5 +30,5 @@ export async function getNewTestClient(): Promise<ClientSearch> {
   const node = process.env.OPENSEARCH_ENDPOINT;
   const auth = { username, password };
   const requestTimeout = 10000;
-  return getOpenSearchClient(node, auth, requestTimeout);
+  return getSearchClient(node, auth, requestTimeout);
 }
