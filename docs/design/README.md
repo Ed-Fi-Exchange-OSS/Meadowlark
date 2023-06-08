@@ -3,4 +3,4 @@
 ## Contents
 
 * [Support for Offline Cascading Updates](offline-cascading-updates/)
-* [Performance Benchmarking](performance-benchmarking/)
+* [Read Performance Benchmarking](read-performance-benchmarking/)

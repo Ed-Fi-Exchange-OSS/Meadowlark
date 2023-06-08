@@ -1,6 +1,6 @@
-# Performance Benchmarking
+# Read Performance Benchmarking
 
-## Running GET Performance for Meadowlark
+## Running Read Performance for Meadowlark
 
 To do the performance tests to retrieve endpoints, use the
 [Suite3-Performance-Testing](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing).
