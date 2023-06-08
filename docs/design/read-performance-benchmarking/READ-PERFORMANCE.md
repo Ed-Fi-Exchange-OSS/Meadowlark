@@ -20,14 +20,16 @@ To do the performance tests to retrieve endpoints, use the
 ### Comparing performance of multiple runs
 
 To get a detailed comparison of Mean time and Standard Deviation, run the script
-[GetAll-Performance.ps1](../../../eng/performance/GetAll-Performance.ps1). This will print the details of the execution,
-additionally, it will generate a report per each run executed in CSV format, that can be analyzed.
+[GetAll-Performance.ps1](../../../eng/performance/GetAll-Performance.ps1).
 
 The script receives two parameters:
 
-PagingTestsPath: Path of the Suite3-Performance-Testing edfi-paging-tests location.
+**PagingTestsPath**: Path of the Suite3-Performance-Testing edfi-paging-tests location.
 
-NumTrials: Number of times to run the tests. Defaults to *5*.
+**NumTrials**: Number of times to run the tests. Defaults to *5*.
+
+This will print the details of the execution,
+additionally, it will generate a report per each run executed in CSV format, that can be analyzed.
 
 Example
 
