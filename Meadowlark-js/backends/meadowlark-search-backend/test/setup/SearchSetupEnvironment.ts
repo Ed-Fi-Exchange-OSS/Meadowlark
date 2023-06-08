@@ -8,15 +8,15 @@ import * as searchContainer from './SearchContainer';
 import { getSearchClient } from '../../src/repository/Db';
 import { ClientSearch } from '../../src/repository/ClientSearch';
 
-const moduleName = 'opensearch.repository.Db';
+const moduleName = 'search.repository.Db';
 
-export async function setupOpenSearch() {
-  Logger.info('-- Setup OpenSearch environment --', null);
+export async function setupSearch() {
+  Logger.info('-- Setup Search environment --', null);
   await searchContainer.setup();
 }
 
-export async function teardownOpenSearch() {
-  Logger.info('-- Tearing down OpenSearch environment --', null);
+export async function teardownSearch() {
+  Logger.info('-- Tearing down Search environment --', null);
   await searchContainer.stop();
 }
 
@@ -27,8 +27,9 @@ export async function getNewTestClient(): Promise<ClientSearch> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
   const username = 'admin';
   const password = 'admin';
+  const searchProvider = process.env.SEARCH_PROVIDER;
   const node = process.env.OPENSEARCH_ENDPOINT;
   const auth = { username, password };
   const requestTimeout = 10000;
-  return getSearchClient(node, auth, requestTimeout);
+  return getSearchClient(searchProvider, node, auth, requestTimeout);
 }

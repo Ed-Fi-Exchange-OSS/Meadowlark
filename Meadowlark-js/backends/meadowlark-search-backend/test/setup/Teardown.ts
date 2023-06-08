@@ -7,7 +7,7 @@ const openSearchEnvironmentTeardown = require('./SearchSetupEnvironment');
 module.exports = async () => {
   try {
     // Setup openSearch environment for integration tests.
-    await openSearchEnvironmentTeardown.teardownOpenSearch();
+    await openSearchEnvironmentTeardown.teardownSearch();
   } catch (error) {
     throw new Error(`Error Teardown: ${error}`);
   }

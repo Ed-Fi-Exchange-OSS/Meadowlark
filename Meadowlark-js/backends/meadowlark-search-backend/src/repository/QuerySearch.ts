@@ -9,7 +9,7 @@ import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { handleSearchError } from './SearchException';
 import { ClientSearch } from './ClientSearch';
 
-const moduleName = 'opensearch.repository.QueryOpensearch';
+const moduleName = 'search.repository.QueryOpensearch';
 
 /**
  * Returns OpenSearch index name from the given ResourceInfo.

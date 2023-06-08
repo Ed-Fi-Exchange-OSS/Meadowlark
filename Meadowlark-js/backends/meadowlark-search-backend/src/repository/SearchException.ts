@@ -10,13 +10,11 @@ export async function handleSearchError(
   err: ErrorSearch | Error,
   moduleName: string = '',
   traceId: string = '',
-  openSearchRequestId: string = '',
+  searchRequestId: string = '',
 ): Promise<QueryResult> {
   try {
     const openSearchClientError = err as ErrorSearch;
-    const documentProcessError = `OpenSearch Error${
-      openSearchRequestId ? ` processing the object '${openSearchRequestId}'` : ''
-    }:`;
+    const documentProcessError = `Search Error${searchRequestId ? ` processing the object '${searchRequestId}'` : ''}:`;
     if (openSearchClientError?.name !== undefined) {
       switch (openSearchClientError.name) {
         case 'ConfigurationError':

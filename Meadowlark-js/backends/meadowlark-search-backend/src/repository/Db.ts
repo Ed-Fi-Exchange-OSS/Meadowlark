@@ -9,11 +9,16 @@ import { ClientSearch, newSearchClient } from './ClientSearch';
 
 let singletonClient: ClientSearch | null = null;
 
-const moduleName = 'opensearch.repository.Db';
+const moduleName = 'search.repository.Db';
 
-export async function getSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): Promise<ClientSearch> {
-  Logger.debug(`${moduleName}.getOpenSearchClient creating local client`, null);
-  return newSearchClient(node, auth, requestTimeout);
+export async function getSearchClient(
+  searchProvider?: string,
+  node?: string,
+  auth?: BasicAuth,
+  requestTimeout?: number,
+): Promise<ClientSearch> {
+  Logger.debug(`${moduleName}.getSearchClient creating local client`, null);
+  return newSearchClient(searchProvider, node, auth, requestTimeout);
 }
 
 /**
@@ -24,17 +29,8 @@ export async function getNewClient(): Promise<ClientSearch> {
   let node;
   let auth;
   let requestTimeout = 0;
-  const searchApi = Config.get<string>('SEARCH_API');
-  switch (searchApi) {
-    case 'OpenSearch': {
-      node = Config.get<string>('OPENSEARCH_ENDPOINT');
-      auth = {
-        username: Config.get<string>('OPENSEARCH_USERNAME'),
-        password: Config.get<string>('OPENSEARCH_PASSWORD'),
-      };
-      requestTimeout = Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT');
-      return getSearchClient(node, auth, requestTimeout);
-    }
+  const searchProvider = Config.get<string>('SEARCH_PROVIDER');
+  switch (searchProvider) {
     case 'ElasticSearch':
       node = Config.get<string>('ELASTICSEARCH_ENDPOINT');
       auth = {
@@ -42,9 +38,16 @@ export async function getNewClient(): Promise<ClientSearch> {
         password: Config.get<string>('ELASTICSEARCH_PASSWORD'),
       };
       requestTimeout = Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT');
-      return getSearchClient(node, auth, requestTimeout);
+      return getSearchClient(searchProvider, node, auth, requestTimeout);
+    case 'OpenSearch':
     default: {
-      throw new Error();
+      node = Config.get<string>('OPENSEARCH_ENDPOINT');
+      auth = {
+        username: Config.get<string>('OPENSEARCH_USERNAME'),
+        password: Config.get<string>('OPENSEARCH_PASSWORD'),
+      };
+      requestTimeout = Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT');
+      return getSearchClient(searchProvider, node, auth, requestTimeout);
     }
   }
 }
@@ -65,5 +68,5 @@ export async function closeSharedConnection(): Promise<void> {
     await singletonClient.close();
   }
   singletonClient = null;
-  Logger.info(`Opensearch connection: closed`, null);
+  Logger.info(`Search connection: closed`, null);
 }

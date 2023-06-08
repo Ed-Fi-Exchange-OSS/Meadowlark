@@ -19,10 +19,10 @@ import { indexFromResourceInfo } from './QuerySearch';
 import { handleSearchError } from './SearchException';
 import { ClientSearch } from './ClientSearch';
 
-const moduleName = 'opensearch.repository.UpdateOpensearch';
+const moduleName = 'search.repository.UpdateOpensearch';
 
 /**
- * Parameters for an OpenSearch request
+ * Parameters for an Search request
  */
 type SearchRequest = { index: string; id: DocumentUuid };
 
@@ -50,16 +50,16 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
 }
 
 /**
- * Shared opensearch upsert logic
+ * Shared search upsert logic
  */
-async function upsertToOpensearch(request: UpsertRequest, documentUuid: DocumentUuid, client: ClientSearch) {
+async function upsertToSearch(request: UpsertRequest, documentUuid: DocumentUuid, client: ClientSearch) {
   const opensearchRequest: SearchRequest = {
     id: documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
   Logger.debug(
-    `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
+    `${moduleName}.upsertTosearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
     request.traceId,
   );
 
@@ -77,7 +77,7 @@ async function upsertToOpensearch(request: UpsertRequest, documentUuid: Document
       refresh: true,
     });
   } catch (err) {
-    await handleSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
+    await handleSearchError(err, `${moduleName}.upsertToSearch`, request.traceId, opensearchRequest.id);
   }
 }
 
@@ -89,7 +89,7 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
   const documentUuid: DocumentUuid =
     result.response === 'UPDATE_SUCCESS' ? result.existingDocumentUuid : result.newDocumentUuid;
-  await upsertToOpensearch(request, documentUuid, client);
+  await upsertToSearch(request, documentUuid, client);
 }
 
 /**
@@ -98,7 +98,7 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: ClientSearch) {
   Logger.info(`${moduleName}.afterUpdateDocumentById`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
-  await upsertToOpensearch(
+  await upsertToSearch(
     {
       meadowlarkId: request.meadowlarkId,
       resourceInfo: request.resourceInfo,

@@ -52,7 +52,7 @@ export type ConfigKeys =
   | 'HTTP_PROTOCOL_AND_SERVER'
   | 'DISABLE_LOG_ANONYMIZATION'
   | 'MONGODB_MAX_NUMBER_OF_RETRIES'
-  | 'SEARCH_API';
+  | 'SEARCH_PROVIDER';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;
@@ -122,7 +122,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
   set('LISTENER2_PLUGIN', await provider.getString('LISTENER2_PLUGIN', ''));
   set('QUERY_HANDLER_PLUGIN', await provider.getString('QUERY_HANDLER_PLUGIN', ''));
 
-  set('SEARCH_API', await provider.getString('SEARCH_API', 'OpenSearch'));
+  set('SEARCH_PROVIDER', await provider.getString('SEARCH_PROVIDER', 'OpenSearch'));
 
   // should only be required if enabled...
   if (
@@ -130,7 +130,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
     get<string>('LISTENER2_PLUGIN') === '@edfi/meadowlark-search-backend' ||
     get<string>('QUERY_HANDLER_PLUGIN') === '@edfi/meadowlark-search-backend'
   ) {
-    if (get<string>('SEARCH_API') === 'OpenSearch') {
+    if (get<string>('SEARCH_PROVIDER') === 'OpenSearch') {
       set('OPENSEARCH_ENDPOINT', await provider.getString('OPENSEARCH_ENDPOINT', ThrowIfNotFound));
       set('OPENSEARCH_USERNAME', await provider.getString('OPENSEARCH_USERNAME', 'x'));
       set('OPENSEARCH_PASSWORD', await provider.getString('OPENSEARCH_PASSWORD', 'y'));

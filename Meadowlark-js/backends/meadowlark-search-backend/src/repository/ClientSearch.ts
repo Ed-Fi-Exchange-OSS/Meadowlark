@@ -1,20 +1,18 @@
 import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
 import { Client as ElasticClient } from '@elastic/elasticsearch';
-import { /* Config, */ Logger } from '@edfi/meadowlark-utilities';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { BasicAuth } from '@opensearch-project/opensearch/lib/pool';
 
 export type ClientSearch = OpenSearchClient | ElasticClient;
 
-const moduleName = 'opensearch.repository.Db';
+const moduleName = 'search.repository.Db';
 
-function getSearchAPI() {
-  // return Config.get<string>('SEARCH_API');
-  return 'OpenSearch';
-}
-
-export function newSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): ClientSearch {
-  const searchAPI = getSearchAPI();
-
+export function newSearchClient(
+  searchProvider?: string,
+  node?: string,
+  auth?: BasicAuth,
+  requestTimeout?: number,
+): ClientSearch {
   const clientOpts = {
     node,
     auth,
@@ -25,7 +23,7 @@ export function newSearchClient(node?: string, auth?: BasicAuth, requestTimeout?
   delete masked.auth?.password;
 
   try {
-    switch (searchAPI) {
+    switch (searchProvider) {
       case 'ElasticSearch': {
         return new ElasticClient(clientOpts);
       }
@@ -35,7 +33,7 @@ export function newSearchClient(node?: string, auth?: BasicAuth, requestTimeout?
       }
     }
   } catch (e) {
-    Logger.error(`${moduleName}.getOpenSearchClient error connecting with options ${JSON.stringify(masked)}`, null, e);
+    Logger.error(`${moduleName}.getSearchClient error connecting with options ${JSON.stringify(masked)}`, null, e);
     throw e;
   }
 }

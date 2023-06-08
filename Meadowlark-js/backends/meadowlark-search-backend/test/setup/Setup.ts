@@ -8,7 +8,7 @@ const openSearchEnvironmentSetup = require('./SearchSetupEnvironment');
 async function setupIntegrationTestEnvironment() {
   try {
     // Setup openSearch environment for integration tests.
-    await openSearchEnvironmentSetup.setupOpenSearch();
+    await openSearchEnvironmentSetup.setupSearch();
   } catch (error) {
     throw new Error(`Error setting up integration test environment: ${error}`);
   }
