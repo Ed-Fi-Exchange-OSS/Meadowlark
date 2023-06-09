@@ -3,6 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 import R from 'ramda';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { PeriodicExportingMetricReader, ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
 import { initializeLogging, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { authorize } from '../middleware/AuthorizationMiddleware';
 import { MiddlewareModel } from '../middleware/MiddlewareModel';
@@ -34,6 +38,16 @@ const moduleName = 'core.handler.FrontendFacade';
  */
 async function initialize(): Promise<void> {
   initializeLogging();
+  const sdk = new NodeSDK({
+    traceExporter: new ConsoleSpanExporter(),
+    metricReader: new PeriodicExportingMetricReader({
+      exporter: new ConsoleMetricExporter(),
+    }),
+    instrumentations: [getNodeAutoInstrumentations()],
+  });
+
+  sdk.start();
+
   await ensurePluginsLoaded();
 }
 

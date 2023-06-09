@@ -2,6 +2,9 @@
     "files.associations": {
         "*.metaed": "csharp"
     },
+    "[markdown]": {
+      "editor.rulers": [80]
+    },
     "psi-header.config": {
         "forceToTop": true,
         "blankLinesAfter": 1,
