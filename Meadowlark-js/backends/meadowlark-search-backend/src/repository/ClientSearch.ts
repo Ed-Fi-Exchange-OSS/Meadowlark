@@ -24,12 +24,12 @@ export function newSearchClient(
 
   try {
     switch (searchProvider) {
-      case 'OpenSearch': {
-        return new OpenSearchClient(clientOpts);
-      }
-      case 'ElasticSearch':
-      default: {
+      case 'ElasticSearch': {
         return new ElasticClient(clientOpts);
+      }
+      case 'OpenSearch':
+      default: {
+        return new OpenSearchClient(clientOpts);
       }
     }
   } catch (e) {

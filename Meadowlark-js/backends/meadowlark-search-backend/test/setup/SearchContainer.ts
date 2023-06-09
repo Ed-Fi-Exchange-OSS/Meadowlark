@@ -24,9 +24,10 @@ async function setupElasticSearch() {
     .withStartupTimeout(120_000)
     .start();
 
+  process.env.SEARCH_PROVIDER = 'ElasticSearch';
   process.env.ELASTICSEARCH_ENDPOINT = `http://localhost:${elasticSearchPort}`;
-  process.env.ELASTICSEARCH_USERNAME = '';
-  process.env.ELASTICSEARCH_PASSWORD = '';
+  process.env.ELASTICSEARCH_USERNAME = 'admin';
+  process.env.ELASTICSEARCH_PASSWORD = 'admin';
   process.env.ELASTICSEARCH_REQUEST_TIMEOUT = '10000';
 }
 
@@ -49,6 +50,7 @@ async function setupOpenSeach() {
     .withStartupTimeout(120_000)
     .start();
 
+  process.env.SEARCH_PROVIDER = 'OpenSearch';
   process.env.OPENSEARCH_ENDPOINT = `http://localhost:${openSearchPort}`;
   process.env.OPENSEARCH_USERNAME = 'admin';
   process.env.OPENSEARCH_PASSWORD = 'admin';
@@ -57,13 +59,13 @@ async function setupOpenSeach() {
 
 export async function setup() {
   switch (process.env.SEARCH_PROVIDER) {
-    case 'OpenSearch': {
-      await setupOpenSeach();
+    case 'ElasticSearch': {
+      await setupElasticSearch();
       break;
     }
-    case 'ElasticSearch':
+    case 'OpenSearch':
     default: {
-      await setupElasticSearch();
+      await setupOpenSeach();
       break;
     }
   }
