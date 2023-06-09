@@ -26,13 +26,3 @@ services:
       - ELASTIC_PASSWORD=elasticpassword
       - xpack.security.enabled=false
     mem_limit: 2g
-
-  kibana:
-    image: kibana:latest
-    environment:
-      - xpack.security.enabled=false
-    ports:
-      - target: 5601
-        published: 5601
-    depends_on:
-      - elasticsearch-node1
