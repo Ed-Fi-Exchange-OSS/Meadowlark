@@ -22,10 +22,10 @@ import {
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
-import { getDocumentById } from '../../src/repository/Get';
+import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
-import { updateDocumentById } from '../../src/repository/Update';
+import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 
 const newGetRequest = (): GetRequest => ({
   documentUuid: '' as DocumentUuid,
@@ -74,7 +74,7 @@ describe('given the get of a non-existent document', () => {
 
     client = (await getNewClient()) as MongoClient;
 
-    getResult = await getDocumentById({ ...newGetRequest(), documentUuid: '123' as DocumentUuid }, client);
+    getResult = await getDocumentByDocumentUuid({ ...newGetRequest(), documentUuid: '123' as DocumentUuid }, client);
   });
 
   afterAll(async () => {
@@ -122,7 +122,7 @@ describe('given the get of an existing document', () => {
     const upsertResult = await upsertDocument(upsertRequest, client);
     if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
 
-    getResult = await getDocumentById(
+    getResult = await getDocumentByDocumentUuid(
       { ...newGetRequest(), documentUuid: upsertResult.newDocumentUuid, resourceInfo },
       client,
     );
@@ -184,9 +184,9 @@ describe('given the get of an updated document', () => {
       documentInfo,
       edfiDoc: { natural: 'keyUpdated' },
     };
-    const updateResult = await updateDocumentById(updateRequest, client);
+    const updateResult = await updateDocumentByDocumentUuid(updateRequest, client);
     if (updateResult.response !== 'UPDATE_SUCCESS') throw new Error();
-    getResult = await getDocumentById(
+    getResult = await getDocumentByDocumentUuid(
       { ...newGetRequest(), documentUuid: upsertResult.newDocumentUuid, resourceInfo },
       client,
     );

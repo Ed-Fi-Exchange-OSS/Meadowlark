@@ -8,61 +8,65 @@ import format from 'pg-format';
 // SQL for Selects
 
 /**
- * Returns the SQL query that does a reverse lookup to find the ids of documents that reference the given ids.
+ * Returns the SQL query that does a reverse lookup to find the meadowlarkIds of documents that reference the given
+ * meadowlarkIds.
  *
- * @param referencedMeadowlarkIds the ids of the documents that are being referenced
- * @returns a SQL query to find the ids of the documents referencing the given ids
+ * @param referencedMeadowlarkIds the meadowlarkIds of the documents that are being referenced
+ * @returns a SQL query to find the meadowlarkIds of the documents referencing the given meadowlarkIds
  */
 export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: MeadowlarkId[]): string {
   return format(
-    `SELECT parent_document_id FROM meadowlark.references WHERE referenced_document_id IN (%L)`,
+    `SELECT parent_meadowlark_id FROM meadowlark.references WHERE referenced_meadowlark_id IN (%L)`,
     referencedMeadowlarkIds,
   );
 }
 
 /**
- * Returns the SQL query to find the alias ids for a given document. Alias ids include the document id
- * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
- * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ * Returns the SQL query to find the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
+ * meadowlarkId itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
- * @param meadowlarkId the id of the document to find aliases for
- * @returns a SQL query to find the alias ids of the given document
+ * @param meadowlarkId the meadowlarkId of the document to find aliases for
+ * @returns a SQL query to find the alias meadowlarkIds of the given document
  */
-export function findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format(`SELECT alias_id FROM meadowlark.aliases WHERE document_id = %L FOR SHARE NOWAIT`, meadowlarkId);
+export function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
+  return format(
+    `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE meadowlark_id = %L FOR SHARE NOWAIT`,
+    meadowlarkId,
+  );
 }
 
 /**
- * Returns the SQL query to find the alias ids for a given document. Alias ids include the document id
- * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
- * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ * Returns the SQL query to find the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
+ * meadowlarkId itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
- * @param meadowlarkId the id of the document to find aliases for
- * @returns a SQL query to find the alias ids of the given document
+ * @param meadowlarkId the meadowlarkId of the document to find aliases for
+ * @returns a SQL query to find the alias meadowlarkIds of the given document
  */
-export function findAliasIdsForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
+export function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
   return format(
-    `SELECT alias_id, document_id FROM meadowlark.aliases WHERE document_uuid = %L FOR SHARE NOWAIT`,
+    `SELECT alias_meadowlark_id, meadowlark_id FROM meadowlark.aliases WHERE document_uuid = %L FOR SHARE NOWAIT`,
     documentUuid,
   );
 }
 
 /**
- * Returns the SQL query to find the existence of an alias id. Alias ids include the document id
+ * Returns the SQL query to find the existence of an alias meadowlarkId. Alias meadowlarkIds include the document meadowlarkId
  * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
- * of EducationOrganization, so each School document has an additional alias id as an EducationOrganization.
+ * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This function does NOT read-for-write lock.
  *
- * @param meadowlarkId the id of the document to find aliases for
- * @returns a SQL query to find the alias ids of the given document
+ * @param meadowlarkId the meadowlarkId of the document to find aliases for
+ * @returns a SQL query to find the alias meadowlarkIds of the given document
  */
-export function findAliasIdSql(meadowlarkId: MeadowlarkId): string {
-  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id = %L`, meadowlarkId);
+export function findAliasMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
+  return format(`SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id = %L`, meadowlarkId);
 }
 
 /**
@@ -73,9 +77,9 @@ export function findAliasIdSql(meadowlarkId: MeadowlarkId): string {
 export function findDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
   return format(
     `
-    SELECT document_uuid, document_id, document_identity, edfi_doc
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
        FROM meadowlark.documents
-       WHERE document_id = %L;`,
+       WHERE meadowlark_id = %L;`,
     [meadowlarkId],
   );
 }
@@ -88,7 +92,7 @@ export function findDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): strin
 export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
   return format(
     `
-    SELECT document_uuid, document_id, document_identity, edfi_doc
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
        FROM meadowlark.documents
        WHERE document_uuid = %L;`,
     [documentUuid],
@@ -109,33 +113,36 @@ export function findOwnershipForDocumentByDocumentUuidSql(documentUuid: Document
  * @param meadowlarkId The identifier of the document
  * @returns SQL query string to retrieve ownership
  */
-export function findOwnershipForDocumentSql(meadowlarkId: MeadowlarkId): string {
-  return format('SELECT created_by FROM meadowlark.documents WHERE document_id = %L;', [meadowlarkId]);
+export function findOwnershipForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
+  return format('SELECT created_by FROM meadowlark.documents WHERE meadowlark_id = %L;', [meadowlarkId]);
 }
 
 /**
- * Returns the SQL statement for retrieving alias ids from the aliases table for the given
+ * Returns the SQL statement for retrieving alias meadowlarkIds from the aliases table for the given
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param meadowlarkIds the id of the document we're checking references for
- * @returns SQL query string to retrieve existing alias ids
+ * @param meadowlarkIds the meadowlarkId of the document we're checking references for
+ * @returns SQL query string to retrieve existing alias meadowlarkIds
  */
 export function validateReferenceExistenceSql(meadowlarkIds: MeadowlarkId[]): string {
-  return format(`SELECT alias_id FROM meadowlark.aliases WHERE alias_id IN (%L) FOR NO KEY UPDATE NOWAIT`, meadowlarkIds);
+  return format(
+    `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    meadowlarkIds,
+  );
 }
 
 /**
- * Returns the SQL statement for retrieving alias ids from the aliases table for the given
+ * Returns the SQL statement for retrieving alias meadowlarkIds from the aliases table for the given
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param meadowlarkIds the id of the document we're checking references for
- * @returns SQL query string to retrieve existing alias ids
+ * @param meadowlarkIds the meadowlarkId of the document we're checking references for
+ * @returns SQL query string to retrieve existing alias meadowlarkIds
  */
 export function validateReferenceExistenceByDocumentUuidSql(documentUuids: DocumentUuid[]): string {
   return format(
-    `SELECT alias_id FROM meadowlark.aliases WHERE document_uuid IN (%L) FOR NO KEY UPDATE NOWAIT`,
+    `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE document_uuid IN (%L) FOR NO KEY UPDATE NOWAIT`,
     documentUuids,
   );
 }
@@ -145,11 +152,11 @@ export function validateReferenceExistenceByDocumentUuidSql(documentUuids: Docum
  * This is for error reporting when an attempt is made to delete the document.
  *
  * @param referringMeadowlarkIds The referring documents
- * @returns SQL query string to retrieve the document_id and resource_name of the referring documents
+ * @returns SQL query string to retrieve the meadowlark_id and resource_name of the referring documents
  */
 export function findReferringDocumentInfoForErrorReportingSql(referringMeadowlarkIds: MeadowlarkId[]): string {
   return format(
-    `SELECT project_name, resource_name, resource_version, document_id, document_uuid FROM meadowlark.documents WHERE document_id IN (%L) LIMIT 5`,
+    `SELECT project_name, resource_name, resource_version, meadowlark_id, document_uuid FROM meadowlark.documents WHERE meadowlark_id IN (%L) LIMIT 5`,
     referringMeadowlarkIds,
   );
 }
@@ -158,14 +165,14 @@ export function findReferringDocumentInfoForErrorReportingSql(referringMeadowlar
 
 /**
  * Returns the SQL statement to add an alias entry to the alias table
- * @param meadowlarkId the document with the given alias id
- * @param aliasId the alias id for the given document, this may be the same as the meadowlarkId
+ * @param meadowlarkId the document with the given alias meadowlarkId
+ * @param aliasId the alias meadowlarkId for the given document, this may be the same as the meadowlarkId
  * @returns SQL query string to insert into the aliases table
  */
 export function insertAliasSql(documentUuid: DocumentUuid, meadowlarkId: MeadowlarkId, aliasId: MeadowlarkId): string {
   return format(
     `INSERT INTO meadowlark.aliases
-     (document_uuid, document_id, alias_id)
+     (document_uuid, meadowlark_id, alias_meadowlark_id)
      VALUES (%L)`,
     [documentUuid, meadowlarkId, aliasId],
   );
@@ -178,7 +185,7 @@ export function insertAliasSql(documentUuid: DocumentUuid, meadowlarkId: Meadowl
  * @returns SQL query string to insert reference into references table
  */
 export function insertOutboundReferencesSql(meadowlarkId: MeadowlarkId, referencedMeadowlarkId: MeadowlarkId): string {
-  return format('INSERT INTO meadowlark.references (parent_document_id, referenced_document_id) VALUES (%L);', [
+  return format('INSERT INTO meadowlark.references (parent_meadowlark_id, referenced_meadowlark_id) VALUES (%L);', [
     meadowlarkId,
     referencedMeadowlarkId,
   ]);
@@ -191,11 +198,11 @@ export function insertOutboundReferencesSql(meadowlarkId: MeadowlarkId, referenc
  * @returns SQL query string for inserting or updating provided document info
  */
 export function documentInsertOrUpdateSql(
-  { id, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+  { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
   isInsert: boolean,
 ): string {
   const documentValues = [
-    id,
+    meadowlarkId,
     documentUuid,
     JSON.stringify(documentInfo.documentIdentity),
     resourceInfo.projectName,
@@ -213,7 +220,7 @@ export function documentInsertOrUpdateSql(
     documentSql = format(
       `
       INSERT INTO meadowlark.documents
-        (document_id, document_uuid, document_identity, project_name, resource_name, resource_version, is_descriptor,
+        (meadowlark_id, document_uuid, document_identity, project_name, resource_name, resource_version, is_descriptor,
         validated, created_by, edfi_doc)
         VALUES (%L)
         RETURNING document_uuid;`,
@@ -224,7 +231,7 @@ export function documentInsertOrUpdateSql(
       `
       UPDATE meadowlark.documents
         SET
-        document_id = %L,
+        meadowlark_id = %L,
         document_identity = %L,
         project_name = %L,
         resource_name = %L,
@@ -267,23 +274,23 @@ export function deleteDocumentByDocumentUuIdSql(documentUuid: DocumentUuid): str
  * Returns the SQL query for deleting the outbound references of a document from the database.
  * Used as part of deleting the document itself.
  *
- * @param meadowlarkId the id of the document whose outbound references we want to delete
+ * @param meadowlarkId the meadowlarkId of the document whose outbound references we want to delete
  * @returns SQL query string to delete references
  */
-export function deleteOutboundReferencesOfDocumentSql(meadowlarkId: MeadowlarkId): string {
-  const sql = format('DELETE FROM meadowlark.references WHERE parent_document_id = (%L);', [meadowlarkId]);
+export function deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
+  const sql = format('DELETE FROM meadowlark.references WHERE parent_meadowlark_id = (%L);', [meadowlarkId]);
   return sql;
 }
 
 /**
- * Returns the SQL query for deleting aliases for a given document id. Used as part of deleting the document itself.
- * @param meadowlarkId the id of the document we're deleting aliases for
+ * Returns the SQL query for deleting aliases for a given document meadowlarkId. Used as part of deleting the document itself.
+ * @param meadowlarkId the meadowlarkId of the document we're deleting aliases for
  * @returns SQL query string for deleting aliases
  */
-export function deleteAliasesForDocumentSql(meadowlarkId: MeadowlarkId): string {
+export function deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
   return format(
     `DELETE from meadowlark.aliases
-  WHERE document_id = %L`,
+  WHERE meadowlark_id = %L`,
     [meadowlarkId],
   );
 }
@@ -310,7 +317,7 @@ export const createSchemaSql = 'CREATE SCHEMA IF NOT EXISTS meadowlark';
 export const createDocumentTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.documents(
   id bigserial PRIMARY KEY,
-  document_id VARCHAR(56) NOT NULL,
+  meadowlark_id VARCHAR(56) NOT NULL,
   document_uuid uuid,
   document_identity JSONB NOT NULL,
   project_name VARCHAR NOT NULL,
@@ -321,9 +328,9 @@ export const createDocumentTableSql = `
   created_by VARCHAR(100) NULL,
   edfi_doc JSONB NOT NULL);`;
 
-// All queries are on document_id, which must be unique
+// All queries are on meadowlark_id, which must be unique
 export const createDocumentTableUniqueIndexSql =
-  'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(document_id)';
+  'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(meadowlark_id)';
 
 // All queries are on document_uuid, which must be unique
 export const createDocumentUuidTableUniqueIndexSql =
@@ -335,16 +342,16 @@ export const createDocumentUuidTableUniqueIndexSql =
 export const createReferencesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.references(
   id bigserial PRIMARY KEY,
-  parent_document_id VARCHAR NOT NULL,
-  referenced_document_id VARCHAR NOT NULL);`;
+  parent_meadowlark_id VARCHAR NOT NULL,
+  referenced_meadowlark_id VARCHAR NOT NULL);`;
 
 // For reference checking before parent delete
 export const createReferencesTableCheckingIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_checking ON meadowlark.references(referenced_document_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_checking ON meadowlark.references(referenced_meadowlark_id)';
 
 // For reference removal in transaction with parent update/delete
 export const createReferencesTableDeletingIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_document_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_meadowlark_id)';
 
 /**
  * SQL query string to create the aliases table
@@ -352,18 +359,18 @@ export const createReferencesTableDeletingIndexSql =
 export const createAliasesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.aliases(
     id bigserial PRIMARY KEY,
-    document_id VARCHAR,
+    meadowlark_id VARCHAR,
     document_uuid uuid,
-    alias_id VARCHAR);`;
+    alias_meadowlark_id VARCHAR);`;
 
-// For finding alias ids given a document id
+// For finding alias meadowlarkIds given a document meadowlarkId
 export const createAliasesTableDocumentIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_document_id ON meadowlark.aliases(document_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_meadowlark_id ON meadowlark.aliases(meadowlark_id)';
 
-// For finding alias ids given a document_uuid
+// For finding alias meadowlarkIds given a document_uuid
 export const createAliasesTableDocumentUuidIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_document_uuid ON meadowlark.aliases(document_uuid)';
 
-// For finding document ids given an alias id
+// For finding document meadowlarkIds given an alias meadowlarkId
 export const createAliasesTableAliasIndexSql =
-  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_alias_id ON meadowlark.aliases(alias_id)';
+  'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_alias_meadowlark_id ON meadowlark.aliases(alias_meadowlark_id)';

@@ -26,7 +26,7 @@ import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurit
 import { upsertDocument } from '../../src/repository/Upsert';
 import { SecurityResult } from '../../src/security/SecurityResult';
 
-describe('given the upsert where no document id is specified', () => {
+describe('given the upsert where no meadowlark id is specified', () => {
   let client: PoolClient;
   let result: SecurityResult;
 
@@ -52,7 +52,7 @@ describe('given the upsert where no document id is specified', () => {
     await resetSharedClient();
   });
 
-  it('should not apply security when no document id is specified', async () => {
+  it('should not apply security when no meadowlark id is specified', async () => {
     expect(result).toBe('NOT_APPLICABLE');
   });
 });

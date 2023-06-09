@@ -61,7 +61,7 @@ describe('given the getById where resource info is a Descriptor', () => {
   });
 });
 
-describe('given the upsert where no document id is specified', () => {
+describe('given the upsert where no meadowlark id is specified', () => {
   let client;
   let result;
 
@@ -88,7 +88,7 @@ describe('given the upsert where no document id is specified', () => {
     await client.close();
   });
 
-  it('should not apply security when no document id is specified', async () => {
+  it('should not apply security when no meadowlark id is specified', async () => {
     expect(result).toBe('NOT_APPLICABLE');
   });
 });

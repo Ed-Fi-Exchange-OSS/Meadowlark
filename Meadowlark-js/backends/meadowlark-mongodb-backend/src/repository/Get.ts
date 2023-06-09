@@ -11,8 +11,11 @@ import { getDocumentCollection } from './Db';
 
 const moduleName: string = 'mongodb.repository.get';
 
-export async function getDocumentById({ documentUuid, traceId }: GetRequest, client: MongoClient): Promise<GetResult> {
-  Logger.debug(`${moduleName}.getDocumentById ${documentUuid}`, traceId);
+export async function getDocumentByDocumentUuid(
+  { documentUuid, traceId }: GetRequest,
+  client: MongoClient,
+): Promise<GetResult> {
+  Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
 

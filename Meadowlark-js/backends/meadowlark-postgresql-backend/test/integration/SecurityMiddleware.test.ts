@@ -26,7 +26,7 @@ import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll } from './TestHelper';
 
-describe('given the upsert where no document id is specified', () => {
+describe('given the upsert where no meadowlark id is specified', () => {
   let client: PoolClient;
   let result: MiddlewareModel;
 
@@ -52,7 +52,7 @@ describe('given the upsert where no document id is specified', () => {
     await resetSharedClient();
   });
 
-  it('should not respond when no document id is specified', async () => {
+  it('should not respond when no meadowlark id is specified', async () => {
     expect(result.frontendResponse).toBeNull();
   });
 });

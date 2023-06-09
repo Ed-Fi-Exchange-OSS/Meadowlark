@@ -16,10 +16,10 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   documentInsertOrUpdateSql,
-  findAliasIdsForDocumentByDocumentUuidSql,
-  deleteAliasesForDocumentSql,
+  findAliasMeadowlarkIdsForDocumentByDocumentUuidSql,
+  deleteAliasesForDocumentByMeadowlarkIdSql,
   insertAliasSql,
-  deleteOutboundReferencesOfDocumentSql,
+  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
   insertOutboundReferencesSql,
   findReferringDocumentInfoForErrorReportingSql,
 } from './SqlHelper';
@@ -38,7 +38,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     traceId,
     security,
   } = updateRequest;
-  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
+  Logger.info(`${moduleName}.updateDocumentByDocumentUuid ${documentUuid}`, traceId);
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
   const outboundRefs: MeadowlarkId[] = documentInfo.documentReferences.map((dr: DocumentReference) =>
@@ -48,15 +48,15 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   try {
     await client.query('BEGIN');
 
-    const recordExistsResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
+    const recordExistsResult = await client.query(findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid));
     // if this record doesn't exist, this function returns a failure
     if ((recordExistsResult?.rowCount ?? 0) === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
       return updateResult;
     }
-    // Each row contains documentUuid and corresponding meadowlarkId (document_id),
-    // we just need the first row to return the document_id
-    const existingMeadowlarkId: MeadowlarkId = recordExistsResult.rows[0].document_id;
+    // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
+    // we just need the first row to return the meadowlark_id
+    const existingMeadowlarkId: MeadowlarkId = recordExistsResult.rows[0].meadowlark_id;
     if (!resourceInfo.allowIdentityUpdates && existingMeadowlarkId !== meadowlarkId) {
       updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
       return updateResult;
@@ -81,7 +81,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           resourceName: document.resource_name,
-          meadowlarkId: document.document_id,
+          meadowlarkId: document.meadowlark_id,
           documentUuid: document.document_uuid,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
@@ -99,20 +99,22 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
 
     // Perform the document update
     const documentSql: string = documentInsertOrUpdateSql(
-      { id: meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       false,
     );
     const result: QueryResult = await client.query(documentSql);
     // Delete existing alias using the old meadowlarkId
-    const deleteAliaseSql = deleteAliasesForDocumentSql(existingMeadowlarkId);
+    const deleteAliasesSql = deleteAliasesForDocumentByMeadowlarkIdSql(existingMeadowlarkId);
     // Delete existing values from the aliases table
-    await client.query(deleteAliaseSql);
+    await client.query(deleteAliasesSql);
 
-    // Perform insert of alias ids
+    // Perform insert of alias meadowlarkIds
     await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
     if (documentInfo.superclassInfo != null) {
-      const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
-      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
+      const superclassAliasMeadowlarkId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(
+        documentInfo.superclassInfo,
+      ) as MeadowlarkId;
+      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasMeadowlarkId));
     }
 
     // Delete existing references in references table (by old meadowlarkId)
@@ -120,7 +122,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
       `${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${existingMeadowlarkId}`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentSql(existingMeadowlarkId));
+    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(existingMeadowlarkId));
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>

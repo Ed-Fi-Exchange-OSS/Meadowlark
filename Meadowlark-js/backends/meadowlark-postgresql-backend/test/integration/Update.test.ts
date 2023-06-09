@@ -28,10 +28,10 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasId } from './TestHelper';
+import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import {
-  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
   findDocumentByDocumentUuidSql,
   findDocumentByMeadowlarkIdSql,
 } from '../../src/repository/SqlHelper';
@@ -251,7 +251,7 @@ describe('given an update of a document that references a non-existent document 
     const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
-    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
 
     expect(docResult.rows[0].document_identity.natural).toBe('update4');
 
@@ -356,7 +356,7 @@ describe('given an update of a document that references an existing document wit
     const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
-    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
     expect(docResult.rows[0].document_identity.natural).toBe('update6');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
@@ -480,7 +480,7 @@ describe('given an update of a document with one existing and one non-existent r
   it('should not have updated the document with an invalid reference in the db', async () => {
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
-    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_document_id);
+    const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
     expect(outboundRefs).toHaveLength(0);
   });
 });
@@ -583,8 +583,8 @@ describe('given an update of a subclass document referenced by an existing docum
   });
 
   it('should have updated the document with a valid reference to superclass in the db', async () => {
-    const result: any = await client.query(verifyAliasId(referencedMeadowlarkId));
-    const outboundRefs = result.rows.map((row) => row.alias_id);
+    const result: any = await client.query(verifyAliasMeadowlarkId(referencedMeadowlarkId));
+    const outboundRefs = result.rows.map((row) => row.alias_meadowlark_id);
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
@@ -750,13 +750,13 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
-    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
+    const result: any = await client.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
 
     expect(result.rowCount).toEqual(0);
   });
 
   it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
-    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(meadowlarkIdUpdated));
+    const result: any = await client.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkIdUpdated));
 
     expect(result.rowCount).toEqual(1);
   });

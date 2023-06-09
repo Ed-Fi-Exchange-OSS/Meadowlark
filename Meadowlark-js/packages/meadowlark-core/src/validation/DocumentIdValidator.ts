@@ -8,7 +8,7 @@ import { resourceInfoHashFrom } from '../model/DocumentIdentity';
 import type { BaseResourceInfo } from '../model/ResourceInfo';
 
 /**
- * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
+ * Meadowlark Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
  * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
  */
 export function isDocumentUuidWellFormed(documentUuid: string): boolean {
@@ -17,7 +17,7 @@ export function isDocumentUuidWellFormed(documentUuid: string): boolean {
 }
 
 /**
- * Document Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
+ * Meadowlark Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
  * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
  */
 export function isMeadowlarkIdWellFormed(meadowlarkId: string): boolean {
@@ -25,7 +25,7 @@ export function isMeadowlarkIdWellFormed(meadowlarkId: string): boolean {
 }
 
 /**
- * Returns true if resource info hash matches resource info portion of document id
+ * Returns true if resource info hash matches resource info portion of meadowlark id
  */
 export function isMeadowlarkIdValidForResource(meadowlarkId: MeadowlarkId, resourceInfo: BaseResourceInfo): boolean {
   return meadowlarkId.startsWith(resourceInfoHashFrom(resourceInfo));

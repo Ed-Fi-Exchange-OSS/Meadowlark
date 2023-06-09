@@ -26,7 +26,7 @@ import {
 import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
-import { updateDocumentById } from '../../src/repository/Update';
+import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { setupConfigForIntegration } from './Config';
 import { onlyReturnAliasIds } from '../../src/repository/ReferenceValidation';
@@ -71,7 +71,7 @@ describe('given the update of a non-existent document', () => {
 
     client = (await getNewClient()) as MongoClient;
 
-    updateResult = await updateDocumentById(
+    updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
         meadowlarkId,
@@ -140,7 +140,7 @@ describe('given the update of an existing document', () => {
       documentInfo,
       edfiDoc: { natural: 'key' },
     };
-    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
   });
 
   afterAll(async () => {
@@ -207,7 +207,7 @@ describe('given an update of a document that references a non-existent document 
 
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
-    updateResult = await updateDocumentById(
+    updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
@@ -310,7 +310,7 @@ describe('given an update of a document that references an existing document wit
 
     // The updated document with a valid reference
     documentWithReferencesInfo.documentReferences = [validReference];
-    updateResult = await updateDocumentById(
+    updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
         meadowlarkId: documentWithReferencesMeadowlarkId,
@@ -420,7 +420,7 @@ describe('given an update of a document with one existing and one non-existent r
 
     // The updated document with both valid and invalid references
     documentWithReferencesInfo.documentReferences = [validReference, invalidReference];
-    updateResult = await updateDocumentById(
+    updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
@@ -541,7 +541,7 @@ describe('given an update of a subclass document referenced by an existing docum
 
     // The updated document with reference as superclass
     documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
-    updateResult = await updateDocumentById(
+    updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
         documentUuid: upsertResult.newDocumentUuid,
@@ -620,7 +620,7 @@ describe('given the update of an existing document changing meadowlarkId with al
       edfiDoc: { natural: 'key' },
     };
     // change document identity
-    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
   });
 
   afterAll(async () => {
@@ -685,7 +685,7 @@ describe('given the update of an existing document changing meadowlarkId with al
       edfiDoc: { natural: 'key' },
     };
     // change document identity
-    updateResult = await updateDocumentById({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
   });
 
   afterAll(async () => {
@@ -710,6 +710,6 @@ describe('given the update of an existing document changing meadowlarkId with al
       onlyReturnAliasIds(session),
     );
 
-    expect(documents.aliasIds.length).toEqual(1);
+    expect(documents.aliasMeadowlarkIds.length).toEqual(1);
   });
 });

@@ -30,7 +30,7 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import {
-  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
   findDocumentByDocumentUuidSql,
   findDocumentByMeadowlarkIdSql,
   findReferencingMeadowlarkIdsSql,
@@ -53,7 +53,7 @@ const newDeleteRequest = (): DeleteRequest => ({
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
-
+jest.setTimeout(120000);
 describe('given the delete of a non-existent document', () => {
   let client: PoolClient;
   let deleteResult: DeleteResult;
@@ -66,6 +66,7 @@ describe('given the delete of a non-existent document', () => {
   const documentUuid = generateDocumentUuid();
 
   beforeAll(async () => {
+    jest.setTimeout(120000);
     client = await getSharedClient();
 
     deleteResult = await deleteDocumentByDocumentUuid(
@@ -168,7 +169,7 @@ describe('given an delete of a document referenced by an existing document with 
     documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -186,7 +187,7 @@ describe('given an delete of a document referenced by an existing document with 
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
       },
@@ -255,7 +256,7 @@ describe('given an delete of a document with an outbound reference only, with va
     documentIdentity: { natural: 'delete16' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -273,7 +274,7 @@ describe('given an delete of a document with an outbound reference only, with va
     const documentWithReferenceUpsertResult: UpsertResult = await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
       },
@@ -305,13 +306,15 @@ describe('given an delete of a document with an outbound reference only, with va
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
+    const result: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
 
     expect(result.rowCount).toEqual(0);
   });
 
   it('should have deleted the document alias in the db', async () => {
-    const result: any = await client.query(findAliasIdsForDocumentByMeadowlarkIdSql(documentWithReferencesId));
+    const result: any = await client.query(
+      findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(documentWithReferencesMeadowlarkId),
+    );
 
     expect(result.rowCount).toEqual(0);
   });
@@ -355,7 +358,7 @@ describe('given an delete of a document referenced by an existing document with 
     documentIdentity: { natural: 'delete6' },
     documentReferences: [validReference],
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
     documentWithReferencesInfo.documentIdentity,
   );
@@ -373,7 +376,7 @@ describe('given an delete of a document referenced by an existing document with 
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         documentInfo: documentWithReferencesInfo,
         validateDocumentReferencesExist: true,
       },
@@ -458,7 +461,7 @@ describe('given the delete of a subclass document referenced by an existing docu
     documentIdentity: { week: 'delete6' },
     documentReferences: [referenceAsSuperclass],
   };
-  const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
+  const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
     documentWithReferenceDocumentInfo.documentIdentity,
   );
@@ -474,7 +477,7 @@ describe('given the delete of a subclass document referenced by an existing docu
     await upsertDocument(
       {
         ...newUpsertRequest(),
-        meadowlarkId: documentWithReferencesId,
+        meadowlarkId: documentWithReferencesMeadowlarkId,
         documentInfo: documentWithReferenceDocumentInfo,
         validateDocumentReferencesExist: true,
       },

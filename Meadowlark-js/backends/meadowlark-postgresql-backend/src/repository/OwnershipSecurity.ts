@@ -7,7 +7,7 @@ import { meadowlarkIdForDocumentIdentity, FrontendRequest, writeRequestToLog, Me
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
-import { findOwnershipForDocumentByDocumentUuidSql, findOwnershipForDocumentSql } from './SqlHelper';
+import { findOwnershipForDocumentByDocumentUuidSql, findOwnershipForDocumentByMeadowlarkIdSql } from './SqlHelper';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | undefined {
   if (frontendRequest.action !== 'upsert') return undefined;
@@ -50,7 +50,7 @@ export async function rejectByOwnershipSecurity(
   }
 
   if (documentUuid == null && meadowlarkId === '') {
-    Logger.error(`${functionName} no id to secure against`, frontendRequest.traceId);
+    Logger.error(`${functionName} no MeadowlarkId or DocumentUuid to secure against`, frontendRequest.traceId);
     return 'NOT_APPLICABLE';
   }
 
@@ -58,7 +58,7 @@ export async function rejectByOwnershipSecurity(
     const result: QueryResult =
       documentUuid != null
         ? await client.query(findOwnershipForDocumentByDocumentUuidSql(documentUuid))
-        : await client.query(findOwnershipForDocumentSql(meadowlarkId));
+        : await client.query(findOwnershipForDocumentByMeadowlarkIdSql(meadowlarkId));
 
     if (result.rows == null) {
       Logger.error(`${functionName} Unknown Error determining access`, frontendRequest.traceId);

@@ -8,11 +8,11 @@ import type { DeleteResult, DeleteRequest, BlockingDocument, MeadowlarkId } from
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByDocumentUuIdSql,
-  deleteOutboundReferencesOfDocumentSql,
+  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
   findReferringDocumentInfoForErrorReportingSql,
-  deleteAliasesForDocumentSql,
+  deleteAliasesForDocumentByMeadowlarkIdSql,
   findReferencingMeadowlarkIdsSql,
-  findAliasIdsForDocumentByDocumentUuidSql,
+  findAliasMeadowlarkIdsForDocumentByDocumentUuidSql,
 } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.Delete';
@@ -28,16 +28,18 @@ export async function deleteDocumentByDocumentUuid(
 
   try {
     await client.query('BEGIN');
-    // Find the alias ids for the document to be deleted
-    const documentAliasIdsResult: QueryResult = await client.query(findAliasIdsForDocumentByDocumentUuidSql(documentUuid));
-    // Each row contains documentUuid and corresponding meadowlarkId (document_id),
-    // we just need the first row to return the document_id
+    // Find the alias meadowlarkIds for the document to be deleted
+    const documentAliasIdsResult: QueryResult = await client.query(
+      findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid),
+    );
+    // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
+    // we just need the first row to return the meadowlark_id
     meadowlarkId =
       documentAliasIdsResult?.rowCount != null && documentAliasIdsResult.rowCount > 0
-        ? documentAliasIdsResult.rows[0].document_id
+        ? documentAliasIdsResult.rows[0].meadowlark_id
         : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
-      // All documents have alias ids. If no alias ids were found, the document doesn't exist
+      // All documents have alias meadowlarkIds. If no alias meadowlarkIds were found, the document doesn't exist
       if (meadowlarkId === '') {
         await client.query('ROLLBACK');
         Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: DocumentUuid ${documentUuid} does not exist`, traceId);
@@ -46,10 +48,12 @@ export async function deleteDocumentByDocumentUuid(
       }
 
       // Extract from the query result
-      const documentAliasIds: MeadowlarkId[] = documentAliasIdsResult.rows.map((ref) => ref.alias_id);
+      const documentAliasMeadowlarkIds: MeadowlarkId[] = documentAliasIdsResult.rows.map((ref) => ref.alias_meadowlark_id);
 
-      // Find any documents that reference this document, either it's own id or an alias
-      const referenceResult: QueryResult<any> = await client.query(findReferencingMeadowlarkIdsSql(documentAliasIds));
+      // Find any documents that reference this document, either it's own meadowlarkId or an alias
+      const referenceResult: QueryResult<any> = await client.query(
+        findReferencingMeadowlarkIdsSql(documentAliasMeadowlarkIds),
+      );
 
       if (referenceResult.rows == null) {
         await client.query('ROLLBACK');
@@ -59,7 +63,7 @@ export async function deleteDocumentByDocumentUuid(
         return deleteResult;
       }
 
-      const references = referenceResult?.rows.filter((ref) => ref.document_id !== meadowlarkId);
+      const references = referenceResult?.rows.filter((ref) => ref.meadowlark_id !== meadowlarkId);
 
       // If this document is referenced, it's a validation failure
       if (references.length > 0) {
@@ -69,7 +73,7 @@ export async function deleteDocumentByDocumentUuid(
         );
 
         // Get the information of up to five referring documents for failure message purposes
-        const referenceIds = references.map((ref) => ref.parent_document_id);
+        const referenceIds = references.map((ref) => ref.parent_meadowlark_id);
         const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql(referenceIds));
 
         if (referringDocuments.rows == null) {
@@ -82,7 +86,7 @@ export async function deleteDocumentByDocumentUuid(
 
         const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
           documentUuid: document.documentUuid,
-          meadowlarkId: document.document_id,
+          meadowlarkId: document.meadowlark_id,
           resourceName: document.resource_name,
           projectName: document.project_name,
           resourceVersion: document.resource_version,
@@ -115,14 +119,14 @@ export async function deleteDocumentByDocumentUuid(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting references with documentUuid ${documentUuid} as parent meadowlarkId`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentSql(meadowlarkId));
+    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(meadowlarkId));
 
     // Delete this document from the aliases table
     Logger.debug(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting alias entries with meadowlarkId ${meadowlarkId}`,
       traceId,
     );
-    await client.query(deleteAliasesForDocumentSql(meadowlarkId));
+    await client.query(deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId));
 
     await client.query('COMMIT');
   } catch (e) {

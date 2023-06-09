@@ -46,17 +46,17 @@ export async function upsertDocumentTransaction(
 
   // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
   if (isInsert && documentInfo.superclassInfo != null) {
-    const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo);
-    const superclassAliasIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+    const superclassAliasMeadowlarkId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo);
+    const superclassAliasMeadowlarkIdInUse: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
       {
-        aliasIds: superclassAliasId,
+        aliasMeadowlarkIds: superclassAliasMeadowlarkId,
       },
       { session },
     );
 
-    if (superclassAliasIdInUse) {
+    if (superclassAliasMeadowlarkIdInUse) {
       Logger.warn(
-        `${moduleName}.upsertDocumentTransaction insert failed due to another subclass with documentUuid ${superclassAliasIdInUse.documentUuid} and the same identity ${superclassAliasIdInUse._id}`,
+        `${moduleName}.upsertDocumentTransaction insert failed due to another subclass with documentUuid ${superclassAliasMeadowlarkIdInUse.documentUuid} and the same identity ${superclassAliasMeadowlarkIdInUse._id}`,
         traceId,
       );
 
@@ -65,11 +65,11 @@ export async function upsertDocumentTransaction(
         failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
         blockingDocuments: [
           {
-            documentUuid: superclassAliasIdInUse.documentUuid,
-            meadowlarkId: superclassAliasIdInUse._id,
-            resourceName: superclassAliasIdInUse.resourceName,
-            projectName: superclassAliasIdInUse.projectName,
-            resourceVersion: superclassAliasIdInUse.resourceVersion,
+            documentUuid: superclassAliasMeadowlarkIdInUse.documentUuid,
+            meadowlarkId: superclassAliasMeadowlarkIdInUse._id,
+            resourceName: superclassAliasMeadowlarkIdInUse.resourceName,
+            projectName: superclassAliasMeadowlarkIdInUse.projectName,
+            resourceVersion: superclassAliasMeadowlarkIdInUse.resourceVersion,
           },
         ],
       };
@@ -88,7 +88,7 @@ export async function upsertDocumentTransaction(
     // Abort on validation failure
     if (failures.length > 0) {
       Logger.debug(
-        `${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid} failed due to invalid references`,
+        `${moduleName}.upsertDocumentTransaction Upserting DocumentUuid ${documentUuid} failed due to invalid references`,
         traceId,
       );
 

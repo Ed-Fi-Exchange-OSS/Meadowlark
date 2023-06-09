@@ -8,7 +8,7 @@ import {
   TraceId,
 } from '@edfi/meadowlark-core';
 import * as utilities from '@edfi/meadowlark-utilities';
-import { updateDocumentById } from '../../src/repository/Update';
+import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
 import * as DB from '../../src/repository/Db';
 
 describe('given a transaction on a resource', () => {
@@ -56,7 +56,7 @@ describe('given a transaction on a resource', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(retryNumberOfTimes);
-        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
+        result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('returns error', async () => {
@@ -76,7 +76,7 @@ describe('given a transaction on a resource', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(0);
-        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
+        result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {
@@ -91,7 +91,7 @@ describe('given a transaction on a resource', () => {
     describe('given that a number of retries was not configured', () => {
       beforeAll(async () => {
         jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
-        result = await updateDocumentById(newUpdateRequest(), mongoClientMock as any);
+        result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {

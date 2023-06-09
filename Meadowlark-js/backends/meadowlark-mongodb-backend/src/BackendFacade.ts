@@ -41,11 +41,11 @@ import { getSharedClient, closeSharedConnection } from './repository/Db';
 
 // DocumentStore implementation
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
-  return Delete.deleteDocumentById(request, await getSharedClient());
+  return Delete.deleteDocumentByDocumentUuid(request, await getSharedClient());
 }
 
 export async function getDocumentById(request: GetRequest): Promise<GetResult> {
-  return Get.getDocumentById(request, await getSharedClient());
+  return Get.getDocumentByDocumentUuid(request, await getSharedClient());
 }
 
 export async function upsertDocument(request: UpsertRequest): Promise<UpsertResult> {
@@ -53,7 +53,7 @@ export async function upsertDocument(request: UpsertRequest): Promise<UpsertResu
 }
 
 export async function updateDocumentById(request: UpdateRequest): Promise<UpdateResult> {
-  return Update.updateDocumentById(request, await getSharedClient());
+  return Update.updateDocumentByDocumentUuid(request, await getSharedClient());
 }
 
 export async function securityMiddleware(middlewareModel: MiddlewareModel): Promise<MiddlewareModel> {
