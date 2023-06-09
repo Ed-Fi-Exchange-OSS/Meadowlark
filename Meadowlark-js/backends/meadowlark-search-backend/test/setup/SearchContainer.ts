@@ -9,7 +9,7 @@ let startedContainer: StartedTestContainer;
 
 async function setupElasticSearch() {
   const elasticSearchPort = parseInt(process.env.ELASTICSEARCH_PORT ?? '9200', 10);
-  startedContainer = await new GenericContainer('docker.elastic.co/elasticsearch/elasticsearch:latest')
+  startedContainer = await new GenericContainer('docker.elastic.co/elasticsearch/elasticsearch:8.8.0')
     .withName('elasticsearch-node-test')
     .withExposedPorts({
       container: elasticSearchPort,
@@ -19,16 +19,14 @@ async function setupElasticSearch() {
       'node.name': 'es01',
       'cluster.name': 'elasticsearch-node1',
       'discovery.type': 'single-node',
-      ELASTIC_PASSWORD: 'elasticpassword',
       'xpack.security.enabled': 'false',
     })
     .withStartupTimeout(120_000)
     .start();
 
-  process.env.SEARCH_PROVIDER = 'ElasticSearch';
   process.env.ELASTICSEARCH_ENDPOINT = `http://localhost:${elasticSearchPort}`;
-  process.env.ELASTICSEARCH_USERNAME = 'admin';
-  process.env.ELASTICSEARCH_PASSWORD = 'admin';
+  process.env.ELASTICSEARCH_USERNAME = '';
+  process.env.ELASTICSEARCH_PASSWORD = '';
   process.env.ELASTICSEARCH_REQUEST_TIMEOUT = '10000';
 }
 
@@ -51,7 +49,6 @@ async function setupOpenSeach() {
     .withStartupTimeout(120_000)
     .start();
 
-  process.env.SEARCH_PROVIDER = 'OpenSearch';
   process.env.OPENSEARCH_ENDPOINT = `http://localhost:${openSearchPort}`;
   process.env.OPENSEARCH_USERNAME = 'admin';
   process.env.OPENSEARCH_PASSWORD = 'admin';
@@ -60,13 +57,14 @@ async function setupOpenSeach() {
 
 export async function setup() {
   switch (process.env.SEARCH_PROVIDER) {
-    case 'ElasticSearch': {
-      await setupElasticSearch();
+    case 'OpenSearch': {
+      await setupOpenSeach();
       break;
     }
-    case 'OpenSearch':
+    case 'ElasticSearch':
     default: {
-      await setupOpenSeach();
+      await setupElasticSearch();
+      break;
     }
   }
 }

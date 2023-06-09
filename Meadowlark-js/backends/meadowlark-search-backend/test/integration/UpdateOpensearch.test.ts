@@ -19,10 +19,11 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { Client } from '@opensearch-project/opensearch/.';
+// import { Client } from '@opensearch-project/opensearch/.';
 import { queryDocuments } from '../../src/repository/QuerySearch';
 import { afterDeleteDocumentById, afterUpdateDocumentById, afterUpsertDocument } from '../../src/repository/UpdateSearch';
 import { getNewTestClient } from '../setup/SearchSetupEnvironment';
+import { ClientSearch } from '../../src/repository/ClientSearch';
 
 jest.setTimeout(120_000);
 
@@ -69,10 +70,10 @@ const setupQueryRequest = (queryParameters: any, paginationParameters: Paginatio
 });
 
 describe('given the upsert of a new document', () => {
-  let client: Client;
+  let client: ClientSearch;
 
   beforeAll(async () => {
-    client = (await getNewTestClient()) as Client;
+    client = (await getNewTestClient()) as ClientSearch;
   });
 
   describe('when insert was successful', () => {
@@ -88,7 +89,7 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await client.indices.delete({ index: resourceIndex });
+      await (client.indices as any).delete({ index: resourceIndex });
     });
 
     it('should be created', async () => {
@@ -111,7 +112,7 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await client.indices.delete({ index: resourceIndex });
+      await (client.indices as any).delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
@@ -155,7 +156,7 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await client.indices.delete({ index: resourceIndex });
+      await (client.indices as any).delete({ index: resourceIndex });
     });
 
     it('should be updated', async () => {
@@ -196,7 +197,7 @@ describe('given the upsert of a new document', () => {
     });
 
     afterEach(async () => {
-      await client.indices.delete({ index: resourceIndex });
+      await (client.indices as any).delete({ index: resourceIndex });
     });
 
     it('should be able to delete document', async () => {

@@ -28,7 +28,7 @@ export async function getNewTestClient(): Promise<ClientSearch> {
   const username = 'admin';
   const password = 'admin';
   const searchProvider = process.env.SEARCH_PROVIDER;
-  const node = process.env.OPENSEARCH_ENDPOINT;
+  const node = searchProvider === 'ElasticSearch' ? 'http://localhost:8201' : 'http://localhost:9200';
   const auth = { username, password };
   const requestTimeout = 10000;
   return getSearchClient(searchProvider, node, auth, requestTimeout);

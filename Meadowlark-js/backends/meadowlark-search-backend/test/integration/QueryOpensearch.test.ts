@@ -17,10 +17,11 @@ import {
 } from '@edfi/meadowlark-core';
 import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/BrandedTypes';
 import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
-import { Client } from '@opensearch-project/opensearch/.';
+// import { Client } from '@opensearch-project/opensearch/.';
 import { queryDocuments } from '../../src/repository/QuerySearch';
 import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateSearch';
 import { getNewTestClient } from '../setup/SearchSetupEnvironment';
+import { ClientSearch } from '../../src/repository/ClientSearch';
 
 jest.setTimeout(120_000);
 
@@ -87,10 +88,10 @@ const setupQueryRequest = (
 });
 
 describe('When querying for documents', () => {
-  let client: Client;
+  let client: ClientSearch;
 
   beforeAll(async () => {
-    client = (await getNewTestClient()) as Client;
+    client = (await getNewTestClient()) as ClientSearch;
 
     await afterUpsertDocument(
       setupUpsertRequest(student1MeadowlarkId, student1),
@@ -112,7 +113,7 @@ describe('When querying for documents', () => {
   });
 
   afterAll(async () => {
-    client = (await getNewTestClient()) as Client;
+    client = (await getNewTestClient()) as ClientSearch;
     await afterDeleteDocumentById(
       { documentUuid: student1DocumentUuid, resourceInfo } as DeleteRequest,
       { response: 'DELETE_SUCCESS' } as DeleteResult,
