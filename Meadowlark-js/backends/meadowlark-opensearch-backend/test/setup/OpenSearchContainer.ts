@@ -10,7 +10,7 @@ let startedContainer: StartedTestContainer;
 export async function setup() {
   const openSearchPort = parseInt(process.env.OPENSEARCH_PORT ?? '8201', 10);
   startedContainer = await new GenericContainer(
-    'opensearchproject/opensearch:2.5.0@sha256:f077efb452be64d3df56d74fe99fd63244704896edf6ead73a0f5decb95a40bf',
+    'opensearchproject/opensearch:2.7.0@sha256:55f1f67e7d3645aa838b63a589bce5645154ba275814e52d4638d371ca0f8cb5',
   )
     .withName('opensearch-test')
     .withExposedPorts({
