@@ -9,11 +9,19 @@ There are two ways to analyze write performance for Meadowlark:
 
 ## Bulk Loading
 
-There are functions to load the GrandBend and PartialGrandBend data sets into Meadowlark, to measure the execution time, run the script [Bulk-LoadPerformance.ps1](../../../eng/performance/BulkLoad-Performance.ps1).
+> **Note**
+> To run the bulk loading tests it's important to start with a clean database.
 
-The script receives the parameter for the **Template** that you desire to run (defaults to GrandBend).
+To load the data, there are functions to load the GrandBend and PartialGrandBend data sets into Meadowlark.
 
-This script will enter the data into Meadowlark and will print the total execution time.
+To measure the execution time, run the script [Bulk-LoadPerformance.ps1](../../../eng/performance/BulkLoad-Performance.ps1).
+
+The script receives two parameters:
+
+- The **Template** that you desire to run (defaults to GrandBend).
+- The **Update** flag specifies if you desire to measure the creation or the update of the resources (defaults to false).
+
+This script will enter the data into Meadowlark and will print the execution time.
 
 ## Performance Testing
 

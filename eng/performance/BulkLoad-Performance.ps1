@@ -8,16 +8,24 @@
 #>
 param(
     [ValidateSet('GrandBend', 'PartialGrandBend')]
-    $Template = "GrandBend"
+    $Template = "GrandBend",
+
+    [Switch]
+    $Update
 )
 
 $originalLocation = Get-Location
 Set-Location -Path "../bulkLoad"
 
+if($Update) {
+  # Run First to create the data (Without measuring)
+  Write-Host "Creating data"
+  Invoke-Expression "./Invoke-Load$Template.ps1"
+}
+
+Write-Host "Starting Measure for $Template..."
 $timing = Measure-Command { Invoke-Expression "./Invoke-Load$Template.ps1"  }
 
-Write-Output @"
-Total Time: $timing
-"@
+Write-Output "Total Time: $timing"
 
 Set-Location -Path $originalLocation
