@@ -53,8 +53,6 @@ describe('When querying for documents', () => {
       // query: "SELECT * FROM \"game-of-thrones\""
     });
 
-    console.log(result);
-
     const data = result.rows.map((row) => {
       const obj = {};
       for (let i = 0; i < row.length; i += 1) {
@@ -62,8 +60,6 @@ describe('When querying for documents', () => {
       }
       return obj;
     });
-
-    // console.log(data);
 
     expect(data.length).toBe(2);
   });
