@@ -53,7 +53,7 @@ const newDeleteRequest = (): DeleteRequest => ({
   security: { ...newSecurity() },
   traceId: 'traceId' as TraceId,
 });
-jest.setTimeout(120000);
+
 describe('given the delete of a non-existent document', () => {
   let client: PoolClient;
   let deleteResult: DeleteResult;
@@ -66,7 +66,6 @@ describe('given the delete of a non-existent document', () => {
   const documentUuid = generateDocumentUuid();
 
   beforeAll(async () => {
-    jest.setTimeout(120000);
     client = await getSharedClient();
 
     deleteResult = await deleteDocumentByDocumentUuid(
