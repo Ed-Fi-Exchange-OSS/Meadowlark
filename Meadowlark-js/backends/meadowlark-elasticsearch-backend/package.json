@@ -22,7 +22,8 @@
     "@edfi/meadowlark-core": "^v0.3.0-pre-35",
     "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
     "@edfi/metaed-core": "^4.0.1-dev.13",
-    "@elastic/elasticsearch": "^8.8.0"
+    "@elastic/elasticsearch": "^8.8.0",
+    "@elastic/transport": "^8.3.2"
   },
   "devDependencies": {
     "@short.io/opensearch-mock": "^0.3.1",
