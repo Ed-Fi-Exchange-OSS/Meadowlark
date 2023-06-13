@@ -13,24 +13,24 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import * as QueryOpensearch from './repository/QueryOpensearch';
-import * as UpdateOpensearch from './repository/UpdateOpensearch';
+import * as QueryElasticsearch from './repository/QueryElasticsearch';
+import * as UpdateElasticsearch from './repository/UpdateElasticsearch';
 import { getSharedClient, closeSharedConnection } from './repository/Db';
 
 export async function queryDocuments(request: QueryRequest): Promise<QueryResult> {
-  return QueryOpensearch.queryDocuments(request, await getSharedClient());
+  return QueryElasticsearch.queryDocuments(request, await getSharedClient());
 }
 
 export async function afterDeleteDocumentById(request: DeleteRequest, result: DeleteResult): Promise<void> {
-  return UpdateOpensearch.afterDeleteDocumentById(request, result, await getSharedClient());
+  return UpdateElasticsearch.afterDeleteDocumentById(request, result, await getSharedClient());
 }
 
 export async function afterUpsertDocument(request: UpsertRequest, result: UpsertResult): Promise<void> {
-  return UpdateOpensearch.afterUpsertDocument(request, result, await getSharedClient());
+  return UpdateElasticsearch.afterUpsertDocument(request, result, await getSharedClient());
 }
 
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult): Promise<void> {
-  return UpdateOpensearch.afterUpdateDocumentById(request, result, await getSharedClient());
+  return UpdateElasticsearch.afterUpdateDocumentById(request, result, await getSharedClient());
 }
 
 export async function closeConnection(): Promise<void> {

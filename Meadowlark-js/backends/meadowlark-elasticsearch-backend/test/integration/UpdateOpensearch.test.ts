@@ -19,14 +19,14 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
-import { Client } from '@opensearch-project/opensearch/.';
-import { queryDocuments } from '../../src/repository/QueryOpensearch';
+import { Client } from '@elastic/elasticsearch';
+import { queryDocuments } from '../../src/repository/QueryElasticsearch';
 import {
   afterDeleteDocumentById,
   afterUpdateDocumentById,
   afterUpsertDocument,
-} from '../../src/repository/UpdateOpensearch';
-import { getNewTestClient } from '../setup/OpenSearchSetupEnvironment';
+} from '../../src/repository/UpdateElasticsearch';
+import { getNewTestClient } from '../setup/ElasticSearchSetupEnvironment';
 
 jest.setTimeout(120_000);
 

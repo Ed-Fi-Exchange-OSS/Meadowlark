@@ -3,15 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-const openSearchEnvironmentSetup = require('./OpenSearchSetupEnvironment');
+const elasticSearchEnvironmentSetup = require('./ElasticSearchSetupEnvironment');
 
-async function setupIntegrationTestEnvironment() {
+async function setupElasticSearchIntegrationTestEnvironment() {
   try {
-    // Setup openSearch environment for integration tests.
-    await openSearchEnvironmentSetup.setupOpenSearch();
+    // Setup elasticSearch environment for integration tests.
+    await elasticSearchEnvironmentSetup.setupElasticSearch();
   } catch (error) {
     throw new Error(`Error setting up integration test environment: ${error}`);
   }
 }
 
-module.exports = async () => setupIntegrationTestEnvironment();
+module.exports = async () => setupElasticSearchIntegrationTestEnvironment();

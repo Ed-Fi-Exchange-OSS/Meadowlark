@@ -1,8 +1,8 @@
 {
-  "name": "@edfi/meadowlark-opensearch-backend",
+  "name": "@edfi/meadowlark-elasticsearch-backend",
   "main": "dist/index.js",
   "version": "0.3.0-pre-36",
-  "description": "Meadowlark backend plugin for OpenSearch",
+  "description": "Meadowlark backend plugin for elasticsearch",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/"
@@ -22,7 +22,7 @@
     "@edfi/meadowlark-core": "^v0.3.0-pre-35",
     "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
     "@edfi/metaed-core": "^4.0.1-dev.13",
-    "@opensearch-project/opensearch": "^2.1.0"
+    "@elastic/elasticsearch": "^8.8.0"
   },
   "devDependencies": {
     "@short.io/opensearch-mock": "^0.3.1",

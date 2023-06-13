@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@opensearch-project/opensearch';
+import { Client } from '@elastic/elasticsearch';
 import {
   DeleteRequest,
   DeleteResult,
@@ -14,15 +14,15 @@ import {
   UpsertResult,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { indexFromResourceInfo } from './QueryOpensearch';
-import { handleOpenSearchError } from './OpenSearchException';
+import { indexFromResourceInfo } from './QueryElasticsearch';
+import { handleElasticSearchError } from './ElasticSearchException';
 
-const moduleName = 'opensearch.repository.UpdateOpensearch';
+const moduleName = 'elasticsearch.repository.UpdateElasticsearch';
 
 /**
- * Parameters for an OpenSearch request
+ * Parameters for an ElasticSearch request
  */
-type OpensearchRequest = { index: string; id: DocumentUuid };
+type ElasticsearchRequest = { index: string; id: DocumentUuid };
 
 /**
  * Listener for afterDeleteDocumentById events
@@ -31,42 +31,42 @@ export async function afterDeleteDocumentById(request: DeleteRequest, result: De
   Logger.info(`${moduleName}.afterDeleteDocumentById`, request.traceId);
   if (result.response !== 'DELETE_SUCCESS') return;
 
-  const opensearchRequest: OpensearchRequest = {
+  const elasticsearchRequest: ElasticsearchRequest = {
     id: request.documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
   try {
     Logger.debug(
-      `${moduleName}.afterDeleteDocumentById removing ${opensearchRequest.id} from index ${opensearchRequest.index}`,
+      `${moduleName}.afterDeleteDocumentById removing ${elasticsearchRequest.id} from index ${elasticsearchRequest.index}`,
       request.traceId,
     );
-    await client.delete({ ...opensearchRequest, refresh: true });
+    await client.delete({ ...elasticsearchRequest, refresh: true });
   } catch (err) {
-    await handleOpenSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, opensearchRequest.id);
+    await handleElasticSearchError(err, `${moduleName}.afterDeleteDocumentById`, request.traceId, elasticsearchRequest.id);
   }
 }
 
 /**
- * Shared opensearch upsert logic
+ * Shared elasticsearch upsert logic
  */
-async function upsertToOpensearch(request: UpsertRequest, documentUuid: DocumentUuid, client: Client) {
-  const opensearchRequest: OpensearchRequest = {
+async function upsertToElasticsearch(request: UpsertRequest, documentUuid: DocumentUuid, client: Client) {
+  const elasticsearchRequest: ElasticsearchRequest = {
     id: documentUuid,
     index: indexFromResourceInfo(request.resourceInfo),
   };
 
   Logger.debug(
-    `${moduleName}.upsertToOpensearch inserting id ${opensearchRequest.id} into index ${opensearchRequest.index}`,
+    `${moduleName}.upsertToElasticsearch inserting id ${elasticsearchRequest.id} into index ${elasticsearchRequest.index}`,
     request.traceId,
   );
 
   try {
     await client.index({
-      ...opensearchRequest,
+      ...elasticsearchRequest,
       body: {
-        id: opensearchRequest.id,
-        info: JSON.stringify({ id: opensearchRequest.id, ...request.edfiDoc }),
+        id: elasticsearchRequest.id,
+        info: JSON.stringify({ id: elasticsearchRequest.id, ...request.edfiDoc }),
         ...request.edfiDoc,
         createdBy: request.security.clientId,
         meadowlarkId: request.meadowlarkId,
@@ -75,7 +75,7 @@ async function upsertToOpensearch(request: UpsertRequest, documentUuid: Document
       refresh: true,
     });
   } catch (err) {
-    await handleOpenSearchError(err, `${moduleName}.upsertToOpensearch`, request.traceId, opensearchRequest.id);
+    await handleElasticSearchError(err, `${moduleName}.upsertToElasticsearch`, request.traceId, elasticsearchRequest.id);
   }
 }
 
@@ -87,7 +87,7 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
   if (result.response !== 'UPDATE_SUCCESS' && result.response !== 'INSERT_SUCCESS') return;
   const documentUuid: DocumentUuid =
     result.response === 'UPDATE_SUCCESS' ? result.existingDocumentUuid : result.newDocumentUuid;
-  await upsertToOpensearch(request, documentUuid, client);
+  await upsertToElasticsearch(request, documentUuid, client);
 }
 
 /**
@@ -96,7 +96,7 @@ export async function afterUpsertDocument(request: UpsertRequest, result: Upsert
 export async function afterUpdateDocumentById(request: UpdateRequest, result: UpdateResult, client: Client) {
   Logger.info(`${moduleName}.afterUpdateDocumentById`, request.traceId);
   if (result.response !== 'UPDATE_SUCCESS') return;
-  await upsertToOpensearch(
+  await upsertToElasticsearch(
     {
       meadowlarkId: request.meadowlarkId,
       resourceInfo: request.resourceInfo,

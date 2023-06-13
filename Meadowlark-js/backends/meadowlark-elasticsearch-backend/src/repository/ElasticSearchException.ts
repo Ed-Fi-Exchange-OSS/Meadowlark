@@ -2,39 +2,40 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { OpenSearchClientError, ResponseError } from '@opensearch-project/opensearch/lib/errors';
+
+import { ElasticsearchClientError, ResponseError } from '@elastic/transport/lib/errors';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { QueryResult } from '@edfi/meadowlark-core';
 
-export async function handleOpenSearchError(
-  err: OpenSearchClientError | Error,
+export async function handleElasticSearchError(
+  err: ElasticsearchClientError | Error,
   moduleName: string = '',
   traceId: string = '',
-  openSearchRequestId: string = '',
+  elasticSearchRequestId: string = '',
 ): Promise<QueryResult> {
   try {
-    const openSearchClientError = err as OpenSearchClientError;
-    const documentProcessError = `OpenSearch Error${
-      openSearchRequestId ? ` processing the object '${openSearchRequestId}'` : ''
+    const elasticSearchClientError = err as ElasticsearchClientError;
+    const documentProcessError = `ElasticSearch Error${
+      elasticSearchRequestId ? ` processing the object '${elasticSearchRequestId}'` : ''
     }:`;
-    if (openSearchClientError?.name !== undefined) {
-      switch (openSearchClientError.name) {
+    if (elasticSearchClientError?.name !== undefined) {
+      switch (elasticSearchClientError.name) {
         case 'ConfigurationError':
         case 'ConnectionError':
         case 'DeserializationError':
         case 'NoLivingConnectionsError':
         case 'NotCompatibleError':
-        case 'OpenSearchClientError':
+        case 'ElasticSearchClientError':
         case 'RequestAbortedError':
         case 'SerializationError':
         case 'TimeoutError': {
-          if (openSearchClientError?.message !== undefined) {
+          if (elasticSearchClientError?.message !== undefined) {
             Logger.error(
               `${moduleName} ${documentProcessError}`,
               traceId,
-              `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
+              `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
             );
-            return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: openSearchClientError.message };
+            return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: elasticSearchClientError.message };
           }
           break;
         }
@@ -53,7 +54,7 @@ export async function handleOpenSearchError(
               Logger.error(
                 `${moduleName} ${documentProcessError}`,
                 traceId,
-                `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
+                `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
               );
               return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
             }
@@ -74,7 +75,7 @@ export async function handleOpenSearchError(
                     Logger.error(
                       `${moduleName} ${documentProcessError} invalid query terms`,
                       traceId,
-                      `(${openSearchClientError.name}) - ${responseBody?.error?.reason}`,
+                      `(${elasticSearchClientError.name}) - ${responseBody?.error?.reason}`,
                     );
                     return {
                       response: 'QUERY_FAILURE_INVALID_QUERY',

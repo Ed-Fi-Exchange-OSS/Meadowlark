@@ -51,6 +51,7 @@
     "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-mongodb-backend/test/config/integration backends/meadowlark-opensearch-backend/test/config/integration backends/meadowlark-postgresql-backend/test/config/integration --runInBand",
     "test:integration:mongodb": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-mongodb-backend/test/config/integration --runInBand",
     "test:integration:opensearch": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-opensearch-backend/test/config/integration --runInBand",
+    "test:integration:elasticsearch": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-elasticsearch-backend/test/config/integration --runInBand",
     "test:integration:postgresql": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects backends/meadowlark-postgresql-backend/test/config/integration --runInBand",
     "test:unit:coverage": "rimraf coverage.unit/ && npm run test:unit",
     "test:unit:coverage:ci": "rimraf coverage.unit/ && npm run test:unit -- --maxWorkers=2 --ci",

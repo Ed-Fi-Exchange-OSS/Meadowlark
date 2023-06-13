@@ -3,18 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@opensearch-project/opensearch';
+import { Client } from '@elastic/elasticsearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
-import { handleOpenSearchError } from './OpenSearchException';
+import { handleElasticSearchError } from './ElasticSearchException';
 
-const moduleName = 'opensearch.repository.QueryOpensearch';
+const moduleName = 'elasticsearch.repository.QueryElasticsearch';
 
 /**
- * Returns OpenSearch index name from the given ResourceInfo.
+ * Returns ElasticSearch index name from the given ResourceInfo.
  *
- * OpenSearch indexes are required to be lowercase only, with no pound signs or periods.
+ * ElasticSearch indexes are required to be lowercase only, with no pound signs or periods.
  */
 export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
   const adjustedResourceName = resourceInfo.isDescriptor
@@ -39,23 +39,21 @@ function sanitize(input: string): string {
 }
 
 /**
- * Convert query string parameters from http request to OpenSearch
+ * Convert query string parameters from http request to ElasticSearch
  * SQL WHERE conditions. Returns empty string if there are none.
  */
 function whereConditionsFrom(queryParameters: object): string {
   return Object.entries(queryParameters)
-    .map(([field, value]) => `${field} = '${sanitize(value)}'`)
+    .map(([field, value]) => `${field} = \'${sanitize(value)}\'`)
     .join(' AND ');
 }
 
 /**
- * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
+ * This mechanism of SQL querying is specific to ElasticSearch (vs Elasticsearch)
  */
 async function performSqlQuery(client: Client, query: string): Promise<any> {
-  return client.transport.request({
-    method: 'POST',
-    path: '/_opendistro/_sql',
-    body: { query },
+  return client.sql.query({
+    query
   });
 }
 
@@ -68,7 +66,7 @@ function appendedWhereClause(existingWhereClause: string, newWhereClause: string
 }
 
 /**
- * Entry point for querying with OpenSearch
+ * Entry point for querying with ElasticSearch
  */
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
   const { resourceInfo, queryParameters, paginationParameters, traceId } = request;
@@ -78,7 +76,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   let documents: any = [];
   let recordCount: number;
   try {
-    let query = `SELECT info FROM ${indexFromResourceInfo(resourceInfo)}`;
+    let query = `SELECT info FROM "${indexFromResourceInfo(resourceInfo)}"`;
     let whereClause: string = '';
 
     // API client requested filters
@@ -96,24 +94,24 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       query += ` WHERE ${whereClause}`;
     }
 
-    query += ' ORDER BY _doc';
+    query += " ORDER BY '_doc'";
 
     if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
     if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
 
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
-    const { body } = await performSqlQuery(client, query);
-    recordCount = body.total;
+    const body = await performSqlQuery(client, query);
+    recordCount = body.rows.length; //ToDo: This is not correct. We'll need to make an extra request to get this value.
 
-    documents = body.datarows.map((datarow) => JSON.parse(datarow));
+    documents = body.rows.map((datarow) => JSON.parse(datarow));
 
     if (isDebugEnabled()) {
       const idsForLogging: string[] = documents.map((document) => document.id);
       Logger.debug(`${moduleName}.queryDocuments Ids of documents returned: ${JSON.stringify(idsForLogging)}`, traceId);
     }
   } catch (e) {
-    return handleOpenSearchError(e, `${moduleName}.queryDocuments`, traceId);
+    return handleElasticSearchError(e, `${moduleName}.queryDocuments`, traceId);
   }
 
   return { response: 'QUERY_SUCCESS', documents, totalCount: recordCount };

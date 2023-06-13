@@ -3,16 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client, ClientOptions } from '@opensearch-project/opensearch';
+import { Client, ClientOptions } from '@elastic/elasticsearch';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import { BasicAuth } from '@opensearch-project/opensearch/lib/pool';
+import { BasicAuth } from '@elastic/transport/lib/types';
 
 let singletonClient: Client | null = null;
 
-const moduleName = 'opensearch.repository.Db';
+const moduleName = 'elasticsearch.repository.Db';
 
-export async function getOpenSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): Promise<Client> {
-  Logger.debug(`${moduleName}.getOpenSearchClient creating local client`, null);
+export async function getElasticSearchClient(node?: string, auth?: BasicAuth, requestTimeout?: number): Promise<Client> {
+  Logger.debug(`${moduleName}.getElasticSearchClient creating local client`, null);
   const clientOpts: ClientOptions = {
     node,
     auth,
@@ -25,20 +25,20 @@ export async function getOpenSearchClient(node?: string, auth?: BasicAuth, reque
     const masked = { ...clientOpts } as any;
     delete masked.auth?.password;
 
-    Logger.error(`${moduleName}.getOpenSearchClient error connecting with options ${JSON.stringify(masked)}`, null, e);
+    Logger.error(`${moduleName}.getElasticSearchClient error connecting with options ${JSON.stringify(masked)}`, null, e);
     throw e;
   }
 }
 
 /**
- * Create and return an OpenSearch connection object
+ * Create and return an ElasticSearch connection object
  */
 export async function getNewClient(): Promise<Client> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
-  const node = Config.get<string>('OPENSEARCH_ENDPOINT');
-  const auth = { username: Config.get<string>('OPENSEARCH_USERNAME'), password: Config.get<string>('OPENSEARCH_PASSWORD') };
-  const requestTimeout = Config.get<number>('OPENSEARCH_REQUEST_TIMEOUT');
-  return getOpenSearchClient(node, auth, requestTimeout);
+  const node = Config.get<string>('ELASTICSEARCH_ENDPOINT');
+  const auth = { username: Config.get<string>('ELASTICSEARCH_USERNAME'), password: Config.get<string>('ELASTICSEARCH_PASSWORD') };
+  const requestTimeout = Config.get<number>('ELASTICSEARCH_REQUEST_TIMEOUT');
+  return getElasticSearchClient(node, auth, requestTimeout);
 }
 
 /**
@@ -57,5 +57,5 @@ export async function closeSharedConnection(): Promise<void> {
     await singletonClient.close();
   }
   singletonClient = null;
-  Logger.info(`Opensearch connection: closed`, null);
+  Logger.info(`Elasticsearch connection: closed`, null);
 }
