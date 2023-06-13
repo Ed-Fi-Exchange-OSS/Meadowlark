@@ -34,7 +34,7 @@ export async function getNewClient(): Promise<MongoClient> {
       .collection(DOCUMENT_COLLECTION_NAME);
     await documentCollection.createIndex({ documentUuid: 1 });
     await documentCollection.createIndex({ outboundRefs: 1 });
-    await documentCollection.createIndex({ aliasIds: 1 });
+    await documentCollection.createIndex({ aliasMeadowlarkIds: 1 });
 
     // Create authorizations collection if not exists
     const authorizationCollection: Collection<AuthorizationDocument> = newClient
@@ -102,7 +102,7 @@ export async function writeLockReferencedDocuments(
   session: ClientSession,
 ): Promise<void> {
   await mongoCollection.updateMany(
-    { aliasIds: { $in: referencedMeadowlarkIds } },
+    { aliasMeadowlarkIds: { $in: referencedMeadowlarkIds } },
     { $set: { lock: new ObjectId() } },
     { session },
   );
@@ -118,7 +118,10 @@ export const onlyReturnDocumentUuid = (session: ClientSession): FindOptions => (
 });
 
 // MongoDB FindOption to return only the aliasId
-export const onlyReturnAliasId = (session: ClientSession): FindOptions => ({ projection: { 'aliasIds.$': 1 }, session });
+export const onlyReturnAliasMeadowlarkId = (session: ClientSession): FindOptions => ({
+  projection: { 'aliasMeadowlarkIds.$': 1 },
+  session,
+});
 
 // MongoDB ReplaceOption that enables upsert (insert if not exists)
 export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: true, session });

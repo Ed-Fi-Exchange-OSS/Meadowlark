@@ -67,7 +67,7 @@ function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
 }
 
 /**
- * Returns a 224-bit document id for the given document identity, as a concatenation of two Base64Url hashes.
+ * Returns a 224-bit meadowlark id for the given document identity, as a concatenation of two Base64Url hashes.
  *
  * The first 96 bits (12 bytes) are a SHAKE256 Base64Url encoded hash of the resource info.
  * The remaining 128 bits (16 bytes) are a SHAKE256 Base64Url encoded hash of the document identity.

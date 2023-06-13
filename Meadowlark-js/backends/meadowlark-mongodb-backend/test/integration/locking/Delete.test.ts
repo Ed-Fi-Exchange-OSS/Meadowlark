@@ -139,7 +139,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const deleteSession: ClientSession = client.startSession();
     deleteSession.startTransaction();
 
-    // Get the aliasIds for the School document, used to check for references to it as School or as EducationOrganization
+    // Get the aliasMeadowlarkIds for the School document, used to check for references to it as School or as EducationOrganization
     const deleteCandidate: any = await mongoCollection.findOne(
       { _id: schoolMeadowlarkId },
       onlyReturnAliasIds(deleteSession),
@@ -147,7 +147,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // Check for any references to the School document
     const anyReferences = await mongoCollection.findOne(
-      onlyDocumentsReferencing(deleteCandidate.aliasIds),
+      onlyDocumentsReferencing(deleteCandidate.aliasMeadowlarkIds),
       onlyReturnId(deleteSession),
     );
 

@@ -10,7 +10,7 @@ import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { SecurityResult } from '../security/SecurityResult';
 import { getDocumentCollection } from './Db';
 
-function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | null {
+function extractMeadowlarkIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | null {
   if (frontendRequest.action !== 'upsert') return null;
 
   return meadowlarkIdForDocumentIdentity(
@@ -54,7 +54,7 @@ export async function rejectByOwnershipSecurity(
       Logger.debug(`${functionName} - document found for documentUuid ${documentUuid}`, frontendRequest.traceId);
     } else {
       // security by meadowlarkId if it's upsert - document body with no documentUuid
-      const meadowlarkId: MeadowlarkId | null = extractIdIfUpsert(frontendRequest);
+      const meadowlarkId: MeadowlarkId | null = extractMeadowlarkIdIfUpsert(frontendRequest);
 
       if (meadowlarkId == null) {
         Logger.error(`${functionName} - no documentUuid or meadowlarkId to secure against`, frontendRequest.traceId);

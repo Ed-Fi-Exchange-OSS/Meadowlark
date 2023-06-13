@@ -15,12 +15,12 @@ export async function getDocumentByDocumentUuid(
   client: PoolClient,
 ): Promise<GetResult> {
   try {
-    Logger.debug(`${moduleName}.getDocumentById ${documentUuid}`, traceId);
+    Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
     const queryResult: QueryResult = await client.query(findDocumentByDocumentUuidSql(documentUuid));
 
     // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
     if (queryResult.rows == null) {
-      const errorMessage = `Could not retrieve document ${documentUuid}
+      const errorMessage = `Could not retrieve DocumentUuid ${documentUuid}
       a null result set was returned, indicating system failure`;
       Logger.error(errorMessage, traceId);
       return {
@@ -34,11 +34,11 @@ export async function getDocumentByDocumentUuid(
 
     const response: GetResult = {
       response: 'GET_SUCCESS',
-      document: { id: queryResult.rows[0].document_id, ...queryResult.rows[0].edfi_doc },
+      document: { id: queryResult.rows[0].meadowlark_id, ...queryResult.rows[0].edfi_doc },
     };
     return response;
   } catch (e) {
-    Logger.error(`${moduleName}.getDocumentById Error retrieving document ${documentUuid}`, traceId, e);
+    Logger.error(`${moduleName}.getDocumentByDocumentUuid Error retrieving DocumentUuid ${documentUuid}`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', document: [] };
   }
 }

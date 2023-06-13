@@ -51,7 +51,7 @@ describe('given non-superclass document info with no references', () => {
     expect(meadowlarkDocument).toMatchInlineSnapshot(`
       {
         "_id": "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
-        "aliasIds": [
+        "aliasMeadowlarkIds": [
           "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
         ],
         "createdAt": 1673827200000,
@@ -169,7 +169,7 @@ describe('given superclass document info', () => {
   });
 
   it('should have two alias ids', async () => {
-    expect(meadowlarkDocument.aliasIds).toMatchInlineSnapshot(`
+    expect(meadowlarkDocument.aliasMeadowlarkIds).toMatchInlineSnapshot(`
       [
         "Qw5FvPdKxAXWnGgh_UOwCVjZeWJb5MV0Gd-nQg",
         "dfR7WrhrnYMh8lF_mnIhAN2Ur2Ji2MmlGBcSUg",

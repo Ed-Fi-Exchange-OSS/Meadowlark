@@ -12,11 +12,11 @@ export async function deleteAll(client: PoolClient): Promise<void> {
   await client.query('TRUNCATE TABLE meadowlark.aliases');
 }
 
-export const verifyAliasId = (aliasId: string): string =>
+export const verifyAliasMeadowlarkId = (aliasMeadowlarkId: MeadowlarkId): string =>
   format(
-    `SELECT alias_id from meadowlark.aliases
-  WHERE document_id = %L AND alias_id != %1$L`,
-    [aliasId],
+    `SELECT alias_meadowlark_id from meadowlark.aliases
+  WHERE meadowlark_id = %L AND alias_meadowlark_id != %1$L`,
+    [aliasMeadowlarkId],
   );
 
 /**
@@ -25,5 +25,5 @@ export const verifyAliasId = (aliasId: string): string =>
  * @returns SQL query string to retrieve references
  */
 export function retrieveReferencesByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format('SELECT referenced_document_id FROM meadowlark.references WHERE parent_document_id=%L', [meadowlarkId]);
+  return format('SELECT referenced_meadowlark_id FROM meadowlark.references WHERE parent_meadowlark_id=%L', [meadowlarkId]);
 }

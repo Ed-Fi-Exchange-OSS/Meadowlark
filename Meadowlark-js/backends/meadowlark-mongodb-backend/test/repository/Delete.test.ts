@@ -1,6 +1,6 @@
 import { DeleteRequest, newSecurity, TraceId, NoResourceInfo, DocumentUuid } from '@edfi/meadowlark-core';
 import * as utilities from '@edfi/meadowlark-utilities';
-import { deleteDocumentById } from '../../src/repository/Delete';
+import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import * as DB from '../../src/repository/Db';
 
 describe('given a transaction on a resource', () => {
@@ -42,7 +42,7 @@ describe('given a transaction on a resource', () => {
     describe('given that a number of retries greater than zero has been configured', () => {
       beforeAll(async () => {
         jest.spyOn(utilities.Config, 'get').mockReturnValue(retryNumberOfTimes);
-        result = await deleteDocumentById(newDeleteRequest(), mongoClientMock as any);
+        result = await deleteDocumentByDocumentUuid(newDeleteRequest(), mongoClientMock as any);
       });
 
       it('returns error', async () => {
@@ -61,7 +61,7 @@ describe('given a transaction on a resource', () => {
     describe('given that a number of retries equal to zero has been configured', () => {
       beforeAll(async () => {
         jest.spyOn(utilities.Config, 'get').mockReturnValue(0);
-        result = await deleteDocumentById(newDeleteRequest(), mongoClientMock as any);
+        result = await deleteDocumentByDocumentUuid(newDeleteRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {
@@ -75,7 +75,7 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries was not configured', () => {
       beforeAll(async () => {
-        result = await deleteDocumentById(newDeleteRequest(), mongoClientMock as any);
+        result = await deleteDocumentByDocumentUuid(newDeleteRequest(), mongoClientMock as any);
       });
 
       it('should not retry', () => {

@@ -11,7 +11,7 @@ import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import { getDocumentCollection, limitFive, onlyReturnId, writeLockReferencedDocuments } from './Db';
-import { deleteDocumentByIdTransaction } from './Delete';
+import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { upsertDocumentTransaction } from './Upsert';
 
@@ -105,7 +105,7 @@ async function tryUpdateByReplacement(
         resourceVersion: document.resourceVersion,
         isDescriptor: document.isDescriptor,
         edfiDoc: document.edfiDoc,
-        aliasIds: document.aliasIds,
+        aliasMeadowlarkIds: document.aliasMeadowlarkIds,
         outboundRefs: document.outboundRefs,
         validated: document.validated,
         lastModifiedAt: document.lastModifiedAt,
@@ -161,7 +161,7 @@ async function updateAllowingIdentityChange(
 
   // Either the documentUuid doesn't exist or the identity has changed.
   // The following delete attempt will catch if documentUuid does not exist
-  const deleteResult = await deleteDocumentByIdTransaction(
+  const deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
     { documentUuid, resourceInfo, security, validateNoReferencesToDocument: true, traceId },
     mongoCollection,
     session,
@@ -203,7 +203,7 @@ async function updateDisallowingIdentityChange(
 ): Promise<UpdateResult> {
   // Perform the document update
   Logger.debug(
-    `${moduleName}.updateDisallowingIdentityChange: Updating document uuid ${updateRequest.documentUuid}`,
+    `${moduleName}.updateDisallowingIdentityChange: Updating DocumentUuid ${updateRequest.documentUuid}`,
     updateRequest.traceId,
   );
 
@@ -253,7 +253,7 @@ async function checkForInvalidReferences(
   if (failures.length === 0) return null;
 
   Logger.debug(
-    `${moduleName}.checkForInvalidReferences: Updating document uuid ${documentUuid} failed due to invalid references`,
+    `${moduleName}.checkForInvalidReferences: Updating DocumentUuid ${documentUuid} failed due to invalid references`,
     traceId,
   );
 
@@ -276,7 +276,7 @@ async function checkForInvalidReferences(
   };
 }
 
-async function updateDocumentByIdTransaction(
+async function updateDocumentByDocumentUuidTransaction(
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
   session: ClientSession,
@@ -316,9 +316,12 @@ async function updateDocumentByIdTransaction(
  * Takes an UpdateRequest and MongoClient from the BackendFacade and performs an update by documentUuid
  * and returns the UpdateResult.
  */
-export async function updateDocumentById(updateRequest: UpdateRequest, client: MongoClient): Promise<UpdateResult> {
+export async function updateDocumentByDocumentUuid(
+  updateRequest: UpdateRequest,
+  client: MongoClient,
+): Promise<UpdateResult> {
   const { documentUuid, traceId } = updateRequest;
-  Logger.info(`${moduleName}.updateDocumentById ${documentUuid}`, traceId);
+  Logger.info(`${moduleName}.updateDocumentByDocumentUuid ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
   const session: ClientSession = client.startSession();
@@ -330,7 +333,7 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: M
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          updateResult = await updateDocumentByIdTransaction(updateRequest, mongoCollection, session);
+          updateResult = await updateDocumentByDocumentUuidTransaction(updateRequest, mongoCollection, session);
           if (updateResult.response !== 'UPDATE_SUCCESS') {
             await session.abortTransaction();
           }
@@ -340,14 +343,14 @@ export async function updateDocumentById(updateRequest: UpdateRequest, client: M
         retries: numberOfRetries,
         onRetry: () => {
           Logger.warn(
-            `${moduleName}.updateDocumentById got write conflict error for documentUuid ${updateRequest.documentUuid}. Retrying...`,
+            `${moduleName}.updateDocumentByDocumentUuid got write conflict error for documentUuid ${updateRequest.documentUuid}. Retrying...`,
             updateRequest.traceId,
           );
         },
       },
     );
   } catch (e) {
-    Logger.error(`${moduleName}.updateDocumentById`, traceId, e);
+    Logger.error(`${moduleName}.updateDocumentByDocumentUuid`, traceId, e);
     await session.abortTransaction();
 
     // If this is a MongoError, it has a codeName

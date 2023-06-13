@@ -24,10 +24,10 @@ import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
   findReferencingMeadowlarkIdsSql,
-  deleteAliasesForDocumentSql,
+  deleteAliasesForDocumentByMeadowlarkIdSql,
   findDocumentByMeadowlarkIdSql,
   documentInsertOrUpdateSql,
-  findAliasIdsForDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
   insertAliasSql,
   insertOutboundReferencesSql,
   deleteDocumentByDocumentUuIdSql,
@@ -133,16 +133,16 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       // Get the alias ids for the document we're trying to delete, because the update transaction is trying
       // to use our school, this is where the code will throw a locking error. This is technically the last line
       // of code in this try block that should execute
-      const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
+      const aliasIdResult = await deleteClient.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
 
-      const validDocIds = aliasIdResult.rows.map((ref) => ref.alias_id);
-      const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocIds));
-      const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolMeadowlarkId);
+      const validDocMeadowlarkIds = aliasIdResult.rows.map((ref) => ref.alias_meadowlark_id);
+      const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocMeadowlarkIds));
+      const anyReferences = referenceResult.rows.filter((ref) => ref.meadowlark_id !== schoolMeadowlarkId);
 
       expect(anyReferences.length).toEqual(0);
 
       await deleteClient.query(deleteDocumentByDocumentUuIdSql(resultDocumentUuid));
-      await deleteClient.query(deleteAliasesForDocumentSql(schoolMeadowlarkId));
+      await deleteClient.query(deleteAliasesForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
       await deleteClient.query('COMMIT');
     } catch (e1) {
       await deleteClient.query('ROLLBACK');
@@ -152,7 +152,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // Perform the insert of AcademicWeek document, adding a reference to to to-be-deleted document
     const documentUpsertSql = documentInsertOrUpdateSql(
       {
-        id: academicWeekMeadowlarkId,
+        meadowlarkId: academicWeekMeadowlarkId,
         documentUuid,
         resourceInfo: academicWeekResourceInfo,
         documentInfo: academicWeekDocumentInfo,
@@ -223,21 +223,21 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
-    const aliasIdResult = await deleteClient.query(findAliasIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
+    const aliasIdResult = await deleteClient.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
 
     // The school is in the database
     expect(aliasIdResult.rowCount).toEqual(1);
 
     // See if there are existing references to this document
-    const validDocIds = aliasIdResult.rows.map((ref) => ref.alias_id);
-    const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocIds));
-    const anyReferences = referenceResult.rows.filter((ref) => ref.document_id !== schoolMeadowlarkId);
+    const validDocMeadowlarkIds = aliasIdResult.rows.map((ref) => ref.alias_meadowlark_id);
+    const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocMeadowlarkIds));
+    const anyReferences = referenceResult.rows.filter((ref) => ref.meadowlark_id !== schoolMeadowlarkId);
 
     expect(anyReferences.length).toEqual(0);
 
     // Delete the document
     await deleteClient.query(deleteDocumentByDocumentUuIdSql(resultDocumentUuid));
-    await deleteClient.query(deleteAliasesForDocumentSql(schoolMeadowlarkId));
+    await deleteClient.query(deleteAliasesForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
 
     // Start the insert
     await insertClient.query('BEGIN');
@@ -263,7 +263,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
       const documentUuid: DocumentUuid = '9ad5c9fa-82d1-494c-8d54-6aa1457f4365' as DocumentUuid;
       const documentUpsertSql = documentInsertOrUpdateSql(
         {
-          id: academicWeekMeadowlarkId,
+          meadowlarkId: academicWeekMeadowlarkId,
           documentUuid,
           resourceInfo: academicWeekResourceInfo,
           documentInfo: academicWeekDocumentInfo,

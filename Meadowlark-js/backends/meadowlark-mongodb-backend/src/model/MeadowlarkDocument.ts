@@ -63,7 +63,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
 
   /**
    * An array of ids this document will satisfy when reference validation performs existence checks.
-   * This array always includes the document id itself. If this document is a subclass, the array will also
+   * This array always includes the document meadowlark id itself. If this document is a subclass, the array will also
    * contain the id of this document in superclass form (superclass name and project, identity property
    * naming differences - like schoolId versus educationOrganizationId - accounted for). Such an id is an alias.
    *
@@ -78,7 +78,7 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    *          a reference from ClassPeriod to a School with schoolId=123, as well as a reference from
    *          Assessment to EducationOrganization with educationOrganizationId=123.
    */
-  aliasIds: MeadowlarkId[];
+  aliasMeadowlarkIds: MeadowlarkId[];
 
   /**
    * True if this document has been reference and descriptor validated.
@@ -135,9 +135,9 @@ export function meadowlarkDocumentFrom(
   createdAt: number,
   lastModifiedAt: number,
 ): MeadowlarkDocument {
-  const aliasIds: MeadowlarkId[] = [meadowlarkId];
+  const aliasMeadowlarkIds: MeadowlarkId[] = [meadowlarkId];
   if (documentInfo.superclassInfo != null) {
-    aliasIds.push(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo));
+    aliasMeadowlarkIds.push(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo));
   }
 
   return {
@@ -149,7 +149,7 @@ export function meadowlarkDocumentFrom(
     documentUuid,
     _id: meadowlarkId,
     edfiDoc,
-    aliasIds,
+    aliasMeadowlarkIds,
     outboundRefs: referencedDocumentIdsFrom(documentInfo),
     validated: validate,
     createdBy,
