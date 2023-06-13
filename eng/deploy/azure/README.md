@@ -56,25 +56,37 @@ container per group.
 # Login to Azure
 az login
 
+$resourceGroup={resource group name}
+
 # Create the mongo container
-az container create --resource-group {resource group name} -n ml-mongo `
+az container create --resource-group $resourceGroup -n ml-mongo `
     --image edfialliance/meadowlark-mongo:latest `
-    --ports 27017 --dns-name-label mlmongo1 `
+    --ports 27017 --dns-name-label ml-mongo `
     --command-line "mongod --replSet rs0"
 
 # Initialize mongodb replica set
-az container exec --resource-group {resource group name} -n ml-mongo `
+az container exec --resource-group $resourceGroup -n ml-mongo `
     --container-name ml-mongo --exec-command 'mongo --eval rs.initiate()'
 
 # Create OpenSearch container
-az container create --resource-group {resource group name} -n ml-opensearch `
+az container create --resource-group $resourceGroup -n ml-opensearch `
     --image edfialliance/meadowlark-opensearch:latest `
     --ports 9200 --dns-name-label ml-opensearch
 
+# Define variables
+$signingKey="<run `openssl rand -base64 256` to create a key>"
+$openSearchUrl="http://ml-opensearch.southcentralus.azurecontainer.io:9200"
+$mongoUri="mongodb://ml-mongo.southcentralus.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true"
+$documentStore="@edfi/meadowlark-mongodb-backend"
+$queryHandler="@edfi/meadowlark-opensearch-backend"
+$listenerPlugin="@edfi/meadowlark-opensearch-backend"
+$authorizationPlugin="@edfi/meadowlark-mongodb-backend"
+
 # Create meadowlark container
-az container create --resource-group {resource group name} -n ml-api `
-    --image edfialliance/meadowlark-ed-fi-api:pre --ports 80 `
-    --environment-variables {specify all env variables required}
+az container create --resource-group $resourceGroup -n ml-api `
+    --image edfialliance/meadowlark-ed-fi-api:pre --ports 3000 `
+    --dns-name-label meadowlark `
+    --environment-variables OAUTH_SIGNING_KEY=$signingKey OAUTH_HARD_CODED_CREDENTIALS_ENABLED=true OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/token OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/verify OPENSEARCH_USERNAME=admin OPENSEARCH_PASSWORD=admin OPENSEARCH_ENDPOINT=$openSearchUrl OPENSEARCH_REQUEST_TIMEOUT=10000 DOCUMENT_STORE_PLUGIN=$documentStore QUERY_HANDLER_PLUGIN=$queryHandler LISTENER1_PLUGIN=$listenerPlugin FASTIFY_RATE_LIMIT=false FASTIFY_PORT=3000 FASTIFY_NUM_THREADS=10 MEADOWLARK_STAGE=local LOG_LEVEL=info IS_LOCAL=false AUTHORIZATION_STORE_PLUGIN=$authorizationPlugin BEGIN_ALLOWED_SCHOOL_YEAR=2022 END_ALLOWED_SCHOOL_YEAR=2034 ALLOW_TYPE_COERCION=true ALLOW__EXT_PROPERTY=true MONGO_URI=$mongoUri
 ```
 
 > **Warning** Not ready for production usage. This example is using a single
