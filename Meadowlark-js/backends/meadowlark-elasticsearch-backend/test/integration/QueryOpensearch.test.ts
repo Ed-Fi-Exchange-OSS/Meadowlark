@@ -215,18 +215,18 @@ describe('When querying for documents', () => {
     //   });
     // });
 
-    // describe('when querying with extra characters', () => {
-    //   it("shouldn't return values", async () => {
-    //     const result = await queryDocuments(
-    //       setupQueryRequest({ firstName: "student1.firstName'%20or%20studentUniqueId%20is%20not%20null%20%23" }, {}),
-    //       client,
-    //     );
+    describe('when querying with extra characters', () => {
+      it("shouldn't return values", async () => {
+        const result = await queryDocuments(
+          setupQueryRequest({ firstName: 'student1.firstName%20or%20studentUniqueId%20is%20not%20null%20%23' }, {}),
+          client,
+        );
 
-    //     expect(result.response).toEqual('QUERY_SUCCESS');
-    //     expect(result.totalCount).toEqual(0);
-    //     expect(result.documents).toHaveLength(0);
-    //   });
-    // });
+        expect(result.response).toEqual('QUERY_SUCCESS');
+        expect(result.totalCount).toEqual(0);
+        expect(result.documents).toHaveLength(0);
+      });
+    });
   });
 
   describe('when querying with ownership', () => {

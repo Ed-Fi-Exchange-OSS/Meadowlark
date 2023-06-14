@@ -43,9 +43,12 @@ function sanitize(input: string): string {
  * SQL WHERE conditions. Returns empty string if there are none.
  */
 function whereConditionsFrom(queryParameters: object): string {
-  return Object.entries(queryParameters)
-    .map(([field, value]) => `${field} = \'${sanitize(value)}\'`)
-    .join(' AND ');
+  return (
+    Object.entries(queryParameters)
+      // eslint-disable-next-line no-useless-escape
+      .map(([field, value]) => `${field} = \'${sanitize(value)}\'`)
+      .join(' AND ')
+  );
 }
 
 /**
@@ -53,7 +56,7 @@ function whereConditionsFrom(queryParameters: object): string {
  */
 async function performSqlQuery(client: Client, query: string): Promise<any> {
   return client.sql.query({
-    query
+    query,
   });
 }
 
@@ -102,7 +105,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
     const body = await performSqlQuery(client, query);
-    recordCount = body.rows.length; //ToDo: This is not correct. We'll need to make an extra request to get this value.
+    recordCount = body.rows.length; // ToDo: This is not correct. We'll need to make an extra request to get this value.
 
     documents = body.rows.map((datarow) => JSON.parse(datarow));
 

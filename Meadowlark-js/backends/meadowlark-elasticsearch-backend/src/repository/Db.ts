@@ -36,7 +36,10 @@ export async function getElasticSearchClient(node?: string, auth?: BasicAuth, re
 export async function getNewClient(): Promise<Client> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
   const node = Config.get<string>('ELASTICSEARCH_ENDPOINT');
-  const auth = { username: Config.get<string>('ELASTICSEARCH_USERNAME'), password: Config.get<string>('ELASTICSEARCH_PASSWORD') };
+  const auth = {
+    username: Config.get<string>('ELASTICSEARCH_USERNAME'),
+    password: Config.get<string>('ELASTICSEARCH_PASSWORD'),
+  };
   const requestTimeout = Config.get<number>('ELASTICSEARCH_REQUEST_TIMEOUT');
   return getElasticSearchClient(node, auth, requestTimeout);
 }

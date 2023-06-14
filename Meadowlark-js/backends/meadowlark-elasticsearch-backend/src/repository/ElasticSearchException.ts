@@ -35,7 +35,11 @@ export async function handleElasticSearchError(
               traceId,
               `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
             );
-            return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: elasticSearchClientError.message };
+            return {
+              response: 'QUERY_FAILURE_INVALID_QUERY',
+              documents: [],
+              failureMessage: elasticSearchClientError.message,
+            };
           }
           break;
         }
