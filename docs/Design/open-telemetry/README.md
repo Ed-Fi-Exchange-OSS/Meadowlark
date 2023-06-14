@@ -1,4 +1,3 @@
-
 # What is Open Telemetry?
 
 [OpenTelemetry](https://opentelemetry.io/), also known as OTel, is an
@@ -32,6 +31,7 @@ number of existing observability back-ends such as
 Tracing gives the overall big picture of what is happening by showing the path a
 request takes through the system. In OTel a trace is a collection of one or more
 spans.
+
 [Spans](https://opentelemetry.io/docs/concepts/observability-primer/#spans)
 represent a unit of work, tracking the specific operation that a request made
 within the system. Spans can have a parent/child relationship, and can be linked
@@ -189,7 +189,39 @@ Pros of using a collector:
 Due to the flexibility of how the collector can be set up and the control it
 gives to it's users, collectors are the suggested way to handle OTel output.
 
-# How Meadowlark could use Open Telemetry
+## Cloud Provider Support
+
+Since the OTel Collector and popular backends are containerized, OTel can be
+used with the top three cloud providers. The following details how the big three
+integrate with OTel:
+
+### Amazon Web Services
+
+AWS has quite possibly the best built in support as of the creation of this
+document. AWS provides the 'AWS Distro' for Open Telemetry, which includes:
+
+- An AWS specific version of the OTel SDK - Allowing for the collection of AWS
+  related resources into your OTel setup
+- OTel Collector Integrates seamlessly into Amazon CloudWatch as the backend
+data store for OTel, allowing the collection of all AWS logging into a single
+location. (Cloudwatch is optional, other OTel backends can be used as well)
+
+### Microsoft Azure
+
+Microsoft plans to go all in and support OTel, but they are still building out
+the internal support for OTel. Microsoft released the Azure Monitor
+OpenTelemetry Distro at the end of May. This will allow OTel data to flow into
+Application Insights but it does require a package to be included and called
+within Meadowlark code. Without code changes it looks like a different backend
+would need to be chosen for Azure.
+
+### Google Cloud Platform
+
+GCP, like AWS has it's own collector, the OpenTelemetry Operations Collector
+that will send OTel data directly to GCP's Cloud Trace and Cloud Monitoring
+Metrics
+
+## How Meadowlark could use Open Telemetry
 
 Since we already have a form of tracing within Meadowlark through our existing
 logs, it doesn't seem like it would be all that difficult to add OTel tracing to
