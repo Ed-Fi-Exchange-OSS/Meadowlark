@@ -185,7 +185,7 @@ describe('When querying for documents', () => {
         const result = await queryDocuments(setupQueryRequest({}, { limit: 1 }), client);
 
         expect(result.response).toEqual('QUERY_SUCCESS');
-        // expect(result.totalCount).toEqual(2);
+        expect(result.totalCount).toEqual(2);
         expect(result.documents).toHaveLength(1);
         expect(result.documents[0]).toEqual({ ...student1, id: student1DocumentUuid });
       });

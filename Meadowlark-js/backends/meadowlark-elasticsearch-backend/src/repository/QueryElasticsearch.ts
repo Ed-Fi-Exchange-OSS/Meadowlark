@@ -69,6 +69,19 @@ function appendedWhereClause(existingWhereClause: string, newWhereClause: string
 }
 
 /**
+ * Returns number of records.
+ */
+function getCountQuery(fromClause: string, whereClause: string): string {
+  let query = `SELECT count(*) as recordCount FROM "${fromClause}"`;
+
+  if (whereClause !== '') {
+    query += ` WHERE ${whereClause}`;
+  }
+
+  return query;
+}
+
+/**
  * Entry point for querying with ElasticSearch
  */
 export async function queryDocuments(request: QueryRequest, client: Client): Promise<QueryResult> {
@@ -80,6 +93,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   let recordCount: number;
   try {
     let query = `SELECT info FROM "${indexFromResourceInfo(resourceInfo)}"`;
+
     let whereClause: string = '';
 
     // API client requested filters
@@ -105,7 +119,9 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
     const body = await performSqlQuery(client, query);
-    recordCount = body.rows.length; // ToDo: This is not correct. We'll need to make an extra request to get this value.
+    const countBody = await performSqlQuery(client, getCountQuery(indexFromResourceInfo(resourceInfo), whereClause));
+
+    recordCount = +countBody.rows[0][0];
 
     documents = body.rows.map((datarow) => JSON.parse(datarow));
 
