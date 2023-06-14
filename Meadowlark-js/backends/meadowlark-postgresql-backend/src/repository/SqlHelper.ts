@@ -3,162 +3,256 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 import { DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
+import { PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
-
-// SQL for Selects
+import { MeadowlarkDocument, getEmptyMeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
 
 /**
- * Returns the SQL query that does a reverse lookup to find the meadowlarkIds of documents that reference the given
- * meadowlarkIds.
+ * Returns a list of meadowlarkIds of documents that reference the given meadowlarkIds.
  *
- * @param referencedMeadowlarkIds the meadowlarkIds of the documents that are being referenced
- * @returns a SQL query to find the meadowlarkIds of the documents referencing the given meadowlarkIds
+ * @param referencedMeadowlarkIds the array of meadowlarkIds of the documents that are being referenced
+ * @returns an array of meadowlarkIds of the documents referencing the given meadowlarkIds
  */
-export function findReferencingMeadowlarkIdsSql(referencedMeadowlarkIds: MeadowlarkId[]): string {
-  return format(
+export async function findReferencingMeadowlarkIdsSql(
+  client: PoolClient,
+  referencedMeadowlarkIds: MeadowlarkId[],
+): Promise<MeadowlarkId[]> {
+  const querySelect = format(
     `SELECT parent_meadowlark_id FROM meadowlark.references WHERE referenced_meadowlark_id IN (%L)`,
     referencedMeadowlarkIds,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return undefined as unknown as MeadowlarkId[];
+  }
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.parent_meadowlark_id) : []) as MeadowlarkId[];
 }
 
 /**
- * Returns the SQL query to find the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
- * meadowlarkId itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * Returns the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
+ * meadowlarkId itself along with any superclass variations that the document satisfies. For example, a School is a subclass
  * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
  * @param meadowlarkId the meadowlarkId of the document to find aliases for
- * @returns a SQL query to find the alias meadowlarkIds of the given document
+ * @returns an array of alias meadowlarkIds of the given document
  */
-export function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format(
+export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+  client: PoolClient,
+  meadowlarkId: MeadowlarkId,
+): Promise<MeadowlarkId[]> {
+  const querySelect = format(
     `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE meadowlark_id = %L FOR SHARE NOWAIT`,
     meadowlarkId,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return undefined as unknown as MeadowlarkId[];
+  }
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
 /**
- * Returns the SQL query to find the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
- * meadowlarkId itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * Returns the alias meadowlarkIds for a given document. Alias meadowlarkIds include the document
+ * meadowlarkId itself along with any superclass variations that the document satisfies. For example, a School is a subclass
  * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
- * @param meadowlarkId the meadowlarkId of the document to find aliases for
- * @returns a SQL query to find the alias meadowlarkIds of the given document
+ * @param documentUuid the documentUuid of the document to find aliases for
+ * @returns an array of alias meadowlarkIds of the given document
  */
-export function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
-  return format(
+export async function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+  client: PoolClient,
+  documentUuid: DocumentUuid,
+): Promise<MeadowlarkAlias[]> {
+  const querySelect = format(
     `SELECT alias_meadowlark_id, meadowlark_id FROM meadowlark.aliases WHERE document_uuid = %L FOR SHARE NOWAIT`,
     documentUuid,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return undefined as unknown as MeadowlarkAlias[];
+  }
+  return (
+    (queryResult?.rowCount ?? 0) > 0
+      ? queryResult.rows.map((ref) => ({
+          alias_meadowlark_id: ref.alias_meadowlark_id,
+          meadowlark_id: ref.meadowlark_id,
+        }))
+      : []
+  ) as MeadowlarkAlias[];
 }
-
 /**
- * Returns the SQL query to find the existence of an alias meadowlarkId. Alias meadowlarkIds include the document meadowlarkId
- * itself along with any superclass variations that the document satisifies. For example, a School is a subclass
+ * Returns a list of alias meadowlarkIds. Alias meadowlarkIds include the document meadowlarkId
+ * itself along with any superclass variations that the document satisfies. For example, a School is a subclass
  * of EducationOrganization, so each School document has an additional alias meadowlarkId as an EducationOrganization.
  *
  * This function does NOT read-for-write lock.
  *
  * @param meadowlarkId the meadowlarkId of the document to find aliases for
- * @returns a SQL query to find the alias meadowlarkIds of the given document
+ * @returns an array of alias meadowlarkIds of the given document
  */
-export function findAliasMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format(`SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id = %L`, meadowlarkId);
+export async function findAliasMeadowlarkIdSql(client: PoolClient, meadowlarkId: MeadowlarkId): Promise<MeadowlarkId[]> {
+  const querySelect = format(
+    `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id = %L`,
+    meadowlarkId,
+  );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
 /**
- * Returns the SQL statement for retrieving a document (with identity)
- * @param meadowlarkId The identifier of the document to retrieve
- * @returns SQL query string to retrieve a document
+ * Returns a document (with identity)
+ * @param meadowlarkId The MeadowlarkId of the document to retrieve
+ * @returns meadowlark document
  */
-export function findDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format(
+export async function findDocumentByMeadowlarkIdSql(
+  client: PoolClient,
+  meadowlarkId: MeadowlarkId,
+): Promise<MeadowlarkDocument> {
+  const querySelect = format(
     `
     SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
        FROM meadowlark.documents
        WHERE meadowlark_id = %L;`,
     [meadowlarkId],
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return undefined as unknown as MeadowlarkDocument;
+  }
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkDocument;
+  }
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
 }
 
 /**
- * Returns the SQL statement for retrieving a document (with identity)
- * @param meadowlarkId The identifier of the document to retrieve
- * @returns SQL query string to retrieve a document
+ * Returns a document (with identity)
+ * @param documentUuid The DocumentUuid of the document to retrieve
+ * @returns meadowlark document
  */
-export function findDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
-  return format(
+export async function findDocumentByDocumentUuidSql(
+  client: PoolClient,
+  documentUuid: DocumentUuid,
+): Promise<MeadowlarkDocument> {
+  const querySelect = format(
     `
     SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
        FROM meadowlark.documents
        WHERE document_uuid = %L;`,
     [documentUuid],
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkDocument;
+  }
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
 }
 
 /**
- * Returns the SQL query for retrieving the ownership for a given document
- * @param meadowlarkId The identifier of the document
- * @returns SQL query string to retrieve ownership
+ * Returns the the ownership for a given document
+ * @param documentUuid The documentUuid of the document
+ * @returns a meadowlark document to retrieve ownership
  */
-export function findOwnershipForDocumentByDocumentUuidSql(documentUuid: DocumentUuid): string {
-  return format('SELECT created_by FROM meadowlark.documents WHERE document_uuid = %L;', [documentUuid]);
+export async function findOwnershipForDocumentByDocumentUuidSql(
+  client: PoolClient,
+  documentUuid: DocumentUuid,
+): Promise<MeadowlarkDocument> {
+  const querySelect = format('SELECT created_by FROM meadowlark.documents WHERE document_uuid = %L;', [documentUuid]);
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkDocument;
+  }
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
 }
 
 /**
- * Returns the SQL query for retrieving the ownership for a given document
- * @param meadowlarkId The identifier of the document
- * @returns SQL query string to retrieve ownership
+ * Returns the the ownership for a given document
+ * @param meadowlarkId The meadowlarkId of the document
+ * @returns a meadowlark document to retrieve ownership
  */
-export function findOwnershipForDocumentByMeadowlarkIdSql(meadowlarkId: MeadowlarkId): string {
-  return format('SELECT created_by FROM meadowlark.documents WHERE meadowlark_id = %L;', [meadowlarkId]);
+export async function findOwnershipForDocumentByMeadowlarkIdSql(
+  client: PoolClient,
+  meadowlarkId: MeadowlarkId,
+): Promise<MeadowlarkDocument> {
+  const querySelect = format('SELECT created_by FROM meadowlark.documents WHERE meadowlark_id = %L;', [meadowlarkId]);
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkDocument;
+  }
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
 }
 
 /**
- * Returns the SQL statement for retrieving alias meadowlarkIds from the aliases table for the given
+ * Returns the alias meadowlarkIds from the aliases table for the given
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param meadowlarkIds the meadowlarkId of the document we're checking references for
- * @returns SQL query string to retrieve existing alias meadowlarkIds
+ * @param meadowlarkIds the array of meadowlarkId of the document we're checking references for
+ * @returns an array of alias meadowlarkIds
  */
-export function validateReferenceExistenceSql(meadowlarkIds: MeadowlarkId[]): string {
-  return format(
+export async function validateReferenceExistenceSql(
+  client: PoolClient,
+  meadowlarkIds: MeadowlarkId[],
+): Promise<MeadowlarkId[]> {
+  const querySelect = format(
     `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id IN (%L) FOR NO KEY UPDATE NOWAIT`,
     meadowlarkIds,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkId[];
+  }
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
 /**
- * Returns the SQL statement for retrieving alias meadowlarkIds from the aliases table for the given
+ * Returns a list alias meadowlarkIds from the aliases table for the given
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
- * @param meadowlarkIds the meadowlarkId of the document we're checking references for
+ * @param documentUuids the DocumentUuid array of the document we're checking references for
  * @returns SQL query string to retrieve existing alias meadowlarkIds
  */
-export function validateReferenceExistenceByDocumentUuidSql(documentUuids: DocumentUuid[]): string {
-  return format(
+export async function validateReferenceExistenceByDocumentUuidSql(
+  client: PoolClient,
+  documentUuids: DocumentUuid[],
+): Promise<MeadowlarkId[]> {
+  const querySelect = format(
     `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE document_uuid IN (%L) FOR NO KEY UPDATE NOWAIT`,
     documentUuids,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkId[];
+  }
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
 /**
- * Returns the SQL statement to find up to five documents that reference this document.
+ * Returns up to five documents that reference this document.
  * This is for error reporting when an attempt is made to delete the document.
  *
  * @param referringMeadowlarkIds The referring documents
- * @returns SQL query string to retrieve the meadowlark_id and resource_name of the referring documents
+ * @returns an array of the referring documents
  */
-export function findReferringDocumentInfoForErrorReportingSql(referringMeadowlarkIds: MeadowlarkId[]): string {
-  return format(
+export async function findReferringDocumentInfoForErrorReportingSql(
+  client: PoolClient,
+  referringMeadowlarkIds: MeadowlarkId[],
+): Promise<MeadowlarkDocument[]> {
+  const querySelect = format(
     `SELECT project_name, resource_name, resource_version, meadowlark_id, document_uuid FROM meadowlark.documents WHERE meadowlark_id IN (%L) LIMIT 5`,
     referringMeadowlarkIds,
   );
+  const queryResult: QueryResult<any> = await client.query(querySelect);
+  if (queryResult == null) {
+    return null as unknown as MeadowlarkDocument[];
+  }
+  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows : []) as MeadowlarkDocument[];
 }
 
 // SQL for inserts/updates/upserts

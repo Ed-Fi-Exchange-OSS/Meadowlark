@@ -3,10 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByDocumentUuidSql } from './SqlHelper';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Get';
 
@@ -16,10 +17,10 @@ export async function getDocumentByDocumentUuid(
 ): Promise<GetResult> {
   try {
     Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
-    const queryResult: QueryResult = await client.query(findDocumentByDocumentUuidSql(documentUuid));
+    const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuidSql(client, documentUuid);
 
     // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
-    if (queryResult.rows == null) {
+    if (meadowlarkDocument == null) {
       const errorMessage = `Could not retrieve DocumentUuid ${documentUuid}
       a null result set was returned, indicating system failure`;
       Logger.error(errorMessage, traceId);
@@ -30,11 +31,11 @@ export async function getDocumentByDocumentUuid(
       };
     }
 
-    if (queryResult.rowCount === 0) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+    if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 
     const response: GetResult = {
       response: 'GET_SUCCESS',
-      document: { id: queryResult.rows[0].meadowlark_id, ...queryResult.rows[0].edfi_doc },
+      document: { id: meadowlarkDocument.meadowlark_id, ...meadowlarkDocument.edfi_doc },
     };
     return response;
   } catch (e) {

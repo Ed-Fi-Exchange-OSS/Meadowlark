@@ -34,16 +34,14 @@ async function findReferencedMeadowlarkIdsByMeadowlarkId(
     return [];
   }
 
-  const referenceExistenceResult = await client.query(
-    validateReferenceExistenceSql(referenceMeadowlarkIds as MeadowlarkId[]),
-  );
+  const referenceExistenceResult = await validateReferenceExistenceSql(client, referenceMeadowlarkIds as MeadowlarkId[]);
 
-  if (referenceExistenceResult.rows == null) {
+  if (referenceExistenceResult == null) {
     Logger.error(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId Database error parsing references`, traceId);
     throw new Error(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId Database error parsing references`);
   }
 
-  return referenceExistenceResult.rows.map((val) => val.alias_meadowlark_id);
+  return referenceExistenceResult.map((val) => val);
 }
 
 /**

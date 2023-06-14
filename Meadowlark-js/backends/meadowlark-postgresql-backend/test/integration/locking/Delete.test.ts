@@ -34,6 +34,7 @@ import {
 } from '../../../src/repository/SqlHelper';
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../../src/model/MeadowlarkDocument';
 
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
@@ -133,11 +134,14 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       // Get the alias ids for the document we're trying to delete, because the update transaction is trying
       // to use our school, this is where the code will throw a locking error. This is technically the last line
       // of code in this try block that should execute
-      const aliasIdResult = await deleteClient.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
+      const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+        deleteClient,
+        schoolMeadowlarkId,
+      );
 
-      const validDocMeadowlarkIds = aliasIdResult.rows.map((ref) => ref.alias_meadowlark_id);
-      const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocMeadowlarkIds));
-      const anyReferences = referenceResult.rows.filter((ref) => ref.meadowlark_id !== schoolMeadowlarkId);
+      const validDocMeadowlarkIds = aliasIdResult.map((ref) => ref);
+      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(deleteClient, validDocMeadowlarkIds);
+      const anyReferences: MeadowlarkId[] = referenceResult.filter((ref) => ref !== schoolMeadowlarkId);
 
       expect(anyReferences.length).toEqual(0);
 
@@ -188,8 +192,8 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const docResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
-    expect(docResult.rows[0].document_identity.schoolId).toBe('123');
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, schoolMeadowlarkId);
+    expect(docResult.document_identity.schoolId).toBe('123');
   });
 });
 
@@ -223,15 +227,18 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
-    const aliasIdResult = await deleteClient.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
+    const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+      deleteClient,
+      schoolMeadowlarkId,
+    );
 
     // The school is in the database
-    expect(aliasIdResult.rowCount).toEqual(1);
+    expect(aliasIdResult.length).toEqual(1);
 
     // See if there are existing references to this document
-    const validDocMeadowlarkIds = aliasIdResult.rows.map((ref) => ref.alias_meadowlark_id);
-    const referenceResult = await deleteClient.query(findReferencingMeadowlarkIdsSql(validDocMeadowlarkIds));
-    const anyReferences = referenceResult.rows.filter((ref) => ref.meadowlark_id !== schoolMeadowlarkId);
+    const validDocMeadowlarkIds = aliasIdResult.map((ref) => ref);
+    const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(deleteClient, validDocMeadowlarkIds);
+    const anyReferences: MeadowlarkId[] = referenceResult.filter((ref) => ref !== schoolMeadowlarkId);
 
     expect(anyReferences.length).toEqual(0);
 
@@ -299,9 +306,9 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const schoolDocResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(schoolMeadowlarkId));
-    const awDocResult: any = await insertClient.query(findDocumentByMeadowlarkIdSql(academicWeekMeadowlarkId));
-    expect(schoolDocResult.rowCount).toEqual(0);
-    expect(awDocResult.rowCount).toEqual(0);
+    const schoolDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, schoolMeadowlarkId);
+    const awDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, academicWeekMeadowlarkId);
+    expect(isMeadowlarkDocumentEmpty(schoolDocResult)).toEqual(true);
+    expect(isMeadowlarkDocumentEmpty(awDocResult)).toEqual(true);
   });
 });

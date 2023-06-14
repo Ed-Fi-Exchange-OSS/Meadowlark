@@ -24,6 +24,7 @@ import {
   findReferringDocumentInfoForErrorReportingSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
+import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
 
 const moduleName = 'postgresql.repository.Update';
 
@@ -48,15 +49,18 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   try {
     await client.query('BEGIN');
 
-    const recordExistsResult = await client.query(findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid));
+    const recordExistsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+      client,
+      documentUuid,
+    );
     // if this record doesn't exist, this function returns a failure
-    if ((recordExistsResult?.rowCount ?? 0) === 0) {
+    if ((recordExistsResult?.length ?? 0) === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
       return updateResult;
     }
     // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
     // we just need the first row to return the meadowlark_id
-    const existingMeadowlarkId: MeadowlarkId = recordExistsResult.rows[0].meadowlark_id;
+    const existingMeadowlarkId: MeadowlarkId = recordExistsResult[0].meadowlark_id;
     if (!resourceInfo.allowIdentityUpdates && existingMeadowlarkId !== meadowlarkId) {
       updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
       return updateResult;
@@ -77,9 +81,9 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           traceId,
         );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([existingMeadowlarkId]));
+        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [existingMeadowlarkId]);
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
           resourceName: document.resource_name,
           meadowlarkId: document.meadowlark_id,
           documentUuid: document.document_uuid,

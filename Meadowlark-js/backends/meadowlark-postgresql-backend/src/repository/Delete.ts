@@ -14,6 +14,7 @@ import {
   findReferencingMeadowlarkIdsSql,
   findAliasMeadowlarkIdsForDocumentByDocumentUuidSql,
 } from './SqlHelper';
+import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
 
 const moduleName = 'postgresql.repository.Delete';
 
@@ -29,15 +30,14 @@ export async function deleteDocumentByDocumentUuid(
   try {
     await client.query('BEGIN');
     // Find the alias meadowlarkIds for the document to be deleted
-    const documentAliasIdsResult: QueryResult = await client.query(
-      findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(documentUuid),
+    const documentAliasIdsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+      client,
+      documentUuid,
     );
     // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
     // we just need the first row to return the meadowlark_id
     meadowlarkId =
-      documentAliasIdsResult?.rowCount != null && documentAliasIdsResult.rowCount > 0
-        ? documentAliasIdsResult.rows[0].meadowlark_id
-        : ('' as MeadowlarkId);
+      (documentAliasIdsResult?.length ?? 0) > 0 ? documentAliasIdsResult[0].meadowlark_id : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
       // All documents have alias meadowlarkIds. If no alias meadowlarkIds were found, the document doesn't exist
       if (meadowlarkId === '') {
@@ -48,14 +48,12 @@ export async function deleteDocumentByDocumentUuid(
       }
 
       // Extract from the query result
-      const documentAliasMeadowlarkIds: MeadowlarkId[] = documentAliasIdsResult.rows.map((ref) => ref.alias_meadowlark_id);
+      const documentAliasMeadowlarkIds: MeadowlarkId[] = documentAliasIdsResult.map((ref) => ref.alias_meadowlark_id);
 
       // Find any documents that reference this document, either it's own meadowlarkId or an alias
-      const referenceResult: QueryResult<any> = await client.query(
-        findReferencingMeadowlarkIdsSql(documentAliasMeadowlarkIds),
-      );
+      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(client, documentAliasMeadowlarkIds);
 
-      if (referenceResult.rows == null) {
+      if (referenceResult == null) {
         await client.query('ROLLBACK');
         const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid: Error determining documents referenced by ${documentUuid}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
@@ -63,7 +61,7 @@ export async function deleteDocumentByDocumentUuid(
         return deleteResult;
       }
 
-      const references = referenceResult?.rows.filter((ref) => ref.meadowlark_id !== meadowlarkId);
+      const references = referenceResult.filter((ref) => ref !== meadowlarkId);
 
       // If this document is referenced, it's a validation failure
       if (references.length > 0) {
@@ -73,10 +71,10 @@ export async function deleteDocumentByDocumentUuid(
         );
 
         // Get the information of up to five referring documents for failure message purposes
-        const referenceIds = references.map((ref) => ref.parent_meadowlark_id);
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql(referenceIds));
+        const referenceIds = references.map((ref) => ref);
+        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, referenceIds);
 
-        if (referringDocuments.rows == null) {
+        if (referringDocuments == null) {
           await client.query('ROLLBACK');
           const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid Error retrieving documents referenced by ${meadowlarkId}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
@@ -84,8 +82,8 @@ export async function deleteDocumentByDocumentUuid(
           return deleteResult;
         }
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
-          documentUuid: document.documentUuid,
+        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+          documentUuid: document.document_uuid,
           meadowlarkId: document.meadowlark_id,
           resourceName: document.resource_name,
           projectName: document.project_name,

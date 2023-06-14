@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import {
   UpsertResult,
   UpsertRequest,
@@ -27,6 +27,7 @@ import {
   findDocumentByMeadowlarkIdSql,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Upsert';
 
@@ -43,16 +44,18 @@ export async function upsertDocument(
     await client.query('BEGIN');
 
     // Check whether this is an insert or update
-    const documentExistsResult: QueryResult = await client.query(findDocumentByMeadowlarkIdSql(meadowlarkId));
-    const isInsert: boolean = documentExistsResult.rowCount === 0;
-    const documentUuid: DocumentUuid =
-      documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].document_uuid : generateDocumentUuid();
+    const documentExistsResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, meadowlarkId);
+    const isInsert: boolean = isMeadowlarkDocumentEmpty(documentExistsResult);
+    const documentUuid: DocumentUuid = !isMeadowlarkDocumentEmpty(documentExistsResult)
+      ? documentExistsResult.document_uuid
+      : generateDocumentUuid();
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
-      const superclassAliasMeadowlarkIdInUseResult = await client.query(
-        findAliasMeadowlarkIdSql(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId),
+      const superclassAliasMeadowlarkIdInUseResult: MeadowlarkId[] = await findAliasMeadowlarkIdSql(
+        client,
+        getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId,
       );
-      const superclassAliasMeadowlarkIdInUse: boolean = superclassAliasMeadowlarkIdInUseResult.rowCount !== 0;
+      const superclassAliasMeadowlarkIdInUse: boolean = superclassAliasMeadowlarkIdInUseResult.length !== 0;
 
       if (superclassAliasMeadowlarkIdInUse) {
         Logger.debug(
@@ -64,9 +67,9 @@ export async function upsertDocument(
           documentInfo.superclassInfo,
         ) as MeadowlarkId;
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
+        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [superclassAliasId]);
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
           resourceName: document.resource_name,
           documentUuid: document.document_uuid,
           meadowlarkId: document.meadowlark_id,
@@ -103,9 +106,9 @@ export async function upsertDocument(
           traceId,
         );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([meadowlarkId]));
+        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [meadowlarkId]);
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
+        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
           resourceName: document.resource_name,
           documentUuid: document.document_uuid,
           meadowlarkId: document.meadowlark_id,

@@ -5,9 +5,10 @@
 
 import { meadowlarkIdForDocumentIdentity, FrontendRequest, writeRequestToLog, MeadowlarkId } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
 import { findOwnershipForDocumentByDocumentUuidSql, findOwnershipForDocumentByMeadowlarkIdSql } from './SqlHelper';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | undefined {
   if (frontendRequest.action !== 'upsert') return undefined;
@@ -55,23 +56,23 @@ export async function rejectByOwnershipSecurity(
   }
 
   try {
-    const result: QueryResult =
+    const meadowlarkDocument: MeadowlarkDocument =
       documentUuid != null
-        ? await client.query(findOwnershipForDocumentByDocumentUuidSql(documentUuid))
-        : await client.query(findOwnershipForDocumentByMeadowlarkIdSql(meadowlarkId));
+        ? await findOwnershipForDocumentByDocumentUuidSql(client, documentUuid)
+        : await findOwnershipForDocumentByMeadowlarkIdSql(client, meadowlarkId);
 
-    if (result.rows == null) {
+    if (meadowlarkDocument == null) {
       Logger.error(`${functionName} Unknown Error determining access`, frontendRequest.traceId);
       return 'UNKNOWN_FAILURE';
     }
 
-    if (result.rowCount === 0) {
+    if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) {
       Logger.debug(`${functionName} document not found for ${idLogMessage}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }
     const { clientId } = frontendRequest.middleware.security;
 
-    if (result.rows[0].created_by === clientId) {
+    if (meadowlarkDocument.created_by === clientId) {
       Logger.debug(`${functionName} access approved: ${idLogMessage}, clientId ${clientId}`, frontendRequest.traceId);
       return 'ACCESS_APPROVED';
     }
