@@ -52,8 +52,8 @@ on branch [meadowlark-updates](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Per
 
 List of issues:
 
-- [PERF-296](https://tracker.ed-fi.org/browse/PERF-296)
-- [PERF-297](https://tracker.ed-fi.org/browse/PERF-297)
+- [RND-583](https://tracker.ed-fi.org/browse/RND-583)
+- [RND-584](https://tracker.ed-fi.org/browse/RND-584)
 - [PERF-298](https://tracker.ed-fi.org/browse/PERF-298)
 
 After fixing this errors, the tests should be executed as part of [RND-580](https://tracker.ed-fi.org/browse/RND-580)
