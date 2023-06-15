@@ -5,7 +5,7 @@ services:
   meadowlark-ed-fi-api:
     image: edfialliance/meadowlark-ed-fi-api:pre
     container_name: ml-api
-    domainname: meadowlark
+    domainname: ${ED_FI_DOMAIN_NAME}
     ports:
       - 3000:3000
     environment:
@@ -14,16 +14,16 @@ services:
       OAUTH_HARD_CODED_CREDENTIALS_ENABLED: ${OAUTH_HARD_CODED_CREDENTIALS_ENABLED:-true}
       OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH: ${OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH:-meadowlark_verify-only_key_1}
       OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH: ${OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH:-meadowlark_verify-only_secret_1}
-      OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: ${OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST:-http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/token}
-      OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: ${OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION:-http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/verify}
+      OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST: http://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:3000/local/oauth/token
+      OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION: http://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:3000/local/oauth/verify
       OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME:-admin}
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASS:-admin}
-      OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://meadowlark.southcentralus.azurecontainer.io:9200}
+      OPENSEARCH_ENDPOINT: http://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:9200
       OPENSEARCH_REQUEST_TIMEOUT: '10000'
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
       LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
-      MONGO_URI: ${MONGODB_URI:-mongodb://meadowlark.southcentralus.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true}
+      MONGO_URI: mongodb://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true
       FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
       FASTIFY_PORT: ${FASTIFY_PORT:-3000}
       FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}
@@ -37,7 +37,7 @@ services:
       ALLOW__EXT_PROPERTY: ${ALLOW__EXT_PROPERTY:-true}
     restart: unless-stopped
     healthcheck:
-      test: curl -s http://meadowlark.southcentralus.azurecontainer.io:3000/local >/dev/null || exit 1
+      test: curl -s http://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:3000/local >/dev/null || exit 1
       interval: 30s
       timeout: 10s
       retries: 50
@@ -45,7 +45,7 @@ services:
   mongo1:
     image: edfialliance/meadowlark-mongo:latest
     container_name: ml-mongo1
-    domainname: meadowlark
+    domainname: ${ED_FI_DOMAIN_NAME}
     hostname: ml-mongo1
     ports:
       - 27017:27017
@@ -66,7 +66,7 @@ services:
   opensearch:
     image: edfialliance/meadowlark-opensearch:latest
     container_name: ml-opensearch1
-    domainname: meadowlark
+    domainname: ${ED_FI_DOMAIN_NAME}
     hostname: ml-opensearch1
     environment:
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
@@ -84,7 +84,7 @@ services:
       - 9200:9200
     restart: unless-stopped
     healthcheck:
-      test: curl -s http://meadowlark.southcentralus.azurecontainer.io:9200/_cat/health >/dev/null || exit 1
+      test: curl -s http://${ED_FI_DOMAIN_NAME}.${AZURE_REGION}.azurecontainer.io:9200/_cat/health >/dev/null || exit 1
       interval: 30s
       timeout: 10s
       retries: 50
