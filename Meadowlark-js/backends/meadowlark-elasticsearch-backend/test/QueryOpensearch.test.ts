@@ -13,30 +13,30 @@ import {
   TraceId,
   ResourceInfo,
 } from '@edfi/meadowlark-core';
-// import { TransportRequestCallback, TransportRequestParams, TransportRequestOptions } from '@elastic/transport';
+// import { /* TransportRequestCallback, */ TransportRequestParams, TransportRequestOptions } from '@elastic/transport';
 import { queryDocuments, indexFromResourceInfo } from '../src/repository/QueryElasticsearch';
 
+const resourceInfo: ResourceInfo = {
+  projectName: 'ed-fi',
+  resourceName: 'student',
+  isDescriptor: false,
+  resourceVersion: '3.3.1-b',
+  allowIdentityUpdates: false,
+};
+
 describe('when querying for students', () => {
-  const setupMockRequestHappyPath = (uniqueIds: string[]): Client => {
+  const setupMockRequestHappyPath = (uniqueIds: string[], matches: any[]): Client => {
     const mock = new Mock();
     const datarows = uniqueIds.map((x) => ({ _source: { studentUniqueId: x, info: `{ "studentUniqueId": "${x}" }` } }));
-    const projectName = 'ed-fi';
-    const resourceVersion = '3.3.1-b';
-    const resourceName = 'student';
-    const index = indexFromResourceInfo({
-      projectName,
-      resourceVersion,
-      resourceName,
-    } as ResourceInfo);
 
     mock.add(
       {
         method: 'POST',
-        path: `/${index}/_search`,
+        path: `/${indexFromResourceInfo(resourceInfo)}/_search`,
         body: {
           query: {
             bool: {
-              must: [],
+              must: matches,
             },
           },
           sort: [{ _doc: { order: 'asc' } }],
@@ -63,13 +63,7 @@ describe('when querying for students', () => {
     paginationParameters: PaginationParameters,
     clientId = 'hi',
   ): QueryRequest => ({
-    resourceInfo: {
-      projectName: 'ed-fi',
-      resourceName: 'student',
-      isDescriptor: false,
-      resourceVersion: '3.3.1-b',
-      allowIdentityUpdates: false,
-    },
+    resourceInfo,
     queryParameters,
     paginationParameters,
     security: { authorizationStrategy, clientId },
@@ -79,7 +73,7 @@ describe('when querying for students', () => {
   describe('given there are no students', () => {
     it('should return an empty array', async () => {
       // Arrange
-      const client = setupMockRequestHappyPath([]);
+      const client = setupMockRequestHappyPath([], []);
       const request = setupQueryRequest({ type: 'FULL_ACCESS' }, {}, {});
 
       // Act
@@ -99,7 +93,7 @@ describe('when querying for students', () => {
         const studentUniqueIdTwo = 'two';
 
         beforeAll(async () => {
-          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
+          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], []);
           const request = setupQueryRequest(authorizationStrategy, {}, {});
 
           queryResult = await queryDocuments(request, client);
@@ -118,52 +112,60 @@ describe('when querying for students', () => {
         });
       });
 
-      // describe('given two query terms', () => {
-      //   const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
-      //   let queryResult: QueryResult;
-      //   const studentUniqueIdOne = 'one';
-      //   const studentUniqueIdTwo = 'two';
-      //   let spyOnRequest: jest.SpyInstance<
-      //     TransportRequestCallback,
-      //     [
-      //       params: TransportRequestParams,
-      //       options?: TransportRequestOptions | undefined,
-      //       callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-      //     ]
-      //   >;
-      //   const birthCity = 'a';
-      //   const birthDate = '2022-07-28';
-      //   const expectedQuery =
-      //     '{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = \'a\' AND birthDate = \'2022-07-28\' ORDER BY _doc"}';
+      describe('given two query terms', () => {
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
+        let queryResult: QueryResult;
+        const studentUniqueIdOne = 'one';
+        const studentUniqueIdTwo = 'two';
+        const matches = [
+          {
+            match: { birthCity: 'a' },
+          },
+          {
+            match: { birthDate: '2022-07-28' },
+          },
+        ];
+        let spyOnRequest: jest.SpyInstance;
+        const birthCity = 'a';
+        const birthDate = '2022-07-28';
+        const expectedQuery = {
+          from: undefined,
+          query: {
+            bool: {
+              must: matches,
+            },
+          },
+          size: undefined,
+          sort: [{ _doc: { order: 'asc' } }],
+        };
+        beforeAll(async () => {
+          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], matches);
+          const request = setupQueryRequest(authorizationStrategy, { birthCity, birthDate }, {});
 
-      //   beforeAll(async () => {
-      //     const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-      //     const request = setupQueryRequest(authorizationStrategy, { birthCity, birthDate }, {});
+          spyOnRequest = jest.spyOn(client.transport, 'request');
 
-      //     spyOnRequest = jest.spyOn(client.transport, 'request');
+          queryResult = await queryDocuments(request, client);
+        });
 
-      //     queryResult = await queryDocuments(request, client);
-      //   });
+        it('should return two students', async () => {
+          expect(queryResult.documents.length).toBe(2);
+        });
 
-      //   it('should return two students', async () => {
-      //     expect(queryResult.documents.length).toBe(2);
-      //   });
+        it('should return the first student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
+        });
 
-      //   it('should return the first student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-      //   });
+        it('should return the second student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
+        });
 
-      //   it('should return the second student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-      //   });
-
-      //   it('should have used the correct SQL query', async () => {
-      //     expect(spyOnRequest.mock.calls.length).toBe(1);
-      //     expect(spyOnRequest.mock.calls[0].length).toBe(1);
-      //     const { body } = spyOnRequest.mock.calls[0][0];
-      //     expect(body).toBe(expectedQuery);
-      //   });
-      // });
+        it('should have used the correct SQL query', async () => {
+          expect(spyOnRequest.mock.calls.length).toBe(1);
+          expect(spyOnRequest.mock.calls[0].length).toBe(1);
+          const { body } = spyOnRequest.mock.calls[0][0];
+          expect(body).toEqual(expectedQuery);
+        });
+      });
 
       // describe('given page limits', () => {
       //   const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
