@@ -43,7 +43,7 @@ performance, Pipeclean Tests and Volume Tests.
 
 - Follow steps to [setup performance suite](./SETUP-PERFORMANCE-SUITE.md).
 - Go to /src/edfi_performance_test folder and run `poetry install`.
-- Create a user in meadowlark with the role of `assessment` (required to be able to insert the resources). Save key and secret.
+- Create a user in meadowlark with the role of `vendor`. Save key and secret.
 - Create a .env file based on
   /src/edfi_paging_test/edfi_paging_test/.env.example with your endpoint, and the previously created key
   and secret. Set the values required for Meadowlark.
@@ -57,6 +57,7 @@ List of issues:
 
 - [RND-583](https://tracker.ed-fi.org/browse/RND-583)
 - [RND-584](https://tracker.ed-fi.org/browse/RND-584)
+- [RND-585](https://tracker.ed-fi.org/browse/RND-585)
 - [PERF-298](https://tracker.ed-fi.org/browse/PERF-298)
 
 After fixing this errors, the tests should be executed as part of [RND-580](https://tracker.ed-fi.org/browse/RND-580)
