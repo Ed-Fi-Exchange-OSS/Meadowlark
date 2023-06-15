@@ -52,16 +52,22 @@ command line since it is not possible to read a .env file. Additionally, it is
 not possible to add all containers into the same container group, it must be one
 container per group.
 
-```Shell
+```pwsh
 # Login to Azure
 az login
 
 $resourceGroup={resource group name}
 
+# Dns labels must be unique per Azure subscription.
+# These are examples of different values
+$meadowlarkDnsLabel="meadowlark-1"
+$mongoDnsLabel="meadowlark-2"
+$openSearchDnsLabel="meadowlark-3"
+
 # Create the mongo container
 az container create --resource-group $resourceGroup -n ml-mongo `
     --image edfialliance/meadowlark-mongo:latest `
-    --ports 27017 --dns-name-label ml-mongo `
+    --ports 27017 --dns-name-label $mongoDnsLabel `
     --command-line "mongod --replSet rs0"
 
 # Initialize mongodb replica set
@@ -71,12 +77,12 @@ az container exec --resource-group $resourceGroup -n ml-mongo `
 # Create OpenSearch container
 az container create --resource-group $resourceGroup -n ml-opensearch `
     --image edfialliance/meadowlark-opensearch:latest `
-    --ports 9200 --dns-name-label ml-opensearch
+    --ports 9200 --dns-name-label $openSearchDnsLabel
 
 # Define variables
 $signingKey="<run `openssl rand -base64 256` to create a key>"
-$openSearchUrl="http://ml-opensearch.southcentralus.azurecontainer.io:9200"
-$mongoUri="mongodb://ml-mongo.southcentralus.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true"
+$openSearchUrl="http://${openSearchDnsLabel}.southcentralus.azurecontainer.io:9200"
+$mongoUri="mongodb://${mongoDnsLabel}.southcentralus.azurecontainer.io:27017/?replicaSet=rs0\&directConnection=true"
 $documentStore="@edfi/meadowlark-mongodb-backend"
 $queryHandler="@edfi/meadowlark-opensearch-backend"
 $listenerPlugin="@edfi/meadowlark-opensearch-backend"
@@ -85,8 +91,8 @@ $authorizationPlugin="@edfi/meadowlark-mongodb-backend"
 # Create meadowlark container
 az container create --resource-group $resourceGroup -n ml-api `
     --image edfialliance/meadowlark-ed-fi-api:pre --ports 3000 `
-    --dns-name-label meadowlark `
-    --environment-variables OAUTH_SIGNING_KEY=$signingKey OAUTH_HARD_CODED_CREDENTIALS_ENABLED=true OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/token OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://meadowlark.southcentralus.azurecontainer.io:3000/local/oauth/verify OPENSEARCH_USERNAME=admin OPENSEARCH_PASSWORD=admin OPENSEARCH_ENDPOINT=$openSearchUrl OPENSEARCH_REQUEST_TIMEOUT=10000 DOCUMENT_STORE_PLUGIN=$documentStore QUERY_HANDLER_PLUGIN=$queryHandler LISTENER1_PLUGIN=$listenerPlugin FASTIFY_RATE_LIMIT=false FASTIFY_PORT=3000 FASTIFY_NUM_THREADS=10 MEADOWLARK_STAGE=local LOG_LEVEL=info IS_LOCAL=false AUTHORIZATION_STORE_PLUGIN=$authorizationPlugin BEGIN_ALLOWED_SCHOOL_YEAR=2022 END_ALLOWED_SCHOOL_YEAR=2034 ALLOW_TYPE_COERCION=true ALLOW__EXT_PROPERTY=true MONGO_URI=$mongoUri
+    --dns-name-label $meadowlarkDnsLabel `
+    --environment-variables OAUTH_SIGNING_KEY=$signingKey OAUTH_HARD_CODED_CREDENTIALS_ENABLED=true OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://${meadowlarkDnsLabel}.southcentralus.azurecontainer.io:3000/local/oauth/token OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://${meadowlarkDnsLabel}.southcentralus.azurecontainer.io:3000/local/oauth/verify OPENSEARCH_USERNAME=admin OPENSEARCH_PASSWORD=admin OPENSEARCH_ENDPOINT=$openSearchUrl OPENSEARCH_REQUEST_TIMEOUT=10000 DOCUMENT_STORE_PLUGIN=$documentStore QUERY_HANDLER_PLUGIN=$queryHandler LISTENER1_PLUGIN=$listenerPlugin FASTIFY_RATE_LIMIT=false FASTIFY_PORT=3000 FASTIFY_NUM_THREADS=10 MEADOWLARK_STAGE=local LOG_LEVEL=info IS_LOCAL=false AUTHORIZATION_STORE_PLUGIN=$authorizationPlugin BEGIN_ALLOWED_SCHOOL_YEAR=2022 END_ALLOWED_SCHOOL_YEAR=2034 ALLOW_TYPE_COERCION=true ALLOW__EXT_PROPERTY=true MONGO_URI=$mongoUri
 ```
 
 > **Warning** Not ready for production usage. This example is using a single
