@@ -56,14 +56,6 @@ export async function deleteDocumentByDocumentUuid(
       // Find any documents that reference this document, either it's own meadowlarkId or an alias
       const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIds(client, documentAliasMeadowlarkIds);
 
-      if (referenceResult.length === 0) {
-        await rollbackTransaction(client);
-        const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid: Error determining documents referenced by ${documentUuid}, a null result set was returned`;
-        deleteResult.failureMessage = errorMessage;
-        Logger.error(errorMessage, traceId);
-        return deleteResult;
-      }
-
       const references = referenceResult.filter((ref) => ref !== meadowlarkId);
 
       // If this document is referenced, it's a validation failure
