@@ -60,9 +60,9 @@ $resourceGroup={resource group name}
 
 # Dns labels must be unique per Azure subscription.
 # These are examples of different values
-$meadowlarkDnsLabel="meadowlark-1"
-$mongoDnsLabel="meadowlark-2"
-$openSearchDnsLabel="meadowlark-3"
+$meadowlarkDnsLabel={meadowlark dns}
+$mongoDnsLabel={mongo dns}
+$openSearchDnsLabel={opensearch dns}
 
 # Create the mongo container
 az container create --resource-group $resourceGroup -n ml-mongo `
@@ -80,9 +80,10 @@ az container create --resource-group $resourceGroup -n ml-opensearch `
     --ports 9200 --dns-name-label $openSearchDnsLabel
 
 # Define variables
+# Replace with signing key
 $signingKey="<run `openssl rand -base64 256` to create a key>"
+$mongoUri='"mongodb://'+$mongoDnsLabel+'.southcentralus.azurecontainer.io:27017/?replicaSet=rs0&directConnection=true"'
 $openSearchUrl="http://${openSearchDnsLabel}.southcentralus.azurecontainer.io:9200"
-$mongoUri="mongodb://${mongoDnsLabel}.southcentralus.azurecontainer.io:27017/?replicaSet=rs0\&directConnection=true"
 $documentStore="@edfi/meadowlark-mongodb-backend"
 $queryHandler="@edfi/meadowlark-opensearch-backend"
 $listenerPlugin="@edfi/meadowlark-opensearch-backend"
