@@ -87,5 +87,6 @@ export const NoMeadowlarkDocument = Object.freeze({
 });
 
 export function isMeadowlarkDocumentEmpty(meadowlarkDocument: MeadowlarkDocument): boolean {
-  return meadowlarkDocument === NoMeadowlarkDocument;
+  const noMeadowlarkDocument = NoMeadowlarkDocument;
+  return meadowlarkDocument === noMeadowlarkDocument;
 }

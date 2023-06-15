@@ -29,7 +29,7 @@ export async function rollbackTransaction(client: PoolClient) {
  * @param client database connector client.
  */
 export async function commitTransaction(client: PoolClient) {
-  await client.query('TRANSACTION');
+  await client.query('COMMIT');
 }
 
 /**
