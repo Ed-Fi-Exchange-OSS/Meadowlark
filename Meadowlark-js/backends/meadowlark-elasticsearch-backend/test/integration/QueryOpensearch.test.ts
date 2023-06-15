@@ -143,8 +143,8 @@ describe('When querying for documents', () => {
       it('should return error message', async () => {
         const result = await queryDocuments(setupQueryRequest({ lastSure: 'Last' }, {}), client);
 
-        expect(result.response).toEqual('QUERY_FAILURE_INVALID_QUERY');
-        expect(result.failureMessage).toContain('Unknown column [lastSure], did you mean [lastSurname]?');
+        expect(result.response).toEqual('QUERY_SUCCESS');
+        expect(result.totalCount).toEqual(0);
         expect(result.documents).toHaveLength(0);
       });
     });
@@ -191,34 +191,34 @@ describe('When querying for documents', () => {
       });
     });
 
-    // describe('when querying with limit and offset', () => {
-    //   it('should return value', async () => {
-    //     const result = await queryDocuments(setupQueryRequest({}, { limit: 1, offset: 1 }), client);
+    describe('when querying with limit and offset', () => {
+      it('should return value', async () => {
+        const result = await queryDocuments(setupQueryRequest({}, { limit: 1, offset: 1 }), client);
 
-    //     expect(result.response).toEqual('QUERY_SUCCESS');
-    //     expect(result.totalCount).toEqual(2);
-    //     expect(result.documents).toHaveLength(1);
-    //     expect(result.documents[0]).toEqual({ ...student2, id: student2DocumentUuid });
-    //   });
-    // });
+        expect(result.response).toEqual('QUERY_SUCCESS');
+        expect(result.totalCount).toEqual(2);
+        expect(result.documents).toHaveLength(1);
+        expect(result.documents[0]).toEqual({ ...student2, id: student2DocumentUuid });
+      });
+    });
 
-    // describe('when querying with parameters and offset', () => {
-    //   it('should return value', async () => {
-    //     const result = await queryDocuments(
-    //       setupQueryRequest({ firstName: student1.firstName }, { limit: 2, offset: 1 }),
-    //       client,
-    //     );
+    describe('when querying with parameters and offset', () => {
+      it('should return value', async () => {
+        const result = await queryDocuments(
+          setupQueryRequest({ firstName: student1.firstName }, { limit: 2, offset: 1 }),
+          client,
+        );
 
-    //     expect(result.response).toEqual('QUERY_SUCCESS');
-    //     expect(result.totalCount).toEqual(1);
-    //     expect(result.documents).toHaveLength(0);
-    //   });
-    // });
+        expect(result.response).toEqual('QUERY_SUCCESS');
+        expect(result.totalCount).toEqual(1);
+        expect(result.documents).toHaveLength(0);
+      });
+    });
 
     describe('when querying with extra characters', () => {
       it("shouldn't return values", async () => {
         const result = await queryDocuments(
-          setupQueryRequest({ firstName: 'student1.firstName%20or%20studentUniqueId%20is%20not%20null%20%23' }, {}),
+          setupQueryRequest({ firstName: "student1.firstName'%20or%20studentUniqueId%20is%20not%20null%20%23" }, {}),
           client,
         );
 

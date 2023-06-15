@@ -13,8 +13,6 @@ const moduleName = 'elasticsearch.repository.QueryElasticsearch';
 
 /**
  * Returns ElasticSearch index name from the given ResourceInfo.
- *
- * ElasticSearch indexes are required to be lowercase only, with no pound signs or periods.
  */
 export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
   const adjustedResourceName = resourceInfo.isDescriptor
@@ -27,58 +25,19 @@ export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
 }
 
 /**
- * Sanitizes input by escaping single all apostrophes. If \' is present, then someone is trying to evade the sanitization. In
- * that case, replace the search term with an empty string.
+ * DSL querying
  */
-function sanitize(input: string): string {
-  if (input.indexOf(`\\'`) > -1) {
-    return '';
-  }
-
-  return input.replaceAll(`'`, `\\'`);
-}
-
-/**
- * Convert query string parameters from http request to ElasticSearch
- * SQL WHERE conditions. Returns empty string if there are none.
- */
-function whereConditionsFrom(queryParameters: object): string {
-  return (
-    Object.entries(queryParameters)
-      // eslint-disable-next-line no-useless-escape
-      .map(([field, value]) => `${field} = \'${sanitize(value)}\'`)
-      .join(' AND ')
-  );
-}
-
-/**
- * This mechanism of SQL querying is specific to ElasticSearch (vs Elasticsearch)
- */
-async function performSqlQuery(client: Client, query: string): Promise<any> {
-  return client.sql.query({
-    query,
+async function performDslQuery(client: Client, path: string, query: any, size: number, from: number): Promise<any> {
+  return client.transport.request({
+    method: 'POST',
+    path: `/${path}/_search`,
+    body: {
+      query,
+      sort: [{ _doc: { order: 'asc' } }],
+      size,
+      from,
+    },
   });
-}
-
-/**
- * Returns well-formed WHERE clause from existing where clause and new clause
- */
-function appendedWhereClause(existingWhereClause: string, newWhereClause: string): string {
-  if (existingWhereClause === '') return newWhereClause;
-  return `${existingWhereClause} AND ${newWhereClause}`;
-}
-
-/**
- * Returns number of records.
- */
-function getCountQuery(fromClause: string, whereClause: string): string {
-  let query = `SELECT count(*) as recordCount FROM "${fromClause}"`;
-
-  if (whereClause !== '') {
-    query += ` WHERE ${whereClause}`;
-  }
-
-  return query;
 }
 
 /**
@@ -92,38 +51,48 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   let documents: any = [];
   let recordCount: number;
   try {
-    let query = `SELECT info FROM "${indexFromResourceInfo(resourceInfo)}"`;
-
-    let whereClause: string = '';
+    const matches: any[] = [];
 
     // API client requested filters
     if (Object.entries(queryParameters).length > 0) {
-      whereClause = whereConditionsFrom(queryParameters);
+      Object.entries(queryParameters).forEach(([key, value]) => {
+        matches.push({
+          match: { [key]: value },
+        });
+      });
     }
 
     // Ownership-based security filter - if the resource is a descriptor we will ignore security
     if (request.security.authorizationStrategy.type === 'OWNERSHIP_BASED' && !resourceInfo.isDescriptor) {
-      const securityWhereClause = `createdBy = '${request.security.clientId}'`;
-      whereClause = appendedWhereClause(whereClause, securityWhereClause);
+      matches.push({
+        match: {
+          createdBy: `"${request.security.clientId}"`,
+        },
+      });
     }
 
-    if (whereClause !== '') {
-      query += ` WHERE ${whereClause}`;
-    }
-
-    query += " ORDER BY '_doc'";
-
-    if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
-    if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
+    const query = {
+      bool: {
+        must: matches,
+      },
+    };
 
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
-    const body = await performSqlQuery(client, query);
-    const countBody = await performSqlQuery(client, getCountQuery(indexFromResourceInfo(resourceInfo), whereClause));
+    const body = await performDslQuery(
+      client,
+      indexFromResourceInfo(resourceInfo),
+      query,
+      paginationParameters.limit as number,
+      paginationParameters.offset as number,
+    );
 
-    recordCount = +countBody.rows[0][0];
+    recordCount = body.hits.total.value;
 
-    documents = body.rows.map((datarow) => JSON.parse(datarow));
+    if (recordCount > 0) {
+      // eslint-disable-next-line no-underscore-dangle
+      documents = body.hits.hits.map((datarow) => JSON.parse(datarow._source.info));
+    }
 
     if (isDebugEnabled()) {
       const idsForLogging: string[] = documents.map((document) => document.id);
