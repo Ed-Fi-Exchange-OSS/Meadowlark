@@ -72,23 +72,18 @@ export async function deleteDocumentByDocumentUuid(
 
         // Get the information of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref);
-        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, referenceIds);
+        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(
+          client,
+          referenceIds,
+        );
 
-        if (referringDocuments == null) {
+        if (blockingDocuments == null) {
           await client.query('ROLLBACK');
           const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid Error retrieving documents referenced by ${meadowlarkId}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
           Logger.error(errorMessage, traceId);
           return deleteResult;
         }
-
-        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-          documentUuid: document.document_uuid,
-          meadowlarkId: document.meadowlark_id,
-          resourceName: document.resource_name,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
 
         deleteResult = {
           response: 'DELETE_FAILURE_REFERENCE',

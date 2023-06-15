@@ -67,15 +67,9 @@ export async function upsertDocument(
           documentInfo.superclassInfo,
         ) as MeadowlarkId;
 
-        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [superclassAliasId]);
-
-        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-          resourceName: document.resource_name,
-          documentUuid: document.document_uuid,
-          meadowlarkId: document.meadowlark_id,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
+        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+          superclassAliasId,
+        ]);
 
         await client.query('ROLLBACK');
         return {
@@ -106,15 +100,9 @@ export async function upsertDocument(
           traceId,
         );
 
-        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [meadowlarkId]);
-
-        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-          resourceName: document.resource_name,
-          documentUuid: document.document_uuid,
-          meadowlarkId: document.meadowlark_id,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
+        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+          meadowlarkId,
+        ]);
 
         await client.query('ROLLBACK');
         return {

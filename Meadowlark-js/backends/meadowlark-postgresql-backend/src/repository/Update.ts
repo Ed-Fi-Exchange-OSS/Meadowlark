@@ -81,15 +81,9 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           traceId,
         );
 
-        const referringDocuments = await findReferringDocumentInfoForErrorReportingSql(client, [existingMeadowlarkId]);
-
-        const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
-          resourceName: document.resource_name,
-          meadowlarkId: document.meadowlark_id,
-          documentUuid: document.document_uuid,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
+        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+          existingMeadowlarkId,
+        ]);
 
         updateResult = {
           response: 'UPDATE_FAILURE_REFERENCE',

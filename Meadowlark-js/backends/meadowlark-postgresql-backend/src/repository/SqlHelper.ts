@@ -2,7 +2,7 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
+import { BlockingDocument, DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
 import { PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
 import { MeadowlarkDocument, getEmptyMeadowlarkDocument } from '../model/MeadowlarkDocument';
@@ -243,16 +243,26 @@ export async function validateReferenceExistenceByDocumentUuidSql(
 export async function findReferringDocumentInfoForErrorReportingSql(
   client: PoolClient,
   referringMeadowlarkIds: MeadowlarkId[],
-): Promise<MeadowlarkDocument[]> {
+): Promise<BlockingDocument[]> {
   const querySelect = format(
     `SELECT project_name, resource_name, resource_version, meadowlark_id, document_uuid FROM meadowlark.documents WHERE meadowlark_id IN (%L) LIMIT 5`,
     referringMeadowlarkIds,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
   if (queryResult == null) {
-    return null as unknown as MeadowlarkDocument[];
+    return null as unknown as BlockingDocument[];
   }
-  return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows : []) as MeadowlarkDocument[];
+  return (
+    (queryResult?.rowCount ?? 0) > 0
+      ? queryResult.rows.map((document) => ({
+          resourceName: document.resource_name,
+          meadowlarkId: document.meadowlark_id,
+          documentUuid: document.document_uuid,
+          projectName: document.project_name,
+          resourceVersion: document.resource_version,
+        }))
+      : []
+  ) as BlockingDocument[];
 }
 
 // SQL for inserts/updates/upserts
