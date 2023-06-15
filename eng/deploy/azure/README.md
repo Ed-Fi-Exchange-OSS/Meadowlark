@@ -68,7 +68,7 @@ $openSearchDnsLabel={opensearch dns}
 az container create --resource-group $resourceGroup -n ml-mongo `
     --image edfialliance/meadowlark-mongo:latest `
     --ports 27017 --dns-name-label $mongoDnsLabel `
-    --command-line "mongod --replSet rs0"
+    --command-line "mongod --bind_ip_all --replSet rs0"
 
 # Initialize mongodb replica set
 az container exec --resource-group $resourceGroup -n ml-mongo `
