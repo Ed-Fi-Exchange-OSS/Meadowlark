@@ -5,7 +5,7 @@
 
 /* eslint-disable no-underscore-dangle */
 
-import { UpdateResult, UpdateRequest, BlockingDocument } from '@edfi/meadowlark-core';
+import { UpdateResult, UpdateRequest, ReferringDocumentInfo } from '@edfi/meadowlark-core';
 import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
@@ -62,7 +62,7 @@ async function insertUpdatedDocument(
         traceId,
         'Got "INSERT_FAILURE_REFERENCE" from upsertDocumentTransaction() but references should not have been validated',
       );
-      return { response: 'UPDATE_FAILURE_REFERENCE', blockingDocuments: upsertResult.blockingDocuments };
+      return { response: 'UPDATE_FAILURE_REFERENCE', referringDocumentInfo: upsertResult.referringDocumentInfo };
     case 'UPDATE_FAILURE_REFERENCE':
       // Something unexpected happened. There should have been a prior delete, and validation should not have occurred.
       Logger.error(
@@ -70,9 +70,9 @@ async function insertUpdatedDocument(
         traceId,
         'Got "UPDATE_FAILURE_REFERENCE" from upsertDocumentTransaction() but document should have been deleted first and references should not have been validated',
       );
-      return { response: 'UPDATE_FAILURE_REFERENCE', blockingDocuments: upsertResult.blockingDocuments };
+      return { response: 'UPDATE_FAILURE_REFERENCE', referringDocumentInfo: upsertResult.referringDocumentInfo };
     case 'INSERT_FAILURE_CONFLICT':
-      return { response: 'UPDATE_FAILURE_CONFLICT', blockingDocuments: upsertResult.blockingDocuments };
+      return { response: 'UPDATE_FAILURE_CONFLICT', referringDocumentInfo: upsertResult.referringDocumentInfo };
     default:
       return { response: 'UNKNOWN_FAILURE', failureMessage: upsertResult.failureMessage };
   }
@@ -261,7 +261,7 @@ async function checkForInvalidReferences(
     .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
     .toArray();
 
-  const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+  const referringDocumentInfo: ReferringDocumentInfo[] = referringDocuments.map((document) => ({
     documentUuid: document.documentUuid,
     meadowlarkId: document._id,
     resourceName: document.resourceName,
@@ -272,7 +272,7 @@ async function checkForInvalidReferences(
   return {
     response: 'UPDATE_FAILURE_REFERENCE',
     failureMessage: { message: 'Reference validation failed', failures },
-    blockingDocuments,
+    referringDocumentInfo,
   };
 }
 

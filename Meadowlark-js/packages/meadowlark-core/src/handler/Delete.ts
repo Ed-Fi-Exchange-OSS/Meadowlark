@@ -57,7 +57,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     }
 
     if (result.response === 'DELETE_FAILURE_REFERENCE') {
-      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
 
       if (isDebugEnabled()) {
         writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 409, blockingUris.join(','));

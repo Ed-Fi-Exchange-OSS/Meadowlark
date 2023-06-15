@@ -10,7 +10,7 @@ import {
   DocumentReference,
   getMeadowlarkIdForDocumentReference,
   getMeadowlarkIdForSuperclassInfo,
-  BlockingDocument,
+  ReferringDocumentInfo,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
@@ -81,14 +81,14 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           traceId,
         );
 
-        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(client, [
           existingMeadowlarkId,
         ]);
 
         updateResult = {
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: { error: { message: 'Reference validation failed', failures } },
-          blockingDocuments,
+          referringDocumentInfo,
         };
         await client.query('ROLLBACK');
         return updateResult;

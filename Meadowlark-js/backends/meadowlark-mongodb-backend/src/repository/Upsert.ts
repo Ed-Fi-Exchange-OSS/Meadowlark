@@ -10,7 +10,7 @@ import {
   UpsertResult,
   UpsertRequest,
   getMeadowlarkIdForSuperclassInfo,
-  BlockingDocument,
+  ReferringDocumentInfo,
   DocumentUuid,
   generateDocumentUuid,
   MeadowlarkId,
@@ -63,7 +63,7 @@ export async function upsertDocumentTransaction(
       return {
         response: 'INSERT_FAILURE_CONFLICT',
         failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
-        blockingDocuments: [
+        referringDocumentInfo: [
           {
             documentUuid: superclassAliasMeadowlarkIdInUse.documentUuid,
             meadowlarkId: superclassAliasMeadowlarkIdInUse._id,
@@ -96,7 +96,7 @@ export async function upsertDocumentTransaction(
         .find(onlyDocumentsReferencing([meadowlarkId]), limitFive(session))
         .toArray();
 
-      const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+      const referringDocumentInfo: ReferringDocumentInfo[] = referringDocuments.map((document) => ({
         documentUuid: document.documentUuid,
         meadowlarkId: document._id,
         resourceName: document.resourceName,
@@ -107,7 +107,7 @@ export async function upsertDocumentTransaction(
       return {
         response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
         failureMessage: { error: { message: 'Reference validation failed', failures } },
-        blockingDocuments,
+        referringDocumentInfo,
       };
     }
   }

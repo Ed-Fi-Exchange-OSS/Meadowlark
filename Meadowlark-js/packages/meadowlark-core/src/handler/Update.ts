@@ -62,7 +62,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
-      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'reference error');
       return {
         body: R.is(String, result.failureMessage) ? { error: result.failureMessage, blockingUris } : result.failureMessage,
@@ -95,7 +95,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_CONFLICT') {
-      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.blockingDocuments);
+      const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, blockingUris.join(','));
       return {
         body: { error: { message: result.failureMessage ?? '', blockingUris } },

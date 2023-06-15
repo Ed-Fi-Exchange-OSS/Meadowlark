@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi/meadowlark-utilities';
-import type { DeleteResult, DeleteRequest, BlockingDocument, MeadowlarkId } from '@edfi/meadowlark-core';
+import type { DeleteResult, DeleteRequest, ReferringDocumentInfo, MeadowlarkId } from '@edfi/meadowlark-core';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByDocumentUuIdSql,
@@ -72,12 +72,12 @@ export async function deleteDocumentByDocumentUuid(
 
         // Get the information of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref);
-        const blockingDocuments: BlockingDocument[] = await findReferringDocumentInfoForErrorReportingSql(
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(
           client,
           referenceIds,
         );
 
-        if (blockingDocuments == null) {
+        if (referringDocumentInfo == null) {
           await client.query('ROLLBACK');
           const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid Error retrieving documents referenced by ${meadowlarkId}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
@@ -87,7 +87,7 @@ export async function deleteDocumentByDocumentUuid(
 
         deleteResult = {
           response: 'DELETE_FAILURE_REFERENCE',
-          blockingDocuments,
+          referringDocumentInfo,
         };
         await client.query('ROLLBACK');
         return deleteResult;

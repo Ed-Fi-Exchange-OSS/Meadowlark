@@ -2,7 +2,7 @@
 // Licensed to the Ed-Fi Alliance under one or more agreements.
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
-import { BlockingDocument, DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
+import { ReferringDocumentInfo, DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
 import { PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
 import { MeadowlarkDocument, getEmptyMeadowlarkDocument } from '../model/MeadowlarkDocument';
@@ -243,14 +243,14 @@ export async function validateReferenceExistenceByDocumentUuidSql(
 export async function findReferringDocumentInfoForErrorReportingSql(
   client: PoolClient,
   referringMeadowlarkIds: MeadowlarkId[],
-): Promise<BlockingDocument[]> {
+): Promise<ReferringDocumentInfo[]> {
   const querySelect = format(
     `SELECT project_name, resource_name, resource_version, meadowlark_id, document_uuid FROM meadowlark.documents WHERE meadowlark_id IN (%L) LIMIT 5`,
     referringMeadowlarkIds,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
   if (queryResult == null) {
-    return null as unknown as BlockingDocument[];
+    return null as unknown as ReferringDocumentInfo[];
   }
   return (
     (queryResult?.rowCount ?? 0) > 0
@@ -262,7 +262,7 @@ export async function findReferringDocumentInfoForErrorReportingSql(
           resourceVersion: document.resource_version,
         }))
       : []
-  ) as BlockingDocument[];
+  ) as ReferringDocumentInfo[];
 }
 
 // SQL for inserts/updates/upserts

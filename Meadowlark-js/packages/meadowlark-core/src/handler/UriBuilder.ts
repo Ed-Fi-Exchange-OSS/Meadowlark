@@ -6,7 +6,7 @@
 import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-api-schema';
 import { PathComponents } from '../model/PathComponents';
 import { FrontendRequest } from './FrontendRequest';
-import { BlockingDocument } from '../message/BlockingDocument';
+import { ReferringDocumentInfo } from '../message/ReferringDocumentInfo';
 import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
 
 /**
@@ -19,10 +19,13 @@ export function resourceUriFrom(pathComponents: PathComponents, documentUuid: st
 /**
  * For generating problem details when a document references the document to be deleted.
  */
-export function blockingDocumentsToUris(frontendRequest: FrontendRequest, blockingDocuments?: BlockingDocument[]): string[] {
+export function blockingDocumentsToUris(
+  frontendRequest: FrontendRequest,
+  referringDocumentInfo?: ReferringDocumentInfo[],
+): string[] {
   const result: string[] = [];
-  if (blockingDocuments) {
-    blockingDocuments.forEach((document) => {
+  if (referringDocumentInfo) {
+    referringDocumentInfo.forEach((document) => {
       let uri = resourceUriFrom(
         {
           version: versionAbbreviationFor(document.resourceVersion),

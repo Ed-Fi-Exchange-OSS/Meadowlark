@@ -6,9 +6,9 @@
 import { DocumentUuid, MeadowlarkId } from '../model/BrandedTypes';
 
 /**
- * Information on a document that is blocking the delete of another document for referential integrity reasons
+ * Information on a document that is referring another document for referential integrity reasons
  */
-export type BlockingDocument = {
+export type ReferringDocumentInfo = {
   projectName: string;
   resourceVersion: string;
   resourceName: string;
