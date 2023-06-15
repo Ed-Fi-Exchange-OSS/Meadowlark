@@ -23,10 +23,7 @@ import {
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
-import {
-  findDocumentByMeadowlarkIdSql,
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
-} from '../../src/repository/SqlHelper';
+import { findDocumentByMeadowlarkId, findAliasMeadowlarkIdsForDocumentByMeadowlarkId } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { isMeadowlarkDocumentEmpty, MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -78,7 +75,7 @@ describe('given the upsert of a new document', () => {
   });
 
   it('should exist in the db', async () => {
-    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(client, meadowlarkId);
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkId);
 
     expect(result.length).toBe(1);
   });
@@ -167,7 +164,7 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
   });
 
   it('should have the change in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, meadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
 
     expect(result.edfi_doc.call).toBe('two');
   });
@@ -226,7 +223,7 @@ describe('given an upsert of a new document that references a non-existent docum
   });
 
   it('should have inserted the document with an invalid reference in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     expect(result.document_identity.natural).toBe('upsert4');
   });
 });
@@ -307,7 +304,7 @@ describe('given an upsert of a new document that references an existing document
   });
 
   it('should have inserted the document with a valid reference in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     expect(result.document_identity.natural).toBe('upsert6');
   });
 });
@@ -410,7 +407,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   });
 
   it('should not have inserted the document with an invalid reference in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 });
@@ -497,7 +494,7 @@ describe('given an upsert of a subclass document when a different subclass has t
   });
 
   it('should not have inserted the document with the same superclass identity in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, sameSuperclassIdentityMeadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, sameSuperclassIdentityMeadowlarkId);
     expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 });
@@ -569,7 +566,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
@@ -670,7 +667,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
@@ -794,7 +791,7 @@ describe('given an update of a document with one existing and one non-existent r
   });
 
   it('should not have updated the document with an invalid reference in the db', async () => {
-    await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);

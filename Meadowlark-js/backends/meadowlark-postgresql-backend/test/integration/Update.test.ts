@@ -31,9 +31,9 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import {
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
-  findDocumentByDocumentUuidSql,
-  findDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkId,
+  findDocumentByDocumentUuid,
+  findDocumentByMeadowlarkId,
 } from '../../src/repository/SqlHelper';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
@@ -174,7 +174,7 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByDocumentUuidSql(client, resultDocumentUuid);
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
 
     expect(result.document_identity.natural).toBe('update2');
 
@@ -249,7 +249,7 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
@@ -354,7 +354,7 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
@@ -751,13 +751,13 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
-    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(client, meadowlarkId);
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkId);
 
     expect(result.length).toEqual(0);
   });
 
   it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
-    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(client, meadowlarkIdUpdated);
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkIdUpdated);
 
     expect(result.length).toEqual(1);
   });

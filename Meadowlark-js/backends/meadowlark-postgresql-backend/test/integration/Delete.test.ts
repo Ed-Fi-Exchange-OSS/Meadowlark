@@ -30,10 +30,10 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import {
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
-  findDocumentByDocumentUuidSql,
-  findDocumentByMeadowlarkIdSql,
-  findReferencingMeadowlarkIdsSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkId,
+  findDocumentByDocumentUuid,
+  findDocumentByMeadowlarkId,
+  findReferencingMeadowlarkIds,
 } from '../../src/repository/SqlHelper';
 import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../src/model/MeadowlarkDocument';
 
@@ -130,7 +130,7 @@ describe('given the delete of an existing document', () => {
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByDocumentUuidSql(client, documentUuid);
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
     expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 });
@@ -217,7 +217,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should still have the referenced document in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, referencedDocumentId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
     expect(docResult.document_identity.natural).toBe('delete5');
   });
 });
@@ -306,13 +306,13 @@ describe('given an delete of a document with an outbound reference only, with va
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, documentWithReferencesMeadowlarkId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
 
     expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 
   it('should have deleted the document alias in the db', async () => {
-    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
       client,
       documentWithReferencesMeadowlarkId,
     );
@@ -320,7 +320,7 @@ describe('given an delete of a document with an outbound reference only, with va
     expect(result.length).toEqual(0);
   });
   it('should have deleted the document reference in the db', async () => {
-    const result: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(client, [referencedDocumentId]);
+    const result: MeadowlarkId[] = await findReferencingMeadowlarkIds(client, [referencedDocumentId]);
 
     expect(result.length).toEqual(0);
   });
@@ -409,7 +409,7 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should not have the referenced document in the db', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, referencedDocumentId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
     expect(isMeadowlarkDocumentEmpty(docResult)).toEqual(true);
   });
 
@@ -513,7 +513,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   });
 
   it('should still have the referenced document in the db', async () => {
-    const result: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, referencedDocumentId);
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
     expect(result.document_identity.schoolId).toBe('123');
   });
 });

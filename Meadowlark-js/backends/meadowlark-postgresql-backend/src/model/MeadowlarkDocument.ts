@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity, MeadowlarkId, DocumentUuid } from '@edfi/meadowlark-core';
+import { DocumentIdentity, MeadowlarkId, NoDocumentIdentity, DocumentUuid } from '@edfi/meadowlark-core';
 
 export interface MeadowlarkDocumentId {
   /**
@@ -61,10 +61,31 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   created_by: string;
 }
 
-export function getEmptyMeadowlarkDocument(): MeadowlarkDocument {
-  return {} as MeadowlarkDocument;
+/**
+ * Creates a new empty newMeadowlarkDocument object
+ */
+export function newMeadowlarkDocument(): MeadowlarkDocument {
+  return {
+    meadowlark_id: undefined as unknown as MeadowlarkId,
+    document_uuid: undefined as unknown as DocumentUuid,
+    document_identity: NoDocumentIdentity,
+    project_name: '',
+    resource_name: '',
+    resource_version: '',
+    edfi_doc: null,
+    validated: false,
+    is_descriptor: false,
+    created_by: '',
+  };
 }
 
+/**
+ * The null object for DocumentInfo
+ */
+export const NoMeadowlarkDocument = Object.freeze({
+  ...newMeadowlarkDocument(),
+});
+
 export function isMeadowlarkDocumentEmpty(meadowlarkDocument: MeadowlarkDocument): boolean {
-  return Object.keys(meadowlarkDocument).length === 0;
+  return meadowlarkDocument === NoMeadowlarkDocument;
 }

@@ -9,10 +9,13 @@ import type { PoolClient, QueryResult } from 'pg';
 import {
   deleteDocumentByDocumentUuIdSql,
   deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
-  findReferringDocumentInfoForErrorReportingSql,
+  findReferringDocumentInfoForErrorReporting,
   deleteAliasesForDocumentByMeadowlarkIdSql,
-  findReferencingMeadowlarkIdsSql,
-  findAliasMeadowlarkIdsForDocumentByDocumentUuidSql,
+  findReferencingMeadowlarkIds,
+  findAliasMeadowlarkIdsForDocumentByDocumentUuid,
+  beginTransaction,
+  rollbackTransaction,
+  commitTransaction,
 } from './SqlHelper';
 import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
 
@@ -28,9 +31,9 @@ export async function deleteDocumentByDocumentUuid(
   let meadowlarkId: MeadowlarkId = '' as MeadowlarkId;
 
   try {
-    await client.query('BEGIN');
+    await beginTransaction(client);
     // Find the alias meadowlarkIds for the document to be deleted
-    const documentAliasIdsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+    const documentAliasIdsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
       client,
       documentUuid,
     );
@@ -41,7 +44,7 @@ export async function deleteDocumentByDocumentUuid(
     if (validateNoReferencesToDocument) {
       // All documents have alias meadowlarkIds. If no alias meadowlarkIds were found, the document doesn't exist
       if (meadowlarkId === '') {
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: DocumentUuid ${documentUuid} does not exist`, traceId);
         deleteResult = { response: 'DELETE_FAILURE_NOT_EXISTS' };
         return deleteResult;
@@ -51,10 +54,10 @@ export async function deleteDocumentByDocumentUuid(
       const documentAliasMeadowlarkIds: MeadowlarkId[] = documentAliasIdsResult.map((ref) => ref.alias_meadowlark_id);
 
       // Find any documents that reference this document, either it's own meadowlarkId or an alias
-      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(client, documentAliasMeadowlarkIds);
+      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIds(client, documentAliasMeadowlarkIds);
 
-      if (referenceResult == null) {
-        await client.query('ROLLBACK');
+      if (referenceResult.length === 0) {
+        await rollbackTransaction(client);
         const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid: Error determining documents referenced by ${documentUuid}, a null result set was returned`;
         deleteResult.failureMessage = errorMessage;
         Logger.error(errorMessage, traceId);
@@ -72,13 +75,13 @@ export async function deleteDocumentByDocumentUuid(
 
         // Get the information of up to five referring documents for failure message purposes
         const referenceIds = references.map((ref) => ref);
-        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(
           client,
           referenceIds,
         );
 
-        if (referringDocumentInfo == null) {
-          await client.query('ROLLBACK');
+        if (referringDocumentInfo.length === 0) {
+          await rollbackTransaction(client);
           const errorMessage = `${moduleName}.deleteDocumentByDocumentUuid Error retrieving documents referenced by ${meadowlarkId}, a null result set was returned`;
           deleteResult.failureMessage = errorMessage;
           Logger.error(errorMessage, traceId);
@@ -89,7 +92,7 @@ export async function deleteDocumentByDocumentUuid(
           response: 'DELETE_FAILURE_REFERENCE',
           referringDocumentInfo,
         };
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return deleteResult;
       }
     }
@@ -99,7 +102,7 @@ export async function deleteDocumentByDocumentUuid(
     const deleteQueryResult: QueryResult = await client.query(deleteDocumentByDocumentUuIdSql(documentUuid));
 
     if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
-      await client.query('ROLLBACK');
+      await rollbackTransaction(client);
       deleteResult.failureMessage = `deleteDocumentByDocumentUuid: Failure deleting document ${documentUuid}, a null result was returned`;
       return deleteResult;
     }
@@ -121,10 +124,10 @@ export async function deleteDocumentByDocumentUuid(
     );
     await client.query(deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId));
 
-    await client.query('COMMIT');
+    await commitTransaction(client);
   } catch (e) {
     Logger.error(`${moduleName}.deleteDocumentByDocumentUuid`, traceId, e);
-    await client.query('ROLLBACK');
+    await rollbackTransaction(client);
     return { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   }
   return deleteResult;

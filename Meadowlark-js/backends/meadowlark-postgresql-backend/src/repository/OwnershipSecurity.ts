@@ -7,7 +7,7 @@ import { meadowlarkIdForDocumentIdentity, FrontendRequest, writeRequestToLog, Me
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
-import { findOwnershipForDocumentByDocumentUuidSql, findOwnershipForDocumentByMeadowlarkIdSql } from './SqlHelper';
+import { findOwnershipForDocumentByDocumentUuid, findOwnershipForDocumentByMeadowlarkId } from './SqlHelper';
 import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | undefined {
@@ -58,8 +58,8 @@ export async function rejectByOwnershipSecurity(
   try {
     const meadowlarkDocument: MeadowlarkDocument =
       documentUuid != null
-        ? await findOwnershipForDocumentByDocumentUuidSql(client, documentUuid)
-        : await findOwnershipForDocumentByMeadowlarkIdSql(client, meadowlarkId);
+        ? await findOwnershipForDocumentByDocumentUuid(client, documentUuid)
+        : await findOwnershipForDocumentByMeadowlarkId(client, meadowlarkId);
 
     if (meadowlarkDocument == null) {
       Logger.error(`${functionName} Unknown Error determining access`, frontendRequest.traceId);

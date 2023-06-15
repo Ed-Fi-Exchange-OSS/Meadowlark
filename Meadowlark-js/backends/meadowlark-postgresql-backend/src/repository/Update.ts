@@ -16,12 +16,15 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient, QueryResult } from 'pg';
 import {
   documentInsertOrUpdateSql,
-  findAliasMeadowlarkIdsForDocumentByDocumentUuidSql,
+  findAliasMeadowlarkIdsForDocumentByDocumentUuid,
   deleteAliasesForDocumentByMeadowlarkIdSql,
   insertAliasSql,
   deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
   insertOutboundReferencesSql,
-  findReferringDocumentInfoForErrorReportingSql,
+  findReferringDocumentInfoForErrorReporting,
+  beginTransaction,
+  rollbackTransaction,
+  commitTransaction,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
@@ -47,9 +50,9 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   );
 
   try {
-    await client.query('BEGIN');
+    await beginTransaction(client);
 
-    const recordExistsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+    const recordExistsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
       client,
       documentUuid,
     );
@@ -81,7 +84,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           traceId,
         );
 
-        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(client, [
           existingMeadowlarkId,
         ]);
 
@@ -90,7 +93,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
           failureMessage: { error: { message: 'Reference validation failed', failures } },
           referringDocumentInfo,
         };
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return updateResult;
       }
     }
@@ -138,7 +141,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
       await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
     }
 
-    await client.query('COMMIT');
+    await commitTransaction(client);
 
     updateResult =
       result.rowCount && result.rowCount > 0
@@ -149,7 +152,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
             response: 'UPDATE_FAILURE_NOT_EXISTS',
           };
   } catch (e) {
-    await client.query('ROLLBACK');
+    await rollbackTransaction(client);
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }

@@ -6,7 +6,7 @@
 import type { PoolClient } from 'pg';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { findDocumentByDocumentUuidSql } from './SqlHelper';
+import { findDocumentByDocumentUuid } from './SqlHelper';
 import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Get';
@@ -17,19 +17,7 @@ export async function getDocumentByDocumentUuid(
 ): Promise<GetResult> {
   try {
     Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
-    const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuidSql(client, documentUuid);
-
-    // Postgres will return an empty row set if no results are returned, if we have no rows, there is a problem
-    if (meadowlarkDocument == null) {
-      const errorMessage = `Could not retrieve DocumentUuid ${documentUuid}
-      a null result set was returned, indicating system failure`;
-      Logger.error(errorMessage, traceId);
-      return {
-        response: 'UNKNOWN_FAILURE',
-        document: {},
-        failureMessage: errorMessage,
-      };
-    }
+    const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
 
     if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 

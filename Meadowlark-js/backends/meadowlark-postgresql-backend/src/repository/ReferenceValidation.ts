@@ -12,7 +12,7 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
-import { validateReferenceExistenceSql } from './SqlHelper';
+import { validateReferenceExistence } from './SqlHelper';
 
 const moduleName = 'postgresql.repository.ReferenceValidation';
 
@@ -34,7 +34,7 @@ async function findReferencedMeadowlarkIdsByMeadowlarkId(
     return [];
   }
 
-  const referenceExistenceResult = await validateReferenceExistenceSql(client, referenceMeadowlarkIds as MeadowlarkId[]);
+  const referenceExistenceResult = await validateReferenceExistence(client, referenceMeadowlarkIds as MeadowlarkId[]);
 
   if (referenceExistenceResult == null) {
     Logger.error(`${moduleName}.findReferencedMeadowlarkIdsByMeadowlarkId Database error parsing references`, traceId);

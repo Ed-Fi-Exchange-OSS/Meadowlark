@@ -5,16 +5,41 @@
 import { ReferringDocumentInfo, DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
 import { PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
-import { MeadowlarkDocument, getEmptyMeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
+
+/**
+ * Executes a database begin transaction
+ * @param client database connector client.
+ */
+export async function beginTransaction(client: PoolClient) {
+  await client.query('BEGIN');
+}
+
+/**
+ * Executes a database rollback transaction
+ * @param client database connector client.
+ */
+export async function rollbackTransaction(client: PoolClient) {
+  await client.query('ROLLBACK');
+}
+
+/**
+ * Executes a database commit transaction
+ * @param client database connector client.
+ */
+export async function commitTransaction(client: PoolClient) {
+  await client.query('TRANSACTION');
+}
 
 /**
  * Returns a list of meadowlarkIds of documents that reference the given meadowlarkIds.
  *
+ * @param client database connector client.
  * @param referencedMeadowlarkIds the array of meadowlarkIds of the documents that are being referenced
  * @returns an array of meadowlarkIds of the documents referencing the given meadowlarkIds
  */
-export async function findReferencingMeadowlarkIdsSql(
+export async function findReferencingMeadowlarkIds(
   client: PoolClient,
   referencedMeadowlarkIds: MeadowlarkId[],
 ): Promise<MeadowlarkId[]> {
@@ -23,9 +48,6 @@ export async function findReferencingMeadowlarkIdsSql(
     referencedMeadowlarkIds,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return undefined as unknown as MeadowlarkId[];
-  }
   return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.parent_meadowlark_id) : []) as MeadowlarkId[];
 }
 
@@ -36,10 +58,11 @@ export async function findReferencingMeadowlarkIdsSql(
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
+ * @param client database connector client.
  * @param meadowlarkId the meadowlarkId of the document to find aliases for
  * @returns an array of alias meadowlarkIds of the given document
  */
-export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<MeadowlarkId[]> {
@@ -48,9 +71,6 @@ export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
     meadowlarkId,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return undefined as unknown as MeadowlarkId[];
-  }
   return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
@@ -61,10 +81,11 @@ export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
  *
  * This has a secondary function of read-for-write locking this row for proper updating and deleting.
  *
+ * @param client database connector client.
  * @param documentUuid the documentUuid of the document to find aliases for
  * @returns an array of alias meadowlarkIds of the given document
  */
-export async function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
+export async function findAliasMeadowlarkIdsForDocumentByDocumentUuid(
   client: PoolClient,
   documentUuid: DocumentUuid,
 ): Promise<MeadowlarkAlias[]> {
@@ -73,9 +94,6 @@ export async function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
     documentUuid,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return undefined as unknown as MeadowlarkAlias[];
-  }
   return (
     (queryResult?.rowCount ?? 0) > 0
       ? queryResult.rows.map((ref) => ({
@@ -92,10 +110,11 @@ export async function findAliasMeadowlarkIdsForDocumentByDocumentUuidSql(
  *
  * This function does NOT read-for-write lock.
  *
+ * @param client database connector client.
  * @param meadowlarkId the meadowlarkId of the document to find aliases for
  * @returns an array of alias meadowlarkIds of the given document
  */
-export async function findAliasMeadowlarkIdSql(client: PoolClient, meadowlarkId: MeadowlarkId): Promise<MeadowlarkId[]> {
+export async function findAliasMeadowlarkId(client: PoolClient, meadowlarkId: MeadowlarkId): Promise<MeadowlarkId[]> {
   const querySelect = format(
     `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE alias_meadowlark_id = %L`,
     meadowlarkId,
@@ -106,10 +125,11 @@ export async function findAliasMeadowlarkIdSql(client: PoolClient, meadowlarkId:
 
 /**
  * Returns a document (with identity)
+ * @param client database connector client.
  * @param meadowlarkId The MeadowlarkId of the document to retrieve
  * @returns meadowlark document
  */
-export async function findDocumentByMeadowlarkIdSql(
+export async function findDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<MeadowlarkDocument> {
@@ -121,21 +141,16 @@ export async function findDocumentByMeadowlarkIdSql(
     [meadowlarkId],
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return undefined as unknown as MeadowlarkDocument;
-  }
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkDocument;
-  }
-  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
 }
 
 /**
  * Returns a document (with identity)
+ * @param client database connector client.
  * @param documentUuid The DocumentUuid of the document to retrieve
  * @returns meadowlark document
  */
-export async function findDocumentByDocumentUuidSql(
+export async function findDocumentByDocumentUuid(
   client: PoolClient,
   documentUuid: DocumentUuid,
 ): Promise<MeadowlarkDocument> {
@@ -147,44 +162,37 @@ export async function findDocumentByDocumentUuidSql(
     [documentUuid],
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkDocument;
-  }
-  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
 }
 
 /**
  * Returns the the ownership for a given document
+ * @param client database connector client.
  * @param documentUuid The documentUuid of the document
  * @returns a meadowlark document to retrieve ownership
  */
-export async function findOwnershipForDocumentByDocumentUuidSql(
+export async function findOwnershipForDocumentByDocumentUuid(
   client: PoolClient,
   documentUuid: DocumentUuid,
 ): Promise<MeadowlarkDocument> {
   const querySelect = format('SELECT created_by FROM meadowlark.documents WHERE document_uuid = %L;', [documentUuid]);
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkDocument;
-  }
-  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
 }
 
 /**
  * Returns the the ownership for a given document
+ * @param client database connector client.
  * @param meadowlarkId The meadowlarkId of the document
  * @returns a meadowlark document to retrieve ownership
  */
-export async function findOwnershipForDocumentByMeadowlarkIdSql(
+export async function findOwnershipForDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<MeadowlarkDocument> {
   const querySelect = format('SELECT created_by FROM meadowlark.documents WHERE meadowlark_id = %L;', [meadowlarkId]);
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkDocument;
-  }
-  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : getEmptyMeadowlarkDocument();
+  return (queryResult?.rowCount ?? 0) > 0 ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
 }
 
 /**
@@ -192,10 +200,11 @@ export async function findOwnershipForDocumentByMeadowlarkIdSql(
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
+ * @param client database connector client.
  * @param meadowlarkIds the array of meadowlarkId of the document we're checking references for
  * @returns an array of alias meadowlarkIds
  */
-export async function validateReferenceExistenceSql(
+export async function validateReferenceExistence(
   client: PoolClient,
   meadowlarkIds: MeadowlarkId[],
 ): Promise<MeadowlarkId[]> {
@@ -204,9 +213,6 @@ export async function validateReferenceExistenceSql(
     meadowlarkIds,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkId[];
-  }
   return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
@@ -215,10 +221,11 @@ export async function validateReferenceExistenceSql(
  * documents. This allows for checking for the existence of documents from the aliases table for deletes
  * and general reference validation.
  *
+ * @param client database connector client.
  * @param documentUuids the DocumentUuid array of the document we're checking references for
  * @returns SQL query string to retrieve existing alias meadowlarkIds
  */
-export async function validateReferenceExistenceByDocumentUuidSql(
+export async function validateReferenceExistenceByDocumentUuid(
   client: PoolClient,
   documentUuids: DocumentUuid[],
 ): Promise<MeadowlarkId[]> {
@@ -227,9 +234,6 @@ export async function validateReferenceExistenceByDocumentUuidSql(
     documentUuids,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as MeadowlarkId[];
-  }
   return ((queryResult?.rowCount ?? 0) > 0 ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
 
@@ -237,10 +241,11 @@ export async function validateReferenceExistenceByDocumentUuidSql(
  * Returns up to five documents that reference this document.
  * This is for error reporting when an attempt is made to delete the document.
  *
+ * @param client database connector client.
  * @param referringMeadowlarkIds The referring documents
  * @returns an array of the referring documents
  */
-export async function findReferringDocumentInfoForErrorReportingSql(
+export async function findReferringDocumentInfoForErrorReporting(
   client: PoolClient,
   referringMeadowlarkIds: MeadowlarkId[],
 ): Promise<ReferringDocumentInfo[]> {
@@ -249,9 +254,6 @@ export async function findReferringDocumentInfoForErrorReportingSql(
     referringMeadowlarkIds,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
-  if (queryResult == null) {
-    return null as unknown as ReferringDocumentInfo[];
-  }
   return (
     (queryResult?.rowCount ?? 0) > 0
       ? queryResult.rows.map((document) => ({

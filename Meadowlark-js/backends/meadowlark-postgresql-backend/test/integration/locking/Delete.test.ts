@@ -23,11 +23,11 @@ import { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { validateReferences } from '../../../src/repository/ReferenceValidation';
 import {
-  findReferencingMeadowlarkIdsSql,
+  findReferencingMeadowlarkIds,
   deleteAliasesForDocumentByMeadowlarkIdSql,
-  findDocumentByMeadowlarkIdSql,
+  findDocumentByMeadowlarkId,
   documentInsertOrUpdateSql,
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkId,
   insertAliasSql,
   insertOutboundReferencesSql,
   deleteDocumentByDocumentUuIdSql,
@@ -134,13 +134,13 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       // Get the alias ids for the document we're trying to delete, because the update transaction is trying
       // to use our school, this is where the code will throw a locking error. This is technically the last line
       // of code in this try block that should execute
-      const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+      const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
         deleteClient,
         schoolMeadowlarkId,
       );
 
       const validDocMeadowlarkIds = aliasIdResult.map((ref) => ref);
-      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(deleteClient, validDocMeadowlarkIds);
+      const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIds(deleteClient, validDocMeadowlarkIds);
       const anyReferences: MeadowlarkId[] = referenceResult.filter((ref) => ref !== schoolMeadowlarkId);
 
       expect(anyReferences.length).toEqual(0);
@@ -192,7 +192,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, schoolMeadowlarkId);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(insertClient, schoolMeadowlarkId);
     expect(docResult.document_identity.schoolId).toBe('123');
   });
 });
@@ -227,7 +227,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
     // Retrieve the alias ids for the school that we're trying to delete, this call will also
     // lock the school record so when we try to lock the records during the insert of the academic week
     // below it will fail
-    const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(
+    const aliasIdResult: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
       deleteClient,
       schoolMeadowlarkId,
     );
@@ -237,7 +237,7 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
 
     // See if there are existing references to this document
     const validDocMeadowlarkIds = aliasIdResult.map((ref) => ref);
-    const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIdsSql(deleteClient, validDocMeadowlarkIds);
+    const referenceResult: MeadowlarkId[] = await findReferencingMeadowlarkIds(deleteClient, validDocMeadowlarkIds);
     const anyReferences: MeadowlarkId[] = referenceResult.filter((ref) => ref !== schoolMeadowlarkId);
 
     expect(anyReferences.length).toEqual(0);
@@ -306,8 +306,8 @@ describe('given an insert concurrent with a delete referencing the to-be-deleted
   });
 
   it('should have still have the School document in the db - a success', async () => {
-    const schoolDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, schoolMeadowlarkId);
-    const awDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(insertClient, academicWeekMeadowlarkId);
+    const schoolDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(insertClient, schoolMeadowlarkId);
+    const awDocResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(insertClient, academicWeekMeadowlarkId);
     expect(isMeadowlarkDocumentEmpty(schoolDocResult)).toEqual(true);
     expect(isMeadowlarkDocumentEmpty(awDocResult)).toEqual(true);
   });

@@ -22,9 +22,12 @@ import {
   insertOutboundReferencesSql,
   deleteAliasesForDocumentByMeadowlarkIdSql,
   insertAliasSql,
-  findAliasMeadowlarkIdSql,
-  findReferringDocumentInfoForErrorReportingSql,
-  findDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkId,
+  findReferringDocumentInfoForErrorReporting,
+  findDocumentByMeadowlarkId,
+  beginTransaction,
+  rollbackTransaction,
+  commitTransaction,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
@@ -41,17 +44,17 @@ export async function upsertDocument(
     getMeadowlarkIdForDocumentReference(dr),
   );
   try {
-    await client.query('BEGIN');
+    await beginTransaction(client);
 
     // Check whether this is an insert or update
-    const documentExistsResult: MeadowlarkDocument = await findDocumentByMeadowlarkIdSql(client, meadowlarkId);
+    const documentExistsResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
     const isInsert: boolean = isMeadowlarkDocumentEmpty(documentExistsResult);
     const documentUuid: DocumentUuid = !isMeadowlarkDocumentEmpty(documentExistsResult)
       ? documentExistsResult.document_uuid
       : generateDocumentUuid();
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
-      const superclassAliasMeadowlarkIdInUseResult: MeadowlarkId[] = await findAliasMeadowlarkIdSql(
+      const superclassAliasMeadowlarkIdInUseResult: MeadowlarkId[] = await findAliasMeadowlarkId(
         client,
         getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId,
       );
@@ -67,11 +70,11 @@ export async function upsertDocument(
           documentInfo.superclassInfo,
         ) as MeadowlarkId;
 
-        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(client, [
           superclassAliasId,
         ]);
 
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return {
           response: 'INSERT_FAILURE_CONFLICT',
           failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
@@ -100,11 +103,11 @@ export async function upsertDocument(
           traceId,
         );
 
-        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReportingSql(client, [
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(client, [
           meadowlarkId,
         ]);
 
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return {
           response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
           failureMessage: { error: { message: 'Reference validation failed', failures } },
@@ -145,13 +148,13 @@ export async function upsertDocument(
       await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
     }
 
-    await client.query('COMMIT');
+    await commitTransaction(client);
     return isInsert
       ? { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid }
       : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
-    await client.query('ROLLBACK');
+    await rollbackTransaction(client);
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
 }
