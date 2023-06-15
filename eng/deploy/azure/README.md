@@ -59,7 +59,6 @@ az login
 $resourceGroup={resource group name}
 
 # Dns labels must be unique per Azure subscription.
-# These are examples of different values
 $meadowlarkDnsLabel={meadowlark dns}
 $mongoDnsLabel={mongo dns}
 $openSearchDnsLabel={opensearch dns}
