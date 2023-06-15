@@ -34,9 +34,12 @@ performance, Pipeclean Tests and Volume Tests.
 
 ### Setup
 
-The tests will be executed with
-[Suite3-Performance-Testing](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing)
-on branch [meadowlark-updates](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing/tree/meadowlark-updates) to have the changes required for Meadowlark.
+> **Warning**
+> _For now_: The tests will be executed with
+> [Suite3-Performance-Testing](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing)
+> on branch [meadowlark-updates](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing/tree/meadowlark-updates)
+> to have the changes required for Meadowlark. Vinaya and/or StephenF can verify when to remove
+> this temporary note and use the `main` branch again.
 
 - Follow steps to [setup performance suite](./SETUP-PERFORMANCE-SUITE.md).
 - Go to /src/edfi_performance_test folder and run `poetry install`.
