@@ -17,11 +17,11 @@ import {
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import {
-  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
-  documentInsertOrUpdateSql,
-  insertOutboundReferencesSql,
-  deleteAliasesForDocumentByMeadowlarkIdSql,
-  insertAliasSql,
+  executeDeleteOutboundReferencesOfDocumentByMeadowlarkId,
+  executeDocumentInsertOrUpdate,
+  executeInsertOutboundReferences,
+  executeDeleteAliasesForDocumentByMeadowlarkId,
+  executeInsertAlias,
   findAliasMeadowlarkId,
   findReferringDocumentInfoForErrorReporting,
   findDocumentByMeadowlarkId,
@@ -83,11 +83,6 @@ export async function upsertDocument(
       }
     }
 
-    const documentUpsertSql: string = documentInsertOrUpdateSql(
-      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
-      isInsert,
-    );
-
     if (validateDocumentReferencesExist) {
       const failures = await validateReferences(
         documentInfo.documentReferences,
@@ -118,19 +113,23 @@ export async function upsertDocument(
 
     // Perform the document upsert
     Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
-    await client.query(documentUpsertSql);
+    await executeDocumentInsertOrUpdate(
+      client,
+      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+      isInsert,
+    );
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId));
+    await executeDeleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
     // Perform insert of alias ids
-    await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
+    await executeInsertAlias(client, documentUuid, meadowlarkId, meadowlarkId);
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
-      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
+      await executeInsertAlias(client, documentUuid, meadowlarkId, superclassAliasId);
     }
 
     // Delete existing references in references table
     Logger.debug(`${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${meadowlarkId}`, traceId);
-    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(meadowlarkId));
+    await executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(client, meadowlarkId);
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
@@ -145,7 +144,7 @@ export async function upsertDocument(
         `post${moduleName}.upsertDocument: Inserting reference meadowlarkId ${ref} for document meadowlarkId ${meadowlarkId}`,
         ref,
       );
-      await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
+      await executeInsertOutboundReferences(client, meadowlarkId, ref as MeadowlarkId);
     }
 
     await commitTransaction(client);

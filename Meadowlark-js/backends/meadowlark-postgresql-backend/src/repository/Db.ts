@@ -13,7 +13,7 @@ import {
   createReferencesTableDeletingIndexSql,
   createReferencesTableSql,
   createSchemaSql,
-  createDatabaseSql,
+  createDatabase,
   createAliasesTableSql,
   createAliasesTableDocumentIndexSql,
   createAliasesTableAliasIndexSql,
@@ -92,7 +92,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   const client: Client = new Client(getDbConfiguration());
   try {
     await client.connect();
-    await client.query(createDatabaseSql(meadowlarkDbName));
+    await createDatabase(client, meadowlarkDbName);
 
     Logger.info(`${moduleName}.createConnectionPoolAndReturnClient database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {

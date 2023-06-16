@@ -13,14 +13,14 @@ import {
   ReferringDocumentInfo,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import {
-  documentInsertOrUpdateSql,
+  executeDocumentInsertOrUpdate,
   findAliasMeadowlarkIdsForDocumentByDocumentUuid,
-  deleteAliasesForDocumentByMeadowlarkIdSql,
-  insertAliasSql,
-  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
-  insertOutboundReferencesSql,
+  executeDeleteAliasesForDocumentByMeadowlarkId,
+  executeInsertAlias,
+  executeDeleteOutboundReferencesOfDocumentByMeadowlarkId,
+  executeInsertOutboundReferences,
   findReferringDocumentInfoForErrorReporting,
   beginTransaction,
   rollbackTransaction,
@@ -57,7 +57,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
       documentUuid,
     );
     // if this record doesn't exist, this function returns a failure
-    if ((recordExistsResult?.length ?? 0) === 0) {
+    if (recordExistsResult.length === 0) {
       updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
       return updateResult;
     }
@@ -99,23 +99,21 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     }
 
     // Perform the document update
-    const documentSql: string = documentInsertOrUpdateSql(
+    const insertOrUpdateResult: boolean = await executeDocumentInsertOrUpdate(
+      client,
       { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
       false,
     );
-    const result: QueryResult = await client.query(documentSql);
-    // Delete existing alias using the old meadowlarkId
-    const deleteAliasesSql = deleteAliasesForDocumentByMeadowlarkIdSql(existingMeadowlarkId);
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesSql);
+    await executeDeleteAliasesForDocumentByMeadowlarkId(client, existingMeadowlarkId);
 
     // Perform insert of alias meadowlarkIds
-    await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
+    await executeInsertAlias(client, documentUuid, meadowlarkId, meadowlarkId);
     if (documentInfo.superclassInfo != null) {
       const superclassAliasMeadowlarkId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(
         documentInfo.superclassInfo,
       ) as MeadowlarkId;
-      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasMeadowlarkId));
+      await executeInsertAlias(client, documentUuid, meadowlarkId, superclassAliasMeadowlarkId);
     }
 
     // Delete existing references in references table (by old meadowlarkId)
@@ -123,7 +121,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
       `${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${existingMeadowlarkId}`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(existingMeadowlarkId));
+    await executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(client, existingMeadowlarkId);
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
@@ -138,19 +136,18 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
         `${moduleName}.upsertDocument: Inserting reference meadowlarkId ${ref} for document meadowlarkId ${meadowlarkId}`,
         ref,
       );
-      await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
+      await executeInsertOutboundReferences(client, meadowlarkId, ref as MeadowlarkId);
     }
 
     await commitTransaction(client);
 
-    updateResult =
-      result.rowCount && result.rowCount > 0
-        ? {
-            response: 'UPDATE_SUCCESS',
-          }
-        : {
-            response: 'UPDATE_FAILURE_NOT_EXISTS',
-          };
+    updateResult = insertOrUpdateResult
+      ? {
+          response: 'UPDATE_SUCCESS',
+        }
+      : {
+          response: 'UPDATE_FAILURE_NOT_EXISTS',
+        };
   } catch (e) {
     await rollbackTransaction(client);
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);

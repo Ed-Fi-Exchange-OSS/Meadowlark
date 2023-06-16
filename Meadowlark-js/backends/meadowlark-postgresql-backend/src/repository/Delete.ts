@@ -5,12 +5,12 @@
 
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { DeleteResult, DeleteRequest, ReferringDocumentInfo, MeadowlarkId } from '@edfi/meadowlark-core';
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import {
-  deleteDocumentByDocumentUuIdSql,
-  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
+  executeDeleteDocumentByDocumentUuId,
+  executeDeleteOutboundReferencesOfDocumentByMeadowlarkId,
   findReferringDocumentInfoForErrorReporting,
-  deleteAliasesForDocumentByMeadowlarkIdSql,
+  executeDeleteAliasesForDocumentByMeadowlarkId,
   findReferencingMeadowlarkIds,
   findAliasMeadowlarkIdsForDocumentByDocumentUuid,
   beginTransaction,
@@ -39,8 +39,7 @@ export async function deleteDocumentByDocumentUuid(
     );
     // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
     // we just need the first row to return the meadowlark_id
-    meadowlarkId =
-      (documentAliasIdsResult?.length ?? 0) > 0 ? documentAliasIdsResult[0].meadowlark_id : ('' as MeadowlarkId);
+    meadowlarkId = documentAliasIdsResult.length > 0 ? documentAliasIdsResult[0].meadowlark_id : ('' as MeadowlarkId);
     if (validateNoReferencesToDocument) {
       // All documents have alias meadowlarkIds. If no alias meadowlarkIds were found, the document doesn't exist
       if (meadowlarkId === '') {
@@ -91,30 +90,21 @@ export async function deleteDocumentByDocumentUuid(
 
     // Perform the document delete
     Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: Deleting document documentUuid ${documentUuid}`, traceId);
-    const deleteQueryResult: QueryResult = await client.query(deleteDocumentByDocumentUuIdSql(documentUuid));
-
-    if (deleteQueryResult.rowCount === 0 || deleteQueryResult.rows == null) {
-      await rollbackTransaction(client);
-      deleteResult.failureMessage = `deleteDocumentByDocumentUuid: Failure deleting document ${documentUuid}, a null result was returned`;
-      return deleteResult;
-    }
-
-    deleteResult =
-      deleteQueryResult.rows[0].count === '0' ? { response: 'DELETE_FAILURE_NOT_EXISTS' } : { response: 'DELETE_SUCCESS' };
+    deleteResult = await executeDeleteDocumentByDocumentUuId(client, documentUuid);
 
     // Delete references where this is the parent document
     Logger.debug(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting references with documentUuid ${documentUuid} as parent meadowlarkId`,
       traceId,
     );
-    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(meadowlarkId));
+    await executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(client, meadowlarkId);
 
     // Delete this document from the aliases table
     Logger.debug(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting alias entries with meadowlarkId ${meadowlarkId}`,
       traceId,
     );
-    await client.query(deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId));
+    await executeDeleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
 
     await commitTransaction(client);
   } catch (e) {
