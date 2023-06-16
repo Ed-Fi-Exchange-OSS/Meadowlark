@@ -7,7 +7,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import { Client, PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
+import { MeadowlarkDocumentAndAliasId } from '../model/MeadowlarkDocumentAndAliasId';
 
 const moduleName = 'postgresql.repository.SqlHelper';
 /**
@@ -102,7 +102,7 @@ export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
 export async function findAliasMeadowlarkIdsForDocumentByDocumentUuid(
   client: PoolClient,
   documentUuid: DocumentUuid,
-): Promise<MeadowlarkAlias[]> {
+): Promise<MeadowlarkDocumentAndAliasId[]> {
   const querySelect = format(
     `SELECT alias_meadowlark_id, meadowlark_id FROM meadowlark.aliases WHERE document_uuid = %L FOR SHARE NOWAIT`,
     documentUuid,
@@ -115,7 +115,7 @@ export async function findAliasMeadowlarkIdsForDocumentByDocumentUuid(
           meadowlark_id: ref.meadowlark_id,
         }))
       : []
-  ) as MeadowlarkAlias[];
+  ) as MeadowlarkDocumentAndAliasId[];
 }
 /**
  * Returns a list of alias meadowlarkIds. Alias meadowlarkIds include the document meadowlarkId

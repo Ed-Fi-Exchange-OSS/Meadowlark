@@ -6,7 +6,7 @@
 import { MeadowlarkId } from '@edfi/meadowlark-core';
 import { MeadowlarkDocumentId } from './MeadowlarkDocument';
 
-export interface MeadowlarkAlias extends MeadowlarkDocumentId {
+export interface MeadowlarkDocumentAndAliasId extends MeadowlarkDocumentId {
   /**
    * Alias meadowlarkId.
    */

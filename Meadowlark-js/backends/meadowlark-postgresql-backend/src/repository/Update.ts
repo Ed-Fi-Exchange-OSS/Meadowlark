@@ -27,7 +27,7 @@ import {
   commitTransaction,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
-import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
+import { MeadowlarkDocumentAndAliasId } from '../model/MeadowlarkDocumentAndAliasId';
 
 const moduleName = 'postgresql.repository.Update';
 
@@ -52,7 +52,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   try {
     await beginTransaction(client);
 
-    const recordExistsResult: MeadowlarkAlias[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
+    const recordExistsResult: MeadowlarkDocumentAndAliasId[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
       client,
       documentUuid,
     );
