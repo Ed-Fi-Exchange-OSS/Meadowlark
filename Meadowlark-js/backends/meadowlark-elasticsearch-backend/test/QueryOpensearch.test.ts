@@ -16,6 +16,8 @@ import {
 // import { /* TransportRequestCallback, */ TransportRequestParams, TransportRequestOptions } from '@elastic/transport';
 import { queryDocuments, indexFromResourceInfo } from '../src/repository/QueryElasticsearch';
 
+const mock = new Mock();
+
 const resourceInfo: ResourceInfo = {
   projectName: 'ed-fi',
   resourceName: 'student',
@@ -25,22 +27,27 @@ const resourceInfo: ResourceInfo = {
 };
 
 describe('when querying for students', () => {
-  const setupMockRequestHappyPath = (uniqueIds: string[], matches: any[]): Client => {
-    const mock = new Mock();
+  const setupMockRequestHappyPath = (uniqueIds: string[], matches: any[], size?: number, from?: number): Client => {
     const datarows = uniqueIds.map((x) => ({ _source: { studentUniqueId: x, info: `{ "studentUniqueId": "${x}" }` } }));
+
+    const body: any = {
+      query: {
+        bool: {
+          must: matches,
+        },
+      },
+      sort: [{ _doc: { order: 'asc' } }],
+    };
+
+    if (size) body.size = size;
+
+    if (from) body.from = from;
 
     mock.add(
       {
         method: 'POST',
         path: `/${indexFromResourceInfo(resourceInfo)}/_search`,
-        body: {
-          query: {
-            bool: {
-              must: matches,
-            },
-          },
-          sort: [{ _doc: { order: 'asc' } }],
-        },
+        body,
       },
       () => ({
         hits: {
@@ -82,6 +89,10 @@ describe('when querying for students', () => {
       // Assert
       expect(result.documents.length).toEqual(0);
     });
+
+    afterAll(() => {
+      mock.clearAll();
+    });
   });
 
   describe('given there are students', () => {
@@ -109,6 +120,10 @@ describe('when querying for students', () => {
 
         it('should return the second student', async () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
+        });
+
+        afterAll(() => {
+          mock.clearAll();
         });
       });
 
@@ -165,245 +180,117 @@ describe('when querying for students', () => {
           const { body } = spyOnRequest.mock.calls[0][0];
           expect(body).toEqual(expectedQuery);
         });
+
+        afterAll(() => {
+          mock.clearAll();
+        });
       });
 
-      // describe('given page limits', () => {
-      //   const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
-      //   let queryResult: QueryResult;
-      //   const studentUniqueIdOne = 'one';
-      //   const studentUniqueIdTwo = 'two';
-      //   let spyOnRequest: jest.SpyInstance<
-      //     TransportRequestCallback,
-      //     [
-      //       params: TransportRequestParams,
-      //       options?: TransportRequestOptions | undefined,
-      //       callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-      //     ]
-      //   >;
-      //   const limit = '1';
-      //   const offset = '2';
-      //   const expectedQuery = '{"query":"SELECT info FROM ed-fi$3-3-1-b$student ORDER BY _doc LIMIT 1 OFFSET 2"}';
+      describe('given page limits', () => {
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
+        let queryResult: QueryResult;
+        const studentUniqueIdOne = 'one';
+        const studentUniqueIdTwo = 'two';
+        let spyOnRequest: jest.SpyInstance;
+        const limit = 1;
+        const offset = 2;
+        const expectedQuery = {
+          from: 2,
+          query: { bool: { must: [] } },
+          size: 1,
+          sort: [{ _doc: { order: 'asc' } }],
+        };
 
-      //   beforeAll(async () => {
-      //     const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-      //     const request = setupQueryRequest(authorizationStrategy, {}, { limit, offset });
+        beforeAll(async () => {
+          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], [], limit, offset);
+          const request = setupQueryRequest(authorizationStrategy, {}, { limit, offset });
 
-      //     spyOnRequest = jest.spyOn(client.transport, 'request');
+          spyOnRequest = jest.spyOn(client.transport, 'request');
 
-      //     queryResult = await queryDocuments(request, client);
-      //   });
+          queryResult = await queryDocuments(request, client);
+        });
 
-      //   it('should return two students', async () => {
-      //     expect(queryResult.documents.length).toBe(2);
-      //   });
+        it('should return two students', async () => {
+          expect(queryResult.documents.length).toBe(2);
+        });
 
-      //   it('should return the first student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-      //   });
+        it('should return the first student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
+        });
 
-      //   it('should return the second student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-      //   });
+        it('should return the second student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
+        });
 
-      //   it('should have used the correct SQL query', async () => {
-      //     expect(spyOnRequest.mock.calls.length).toBe(1);
-      //     expect(spyOnRequest.mock.calls[0].length).toBe(1);
-      //     const { body } = spyOnRequest.mock.calls[0][0];
-      //     expect(body).toBe(expectedQuery);
-      //   });
-      // });
+        it('should have used the correct SQL query', async () => {
+          expect(spyOnRequest.mock.calls.length).toBe(1);
+          expect(spyOnRequest.mock.calls[0].length).toBe(1);
+          const { body } = spyOnRequest.mock.calls[0][0];
+          expect(body).toEqual(expectedQuery);
+        });
 
-      // describe('given both query terms and page limits', () => {
-      //   const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
-      //   let queryResult: QueryResult;
-      //   const studentUniqueIdOne = 'one';
-      //   const studentUniqueIdTwo = 'two';
-      //   let spyOnRequest: jest.SpyInstance<
-      //     TransportRequestCallback,
-      //     [
-      //       params: TransportRequestParams,
-      //       options?: TransportRequestOptions | undefined,
-      //       callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-      //     ]
-      //   >;
-      //   const birthCity = 'a';
-      //   const birthDate = '2022-07-28';
-      //   const limit = '1';
-      //   const offset = '2';
-      //   const expectedQuery =
-      //     '{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = \'a\' AND birthDate = \'2022-07-28\' ORDER BY _doc LIMIT 1 OFFSET 2"}';
+        afterAll(() => {
+          mock.clearAll();
+        });
+      });
 
-      //   beforeAll(async () => {
-      //     const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-      //     const request = setupQueryRequest(authorizationStrategy, { birthCity, birthDate }, { limit, offset });
+      describe('given both query terms and page limits', () => {
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
+        let queryResult: QueryResult;
+        const studentUniqueIdOne = 'one';
+        const studentUniqueIdTwo = 'two';
+        const birthCity = 'a';
+        const birthDate = '2022-07-28';
+        const matches = [
+          {
+            match: { birthCity },
+          },
+          {
+            match: { birthDate },
+          },
+        ];
+        let spyOnRequest: jest.SpyInstance;
+        const limit = 1;
+        const offset = 1;
+        const expectedQuery = {
+          from: offset,
+          query: { bool: { must: matches } },
+          size: limit,
+          sort: [{ _doc: { order: 'asc' } }],
+        };
 
-      //     spyOnRequest = jest.spyOn(client.transport, 'request');
+        beforeAll(async () => {
+          const client = setupMockRequestHappyPath([studentUniqueIdTwo], matches, limit, offset);
+          const request = setupQueryRequest(authorizationStrategy, { birthCity, birthDate }, { limit, offset });
 
-      //     queryResult = await queryDocuments(request, client);
-      //   });
+          spyOnRequest = jest.spyOn(client.transport, 'request');
 
-      //   it('should return two students', async () => {
-      //     expect(queryResult.documents.length).toBe(2);
-      //   });
+          queryResult = await queryDocuments(request, client);
+        });
 
-      //   it('should return the first student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-      //   });
+        it('should return two students', async () => {
+          expect(queryResult.documents.length).toBe(1);
+        });
 
-      //   it('should return the second student', async () => {
-      //     expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-      //   });
+        it('should return the first student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBe(-1);
+        });
 
-      //   it('should have used the correct SQL query', async () => {
-      //     expect(spyOnRequest.mock.calls.length).toBe(1);
-      //     expect(spyOnRequest.mock.calls[0].length).toBe(1);
-      //     const { body } = spyOnRequest.mock.calls[0][0];
-      //     expect(body).toBe(expectedQuery);
-      //   });
-      // });
+        it('should return the second student', async () => {
+          expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
+        });
+
+        it('should have used the correct SQL query', async () => {
+          expect(spyOnRequest.mock.calls.length).toBe(1);
+          expect(spyOnRequest.mock.calls[0].length).toBe(1);
+          const { body } = spyOnRequest.mock.calls[0][0];
+          expect(body).toEqual(expectedQuery);
+        });
+
+        afterAll(() => {
+          mock.clearAll();
+        });
+      });
     });
-
-    // describe('given ownership access authorization', () => {
-    //   describe('given a query term with SQL injection attack to bypass authorization', () => {
-    //     const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
-    //     let queryResult: QueryResult;
-    //     const studentUniqueIdOne = 'one';
-    //     const studentUniqueIdTwo = 'two';
-    //     let spyOnRequest: jest.SpyInstance<
-    //       TransportRequestCallback,
-    //       [
-    //         params: TransportRequestParams,
-    //         options?: TransportRequestOptions | undefined,
-    //         callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-    //       ]
-    //     >;
-    //     // Explanation: this attack attempts to retrieve all students, and comment out the rest of the query including the
-    //     // clause limiting the search by ownership.
-    //     const birthCity = `a' or studentUniqueId is not null #`;
-    //     const expectedQuery = `{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = 'a\\\\' or studentUniqueId is not null #' AND createdBy = 'hi' ORDER BY _doc"}`;
-
-    //     beforeAll(async () => {
-    //       const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-    //       const request = setupQueryRequest(authorizationStrategy, { birthCity }, {});
-
-    //       spyOnRequest = jest.spyOn(client.transport, 'request');
-
-    //       queryResult = await queryDocuments(request, client);
-    //     });
-
-    //     it('should return two students', async () => {
-    //       expect(queryResult.documents.length).toBe(2);
-    //     });
-
-    //     it('should return the first student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should return the second student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should have used the correct SQL query', async () => {
-    //       expect(spyOnRequest.mock.calls.length).toBe(1);
-    //       expect(spyOnRequest.mock.calls[0].length).toBe(1);
-    //       const { body } = spyOnRequest.mock.calls[0][0];
-    //       expect(body).toBe(expectedQuery);
-    //     });
-    //   });
-
-    //   describe('given a query term with SQL injection using doubled apostrophes', () => {
-    //     const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
-    //     let queryResult: QueryResult;
-    //     const studentUniqueIdOne = 'one';
-    //     const studentUniqueIdTwo = 'two';
-    //     let spyOnRequest: jest.SpyInstance<
-    //       TransportRequestCallback,
-    //       [
-    //         params: TransportRequestParams,
-    //         options?: TransportRequestOptions | undefined,
-    //         callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-    //       ]
-    //     >;
-    //     // Explanation: in addition to attack in the above test, now doubled the apostrophes to try to get around the
-    //     // backslash escaping.
-    //     const birthCity = `a'' or studentUniqueId is not null #`;
-    //     const expectedQuery = `{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = 'a\\\\'\\\\' or studentUniqueId is not null #' AND createdBy = 'hi' ORDER BY _doc"}`;
-
-    //     beforeAll(async () => {
-    //       const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-    //       const request = setupQueryRequest(authorizationStrategy, { birthCity }, {});
-
-    //       spyOnRequest = jest.spyOn(client.transport, 'request');
-
-    //       queryResult = await queryDocuments(request, client);
-    //     });
-
-    //     it('should return two students', async () => {
-    //       expect(queryResult.documents.length).toBe(2);
-    //     });
-
-    //     it('should return the first student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should return the second student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should have used the correct SQL query', async () => {
-    //       expect(spyOnRequest.mock.calls.length).toBe(1);
-    //       expect(spyOnRequest.mock.calls[0].length).toBe(1);
-    //       const { body } = spyOnRequest.mock.calls[0][0];
-    //       expect(body).toBe(expectedQuery);
-    //     });
-    //   });
-
-    //   describe('given a query term with SQL injection using an escaped apostrophe', () => {
-    //     const authorizationStrategy: AuthorizationStrategy = { type: 'OWNERSHIP_BASED' };
-    //     let queryResult: QueryResult;
-    //     const studentUniqueIdOne = 'one';
-    //     const studentUniqueIdTwo = 'two';
-    //     let spyOnRequest: jest.SpyInstance<
-    //       TransportRequestCallback,
-    //       [
-    //         params: TransportRequestParams,
-    //         options?: TransportRequestOptions | undefined,
-    //         callback?: ((err: ApiError, result: ApiResponse<Record<string, any>, unknown>) => void) | undefined,
-    //       ]
-    //     >;
-    //     // Explanation: try to avoid the escaping of ' by injecting a slash, so that the instead of "a\'" we generate a query
-    //     // containing "a\\'". In that case, the final apostrophe is a real apostrophe, not an escaped one.
-    //     const birthCity = `a\\' or studentUniqueId is not null #`;
-    //     const expectedQuery = `{"query":"SELECT info FROM ed-fi$3-3-1-b$student WHERE birthCity = '' AND createdBy = 'hi' ORDER BY _doc"}`;
-
-    //     beforeAll(async () => {
-    //       const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo]);
-    //       const request = setupQueryRequest(authorizationStrategy, { birthCity }, {});
-
-    //       spyOnRequest = jest.spyOn(client.transport, 'request');
-
-    //       queryResult = await queryDocuments(request, client);
-    //     });
-
-    //     it('should return two students', async () => {
-    //       expect(queryResult.documents.length).toBe(2);
-    //     });
-
-    //     it('should return the first student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdOne)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should return the second student', async () => {
-    //       expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
-    //     });
-
-    //     it('should have used the correct SQL query', async () => {
-    //       expect(spyOnRequest.mock.calls.length).toBe(1);
-    //       expect(spyOnRequest.mock.calls[0].length).toBe(1);
-    //       const { body } = spyOnRequest.mock.calls[0][0];
-    //       expect(body).toBe(expectedQuery);
-    //     });
-    //   });
-    // });
   });
 });

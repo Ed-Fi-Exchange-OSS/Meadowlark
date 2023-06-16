@@ -32,10 +32,10 @@ async function performDslQuery(client: Client, path: string, query: any, size: n
     method: 'POST',
     path: `/${path}/_search`,
     body: {
-      query,
-      sort: [{ _doc: { order: 'asc' } }],
-      size,
       from,
+      query,
+      size,
+      sort: [{ _doc: { order: 'asc' } }],
     },
   });
 }
