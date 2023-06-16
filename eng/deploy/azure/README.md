@@ -15,7 +15,8 @@ CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 
 - Browse to `../eng/deploy/azure`
 
-- Create a .env file. Update URLs to match your correct Azure region.
+- Create a .env file. Set the OAUTH_SIGNING_KEY, AZURE_REGION and
+ED_FI_DOMAIN_NAME. The domain name must be unique per Azure subscription
 
 - Execute the following script:
 
