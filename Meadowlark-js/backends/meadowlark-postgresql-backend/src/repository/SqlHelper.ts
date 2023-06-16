@@ -3,11 +3,13 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 import { ReferringDocumentInfo, DocumentUuid, MeadowlarkId, DeleteResult } from '@edfi/meadowlark-core';
+import { Logger } from '@edfi/meadowlark-utilities';
 import { Client, PoolClient, QueryResult } from 'pg';
 import format from 'pg-format';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 import { MeadowlarkAlias } from '../model/MeadowlarkAlias';
 
+const moduleName = 'postgresql.repository.SqlHelper';
 /**
  * Executes a database begin transaction
  * @param client database connector client.
@@ -482,12 +484,12 @@ export async function createDatabase(client: Client, meadowlarkDbName: string): 
 /**
  * SQL query string to create schema in the meadowlark database
  */
-export const createSchemaSql = 'CREATE SCHEMA IF NOT EXISTS meadowlark';
+const createSchemaSql = 'CREATE SCHEMA IF NOT EXISTS meadowlark';
 
 /**
  * SQL query string to create document table
  */
-export const createDocumentTableSql = `
+const createDocumentTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.documents(
   id bigserial PRIMARY KEY,
   meadowlark_id VARCHAR(56) NOT NULL,
@@ -502,34 +504,34 @@ export const createDocumentTableSql = `
   edfi_doc JSONB NOT NULL);`;
 
 // All queries are on meadowlark_id, which must be unique
-export const createDocumentTableUniqueIndexSql =
+const createDocumentTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_documents ON meadowlark.documents(meadowlark_id)';
 
 // All queries are on document_uuid, which must be unique
-export const createDocumentUuidTableUniqueIndexSql =
+const createDocumentUuidTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_document_uuid ON meadowlark.documents(document_uuid)';
 
 /**
  * SQL query string to create the references table
  */
-export const createReferencesTableSql = `
+const createReferencesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.references(
   id bigserial PRIMARY KEY,
   parent_meadowlark_id VARCHAR NOT NULL,
   referenced_meadowlark_id VARCHAR NOT NULL);`;
 
 // For reference checking before parent delete
-export const createReferencesTableCheckingIndexSql =
+const createReferencesTableCheckingIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_checking ON meadowlark.references(referenced_meadowlark_id)';
 
 // For reference removal in transaction with parent update/delete
-export const createReferencesTableDeletingIndexSql =
+const createReferencesTableDeletingIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_references_deleting ON meadowlark.references(parent_meadowlark_id)';
 
 /**
  * SQL query string to create the aliases table
  */
-export const createAliasesTableSql = `
+const createAliasesTableSql = `
   CREATE TABLE IF NOT EXISTS meadowlark.aliases(
     id bigserial PRIMARY KEY,
     meadowlark_id VARCHAR,
@@ -537,13 +539,36 @@ export const createAliasesTableSql = `
     alias_meadowlark_id VARCHAR);`;
 
 // For finding alias meadowlarkIds given a document meadowlarkId
-export const createAliasesTableDocumentIndexSql =
+const createAliasesTableDocumentIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_meadowlark_id ON meadowlark.aliases(meadowlark_id)';
 
 // For finding alias meadowlarkIds given a document_uuid
-export const createAliasesTableDocumentUuidIndexSql =
+const createAliasesTableDocumentUuidIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_document_uuid ON meadowlark.aliases(document_uuid)';
 
 // For finding document meadowlarkIds given an alias meadowlarkId
-export const createAliasesTableAliasIndexSql =
+const createAliasesTableAliasIndexSql =
   'CREATE INDEX IF NOT EXISTS ix_meadowlark_aliases_alias_meadowlark_id ON meadowlark.aliases(alias_meadowlark_id)';
+
+/**
+ * Checks that the meadowlark schema, document and references tables exist in the database, if not will create them
+ * @param client The Postgres client for querying
+ */
+export async function checkExistsAndCreateTables(client: PoolClient) {
+  try {
+    await client.query(createSchemaSql);
+    await client.query(createDocumentTableSql);
+    await client.query(createDocumentTableUniqueIndexSql);
+    await client.query(createDocumentUuidTableUniqueIndexSql);
+    await client.query(createReferencesTableSql);
+    await client.query(createReferencesTableCheckingIndexSql);
+    await client.query(createReferencesTableDeletingIndexSql);
+    await client.query(createAliasesTableSql);
+    await client.query(createAliasesTableDocumentIndexSql);
+    await client.query(createAliasesTableDocumentUuidIndexSql);
+    await client.query(createAliasesTableAliasIndexSql);
+  } catch (e) {
+    Logger.error(`${moduleName}.checkExistsAndCreateTables error connecting to PostgreSQL`, null, e);
+    throw e;
+  }
+}
