@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { /* ApiError, ApiResponse, */ Client } from '@elastic/elasticsearch';
+import { Client } from '@elastic/elasticsearch';
 import Mock from '@elastic/elasticsearch-mock';
 import {
   PaginationParameters,
@@ -13,7 +13,6 @@ import {
   TraceId,
   ResourceInfo,
 } from '@edfi/meadowlark-core';
-// import { /* TransportRequestCallback, */ TransportRequestParams, TransportRequestOptions } from '@elastic/transport';
 import { queryDocuments, indexFromResourceInfo } from '../src/repository/QueryElasticsearch';
 
 const mock = new Mock();
@@ -130,19 +129,19 @@ describe('when querying for students', () => {
       describe('given two query terms', () => {
         const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
         let queryResult: QueryResult;
+        let spyOnRequest: jest.SpyInstance;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
-        const matches = [
-          {
-            match: { birthCity: 'a' },
-          },
-          {
-            match: { birthDate: '2022-07-28' },
-          },
-        ];
-        let spyOnRequest: jest.SpyInstance;
         const birthCity = 'a';
         const birthDate = '2022-07-28';
+        const matches = [
+          {
+            match: { birthCity },
+          },
+          {
+            match: { birthDate },
+          },
+        ];
         const expectedQuery = {
           from: undefined,
           query: {
@@ -153,6 +152,7 @@ describe('when querying for students', () => {
           size: undefined,
           sort: [{ _doc: { order: 'asc' } }],
         };
+
         beforeAll(async () => {
           const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], matches);
           const request = setupQueryRequest(authorizationStrategy, { birthCity, birthDate }, {});
@@ -189,9 +189,9 @@ describe('when querying for students', () => {
       describe('given page limits', () => {
         const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
         let queryResult: QueryResult;
+        let spyOnRequest: jest.SpyInstance;
         const studentUniqueIdOne = 'one';
         const studentUniqueIdTwo = 'two';
-        let spyOnRequest: jest.SpyInstance;
         const limit = 1;
         const offset = 2;
         const expectedQuery = {
