@@ -27,6 +27,12 @@ The script receives two parameters:
 This script will enter the data into Meadowlark and will print the execution
 time.
 
+> **Warning** The LoadGrandBend script is returning errors when processing some data ([RND-586](https://tracker.ed-fi.org/browse/RND-586)).
+
+List of issues:
+
+- [RND-583](https://tracker.ed-fi.org/browse/RND-583)
+
 ## Performance Testing Suite
 
 There are two performance test types that paths that cover the write
