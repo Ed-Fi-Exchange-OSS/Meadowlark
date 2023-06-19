@@ -7,10 +7,10 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { DeleteResult, DeleteRequest, ReferringDocumentInfo, MeadowlarkId } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import {
-  executeDeleteDocumentByDocumentUuId,
-  executeDeleteOutboundReferencesOfDocumentByMeadowlarkId,
+  deleteDocumentRowByDocumentUuid,
+  deleteOutboundReferencesOfDocumentByMeadowlarkId,
   findReferringDocumentInfoForErrorReporting,
-  executeDeleteAliasesForDocumentByMeadowlarkId,
+  deleteAliasesForDocumentByMeadowlarkId,
   findReferencingMeadowlarkIds,
   findAliasMeadowlarkIdsForDocumentByDocumentUuid,
   beginTransaction,
@@ -90,21 +90,21 @@ export async function deleteDocumentByDocumentUuid(
 
     // Perform the document delete
     Logger.debug(`${moduleName}.deleteDocumentByDocumentUuid: Deleting document documentUuid ${documentUuid}`, traceId);
-    deleteResult = await executeDeleteDocumentByDocumentUuId(client, documentUuid);
+    deleteResult = await deleteDocumentRowByDocumentUuid(client, documentUuid);
 
     // Delete references where this is the parent document
     Logger.debug(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting references with documentUuid ${documentUuid} as parent meadowlarkId`,
       traceId,
     );
-    await executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(client, meadowlarkId);
+    await deleteOutboundReferencesOfDocumentByMeadowlarkId(client, meadowlarkId);
 
     // Delete this document from the aliases table
     Logger.debug(
       `${moduleName}.deleteDocumentByDocumentUuid Deleting alias entries with meadowlarkId ${meadowlarkId}`,
       traceId,
     );
-    await executeDeleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
+    await deleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
 
     await commitTransaction(client);
   } catch (e) {

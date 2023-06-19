@@ -281,15 +281,13 @@ export async function findReferringDocumentInfoForErrorReporting(
   ) as ReferringDocumentInfo[];
 }
 
-// SQL for inserts/updates/upserts
-
 /**
- * Returns the SQL statement to add an alias entry to the alias table
+ * Inserts an alias entry to the alias table
  * @param meadowlarkId the document with the given alias meadowlarkId
  * @param aliasId the alias meadowlarkId for the given document, this may be the same as the meadowlarkId
- * @returns SQL query string to insert into the aliases table
+ * @returns if the result returned rows
  */
-export async function executeInsertAlias(
+export async function insertAlias(
   client: PoolClient,
   documentUuid: DocumentUuid,
   meadowlarkId: MeadowlarkId,
@@ -307,12 +305,12 @@ export async function executeInsertAlias(
 }
 
 /**
- * Returns the SQL statement to insert an outbound reference for a document into the references table
+ * Inserts an outbound reference for a document into the references table
  * @param meadowlarkId The parent document of the reference
  * @param referencedMeadowlarkId The document that is referenced
- * @returns SQL query string to insert reference into references table
+ * @returns if the result returned rows
  */
-export async function executeInsertOutboundReferences(
+export async function insertOutboundReferences(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
   referencedMeadowlarkId: MeadowlarkId,
@@ -326,12 +324,12 @@ export async function executeInsertOutboundReferences(
 }
 
 /**
- * Returns the SQL statement for inserting or updating a document in the database
+ * Inserts or updates a document in the database
  * @param param0 Document info for insert/update
  * @param isInsert is insert or update SQL re
- * @returns SQL query string for inserting or updating provided document info
+ * @returns if the result returned rows
  */
-export async function executeDocumentInsertOrUpdate(
+export async function insertOrUpdateDocument(
   client: PoolClient,
   { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
   isInsert: boolean,
@@ -392,7 +390,7 @@ export async function executeDocumentInsertOrUpdate(
   return hasResults(queryResult);
 }
 
-// SQL for Deletes
+// Deletes
 /**
  * Checks a delete result to return a deleteResult
  * @param deleteQueryResult The result from database
@@ -418,11 +416,11 @@ async function checkDeleteResult(
   return { response: 'DELETE_SUCCESS' };
 }
 /**
- * Returns the SQL query for deleting a document from the database
+ * Deletes a document from the database
  * @param meadowlarkId the document to delete from the documents table
- * @returns SQL query string to delete the document
+ * @returns a DeleteResult
  */
-export async function executeDeleteDocumentByDocumentUuId(
+export async function deleteDocumentRowByDocumentUuid(
   client: PoolClient,
   documentUuid: DocumentUuid,
 ): Promise<DeleteResult> {
@@ -435,13 +433,13 @@ export async function executeDeleteDocumentByDocumentUuId(
 }
 
 /**
- * Returns the SQL query for deleting the outbound references of a document from the database.
+ * Deletes the outbound references of a document from the database.
  * Used as part of deleting the document itself.
  *
  * @param meadowlarkId the meadowlarkId of the document whose outbound references we want to delete
- * @returns SQL query string to delete references
+ * @returns if the result returned rows
  */
-export async function executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(
+export async function deleteOutboundReferencesOfDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<Boolean> {
@@ -451,11 +449,11 @@ export async function executeDeleteOutboundReferencesOfDocumentByMeadowlarkId(
 }
 
 /**
- * Returns the SQL query for deleting aliases for a given document meadowlarkId. Used as part of deleting the document itself.
+ * Deletes aliases for a given document meadowlarkId. Used as part of deleting the document itself.
  * @param meadowlarkId the meadowlarkId of the document we're deleting aliases for
- * @returns SQL query string for deleting aliases
+ * @returns if the result returned rows
  */
-export async function executeDeleteAliasesForDocumentByMeadowlarkId(
+export async function deleteAliasesForDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<Boolean> {
@@ -473,7 +471,7 @@ export async function executeDeleteAliasesForDocumentByMeadowlarkId(
 /**
  * Creates the meadowlark database
  * @param meadowlarkDbName the name of the database to create
- * @returns SQL query string to create the database
+ * @returns if the result returned rows
  */
 export async function createDatabase(client: Client, meadowlarkDbName: string): Promise<boolean> {
   const createDatabaseScript = format('CREATE DATABASE %I', meadowlarkDbName);
