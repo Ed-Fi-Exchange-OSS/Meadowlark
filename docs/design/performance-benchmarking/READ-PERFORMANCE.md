@@ -7,11 +7,7 @@ To do the performance tests to retrieve endpoints, use the
 
 ### Setup
 
-- Configure Meadowlark and verify that it's running.
-- Load Sample data with the Invoke-LoadGrandBend or Invoke-LoadPartialGrandBend scripts.
-- Verify that the data has been loaded correctly through the API or from the database.
-- Clone the [Suite3-Performance-Testing](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing) repository.
-- Install [python](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation).
+- Follow steps to [setup performance suite](./SETUP-PERFORMANCE-SUITE.md).
 - Go to /src/edfi_paging_test folder and run `poetry install`.
 - Create a .env file based on /src/edfi_paging_test/edfi_paging_test/.env.example with your endpoint, key and secret.
 
@@ -24,14 +20,16 @@ To do the performance tests to retrieve endpoints, use the
 ### Comparing performance of multiple runs
 
 To get a detailed comparison of Mean time and Standard Deviation, run the script
-[GetAll-Performance.ps1](../../../eng/performance/GetAll-Performance.ps1). This will print the details of the execution,
-additionally, it will generate a report per each run executed in CSV format, that can be analyzed.
+[GetAll-Performance.ps1](../../../eng/performance/GetAll-Performance.ps1).
 
 The script receives two parameters:
 
-PagingTestsPath: Path of the Suite3-Performance-Testing edfi-paging-tests location.
+**PagingTestsPath**: Path of the Suite3-Performance-Testing edfi-paging-tests location.
 
-NumTrials: Number of times to run the tests. Defaults to *5*.
+**NumTrials**: Number of times to run the tests. Defaults to *5*.
+
+This will print the details of the execution,
+additionally, it will generate a report per each run executed in CSV format, that can be analyzed.
 
 Example
 
@@ -76,49 +74,3 @@ Results example:
 
 Run the same tests against and ODS/API instance with the same data set and filtering out the tpdm, sample and homograph
 resources since those are not handled by Meadowlark. Changing the url and variables in the .env file inside edfi_paging_test.
-
-### Profiler
-
-<details>
-  <summary>Running MongoDB profiler</summary>
-
-MongoDB comes with a built in profiler, disabled by default.
-
-To enable, connect to the docker container with `mongosh` and execute `db.setProfilingLevel(2)` to track all traffic.
-
-This must be done before running the paging tests to track the next instructions. To see the latest tracked data, run `show
-profile`.
-
-This will display something similar to:
-
-```json
-query   meadowlark.documents 1ms Wed Jun 07 2023 15:20:33
-command:{
-  find: 'documents',
-  filter: {
-    aliasIds: {
-      '$in': [
-        'KcsqHWHlSrAHP0LyDuChFK-C3NuO_tH5NF2YRA',
-        'auET2M3A7eg92ChrMaFL6vkmjHtx83fCs3kt_w',
-        'h0E08by8zxQHVXAblfHfXX4gU4l2-0AKcLWbGA'
-      ]
-    }
-  },
-  projection: { _id: 1 },
-  txnNumber: Long("754"),
-  autocommit: false,
-  '$clusterTime': {
-    clusterTime: Timestamp({ t: 1686172829, i: 1 }),
-    signature: {
-      hash: "",
-      keyId: Long("7241292544405929986")
-    }
-  },
-  '$db': 'meadowlark'
-} keysExamined:5 docsExamined:2 cursorExhausted numYield:0 nreturned:2 locks:{} storage:{} responseLength:346 protocol:op_msg
-```
-
-From the results, you can analyze the timeStamp and the number of docs and keys examined to get the results. [Read
-more](https://www.mongodb.com/docs/manual/reference/database-profiler/).
-
-</details>

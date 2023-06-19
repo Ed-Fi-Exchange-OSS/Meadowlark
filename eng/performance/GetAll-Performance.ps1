@@ -19,8 +19,8 @@ param(
 $times = @()
 
 $originalLocation = Get-Location
-
 Set-Location -Path $PagingTestsPath
+
 for ($i = 0; $i -lt $NumTrials; $i++) {
     $timing = Measure-Command { poetry run python edfi_paging_test }
     $times += $timing.TotalMilliseconds
