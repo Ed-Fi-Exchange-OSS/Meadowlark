@@ -6,18 +6,7 @@
 import { Pool, Client } from 'pg';
 import type { PoolClient } from 'pg';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import {
-  createDocumentTableSql,
-  createDocumentTableUniqueIndexSql,
-  createReferencesTableCheckingIndexSql,
-  createReferencesTableDeletingIndexSql,
-  createReferencesTableSql,
-  createSchemaSql,
-  createDatabaseSql,
-  createAliasesTableSql,
-  createAliasesTableDocumentIndexSql,
-  createAliasesTableAliasIndexSql,
-} from './SqlHelper';
+import { createDatabase, checkExistsAndCreateTables } from './SqlHelper';
 
 let singletonDbPool: Pool | null = null;
 
@@ -30,27 +19,6 @@ const getDbConfiguration = () => ({
 });
 
 const moduleName = 'postgresql.repository.Db';
-
-/**
- * Checks that the meadowlark schema, document and references tables exist in the database, if not will create them
- * @param client The Postgres client for querying
- */
-export async function checkExistsAndCreateTables(client: PoolClient) {
-  try {
-    await client.query(createSchemaSql);
-    await client.query(createDocumentTableSql);
-    await client.query(createDocumentTableUniqueIndexSql);
-    await client.query(createReferencesTableSql);
-    await client.query(createReferencesTableCheckingIndexSql);
-    await client.query(createReferencesTableDeletingIndexSql);
-    await client.query(createAliasesTableSql);
-    await client.query(createAliasesTableDocumentIndexSql);
-    await client.query(createAliasesTableAliasIndexSql);
-  } catch (e) {
-    Logger.error(`${moduleName}.checkExistsAndCreateTables error connecting to PostgreSQL`, null, e);
-    throw e;
-  }
-}
 
 /**
  * Create a connection pool, check that the database and table structure is in place
@@ -92,7 +60,7 @@ export async function createConnectionPoolAndReturnClient(): Promise<PoolClient>
   const client: Client = new Client(getDbConfiguration());
   try {
     await client.connect();
-    await client.query(createDatabaseSql(meadowlarkDbName));
+    await createDatabase(client, meadowlarkDbName);
 
     Logger.info(`${moduleName}.createConnectionPoolAndReturnClient database ${meadowlarkDbName} created successfully`, null);
   } catch (e) {

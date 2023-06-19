@@ -8,7 +8,7 @@ import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
-import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
@@ -61,7 +61,7 @@ describe('given the requested document does not exist', () => {
 
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
-  const expectedBlockingDocument: BlockingDocument = {
+  const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName',
     documentUuid: 'documentUuid' as DocumentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
@@ -78,7 +78,7 @@ describe('given the new document has an invalid reference ', () => {
         Promise.resolve({
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: expectedError,
-          blockingDocuments: [expectedBlockingDocument],
+          referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
 

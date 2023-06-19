@@ -4,12 +4,12 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentUuid } from '../model/BrandedTypes';
-import { BlockingDocument } from './BlockingDocument';
+import { ReferringDocumentInfo } from './ReferringDocumentInfo';
 
 type UpsertFailureBlocked = {
   response: 'INSERT_FAILURE_REFERENCE' | 'INSERT_FAILURE_CONFLICT' | 'UPDATE_FAILURE_REFERENCE';
   failureMessage?: string | object;
-  blockingDocuments: BlockingDocument[];
+  referringDocumentInfo: ReferringDocumentInfo[];
 };
 
 export type UpsertResult =

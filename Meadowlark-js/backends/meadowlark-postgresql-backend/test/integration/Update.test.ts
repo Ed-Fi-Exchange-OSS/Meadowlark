@@ -31,10 +31,11 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import {
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
-  findDocumentByDocumentUuidSql,
-  findDocumentByMeadowlarkIdSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkId,
+  findDocumentByDocumentUuid,
+  findDocumentByMeadowlarkId,
 } from '../../src/repository/SqlHelper';
+import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
@@ -173,11 +174,11 @@ describe('given the update of an existing document', () => {
   });
 
   it('should have updated the document in the db', async () => {
-    const result: any = await client.query(findDocumentByDocumentUuidSql(resultDocumentUuid));
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
 
-    expect(result.rows[0].document_identity.natural).toBe('update2');
+    expect(result.document_identity.natural).toBe('update2');
 
-    expect(result.rows[0].edfi_doc.changeToDoc).toBe(true);
+    expect(result.edfi_doc.changeToDoc).toBe(true);
   });
 });
 
@@ -248,12 +249,12 @@ describe('given an update of a document that references a non-existent document 
   });
 
   it('should have updated the document with an invalid reference in the db', async () => {
-    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
 
-    expect(docResult.rows[0].document_identity.natural).toBe('update4');
+    expect(docResult.document_identity.natural).toBe('update4');
 
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
@@ -353,11 +354,11 @@ describe('given an update of a document that references an existing document wit
   });
 
   it('should have updated the document with a valid reference in the db', async () => {
-    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesId));
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
-    expect(docResult.rows[0].document_identity.natural).toBe('update6');
+    expect(docResult.document_identity.natural).toBe('update6');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "Qw5FvPdKxAXWnGghsMh3I61yLFfls4Q949Fk2w",
@@ -750,14 +751,14 @@ describe('given the update of an existing document changing meadowlarkId with al
   });
 
   it('should have deleted the document alias related to the old meadowlarkId in the db', async () => {
-    const result: any = await client.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkId));
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkId);
 
-    expect(result.rowCount).toEqual(0);
+    expect(result.length).toEqual(0);
   });
 
   it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
-    const result: any = await client.query(findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(meadowlarkIdUpdated));
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkIdUpdated);
 
-    expect(result.rowCount).toEqual(1);
+    expect(result.length).toEqual(1);
   });
 });

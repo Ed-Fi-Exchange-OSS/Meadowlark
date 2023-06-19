@@ -30,11 +30,12 @@ import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { deleteDocumentByDocumentUuid } from '../../src/repository/Delete';
 import { upsertDocument } from '../../src/repository/Upsert';
 import {
-  findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql,
-  findDocumentByDocumentUuidSql,
-  findDocumentByMeadowlarkIdSql,
-  findReferencingMeadowlarkIdsSql,
+  findAliasMeadowlarkIdsForDocumentByMeadowlarkId,
+  findDocumentByDocumentUuid,
+  findDocumentByMeadowlarkId,
+  findReferencingMeadowlarkIds,
 } from '../../src/repository/SqlHelper';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../src/model/MeadowlarkDocument';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -129,8 +130,8 @@ describe('given the delete of an existing document', () => {
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: any = await client.query(findDocumentByDocumentUuidSql(documentUuid));
-    expect(result.rowCount).toEqual(0);
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
+    expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 });
 
@@ -216,8 +217,8 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should still have the referenced document in the db', async () => {
-    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(referencedDocumentId));
-    expect(docResult.rows[0].document_identity.natural).toBe('delete5');
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
+    expect(docResult.document_identity.natural).toBe('delete5');
   });
 });
 
@@ -305,22 +306,23 @@ describe('given an delete of a document with an outbound reference only, with va
   });
 
   it('should have deleted the document in the db', async () => {
-    const result: any = await client.query(findDocumentByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
 
-    expect(result.rowCount).toEqual(0);
+    expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
   });
 
   it('should have deleted the document alias in the db', async () => {
-    const result: any = await client.query(
-      findAliasMeadowlarkIdsForDocumentByMeadowlarkIdSql(documentWithReferencesMeadowlarkId),
+    const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
+      client,
+      documentWithReferencesMeadowlarkId,
     );
 
-    expect(result.rowCount).toEqual(0);
+    expect(result.length).toEqual(0);
   });
   it('should have deleted the document reference in the db', async () => {
-    const result: any = await client.query(findReferencingMeadowlarkIdsSql([referencedDocumentId]));
+    const result: MeadowlarkId[] = await findReferencingMeadowlarkIds(client, [referencedDocumentId]);
 
-    expect(result.rowCount).toEqual(0);
+    expect(result.length).toEqual(0);
   });
 });
 
@@ -407,8 +409,8 @@ describe('given an delete of a document referenced by an existing document with 
   });
 
   it('should not have the referenced document in the db', async () => {
-    const docResult: any = await client.query(findDocumentByMeadowlarkIdSql(referencedDocumentId));
-    expect(docResult.rowCount).toEqual(0);
+    const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
+    expect(isMeadowlarkDocumentEmpty(docResult)).toEqual(true);
   });
 
   it('should not be the parent document in the references table', async () => {
@@ -511,7 +513,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   });
 
   it('should still have the referenced document in the db', async () => {
-    const result: any = await client.query(findDocumentByMeadowlarkIdSql(referencedDocumentId));
-    expect(result.rows[0].document_identity.schoolId).toBe('123');
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
+    expect(result.document_identity.schoolId).toBe('123');
   });
 });

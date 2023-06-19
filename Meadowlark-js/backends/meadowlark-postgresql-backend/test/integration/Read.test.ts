@@ -23,8 +23,9 @@ import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { deleteAll } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
-import { findDocumentByMeadowlarkIdSql } from '../../src/repository/SqlHelper';
+import { findDocumentByMeadowlarkId } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../src/model/MeadowlarkDocument';
 
 const newGetRequest = (): GetRequest => ({
   documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
@@ -71,9 +72,9 @@ describe('given the get of a non-existent document', () => {
   });
 
   it('should not exist in the db', async () => {
-    const result = await client.query(findDocumentByMeadowlarkIdSql(meadowlarkId));
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
 
-    expect(result.rowCount).toBe(0);
+    expect(isMeadowlarkDocumentEmpty(result)).toBe(true);
   });
 
   it('should return get failure', async () => {

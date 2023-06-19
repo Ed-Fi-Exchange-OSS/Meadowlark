@@ -3,11 +3,11 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { BlockingDocument } from './BlockingDocument';
+import { ReferringDocumentInfo } from './ReferringDocumentInfo';
 
 export type DeleteFailureReference = {
   response: 'DELETE_FAILURE_REFERENCE';
-  blockingDocuments: BlockingDocument[];
+  referringDocumentInfo: ReferringDocumentInfo[];
 };
 
 export type DeleteResult =

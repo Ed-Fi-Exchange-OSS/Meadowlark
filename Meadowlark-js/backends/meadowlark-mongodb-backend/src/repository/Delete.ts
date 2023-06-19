@@ -6,7 +6,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { Logger, Config } from '@edfi/meadowlark-utilities';
-import { DeleteResult, DeleteRequest, BlockingDocument, DocumentUuid, TraceId } from '@edfi/meadowlark-core';
+import { DeleteResult, DeleteRequest, ReferringDocumentInfo, DocumentUuid, TraceId } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
@@ -55,7 +55,7 @@ async function checkForReferencesToDocument(
     .find(onlyDocumentsReferencing(deleteCandidate.aliasMeadowlarkIds), limitFive(session))
     .toArray();
 
-  const blockingDocuments: BlockingDocument[] = referringDocuments.map((document) => ({
+  const referringDocumentInfo: ReferringDocumentInfo[] = referringDocuments.map((document) => ({
     documentUuid: document.documentUuid,
     meadowlarkId: document._id,
     resourceName: document.resourceName,
@@ -63,7 +63,7 @@ async function checkForReferencesToDocument(
     resourceVersion: document.resourceVersion,
   }));
 
-  return { response: 'DELETE_FAILURE_REFERENCE', blockingDocuments };
+  return { response: 'DELETE_FAILURE_REFERENCE', referringDocumentInfo };
 }
 
 /**

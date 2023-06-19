@@ -9,7 +9,7 @@ import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
-import { BlockingDocument } from '../../src/message/BlockingDocument';
+import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
 
@@ -29,7 +29,7 @@ const frontendRequest: FrontendRequest = {
 
 describe('given persistence is going to throw a reference error on insert', () => {
   let response: FrontendResponse;
-  const expectedBlockingDocument: BlockingDocument = {
+  const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName',
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
@@ -46,7 +46,7 @@ describe('given persistence is going to throw a reference error on insert', () =
         Promise.resolve({
           response: 'INSERT_FAILURE_REFERENCE',
           failureMessage: expectedError,
-          blockingDocuments: [expectedBlockingDocument],
+          referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
 
@@ -113,7 +113,7 @@ describe('given upsert has write conflict failure', () => {
 
 describe('given persistence is going to throw a conflict error on insert', () => {
   let response: FrontendResponse;
-  const expectedBlockingDocument: BlockingDocument = {
+  const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName',
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
@@ -130,7 +130,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
         Promise.resolve({
           response: 'INSERT_FAILURE_CONFLICT',
           failureMessage: expectedError,
-          blockingDocuments: [expectedBlockingDocument],
+          referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
 
@@ -161,7 +161,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
 
 describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
   let response: FrontendResponse;
-  const expectedBlockingDocument: BlockingDocument = {
+  const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName',
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
@@ -177,7 +177,7 @@ describe('given persistence is going to throw a reference error on update though
         Promise.resolve({
           response: 'UPDATE_FAILURE_REFERENCE',
           failureMessage: 'Reference failure',
-          blockingDocuments: [expectedBlockingDocument],
+          referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
 

@@ -3,30 +3,34 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import type { PoolClient, QueryResult } from 'pg';
+import type { PoolClient } from 'pg';
 import {
   UpsertResult,
   UpsertRequest,
   DocumentReference,
   getMeadowlarkIdForDocumentReference,
   getMeadowlarkIdForSuperclassInfo,
-  BlockingDocument,
+  ReferringDocumentInfo,
   generateDocumentUuid,
   DocumentUuid,
   MeadowlarkId,
 } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import {
-  deleteOutboundReferencesOfDocumentByMeadowlarkIdSql,
-  documentInsertOrUpdateSql,
-  insertOutboundReferencesSql,
-  deleteAliasesForDocumentByMeadowlarkIdSql,
-  insertAliasSql,
-  findAliasMeadowlarkIdSql,
-  findReferringDocumentInfoForErrorReportingSql,
-  findDocumentByMeadowlarkIdSql,
+  deleteOutboundReferencesOfDocumentByMeadowlarkId,
+  insertOrUpdateDocument,
+  insertOutboundReferences,
+  deleteAliasesForDocumentByMeadowlarkId,
+  insertAlias,
+  findAliasMeadowlarkId,
+  findReferringDocumentInfoForErrorReporting,
+  findDocumentByMeadowlarkId,
+  beginTransaction,
+  rollbackTransaction,
+  commitTransaction,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
+import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Upsert';
 
@@ -40,19 +44,21 @@ export async function upsertDocument(
     getMeadowlarkIdForDocumentReference(dr),
   );
   try {
-    await client.query('BEGIN');
+    await beginTransaction(client);
 
     // Check whether this is an insert or update
-    const documentExistsResult: QueryResult = await client.query(findDocumentByMeadowlarkIdSql(meadowlarkId));
-    const isInsert: boolean = documentExistsResult.rowCount === 0;
-    const documentUuid: DocumentUuid =
-      documentExistsResult.rowCount > 0 ? documentExistsResult.rows[0].document_uuid : generateDocumentUuid();
+    const documentExistsResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    const isInsert: boolean = isMeadowlarkDocumentEmpty(documentExistsResult);
+    const documentUuid: DocumentUuid = !isMeadowlarkDocumentEmpty(documentExistsResult)
+      ? documentExistsResult.document_uuid
+      : generateDocumentUuid();
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
-      const superclassAliasMeadowlarkIdInUseResult = await client.query(
-        findAliasMeadowlarkIdSql(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId),
+      const superclassAliasMeadowlarkIdInUseResult: MeadowlarkId[] = await findAliasMeadowlarkId(
+        client,
+        getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId,
       );
-      const superclassAliasMeadowlarkIdInUse: boolean = superclassAliasMeadowlarkIdInUseResult.rowCount !== 0;
+      const superclassAliasMeadowlarkIdInUse: boolean = superclassAliasMeadowlarkIdInUseResult.length !== 0;
 
       if (superclassAliasMeadowlarkIdInUse) {
         Logger.debug(
@@ -64,29 +70,18 @@ export async function upsertDocument(
           documentInfo.superclassInfo,
         ) as MeadowlarkId;
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([superclassAliasId]));
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(client, [
+          superclassAliasId,
+        ]);
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
-          resourceName: document.resource_name,
-          documentUuid: document.document_uuid,
-          meadowlarkId: document.meadowlark_id,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
-
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return {
           response: 'INSERT_FAILURE_CONFLICT',
           failureMessage: `Insert failed: the identity is in use by '${resourceInfo.resourceName}' which is also a(n) '${documentInfo.superclassInfo.resourceName}'`,
-          blockingDocuments,
+          referringDocumentInfo,
         };
       }
     }
-
-    const documentUpsertSql: string = documentInsertOrUpdateSql(
-      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
-      isInsert,
-    );
 
     if (validateDocumentReferencesExist) {
       const failures = await validateReferences(
@@ -103,40 +98,38 @@ export async function upsertDocument(
           traceId,
         );
 
-        const referringDocuments = await client.query(findReferringDocumentInfoForErrorReportingSql([meadowlarkId]));
+        const referringDocumentInfo: ReferringDocumentInfo[] = await findReferringDocumentInfoForErrorReporting(client, [
+          meadowlarkId,
+        ]);
 
-        const blockingDocuments: BlockingDocument[] = referringDocuments.rows.map((document) => ({
-          resourceName: document.resource_name,
-          documentUuid: document.document_uuid,
-          meadowlarkId: document.meadowlark_id,
-          projectName: document.project_name,
-          resourceVersion: document.resource_version,
-        }));
-
-        await client.query('ROLLBACK');
+        await rollbackTransaction(client);
         return {
           response: isInsert ? 'INSERT_FAILURE_REFERENCE' : 'UPDATE_FAILURE_REFERENCE',
           failureMessage: { error: { message: 'Reference validation failed', failures } },
-          blockingDocuments,
+          referringDocumentInfo,
         };
       }
     }
 
     // Perform the document upsert
     Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
-    await client.query(documentUpsertSql);
+    await insertOrUpdateDocument(
+      client,
+      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
+      isInsert,
+    );
     // Delete existing values from the aliases table
-    await client.query(deleteAliasesForDocumentByMeadowlarkIdSql(meadowlarkId));
+    await deleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
     // Perform insert of alias ids
-    await client.query(insertAliasSql(documentUuid, meadowlarkId, meadowlarkId));
+    await insertAlias(client, documentUuid, meadowlarkId, meadowlarkId);
     if (documentInfo.superclassInfo != null) {
       const superclassAliasId: MeadowlarkId = getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo) as MeadowlarkId;
-      await client.query(insertAliasSql(documentUuid, meadowlarkId, superclassAliasId));
+      await insertAlias(client, documentUuid, meadowlarkId, superclassAliasId);
     }
 
     // Delete existing references in references table
     Logger.debug(`${moduleName}.upsertDocument: Deleting references for document meadowlarkId ${meadowlarkId}`, traceId);
-    await client.query(deleteOutboundReferencesOfDocumentByMeadowlarkIdSql(meadowlarkId));
+    await deleteOutboundReferencesOfDocumentByMeadowlarkId(client, meadowlarkId);
 
     // Adding descriptors to outboundRefs for reference checking
     const descriptorOutboundRefs = documentInfo.descriptorReferences.map((dr: DocumentReference) =>
@@ -151,16 +144,16 @@ export async function upsertDocument(
         `post${moduleName}.upsertDocument: Inserting reference meadowlarkId ${ref} for document meadowlarkId ${meadowlarkId}`,
         ref,
       );
-      await client.query(insertOutboundReferencesSql(meadowlarkId, ref as MeadowlarkId));
+      await insertOutboundReferences(client, meadowlarkId, ref as MeadowlarkId);
     }
 
-    await client.query('COMMIT');
+    await commitTransaction(client);
     return isInsert
       ? { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid }
       : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };
   } catch (e) {
     Logger.error(`${moduleName}.upsertDocument`, traceId, e);
-    await client.query('ROLLBACK');
+    await rollbackTransaction(client);
     return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   }
 }
