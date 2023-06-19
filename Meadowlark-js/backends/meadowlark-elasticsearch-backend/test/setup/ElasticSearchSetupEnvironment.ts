@@ -25,10 +25,8 @@ export async function teardownElasticSearch() {
  */
 export async function getNewTestClient(): Promise<Client> {
   Logger.debug(`${moduleName}.getNewClient creating local client`, null);
-  const username = 'admin';
-  const password = 'admin';
   const node = process.env.ELASTICSEARCH_ENDPOINT;
-  const auth = { username, password };
+  const auth = { username: '', password: '' };
   const requestTimeout = 10000;
   return getElasticSearchClient(node, auth, requestTimeout);
 }

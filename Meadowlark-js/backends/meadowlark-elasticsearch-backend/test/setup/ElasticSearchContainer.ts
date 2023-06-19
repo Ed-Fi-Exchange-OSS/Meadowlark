@@ -27,8 +27,6 @@ export async function setup() {
     .start();
 
   process.env.ELASTICSEARCH_ENDPOINT = `http://localhost:${elasticSearchPort}`;
-  process.env.ELASTICSEARCH_USERNAME = 'admin';
-  process.env.ELASTICSEARCH_PASSWORD = 'admin';
   process.env.ELASTICSEARCH_REQUEST_TIMEOUT = '10000';
 }
 
