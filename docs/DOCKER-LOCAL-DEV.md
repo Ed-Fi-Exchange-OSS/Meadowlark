@@ -17,6 +17,7 @@ to for permanent data storage:
   :exclamation: be sure to read for critical one-time manual setup instructions.
 * [PostgreSQL](../backends/meadowlark-postgresql-backend/docker/readme.md)
 * [OpenSearch](../backends/meadowlark-opensearch-backend/docker/readme.md)
+* [ElasticSearch](../backends/meadowlark-elasticsearch-backend/docker/readme.md)
 
 ## Global Docker Configuration
 

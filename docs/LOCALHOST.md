@@ -18,6 +18,7 @@ Instructions for running a local "developer" environment on localhost:
    * [MongoDB](../Meadowlark-js/backends/meadowlark-mongodb-backend/docker)
    * [PostgreSQL](../Meadowlark-js/backends/meadowlark-postgresql-backend/docker)
    * [OpenSearch](../Meadowlark-js/backends/meadowlark-opensearch-backend/docker)
+   * [ElasticSearch](../Meadowlark-js/backends/meadowlark-elasticsearch-backend/docker)
 5. Open a command prompt and navigate to the `/Meadowlark-js` folder
 6. Run `npm install`
 7. Run `npm run build`
@@ -35,7 +36,7 @@ PostgreSQL, and OpenSearch. One mechanism is to stop the Docker containers and
 then delete the volumes they were using, then restart Docker. If you do not want
 to delete the volumes, then you can manually delete records. Examples:
 
-### OpenSearch
+### OpenSearch and ElasticSearch (Same commands work for both)
 
 Open the [DevTools console](http://localhost:5601/app/dev_tools#/console) in a
 browser and run these dangerous commands:

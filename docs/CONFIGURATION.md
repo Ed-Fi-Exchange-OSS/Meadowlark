@@ -5,9 +5,8 @@
 As of release 0.3.0, "Meadowlark" provides a Fastify-based API that implements
 (imperfectly) an Ed-Fi API compliant with Data Standard 3.3, and implements an
 OAuth2 API supporting the client-credentials flow. These services are backed by
-MongoDB for primary data storage. The Ed-Fi API also OpenSearch to handle `GET`
-all items and `GET` by querystring filters; in theory Elasticsearch should work
-as well, though the development team has not tested it.
+MongoDB for primary data storage. The Ed-Fi API also includes OpenSearch and
+ElasticSearch to handle `GET` all items and `GET` by querystring filters.
 
 The MongoDB configuration needs to have a replica set to support atomic
 transactions. Technically the replica set can contain only a single node, though
@@ -19,22 +18,22 @@ communicate through unencrypted channels. Indeed, the development team has not
 tested any alternative. However, only the API port should be open to outside
 traffic, except as needed for debugging.
 
-                           ┌──────────────────────────────────────────────┐
-                           │                                              │
-                           │                      ┌────────┐              │
-                           │               ┌──────►MongoDB ├───────┐      │
-                           │               │      └───┬────┘       │      │
-    ┌───────────┐          │ ┌────────┐    │          │            │      │
-    │API Clients├──────────┼─►Fastify ├────┤      ┌───▼────┐  ┌────▼───┐  │
-    └───────────┘          │ └────────┘    │      │MongoDB │  │MongoDB │  │
-                           │               │      └────────┘  └────────┘  │
-                           │               │                              │
-                           │               │      ┌───────────┐           │
-                           │               └──────►OpenSearch │           │
-                           │                      └───────────┘           │
-                           │                                              │
-                           │                             Network Boundary │
-                           └──────────────────────────────────────────────┘
+                       ┌────────────────────────────────────────────────────────┐
+                       │                                                        │
+                       │                      ┌────────┐                        │
+                       │               ┌──────►MongoDB ├───────┐                │
+                       │               │      └───┬────┘       │                │
+    ┌───────────┐      │ ┌────────┐    │          │            │                │
+    │API Clients├──────┼─►Fastify ├────┤      ┌───▼────┐  ┌────▼───┐            │
+    └───────────┘      │ └────────┘    │      │MongoDB │  │MongoDB │            │
+                       │               │      └────────┘  └────────┘            │
+                       │               │                                        │
+                       │               │      ┌───────────┐     ┌──────────────┐│
+                       │               └──────►OpenSearch │ --- │ElasticSearch ││
+                       │                      └───────────┘     └──────────────┘│
+                       │                                                        │
+                       │                                      Network Boundary  │
+                       └────────────────────────────────────────────────────────┘
 
 ## Environment Variables
 
@@ -90,9 +89,9 @@ To create a new key:
 | HTTP_PROTOCOL_AND_SERVER                         | http://localhost                 | The base URL for the site                                                                                |
 | MEADOWLARK_STAGE                                 | local                            | Used in the URL                                                                                          |
 | DISABLE_LOG_ANONYMIZATION                        | false                            | When true, request and response logs will contain complete payloads instead of anonymized payloads       |
-| LISTENER1_PLUGIN                                 | (none)                           | Only one option at this time: "@edfi/meadowlark-opensearch-backend"; if not set, `GET` queries will fail |
+| LISTENER1_PLUGIN                                 | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
 | LISTENER2_PLUGIN                                 | (none)                           | No options at this time                                                                                  |
-| QUERY_HANDLER_PLUGIN                             | (none)                           | Only one option at this time: "@edfi/meadowlark-opensearch-backend"; if not set, `GET` queries will fail |
+| QUERY_HANDLER_PLUGIN                             | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
 | DOCUMENT_STORE_PLUGIN                            | @edfi/meadowlark-mongodb-backend | Future alternative: "@edfi/meadowlark-postgresql-back                                                    |
 | AUTHORIZATION_STORE_PLUGIN                   | @edfi/meadowlark-mongodb-backend | No alternative at this time.                                                                             |
 | **OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST**  | (none)                           | Ex: http://localhost:3000/local/oauth/token                                                              |
