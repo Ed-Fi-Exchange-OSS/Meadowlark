@@ -48,6 +48,9 @@ $queryHandler="@edfi/meadowlark-opensearch-backend"
 $listenerPlugin="@edfi/meadowlark-opensearch-backend"
 $authorizationPlugin="@edfi/meadowlark-mongodb-backend"
 
+> **Note** See [Enable Logging](#enable-logging)
+> before running the following command if you want to get log information.
+
 # Create meadowlark container
 az container create --resource-group $resourceGroup -n ml-api `
     --image edfialliance/meadowlark-ed-fi-api:pre --ports 3000 `
@@ -65,6 +68,43 @@ az container create --resource-group $resourceGroup -n ml-api `
     ALLOW__EXT_PROPERTY=true MONGO_URI=$mongoUri
 ```
 
+### Enable Logging
+
+To enable logging, we need to send the logs to _Log Analytics_
+
+```Shell
+  # Create workspace
+  az monitor log-analytics workspace create `
+  --resource-group $resourceGroup --workspace-name meadowlark-logs
+```
+
+Copy the `customerId` from the result.
+
+```Shell
+  # Get shared key
+  az monitor log-analytics workspace get-shared-keys `
+  --resource-group $resourceGroup --name meadowlark-logs
+```
+
+Copy the `primarySharedKey` from the result.
+
+> **Note** This information can be retrieved from the Portal, in Log Analytics
+> Workspaces -> Settings -> Agents. [More
+> information](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics)
+
+When creating the meadowlark container, include the customerId (workspace_id)
+and the primarySharedKey (workspace_key) as additional properties with the
+following flags:
+
+```Shell
+az container create ... `
+    --log-analytics-workspace <WORKSPACE_ID> `
+    --log-analytics-workspace-key <WORKSPACE_KEY>
+```
+
+To view the log information, follow [these
+steps](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#view-logs)
+
 ## Deploy with Docker Azure Integration
 
 > **Warning** The Docker Azure Integration will be retired in November 2023.
@@ -78,8 +118,8 @@ az container create --resource-group $resourceGroup -n ml-api `
 - Browse to `../eng/deploy/azure`
 
 - Create a .env file. Set the OAUTH_SIGNING_KEY, AZURE_REGION and
-  ED_FI_DOMAIN_NAME. The combination of domain name an azure region must
-  be globally unique.
+  ED_FI_DOMAIN_NAME. The combination of domain name an azure region must be
+  globally unique.
 
 - Execute the following script:
 
