@@ -1,0 +1,27 @@
+version: "3.8"
+
+volumes:
+  esdata01:
+    driver: local
+
+networks:
+  default:
+    name: elastic
+    external: false
+
+services:
+  elasticsearch-node1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0@sha256:9aaa38551b4d9e655c54d9dc6a1dad24ee568c41952dc8cf1d4808513cfb5f65
+    container_name: elasticsearch-node1
+    labels:
+      co.elastic.logs/module: elasticsearch
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    environment:
+      - node.name=es01
+      - cluster.name=elasticsearch-node1
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    mem_limit: 2g

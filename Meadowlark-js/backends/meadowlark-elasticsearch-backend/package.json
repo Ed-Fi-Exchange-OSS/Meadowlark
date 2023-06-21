@@ -1,0 +1,35 @@
+{
+  "name": "@edfi/meadowlark-elasticsearch-backend",
+  "main": "dist/index.js",
+  "version": "0.3.0-pre-36",
+  "description": "Meadowlark backend plugin for elasticsearch",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/"
+  },
+  "files": [
+    "/dist",
+    "/LICENSE.md",
+    "/package.json"
+  ],
+  "scripts": {
+    "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
+    "build:clean": "rimraf dist",
+    "build:dist": "tsc",
+    "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
+  },
+  "dependencies": {
+    "@edfi/meadowlark-core": "^v0.3.0-pre-35",
+    "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
+    "@edfi/metaed-core": "^4.0.1-dev.13",
+    "@elastic/elasticsearch": "^8.8.0",
+    "@elastic/transport": "^8.3.2"
+  },
+  "devDependencies": {
+    "@elastic/elasticsearch-mock": "^2.0.0",
+    "copyfiles": "^2.4.1",
+    "dotenv": "^16.0.3",
+    "rimraf": "^3.0.2",
+    "testcontainers": "^9.8.0"
+  }
+}

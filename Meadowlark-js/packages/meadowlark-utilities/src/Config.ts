@@ -30,6 +30,10 @@ export type ConfigKeys =
   | 'OPENSEARCH_USERNAME'
   | 'OPENSEARCH_PASSWORD'
   | 'OPENSEARCH_REQUEST_TIMEOUT'
+  | 'ELASTICSEARCH_ENDPOINT'
+  | 'ELASTICSEARCH_USERNAME'
+  | 'ELASTICSEARCH_PASSWORD'
+  | 'ELASTICSEARCH_REQUEST_TIMEOUT'
   | 'LISTENER1_PLUGIN'
   | 'LISTENER2_PLUGIN'
   | 'QUERY_HANDLER_PLUGIN'
@@ -127,6 +131,18 @@ export async function initializeConfig(provider: ConfigPlugin) {
     set('OPENSEARCH_USERNAME', await provider.getString('OPENSEARCH_USERNAME', 'x'));
     set('OPENSEARCH_PASSWORD', await provider.getString('OPENSEARCH_PASSWORD', 'y'));
     set('OPENSEARCH_REQUEST_TIMEOUT', await provider.getInt('OPENSEARCH_REQUEST_TIMEOUT', 30000));
+  }
+
+  // should only be required if enabled...
+  if (
+    get<string>('LISTENER1_PLUGIN') === '@edfi/meadowlark-elasticsearch-backend' ||
+    get<string>('LISTENER2_PLUGIN') === '@edfi/meadowlark-elasticsearch-backend' ||
+    get<string>('QUERY_HANDLER_PLUGIN') === '@edfi/meadowlark-elasticsearch-backend'
+  ) {
+    set('ELASTICSEARCH_ENDPOINT', await provider.getString('ELASTICSEARCH_ENDPOINT', ThrowIfNotFound));
+    set('ELASTICSEARCH_USERNAME', await provider.getString('ELASTICSEARCH_USERNAME', 'x'));
+    set('ELASTICSEARCH_PASSWORD', await provider.getString('ELASTICSEARCH_PASSWORD', 'y'));
+    set('ELASTICSEARCH_REQUEST_TIMEOUT', await provider.getInt('ELASTICSEARCH_REQUEST_TIMEOUT', 30000));
   }
 
   set('ALLOW_TYPE_COERCION', await provider.getBool('ALLOW_TYPE_COERCION', false));
