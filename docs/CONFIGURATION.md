@@ -61,6 +61,8 @@ release 0.3.0.
 | OPENSEARCH_USERNAME        | x          | Username for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_PASSWORD        | y          | Password for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_REQUEST_TIMEOUT | 30000      | In milliseconds                                                                                                                        |
+| **ELASTICSEARCH_ENDPOINT**    | (none)     | Only required when the ElasticSearch listener is configured for Fastify.                |
+| ELASTICSEARCH_REQUEST_TIMEOUT | 30000      | In milliseconds                                                                                                                        |
 | POSTGRES_HOST              | localhost  | Server/host name for PostgreSQL                                                                                                        |
 | POSTGRES_PORT              | 5432       | Port number for PostgreSQL                                                                                                             |
 | POSTGRES_USER              | (none)     | Username for accessing PostgreSQL                                                                                                      |
