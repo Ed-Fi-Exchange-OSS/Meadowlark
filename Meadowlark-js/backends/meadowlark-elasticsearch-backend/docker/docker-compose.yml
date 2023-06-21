@@ -11,7 +11,7 @@ networks:
 
 services:
   elasticsearch-node1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
     container_name: elasticsearch-node1
     labels:
       co.elastic.logs/module: elasticsearch
@@ -23,6 +23,5 @@ services:
       - node.name=es01
       - cluster.name=elasticsearch-node1
       - discovery.type=single-node
-      - ELASTIC_PASSWORD=elasticpassword
       - xpack.security.enabled=false
     mem_limit: 2g
