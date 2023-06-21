@@ -1,14 +1,16 @@
 # Azure Deployment
 
-To deploy to Azure, this can be done thorough Azure Container Instances (ACI) deploying with the [Azure
-CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) or with the [Docker Azure
-Integration](https://docs.docker.com/cloud/aci-integration/).
+To deploy to Azure, this can be done thorough Azure Container Instances (ACI)
+deploying with the [Azure
+CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) or with the
+[Docker Azure Integration](https://docs.docker.com/cloud/aci-integration/).
 
 ## Deploy with Azure CLI
 
-For Azure CLI, it's necessary to specify all environment variables in the command line since it is not possible to read a
-.env file. Additionally, it is not possible to add all containers into the same container group, it must be one container per
-group.
+For Azure CLI, it's necessary to specify all environment variables in the
+command line since it is not possible to read a .env file. Additionally, it is
+not possible to add all containers into the same container group, it must be one
+container per group.
 
 ```pwsh
 # Login to Azure
@@ -16,7 +18,7 @@ az login
 
 $resourceGroup={resource group name}
 
-# Dns labels must be unique per Azure subscription.
+# The combination of DNS labels and azure regions must be globally unique.
 $meadowlarkDnsLabel={meadowlark dns}
 $mongoDnsLabel={mongo dns}
 $openSearchDnsLabel={opensearch dns}
@@ -67,14 +69,17 @@ az container create --resource-group $resourceGroup -n ml-api `
 
 > **Warning** The Docker Azure Integration will be retired in November 2023.
 
-- [Log into Azure from Docker](https://docs.docker.com/cloud/aci-integration/#log-into-azure).
+- [Log into Azure from
+  Docker](https://docs.docker.com/cloud/aci-integration/#log-into-azure).
 
-- [Create an ACI Docker context](https://docs.docker.com/cloud/aci-integration/#create-an-aci-context)
+- [Create an ACI Docker
+  context](https://docs.docker.com/cloud/aci-integration/#create-an-aci-context)
 
 - Browse to `../eng/deploy/azure`
 
-- Create a .env file. Set the OAUTH_SIGNING_KEY, AZURE_REGION and ED_FI_DOMAIN_NAME. The domain name must be unique per Azure
-subscription
+- Create a .env file. Set the OAUTH_SIGNING_KEY, AZURE_REGION and
+  ED_FI_DOMAIN_NAME. The combination of domain name an azure region must
+  be globally unique.
 
 - Execute the following script:
 
@@ -91,18 +96,22 @@ az container exec --resource-group {resource group name} -n meadowlark `
 
 ```
 
-> **Note** Not all functionality available in a Docker Compose file is available when deploying to ACI. To review the
-> available features, check [the documentation](https://docs.docker.com/cloud/aci-compose-features/) .
+> **Note** Not all functionality available in a Docker Compose file is available
+> when deploying to ACI. To review the available features, check [the
+> documentation](https://docs.docker.com/cloud/aci-compose-features/) .
 
 ### Removing the containers
 
-Given that `docker compose down` is not available. To remove all the containers in the group, execute:
+Given that `docker compose down` is not available. To remove all the containers
+in the group, execute:
 
 ```Shell
 az container delete --resource-group {resource group name} -n meadowlark
 ```
 
-> **Warning** Not ready for production usage. This example is using a single mongo node with a simulated replica set and
-> bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials. The current configuration is
-> initializing the mongo replica manually, and this is not saved. Therefore, if the container instance is stopped, it's
-> necessary to reinitialize the replica set.
+> **Warning** Not ready for production usage. This example is using a single
+> mongo node with a simulated replica set and bypassing security with a direct
+> connection, also, it's using the OAUTH hardcoded credentials. The current
+> configuration is initializing the mongo replica manually, and this is not
+> saved. Therefore, if the container instance is stopped, it's necessary to
+> reinitialize the replica set.
