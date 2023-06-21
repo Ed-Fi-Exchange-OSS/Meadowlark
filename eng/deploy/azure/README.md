@@ -38,6 +38,13 @@ az container create --resource-group $resourceGroup -n ml-opensearch `
     --image edfialliance/meadowlark-opensearch:latest `
     --ports 9200 --dns-name-label $openSearchDnsLabel
 
+```
+
+> **Note** See [Enable Logging](#enable-logging)
+> before setting up meadowlark container if you want to get log information.
+
+```Shell
+
 # Define variables
 # Replace with signing key
 $signingKey="<run `openssl rand -base64 256` to create a key>"
@@ -47,9 +54,6 @@ $documentStore="@edfi/meadowlark-mongodb-backend"
 $queryHandler="@edfi/meadowlark-opensearch-backend"
 $listenerPlugin="@edfi/meadowlark-opensearch-backend"
 $authorizationPlugin="@edfi/meadowlark-mongodb-backend"
-
-> **Note** See [Enable Logging](#enable-logging)
-> before running the following command if you want to get log information.
 
 # Create meadowlark container
 az container create --resource-group $resourceGroup -n ml-api `
@@ -90,9 +94,9 @@ Copy the `primarySharedKey` from the result.
 
 > **Note** This information can be retrieved from the Portal, in Log Analytics
 > Workspaces -> Settings -> Agents. [More
-> information](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics)
+> information](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#get-log-analytics-credentials)
 
-When creating the meadowlark container, include the customerId (workspace_id)
+When creating the **meadowlark container**, include the customerId (workspace_id)
 and the primarySharedKey (workspace_key) as additional properties with the
 following flags:
 
