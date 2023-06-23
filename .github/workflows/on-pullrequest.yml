@@ -234,14 +234,19 @@ jobs:
           retention-days: 10
 
   end-to-end:
-    name: End to End tests for ${{ matrix.config.db }}
+    name: End to End tests for ${{ matrix.store.db }} as store and ${{matrix.query_handler.provider}} as query handler
     needs: [lint]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        config: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
+        store: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
                  { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }]
+        query_handler:
+          [
+            { provider: "opensearch", plugin: "@edfi/meadowlark-opensearch-backend" },
+            { provider: "elasticsearch", plugin: "@edfi/meadowlark-elasticsearch-backend" }
+          ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
@@ -269,10 +274,11 @@ jobs:
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
         working-directory: Meadowlark-js/tests/e2e/setup/
 
-      - name: End to End tests for ${{matrix.config.db}}
+      - name: End to End tests for ${{matrix.store.db}} as store and ${{matrix.query_handler.provider}} as query handler
         run: npm run test:e2e:build -- --ci
         env:
-          DOCUMENT_STORE_PLUGIN: ${{ matrix.config.plugin }}
+          DOCUMENT_STORE_PLUGIN: ${{ matrix.store.plugin }}
+          QUERY_HANDLER_PLUGIN: ${{ matrix.query_handler.plugin }}
 
       - name: Docker logs
         if: ${{ failure() }}
