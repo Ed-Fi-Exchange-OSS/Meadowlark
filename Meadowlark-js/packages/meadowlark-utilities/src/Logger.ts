@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import winston from 'winston';
+import { join } from 'path';
 import * as Config from './Config';
 
 const timestampFormat: string = 'YYYY-MM-DD HH:mm:ss.SSS';
@@ -104,6 +105,14 @@ export function initializeLogging(): void {
       }),
     ],
   });
+
+  if (Config.get('SAVE_LOG_TO_FILE') === true) {
+    logger.add(
+      new winston.transports.File({
+        filename: join(process.cwd(), 'meadowlark.log'),
+      }),
+    );
+  }
 }
 
 export const Logger = {

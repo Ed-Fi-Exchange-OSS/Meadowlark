@@ -71,7 +71,9 @@ az container create --resource-group $resourceGroup -n ml-api `
 
 ### Enable Logging
 
-To enable logging, we need to send the logs to _Log Analytics_
+To save the logs to a file, for a summarized result, set the flag `SAVE_LOG_TO_FILE` to true, which will create a `meadowlark.log` file with the logs.
+
+For a production deployment, it's recommended to send the logs to _Log Analytics_, with the following steps:
 
 ```Shell
   # Create workspace

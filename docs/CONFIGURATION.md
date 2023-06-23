@@ -57,7 +57,7 @@ release 0.3.0.
 | MONGODB_MAX_NUMBER_OF_RETRIES  | 1     | Meadowlark can be configured to retry on MongoDB failure, for example when two concurrent transactions attempt to access the same resource. By default, Meadowlark will retry once. This can be changed with the MONGODB_MAX_NUMBER_OF_RETRIES environment variable. |
 | MONGO_WRITE_CONCERN        | majority   | See [MongoDB: Write Concern](https://www.mongodb.com/docs/v4.0/reference/write-concern/)                                               |
 | MONGO_READ_CONCERN         | majority   | See [MongoDB: Read Concern](https://www.mongodb.com/docs/v4.0/reference/read-concern/)                                                 |
-| **OPENSEARCH_ENDPOINT**    | (none)     | Only required when the OpenSearch listener is configured for Fastify. Example: "http://localhost:9200"                                 |
+| **OPENSEARCH_ENDPOINT**    | (none)     | Only required when the OpenSearch listener is configured for Fastify. Example: "<http://localhost:9200>"                                 |
 | OPENSEARCH_USERNAME        | x          | Username for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_PASSWORD        | y          | Password for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_REQUEST_TIMEOUT | 30000      | In milliseconds                                                                                                                        |
@@ -78,6 +78,7 @@ release 0.3.0.
 | OAUTH_TOKEN_AUDIENCE     | edfi-meadowlark-audience | Token audience                                      |
 
 To create a new key:
+
 * Try running the application and accessing endpoint `/{stage}/createSigningKey`
 * Or run `openssl rand -base64 256` from a bash terminal shell.
 
@@ -88,7 +89,7 @@ To create a new key:
 | FASTIFY_NUM_THREADS                              | # of available CPUs              | Number of parallel Fastify threads to run                                                                |
 | FASTIFY_PORT                                     | 3000                             | Port number for the API service                                                                          |
 | FASTIFY_RATE_LIMIT                               | 0                                | Disabled when zero; otherwise limits a client to this number of requests per minute                      |
-| HTTP_PROTOCOL_AND_SERVER                         | http://localhost                 | The base URL for the site                                                                                |
+| HTTP_PROTOCOL_AND_SERVER                         | <http://localhost>                 | The base URL for the site                                                                                |
 | MEADOWLARK_STAGE                                 | local                            | Used in the URL                                                                                          |
 | DISABLE_LOG_ANONYMIZATION                        | false                            | When true, request and response logs will contain complete payloads instead of anonymized payloads       |
 | LISTENER1_PLUGIN                                 | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
@@ -96,8 +97,8 @@ To create a new key:
 | QUERY_HANDLER_PLUGIN                             | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
 | DOCUMENT_STORE_PLUGIN                            | @edfi/meadowlark-mongodb-backend | Future alternative: "@edfi/meadowlark-postgresql-back                                                    |
 | AUTHORIZATION_STORE_PLUGIN                   | @edfi/meadowlark-mongodb-backend | No alternative at this time.                                                                             |
-| **OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST**  | (none)                           | Ex: http://localhost:3000/local/oauth/token                                                              |
-| **OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION** | (none)                           | Ex: http://localhost:3000/local/oauth/verify                                                             |
+| **OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST**  | (none)                           | Ex: <http://localhost:3000/local/oauth/token>                                                              |
+| **OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION** | (none)                           | Ex: <http://localhost:3000/local/oauth/verify>                                                             |
 | **OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH**          | (none)                           | Client ID with role "verify-only"                                                                        |
 | **OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH**      | (none)                           | Client Secret                                                                                            |
 | OAUTH_HARD_CODED_CREDENTIALS_ENABLED             | false                            | Allow use of hard-coded tokens for bootstrapping startup of a new system or test automation              |
@@ -105,6 +106,7 @@ To create a new key:
 | OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES    | 1000                             | Control the size of the token cache                                                                      |
 | IS_LOCAL                                         | true                             | When true, prints plain text logs. Else prints structured JSON logs                                      |
 | LOG_LEVEL                                        | info                             | Options: error, warn, info, debug                                                                        |
+| SAVE_LOG_TO_FILE                                 | false                            | When true, saves logs to console and to a file called meadowlark.log                             |
 | ALLOW_TYPE_COERCION                              | false                            | When true, numbers send as strings (e.g. "1") will be accepted in validation                             |
 | ALLOW__EXT_PROPERTY                              | false                            | When true, a payload may contain the `_ext` property without causing a validation error                  |
 | **BEGIN_ALLOWED_SCHOOL_YEAR**                    | 1900                             | The beginning of the range of valid school years                                                         |
