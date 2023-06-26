@@ -26,6 +26,7 @@ export async function setup(network: StartedNetwork) {
         'cluster.name': 'elasticsearch-node1',
         'discovery.type': 'single-node',
         'xpack.security.enabled': 'false',
+        ES_JAVA_OPTS: '-Xmx300m', // Limiting memory
       })
       .withStartupTimeout(120_000);
 

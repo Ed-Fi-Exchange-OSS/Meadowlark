@@ -14,7 +14,7 @@ if [[ $(grep Microsoft /proc/version) ]]; then
   docker=docker.exe
 fi
 
-for container in "mongo-test" "postgres-test" "opensearch-test" "meadowlark-api-test"
+for container in "mongo-test" "postgres-test" "opensearch-test" "elasticsearch-node-test" "meadowlark-api-test"
 do
   docker ps -q --filter "name=$container" | grep -q . && docker stop $container && docker rm -f $container
 done

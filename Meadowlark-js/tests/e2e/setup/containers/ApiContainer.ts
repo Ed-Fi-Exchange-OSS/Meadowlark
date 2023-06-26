@@ -38,7 +38,7 @@ export async function setup(network: StartedNetwork) {
         ELASTICSEARCH_REQUEST_TIMEOUT: '10000',
         DOCUMENT_STORE_PLUGIN: process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend',
         QUERY_HANDLER_PLUGIN: process.env.QUERY_HANDLER_PLUGIN ?? '@edfi/meadowlark-opensearch-backend',
-        LISTENER1_PLUGIN: '@edfi/meadowlark-opensearch-backend',
+        LISTENER1_PLUGIN: process.env.LISTENER1_PLUGIN ?? '@edfi/meadowlark-opensearch-backend',
         MONGO_URI: process.env.MONGO_URI ?? 'mongodb://mongo-t1:27017/?directConnection=true',
         FASTIFY_RATE_LIMIT: 'false',
         FASTIFY_PORT: `${fastifyPort}`,
