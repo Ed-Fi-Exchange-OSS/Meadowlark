@@ -79,17 +79,9 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
 
     Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
 
-    const index = indexFromResourceInfo(resourceInfo);
-    const indexexists = await client.indices.exists({ index });
-
-    if (indexexists === false) {
-      Logger.info(`${moduleName}.queryDocuments: Index not found`, traceId);
-      return { response: 'QUERY_SUCCESS', documents, totalCount: 0 };
-    }
-
     const body = await performDslQuery(
       client,
-      index,
+      indexFromResourceInfo(resourceInfo),
       query,
       paginationParameters.limit as number,
       paginationParameters.offset as number,
