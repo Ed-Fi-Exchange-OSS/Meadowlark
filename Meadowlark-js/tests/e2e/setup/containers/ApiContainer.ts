@@ -34,7 +34,7 @@ export async function setup(network: StartedNetwork) {
         OPENSEARCH_USERNAME: 'admin',
         OPENSEARCH_PASSWORD: 'admin',
         OPENSEARCH_ENDPOINT: 'http://opensearch-test:8200',
-        ELASTICSEARCH_ENDPOINT: 'http://elasticsearch-node-test:8200',
+        ELASTICSEARCH_ENDPOINT: 'http://elasticsearch-node-test:9200',
         ELASTICSEARCH_REQUEST_TIMEOUT: '10000',
         DOCUMENT_STORE_PLUGIN: process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend',
         QUERY_HANDLER_PLUGIN: process.env.QUERY_HANDLER_PLUGIN ?? '@edfi/meadowlark-opensearch-backend',
