@@ -22,9 +22,7 @@ WORKDIR /app
 # Load all packages into Docker
 COPY .npmrc /app
 
-# Install the Meadowlark Fastify service TEMPORARY: install Ed-Fi custom antlr4
-# from MyGet, because it cannot be deployed through Azure Artifacts due to lack
-# of scope.
+# Install the Meadowlark Fastify service
 RUN npm i https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/@edfi/antlr4/-/antlr4-4.6.1.tgz && \
     npm i @edfi/meadowlark-fastify@"${ML_VERSION}" && \
     chown -R node:node /app
