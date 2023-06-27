@@ -2,21 +2,18 @@
 
 ## Services and Network Topology
 
-As of release 0.3.0, "Meadowlark" provides a Fastify-based API that implements
-(imperfectly) an Ed-Fi API compliant with Data Standard 3.3, and implements an
-OAuth2 API supporting the client-credentials flow. These services are backed by
-MongoDB for primary data storage. The Ed-Fi API also includes OpenSearch and
-ElasticSearch to handle `GET` all items and `GET` by querystring filters.
+As of release 0.3.0, "Meadowlark" provides a Fastify-based API that implements (imperfectly) an Ed-Fi API compliant with Data
+Standard 3.3, and implements an OAuth2 API supporting the client-credentials flow. These services are backed by MongoDB for
+primary data storage. The Ed-Fi API also includes OpenSearch and ElasticSearch to handle `GET` all items and `GET` by
+querystring filters.
 
-The MongoDB configuration needs to have a replica set to support atomic
-transactions. Technically the replica set can contain only a single node, though
-we recommend at least three nodes. OpenSearch clustering has not been tested,
-and the development team does not yet know how clustering works with this tool.
+The MongoDB configuration needs to have a replica set to support atomic transactions. Technically the replica set can contain
+only a single node, though we recommend at least three nodes. OpenSearch clustering has not been tested, and the development
+team does not yet know how clustering works with this tool.
 
-Ideall, all three services would be in the same network segment and able to
-communicate through unencrypted channels. Indeed, the development team has not
-tested any alternative. However, only the API port should be open to outside
-traffic, except as needed for debugging.
+Ideall, all three services would be in the same network segment and able to communicate through unencrypted channels. Indeed,
+the development team has not tested any alternative. However, only the API port should be open to outside traffic, except as
+needed for debugging.
 
                        ┌────────────────────────────────────────────────────────┐
                        │                                                        │
@@ -37,18 +34,15 @@ traffic, except as needed for debugging.
 
 ## Environment Variables
 
-Meadowlark has a wealth of configuration options for fine tuning a deployment.
-At this time, they are all set via environment variable, though many of them
-have sensible default values. The variables are grouped below by category to
-help the page remain readable and to aid in searching out specific areas for
-configuration.
+Meadowlark has a wealth of configuration options for fine tuning a deployment. At this time, they are all set via environment
+variable, though many of them have sensible default values. The variables are grouped below by category to help the page
+remain readable and to aid in searching out specific areas for configuration.
 
 Required configuration values are in bold.
 
 ### Database Connectivity
 
-:exclamation: Note: PostgreSQL as an alternative to MongoDB is not supported in
-release 0.3.0.
+:exclamation: Note: PostgreSQL as an alternative to MongoDB is not supported in release 0.3.0.
 
 | Name                       | Default    | Explanation                                                                                                                            |
 | -------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,7 +51,7 @@ release 0.3.0.
 | MONGODB_MAX_NUMBER_OF_RETRIES  | 1     | Meadowlark can be configured to retry on MongoDB failure, for example when two concurrent transactions attempt to access the same resource. By default, Meadowlark will retry once. This can be changed with the MONGODB_MAX_NUMBER_OF_RETRIES environment variable. |
 | MONGO_WRITE_CONCERN        | majority   | See [MongoDB: Write Concern](https://www.mongodb.com/docs/v4.0/reference/write-concern/)                                               |
 | MONGO_READ_CONCERN         | majority   | See [MongoDB: Read Concern](https://www.mongodb.com/docs/v4.0/reference/read-concern/)                                                 |
-| **OPENSEARCH_ENDPOINT**    | (none)     | Only required when the OpenSearch listener is configured for Fastify. Example: "<http://localhost:9200>"                                 |
+| **OPENSEARCH_ENDPOINT**    | (none)     | Only required when the OpenSearch listener is configured for Fastify. Example: "http://localhost:9200"                                 |
 | OPENSEARCH_USERNAME        | x          | Username for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_PASSWORD        | y          | Password for connecting to OpenSearch                                                                                                  |
 | OPENSEARCH_REQUEST_TIMEOUT | 30000      | In milliseconds                                                                                                                        |
@@ -89,7 +83,7 @@ To create a new key:
 | FASTIFY_NUM_THREADS                              | # of available CPUs              | Number of parallel Fastify threads to run                                                                |
 | FASTIFY_PORT                                     | 3000                             | Port number for the API service                                                                          |
 | FASTIFY_RATE_LIMIT                               | 0                                | Disabled when zero; otherwise limits a client to this number of requests per minute                      |
-| HTTP_PROTOCOL_AND_SERVER                         | <http://localhost>                 | The base URL for the site                                                                                |
+| HTTP_PROTOCOL_AND_SERVER                         | http://localhost                 | The base URL for the site                                                                                |
 | MEADOWLARK_STAGE                                 | local                            | Used in the URL                                                                                          |
 | DISABLE_LOG_ANONYMIZATION                        | false                            | When true, request and response logs will contain complete payloads instead of anonymized payloads       |
 | LISTENER1_PLUGIN                                 | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
@@ -97,8 +91,8 @@ To create a new key:
 | QUERY_HANDLER_PLUGIN                             | (none)                           | "@edfi/meadowlark-opensearch-backend" or "@edfi/meadowlark-elasticsearch-backend"; if not set, `GET` queries will fail |
 | DOCUMENT_STORE_PLUGIN                            | @edfi/meadowlark-mongodb-backend | Future alternative: "@edfi/meadowlark-postgresql-back                                                    |
 | AUTHORIZATION_STORE_PLUGIN                   | @edfi/meadowlark-mongodb-backend | No alternative at this time.                                                                             |
-| **OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST**  | (none)                           | Ex: <http://localhost:3000/local/oauth/token>                                                              |
-| **OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION** | (none)                           | Ex: <http://localhost:3000/local/oauth/verify>                                                             |
+| **OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST**  | (none)                           | Ex: http://localhost:3000/local/oauth/token                                                              |
+| **OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION** | (none)                           | Ex: http://localhost:3000/local/oauth/verify                                                             |
 | **OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH**          | (none)                           | Client ID with role "verify-only"                                                                        |
 | **OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH**      | (none)                           | Client Secret                                                                                            |
 | OAUTH_HARD_CODED_CREDENTIALS_ENABLED             | false                            | Allow use of hard-coded tokens for bootstrapping startup of a new system or test automation              |
