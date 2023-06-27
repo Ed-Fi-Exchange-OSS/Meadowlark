@@ -26,7 +26,7 @@ COPY .npmrc /app
 # from MyGet, because it cannot be deployed through Azure Artifacts due to lack
 # of scope.
 RUN npm i https://pkgs.dev.azure.com/ed-fi-alliance/Ed-Fi-Alliance-OSS/_packaging/EdFi/npm/registry/@edfi/antlr4/-/antlr4-4.6.1.tgz && \
-    npm i @edfi/meadowlark-fastify@${ML_VERSION} && \
+    npm i @edfi/meadowlark-fastify@"${ML_VERSION}" && \
     chown -R node:node /app
 
 EXPOSE 3000
