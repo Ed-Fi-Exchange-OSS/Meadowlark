@@ -40,7 +40,7 @@ az container create --resource-group $resourceGroup -n ml-opensearch `
 
 > **Note** See [Enable Logging](#enable-logging) before setting up meadowlark container if you want to get log information.
 
-```Shell
+```pwsh
 
 # Define variables
 # Replace with signing key
@@ -75,7 +75,7 @@ To save the logs to a file, for a summarized result, set the flag `SAVE_LOG_TO_F
 
 For a production deployment, it's recommended to send the logs to _Log Analytics_, with the following steps:
 
-```Shell
+```pwsh
   # Create workspace
   az monitor log-analytics workspace create `
   --resource-group $resourceGroup --workspace-name meadowlark-logs
@@ -83,7 +83,7 @@ For a production deployment, it's recommended to send the logs to _Log Analytics
 
 Copy the `customerId` from the result.
 
-```Shell
+```pwsh
   # Get shared key
   az monitor log-analytics workspace get-shared-keys `
   --resource-group $resourceGroup --name meadowlark-logs
@@ -97,7 +97,7 @@ Copy the `primarySharedKey` from the result.
 When creating the **meadowlark container**, include the customerId (workspace_id) and the primarySharedKey (workspace_key) as
 additional properties with the following flags:
 
-```Shell
+```pwsh
 az container create ... `
     --log-analytics-workspace <WORKSPACE_ID> `
     --log-analytics-workspace-key <WORKSPACE_KEY>
@@ -121,7 +121,7 @@ steps](https://learn.microsoft.com/en-us/azure/container-instances/container-ins
 
 - Execute the following script:
 
-```Shell
+```pwsh
 
 # Switch to the ACI Context
 docker context use myacicontext
@@ -141,7 +141,7 @@ az container exec --resource-group {resource group name} -n meadowlark `
 
 Given that `docker compose down` is not available. To remove all the containers in the group, execute:
 
-```Shell
+```pwsh
 az container delete --resource-group {resource group name} -n meadowlark
 ```
 

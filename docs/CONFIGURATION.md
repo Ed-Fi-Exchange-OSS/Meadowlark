@@ -100,7 +100,7 @@ To create a new key:
 | OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES    | 1000                             | Control the size of the token cache                                                                      |
 | IS_LOCAL                                         | true                             | When true, prints plain text logs. Else prints structured JSON logs                                      |
 | LOG_LEVEL                                        | info                             | Options: error, warn, info, debug                                                                        |
-| SAVE_LOG_TO_FILE                                 | false                            | When true, saves logs to console and to a file called meadowlark.log                             |
+| SAVE_LOG_TO_FILE                                 | false                            | When true, save log messages to a file in addition to writing to the console                       |
 | ALLOW_TYPE_COERCION                              | false                            | When true, numbers send as strings (e.g. "1") will be accepted in validation                             |
 | ALLOW__EXT_PROPERTY                              | false                            | When true, a payload may contain the `_ext` property without causing a validation error                  |
 | **BEGIN_ALLOWED_SCHOOL_YEAR**                    | 1900                             | The beginning of the range of valid school years                                                         |
