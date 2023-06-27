@@ -101,6 +101,7 @@ To create a new key:
 | IS_LOCAL                                         | true                             | When true, prints plain text logs. Else prints structured JSON logs                                      |
 | LOG_LEVEL                                        | info                             | Options: error, warn, info, debug                                                                        |
 | SAVE_LOG_TO_FILE                                 | false                            | When true, save log messages to a file in addition to writing to the console                       |
+| LOG_FILE_LOCATION                                 | var/log/                            | Location of log file if SAVE_LOG_TO_FILE is enabled                       |
 | ALLOW_TYPE_COERCION                              | false                            | When true, numbers send as strings (e.g. "1") will be accepted in validation                             |
 | ALLOW__EXT_PROPERTY                              | false                            | When true, a payload may contain the `_ext` property without causing a validation error                  |
 | **BEGIN_ALLOWED_SCHOOL_YEAR**                    | 1900                             | The beginning of the range of valid school years                                                         |
