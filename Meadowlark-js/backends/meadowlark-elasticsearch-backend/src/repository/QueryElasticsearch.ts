@@ -57,7 +57,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     if (Object.entries(queryParameters).length > 0) {
       Object.entries(queryParameters).forEach(([key, value]) => {
         matches.push({
-          match: { [key]: value },
+          match_phrase: { [key]: value },
         });
       });
     }
@@ -66,7 +66,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
     if (request.security.authorizationStrategy.type === 'OWNERSHIP_BASED' && !resourceInfo.isDescriptor) {
       matches.push({
         match: {
-          createdBy: `"${request.security.clientId}"`,
+          createdBy: request.security.clientId,
         },
       });
     }

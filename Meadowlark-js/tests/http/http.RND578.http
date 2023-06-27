@@ -1,0 +1,181 @@
+
+##### START AUTHENTICATION SETUP
+
+@admin_client_id=meadowlark_admin_key_1
+@admin_client_secret=meadowlark_admin_secret_1
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3001/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3001/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
+# @name client1
+POST http://localhost:3001/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+###
+
+### Create client4
+# @name created_client4
+POST http://localhost:3001/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+###
+@client4_client_id={{created_client4.response.body.$.client_id}}
+@client4_client_secret={{created_client4.response.body.$.client_secret}}
+
+### Authenticate client4
+# @name client4
+POST http://localhost:3001/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{client4_client_id}}",
+    "client_secret": "{{client4_client_secret}}"
+}
+
+###
+@authToken4 = {{client4.response.body.$.access_token}}
+
+
+##### END AUTHENTICATION SETUP
+
+### Create school 1 without validation
+# @name school_1
+POST http://localhost:3001/local/v3.3b/ed-fi/schools
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "schoolId": 1,
+    "nameOfInstitution": "A School 1",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+
+### Create school 2 without validation
+# @name school_2
+POST http://localhost:3001/local/v3.3b/ed-fi/schools
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "schoolId": 2,
+    "nameOfInstitution": "A School 2",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+
+### Create school 3 without validation
+# @name school_3
+POST http://localhost:3001/local/v3.3b/ed-fi/schools
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "schoolId": 3,
+    "nameOfInstitution": "A School 3",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+###
+
+GET http://localhost:3001/local/v3.3b/ed-fi/schools
+authorization: bearer {{authToken4}}
+
+### 
+@nameOfInstitution = "A School 1"
+
+GET http://localhost:3001/local/v3.3b/ed-fi/schools?limit=5&nameOfInstitution={{nameOfInstitution}}`)
+authorization: bearer {{authToken4}}
+
