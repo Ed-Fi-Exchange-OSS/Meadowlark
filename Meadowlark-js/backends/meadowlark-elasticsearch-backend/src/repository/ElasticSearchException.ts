@@ -25,7 +25,7 @@ export async function handleElasticSearchError(
         case 'DeserializationError':
         case 'NoLivingConnectionsError':
         case 'NotCompatibleError':
-        case 'ElasticSearchClientError':
+        case 'ElasticsearchClientError':
         case 'RequestAbortedError':
         case 'SerializationError':
         case 'TimeoutError': {
@@ -47,13 +47,13 @@ export async function handleElasticSearchError(
           const responseException = err as ResponseError;
           if (responseException?.message !== undefined) {
             if (responseException.message !== 'Response Error') {
-              let startPosition = responseException?.message?.indexOf('Reason:');
-              const position = responseException?.message?.indexOf(' Preview');
-              startPosition = startPosition > -1 ? startPosition : 0;
-              if (position > -1) {
-                responseException.message = responseException?.message?.substring(startPosition, position);
-              } else if (startPosition !== 0) {
-                responseException.message = responseException?.message?.substring(startPosition);
+              if (responseException?.message.indexOf('index_not_found_exception') !== -1) {
+                Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
+                return {
+                  response: 'QUERY_FAILURE_INVALID_QUERY',
+                  documents: [],
+                  failureMessage: 'IndexNotFoundException',
+                };
               }
               Logger.error(
                 `${moduleName} ${documentProcessError}`,
@@ -61,40 +61,6 @@ export async function handleElasticSearchError(
                 `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
               );
               return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: responseException.message };
-            }
-            if (responseException?.body !== undefined) {
-              let responseBody = JSON.parse(responseException?.body?.toString());
-              if (responseBody?.error?.type !== undefined) {
-                switch (responseBody?.error?.type) {
-                  case 'IndexNotFoundException':
-                    // No object has been uploaded for the requested type
-                    Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
-                    return {
-                      response: 'QUERY_FAILURE_INVALID_QUERY',
-                      documents: [],
-                      failureMessage: 'IndexNotFoundException',
-                    };
-                  case 'SemanticAnalysisException':
-                    // The query term is invalid
-                    Logger.error(
-                      `${moduleName} ${documentProcessError} invalid query terms`,
-                      traceId,
-                      `(${elasticSearchClientError.name}) - ${responseBody?.error?.reason}`,
-                    );
-                    return {
-                      response: 'QUERY_FAILURE_INVALID_QUERY',
-                      documents: [],
-                      failureMessage: responseBody?.error?.details,
-                    };
-                  default:
-                    Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBody ?? err);
-                    return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
-                }
-              } else {
-                responseBody = JSON.parse(JSON.stringify(responseException.body));
-                Logger.error(`${moduleName} ${documentProcessError}`, traceId, responseBody ?? err);
-                return { response: 'UNKNOWN_FAILURE', documents: [], failureMessage: responseBody };
-              }
             }
           }
           break;
