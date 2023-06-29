@@ -22,10 +22,10 @@ export async function stop() {
   }
 
   if (process.env.QUERY_HANDLER_PLUGIN === '@edfi/meadowlark-elasticsearch-backend') {
-    console.info('-- Setting up elasticsearch --');
+    console.info('-- Tearing down elasticsearch --');
     await ElasticSearchContainer.stop();
   } else {
-    console.info('-- Setting up opensearch --');
+    console.info('-- Tearing down opensearch --');
     await OpenSearchContainer.stop();
   }
 }
