@@ -11,7 +11,10 @@ RUN apt-get update && \
   # dumb-init is useful for running node properly (not as PID 1)
   apt-get install -y --no-install-recommends dumb-init=1.2.5-1 && \
   apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+  rm -rf /var/lib/apt/lists/* && \
+  # create meadowlark.log file and give permissions to allow winston to write if enabled
+  touch /var/log/meadowlark.log && \
+  chmod 777 /var/log/meadowlark.log
 
 # Start a new layer so that we don't need to rebuild everything above
 FROM base as build
