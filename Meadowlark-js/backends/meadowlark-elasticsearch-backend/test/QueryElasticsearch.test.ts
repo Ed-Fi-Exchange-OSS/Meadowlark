@@ -136,10 +136,10 @@ describe('when querying for students', () => {
         const birthDate = '2022-07-28';
         const matches = [
           {
-            match: { birthCity },
+            match_phrase: { birthCity },
           },
           {
-            match: { birthDate },
+            match_phrase: { birthDate },
           },
         ];
         const expectedQuery = {
@@ -243,10 +243,10 @@ describe('when querying for students', () => {
         const birthDate = '2022-07-28';
         const matches = [
           {
-            match: { birthCity },
+            match_phrase: { birthCity },
           },
           {
-            match: { birthDate },
+            match_phrase: { birthDate },
           },
         ];
         let spyOnRequest: jest.SpyInstance;
