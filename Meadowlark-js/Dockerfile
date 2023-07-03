@@ -14,7 +14,8 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/* && \
   # create meadowlark.log file and give permissions to allow winston to write if enabled
   touch /var/log/meadowlark.log && \
-  chmod 777 /var/log/meadowlark.log
+  chown node /var/log/meadowlark.log && \ 
+  chmod 600 /var/log/meadowlark.log
 
 # Start a new layer so that we don't need to rebuild everything above
 FROM base as build
