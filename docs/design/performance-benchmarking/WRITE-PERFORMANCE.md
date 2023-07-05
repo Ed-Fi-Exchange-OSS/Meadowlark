@@ -27,7 +27,8 @@ The script receives two parameters:
 This script will enter the data into Meadowlark and will print the execution
 time.
 
-> **Warning** The LoadGrandBend script is returning errors when processing some data ([RND-586](https://tracker.ed-fi.org/browse/RND-586)).
+> **Warning** The LoadGrandBend script is returning errors related to incorrect casing on properties that
+> begin with acronyms ([METAED-1360](https://tracker.ed-fi.org/browse/METAED-1360)).
 
 List of issues:
 
