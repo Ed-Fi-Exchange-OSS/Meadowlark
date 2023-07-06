@@ -5,3 +5,4 @@
 * [Support for Offline Cascading Updates](offline-cascading-updates/)
 * [Performance Benchmarking](performance-benchmarking/)
 * [Open Telemetry](open-telemetry/)
+* [Reference Validation Correctness](reference-validation-correctness/)
