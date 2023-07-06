@@ -36,6 +36,12 @@ az container create --resource-group $resourceGroup -n ml-opensearch `
     --image edfialliance/meadowlark-opensearch:latest `
     --ports 9200 --dns-name-label $openSearchDnsLabel
 
+```
+
+> **Note** See [Enable Logging](#enable-logging) before setting up meadowlark container if you want to get log information.
+
+```pwsh
+
 # Define variables
 # Replace with signing key
 $signingKey="<run `openssl rand -base64 256` to create a key>"
@@ -63,6 +69,44 @@ az container create --resource-group $resourceGroup -n ml-api `
     ALLOW__EXT_PROPERTY=true MONGO_URI=$mongoUri
 ```
 
+### Enable Logging
+
+To save the logs to a file, for a summarized result, set the flag `SAVE_LOG_TO_FILE` to true, which will create a
+`meadowlark.log` file with the logs.
+
+For a production deployment, it's recommended to send the logs to _Log Analytics_, with the following steps:
+
+```pwsh
+  # Create workspace
+  az monitor log-analytics workspace create `
+  --resource-group $resourceGroup --workspace-name meadowlark-logs
+```
+
+Copy the `customerId` from the result.
+
+```pwsh
+  # Get shared key
+  az monitor log-analytics workspace get-shared-keys `
+  --resource-group $resourceGroup --workspace-name meadowlark-logs
+```
+
+Copy the `primarySharedKey` from the result.
+
+> **Note** This information can be retrieved from the Portal, in Log Analytics Workspaces -> Settings -> Agents. [More
+> information](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#get-log-analytics-credentials)
+
+When creating the **meadowlark container**, include the customerId (workspace_id) and the primarySharedKey (workspace_key) as
+additional properties with the following flags:
+
+```pwsh
+az container create ... `
+    --log-analytics-workspace <WORKSPACE_ID> `
+    --log-analytics-workspace-key <WORKSPACE_KEY>
+```
+
+To view the log information, follow [these
+steps](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#view-logs)
+
 ## Deploy with Docker Azure Integration
 
 > **Warning** The Docker Azure Integration will be retired in November 2023.
@@ -78,7 +122,7 @@ az container create --resource-group $resourceGroup -n ml-api `
 
 - Execute the following script:
 
-```Shell
+```pwsh
 
 # Switch to the ACI Context
 docker context use myacicontext
@@ -98,9 +142,19 @@ az container exec --resource-group {resource group name} -n meadowlark `
 
 Given that `docker compose down` is not available. To remove all the containers in the group, execute:
 
-```Shell
+```pwsh
 az container delete --resource-group {resource group name} -n meadowlark
 ```
+
+## Test your deployment
+
+To verify your deployment, run:
+
+```pwsh
+curl http://$meadowlarkDnsLabel.southcentralus.azurecontainer.io:3000/stg | ConvertFrom-Json | ConvertTo-Json
+```
+
+This will output the summary of the deployment
 
 > **Warning** Not ready for production usage. This example is using a single mongo node with a simulated replica set and
 > bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials. The current configuration is

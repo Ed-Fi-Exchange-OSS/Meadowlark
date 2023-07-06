@@ -46,6 +46,8 @@ export type ConfigKeys =
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES'
   | 'IS_LOCAL'
   | 'LOG_LEVEL'
+  | 'SAVE_LOG_TO_FILE'
+  | 'LOG_FILE_LOCATION'
   | 'FASTIFY_PORT'
   | 'MEADOWLARK_STAGE'
   | 'FASTIFY_RATE_LIMIT'
@@ -97,6 +99,8 @@ export async function initializeConfig(provider: ConfigPlugin) {
   set('MEADOWLARK_STAGE', await provider.getString('MEADOWLARK_STAGE', 'local'));
   set('IS_LOCAL', await provider.getBool('IS_LOCAL', true));
   set('LOG_LEVEL', await provider.getString('LOG_LEVEL', 'info'));
+  set('SAVE_LOG_TO_FILE', await provider.getBool('SAVE_LOG_TO_FILE', false));
+  set('LOG_FILE_LOCATION', await provider.getString('LOG_FILE_LOCATION', '/var/log/'));
   set('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', await provider.getInt('OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL', 300000));
   set(
     'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES',

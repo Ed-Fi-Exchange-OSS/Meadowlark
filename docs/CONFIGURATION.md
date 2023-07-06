@@ -2,21 +2,18 @@
 
 ## Services and Network Topology
 
-As of release 0.3.0, "Meadowlark" provides a Fastify-based API that implements
-(imperfectly) an Ed-Fi API compliant with Data Standard 3.3, and implements an
-OAuth2 API supporting the client-credentials flow. These services are backed by
-MongoDB for primary data storage. The Ed-Fi API also includes OpenSearch and
-ElasticSearch to handle `GET` all items and `GET` by querystring filters.
+As of release 0.3.0, "Meadowlark" provides a Fastify-based API that implements (imperfectly) an Ed-Fi API compliant with Data
+Standard 3.3, and implements an OAuth2 API supporting the client-credentials flow. These services are backed by MongoDB for
+primary data storage. The Ed-Fi API also includes OpenSearch and ElasticSearch to handle `GET` all items and `GET` by
+querystring filters.
 
-The MongoDB configuration needs to have a replica set to support atomic
-transactions. Technically the replica set can contain only a single node, though
-we recommend at least three nodes. OpenSearch clustering has not been tested,
-and the development team does not yet know how clustering works with this tool.
+The MongoDB configuration needs to have a replica set to support atomic transactions. Technically the replica set can contain
+only a single node, though we recommend at least three nodes. OpenSearch clustering has not been tested, and the development
+team does not yet know how clustering works with this tool.
 
-Ideall, all three services would be in the same network segment and able to
-communicate through unencrypted channels. Indeed, the development team has not
-tested any alternative. However, only the API port should be open to outside
-traffic, except as needed for debugging.
+Ideall, all three services would be in the same network segment and able to communicate through unencrypted channels. Indeed,
+the development team has not tested any alternative. However, only the API port should be open to outside traffic, except as
+needed for debugging.
 
                        ┌────────────────────────────────────────────────────────┐
                        │                                                        │
@@ -37,18 +34,15 @@ traffic, except as needed for debugging.
 
 ## Environment Variables
 
-Meadowlark has a wealth of configuration options for fine tuning a deployment.
-At this time, they are all set via environment variable, though many of them
-have sensible default values. The variables are grouped below by category to
-help the page remain readable and to aid in searching out specific areas for
-configuration.
+Meadowlark has a wealth of configuration options for fine tuning a deployment. At this time, they are all set via environment
+variable, though many of them have sensible default values. The variables are grouped below by category to help the page
+remain readable and to aid in searching out specific areas for configuration.
 
 Required configuration values are in bold.
 
 ### Database Connectivity
 
-:exclamation: Note: PostgreSQL as an alternative to MongoDB is not supported in
-release 0.3.0.
+:exclamation: Note: PostgreSQL as an alternative to MongoDB is not supported in release 0.3.0.
 
 | Name                       | Default    | Explanation                                                                                                                            |
 | -------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -78,6 +72,7 @@ release 0.3.0.
 | OAUTH_TOKEN_AUDIENCE     | edfi-meadowlark-audience | Token audience                                      |
 
 To create a new key:
+
 * Try running the application and accessing endpoint `/{stage}/createSigningKey`
 * Or run `openssl rand -base64 256` from a bash terminal shell.
 
@@ -105,6 +100,8 @@ To create a new key:
 | OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES    | 1000                             | Control the size of the token cache                                                                      |
 | IS_LOCAL                                         | true                             | When true, prints plain text logs. Else prints structured JSON logs                                      |
 | LOG_LEVEL                                        | info                             | Options: error, warn, info, debug                                                                        |
+| SAVE_LOG_TO_FILE                                 | false                            | When true, save log messages to a file in addition to writing to the console                       |
+| LOG_FILE_LOCATION                                 | /var/log/                           | Location of log file if SAVE_LOG_TO_FILE is enabled                       |
 | ALLOW_TYPE_COERCION                              | false                            | When true, numbers send as strings (e.g. "1") will be accepted in validation                             |
 | ALLOW__EXT_PROPERTY                              | false                            | When true, a payload may contain the `_ext` property without causing a validation error                  |
 | **BEGIN_ALLOWED_SCHOOL_YEAR**                    | 1900                             | The beginning of the range of valid school years                                                         |

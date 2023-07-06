@@ -42,6 +42,10 @@ export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymiz
         return isDebug ? 'DEBUG' : 'ERROR';
       case 'DISABLE_LOG_ANONYMIZATION':
         return disableAnonymization;
+      case 'SAVE_LOG_TO_FILE':
+        return false;
+      case 'LOG_FILE_LOCATION':
+        return '/var/log/';
       case 'MEADOWLARK_DATABASE_NAME':
         return 'meadowlark-test';
       case 'MONGO_WRITE_CONCERN':

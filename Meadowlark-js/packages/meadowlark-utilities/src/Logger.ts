@@ -104,6 +104,15 @@ export function initializeLogging(): void {
       }),
     ],
   });
+
+  if (Config.get('SAVE_LOG_TO_FILE') === true) {
+    logger.add(
+      new winston.transports.File({
+        dirname: Config.get('LOG_FILE_LOCATION'),
+        filename: 'meadowlark.log',
+      }),
+    );
+  }
 }
 
 export const Logger = {
