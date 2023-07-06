@@ -71,7 +71,8 @@ az container create --resource-group $resourceGroup -n ml-api `
 
 ### Enable Logging
 
-To save the logs to a file, for a summarized result, set the flag `SAVE_LOG_TO_FILE` to true, which will create a `meadowlark.log` file with the logs.
+To save the logs to a file, for a summarized result, set the flag `SAVE_LOG_TO_FILE` to true, which will create a
+`meadowlark.log` file with the logs.
 
 For a production deployment, it's recommended to send the logs to _Log Analytics_, with the following steps:
 
@@ -86,7 +87,7 @@ Copy the `customerId` from the result.
 ```pwsh
   # Get shared key
   az monitor log-analytics workspace get-shared-keys `
-  --resource-group $resourceGroup --name meadowlark-logs
+  --resource-group $resourceGroup --workspace-name meadowlark-logs
 ```
 
 Copy the `primarySharedKey` from the result.
@@ -144,6 +145,16 @@ Given that `docker compose down` is not available. To remove all the containers 
 ```pwsh
 az container delete --resource-group {resource group name} -n meadowlark
 ```
+
+## Test your deployment
+
+To verify your deployment, run:
+
+```pwsh
+curl http://$meadowlarkDnsLabel.southcentralus.azurecontainer.io:3000/stg | ConvertFrom-Json | ConvertTo-Json
+```
+
+This will output the summary of the deployment
 
 > **Warning** Not ready for production usage. This example is using a single mongo node with a simulated replica set and
 > bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials. The current configuration is
