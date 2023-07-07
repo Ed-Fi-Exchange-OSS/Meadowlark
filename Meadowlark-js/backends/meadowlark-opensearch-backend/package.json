@@ -19,9 +19,9 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-core": "^v0.3.0-pre-35",
-    "@edfi/meadowlark-utilities": "^v0.3.0-pre-35",
-    "@edfi/metaed-core": "^4.0.1-dev.13",
+    "@edfi/meadowlark-core": "^v0.3.6-pre-36",
+    "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
+    "@edfi/metaed-core": "^4.0.1-dev.17",
     "@opensearch-project/opensearch": "^2.1.0"
   },
   "devDependencies": {
