@@ -21,13 +21,13 @@
   "dependencies": {
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
-    "pg": "^8.8.0",
+    "pg": "^8.11.1",
     "pg-format": "^1.0.4",
     "ramda": "0.27.2",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
-    "@types/pg": "^8.6.6",
+    "@types/pg": "^8.10.2",
     "@types/pg-format": "^1.0.2",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.3.1",
