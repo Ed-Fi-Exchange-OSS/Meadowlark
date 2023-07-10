@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-postgresql-backend",
   "main": "dist/index.js",
-  "version": "0.3.0-pre-36",
+  "version": "0.3.6-pre-36",
   "description": "Meadowlark backend plugin for PostgreSQL",
   "license": "Apache-2.0",
   "publishConfig": {

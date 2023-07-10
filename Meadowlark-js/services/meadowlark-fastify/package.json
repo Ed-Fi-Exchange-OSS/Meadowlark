@@ -1,6 +1,6 @@
 {
   "name": "@edfi/meadowlark-fastify",
-  "version": "0.3.0-pre-36",
+  "version": "0.3.6-pre-36",
   "description": "Meadowlark service using Fastify",
   "license": "Apache-2.0",
   "publishConfig": {
