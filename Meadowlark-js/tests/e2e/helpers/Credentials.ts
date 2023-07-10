@@ -51,7 +51,7 @@ export async function createClient(client: Credentials): Promise<Credentials> {
     .post(`/oauth/clients`)
     .send(client)
     .auth(await adminAccessToken(), { type: 'bearer' })
-    .then((response) => {
+    .then(async (response) => {
       if (response.status !== 200 && response.status !== 201) {
         return Promise.reject(new Error(`Error creating client: ${JSON.stringify(response.body)}`));
       }
@@ -149,7 +149,7 @@ async function createAdminClient(): Promise<{ key: string; secret: string }> {
       clientName: 'Admin Client',
       roles: ['admin'],
     })
-    .then((response) => {
+    .then(async (response) => {
       if (response.status === 401) {
         return Promise.reject(new Error('Client already exists. Contact administrator for key and secret'));
       }
