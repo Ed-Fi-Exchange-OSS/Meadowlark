@@ -29,6 +29,6 @@
     "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
     "rimraf": "^3.0.2",
-    "testcontainers": "^9.8.0"
+    "testcontainers": "^9.9.1"
   }
 }
