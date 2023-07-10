@@ -21,7 +21,7 @@
   "dependencies": {
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
-    "@edfi/metaed-core": "^4.0.1-dev.17",
+    "@edfi/metaed-core": "^4.1.2-dev.11",
     "@elastic/elasticsearch": "^8.8.1",
     "@elastic/transport": "^8.3.2"
   },
