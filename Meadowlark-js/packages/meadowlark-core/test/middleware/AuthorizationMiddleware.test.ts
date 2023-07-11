@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { AxiosResponse } from 'axios';
 import { authorize, clearCaches } from '../../src/middleware/AuthorizationMiddleware';
 import * as OAuthFetch from '../../src/middleware/OAuthFetch';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
@@ -10,7 +11,7 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { setupMockConfiguration } from '../ConfigHelper';
 
-const newAxiosResponse = () => ({ status: 0, data: {}, headers: {}, config: {}, statusText: '' });
+const newAxiosResponse = () => ({ status: 0, data: {}, headers: {}, config: {}, statusText: '' } as AxiosResponse);
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();

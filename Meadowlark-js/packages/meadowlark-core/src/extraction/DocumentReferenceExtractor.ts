@@ -52,7 +52,7 @@ function extractRawDocumentPaths(referenceGroup: ReferenceGroup, document: objec
   const pathEndings: string[] = (
     referencedEntity.data.edfiApiSchema as EntityApiSchemaData
   ).apiMapping.flattenedIdentityProperties.map(
-    (property) => (property.data.edfiApiSchema as EntityPropertyApiSchemaData).apiMapping.fullName,
+    (property) => (property.identityProperty.data.edfiApiSchema as EntityPropertyApiSchemaData).apiMapping.fullName,
   );
 
   if (apiMapping.isReferenceCollection) {
