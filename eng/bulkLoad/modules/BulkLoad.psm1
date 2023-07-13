@@ -64,12 +64,6 @@ function New-MeadowlarkApiClient {
 }
 
 function Initialize-ToolsAndDirectories {
-  [CmdletBinding()]
-  param (
-    [string]
-    [Parameter(Mandatory=$True)]
-    $Version
-  )
 
   $bulkLoader = (Join-Path -Path (Get-BulkLoadClient $bulkLoadVersion).Trim() -ChildPath "tools/net*/any/EdFi.BulkLoadClient.Console.dll")
   $bulkLoader = Resolve-Path $bulkLoader
@@ -80,8 +74,25 @@ function Initialize-ToolsAndDirectories {
   return @{
     WorkingDirectory = (New-Item -Path "$($PsScriptRoot)/../.working" -Type Directory -Force)
     XsdDirectory = $xsdDirectory
-    SampleDataDirectory = (Get-SampleData $Version).Trim()
     BulkLoaderExe =  $bulkLoader
+  }
+}
+
+function Import-SampleData {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory)]
+    [ValidateSet("Southridge","GrandBend","PartialGrandBend")]
+    $Template = "Southridge",
+
+    [string]
+    $Version
+  )
+
+  if ($Template -eq "Southridge") {
+    return (Get-SouthridgeSampleData)
+  } else {
+    return (Get-SampleData $Version).Trim()
   }
 }
 
@@ -222,6 +233,36 @@ function Write-PartialGrandBend {
     Key = $Key
     Secret = $Secret
     SampleDataDirectory = $partialDir
+    Paths = $Paths
+  }
+  Write-XmlFiles @parameters
+}
+
+function Write-Southridge {
+  [CmdletBinding()]
+  param (
+    [string]
+    [Parameter(Mandatory=$True)]
+    $BaseUrl,
+
+    [string]
+    [Parameter(Mandatory=$True)]
+    $Key,
+
+    [string]
+    [Parameter(Mandatory=$True)]
+    $Secret,
+
+    [hashtable]
+    [Parameter(Mandatory=$True)]
+    $Paths
+  )
+
+  $parameters = @{
+    BaseUrl = $BaseUrl
+    Key = $Key
+    Secret = $Secret
+    SampleDataDirectory = $Paths.SampleDataDirectory
     Paths = $Paths
   }
   Write-XmlFiles @parameters

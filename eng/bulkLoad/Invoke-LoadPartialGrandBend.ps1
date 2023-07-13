@@ -21,7 +21,8 @@ $sampleDataVersion = "3.3.1-b"
 
 $newClient = New-MeadowlarkApiClient -BaseUrl $baseUrl -AdminKey $adminKey -AdminSecret $adminSecret
 
-$paths = Initialize-ToolsAndDirectories -Version $sampleDataVersion
+$paths = Initialize-ToolsAndDirectories
+$paths.SampleDataDirectory = Import-SampleData -Template "GrandBend" -Version $sampleDataVersion
 
 $parameters = @{
   BaseUrl = $baseUrl
