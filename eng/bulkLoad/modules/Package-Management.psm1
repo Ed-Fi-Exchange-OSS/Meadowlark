@@ -221,7 +221,7 @@ function Get-BulkLoadClient {
     `.packages/southridge`.
 
 .EXAMPLE
-    Get-SourhridgeSampleData
+    Get-SouthridgeSampleData
 
 #>
 function Get-SouthridgeSampleData {
