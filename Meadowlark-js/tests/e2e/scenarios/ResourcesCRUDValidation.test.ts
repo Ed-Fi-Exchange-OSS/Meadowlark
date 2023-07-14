@@ -70,6 +70,20 @@ describe('when performing crud operations', () => {
           .expect(404);
       });
     });
+
+    it('should match the location', async () => {
+      const id = await rootURLRequest()
+        .get(resourceResponse.headers.location)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .then((response) => response.body.id);
+
+      await baseURLRequest()
+        .get(`${resourceEndpoint}/${id}`)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .expect(200);
+
+      expect(resourceResponse.headers.location).toContain(`${resourceEndpoint}/${id}`);
+    });
   });
 
   describe('when getting all resources', () => {
