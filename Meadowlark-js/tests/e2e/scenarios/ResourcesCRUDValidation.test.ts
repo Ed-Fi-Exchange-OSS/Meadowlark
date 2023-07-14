@@ -150,7 +150,7 @@ describe('when performing crud operations', () => {
         });
     });
 
-    // This must be updated once RND-XXX is implemented
+    // This must be updated once RND-596 is implemented
     it('should fail when resource ID is included in body', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
