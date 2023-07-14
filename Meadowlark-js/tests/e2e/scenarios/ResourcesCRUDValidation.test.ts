@@ -135,6 +135,36 @@ describe('when performing crud operations', () => {
           expect(response.body).toEqual(expect.objectContaining(resourceBody));
         });
     });
+
+    // This must be updated once RND-XXX is implemented
+    it('should fail when resource ID is included in body', async () => {
+      const id = await rootURLRequest()
+        .get(resourceResponse.headers.location)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .then((response) => response.body.id);
+
+      await baseURLRequest()
+        .put(`${resourceEndpoint}/${id}`)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send({
+          id,
+          ...resourceBodyUpdated,
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.error).toMatchInlineSnapshot(`
+            [
+              {
+                "context": {
+                  "errorType": "additionalProperties",
+                },
+                "message": "'id' property is not expected to be here",
+                "path": "{requestBody}",
+              },
+            ]
+          `);
+        });
+    });
   });
 
   describe('when deleting a resource that does not exist', () => {
