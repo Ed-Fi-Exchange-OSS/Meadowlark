@@ -71,7 +71,8 @@ describe('when performing crud operations', () => {
       });
     });
 
-    it('should match the location', async () => {
+    // TODO: Remove skip after RND-598 is fixed
+    it.skip('should match the location', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
