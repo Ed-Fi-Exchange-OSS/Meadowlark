@@ -7,8 +7,8 @@
     Measure Bulk Load Performance
 #>
 param(
-    [ValidateSet('GrandBend', 'PartialGrandBend')]
-    $Template = "GrandBend",
+    [ValidateSet("GrandBend", "PartialGrandBend", "Southridge")]
+    $Template = "Southridge",
 
     [Switch]
     $Update

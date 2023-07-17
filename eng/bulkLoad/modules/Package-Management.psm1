@@ -212,4 +212,57 @@ function Get-BulkLoadClient {
         -PackageVersion $PackageVersion | Out-String
 }
 
-Export-ModuleMember -Function Get-SampleData, Get-NugetPackage, Get-BulkLoadClient
+<#
+.SYNOPSIS
+    Download and extract the Southridge Data.
+
+.OUTPUTS
+    String containing the name of the created directory, e.g.
+    `.packages/southridge`.
+
+.EXAMPLE
+    Get-SouthridgeSampleData
+
+#>
+function Get-SouthridgeSampleData {
+
+    try {
+
+      if(-not (Get-Module 7Zip4PowerShell -ListAvailable)){
+         Install-Module -Name 7Zip4PowerShell -Force
+      }
+
+      $file = "southridge-xml-2023"
+      $zip = "$($file).7z"
+      $packagesDir = ".packages"
+
+      New-Item -Path $packagesDir -Force -ItemType Directory | Out-Null
+
+      Push-Location $packagesDir
+
+    if ($null -ne (Get-ChildItem $file -ErrorAction SilentlyContinue)) {
+        # Already exists, don't re-download
+        Pop-Location
+        return "$($packagesDir)/$($file)"
+    }
+
+      Invoke-WebRequest -Uri "https://odsassets.blob.core.windows.net/public/Northridge/$($zip)" `
+        -OutFile $zip | Out-String
+
+      Expand-7Zip $zip $(Get-Location)
+
+      Remove-Item $zip
+
+      return "$($packagesDir)/$($file)"
+    }
+    catch {
+        throw $_
+    }
+    finally {
+        Pop-Location
+    }
+
+
+}
+
+Export-ModuleMember -Function Get-SampleData, Get-NugetPackage, Get-BulkLoadClient, Get-SouthridgeSampleData
