@@ -89,25 +89,24 @@ dealing with theoretical data loads, as the Meadowlark development team must do.
 
 Therefore it may be ideal to support multiple access patterns, allowing the
 administrator to tune which resources are cached in memory and which are cached
-externally.
+externally. However, in memory should only be used for single node deployments:
+if load balanced, then a delete must be seen by all instances, which cannot
+happen for in-memory.
 
-**Load balanced application without caching or in-memory only**
+**In-memory only**
 
 ```mermaid
 flowchart LR
-    A(Client Application) -->|API Calls| B[Gateway/Load Balancer]
+    A(Client Application) -->|API Calls| B[Gateway]
     B -->|proxy to| C[Meadowlark 1]
-    B -->|proxy to| D[Meadowlark 2]
-    B -->|proxy to| E[Meadowlark 3]
-    C --> F[(Transactional DB)]
-    D --> F[(Transactional DB)]
-    E --> F[(Transactional DB)]
+
+    C-->|1. check cache| C
+
+    C -->|2. if not found| F[(Transactional DB)]
 
     subgraph Container Network
         B
         C
-        D
-        E
         F
     end
 ```
@@ -117,7 +116,8 @@ flowchart LR
 In this sense, "external" is relative to the API application; as shown, the
 cache provider is inside the Docker network. It should also be trivial to
 configure for access to a cache provider outside of the Docker network (e.g. a
-managed service like Amazon Elasticache).
+managed service like Amazon Elasticache). The cache provider itself might
+distributed / clustered, though only a single node is shown.
 
 ```mermaid
 flowchart LR
@@ -146,19 +146,25 @@ flowchart LR
 
 ## Application Architecture
 
+### Pre-Caching Architecture
+
 Currently, an Upsert request flows through the application code as shown in the
-sequence diagram below:
+sequence diagram below. Note that the `"select" statement` is meant to be a
+generic term for SQL and equivalent commands in document databases. Furthermore,
+note that there is no loop here: Meadowlark constructs a single find requests
+with all reference IDs instead of generating separate requests for each reference.
 
 ```mermaid
 sequenceDiagram
     box Core
-        participant A as FrontEndFacacade
+        participant A as FrontEndFacade
         participant B as Upsert
     end
 
     box Backend
         participant C as BackendFacade
-        participant D as Repository.Upsert
+        participant D as Backend.Upsert
+        participant F as Backend.ReferenceValidation
     end
 
     participant E as [Transactional DB]
@@ -167,94 +173,143 @@ sequenceDiagram
     B->>C: upsertDocument(request)
     C->>D: upsertDocument(request, client)
 
-    loop each reference
-        D->>E: validate
-        E-->>D: exists
+    D->>F: validateReferences(...)
+    F->>E: "select" statement
+    E-->>F: result
+    F-->>D: result
 
-        opt no reference failures
-            D->>E: upsert(doc)
-        end
+    opt result == all exist
+      D->>E: upsert(doc)
+      D-->>C: success
+    end
+    alt
+      D-->>C: failed
     end
 
-    D-->>C: response
     C-->>B: response
     B-->>A: response
 ```
 
+> **Note**
+> In subsequent sequence diagrams, the `FrontEndFacade` will be
+> omitted.
+
+### Introducing a Cache Layer
+
 One simple pattern is to introduce an [Identity
 Map](https://martinfowler.com/eaaCatalog/identityMap.html), which could be
-implemented by multiple providers, representing in-memory or external caches. It
-may be convenient to split this module in two, so that common business logic
-remains in the initial Identity Map, which then delegates out to a simple
-provider that encapsulates data access.
+implemented with multiple backend providers, representing in-memory or external
+caches. It may be convenient to split this module in two, so that common
+business logic remains in the initial Identity Map, which then delegates out to
+a simple provider that encapsulates data access.
 
 Typically the Identity Map module would sit between the backend facade (as
 labeled above) and the repository layer. However, we have validation logic
-inside the repository. Thus we have two choices: insert the Identity Map inside
-the repository, or refactor the backend repositories, moving the reference
-validation into the Core modules. Refactoring would entail moving database
-transaction logic around, which could get messy; protecting transaction scope
-was the reason for placing the validation inside the repository layer.
+inside the repository so that the validation checks are inside a transaction
+context. Therefore the repository layer will need to know how to access the
+cache layer.
 
-Conclusion: we can inject a shared Identity Map and Cache Provider instance into
-the repository (collectively labeled "Cache" below):
+To prevent the repository layer from accruing too much cache-related code, cache
+management needs to be centralized in the cache layer. This also aids in avoid
+coding duplication between different backend implementations. Thus we can inject
+a shared Identity Map and Cache Provider instance into the repository. Note:
+These two modules are treated as one "cache" in the sequence diagram below for
+simplicity.
 
-* add to core
-* pass as instance to backend facade?
-* or treat as singleton?
-* show Repository.Upsert checking the cache
-* then need to modify the cache; this could be done by the Core module
+The repository layer will ask the cache if the references exist. If the cache
+does not contain the references, then it needs to go back to the repository
+layer to check the transactional database. Any hits should be added to the cache
+at that point, for use by subsequent API requests that need to validate the same
+references.
 
 ```mermaid
 sequenceDiagram
     box Core
-        participant A as FrontEndFacacade
         participant B as Upsert
-        participant F as Cache
+        participant G as Cache
     end
 
     box Backend
         participant C as BackendFacade
-        participant D as Repository.Upsert
+        participant D as Backend.Upsert
+        participant F as Backend.ReferenceValidation
     end
 
     participant E as [Transactional DB]
 
-    A->>B: upsert(request)
     B->>C: upsertDocument(request, cache)
     C->>D: upsertDocument(request, cache, client)
+    D->>D: startTransaction()
 
-    loop each reference
-        rect rgb(191, 223, 255)
-            D->>F: validate
-            F-->>D: exists
+    rect ivory
+        D->>G: cache.validateReferences(references, referenceValidation)
+
+        loop for each reference
+            G->>G: isInCache(ref.pk)
+            Note over G: if yes remove from `references`
         end
 
-        opt not in cache
-            D->>E: validate
-            E-->>D: exists
-        end
-
-        opt no reference failures
-            D->>E: upsert(doc)
+        opt any references remaining
+            G->>F: referenceValidation.validateReferences(references)
         end
     end
 
-    D-->>C: response
+    F->>E: "select" statement
+    E-->>F: result
+
+    rect ivory
+        F-->>G: result
+
+        G->>G: cache.add(existingReferences)
+
+        G-->>D: result
+    end
+
+    opt result == all exist
+      D->>E: upsert(doc)
+      D->>D: commit()
+
+      rect ivory
+        D->>G: addToCache(doc)
+      end
+
+      D-->>C: success
+    end
+    alt
+      D->>D: rollback()
+      D-->>C: failed
+    end
+
     C-->>B: response
-    rect rgb(191, 223, 255)
-        B->>F: update(request)
-    end
-
-    B-->>A: response
 ```
 
-## Problem
+> **Note** The pattern explored above needs to be extended to cover all data
+> modification requests. For example, when a delete occurs, then there needs to
+> be a command out to the cache to remove that deleted item (if it is present).
 
-Two load balanced instances, what if you update one? So long as we cache only
-the natural key, doesn't matter, right? Deletes! So when running load balanced,
-either need to recommend having an external cache or need to provide a way to
-read delete events and apply in memroy. Seems like a bad idea.
+### Managing What to Cache
+
+The natural key needs to be stored; this can be done efficiently using the
+calculated `MeadowlarkId`. The application code will easily be able to query by
+this string value, which uniquely identifies a document.
+
+Is there any need to restrict what can go into the cache? As explored earlier in
+this document, there are some resources that are heavily used as references and
+others lightly used. There is a concern that the cache size could grow too large
+if low-value data are included. It may be necessary to add some restriction on
+caching in the future. However, this kind of optimization should be avoided in
+the initial implementation, keeping the code simple: cache all references. Check
+on the storage constraints and cost, then if needed, add a mechanism for
+specifying which resources opt-in to the caching.
+
+### Lazy Loading
+
+The solution described above uses a lazy loading approach, instead of
+pre-warming the cache. Given the potential for a large cache, while there is no
+restriction on which resources are included in the cache, this is the right
+approach to avoid slow startup of the application. Otherwise, the application
+would essentially need to pre-fetch _all_ references in the database and add the
+to the cache - an expensive proposition.
 
 ## Dealing with Stale Data
 
