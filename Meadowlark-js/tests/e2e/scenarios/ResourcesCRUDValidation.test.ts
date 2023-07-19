@@ -156,7 +156,6 @@ describe('when performing crud operations', () => {
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
-
       await baseURLRequest()
         .put(`${resourceEndpoint}/${id}`)
         .auth(await getAccessToken('host'), { type: 'bearer' })
