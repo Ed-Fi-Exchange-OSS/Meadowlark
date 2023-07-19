@@ -1,0 +1,13 @@
+{
+  "name":"kafka_opensearch",
+  "config": {
+    "connector.class": "io.aiven.kafka.connect.opensearch.OpensearchSinkConnector",
+    "topics": "edfi.meadowlark.documents, edfi.meadowlark.authorizations",
+    "connection.url": "http://localhost:9200",
+    "connection.username": "<your-opensearch-username-goes-here>",
+    "connection.password": "<your-opensearch-password-goes-here>",
+    "type.name": "TYPE_NAME",
+    "tasks.max":"1",
+    "key.ignore": "true"
+  }
+}
