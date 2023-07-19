@@ -71,8 +71,7 @@ describe('when performing crud operations', () => {
       });
     });
 
-    // TODO: Remove skip after RND-598 is fixed
-    it.skip('should match the location', async () => {
+    it('should match the location', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
@@ -151,14 +150,12 @@ describe('when performing crud operations', () => {
         });
     });
 
-    // This is failing on postgres, covered in RND-598
     // This must be updated once RND-596 is implemented
-    it.skip('should fail when resource ID is included in body', async () => {
+    it('should fail when resource ID is included in body', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
-
       await baseURLRequest()
         .put(`${resourceEndpoint}/${id}`)
         .auth(await getAccessToken('host'), { type: 'bearer' })

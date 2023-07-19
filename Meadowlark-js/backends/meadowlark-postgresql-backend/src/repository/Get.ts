@@ -23,7 +23,7 @@ export async function getDocumentByDocumentUuid(
 
     const response: GetResult = {
       response: 'GET_SUCCESS',
-      document: { id: meadowlarkDocument.meadowlark_id, ...meadowlarkDocument.edfi_doc },
+      document: { id: meadowlarkDocument.document_uuid, ...meadowlarkDocument.edfi_doc },
     };
     return response;
   } catch (e) {
