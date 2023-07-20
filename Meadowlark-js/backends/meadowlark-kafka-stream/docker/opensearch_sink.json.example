@@ -8,6 +8,11 @@
     "connection.password": "<your-opensearch-password-goes-here>",
     "type.name": "TYPE_NAME",
     "tasks.max":"1",
-    "key.ignore": "true"
+    "key.ignore": "true",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
   }
 }
