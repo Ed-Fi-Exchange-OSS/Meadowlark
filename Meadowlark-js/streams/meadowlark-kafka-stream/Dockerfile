@@ -6,7 +6,11 @@
 FROM debezium/connect:1.9
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 
-ADD https://github.com/aiven/opensearch-connector-for-apache-kafka/releases/download/v3.1.0/opensearch-connector-for-apache-kafka-3.1.0.tar \
-    /kafka/connect/opensearch-connector-for-apache-kafka
+ADD --chown=kafka --chmod=600 https://github.com/aiven/opensearch-connector-for-apache-kafka/releases/download/v3.1.0/opensearch-connector-for-apache-kafka-3.1.0.tar \
+    /kafka/connect/ 
+
+RUN cd /kafka/connect/ && \
+    tar -xvf opensearch-connector-for-apache-kafka-3.1.0.tar && \
+    rm opensearch-connector-for-apache-kafka-3.1.0.tar
 
   
