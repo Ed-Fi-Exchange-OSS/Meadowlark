@@ -5,7 +5,7 @@ services:
   zookeeper:
     hostname: zookeeper1
     container_name: zookeeper1
-    image: debezium/zookeeper:1.9
+    image: debezium/zookeeper:2.4@sha256:5988d3c8994785c2febd10ec9d43cb948413ebd03d2cb0a28cde41a86c3b4b8a
     networks:
       - meadowlark-net
     ports:
@@ -20,7 +20,7 @@ services:
   kafka:
     hostname: kafka1
     container_name: kafka1
-    image: debezium/kafka:1.9
+    image: debezium/kafka:2.4@sha256:114ca9aba366f47d4da2a0143b692b7ac3034383d1cb4992b493036d1089dd8d
     networks:
       - meadowlark-net
     ports:
@@ -53,7 +53,7 @@ services:
   kafdrop:
     hostname: kafdrop
     container_name: kafdrop
-    image: obsidiandynamics/kafdrop:3.30.0
+    image: obsidiandynamics/kafdrop:3.31.0@sha256:f89f34f56e72188aa61b557866dbece57238a74c599e88105b200c2532bb804b
     ports:
       - 9000:9000
     networks:

@@ -3,10 +3,10 @@
   "config": {
       "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
       "tasks.max": "1",
-      "mongodb.name": "edfi",
+      "topic.prefix": "edfi",
+      "mongodb.connection.string": "<your-mongo-connection-string>",
       "mongodb.user": "<admin-username-goes-here>",
       "mongodb.password": "<admin-password-goes-here>",
-      "mongodb.hosts": "rs0/mongo1:27017,mongo2:27018,mongo3:27019",
       "database.history.kafka.bootstrap.servers": "kafka:9092",
 
       "key.converter": "org.apache.kafka.connect.json.JsonConverter",
