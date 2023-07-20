@@ -24,7 +24,7 @@ services:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
     networks:
-      - opensearch-net
+      - meadowlark-net
     restart: unless-stopped
 
   opensearch-dashboards:
@@ -38,11 +38,13 @@ services:
       OPENSEARCH_HOSTS: '["http://opensearch-node1:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true # disables security dashboards plugin in OpenSearch Dashboards
     networks:
-      - opensearch-net
+      - meadowlark-net
     restart: unless-stopped
 
 volumes:
   opensearch-data1:
 
 networks:
-  opensearch-net:
+  meadowlark-net:
+    external: true
+
