@@ -11,7 +11,7 @@ The MongoDB configuration needs to have a replica set to support atomic transact
 only a single node, though we recommend at least three nodes. OpenSearch clustering has not been tested, and the development
 team does not yet know how clustering works with this tool.
 
-Ideall, all three services would be in the same network segment and able to communicate through unencrypted channels. Indeed,
+Ideally, all three services would be in the same network segment and able to communicate through unencrypted channels. Indeed,
 the development team has not tested any alternative. However, only the API port should be open to outside traffic, except as
 needed for debugging.
 
