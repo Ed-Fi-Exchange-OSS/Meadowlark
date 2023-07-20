@@ -11,7 +11,7 @@ services:
     ports:
       - 27017:27017
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -43,7 +43,7 @@ services:
     ports:
       - 27018:27018
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -76,7 +76,7 @@ services:
     ports:
       - 27019:27019
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -111,4 +111,5 @@ volumes:
 
 
 networks:
-  mongo-net:
+  meadowlark-net:
+    name: meadowlark-net

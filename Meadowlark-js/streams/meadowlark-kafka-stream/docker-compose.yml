@@ -6,6 +6,8 @@ services:
     hostname: zookeeper1
     container_name: zookeeper1
     image: debezium/zookeeper:1.9
+    networks:
+      - meadowlark-net
     ports:
       - 2181:2181
       - 2888:2888
@@ -19,6 +21,8 @@ services:
     hostname: kafka1
     container_name: kafka1
     image: debezium/kafka:1.9
+    networks:
+      - meadowlark-net
     ports:
       - 9092:9092
     links:
@@ -34,6 +38,8 @@ services:
     build: .
     ports:
       - 8083:8083
+    networks:
+      - meadowlark-net
     links:
       - kafka
     environment:
@@ -50,6 +56,8 @@ services:
     image: obsidiandynamics/kafdrop:3.30.0
     ports:
       - 9000:9000
+    networks:
+      - meadowlark-net
     environment:
       KAFKA_BROKERCONNECT: kafka1:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
@@ -58,3 +66,7 @@ services:
 volumes:
   zookeeper-logs:
   zookeeper-data:
+
+networks:
+  meadowlark-net:
+    external: true
