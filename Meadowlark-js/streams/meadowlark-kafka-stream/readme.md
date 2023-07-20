@@ -40,11 +40,24 @@ Windows:
 ```pwsh
 Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json `
     -uri http://localhost:8083/connectors/ -ContentType "application/json"
+```
 
+### Verify configuration
+
+To check that connectors are running, execute:
+
+```bash
+curl http://localhost:8083/connector-plugins | jq .
+```
+
+```pwsh
+Invoke-RestMethod http://localhost:8083/connector-plugins | ConvertTo-Json | ConvertFrom-Json
+```
+
+This returns the debezium connectors and the OpenSearch connector information.
 
 ### Browsing Kafka Topics and Messages
 
 [Kafdrop](https://github.com/obsidiandynamics/kafdrop), a free Kafka Web UI, is
 bundled with this deployment. Browse the Kafka instance with Kafdrop at
 `http://localhost:9000/`.
-
