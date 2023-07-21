@@ -68,7 +68,7 @@ function Initialize-ToolsAndDirectories {
   $bulkLoader = (Join-Path -Path (Get-BulkLoadClient $bulkLoadVersion).Trim() -ChildPath "tools/net*/any/EdFi.BulkLoadClient.Console.dll")
   $bulkLoader = Resolve-Path $bulkLoader
 
-  $xsdDirectory = (Resolve-Path "$($PSScriptRoot)/../.packages/XSD")
+  $xsdDirectory = Join-Path -Path (Resolve-Path $PSScriptRoot) -ChildPath "/../.packages/XSD"
   $null = Get-EdFiXsd -XsdDirectory $xsdDirectory
 
   return @{

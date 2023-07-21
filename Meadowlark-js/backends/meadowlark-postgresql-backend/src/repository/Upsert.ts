@@ -31,6 +31,7 @@ import {
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
+import * as Cache from './Cache';
 
 const moduleName = 'postgresql.repository.Upsert';
 
@@ -148,6 +149,11 @@ export async function upsertDocument(
     }
 
     await commitTransaction(client);
+
+    if (resourceInfo.isDescriptor) {
+      await Cache.add(meadowlarkId);
+    }
+
     return isInsert
       ? { response: 'INSERT_SUCCESS', newDocumentUuid: documentUuid }
       : { response: 'UPDATE_SUCCESS', existingDocumentUuid: documentUuid };

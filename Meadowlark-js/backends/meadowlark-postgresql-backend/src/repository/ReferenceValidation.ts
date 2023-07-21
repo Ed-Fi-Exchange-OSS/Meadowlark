@@ -13,6 +13,7 @@ import {
 import { Logger } from '@edfi/meadowlark-utilities';
 import { PoolClient } from 'pg';
 import { validateReferenceExistence } from './SqlHelper';
+import * as Cache from './Cache';
 
 const moduleName = 'postgresql.repository.ReferenceValidation';
 
@@ -23,7 +24,7 @@ const moduleName = 'postgresql.repository.ReferenceValidation';
  * @param client The PostgreSQL client used for querying the database
  * @returns The subset of the given reference meadowlarkIds that are actually documents in the db
  */
-async function findReferencedMeadowlarkIdsByMeadowlarkId(
+export async function findReferencedMeadowlarkIdsByMeadowlarkId(
   referenceMeadowlarkIds: MeadowlarkId[],
   traceId: string,
   client: PoolClient,
@@ -103,7 +104,10 @@ export async function validateReferences(
   const descriptorReferenceMeadowlarkIds: MeadowlarkId[] = descriptorReferences.map((dr: DocumentReference) =>
     getMeadowlarkIdForDocumentReference(dr),
   );
-  const descriptorsInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(descriptorReferenceMeadowlarkIds, traceId, client);
+
+  // const descriptorsInDb = await findReferencedMeadowlarkIdsByMeadowlarkId(descriptorReferenceMeadowlarkIds, traceId, client);
+  const descriptorsInDb = await Cache.validateReferences(descriptorReferenceMeadowlarkIds, traceId, client);
+
   if (descriptorReferenceMeadowlarkIds.length !== descriptorsInDb.length) {
     Logger.debug(`${moduleName}.upsertDocument: descriptorReferences not found`, traceId);
     failureMessages.push(...findMissingReferences(descriptorsInDb, descriptorReferenceMeadowlarkIds, descriptorReferences));

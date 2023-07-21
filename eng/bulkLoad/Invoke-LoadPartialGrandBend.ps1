@@ -31,5 +31,5 @@ $parameters = @{
   Paths = $paths
 }
 
-# Write-Descriptors @parameters
+Write-Descriptors @parameters
 Write-PartialGrandBend  @parameters

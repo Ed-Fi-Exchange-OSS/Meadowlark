@@ -107,6 +107,11 @@ export async function deleteDocumentByDocumentUuid(
     await deleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
 
     await commitTransaction(client);
+
+    // Delete function doesn't know about `resourceInfo` yet, need to refactor to handle this.
+    // if (resourceInfo.isDescriptor) {
+    //   await Cache.remove(existingMeadowlarkId);
+    // }
   } catch (e) {
     Logger.error(`${moduleName}.deleteDocumentByDocumentUuid`, traceId, e);
     await rollbackTransaction(client);

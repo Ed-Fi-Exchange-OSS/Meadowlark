@@ -28,6 +28,7 @@ import {
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
 import { MeadowlarkDocumentAndAliasId } from '../model/MeadowlarkDocumentAndAliasId';
+import * as Cache from './Cache';
 
 const moduleName = 'postgresql.repository.Update';
 
@@ -64,9 +65,20 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
     // we just need the first row to return the meadowlark_id
     const existingMeadowlarkId: MeadowlarkId = recordExistsResult[0].meadowlark_id;
-    if (!resourceInfo.allowIdentityUpdates && existingMeadowlarkId !== meadowlarkId) {
-      updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
-      return updateResult;
+
+    const naturalKeyHasChanged = existingMeadowlarkId !== meadowlarkId;
+    if (naturalKeyHasChanged) {
+      if (!resourceInfo.allowIdentityUpdates) {
+        updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
+        return updateResult;
+      }
+
+      // TODO: long term we don't _only_ want descriptors. This is temporary to keep the size of the cache from getting too
+      // large.
+      if (resourceInfo.isDescriptor) {
+        await Cache.remove(existingMeadowlarkId);
+        await Cache.add(meadowlarkId);
+      }
     }
 
     if (validateDocumentReferencesExist) {
