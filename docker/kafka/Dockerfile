@@ -6,10 +6,18 @@
 FROM debezium/connect:2.3@sha256:dfa59c008a03f45c7b286d2874f2e6dbe04f3db6f26b6f01806c136abb07381a
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 
-ADD --chown=kafka --chmod=600 https://github.com/aiven/opensearch-connector-for-apache-kafka/releases/download/v3.1.0/opensearch-connector-for-apache-kafka-3.1.0.tar \
+ARG package=opensearch-connector-for-apache-kafka-3.1.0.tar
+
+ADD --chown=kafka --chmod=600 https://github.com/aiven/opensearch-connector-for-apache-kafka/releases/download/v3.1.0/${package} \
     /kafka/connect/
 
 RUN cd /kafka/connect/ && \
-    tar -xvf opensearch-connector-for-apache-kafka-3.1.0.tar && \
-    rm opensearch-connector-for-apache-kafka-3.1.0.tar
+    originalSha=58c27bdb0b8883e2e3291a2aaa42151b77240a33d3361ad620c656e775da14d2 && \
+    newSha=$(sha256sum ${package} | awk '{print $1}') && \
+    if [ $originalSha != $newSha ]; then exit 1; fi
+
+
+RUN cd /kafka/connect/ && \
+    tar -xvf ${package} && \
+    rm ${package}
 
