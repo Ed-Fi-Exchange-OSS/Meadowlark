@@ -51,3 +51,10 @@ export function newDocumentInfo(): DocumentInfo {
 export const NoDocumentInfo = Object.freeze({
   ...newDocumentInfo(),
 });
+/**
+ * Returns the id from the body.
+ */
+export function documentUuidForDocumentBody(parsedBody: object): string {
+  const jsonFromBody = JSON.parse(JSON.stringify(parsedBody));
+  return jsonFromBody.id;
+}
