@@ -5,6 +5,9 @@
 To do the performance tests to retrieve endpoints, use the
 [Suite3-Performance-Testing](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing).
 
+Meadowlark and all backend services should be running in containers for consistency
+of resource availability and limitations.
+
 ### Setup
 
 - Follow steps to [setup performance suite](./SETUP-PERFORMANCE-SUITE.md).
