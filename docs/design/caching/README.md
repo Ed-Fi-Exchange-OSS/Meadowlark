@@ -4,8 +4,9 @@
 
 Many data intensive applications gain substantial performance improvements by
 caching some of their data in a repository that is closer to the application
-code and/or has a faster access pattern. This document explores some of the
-patterns, practices, and key areas for caching within Meadowlark.
+code and/or has a faster access pattern relative to the transactional data
+store. This document explores some of the patterns, practices, and key areas for
+caching within Meadowlark.
 
 Aspects to consider:
 
@@ -25,17 +26,16 @@ performance benefits:
 * Unique ID's for parents, staff, and students
 
 Caching these values within the application improves performance by limiting the
-amount of work performed in the database and limiting the number of times the
-database needs to be accessed. Similar considerations apply in Meadowlark.
-Additionally, Meadowlark's in-code management of foreign keys means that there
-are far more database calls: for example, in the ODS/API, the code can submit a
-`StudentEducationOrganizationAssociation` to the relational database and wait
-for it to respond if there are any foreign key violations. For Meadowlark, the
-code must look up each foreign key in a separate call, leading to an explosion
-of database requests.
+amount of work performed in the transactional data store and limiting the number
+of times that database needs to be accessed. Similar considerations apply in
+Meadowlark. Additionally, Meadowlark's in-code management of foreign keys means
+that there are far more database calls: for example, in the ODS/API, the code
+can submit a `StudentEducationOrganizationAssociation` to the relational
+database and wait for it to respond if there are any foreign key violations. For
+Meadowlark, the code must look up foreign keys in a separate call.
 
 As such, other frequently used key values may also benefit from caching.
-Leveraging the ODS/API foreign key definitions, we can easily determine which
+By studying the ODS/API foreign key definitions, we can easily determine which
 resources are the most utilized as foreign keys for other resources, not
 including descriptors (which are a given):
 
@@ -61,15 +61,15 @@ including descriptors (which are a given):
 
 While these all have high connectivity, they may not all have high usage.
 Ideally, Meadowlark would allow the system administrator to choose which
-resources are cached. Initially, Meadowlark tuning should focus on the various
-Descriptors followed by Education Organization, Staff, Student, and School. From
-there it should be clear if we have a pattern for deployment-time tuning of
-which resources to cover.
+resources are cached. Initially, Meadowlark tuning might only focus on
+Descriptors, or could cover everything. Later optimizations might provide a
+system administrator with the ability to fine tune which resources are covered
+by caching.
 
 ## Storage Patterns
 
 The two primary choices are internal (in memory) vs. external caching. Within
-external caching there are data monolithic vs. distributed data sources.
+external caching there are monolithic vs. distributed data sources.
 
 In memory caches are on the same machine where the application code runs. This
 technique usually provide the highest performance, assuming the amount of data
@@ -77,7 +77,7 @@ to be cached fits in memory without crowding out the application. This pattern
 works best for monolithic applications with high memory availability.
 
 External caches can offer some benefit compared to accessing the raw data store,
-particularly when the external cache is design to store in memory instead of on
+particularly when the external cache is designed to store in memory instead of on
 disk. Distributed cache providers provide greater uptime and may be able to
 bring the cache closer to multiple application nodes that are running behind a
 load balancer.
@@ -86,14 +86,10 @@ Depending on the specific access patterns for the data, external caches may not
 guarantee additional performance benefits compared to simply querying a
 well-tuned transactional database. There is a danger of pre-optimizing when
 dealing with theoretical data loads, as the Meadowlark development team must do.
+To alleviate this concern, system administrator should have a third choice: no
+caching.
 
-Therefore it may be ideal to support multiple access patterns, allowing the
-administrator to tune which resources are cached in memory and which are cached
-externally. However, in memory should only be used for single node deployments:
-if load balanced, then a delete must be seen by all instances, which cannot
-happen for in-memory.
-
-**In-memory only**
+### In-memory Only
 
 ```mermaid
 flowchart LR
@@ -111,7 +107,7 @@ flowchart LR
     end
 ```
 
-**Load balanced application with external cache**
+### Load Balanced Application with External Cache
 
 In this sense, "external" is relative to the API application; as shown, the
 cache provider is inside the Docker network. It should also be trivial to
@@ -148,11 +144,12 @@ flowchart LR
 
 ### Architecture Before Adding Caching
 
-an Upsert request flows through the application code as shown in the sequence
-diagram below. Note that the `"select" statement` is meant to be a generic term
-for SQL and equivalent commands in document databases. Furthermore, note that
-there is no loop here: Meadowlark constructs a single find requests with all
-reference IDs instead of generating separate requests for each reference.
+An Upsert request (POST) flows through the application code as shown in the
+sequence diagram below. Note that the `"select" statement` is meant to be a
+generic term for SQL and equivalent commands in document databases. Furthermore,
+note that there is no loop here: Meadowlark constructs a single find requests
+with all reference IDs instead of generating separate requests for each
+reference.
 
 ```mermaid
 sequenceDiagram
@@ -199,9 +196,9 @@ sequenceDiagram
 One simple pattern is to introduce an [Identity
 Map](https://martinfowler.com/eaaCatalog/identityMap.html), which could be
 implemented with multiple backend providers, representing in-memory or external
-caches. It may be convenient to split this module in two, so that common
-business logic remains in the initial Identity Map, which then delegates out to
-a simple provider that encapsulates data access.
+caches. It will be convenient to split this module in two, so that common
+business logic remains in the initial Identity Map module, which then delegates
+out to a simple provider that encapsulates data access.
 
 Typically the Identity Map module would sit between the backend facade (as
 labeled above) and the repository layer. However, we have validation logic
@@ -210,11 +207,13 @@ context. Therefore the repository layer will need to know how to access the
 cache layer.
 
 To prevent the repository layer from accruing too much cache-related code, cache
-management needs to be centralized in the cache layer. This also aids in avoid
-coding duplication between different backend implementations. Thus we can inject
-a shared Identity Map and Cache Provider instance into the repository. Note:
-These two modules are treated as one "cache" in the sequence diagram below for
-simplicity.
+management needs to be centralized in a `Cache` module (the Identity Map), which
+can be placed in the `meadowlark-core` package. This also aids in avoid coding
+duplication between different backend implementations. There will need to be
+startup code to inject the right provider into the `Cache` module; these two are
+treated as one "cache" in the sequence diagram below for simplicity. Then the
+core `Upsert` module can inject the cache into the backend calls following the
+Dependency Inversion principle.
 
 The repository layer will ask the cache if the references exist. If the cache
 does not contain the references, then it needs to go back to the repository
@@ -284,13 +283,13 @@ sequenceDiagram
     C-->>B: response
 ```
 
-> **Note** The pattern explored above needs to be extended to cover all data
-> modification requests.
+### Extending Beyond the Upsert
 
-For example, when a delete occurs, then there needs to be a command out to the
-cache to remove that deleted item (if it is present). New documents could be
-cached immediately, if that resource type is subject to caching. Updated
-documents need to be evaluated: if the natural key changed, and thus the
+The pattern explored above needs to be extended to cover all data modification
+requests. For example, when a delete occurs, then there needs to be a command
+out to the cache to remove that deleted item (if it is present). New documents
+could be cached immediately, if that resource type is subject to caching.
+Updated documents need to be evaluated: if the natural key changed, and thus the
 calculated MeadowlarkId has changed, then the old ID must be removed and the new
 one added.
 
@@ -328,11 +327,11 @@ TwoHardThings](https://martinfowler.com/bliki/TwoHardThings.html):
 >
 > -- Phil Karlton
 
-There are no contents to be concerned about - only ID values. There are two
-obvious scenarios where stale data could become problematic: deleting a document
-that is used as a reference for other documents, or modifying a natural key
-(which is essentially deleting a document and replacing it). Take this scenario
-for example:
+There are no _document contents_ to be concerned about - only ID values. There
+are two obvious scenarios where stale data could become problematic: deleting a
+document that is used as a reference for other documents, or modifying a natural
+key (which is essentially deleting a document and replacing it). Take this
+scenario for example:
 
 1. Received a DELETE for a descriptor.
    1. Removal from transactional backend works.
@@ -342,14 +341,14 @@ for example:
    should have failed.
 
 Two options for dealing with this are to make the cache update in the context of
-the database transaction (so cache failure triggers rollback), or manage the Cache
-downstream in an event-driven process.
+the database transaction (so cache failure triggers rollback), or manage the
+cache downstream in an event-driven process.
 
 The event-driven process sounds appealing, as it also frees up the API
 application from needing to know how to populate the cache datastore. However,
-the eventual consistency problem here could trigger a never consistent problem:
-a delay in removing the deleted item from the cache could result in storing a
-received item that should have been rejected.
+the eventual consistency problem here could trigger a _never consistent_
+problem: a delay in removing the deleted item from the cache could result in
+storing a received item that should have been rejected.
 
 Another option is to provide a time-to-live (TTL) that will automatically flush
 cached items after a certain period of time, thus forcing a continual refresh of
@@ -369,4 +368,21 @@ higher volumes.
 
 The code in that branch does not fully represent the proposed module layers that
 this document describes. Whomever implements the work should read the `// TODO`
-comments carefully and review the proposed design above.
+comments carefully, review the proposed design above, and then make further
+adjustments as the need emerges.
+
+## Tentative Work Breakdown
+
+1. Create the `Cache` module and a `NoCachingProvider` that ignores `add` and
+   `remove` requests and always return an empty array for the `has` requests.
+   Add the configuration support (env var) for reaching the cache provider
+   setting, even though there is only one provider available.
+2. Add an `InMemoryCachingProvider` and support switching to it via
+   configuration. Run bulk upload test three times with NoCaching and three
+   times with InMemory, with Meadowlark running a container. Completely reset
+   all databases between each run. Record test results in this document.
+3. Similarly, add a `RedisCachingProvider`; this should be in a separate backend
+   package. Also add configuration support for the Redis connection information.
+   Add Redis in single-node configuration to the local docker compose
+   infrastructure. Rerun the bulk performance tests and record results here, as
+   in item 2.
