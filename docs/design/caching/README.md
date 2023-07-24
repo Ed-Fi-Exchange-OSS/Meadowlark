@@ -27,12 +27,13 @@ performance benefits:
 
 Caching these values within the application improves performance by limiting the
 amount of work performed in the transactional data store and limiting the number
-of times that database needs to be accessed. Similar considerations apply in
-Meadowlark. Additionally, Meadowlark's in-code management of foreign keys means
-that there are far more database calls: for example, in the ODS/API, the code
-can submit a `StudentEducationOrganizationAssociation` to the relational
-database and wait for it to respond if there are any foreign key violations. For
-Meadowlark, the code must look up foreign keys in a separate call.
+of times that database needs to be accessed. Similar considerations may apply in
+Meadowlark, particularly with Descriptors. Additionally, Meadowlark's in-code
+management of foreign keys means that there are far more database calls: for
+example, in the ODS/API, the code can submit a
+`StudentEducationOrganizationAssociation` to the relational database and wait
+for it to respond if there are any foreign key violations. For Meadowlark, the
+code must look up foreign keys in a separate call.
 
 As such, other frequently used key values may also benefit from caching.
 By studying the ODS/API foreign key definitions, we can easily determine which
@@ -304,9 +305,8 @@ this document, there are some resources that are heavily used as references and
 others lightly used. There is a concern that the cache size could grow too large
 if low-value data are included. It may be necessary to add some restriction on
 caching in the future. However, this kind of optimization should be avoided in
-the initial implementation, keeping the code simple: cache all references. Check
-on the storage constraints and cost, then if needed, add a mechanism for
-specifying which resources opt-in to the caching.
+the initial implementation, keeping the code simple. We can provide three
+options for now: cache nothing; cache only the descriptors; and cache everything.
 
 ### Lazy Loading
 
@@ -341,14 +341,19 @@ scenario for example:
    should have failed.
 
 Two options for dealing with this are to make the cache update in the context of
-the database transaction (so cache failure triggers rollback), or manage the
+the database transaction (so that cache failure triggers rollback), or manage the
 cache downstream in an event-driven process.
 
-The event-driven process sounds appealing, as it also frees up the API
-application from needing to know how to populate the cache datastore. However,
-the eventual consistency problem here could trigger a _never consistent_
-problem: a delay in removing the deleted item from the cache could result in
-storing a received item that should have been rejected.
+The event-driven process sounds appealing because it is consistent with the
+overall architectural pattern employed by Meadowlark. However, populating an
+in-memory cache does not work well in such a system, because the entire data
+store would need to be hot loaded whenever a new instance starts up. Populating
+a cache data store in this case works best with lazy loading, which means it
+needs to come from the API application. A delete operation could be event
+driven, but comes with the potential for consistency problems and offers little
+practical benefit if write operations are already coming directly from the API
+application. Therefore the cache data store modifications need to be inline with
+the backend transactions.
 
 Another option is to provide a time-to-live (TTL) that will automatically flush
 cached items after a certain period of time, thus forcing a continual refresh of
@@ -377,12 +382,17 @@ adjustments as the need emerges.
    `remove` requests and always return an empty array for the `has` requests.
    Add the configuration support (env var) for reaching the cache provider
    setting, even though there is only one provider available.
-2. Add an `InMemoryCachingProvider` and support switching to it via
-   configuration. Run bulk upload test three times with NoCaching and three
-   times with InMemory, with Meadowlark running a container. Completely reset
-   all databases between each run. Record test results in this document.
-3. Similarly, add a `RedisCachingProvider`; this should be in a separate backend
-   package. Also add configuration support for the Redis connection information.
-   Add Redis in single-node configuration to the local docker compose
-   infrastructure. Rerun the bulk performance tests and record results here, as
-   in item 2.
+2. Add an `InMemoryCachingProvider`.
+   * Support switching to it via configuration.
+   * Support a configuration switch for enabling resource caching (descriptor
+     caching always on when using this provider).
+   * Run bulk upload test three times with NoCaching and three times with
+     InMemory, with Meadowlark running a container. Completely reset all
+     databases between each run. Record test results in this document.
+3. Similarly, add a `RedisCachingProvider`.
+   * This should be in a separate backend package.
+   * Same configuration options, plus support for the Redis connection
+     information.
+   * Add Redis in single-node configuration to the local docker compose
+     infrastructure. Rerun the bulk performance tests and record results here,
+     as in item 2.
