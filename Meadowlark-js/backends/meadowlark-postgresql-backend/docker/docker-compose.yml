@@ -14,6 +14,16 @@ services:
       - ${POSTGRES_PORT:-5432}:5432
     volumes:
       - meadowlark-pgsql:/var/lib/postgresql/data
+
+  # TODO: doesn't belong here in a real ticket, only in POC.
+  redis:
+    container_name: Redis-Meadowlark
+    image: redis/redis-stack-server:latest
+    restart: always
+    ports:
+      - 6379:6379
+    # No need to configure volumes, because we do not need to preserve any data outside the container.
+
 volumes:
   meadowlark-pgsql:
     driver: local
