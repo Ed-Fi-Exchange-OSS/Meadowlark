@@ -21,9 +21,11 @@
   "dependencies": {
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
+    "@types/redis": "^4.0.11",
     "pg": "^8.11.1",
     "pg-format": "^1.0.4",
     "ramda": "0.27.2",
+    "redis": "^4.6.7",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
