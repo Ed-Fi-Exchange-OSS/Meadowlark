@@ -146,13 +146,13 @@ flowchart LR
 
 ## Application Architecture
 
-### Pre-Caching Architecture
+### Architecture Before Adding Caching
 
-Currently, an Upsert request flows through the application code as shown in the
-sequence diagram below. Note that the `"select" statement` is meant to be a
-generic term for SQL and equivalent commands in document databases. Furthermore,
-note that there is no loop here: Meadowlark constructs a single find requests
-with all reference IDs instead of generating separate requests for each reference.
+an Upsert request flows through the application code as shown in the sequence
+diagram below. Note that the `"select" statement` is meant to be a generic term
+for SQL and equivalent commands in document databases. Furthermore, note that
+there is no loop here: Meadowlark constructs a single find requests with all
+reference IDs instead of generating separate requests for each reference.
 
 ```mermaid
 sequenceDiagram
@@ -220,7 +220,10 @@ The repository layer will ask the cache if the references exist. If the cache
 does not contain the references, then it needs to go back to the repository
 layer to check the transactional database. Any hits should be added to the cache
 at that point, for use by subsequent API requests that need to validate the same
-references.
+references. For efficiency when querying external provides, the Cache interface
+needs to receive an array of ID's to lookup, rather than just a single ID each
+time. Thus the code can use batch requests instead of individual service
+requests for each ID.
 
 ```mermaid
 sequenceDiagram
@@ -244,10 +247,8 @@ sequenceDiagram
     rect ivory
         D->>G: cache.validateReferences(references, referenceValidation)
 
-        loop for each reference
-            G->>G: isInCache(ref.pk)
-            Note over G: if yes remove from `references`
-        end
+        G->>G: provider.has(references)
+        G->>G: remove the found references
 
         opt any references remaining
             G->>F: referenceValidation.validateReferences(references)
@@ -284,8 +285,14 @@ sequenceDiagram
 ```
 
 > **Note** The pattern explored above needs to be extended to cover all data
-> modification requests. For example, when a delete occurs, then there needs to
-> be a command out to the cache to remove that deleted item (if it is present).
+> modification requests.
+
+For example, when a delete occurs, then there needs to be a command out to the
+cache to remove that deleted item (if it is present). New documents could be
+cached immediately, if that resource type is subject to caching. Updated
+documents need to be evaluated: if the natural key changed, and thus the
+calculated MeadowlarkId has changed, then the old ID must be removed and the new
+one added.
 
 ### Managing What to Cache
 
@@ -313,10 +320,53 @@ to the cache - an expensive proposition.
 
 ## Dealing with Stale Data
 
-From [Martin Fowler): TwoHardThings](https://martinfowler.com/bliki/TwoHardThings.html):
+From [Martin Fowler:
+TwoHardThings](https://martinfowler.com/bliki/TwoHardThings.html):
 
 > "There are only two hard things in Computer Science: cache invalidation and
 > naming things."
 >
 > -- Phil Karlton
 
+There are no contents to be concerned about - only ID values. There are two
+obvious scenarios where stale data could become problematic: deleting a document
+that is used as a reference for other documents, or modifying a natural key
+(which is essentially deleting a document and replacing it). Take this scenario
+for example:
+
+1. Received a DELETE for a descriptor.
+   1. Removal from transactional backend works.
+   2. Removal from cache fails.
+2. Receive a POST request that references that descriptor.
+3. POST succeeds because the descriptor is cached, even though the request
+   should have failed.
+
+Two options for dealing with this are to make the cache update in the context of
+the database transaction (so cache failure triggers rollback), or manage the Cache
+downstream in an event-driven process.
+
+The event-driven process sounds appealing, as it also frees up the API
+application from needing to know how to populate the cache datastore. However,
+the eventual consistency problem here could trigger a never consistent problem:
+a delay in removing the deleted item from the cache could result in storing a
+received item that should have been rejected.
+
+Another option is to provide a time-to-live (TTL) that will automatically flush
+cached items after a certain period of time, thus forcing a continual refresh of
+the lazy-loaded cache. At this time the approach seems unnecessary, as (a)
+again, there is no _body_ to the values in the cache, so there is no update
+(PUT) problem beyond the natural key, and (b) although it would ameliorate the
+possibility of inconsistent state, it would not eliminate that possibility.
+
+## Proof-of-Concept
+
+See branch `SPIKE-CACHING`, which has rough code providing both an in-memory
+cache and a Redis-based cache. In limited testing using the "load partial Grand
+Bend" dataset, the timing for in-memory requests had clear improvement versus no
+cache, and the Redis testing appeared to have a small improvement as well.
+Improvements are more likely to be seen in load balanced situations and at
+higher volumes.
+
+The code in that branch does not fully represent the proposed module layers that
+this document describes. Whomever implements the work should read the `// TODO`
+comments carefully and review the proposed design above.
