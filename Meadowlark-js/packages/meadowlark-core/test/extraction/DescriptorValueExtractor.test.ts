@@ -151,7 +151,7 @@ describe('when extracting single descriptor value from common with role name', (
           },
           "isDescriptor": true,
           "projectName": "EdFi",
-          "resourceName": "availableCreditTypeDescriptor",
+          "resourceName": "CreditTypeDescriptor",
         },
       ]
     `);
