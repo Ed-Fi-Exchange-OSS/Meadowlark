@@ -11,8 +11,13 @@ import {
   NamespaceBuilder,
   DescriptorBuilder,
   DomainEntitySubclassBuilder,
+  CommonBuilder,
 } from '@edfi/metaed-core';
-import { descriptorReferenceEnhancer, domainEntitySubclassBaseClassEnhancer } from '@edfi/metaed-plugin-edfi-unified';
+import {
+  inlineCommonReferenceEnhancer,
+  descriptorReferenceEnhancer,
+  domainEntitySubclassBaseClassEnhancer,
+} from '@edfi/metaed-plugin-edfi-unified';
 import {
   entityPropertyApiSchemaDataSetupEnhancer,
   apiEntityMappingEnhancer,
@@ -81,6 +86,72 @@ describe('when extracting single descriptor value from domain entity', () => {
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
+        },
+      ]
+    `);
+  });
+});
+
+describe('when extracting single descriptor value from common with role name', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let namespace: any = null;
+  let result: DocumentReference[] = [];
+
+  const descriptorValue = 'uri://ed-fi.org/grade';
+
+  const body = {
+    SectionIdentifier: 123,
+    availableCreditTypeDescriptor: descriptorValue,
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+      .withStartDescriptor('CreditType')
+      .withDocumentation('Documentation')
+      .withEndDescriptor()
+      .withStartInlineCommon('Credits')
+      .withDocumentation('Documentation')
+      .withDescriptorProperty('CreditType', 'Documentation', false, false)
+      .withEndInlineCommon()
+
+      .withStartDomainEntity('Section')
+      .withDocumentation('Documentation')
+      .withIntegerIdentity('SectionIdentifier', 'Documentation')
+      .withInlineCommonProperty('Credits', 'Documentation', false, false, 'Available')
+      .withEndDomainEntity()
+      .withEndNamespace()
+
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []))
+      .sendToListener(new CommonBuilder(metaEd, []))
+      .sendToListener(new DescriptorBuilder(metaEd, []));
+
+    inlineCommonReferenceEnhancer(metaEd);
+    descriptorReferenceEnhancer(metaEd);
+    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
+    entityApiSchemaDataSetupEnhancer(metaEd);
+    subclassPropertyNamingCollisionEnhancer(metaEd);
+    referenceComponentEnhancer(metaEd);
+    apiPropertyMappingEnhancer(metaEd);
+    propertyCollectingEnhancer(metaEd);
+    apiEntityMappingEnhancer(metaEd);
+
+    namespace = metaEd.namespace.get('EdFi');
+    const entity = namespace.entity.domainEntity.get('Section');
+    result = extractDescriptorValues(entity, body);
+  });
+
+  it('should have the descriptor value', () => {
+    expect(result).toMatchInlineSnapshot(`
+      [
+        {
+          "documentIdentity": {
+            "descriptor": "uri://ed-fi.org/grade",
+          },
+          "isDescriptor": true,
+          "projectName": "EdFi",
+          "resourceName": "CreditTypeDescriptor",
         },
       ]
     `);
