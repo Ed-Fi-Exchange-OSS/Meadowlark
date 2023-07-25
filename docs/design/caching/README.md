@@ -244,7 +244,7 @@ sequenceDiagram
     C->>D: upsertDocument(request, cache, client)
     D->>D: startTransaction()
 
-    rect ivory
+    rect rgba(128, 128, 128, .2)
         D->>G: cache.validateReferences(references, referenceValidation)
 
         G->>G: provider.has(references)
@@ -258,7 +258,7 @@ sequenceDiagram
     F->>E: "select" statement
     E-->>F: result
 
-    rect ivory
+    rect rgba(128, 128, 128, .2)
         F-->>G: result
 
         G->>G: cache.add(existingReferences)
@@ -270,7 +270,7 @@ sequenceDiagram
       D->>E: upsert(doc)
       D->>D: commit()
 
-      rect ivory
+      rect rgba(128, 128, 128, .2)
         D->>G: addToCache(doc)
       end
 
