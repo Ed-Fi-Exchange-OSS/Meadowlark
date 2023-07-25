@@ -4,8 +4,11 @@
 
 There are two ways to analyze write performance for Meadowlark:
 
-1. Bulk Loading.
+1. Bulk Loading
 2. Run Performance Testing Suite.
+
+In both cases, Meadowlark and all backend services should be running in containers for
+consistency of resource availability and limitations.
 
 ## Bulk Loading
 
