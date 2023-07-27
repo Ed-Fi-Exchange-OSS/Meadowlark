@@ -134,10 +134,18 @@ describe('when performing crud operations', () => {
 
   describe('when updating a resource', () => {
     it('returns 204', async () => {
+      const id = await rootURLRequest()
+        .get(resourceResponse.headers.location)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .then((response) => response.body.id);
+
       await rootURLRequest()
         .put(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBody)
+        .send({
+          id,
+          ...resourceBody,
+        })
         .expect(204);
     });
 
@@ -151,13 +159,13 @@ describe('when performing crud operations', () => {
     });
 
     // This must be updated once RND-596 is implemented
-    it('should fail when resource ID is included in body', async () => {
+    it('should fail when resource ID is included in body for post', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
       await baseURLRequest()
-        .put(`${resourceEndpoint}/${id}`)
+        .post(`${resourceEndpoint}`)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
           id,
