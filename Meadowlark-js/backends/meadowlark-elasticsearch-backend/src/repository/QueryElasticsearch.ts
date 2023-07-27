@@ -77,7 +77,7 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
       },
     };
 
-    Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
+    Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${JSON.stringify(query)}`, traceId);
 
     const body = await performDslQuery(
       client,
