@@ -18,6 +18,33 @@ describe('Education contents', () => {
     contentClassDescriptor = await getDescriptorByLocation(contentClassDescriptorLocation);
   });
 
+  // The Data Standard defines EducationContent.LearningResource as a required "Choice".
+  // The MetaEd documentation notes that this "requirement" will not be enforced by the API, and in fact the ODS/API does not enforce it.
+  describe('when creating an EducationContent without shortDescription, contentClassDescriptor and learningResourceMetadataURI', () => {
+    beforeAll(async () => {
+      const contentIdentifier = generateRandomId();
+      educationContentLocation = await createResource({
+        endpoint: 'educationContents',
+        body: {
+          contentIdentifier,
+          namespace: '43211',
+        },
+      });
+    });
+
+    it('should create the education content', async () => {
+      await baseURLRequest()
+        .get('/v3.3b/ed-fi/educationContents')
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .expect(200);
+
+      await rootURLRequest()
+        .get(educationContentLocation)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .expect(200);
+    });
+  });
+
   describe('Create', () => {
     it('should create an education content', async () => {
       const contentIdentifier = generateRandomId();
