@@ -2,11 +2,15 @@
   "name":"kafka_opensearch",
   "config": {
     "connector.class": "io.aiven.kafka.connect.opensearch.OpensearchSinkConnector",
-    "topics": "edfi.meadowlark.documents, edfi.meadowlark.authorizations",
+    "topics": "edfi.meadowlark.documents",
+    "type_name": "edfi.meadowlark.documents",
     "connection.url": "<your-opensearch-url>",
     "connection.username": "<your-opensearch-username-goes-here>",
     "connection.password": "<your-opensearch-password-goes-here>",
     "tasks.max":"1",
-    "key.ignore": "true",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "schema.ignore": "true"
   }
 }
