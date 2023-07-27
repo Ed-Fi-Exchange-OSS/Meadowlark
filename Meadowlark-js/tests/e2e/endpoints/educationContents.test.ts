@@ -86,10 +86,15 @@ describe('Education contents', () => {
 
     it('should edit an education content', async () => {
       const uri = 'uri://ed-fi.org/fake-updated-uri';
+      const id = await rootURLRequest()
+        .get(educationContentLocation)
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .then((response) => response.body.id);
       await rootURLRequest()
         .put(educationContentLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .send({
+          id,
           contentIdentifier,
           namespace: '43210',
           shortDescription: 'ShortDesc',

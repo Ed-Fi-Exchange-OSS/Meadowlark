@@ -145,7 +145,7 @@ describe('Given the existence of a student, a school, a local education agency a
 
     it('returns error', async () => {
       const id = await rootURLRequest()
-        .get(studentLocation)
+        .get(studentProgramAssociationLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
       await rootURLRequest()
