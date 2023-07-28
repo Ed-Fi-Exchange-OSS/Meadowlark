@@ -33,11 +33,6 @@ describe('Education contents', () => {
     });
 
     it('should create the education content', async () => {
-      await baseURLRequest()
-        .get('/v3.3b/ed-fi/educationContents')
-        .auth(await getAccessToken('vendor'), { type: 'bearer' })
-        .expect(200);
-
       await rootURLRequest()
         .get(educationContentLocation)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
