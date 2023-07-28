@@ -252,7 +252,7 @@ describe('given the existence of two vendors and one host', () => {
       it('should return error', async () => {
         const id = await rootURLRequest()
           .get(resourceLocation)
-          .auth(vendor2DataAccessToken, { type: 'bearer' })
+          .auth(vendor1DataAccessToken, { type: 'bearer' })
           .then((response) => response.body.id);
         await rootURLRequest()
           .put(resourceLocation)
