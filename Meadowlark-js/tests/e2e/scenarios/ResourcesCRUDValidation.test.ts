@@ -136,7 +136,7 @@ describe('when performing crud operations', () => {
     it('returns 204', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
-        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
 
       await rootURLRequest()
