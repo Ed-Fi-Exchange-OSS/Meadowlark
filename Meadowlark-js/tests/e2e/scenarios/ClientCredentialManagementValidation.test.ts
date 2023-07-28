@@ -58,10 +58,15 @@ describe("given it's handling the client permission", () => {
     });
 
     it('returns 403 when updating by vendor', async () => {
+      const id = await rootURLRequest()
+        .get(countryLocation)
+        .auth(vendorToken, { type: 'bearer' })
+        .then((response) => response.body.id);
       await rootURLRequest()
         .put(countryLocation)
         .auth(vendorToken, { type: 'bearer' })
         .send({
+          id,
           codeValue: 'US',
           shortDescription: 'US',
           description: 'USA',

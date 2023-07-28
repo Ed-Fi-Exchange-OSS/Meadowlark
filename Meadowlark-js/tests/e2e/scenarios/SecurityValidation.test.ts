@@ -250,10 +250,17 @@ describe('given the existence of two vendors and one host', () => {
 
     describe('when a different vendor updates the resource', () => {
       it('should return error', async () => {
+        const id = await rootURLRequest()
+          .get(resourceLocation)
+          .auth(vendor2DataAccessToken, { type: 'bearer' })
+          .then((response) => response.body.id);
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPutUpdated)
+          .send({
+            id,
+            ...resourceBodyPutUpdated,
+          })
           .expect(403)
           .then((response) => {
             expect(response.body).toBe('');
