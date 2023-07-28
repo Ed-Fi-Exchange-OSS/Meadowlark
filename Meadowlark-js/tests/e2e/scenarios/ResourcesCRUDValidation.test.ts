@@ -136,7 +136,7 @@ describe('when performing crud operations', () => {
     it('returns 204', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
-        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => response.body.id);
 
       await rootURLRequest()
@@ -149,6 +149,46 @@ describe('when performing crud operations', () => {
         .expect(204);
     });
 
+    it('should fail when resource ID is different in body on put', async () => {
+      const id = 'differentId';
+      await rootURLRequest()
+        .put(resourceResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send({
+          id,
+          ...resourceBody,
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.error).toMatchInlineSnapshot(`
+            {
+              "message": "The identity of the resource does not match the identity in the updated document.",
+            }
+          `);
+        });
+    });
+
+    it('should fail when resource ID is not included in body on put', async () => {
+      await rootURLRequest()
+        .put(resourceResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody)
+        .expect(400)
+        .then((response) => {
+          expect(response.body.error).toMatchInlineSnapshot(`
+            [
+              {
+                "context": {
+                  "errorType": "required",
+                },
+                "message": "{requestBody} must have required property 'id'",
+                "path": "{requestBody}",
+              },
+            ]
+          `);
+        });
+    });
+
     it('returns updated resource on get', async () => {
       await rootURLRequest()
         .get(resourceResponse.headers.location)
@@ -158,11 +198,10 @@ describe('when performing crud operations', () => {
         });
     });
 
-    // This must be updated once RND-596 is implemented
-    it('should fail when resource ID is included in body for post', async () => {
+    it('should fail when resource ID is included in body on post', async () => {
       const id = await rootURLRequest()
         .get(resourceResponse.headers.location)
-        .auth(await getAccessToken('vendor'), { type: 'bearer' })
+        .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => response.body.id);
       await baseURLRequest()
         .post(`${resourceEndpoint}`)

@@ -62,6 +62,7 @@ export async function documentUpdateValidation({
                 id,
                 ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.properties,
               },
+              required: ['id', ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.required],
             },
           },
         },

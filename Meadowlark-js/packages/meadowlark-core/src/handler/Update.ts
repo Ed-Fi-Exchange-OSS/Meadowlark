@@ -40,7 +40,11 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
 
       return {
-        body: { error: failureMessage },
+        body: {
+          error: {
+            message: failureMessage,
+          },
+        },
         statusCode: 400,
         headers: headerMetadata,
       };
