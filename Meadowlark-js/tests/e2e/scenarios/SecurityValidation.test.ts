@@ -250,6 +250,7 @@ describe('given the existence of two vendors and one host', () => {
 
     describe('when a different vendor updates the resource', () => {
       it('should return error', async () => {
+        // Get resource id to update
         const id = await rootURLRequest()
           .get(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
