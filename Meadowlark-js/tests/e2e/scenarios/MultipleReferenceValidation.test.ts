@@ -87,7 +87,6 @@ describe('When querying for a resource that has multiple references to resources
             });
         });
       });
-
     });
   });
 });
