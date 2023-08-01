@@ -62,19 +62,6 @@ describe('When querying for a resource that has multiple references to resources
         await deleteResourceByLocation(entryGradeLevelDescriptorLocation, 'entryGradeLevelDescriptor');
       });
 
-      describe('when filtering by valid reference', () => {
-        it.skip('should return results', async () => {
-          await baseURLRequest()
-            .get(`/v3.3b/ed-fi/studentSchoolAssociations?studentReference.studentUniqueId=${studentUniqueId}`)
-            .auth(await getAccessToken('host'), { type: 'bearer' })
-            .then((response) => {
-              console.log(response.body);
-
-              expect(response.body).not.toEqual([]);
-            });
-        });
-      });
-
       describe('when querying all results', () => {
         it('should return all data', async () => {
           await baseURLRequest()
@@ -98,15 +85,6 @@ describe('When querying for a resource that has multiple references to resources
                 ]),
               );
             });
-        });
-      });
-
-      describe('when filtering by non existing reference', () => {
-        it.skip('should return empty array', async () => {
-          await baseURLRequest()
-            .get(`/v3.3b/ed-fi/studentSchoolAssociations?studentReference.studentUniqueId=n0tEx1sts`)
-            .auth(await getAccessToken('host'), { type: 'bearer' })
-            .expect(404);
         });
       });
     });
