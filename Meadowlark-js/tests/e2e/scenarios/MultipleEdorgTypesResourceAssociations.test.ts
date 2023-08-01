@@ -144,10 +144,15 @@ describe('Given the existence of a student, a school, a local education agency a
     });
 
     it('returns error', async () => {
+      const id = await rootURLRequest()
+        .get(studentProgramAssociationLocation)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .then((response) => response.body.id);
       await rootURLRequest()
         .put(studentProgramAssociationLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
+          id,
           educationOrganizationReference: {
             educationOrganizationId: localEducationAgencyId,
           },

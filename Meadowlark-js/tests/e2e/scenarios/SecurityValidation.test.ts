@@ -220,10 +220,17 @@ describe('given the existence of two vendors and one host', () => {
 
     describe('when the same vendor updates the resource', () => {
       it('should return success', async () => {
+        const id = await rootURLRequest()
+          .get(resourceLocation)
+          .auth(vendor1DataAccessToken, { type: 'bearer' })
+          .then((response) => response.body.id);
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor1DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPutUpdated)
+          .send({
+            id,
+            ...resourceBodyPutUpdated,
+          })
           .expect(204);
       });
     });
@@ -243,10 +250,18 @@ describe('given the existence of two vendors and one host', () => {
 
     describe('when a different vendor updates the resource', () => {
       it('should return error', async () => {
+        // Get resource id to update
+        const id = await rootURLRequest()
+          .get(resourceLocation)
+          .auth(vendor1DataAccessToken, { type: 'bearer' })
+          .then((response) => response.body.id);
         await rootURLRequest()
           .put(resourceLocation)
           .auth(vendor2DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPutUpdated)
+          .send({
+            id,
+            ...resourceBodyPutUpdated,
+          })
           .expect(403)
           .then((response) => {
             expect(response.body).toBe('');
@@ -256,10 +271,17 @@ describe('given the existence of two vendors and one host', () => {
 
     describe('when a host account requests the resource', () => {
       it('should return success', async () => {
+        const id = await rootURLRequest()
+          .get(resourceLocation)
+          .auth(host1DataAccessToken, { type: 'bearer' })
+          .then((response) => response.body.id);
         await rootURLRequest()
           .put(resourceLocation)
           .auth(host1DataAccessToken, { type: 'bearer' })
-          .send(resourceBodyPutUpdated)
+          .send({
+            id,
+            ...resourceBodyPutUpdated,
+          })
           .expect(204);
       });
     });

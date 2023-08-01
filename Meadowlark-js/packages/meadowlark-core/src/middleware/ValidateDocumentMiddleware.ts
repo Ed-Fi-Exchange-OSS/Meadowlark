@@ -6,6 +6,7 @@
 import { validateDocument } from '../validation/DocumentValidator';
 import { writeDebugObject, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
+import { FrontendRequest } from '../handler/FrontendRequest';
 
 const moduleName = 'core.middleware.ValidateDocumentMiddleware';
 
@@ -31,4 +32,43 @@ export async function documentValidation({ frontendRequest, frontendResponse }: 
   }
 
   return { frontendRequest, frontendResponse: null };
+}
+
+/**
+ * Validates JSON document shape for the update function
+ */
+export async function documentUpdateValidation({
+  frontendRequest,
+  frontendResponse,
+}: MiddlewareModel): Promise<MiddlewareModel> {
+  const id = {
+    type: 'string',
+    description: 'The item id',
+  };
+  // Add id to schema to validate document
+  const frontendRequestUpdate: FrontendRequest = {
+    ...frontendRequest,
+    middleware: {
+      ...frontendRequest.middleware,
+      matchingMetaEdModel: {
+        ...frontendRequest.middleware.matchingMetaEdModel,
+        data: {
+          ...frontendRequest.middleware.matchingMetaEdModel.data,
+          edfiApiSchema: {
+            ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema,
+            jsonSchema: {
+              ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema,
+              properties: {
+                id,
+                ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.properties,
+              },
+              required: ['id', ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.required],
+            },
+          },
+        },
+      },
+    },
+  };
+
+  return documentValidation({ frontendRequest: frontendRequestUpdate, frontendResponse });
 }

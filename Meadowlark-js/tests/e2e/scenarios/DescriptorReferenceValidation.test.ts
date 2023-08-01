@@ -89,10 +89,15 @@ describe('When creating a resource that has a reference to a descriptor', () => 
         });
 
         it('should allow to edit', async () => {
+          const id = await rootURLRequest()
+            .get(studentLocation)
+            .auth(await getAccessToken('vendor'), { type: 'bearer' })
+            .then((response) => response.body.id);
           await rootURLRequest()
             .put(studentLocation)
             .auth(await getAccessToken('vendor'), { type: 'bearer' })
             .send({
+              id,
               studentUniqueId,
               firstName: 'First',
               lastSurname: 'Last',

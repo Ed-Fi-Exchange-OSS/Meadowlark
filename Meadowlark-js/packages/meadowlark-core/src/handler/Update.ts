@@ -15,6 +15,7 @@ import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris } from './UriBuilder';
 import { TraceId } from '../model/BrandedTypes';
+import { documentUuidForDocumentBody } from '../model/DocumentInfo';
 
 const moduleName = 'core.handler.Update';
 
@@ -33,7 +34,21 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400);
       return { statusCode: 400, headers: headerMetadata };
     }
+    const documentUuidFromBody = documentUuidForDocumentBody(parsedBody);
+    if (documentUuidFromBody !== pathComponents.documentUuid) {
+      const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
+      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
 
+      return {
+        body: {
+          error: {
+            message: failureMessage,
+          },
+        },
+        statusCode: 400,
+        headers: headerMetadata,
+      };
+    }
     const request: UpdateRequest = {
       meadowlarkId: meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity),
       documentUuid: pathComponents.documentUuid,
