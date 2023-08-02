@@ -21,8 +21,6 @@ function Get-EdFiXsd {
 
     Write-Host "Downloading XSD files..."
 
-    New-Item -Path $XsdDirectory -Type Directory -Force | Out-Null
-
     $serviceBase = Invoke-RestMethod $OdsApiBaseUrl
     $xsdMetadata = $serviceBase.urls.xsdMetadata
     $xsdResource = Invoke-RestMethod $xsdMetadata
