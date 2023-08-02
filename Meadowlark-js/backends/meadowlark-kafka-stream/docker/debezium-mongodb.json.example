@@ -22,8 +22,10 @@
 
       "transforms.outbox.type" : "io.debezium.connector.mongodb.transforms.outbox.MongoEventRouter",
       "transforms.outbox.collection.expand.json.payload" : "true",
+
       "transforms.dropTombstone.type": "org.apache.kafka.connect.transforms.Filter",
       "transforms.dropTombstone.predicate": "isTombstone",
+      
       "transforms.extractDebeziumAfter.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
       "transforms.extractDebeziumAfter.field":"after"
   }
