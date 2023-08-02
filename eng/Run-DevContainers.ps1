@@ -9,35 +9,34 @@
     PostgreSQL. The MongoDB collection also includes Kafka with Debezium.
 #>
 param(
-    # Stops the Docker services
-    [Switch]
-    $Stop
+    
+  [Parameter(Mandatory=$false)]
+  [Switch]
+  $ElasticSearch,
+  
+  [Parameter(Mandatory=$false)]
+  [Switch]
+  $OpenSearch,
+  
+  [Parameter(Mandatory=$false)]
+  [Switch]
+  $MongoDB,
+  
+  [Parameter(Mandatory=$false)]
+  [Switch]
+  $PostgreSQL
 )
 
-@(
-    "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-mongodb-backend",
-    "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-opensearch-backend",
-    "$PSScriptRoot/../Meadowlark-js/backends/meadowlark-postgresql-backend"
-) | ForEach-Object {
-    try {
-      $message = "Starting $_"
-      if ($Stop) {
-        $message = "Stopping $_"
-      }
+$ErrorActionPreference = "Stop"
 
-      $message | Out-Host
-        Push-Location $_/docker
+$start = @()
+if ($ElasticSearch) { $start += "meadowlark-elasticsearch-backend" }
+if ($OpenSearch) { $start += "meadowlark-opensearch-backend"}
+if ($MongoDB) { $start += "meadowlark-mongodb-backend" }
+if ($PostgreSQL) { $start += "meadowlark-postgresql-backend" }
 
-        if ($Stop) {
-            docker compose down
-        }
-        else {
-            docker compose up -d
-        }
-    }
-    finally {
-        Pop-Location
-    }
+$start | ForEach-Object {
+  &docker compose `
+    -f "$PSScriptRoot/../Meadowlark-JS/backends/$_/docker/docker-compose.yml" `
+    up -d
 }
-
-
