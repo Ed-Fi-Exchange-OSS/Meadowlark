@@ -9,6 +9,11 @@
     resetting environment to a clean state between performance test executions.
 #>
 
+# Make sure the custom image is built locally
+Push-Location ../docker/mongodb
+docker build -t edfi-mongo:4.0.28 .
+Pop-Location
+
 # Clean up
 docker compose down -v
 docker volume rm mongo-ml-local-auth
