@@ -23,7 +23,7 @@ services:
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
       LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
-      MONGO_URI: ${MONGODB_URI}
+      MONGO_URI: ${MONGO_URI}
       FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
       FASTIFY_PORT: ${FASTIFY_PORT:-3000}
       FASTIFY_NUM_THREADS: ${FASTIFY_NUM_THREADS:-10}
@@ -91,68 +91,40 @@ services:
 
   # Primary MongoDB node
   mongo1:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    image: edfi-mongo:4.0.28
     container_name: mongo1-ml-local
     hostname: mongo1
     ports:
       - 27027:27017
     restart: unless-stopped
-    healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
+    environment:
+      # These two only needed on mongo1
+      ADMIN_USERNAME: ${MONGODB_USER:-mongo}
+      ADMIN_PASSWORD: ${MONGODB_PASS:-abcdefgh1!}
+    healthcheck: &mongohealth
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
       interval: 10s
       timeout: 10s
       retries: 3
-      start_period: 20s
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--keyFile",
-        "/auth/file.key"
-      ]
+      # Wait a bit for first time startup to complete
+      start_period: 40s
+    command: [ "/usr/local/bin/start-node1.sh" ]
     volumes:
       - mongo-ml-local-data1:/data/db
       - mongo-ml-local-log1:/var/log/mongodb
       - mongo-ml-local-auth:/auth
-      - ./scripts:/scripts
 
   # Secondary MongoDB node
   mongo2:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    image: edfi-mongo:4.0.28
     container_name: mongo2-ml-local
     hostname: mongo2
     ports:
-      - 27028:27018
+      - 27028:27017
     restart: unless-stopped
     healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--port",
-        "27018",
-        "--keyFile",
-        "/auth/file.key"
-      ]
+      *mongohealth
+    command: [ "/usr/local/bin/start.sh" ]
     volumes:
       - mongo-ml-local-data2:/data/db
       - mongo-ml-local-log2:/var/log/mongodb
@@ -160,34 +132,15 @@ services:
 
   # Tertiary MongoDB node
   mongo3:
-    image: mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644
+    image: edfi-mongo:4.0.28
     container_name: mongo3-ml-local
     hostname: mongo3
     ports:
-      - 27029:27019
+      - 27029:27017
     restart: unless-stopped
     healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
-    command:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "rs0",
-        "--journal",
-        "--dbpath",
-        "/data/db",
-        "--enableMajorityReadConcern",
-        "true",
-        "--port",
-        "27019",
-        "--keyFile",
-        "/auth/file.key"
-      ]
+      *mongohealth
+    command: [ "/usr/local/bin/start.sh" ]
     volumes:
       - mongo-ml-local-data3:/data/db
       - mongo-ml-local-log3:/var/log/mongodb
