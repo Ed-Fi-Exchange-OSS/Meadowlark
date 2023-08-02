@@ -10,12 +10,5 @@ COPY --chmod=+x initialize-cluster.sh /usr/local/bin/initialize-cluster.sh
 COPY --chmod=+x mongo-key-file-setup.sh /usr/local/bin/mongo-key-file-setup.sh
 COPY --chmod=+x start.sh /usr/local/bin/start.sh
 COPY --chmod=+x start-node1.sh /usr/local/bin/start-node1.sh
-# COPY --chmod=+x mongo-key-file-setup.sh /usr/local/bin/mongo-key-file-setup.sh
-# COPY --chmod=+x mongo-rs-setup.sh /usr/local/bin/mongo-rs-setup.sh
-# COPY --chmod=+x mongo-user-setup.sh /usr/local/bin/mongo-user-setup.sh
-
-# CMD ["/usr/local/bin/start.sh"]
-# ENTRYPOINT ["docker-entrypoint.sh"]
-# EXPOSE 27017
 
 CMD [ "mongod" ]
