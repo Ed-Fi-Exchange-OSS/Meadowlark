@@ -102,7 +102,7 @@ services:
       ADMIN_USERNAME: ${MONGODB_USER:-mongo}
       ADMIN_PASSWORD: ${MONGODB_PASS:-abcdefgh1!}
     healthcheck: &mongohealth
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u ${MONGODB_USER:-mongo} -p ${MONGODB_PASS:-abcdefgh1!} --quiet | grep 1
       interval: 10s
       timeout: 10s
       retries: 3
