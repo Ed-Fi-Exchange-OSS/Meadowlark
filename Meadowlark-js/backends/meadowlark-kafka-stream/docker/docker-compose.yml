@@ -33,8 +33,7 @@ services:
   connect:
     hostname: kafka-connect
     container_name: kafka-connect
-    # rename once image is published
-    image: meadowlark-kafka
+    image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
     ports:
       - 8083:8083
     networks:
