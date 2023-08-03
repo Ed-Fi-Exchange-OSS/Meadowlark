@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed to the Ed-Fi Alliance under one or more agreements.
+// The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+// See the LICENSE and NOTICES files in the project root for more information.
+
+import org.gradle.util.DistributionLocator
+import org.gradle.util.GradleVersion
+import org.gradle.util.VersionNumber
+
+plugins {
+    // https://docs.gradle.org/current/userguide/java_library_plugin.html
+    id 'java-library'
+
+    // https://docs.gradle.org/current/userguide/distribution_plugin.html
+    id 'distribution'
+
+    // https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+    id 'checkstyle'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+ext {
+    kafkaVersion = "2.3.0"
+    debeziumVersion = "2.3.0.Final"
+}
+
+distributions {
+    main {
+        contents {
+            from jar
+            from configurations.runtimeClasspath
+        }
+    }
+}
+
+wrapper {
+    distributionType = 'ALL'
+    doLast {
+        final DistributionLocator locator = new DistributionLocator()
+        final GradleVersion version = GradleVersion.version(wrapper.gradleVersion)
+        final URI distributionUri = locator.getDistributionFor(version, wrapper.distributionType.name().toLowerCase(Locale.ENGLISH))
+        final URI sha256Uri = new URI(distributionUri.toString() + ".sha256")
+        final String sha256Sum = new String(sha256Uri.toURL().bytes)
+        wrapper.getPropertiesFile() << "distributionSha256Sum=${sha256Sum}\n"
+        println "Added checksum to wrapper properties"
+    }
+}
+
+dependencies {
+    compileOnly "org.apache.kafka:connect-api:$kafkaVersion"
+    compileOnly "io.debezium:debezium-api:$debeziumVersion"
+
+    implementation "org.slf4j:slf4j-api:1.7.36"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
+    testImplementation "org.apache.kafka:connect-api:$kafkaVersion"
+    testImplementation "io.debezium:debezium-api:$debeziumVersion"
+    testImplementation "org.assertj:assertj-core:3.24.2"
+
+    testRuntimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:2.20.0"
+    testRuntimeOnly "org.apache.logging.log4j:log4j-api:2.20.0"
+    testRuntimeOnly "org.apache.logging.log4j:log4j-core:2.20.0"
+}
+
+checkstyle {
+    toolVersion "8.21"
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines 'junit-jupiter'
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Version': "${getArchiveVersion()}"
+        )
+    }
+}
+
+def setVersionInGradleProperties(ver) {
+    logger.quiet('Changing version in gradle.properties to {}', ver)
+    file('gradle.properties.new').withWriter { writer ->
+        file('gradle.properties').eachLine { line ->
+            if (line ==~ /version=.*/) {
+                writer.writeLine("version=${ver}")
+            } else {
+                writer.writeLine(line)
+            }
+        }
+    }
+    file('gradle.properties.new').renameTo('gradle.properties')
+}
+
+def releaseTag() {
+    return 'v' + releaseVersion
+}

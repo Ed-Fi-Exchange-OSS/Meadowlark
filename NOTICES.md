@@ -37,3 +37,27 @@ under the following license:
     COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
     IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--
+
+The `ed-fi-kafka-connect-tranform` project structure and the transformation `GenerateIndexFromResource` and was adapted from the [ExtractTopic
+transformation](https://github.com/Aiven-Open/transforms-for-apache-kafka-connect/blob/master/src/main/java/io/aiven/kafka/connect/transforms/ExtractTopic.java)
+by Aiven Open under the following license:
+
+    Copyright 2019 Aiven Oy
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    Licensed under Apache License, Version 2.0.
+
+--
