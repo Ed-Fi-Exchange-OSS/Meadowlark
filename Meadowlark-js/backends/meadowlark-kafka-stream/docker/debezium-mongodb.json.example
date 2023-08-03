@@ -17,7 +17,7 @@
       "predicates": "isTombstone",
       "predicates.isTombstone.type": "org.apache.kafka.connect.transforms.predicates.RecordIsTombstone",
 
-      "transforms": "outbox, extractId, dropTombstone, extractDebeziumAfter, ",
+      "transforms": "outbox, extractId, dropTombstone, extractDebeziumAfter",
       "transforms.outbox.type" : "io.debezium.connector.mongodb.transforms.outbox.MongoEventRouter",
       "transforms.outbox.collection.expand.json.payload" : "true",
       "transforms.extractId.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
