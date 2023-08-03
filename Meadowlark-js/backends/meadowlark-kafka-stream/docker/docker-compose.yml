@@ -30,12 +30,11 @@ services:
     environment:
       - ZOOKEEPER_CONNECT=zookeeper:2181
 
-  # Define if we should publish the image
   connect:
     hostname: kafka-connect
     container_name: kafka-connect
+    # rename once image is published
     image: meadowlark-kafka
-    build: ../../../../docker/kafka/
     ports:
       - 8083:8083
     networks:
