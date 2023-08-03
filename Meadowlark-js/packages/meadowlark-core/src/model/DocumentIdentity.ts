@@ -82,6 +82,17 @@ export function meadowlarkIdForDocumentIdentity(
   return `${resourceInfoHashFrom(resourceInfo)}${documentIdentityHashFrom(documentIdentity)}` as MeadowlarkId;
 }
 
+/**
+ * Generate a UUID v4
+ */
 export function generateDocumentUuid(): DocumentUuid {
   return crypto.randomUUID() as DocumentUuid;
+}
+
+/**
+ * Check that this is a well formed UUID v4
+ */
+export function isDocumentUuidWellFormed(documentUuid: DocumentUuid): boolean {
+  const uuid4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+  return uuid4Regex.test(documentUuid.toLowerCase());
 }

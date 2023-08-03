@@ -43,7 +43,7 @@
   "scripts": {
     "build": "lerna run build --stream",
     "build:clean": "lerna run build:clean --stream",
-    "test": "npm run test:lint && npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test": "npm run test:lint && npm run test:unit && npm run test:integration && npm run test:e2e:build",
     "test:lint": "npm run test:lint:ts && npm run test:lint:eslint",
     "test:lint:eslint": "eslint --max-warnings 0 --ext .js,.ts .",
     "test:lint:ts": "tsc -p . --noEmit",

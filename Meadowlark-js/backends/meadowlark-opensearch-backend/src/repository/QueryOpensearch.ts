@@ -6,7 +6,6 @@
 import { Client } from '@opensearch-project/opensearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
-import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { handleOpenSearchError } from './OpenSearchException';
 
 const moduleName = 'opensearch.repository.QueryOpensearch';
@@ -17,11 +16,7 @@ const moduleName = 'opensearch.repository.QueryOpensearch';
  * OpenSearch indexes are required to be lowercase only, with no pound signs or periods.
  */
 export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
-  const adjustedResourceName = resourceInfo.isDescriptor
-    ? normalizeDescriptorSuffix(resourceInfo.resourceName)
-    : resourceInfo.resourceName;
-
-  return `${resourceInfo.projectName}$${resourceInfo.resourceVersion}$${adjustedResourceName}`
+  return `${resourceInfo.projectName}$${resourceInfo.resourceVersion}$${resourceInfo.resourceName}`
     .toLowerCase()
     .replace(/\./g, '-');
 }
