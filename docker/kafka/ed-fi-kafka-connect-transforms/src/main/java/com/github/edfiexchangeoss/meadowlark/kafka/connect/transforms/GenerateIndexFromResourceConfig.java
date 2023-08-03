@@ -22,7 +22,7 @@
  */
 
 
-package com.github.edfiallianceoss.kafka.connect.transforms;
+package com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms;
 
 import java.util.Map;
 import java.util.Optional;

@@ -21,7 +21,7 @@
  *  See the LICENSE and NOTICES files in the project root for more information.
  */
 
-package com.github.edfiallianceoss.kafka.connect.transforms;
+package com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +85,7 @@ class GenerateIndexFromResourceTest {
         assertThatThrownBy(() -> transformation(FIELD).apply(originalRecord))
                 .isInstanceOf(DataException.class)
                 .hasMessage(FIELD + " type in value "
-                            + field + " must be a comma separated string: " + originalRecord);
+                        + field + " must be a comma separated string: " + originalRecord);
     }
 
     @ParameterizedTest
@@ -121,18 +121,18 @@ class GenerateIndexFromResourceTest {
         final var resourceName = "resourceName";
 
         final Map<String, String> receivedObject = Stream.of(new String[][] {
-                { "project", project },
-                { "resourceVersion", resourceVersion },
-                { "resourceName", resourceName },
-                { "additionalData", "additionalData" },
-                { "isDescriptor", isDescriptor },
+                {"project", project},
+                {"resourceVersion", resourceVersion},
+                {"resourceName", resourceName},
+                {"additionalData", "additionalData"},
+                {"isDescriptor", isDescriptor},
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         originalRecord = record(receivedObject);
 
         final var params = project + "," + resourceVersion + "," + resourceName;
         var expectedResult = project + "$" + resourceVersion + "$" + resourceName;
-        if(isDescriptor.equals("true")) {
+        if (isDescriptor.equals("true")) {
             expectedResult += "descriptor";
         }
 

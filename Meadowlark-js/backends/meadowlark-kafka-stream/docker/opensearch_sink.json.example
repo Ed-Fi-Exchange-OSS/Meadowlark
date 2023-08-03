@@ -27,7 +27,7 @@
     "transforms.removeId.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
     "transforms.removeId.exclude": "_id",
 
-    "transforms.generateIndexFromResource.type":"com.github.edfiallianceoss.kafka.connect.transforms.GenerateIndexFromResource",
+    "transforms.generateIndexFromResource.type":"com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms.GenerateIndexFromResource",
     "transforms.generateIndexFromResource.field.name":"projectName, resourceVersion, resourceName",
 
     "behavior.on.version.conflict": "ignore"

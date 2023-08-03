@@ -15,7 +15,7 @@ more details about configuring transformations on how to install transforms.
 This transformation builds an index based on a group of values contained in the
 body of the result, separated by $.
 
-- `com.github.edfiallianceoss.kafka.connect.transforms.GenerateIndexFromResource$Value`
+- `com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms.GenerateIndexFromResource$Value`
   - works on values.
 
 The transformation defines the following configurations:
@@ -28,7 +28,7 @@ Here is an example of this transformation configuration:
 
 ```properties
 transforms=GenerateIndexFromResource
-transforms.GenerateIndexFromResource.type=com.github.edfiallianceoss.kafka.connect.transforms.GenerateIndexFromResource
+transforms.GenerateIndexFromResource.type=com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms.GenerateIndexFromResource
 transforms.GenerateIndexFromResource.field.name=projectName,resourceVersion,resourceName
 ```
 

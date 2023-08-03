@@ -21,8 +21,7 @@
  *  See the LICENSE and NOTICES files in the project root for more information.
  */
 
-
-package com.github.edfiallianceoss.kafka.connect.transforms;
+package com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms;
 
 import java.util.List;
 import java.util.Map;
@@ -69,9 +68,9 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
 
         fieldList.forEach(field -> {
             topicResult.append(
-                topicNameFromNamedField(record.toString(),
-                                        schemaAndValue.value(),
-                                        field).get() + separator);
+                    topicNameFromNamedField(record.toString(),
+                            schemaAndValue.value(),
+                            field).get() + separator);
         });
 
         topicResult.replace(topicResult.length() - 1, topicResult.length(), "");
@@ -84,27 +83,26 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
 
         if (newTopic.isPresent()) {
             return record.newRecord(
-                newTopic.get(),
-                record.kafkaPartition(),
-                record.keySchema(),
-                record.key(),
-                record.valueSchema(),
-                record.value(),
-                record.timestamp(),
-                record.headers()
-            );
+                    newTopic.get(),
+                    record.kafkaPartition(),
+                    record.keySchema(),
+                    record.key(),
+                    record.valueSchema(),
+                    record.value(),
+                    record.timestamp(),
+                    record.headers());
         } else {
             return record;
         }
     }
 
     protected SchemaAndValue getSchemaAndValue(final R record) {
-            return new SchemaAndValue(record.valueSchema(), record.value());
+        return new SchemaAndValue(record.valueSchema(), record.value());
     }
 
     private Optional<String> topicNameFromNamedField(final String recordStr,
-                                                               final Object value,
-                                                               final String fieldName) {
+            final Object value,
+            final String fieldName) {
         if (value == null) {
             throw new DataException("value can't be null: " + recordStr);
         }
@@ -113,19 +111,20 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
             throw new DataException("value type must be an object: " + recordStr);
         }
 
-        @SuppressWarnings("unchecked") final Map<String, Object> valueMap = (Map<String, Object>) value;
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> valueMap = (Map<String, Object>) value;
 
         final Optional<String> result = Optional.ofNullable(valueMap.get(fieldName))
-            .map(field -> {
-                if (!field.getClass().equals(String.class)) {
-                    throw new DataException(fieldName + " type in value "
-                        + value
-                        + " must be a comma separated string: "
-                        + recordStr);
-                }
-                return field;
-            })
-            .map(Object::toString);
+                .map(field -> {
+                    if (!field.getClass().equals(String.class)) {
+                        throw new DataException(fieldName + " type in value "
+                                + value
+                                + " must be a comma separated string: "
+                                + recordStr);
+                    }
+                    return field;
+                })
+                .map(Object::toString);
 
         if (result.isPresent() && !result.get().isBlank()) {
             return result;
