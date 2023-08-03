@@ -20,13 +20,9 @@
 
     "compact.map.entries": "true",
 
-    "transforms": "extractKey, removeId, generateIndexFromResource",
-    "transforms.extractKey.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
-    "transforms.extractKey.field":"id",
-
+    "transforms": "removeId, generateIndexFromResource",
     "transforms.removeId.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
     "transforms.removeId.exclude": "_id",
-
     "transforms.generateIndexFromResource.type":"com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms.GenerateIndexFromResource",
     "transforms.generateIndexFromResource.field.name":"projectName, resourceVersion, resourceName",
 
