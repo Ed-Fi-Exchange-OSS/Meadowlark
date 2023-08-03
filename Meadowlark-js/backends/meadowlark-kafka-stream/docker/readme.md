@@ -61,3 +61,11 @@ This returns the debezium connectors and the OpenSearch connector information.
 [Kafdrop](https://github.com/obsidiandynamics/kafdrop), a free Kafka Web UI, is
 bundled with this deployment. Browse the Kafka instance with Kafdrop at
 `http://localhost:9000/`.
+
+### View Logs
+
+To view logs and additional information, use the `kafka-console-consumer.sh` script inside kafka-connect:
+
+```bash
+docker exec -it kafka1 ./bin/kafka-console-consumer.sh --bootstrap-server 172.18.0.9:9092 --topic edfi.meadowlark.documents --from-beginning --max-messages 1 | jq .
+```
