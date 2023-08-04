@@ -1,0 +1,32 @@
+{
+  "name":"kafka_opensearch",
+  "config": {
+    "connector.class": "io.aiven.kafka.connect.opensearch.OpensearchSinkConnector",
+    "topics": "edfi.meadowlark.documents",
+    "type_name": "_doc",
+
+    "connection.url": "<your-opensearch-url>",
+    "connection.username": "<your-opensearch-username-goes-here>",
+    "connection.password": "<your-opensearch-password-goes-here>",
+
+    "tasks.max":"1",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "schema.ignore": "true",
+
+    "compact.map.entries": "true",
+
+    "transforms": "removeId, generateIndexFromResource",
+    "transforms.removeId.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.removeId.exclude": "_id",
+    "transforms.generateIndexFromResource.type":"com.github.edfiexchangeoss.meadowlark.kafka.connect.transforms.GenerateIndexFromResource",
+    "transforms.generateIndexFromResource.field.name":"projectName, resourceVersion, resourceName",
+
+    "behavior.on.version.conflict": "ignore"
+
+  }
+}

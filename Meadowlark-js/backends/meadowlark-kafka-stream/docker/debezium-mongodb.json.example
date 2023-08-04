@@ -1,23 +1,27 @@
 {
-  "name": "DebeziumConnector",
+  "name": "mongo_kafka",
   "config": {
       "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
       "tasks.max": "1",
-      "mongodb.name": "edfi",
+      "topic.prefix": "edfi",
+
+      "mongodb.connection.string": "<your-mongo-connection-string>",
       "mongodb.user": "<admin-username-goes-here>",
       "mongodb.password": "<admin-password-goes-here>",
-      "mongodb.hosts": "rs0/mongo1:27017,mongo2:27018,mongo3:27019",
+      
       "database.history.kafka.bootstrap.servers": "kafka:9092",
 
-      "key.converter": "org.apache.kafka.connect.json.JsonConverter",
-      "key.converter.schemas.enable": "false",
-      "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-      "value.converter.schemas.enable": "false",
+      "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+      "value.converter": "org.apache.kafka.connect.storage.StringConverter",
 
       "predicates": "isTombstone",
       "predicates.isTombstone.type": "org.apache.kafka.connect.transforms.predicates.RecordIsTombstone",
 
-      "transforms": "dropTombstone,extractDebeziumAfter",
+      "transforms": "dropTombstone, extractDebeziumAfter, outbox, extractId",
+      "transforms.outbox.type" : "io.debezium.connector.mongodb.transforms.outbox.MongoEventRouter",
+      "transforms.outbox.collection.expand.json.payload" : "true",
+      "transforms.extractId.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+      "transforms.extractId.field": "id",
       "transforms.dropTombstone.type": "org.apache.kafka.connect.transforms.Filter",
       "transforms.dropTombstone.predicate": "isTombstone",
       "transforms.extractDebeziumAfter.type": "org.apache.kafka.connect.transforms.ExtractField$Value",

@@ -11,7 +11,7 @@ services:
     ports:
       - 27017:27017
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -43,7 +43,7 @@ services:
     ports:
       - 27018:27018
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -76,7 +76,7 @@ services:
     ports:
       - 27019:27019
     networks:
-      - mongo-net
+      - meadowlark-net
     restart: always
     command:
       [
@@ -99,70 +99,6 @@ services:
       - mongo-log3:/var/log/mongodb
       - mongo-auth:/auth
 
-  # Zookeeper image from Debezium
-  zookeeper:
-    hostname: zookeeper1
-    container_name: zookeeper1
-    image: debezium/zookeeper:1.9
-    ports:
-      - 2181:2181
-      - 2888:2888
-      - 3888:3888
-    networks:
-      - mongo-net
-    volumes:
-      - zookeeper-logs:/var/lib/zookeeper/log
-      - zookeeper-data:/var/lib/zookeeper/data
-
-  # Kafka image from Debezium
-  kafka:
-    hostname: kafka1
-    container_name: kafka1
-    image: debezium/kafka:1.9
-    ports:
-      - 9092:9092
-    networks:
-      - mongo-net
-    links:
-      - zookeeper
-    environment:
-      - ZOOKEEPER_CONNECT=zookeeper:2181
-
-  # Kafka Connect from Debezium, includes Debezium connectors
-  connect:
-    hostname: kafka-connect
-    container_name: kafka-connect
-    image: debezium/connect:1.9
-    ports:
-      - 8083:8083
-    networks:
-      - mongo-net
-    links:
-      - kafka
-      - mongo1
-      - mongo2
-      - mongo3
-    environment:
-      - BOOTSTRAP_SERVERS=kafka:9092
-      - GROUP_ID=1
-      - CONFIG_STORAGE_TOPIC=debezium_config
-      - OFFSET_STORAGE_TOPIC=debezium_offset
-      - STATUS_STORAGE_TOPIC=debezium_status
-
-  # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
-  kafdrop:
-    hostname: kafdrop
-    container_name: kafdrop
-    image: obsidiandynamics/kafdrop:3.30.0
-    ports:
-      - 9000:9000
-    networks:
-      - mongo-net
-    environment:
-      KAFKA_BROKERCONNECT: kafka1:9092
-      JVM_OPTS: "-Xms32M -Xmx64M"
-      SERVER_SERVLET_CONTEXTPATH: "/"
-
 volumes:
   mongo-data1:
   mongo-log1:
@@ -172,9 +108,8 @@ volumes:
   mongo-log3:
   mongo-auth:
     external: true
-  zookeeper-logs:
-  zookeeper-data:
 
 
 networks:
-  mongo-net:
+  meadowlark-net:
+    name: meadowlark-net

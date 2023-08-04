@@ -28,6 +28,10 @@ Instructions for running a local "developer" environment on localhost:
 10. Seup other environment variables. See [CONFIGURATION](CONFIGURATION.md) for more details.
 11. Run `npm run start:local` to start the Meadowlark API service
 
+## Using Kafka
+
+Alternatively, you can use Kafka and Kafka-connect to listen to MongoDB changes and write them to OpenSearch (PostgreSQL and ElasticSearch will be added in the future). To do so, run the [Kafka](../Meadowlark-js/backends/meadowlark-kafka-stream/docker) setup and set the `LISTENER1_PLUGIN` as an empty variable in the .env file.
+
 ## Clearing Out Local Databases
 
 Sometimes it is useful to reset your local environment to a fresh state, with no
