@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { writeDebugObject, writeRequestToLog } from '../Logger';
-import { validateEqualityConstraints } from '../metaed/MetaEdValidation';
+import { validateEqualityConstraints } from '../validation/EqualityConstraintValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ValidateEqualityConstraintMiddleware';

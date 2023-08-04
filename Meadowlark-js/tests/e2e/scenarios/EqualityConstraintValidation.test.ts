@@ -120,6 +120,56 @@ describe('given schoolId is an equality constraint on Section between CourseOffe
   });
 });
 
+describe('given schoolId is an equality constraint on Section between CourseOffering and ClassPeriods ', () => {
+  let sectionLocation: string;
+
+  it('should succeed when there are no ClassPeriods as they are optional', async () => {
+    sectionLocation = await createResource({
+      endpoint: 'sections',
+      role: 'host',
+      body: {
+        sectionIdentifier: 'sectionIdentifier',
+        courseOfferingReference: {
+          localCourseCode: 'localCourseCode',
+          schoolId: 6,
+          sessionName: 'sessionName',
+          schoolYear: 2020,
+        },
+        classPeriods: [
+          {
+            classPeriodReference: {
+              schoolId: 6,
+              classPeriodName: 'classPeriodName1',
+            },
+          },
+          {
+            classPeriodReference: {
+              schoolId: 6,
+              classPeriodName: 'classPeriodName2',
+            },
+          },
+        ],
+      },
+    });
+
+    await rootURLRequest()
+      .get(sectionLocation)
+      .auth(await getAccessToken('host'), { type: 'bearer' })
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(
+          expect.objectContaining({
+            sectionIdentifier: 'sectionIdentifier',
+          }),
+        );
+      });
+  });
+
+  afterAll(async () => {
+    await deleteResourceByLocation(sectionLocation, 'section');
+  });
+});
+
 describe('given equality constraint do not apply when an optional element is not present', () => {
   let sectionLocation: string;
 
