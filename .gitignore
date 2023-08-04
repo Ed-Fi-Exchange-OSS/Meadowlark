@@ -1,6 +1,7 @@
 .env
 .env.*
+.env-*
 !.env.example
-Meadowlark-js/.env-docker
+!.env-*.example
 **/node_modules/
 Meadowlark-js/sbom
