@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 // @ts-ignore
-const environment = require('./TestEnvironmentSetup');
+const environment = require('./SetupTestContainers');
 
 async function endServer() {
   try {

@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 
 const credentials = require('../helpers/Credentials');
 // @ts-ignore
-const environment = require('./TestEnvironmentSetup');
+const environment = require('./SetupTestContainers');
 
 dotenv.config({ path: join(__dirname, './.env-e2e') });
 

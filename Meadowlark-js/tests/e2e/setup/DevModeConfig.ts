@@ -1,7 +1,7 @@
 import { join } from 'path';
 import dotenv from 'dotenv';
 
-const infrastructure = require('./TestEnvironmentSetup');
+const infrastructure = require('./SetupTestContainers');
 
 dotenv.config({ path: join(__dirname, './.env-e2e') });
 
