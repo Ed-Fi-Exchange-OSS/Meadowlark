@@ -1,0 +1,41 @@
+Scenario, Timing
+8 threads pool size 1, 156.9
+8 threads pool size 1, 196.12
+8 threads pool size 1, 185.14
+8 threads pool size 1, 198.87
+8 threads pool size 1, 173.17
+8 threads pool size 5, 177.76
+8 threads pool size 5, 180.32
+8 threads pool size 5, 159.98
+8 threads pool size 5, 163.16
+8 threads pool size 5, 166.52
+8 threads pool size 100, 171.39
+8 threads pool size 100, 166.76
+8 threads pool size 100, 188.29
+8 threads pool size 100, 165.87
+8 threads pool size 100, 174.04
+8 threads pool size 150, 156.92
+8 threads pool size 150, 151.31
+8 threads pool size 150, 180.37
+8 threads pool size 150, 180.28
+8 threads pool size 150, 162.29
+1 threads pool size 1, 535.6
+1 threads pool size 1, 526.85
+1 threads pool size 1, 534.49
+1 threads pool size 1, 534.49
+1 threads pool size 1, 552.34
+1 threads pool size 150, 379.5
+1 threads pool size 150, 355.11
+1 threads pool size 150, 365.01
+1 threads pool size 150, 370.14
+1 threads pool size 150, 365.91
+4 threads pool size 150, 166.55
+4 threads pool size 150, 160.14
+4 threads pool size 150, 157.98
+4 threads pool size 150, 183.37
+4 threads pool size 150, 162.24
+ODS/API, 92.23
+ODS/API, 94.53
+ODS/API, 89.43
+ODS/API, 85.09
+ODS/API, 84.73
