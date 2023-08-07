@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { matchResourceNameToMetaEd } from '../metaed/MetaEdValidation';
@@ -81,7 +82,9 @@ export async function validateResource(pathComponents: PathComponents): Promise<
     resourceInfo: {
       projectName: metaEdConfiguration.projects[0].projectName,
       resourceVersion: metaEdConfiguration.projects[0].projectVersion,
-      resourceName: matchingMetaEdModel.metaEdName,
+      resourceName: isDescriptor
+        ? normalizeDescriptorSuffix(matchingMetaEdModel.metaEdName)
+        : matchingMetaEdModel.metaEdName,
       isDescriptor,
       allowIdentityUpdates: matchingMetaEdModel.allowPrimaryKeyUpdates,
     },

@@ -1,0 +1,158 @@
+#
+# Some of the tests in this file assume that the user has already run through
+# the tests in `local.33b.superclass.http`.
+#
+
+##### START AUTHENTICATION SETUP
+
+@admin_client_id=meadowlark_admin_key_1
+@admin_client_secret=meadowlark_admin_secret_1
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+###
+
+### Create client4
+# @name created_client4
+POST http://localhost:3000/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "vendor",
+        "assessment"
+    ]
+}
+
+###
+@client4_client_id={{created_client4.response.body.$.client_id}}
+@client4_client_secret={{created_client4.response.body.$.client_secret}}
+
+### Authenticate client4
+# @name client4
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{client4_client_id}}",
+    "client_secret": "{{client4_client_secret}}"
+}
+
+###
+@authToken4 = {{client4.response.body.$.access_token}}
+
+
+##### END AUTHENTICATION SETUP
+
+
+
+#### should fail when CourseOffering schoolId is a mismatch with a single ClassPeriod
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "sectionIdentifier": "sectionIdentifier",
+    "courseOfferingReference": {
+        "localCourseCode": "localCourseCode",
+        "schoolId": 6,
+        "sessionName": "sessionName",
+        "schoolYear": 2020
+    },
+    "classPeriods": [
+        {
+            "classPeriodReference": {
+                "schoolId": 6666,
+                "classPeriodName": "classPeriodName1"
+            }
+        }
+    ]
+}
+
+
+#### should fail when CourseOffering schoolId is a mismatch with two ClassPeriods
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "sectionIdentifier": "sectionIdentifier",
+    "courseOfferingReference": {
+        "localCourseCode": "localCourseCode",
+        "schoolId": 6,
+        "sessionName": "sessionName",
+        "schoolYear": 2020
+    },
+    "classPeriods": [
+        {
+            "classPeriodReference": {
+                "schoolId": 6666,
+                "classPeriodName": "classPeriodName1"
+            }
+        },        {
+            "classPeriodReference": {
+                "schoolId": 6666,
+                "classPeriodName": "classPeriodName2"
+            }
+        }
+    ]
+}
+
+#### should fail when CourseOffering schoolId is a mismatch with one ClassPeriod but a match with another
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "sectionIdentifier": "sectionIdentifier",
+    "courseOfferingReference": {
+        "localCourseCode": "localCourseCode",
+        "schoolId": 6,
+        "sessionName": "sessionName",
+        "schoolYear": 2020
+    },
+    "classPeriods": [
+        {
+            "classPeriodReference": {
+                "schoolId": 6,
+                "classPeriodName": "classPeriodName1"
+            }
+        },        {
+            "classPeriodReference": {
+                "schoolId": 6666,
+                "classPeriodName": "classPeriodName2"
+            }
+        }
+    ]
+}
+
+#### should succeed when there are no ClassPeriods as they are optional
+POST http://localhost:3000/local/v3.3b/ed-fi/sections
+content-type: application/json
+authorization: bearer {{authToken4}}
+
+{
+    "sectionIdentifier": "sectionIdentifier",
+    "courseOfferingReference": {
+        "localCourseCode": "localCourseCode",
+        "schoolId": 6,
+        "sessionName": "sessionName",
+        "schoolYear": 2020
+    }
+}

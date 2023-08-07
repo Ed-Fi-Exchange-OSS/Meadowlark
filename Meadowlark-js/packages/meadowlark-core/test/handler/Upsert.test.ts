@@ -10,7 +10,7 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
-import { isDocumentUuidWellFormed } from '../../src/validation/DocumentIdValidator';
+import { isDocumentUuidWellFormed } from '../../src/model/DocumentIdentity';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;

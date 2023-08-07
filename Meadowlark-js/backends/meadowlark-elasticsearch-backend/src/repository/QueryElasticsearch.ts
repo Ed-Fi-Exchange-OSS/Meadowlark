@@ -6,7 +6,6 @@
 import { Client } from '@elastic/elasticsearch';
 import { QueryRequest, QueryResult, ResourceInfo } from '@edfi/meadowlark-core';
 import { isDebugEnabled, Logger } from '@edfi/meadowlark-utilities';
-import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import { handleElasticSearchError } from './ElasticSearchException';
 
 const moduleName = 'elasticsearch.repository.QueryElasticsearch';
@@ -15,11 +14,7 @@ const moduleName = 'elasticsearch.repository.QueryElasticsearch';
  * Returns ElasticSearch index name from the given ResourceInfo.
  */
 export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
-  const adjustedResourceName = resourceInfo.isDescriptor
-    ? normalizeDescriptorSuffix(resourceInfo.resourceName)
-    : resourceInfo.resourceName;
-
-  return `${resourceInfo.projectName}$${resourceInfo.resourceVersion}$${adjustedResourceName}`
+  return `${resourceInfo.projectName}$${resourceInfo.resourceVersion}$${resourceInfo.resourceName}`
     .toLowerCase()
     .replace(/\./g, '-');
 }

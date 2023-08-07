@@ -11,9 +11,9 @@ import didYouMean from 'didyoumean2';
 import memoize from 'fast-memoize';
 import { MetaEdEnvironment, TopLevelEntity, NoTopLevelEntity } from '@edfi/metaed-core';
 import { getBooleanFromEnvironment } from '@edfi/meadowlark-utilities';
-import { ResourceMatchResult } from '../model/ResourceMatchResult';
+import type { ResourceMatchResult } from '../model/ResourceMatchResult';
 import { getMetaEdModelForResourceName, getResourceNamesForProject } from './ResourceNameMapping';
-import { FrontendQueryParameters } from '../handler/FrontendRequest';
+import type { FrontendQueryParameters } from '../handler/FrontendRequest';
 
 function getAjv(): Ajv {
   const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);

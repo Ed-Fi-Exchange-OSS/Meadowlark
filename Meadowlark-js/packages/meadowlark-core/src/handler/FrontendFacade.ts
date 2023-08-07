@@ -24,6 +24,7 @@ import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddlew
 import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 import { logRequestBody } from '../middleware/RequestLoggingMiddleware';
 import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
+import { equalityConstraintValidation } from '../middleware/ValidateEqualityConstraintMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -48,6 +49,7 @@ function postStack(): MiddlewareStack {
       R.andThen(resourceValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentValidation),
+      R.andThen(equalityConstraintValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
@@ -66,6 +68,7 @@ function putStack(): MiddlewareStack {
       R.andThen(resourceValidation),
       R.andThen(metaEdModelFinding),
       R.andThen(documentUpdateValidation),
+      R.andThen(equalityConstraintValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),

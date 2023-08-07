@@ -4,9 +4,23 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkId } from '../../src/model/BrandedTypes';
-import { meadowlarkIdForDocumentIdentity } from '../../src/model/DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity, resourceInfoHashFrom } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
-import { isMeadowlarkIdValidForResource, isMeadowlarkIdWellFormed } from '../../src/validation/DocumentIdValidator';
+
+/**
+ * Returns true if resource info hash matches resource info portion of meadowlark id
+ */
+export function isMeadowlarkIdValidForResource(meadowlarkId: MeadowlarkId, resourceInfo: BaseResourceInfo): boolean {
+  return meadowlarkId.startsWith(resourceInfoHashFrom(resourceInfo));
+}
+
+/**
+ * Meadowlark Ids are 38 character Base64Url strings. No whitespace, plus or slash allowed
+ * Example valid id: 02pe_9hl1wM_jO1vdx8w7iqmhPdEsFofglvS4g
+ */
+export function isMeadowlarkIdWellFormed(meadowlarkId: string): boolean {
+  return /^[^\s/+]{38}$/g.test(meadowlarkId);
+}
 
 describe('given a valid id', () => {
   let id: MeadowlarkId;

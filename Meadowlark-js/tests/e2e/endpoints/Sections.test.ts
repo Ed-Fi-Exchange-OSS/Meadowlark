@@ -17,7 +17,7 @@ describe('Sections', () => {
           sectionIdentifier: 'c00v',
           courseOfferingReference: {
             localCourseCode: 'abc',
-            schoolId: 666,
+            schoolId: 66,
             sessionName: 'd',
             schoolYear: 2034,
           },
@@ -64,8 +64,8 @@ describe('Sections', () => {
                   {
                     "identity": {
                       "localCourseCode": "abc",
-                      "schoolReference.schoolId": 666,
-                      "sessionReference.schoolId": 666,
+                      "schoolReference.schoolId": 66,
+                      "sessionReference.schoolId": 66,
                       "sessionReference.schoolYear": 2034,
                       "sessionReference.sessionName": "d",
                     },
@@ -104,7 +104,7 @@ describe('Sections', () => {
           sectionIdentifier: 'c00v',
           courseOfferingReference: {
             localCourseCode: 'abc',
-            schoolId: 666,
+            schoolId: 66,
             sessionName: 'd',
             schoolYear: 2034,
           },

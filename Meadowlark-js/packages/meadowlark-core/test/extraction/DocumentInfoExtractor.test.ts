@@ -23,7 +23,7 @@ const testModel = (): TopLevelEntity => ({
       apiMapping: {
         identityReferenceComponents: [],
         referenceGroups: [],
-        descriptorCollectedProperties: [],
+        descriptorCollectedApiProperties: [],
       },
       jsonSchema: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
@@ -70,7 +70,7 @@ const testSchoolModel = (): TopLevelEntity => ({
       apiMapping: {
         identityReferenceComponents: [],
         referenceGroups: [],
-        descriptorCollectedProperties: [],
+        descriptorCollectedApiProperties: [],
         superclass: {
           metaEdName: 'School',
           documentIdentity: { schoolYear: '2023' },
