@@ -25,18 +25,16 @@ information on the background and design decisions for this project.
 * [Configuration](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/CONFIGURATION.md)
 * [Developer getting started notes](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/README.md)
 * [Additional technical details](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/TECHNICAL.md)
+* [Docker for Local Meadowlark Development](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/DOCKER-LOCAL-DEV.md)
 * [How to Submit an Issue](https://techdocs.ed-fi.org/x/Y8uIBg) (Tech Docs)
 * [How Submit a Feature Request](https://techdocs.ed-fi.org/x/0YADAQ) (Tech
   Docs)
 
-### 😕 Cloud Deployment
+## Deployment and Operations
 
-You may be asking yourself, "where are the instructions for cloud deployment?"
-We're working on it. Milestone 0.1.0 had severless deploy to AWS built-in, but
-there were several aspects that no longer fit well with our refined strategy  in
-milestone 0.2.0, so the current release does not have any intrinsic cloud
-deployment support. The upcoming 0.3.0 release will have basic deployment
-capabilities on Azure, the preferred platform for our first pilot project.
+* [Using Docker with Meadowlark](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/DOCKER.md)
+* [Azure Deployment](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/eng/deploy/azure/)
+* [Performance Testing](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/performance-testing/)
 
 ## Contributing
 
