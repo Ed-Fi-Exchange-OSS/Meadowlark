@@ -86,6 +86,11 @@ SAVE_LOG_TO_FILE=true
 LOG_FILE_LOCATION=c:/temp/
 ```
 
+The API bulk client loader runs on the VM host, connecting to the Docker
+network. It is configured to use maximum of 100 connections, 50 tasks buffered,
+and 500 max simultaneous requests. Retries are disabled. All of the XML files
+load without error at this time.
+
 ## Results
 
 Times below are given in seconds. In the default settings, there was one extreme
@@ -129,6 +134,9 @@ complete the test by roughly 69%.
 > **Note** Five executions of each test appears to be useful, but where timings
 > are very close to one another, the number of data points is insufficient for
 > giving a useful statistical significance.
+
+The difference between Meadowlark and the ODS/API is obviously significant: the
+ODS/API is almost 50% faster.
 
 ## Conclusions
 
