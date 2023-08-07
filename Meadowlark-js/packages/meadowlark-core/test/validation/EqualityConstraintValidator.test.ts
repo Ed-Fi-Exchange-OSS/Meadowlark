@@ -26,7 +26,8 @@ import {
 import { validateEqualityConstraints } from '../../src/validation/EqualityConstraintValidator';
 
 /**
- * A MetaEd model of a Section with a merge on School between CourseOffering and ClassPeriod
+ * A MetaEd model of a Section with a merge on School between CourseOffering and ClassPeriod.
+ *
  */
 function sectionDomainEntity(): DomainEntity {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
@@ -38,6 +39,17 @@ function sectionDomainEntity(): DomainEntity {
     .withStringIdentity('SectionIdentifier', 'doc', '30')
     .withDomainEntityIdentity('CourseOffering', 'doc')
     .withDomainEntityProperty('ClassPeriod', 'doc', true, true)
+
+    // This merge on School is what is being used for testing. School is defined as a reference on both
+    // CourseOffering and ClassPeriod. Because SchoolId is defined as the sole identity field for a School,
+    // School will manifest in the Section API document as schoolId fields on both the courseOfferingReference
+    // (required in the Section document because it is defined as part of Section's identity) and any of
+    // the optional array of classPeriodReferences.
+    //
+    // Thus, the merge creates a requirement of equality between the required document field
+    // courseOfferingReference.schoolId and any classPeriodReference.schoolId fields in the optional
+    // array of classPeriods in the document.
+    //
     .withMergeDirective('ClassPeriod.School', 'CourseOffering.School')
     .withEndDomainEntity()
 
