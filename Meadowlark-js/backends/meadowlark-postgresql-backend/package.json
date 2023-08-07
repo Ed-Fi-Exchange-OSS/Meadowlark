@@ -27,6 +27,7 @@
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "^10.0.2",
     "@types/pg": "^8.10.2",
     "@types/pg-format": "^1.0.2",
     "copyfiles": "^2.4.1",
