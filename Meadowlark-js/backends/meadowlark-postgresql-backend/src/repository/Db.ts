@@ -10,13 +10,19 @@ import { createDatabase, checkExistsAndCreateTables } from './SqlHelper';
 
 let singletonDbPool: Pool | null = null;
 
-const getDbConfiguration = () => ({
-  host: Config.get<string>('POSTGRES_HOST'),
-  port: Config.get<number>('POSTGRES_PORT'),
-  user: Config.get<string>('POSTGRES_USER'),
-  password: Config.get<string>('POSTGRES_PASSWORD'),
-  database: Config.get<string>('MEADOWLARK_DATABASE_NAME'),
-});
+const getDbConfiguration = () => {
+  if (!Config.get<string>('POSTGRES_USER') || !Config.get<string>('POSTGRES_PASSWORD')) {
+    throw new Error('The POSTGRES_USER and POSTGRES_PASSWORD parameters in the .env file are required and cannot be empty.');
+  }
+  const dbConfiguration = {
+    host: Config.get<string>('POSTGRES_HOST'),
+    port: Config.get<number>('POSTGRES_PORT'),
+    user: Config.get<string>('POSTGRES_USER'),
+    password: Config.get<string>('POSTGRES_PASSWORD'),
+    database: Config.get<string>('MEADOWLARK_DATABASE_NAME'),
+  };
+  return dbConfiguration;
+};
 
 const moduleName = 'postgresql.repository.Db';
 
