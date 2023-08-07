@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licensed to the Ed-Fi Alliance under one or more agreements.
+# The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
+# See the LICENSE and NOTICES files in the project root for more information.
+
+version: "3.8"
+
+services:
+  db-ods:
+    image: edfialliance/ods-api-db-ods:v2.1.5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TPDM_ENABLED: false
+    restart: always
+    container_name: ed-fi-db-ods-meadowlark
+
+  db-admin:
+    image: edfialliance/ods-api-db-admin:v2.1.5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      API_MODE: SharedInstance
+    restart: always
+    container_name: ed-fi-db-admin-meadowlark
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: 5432
+      ODS_POSTGRES_HOST: db-ods
+      ADMIN_POSTGRES_HOST: db-admin
+      API_MODE: SharedInstance
+      ApiSettings__PathBase: api
+      TPDM_ENABLED: false
+    depends_on:
+      - db-ods
+      - db-admin
+    restart: always
+    hostname: api
+    container_name: ed-fi-ods-api-meadowlark
+    ports:
+      - 80:80
