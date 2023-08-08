@@ -6,20 +6,23 @@
 import { validateDocument } from '../validation/DocumentValidator';
 import { writeDebugObject, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
-import { FrontendRequest } from '../handler/FrontendRequest';
 
 const moduleName = 'core.middleware.ValidateDocumentMiddleware';
 
 /**
  * Validates JSON document shape
  */
-export async function documentValidation({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
+export async function documentValidation(
+  { frontendRequest, frontendResponse }: MiddlewareModel,
+  isUpdate: boolean = false,
+): Promise<MiddlewareModel> {
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'documentValidation');
   const error: object | null = await validateDocument(
     frontendRequest.middleware.parsedBody,
     frontendRequest.middleware.matchingMetaEdModel,
+    isUpdate,
   );
 
   if (error != null) {
@@ -35,40 +38,21 @@ export async function documentValidation({ frontendRequest, frontendResponse }: 
 }
 
 /**
- * Validates JSON document shape for the update function
+ * Validates JSON document shape for Insert
  */
-export async function documentUpdateValidation({
+export async function documentValidationForInsert({
   frontendRequest,
   frontendResponse,
 }: MiddlewareModel): Promise<MiddlewareModel> {
-  const id = {
-    type: 'string',
-    description: 'The item id',
-  };
-  // Add id to schema to validate document
-  const frontendRequestUpdate: FrontendRequest = {
-    ...frontendRequest,
-    middleware: {
-      ...frontendRequest.middleware,
-      matchingMetaEdModel: {
-        ...frontendRequest.middleware.matchingMetaEdModel,
-        data: {
-          ...frontendRequest.middleware.matchingMetaEdModel.data,
-          edfiApiSchema: {
-            ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema,
-            jsonSchema: {
-              ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema,
-              properties: {
-                id,
-                ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.properties,
-              },
-              required: ['id', ...frontendRequest.middleware.matchingMetaEdModel.data.edfiApiSchema.jsonSchema.required],
-            },
-          },
-        },
-      },
-    },
-  };
+  return documentValidation({ frontendRequest, frontendResponse }, false);
+}
 
-  return documentValidation({ frontendRequest: frontendRequestUpdate, frontendResponse });
+/**
+ * Validates JSON document shape for Update
+ */
+export async function documentValidationForUpdate({
+  frontendRequest,
+  frontendResponse,
+}: MiddlewareModel): Promise<MiddlewareModel> {
+  return documentValidation({ frontendRequest, frontendResponse }, true);
 }

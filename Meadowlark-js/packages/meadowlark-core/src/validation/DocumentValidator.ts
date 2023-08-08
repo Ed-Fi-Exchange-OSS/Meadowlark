@@ -16,7 +16,8 @@ export type ValidationFailure = { error: ValidationError[] | null };
 export async function validateDocument(
   body: object,
   matchingMetaEdModel: TopLevelEntity,
+  isUpdate: boolean = false,
 ): Promise<ValidationFailure | null> {
-  const validationErrors: ValidationError[] | null = validateEntityBodyAgainstSchema(matchingMetaEdModel, body);
+  const validationErrors: ValidationError[] | null = validateEntityBodyAgainstSchema(matchingMetaEdModel, body, isUpdate);
   return validationErrors == null ? null : { error: validationErrors };
 }
