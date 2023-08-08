@@ -3,13 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-const path = require('path');
+const { join } = require('path');
 const dotenv = require('dotenv');
 
-const credentialManager = require('../helpers/Credentials');
-const setupEnvironment = require('./EnvironmentConfig');
+const credentials = require('../helpers/Credentials');
+// @ts-ignore
+const environment = require('./SetupTestContainers');
 
-dotenv.config({ path: path.join(__dirname, './.env') });
+if (process.env.USE_EXISTING_ENVIRONMENT) {
+  dotenv.config({ path: join(process.cwd(), './services/meadowlark-fastify/.env') });
+} else {
+  dotenv.config({ path: join(__dirname, './.env-e2e') });
+}
 
 module.exports = async () => {
   console.time('Setup Time');
@@ -18,16 +23,20 @@ module.exports = async () => {
 
   const initialize = process.env.DEVELOPER_MODE !== 'true';
 
-  await setupEnvironment.configure(initialize);
+  if (process.env.USE_EXISTING_ENVIRONMENT) {
+    console.info('Using existing environment, Verify that variables are set');
+  } else {
+    await environment.configure(initialize);
+  }
 
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
   process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
   console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 
   console.debug('-- Authenticating Admin --');
-  await credentialManager.authenticateAdmin();
+  await credentials.authenticateAdmin();
 
   console.debug('-- Creating Automation Users --');
-  await credentialManager.createAutomationUsers();
+  await credentials.createAutomationUsers();
   console.timeEnd('Setup Time');
 };

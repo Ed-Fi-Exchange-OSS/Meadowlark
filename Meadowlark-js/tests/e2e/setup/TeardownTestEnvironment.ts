@@ -3,11 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-const environment = require('./EnvironmentConfig');
+// @ts-ignore
+const environment = require('./SetupTestContainers');
 
 async function endServer() {
   try {
-    if (!process.env.DEVELOPER_MODE) {
+    if (!process.env.DEVELOPER_MODE && !process.env.USE_EXISTING_ENVIRONMENT) {
       await environment.stop();
     }
   } catch (error) {

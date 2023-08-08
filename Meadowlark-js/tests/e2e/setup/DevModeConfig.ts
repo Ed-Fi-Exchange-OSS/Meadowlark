@@ -1,9 +1,9 @@
-const p = require('path');
-const de = require('dotenv');
+import { join } from 'path';
+import dotenv from 'dotenv';
 
-const infrastructure = require('./EnvironmentConfig');
+const infrastructure = require('./SetupTestContainers');
 
-de.config({ path: p.join(__dirname, './.env') });
+dotenv.config({ path: join(__dirname, './.env-e2e') });
 
 (async () => {
   await infrastructure.configure();

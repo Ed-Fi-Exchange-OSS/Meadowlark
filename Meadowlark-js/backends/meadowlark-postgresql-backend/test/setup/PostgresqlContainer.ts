@@ -4,7 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Logger } from '@edfi/meadowlark-utilities';
-import { PostgreSqlContainer, StartedTestContainer } from 'testcontainers';
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
+import { StartedTestContainer } from 'testcontainers';
 
 let startedContainer: StartedTestContainer;
 

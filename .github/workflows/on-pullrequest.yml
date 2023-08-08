@@ -270,8 +270,8 @@ jobs:
 
       - name: Create .env file
         run: |
-          touch .env
-          echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
+          touch .env-e2e
+          echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env-e2e
         working-directory: Meadowlark-js/tests/e2e/setup/
 
       - name: End to End tests for ${{matrix.store.db}} as store and ${{matrix.query_handler.provider}} as query handler
