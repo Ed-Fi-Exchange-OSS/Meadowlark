@@ -1,6 +1,8 @@
 # This test suite requires first clearing/dropping any existing "authorizations" collection in the
 # "meadowlark" database in MongoDB
 
+###
+GET http://localhost:80/
 
 ### Bootstrap an admin
 # @name created_admin
