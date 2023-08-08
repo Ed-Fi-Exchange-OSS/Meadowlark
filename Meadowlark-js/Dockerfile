@@ -18,7 +18,7 @@ RUN apt-get update && \
   chmod 600 /var/log/meadowlark.log
 
 # Start a new layer so that we don't need to rebuild everything above
-FROM base as build
+FROM base AS build
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 WORKDIR /app
 
@@ -30,7 +30,7 @@ RUN npm run docker:install && \
   npm run build
 
 # Start from the node base image, copy all js files, and run Fastify
-FROM base as prod
+FROM base AS prod
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 WORKDIR /app
 
