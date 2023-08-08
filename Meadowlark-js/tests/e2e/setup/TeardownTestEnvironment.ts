@@ -8,7 +8,7 @@ const environment = require('./SetupTestContainers');
 
 async function endServer() {
   try {
-    if (!process.env.DEVELOPER_MODE) {
+    if (!process.env.DEVELOPER_MODE && !process.env.USE_EXISTING_ENVIRONMENT) {
       await environment.stop();
     }
   } catch (error) {

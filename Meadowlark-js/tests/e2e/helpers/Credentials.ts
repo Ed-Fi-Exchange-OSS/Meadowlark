@@ -24,8 +24,8 @@ async function getAdminAccessToken(): Promise<string> {
       .post('/oauth/token')
       .send({
         grant_type: 'client_credentials',
-        client_id: process.env.ADMIN_KEY ?? process.env.OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH,
-        client_secret: process.env.ADMIN_SECRET ?? process.env.OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH,
+        client_id: process.env.ADMIN_KEY,
+        client_secret: process.env.ADMIN_SECRET,
       })
       .then((response) => {
         if (response.status !== 200) {
@@ -180,9 +180,21 @@ export async function authenticateAdmin(): Promise<void> {
   try {
     const hasExistingClient = process.env.ADMIN_KEY && process.env.ADMIN_SECRET;
 
-    if (process.env.DEVELOPER_MODE && hasExistingClient) {
+    if (process.env.USE_EXISTING_ENVIRONMENT) {
+      if (process.env.OAUTH_HARD_CODED_CREDENTIALS_ENABLED) {
+        process.env.ADMIN_KEY = 'meadowlark_admin_key_1';
+        process.env.ADMIN_SECRET = 'meadowlark_admin_secret_1';
+      } else {
+        await Promise.reject(
+          new Error('Enable hardcoded credentials or set the ADMIN_KEY and ADMIN_SECRET of a user with role admin'),
+        );
+      }
+
+      await getAdminAccessToken();
+    } else if (process.env.DEVELOPER_MODE && hasExistingClient) {
       console.info('INFO ℹ️: Using existing admin key and secret');
       await getAdminAccessToken();
+      console.log(`Admin access token ${adminAccessToken}`);
     } else {
       const credentials = await createAdminClient();
       if (process.env.DEVELOPER_MODE && !hasExistingClient) {
