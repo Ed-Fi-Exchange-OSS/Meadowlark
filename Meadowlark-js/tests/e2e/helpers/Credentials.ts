@@ -194,7 +194,6 @@ export async function authenticateAdmin(): Promise<void> {
     } else if (process.env.DEVELOPER_MODE && hasExistingClient) {
       console.info('INFO ℹ️: Using existing admin key and secret');
       await getAdminAccessToken();
-      console.log(`Admin access token ${adminAccessToken}`);
     } else {
       const credentials = await createAdminClient();
       if (process.env.DEVELOPER_MODE && !hasExistingClient) {
