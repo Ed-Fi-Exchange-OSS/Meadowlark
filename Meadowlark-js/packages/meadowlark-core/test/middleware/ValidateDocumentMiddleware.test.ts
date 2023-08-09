@@ -5,7 +5,7 @@
 
 import type { ValidationError } from '@apideck/better-ajv-errors';
 import * as DocumentValidator from '../../src/validation/DocumentValidator';
-import { documentValidationForInsert, documentValidationForUpdate } from '../../src/middleware/ValidateDocumentMiddleware';
+import { documentValidation } from '../../src/middleware/ValidateDocumentMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
@@ -20,7 +20,7 @@ describe('given a previous middleware for Insert has created a response', () => 
     mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument');
 
     // Act
-    resultChain = await documentValidationForInsert({ frontendRequest, frontendResponse });
+    resultChain = await documentValidation({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -40,37 +40,7 @@ describe('given a previous middleware for Insert has created a response', () => 
   });
 });
 
-describe('given a previous middleware for Update has created a response', () => {
-  const frontendRequest: FrontendRequest = newFrontendRequest();
-  const frontendResponse: FrontendResponse = newFrontendResponse();
-  let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
-
-  beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument');
-
-    // Act
-    resultChain = await documentValidationForUpdate({ frontendRequest, frontendResponse });
-  });
-
-  afterAll(() => {
-    mockDocumentValidator.mockRestore();
-  });
-
-  it('returns the given request', () => {
-    expect(resultChain.frontendRequest).toBe(frontendRequest);
-  });
-
-  it('returns the given response', () => {
-    expect(resultChain.frontendResponse).toBe(frontendResponse);
-  });
-
-  it('never calls validateDocument', () => {
-    expect(mockDocumentValidator).not.toHaveBeenCalled();
-  });
-});
-
-describe('given an error response and document info from documentValidationForInsert', () => {
+describe('given an error response and document info from documentValidation', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const errorBody = [
     {
@@ -93,62 +63,7 @@ describe('given an error response and document info from documentValidationForIn
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await documentValidationForInsert({ frontendRequest, frontendResponse: null });
-  });
-
-  afterAll(() => {
-    mockDocumentValidator.mockRestore();
-  });
-
-  it('returns the given request', () => {
-    expect(resultChain.frontendRequest).toBe(frontendRequest);
-  });
-
-  it('returns status 400', () => {
-    expect(resultChain.frontendResponse?.statusCode).toEqual(400);
-  });
-
-  it('returns the expected error message', () => {
-    expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
-      {
-        "error": [
-          {
-            "context": {
-              "errorType": "additionalProperties",
-            },
-            "message": "a",
-            "path": "b",
-          },
-        ],
-      }
-    `);
-  });
-});
-
-describe('given an error response and document info from documentValidationForUpdate', () => {
-  const frontendRequest: FrontendRequest = newFrontendRequest();
-  const errorBody = [
-    {
-      message: 'a',
-      path: 'b',
-      context: {
-        errorType: 'additionalProperties',
-      },
-    } as ValidationError,
-  ];
-
-  let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
-
-  beforeAll(async () => {
-    const validationResult = { error: errorBody };
-
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
-      .mockReturnValue(Promise.resolve(validationResult));
-
-    // Act
-    resultChain = await documentValidationForUpdate({ frontendRequest, frontendResponse: null });
+    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -190,37 +105,7 @@ describe('given a valid response from documentValidation for Insert', () => {
     mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(Promise.resolve(null));
 
     // Act
-    resultChain = await documentValidationForInsert({ frontendRequest, frontendResponse: null });
-  });
-
-  afterAll(() => {
-    mockDocumentValidator.mockRestore();
-  });
-
-  it('returns the given request', () => {
-    expect(resultChain.frontendRequest).toBe(frontendRequest);
-  });
-
-  it('adds headerMetadata to frontendRequest', () => {
-    expect(resultChain.frontendRequest.middleware.headerMetadata).toEqual(headerMetadata);
-  });
-
-  it('does not create a response', () => {
-    expect(resultChain.frontendResponse).toBeNull();
-  });
-});
-
-describe('given a valid response from documentValidation for Update', () => {
-  const frontendRequest: FrontendRequest = newFrontendRequest();
-  const headerMetadata = {};
-  let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
-
-  beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(Promise.resolve(null));
-
-    // Act
-    resultChain = await documentValidationForUpdate({ frontendRequest, frontendResponse: null });
+    resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {

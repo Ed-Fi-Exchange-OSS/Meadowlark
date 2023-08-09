@@ -12,10 +12,8 @@ const moduleName = 'core.middleware.ValidateDocumentMiddleware';
 /**
  * Validates JSON document shape
  */
-async function documentValidation(
-  { frontendRequest, frontendResponse }: MiddlewareModel,
-  isUpdate: boolean = false,
-): Promise<MiddlewareModel> {
+export async function documentValidation({ frontendRequest, frontendResponse }: MiddlewareModel): Promise<MiddlewareModel> {
+  const isUpdate = frontendRequest.action === 'updateById';
   // if there is a response already posted, we are done
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'documentValidation');
@@ -35,24 +33,4 @@ async function documentValidation(
   }
 
   return { frontendRequest, frontendResponse: null };
-}
-
-/**
- * Validates JSON document shape for Insert
- */
-export async function documentValidationForInsert({
-  frontendRequest,
-  frontendResponse,
-}: MiddlewareModel): Promise<MiddlewareModel> {
-  return documentValidation({ frontendRequest, frontendResponse }, false);
-}
-
-/**
- * Validates JSON document shape for Update
- */
-export async function documentValidationForUpdate({
-  frontendRequest,
-  frontendResponse,
-}: MiddlewareModel): Promise<MiddlewareModel> {
-  return documentValidation({ frontendRequest, frontendResponse }, true);
 }
