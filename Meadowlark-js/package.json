@@ -9,6 +9,7 @@
     "@types/node": "16.18.38",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
+    "clinic": "^13.0.0",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",

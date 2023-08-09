@@ -44,7 +44,7 @@ const createModel = (): TopLevelEntity => ({
         title: 'EdFi.Student',
         type: 'object',
       },
-      jsonSchemaForUpsert: {
+      jsonSchemaForUpdate: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
         additionalProperties: false,
         description: 'doc',

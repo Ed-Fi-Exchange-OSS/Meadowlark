@@ -31,6 +31,10 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose",
     "start:local": "node --require=dotenv/config dist/index.js",
     "start:local:ts": "ts-node --require=dotenv/config src/index.ts",
-    "createKey": "openssl rand -base64 256"
+    "createKey": "openssl rand -base64 256",
+
+    "clinic:flame": "clinic flame -- node dist/index.js",
+    "clinic:doctor": "clinic doctor -- node dist/index.js",
+    "clinic:heapprofiler": "clinic heapprofiler -- node dist/index.js"
   }
 }
