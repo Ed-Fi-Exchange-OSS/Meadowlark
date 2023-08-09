@@ -25,7 +25,34 @@ const testModel = (): TopLevelEntity => ({
         referenceGroups: [],
         descriptorCollectedApiProperties: [],
       },
-      jsonSchema: {
+      jsonSchemaForInsert: {
+        $schema: 'https://json-schema.org/draft/2020-12/schema',
+        additionalProperties: false,
+        description: 'doc',
+        properties: {
+          uniqueId: {
+            description: 'doc',
+            maxLength: 30,
+            type: 'string',
+          },
+          someBooleanParameter: {
+            description: 'doc',
+            type: 'boolean',
+          },
+          someIntegerParameter: {
+            description: 'doc',
+            type: 'integer',
+          },
+          someDecimalParameter: {
+            description: 'doc',
+            type: 'number',
+          },
+        },
+        required: ['uniqueId'],
+        title: 'EdFi.Student',
+        type: 'object',
+      },
+      jsonSchemaForUpdate: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
         additionalProperties: false,
         description: 'doc',
@@ -80,7 +107,7 @@ const testSchoolModel = (): TopLevelEntity => ({
           resourceName: 'School',
         },
       },
-      jsonSchema: {
+      jsonSchemaForInsert: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
         additionalProperties: false,
         description: 'doc',
@@ -104,6 +131,37 @@ const testSchoolModel = (): TopLevelEntity => ({
           },
         },
         required: ['uniqueId'],
+        title: 'EdFi.Student',
+        type: 'object',
+      },
+      jsonSchemaForUpdate: {
+        $schema: 'https://json-schema.org/draft/2020-12/schema',
+        additionalProperties: false,
+        description: 'doc',
+        properties: {
+          id: {
+            description: 'The item id',
+            type: 'string',
+          },
+          uniqueId: {
+            description: 'doc',
+            maxLength: 30,
+            type: 'string',
+          },
+          someBooleanParameter: {
+            description: 'doc',
+            type: 'boolean',
+          },
+          someIntegerParameter: {
+            description: 'doc',
+            type: 'integer',
+          },
+          someDecimalParameter: {
+            description: 'doc',
+            type: 'number',
+          },
+        },
+        required: ['id', 'uniqueId'],
         title: 'EdFi.Student',
         type: 'object',
       },

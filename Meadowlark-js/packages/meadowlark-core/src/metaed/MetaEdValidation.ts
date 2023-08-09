@@ -71,8 +71,14 @@ export function matchResourceNameToMetaEd(
  * Validate the JSON body of the request against the Joi schema for the MetaEd entity corresponding
  * to the API endpoint.
  */
-export function validateEntityBodyAgainstSchema(metaEdModel: TopLevelEntity, body: object): ValidationError[] | null {
-  const schema = metaEdModel.data.edfiApiSchema.jsonSchema;
+export function validateEntityBodyAgainstSchema(
+  metaEdModel: TopLevelEntity,
+  body: object,
+  isUpdate: boolean = false,
+): ValidationError[] | null {
+  const schema = isUpdate
+    ? metaEdModel.data.edfiApiSchema.jsonSchemaForUpdate
+    : metaEdModel.data.edfiApiSchema.jsonSchemaForInsert;
 
   const validateFunction: ValidateFunction = ajv().compile(schema);
   const isValid: boolean = validateFunction(body);
@@ -97,7 +103,7 @@ export function validateQueryParametersAgainstSchema(
   let errors: string[] = [];
 
   const schema = {
-    ...metaEdModel.data.edfiApiSchema.jsonSchema,
+    ...metaEdModel.data.edfiApiSchema.jsonSchemaForInsert,
     // Need to relax the validation such that no fields are "required"
     required: [],
   };

@@ -9,7 +9,7 @@ import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
 import { resourceValidation } from '../middleware/ValidateResourceMiddleware';
-import { documentValidation, documentUpdateValidation } from '../middleware/ValidateDocumentMiddleware';
+import { documentValidation } from '../middleware/ValidateDocumentMiddleware';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import * as Upsert from './Upsert';
@@ -67,7 +67,7 @@ function putStack(): MiddlewareStack {
       R.andThen(logRequestBody),
       R.andThen(resourceValidation),
       R.andThen(metaEdModelFinding),
-      R.andThen(documentUpdateValidation),
+      R.andThen(documentValidation),
       R.andThen(equalityConstraintValidation),
       R.andThen(documentInfoExtraction),
       R.andThen(getDocumentStore().securityMiddleware),
