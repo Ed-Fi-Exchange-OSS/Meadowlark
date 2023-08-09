@@ -13,7 +13,7 @@ const createModel = (): TopLevelEntity => ({
   properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true }],
   data: {
     edfiApiSchema: {
-      jsonSchema: {
+      jsonSchemaForInsert: {
         $schema: 'https://json-schema.org/draft/2020-12/schema',
         additionalProperties: false,
         description: 'doc',
@@ -34,6 +34,34 @@ const createModel = (): TopLevelEntity => ({
           },
         },
         required: ['uniqueId'],
+        title: 'EdFi.Student',
+        type: 'object',
+      },
+      jsonSchemaForUpdate: {
+        $schema: 'https://json-schema.org/draft/2020-12/schema',
+        additionalProperties: false,
+        description: 'doc',
+        properties: {
+          id: {
+            description: 'The item id',
+            type: 'string',
+          },
+          uniqueId: {
+            description: 'doc',
+            maxLength: 30,
+            type: 'string',
+          },
+          name: {
+            description: 'doc',
+            maxLength: 50,
+            type: 'string',
+          },
+          age: {
+            description: 'doc',
+            type: 'integer',
+          },
+        },
+        required: ['id', 'uniqueId'],
         title: 'EdFi.Student',
         type: 'object',
       },
