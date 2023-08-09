@@ -12,7 +12,7 @@ const moduleName = 'core.middleware.ValidateDocumentMiddleware';
 /**
  * Validates JSON document shape
  */
-export async function documentValidation(
+async function documentValidation(
   { frontendRequest, frontendResponse }: MiddlewareModel,
   isUpdate: boolean = false,
 ): Promise<MiddlewareModel> {
