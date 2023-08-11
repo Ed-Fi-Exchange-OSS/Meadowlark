@@ -1,0 +1,87 @@
+import autocannon from 'autocannon';
+import axios from 'axios';
+import { faker } from '@faker-js/faker';
+import { getBearerToken } from './BearerToken';
+
+const AUTOCANNON_DURATION_IN_SECONDS = 60;
+
+export type AutocannonParameters = {
+  bearerToken: string;
+  urlPrefix: string;
+};
+
+/**
+ * POST references that are required for Schools
+ */
+export async function postRequiredSchoolReferences({ bearerToken, urlPrefix }: AutocannonParameters): Promise<void> {
+  // Create an initial EducationOrganizationCategory descriptor
+  await axios.post(
+    `${urlPrefix}/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors`,
+    {
+      codeValue: 'Other',
+      shortDescription: 'Other',
+      description: 'Other',
+      namespace: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor',
+    },
+    {
+      headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
+    },
+  );
+
+  // Create an initial GradeLevel descriptor
+  await axios.post(
+    `${urlPrefix}/local/v3.3b/ed-fi/gradeLevelDescriptors`,
+    {
+      codeValue: 'Other',
+      shortDescription: 'Other',
+      description: 'Other',
+      namespace: 'uri://ed-fi.org/GradeLevelDescriptor',
+    },
+    {
+      headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
+    },
+  );
+}
+
+/**
+ * Run autocannon to generate POSTs of Schools. Assumes required references already exist
+ *
+ * @returns An autocannon tracker/statistics object
+ */
+export async function autocannonSchools({ bearerToken, urlPrefix }: AutocannonParameters): Promise<any> {
+  return autocannon({
+    url: urlPrefix,
+    duration: AUTOCANNON_DURATION_IN_SECONDS,
+
+    requests: [
+      {
+        method: 'POST',
+        path: '/local/v3.3b/ed-fi/schools',
+        body: JSON.stringify({
+          schoolId: faker.number.int(),
+          nameOfInstitution: faker.person.fullName(),
+          educationOrganizationCategories: [
+            {
+              educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+            },
+          ],
+          gradeLevels: [
+            {
+              gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#Other',
+            },
+          ],
+        }),
+        headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
+      },
+    ],
+  });
+}
+
+(async () => {
+  const urlPrefix = 'http://localhost:3000';
+  const bearerToken: string = await getBearerToken(urlPrefix);
+  await postRequiredSchoolReferences({ bearerToken, urlPrefix });
+  const result = await autocannonSchools({ bearerToken, urlPrefix });
+  // eslint-disable-next-line no-console
+  console.log(result);
+})();

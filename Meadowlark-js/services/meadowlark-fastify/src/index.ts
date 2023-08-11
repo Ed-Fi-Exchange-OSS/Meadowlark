@@ -15,7 +15,12 @@ const start = async () => {
   await Config.initializeConfig(CachedEnvironmentConfigProvider);
   initializeLogging();
 
-  new ClusterService(serviceFactory).run();
+  if (Config.get<number>('FASTIFY_NUM_THREADS') === 1) {
+    // Don't bother with cluster if requesting single threaded
+    await serviceFactory(0);
+  } else {
+    new ClusterService(serviceFactory).run();
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
