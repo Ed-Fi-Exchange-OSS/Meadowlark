@@ -1,6 +1,7 @@
 import autocannon from 'autocannon';
 import axios from 'axios';
 import { faker } from '@faker-js/faker';
+import { getBearerToken } from './BearerToken';
 
 const AUTOCANNON_DURATION_IN_SECONDS = 60;
 
@@ -75,3 +76,12 @@ export async function autocannonSchools({ bearerToken, urlPrefix }: AutocannonPa
     ],
   });
 }
+
+(async () => {
+  const urlPrefix = 'http://localhost:3000';
+  const bearerToken: string = await getBearerToken(urlPrefix);
+  await postRequiredSchoolReferences({ bearerToken, urlPrefix });
+  const result = await autocannonSchools({ bearerToken, urlPrefix });
+  // eslint-disable-next-line no-console
+  console.log(result);
+})();

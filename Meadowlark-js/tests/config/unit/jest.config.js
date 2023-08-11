@@ -5,7 +5,7 @@ module.exports = {
   displayName: 'Unit Tests',
   ...defaultConfig,
   testMatch: ['<rootDir>/**/*.(spec|test).[jt]s?(x)'],
-  testPathIgnorePatterns: ["integration|e2e"],
+  testPathIgnorePatterns: ["integration|e2e|profiling"],
   coverageThreshold: {
     global: {
       branches: 52,
