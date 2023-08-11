@@ -6,7 +6,7 @@
 /* istanbul ignore file */
 import dotenv from 'dotenv';
 import { initializeLogging, Config, CachedEnvironmentConfigProvider } from '@edfi/meadowlark-utilities';
-// import { ClusterService } from './ClusterService';
+import { ClusterService } from './ClusterService';
 import { serviceFactory } from './ServiceFactory';
 
 dotenv.config();
@@ -15,8 +15,12 @@ const start = async () => {
   await Config.initializeConfig(CachedEnvironmentConfigProvider);
   initializeLogging();
 
-  // new ClusterService(serviceFactory).run();
-  await serviceFactory(0);
+  if (Config.get<number>('FASTIFY_NUM_THREADS') === 1) {
+    // Don't bother with cluster if requesting single threaded
+    await serviceFactory(0);
+  } else {
+    new ClusterService(serviceFactory).run();
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
