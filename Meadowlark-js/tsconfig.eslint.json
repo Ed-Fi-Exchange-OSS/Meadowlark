@@ -5,6 +5,5 @@
     "**/test/**/*.ts",
     "**/tests/**/*.ts",
     "**/index.ts",
-    "**/profiling/*.js"
   ]
 }
