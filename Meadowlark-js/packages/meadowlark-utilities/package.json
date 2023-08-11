@@ -19,6 +19,7 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "winston": "^3.8.2"
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0"
   }
 }

@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import xml2js from 'xml2js';
-import { Logger } from '@edfi/meadowlark-utilities';
+import { Logger, isDebugEnabled } from '@edfi/meadowlark-utilities';
 import { ensurePluginsLoaded, getDocumentStore, loadDocumentStore } from '../plugin/PluginLoader';
 import type { DocumentInfo } from '../model/DocumentInfo';
 import { newSecurity } from '../security/Security';
@@ -142,12 +142,14 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
       const upsertResult: UpsertResult = await getDocumentStore().upsertDocument(upsertRequest);
       await afterUpsertDocument(upsertRequest, upsertResult);
 
-      Logger.debug(
-        `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
-          upsertResult.failureMessage ?? 'OK'
-        }`,
-        '-',
-      );
+      if (isDebugEnabled()) {
+        Logger.debug(
+          `Loading descriptor ${descriptorName} with identity ${JSON.stringify(documentInfo.documentIdentity)}: ${
+            upsertResult.failureMessage ?? 'OK'
+          }`,
+          '-',
+        );
+      }
 
       if (!(upsertResult.response === 'INSERT_SUCCESS' || upsertResult.response === 'UPDATE_SUCCESS')) {
         Logger.error(
