@@ -33,8 +33,8 @@
     "start:local:ts": "ts-node --require=dotenv/config src/index.ts",
     "createKey": "openssl rand -base64 256",
 
-    "clinic:flame": "FASTIFY_NUM_THREADS=1 clinic flame -- node dist/index.js",
-    "clinic:doctor": "FASTIFY_NUM_THREADS=1 clinic doctor -- node dist/index.js",
-    "clinic:heapprofiler": "FASTIFY_NUM_THREADS=1 clinic heapprofiler -- node dist/index.js"
+    "clinic:flame": "clinic flame -- node dist/index.js",
+    "clinic:doctor": "clinic doctor -- node dist/index.js",
+    "clinic:heapprofiler": "clinic heapprofiler -- node dist/index.js"
   }
 }
