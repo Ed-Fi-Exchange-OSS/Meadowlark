@@ -64,6 +64,15 @@
         "${workspaceRoot}\\tests\\config\\integration\\jest.config.js",
         "backends/meadowlark-mongodb-backend/test/integration"
       ]
-    }
+    },
+    {
+      "name": "Run with ts-node",
+      "type": "node",
+      "request": "launch",
+      "args": ["${relativeFile}"],
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
   ]
 }

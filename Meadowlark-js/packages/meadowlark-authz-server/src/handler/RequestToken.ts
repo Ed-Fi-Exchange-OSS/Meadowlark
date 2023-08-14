@@ -5,7 +5,7 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { Config, Logger } from '@edfi/meadowlark-utilities';
+import { Config, Logger, isDebugEnabled } from '@edfi/meadowlark-utilities';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
@@ -138,7 +138,9 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
     const { requestTokenBody } = parsedRequest;
 
-    Logger.debug(`${moduleName}.requestToken ${maskClientSecret(requestTokenBody)}`, authorizationRequest.traceId);
+    if (isDebugEnabled()) {
+      Logger.debug(`${moduleName}.requestToken ${maskClientSecret(requestTokenBody)}`, authorizationRequest.traceId);
+    }
 
     if (requestTokenBody.grant_type === 'client_credentials') {
       // Check hardcoded credentials first
@@ -147,10 +149,12 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       const enableHardCoded = Config.get('OAUTH_HARD_CODED_CREDENTIALS_ENABLED');
 
       if (!enableHardCoded && (clientId === admin1.key || clientId === verifyOnly1.key)) {
-        Logger.debug(
-          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Hard-coded credentials are not enabled`,
-          authorizationRequest.traceId,
-        );
+        if (isDebugEnabled()) {
+          Logger.debug(
+            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Hard-coded credentials are not enabled`,
+            authorizationRequest.traceId,
+          );
+        }
         return { statusCode: 401 };
       }
 
@@ -176,28 +180,42 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       });
 
       if (result.response === 'UNKNOWN_FAILURE') {
-        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`, authorizationRequest.traceId);
+        if (isDebugEnabled()) {
+          Logger.debug(
+            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`,
+            authorizationRequest.traceId,
+          );
+        }
         return { statusCode: 500 };
       }
 
       if (result.response === 'GET_FAILURE_NOT_EXISTS') {
-        Logger.debug(
-          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client does not exist`,
-          authorizationRequest.traceId,
-        );
+        if (isDebugEnabled()) {
+          Logger.debug(
+            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client does not exist`,
+            authorizationRequest.traceId,
+          );
+        }
         return { statusCode: 401 };
       }
 
       if (!result.active) {
-        Logger.debug(
-          `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client deactivated `,
-          authorizationRequest.traceId,
-        );
+        if (isDebugEnabled()) {
+          Logger.debug(
+            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client deactivated `,
+            authorizationRequest.traceId,
+          );
+        }
         return { statusCode: 403 };
       }
 
       if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
-        Logger.debug(`${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`, authorizationRequest.traceId);
+        if (isDebugEnabled()) {
+          Logger.debug(
+            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`,
+            authorizationRequest.traceId,
+          );
+        }
         return { statusCode: 401 };
       }
 

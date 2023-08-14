@@ -1,4 +1,4 @@
-import autocannon from 'autocannon';
+import autocannon, { Client } from 'autocannon';
 import axios from 'axios';
 import { faker } from '@faker-js/faker';
 import { getBearerToken } from './BearerToken';
@@ -44,37 +44,48 @@ export async function postRequiredSchoolReferences({ bearerToken, urlPrefix }: A
 }
 
 /**
+ * Generates a new School document
+ */
+function newSchoolDocument(): string {
+  return JSON.stringify({
+    schoolId: faker.number.int(),
+    nameOfInstitution: faker.person.fullName(),
+    educationOrganizationCategories: [
+      {
+        educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+      },
+    ],
+    gradeLevels: [
+      {
+        gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#Other',
+      },
+    ],
+  });
+}
+
+/**
  * Run autocannon to generate POSTs of Schools. Assumes required references already exist
  *
  * @returns An autocannon tracker/statistics object
  */
 export async function autocannonSchools({ bearerToken, urlPrefix }: AutocannonParameters): Promise<any> {
-  return autocannon({
+  const instance = autocannon({
     url: urlPrefix,
     duration: AUTOCANNON_DURATION_IN_SECONDS,
-
     requests: [
       {
         method: 'POST',
         path: '/local/v3.3b/ed-fi/schools',
-        body: JSON.stringify({
-          schoolId: faker.number.int(),
-          nameOfInstitution: faker.person.fullName(),
-          educationOrganizationCategories: [
-            {
-              educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
-            },
-          ],
-          gradeLevels: [
-            {
-              gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#Other',
-            },
-          ],
-        }),
+        body: newSchoolDocument(),
         headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
       },
     ],
+    setupClient: (client: Client) => {
+      client.setBody(newSchoolDocument());
+    },
   });
+
+  return instance;
 }
 
 (async () => {

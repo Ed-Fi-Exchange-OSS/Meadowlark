@@ -3,10 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import winston from 'winston';
+import pino from 'pino';
+import type { Logger as PinoLogger } from 'pino';
 import * as Config from './Config';
-
-const timestampFormat: string = 'YYYY-MM-DD HH:mm:ss.SSS';
 
 /*
  * Function to remove sensitive from mongoDb connection string.
@@ -40,79 +39,78 @@ const convertErrorToString = (err) => {
   return err;
 };
 
-const format = winston.format.combine(
-  winston.format.label({
-    label: 'Meadowlark',
-  }),
-  winston.format.timestamp({
-    format: timestampFormat,
-  }),
-  winston.format.json(),
-);
-
-const offlineFormat = winston.format.combine(
-  winston.format.timestamp({
-    format: timestampFormat,
-  }),
-  winston.format.printf(({ level, message, timestamp, traceId, extra, error }) => {
-    let m = message;
-    let e = error ?? extra ?? '';
-    const t = traceId ?? 'not-applicable';
-
-    if (typeof message === 'object') {
-      // TypeScript thinks that this is a string, but it there are cases where it ends up being an object
-      m = convertErrorToString(m);
-    }
-    if (typeof e === 'object') {
-      e = JSON.stringify(e);
-    }
-
-    return `${timestamp} ${level} ${t} ${m} ${e}`;
-  }),
-  winston.format.colorize({
-    all: true,
-  }),
-);
+// The pino logger
+let logger: PinoLogger = pino({ level: 'silent' });
 
 // Logger begins life "uninitialized" and in silent mode
 let isInitialized = false;
 
-// Create and set up a silent default logger transport - in case a library is using the default logger
-const transport = new winston.transports.Console();
-transport.silent = true;
-winston.configure({ transports: [transport] });
-
-// Set initial logger to silent
-let logger: winston.Logger = winston.createLogger({
-  transports: [transport],
-});
-
 /**
  * This should be called by frontend services at startup, before logging. Because services can have
  * multiple startup points (e.g. multiple lambdas), this checks if initialization has already happened.
+ *
+ * Note that writing logs to STDOUT is slower than writing to a file, and pretty-printing with LOG_PRETTY_PRINT
+ * is slower than not.
  */
 export function initializeLogging(): void {
   if (isInitialized) return;
-
-  const offline = Config.get('IS_LOCAL') === true;
   isInitialized = true;
-  logger = winston.createLogger({
-    level: Config.get<string>('LOG_LEVEL').toLocaleLowerCase(),
-    transports: [
-      new winston.transports.Console({
-        format: offline ? offlineFormat : format,
-      }),
-    ],
-  });
 
-  if (Config.get('SAVE_LOG_TO_FILE') === true) {
-    logger.add(
-      new winston.transports.File({
-        dirname: Config.get('LOG_FILE_LOCATION'),
-        filename: 'meadowlark.log',
-      }),
-    );
+  const targets: any[] = [];
+  if (Config.get<boolean>('LOG_TO_FILE')) {
+    if (Config.get<boolean>('LOG_PRETTY_PRINT')) {
+      targets.push({
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          colorizeObjects: true,
+          translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+          destination: `${Config.get('LOG_FILE_LOCATION')}/meadowlark.log`,
+          mkdir: true,
+        },
+      });
+    } else {
+      targets.push({
+        target: 'pino/file',
+        options: {
+          destination: `${Config.get('LOG_FILE_LOCATION')}/meadowlark.log`,
+          mkdir: true,
+        },
+      });
+    }
+  } else if (Config.get<boolean>('LOG_PRETTY_PRINT')) {
+    // pretty-printed to STDOUT
+    targets.push({
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        colorizeObjects: true,
+        translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+      },
+    });
+  } else {
+    // STDOUT
+    targets.push({
+      target: 'pino/file',
+    });
   }
+
+  logger = pino({
+    name: 'Meadowlark',
+    level: Config.get<string>('LOG_LEVEL').toLocaleLowerCase(),
+    timestamp: pino.stdTimeFunctions.isoTime,
+    transport: {
+      targets,
+    },
+  });
+}
+
+export function isDebugEnabled(): boolean {
+  return logger.isLevelEnabled('debug');
+}
+
+export function isInfoEnabled(): boolean {
+  return logger.isLevelEnabled('info');
 }
 
 export const Logger = {
@@ -130,10 +128,14 @@ export const Logger = {
     logger.warn({ message: removeSensitiveData(message), traceId });
   },
   info: (message: string, traceId: string | null, extra?: any | null) => {
-    logger.info({ message: removeSensitiveData(message), traceId, extra });
+    if (isInfoEnabled()) {
+      logger.info({ message: removeSensitiveData(message), traceId, extra });
+    }
   },
   debug: (message: string, traceId: string | null, extra?: any | null) => {
-    logger.debug({ message: removeSensitiveData(message), traceId, extra });
+    if (isDebugEnabled()) {
+      logger.debug({ message: removeSensitiveData(message), traceId, extra });
+    }
   },
   trace: (message: string) => {
     logger.debug({ message: JSON.stringify(message) });
@@ -149,12 +151,4 @@ export function writeErrorToLog(
   error?: any,
 ): void {
   Logger.error(`${moduleName}.${method} ${status || ''}`, traceId, error);
-}
-
-export function isDebugEnabled(): boolean {
-  return logger.levels[logger.level] >= logger.levels.debug;
-}
-
-export function isInfoEnabled(): boolean {
-  return logger.levels[logger.level] >= logger.levels.info;
 }
