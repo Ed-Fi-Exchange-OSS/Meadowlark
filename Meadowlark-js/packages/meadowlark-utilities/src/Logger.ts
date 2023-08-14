@@ -49,7 +49,7 @@ let isInitialized = false;
  * This should be called by frontend services at startup, before logging. Because services can have
  * multiple startup points (e.g. multiple lambdas), this checks if initialization has already happened.
  *
- * Note that writing logs to STDOUT is slower than writing to a file, and pretty-printing with IS_LOCAL
+ * Note that writing logs to STDOUT is slower than writing to a file, and pretty-printing with LOG_PRETTY_PRINT
  * is slower than not.
  */
 export function initializeLogging(): void {
@@ -58,7 +58,7 @@ export function initializeLogging(): void {
 
   const targets: any[] = [];
   if (Config.get<boolean>('LOG_TO_FILE')) {
-    if (Config.get<boolean>('IS_LOCAL')) {
+    if (Config.get<boolean>('LOG_PRETTY_PRINT')) {
       targets.push({
         target: 'pino-pretty',
         options: {
@@ -78,7 +78,7 @@ export function initializeLogging(): void {
         },
       });
     }
-  } else if (Config.get<boolean>('IS_LOCAL')) {
+  } else if (Config.get<boolean>('LOG_PRETTY_PRINT')) {
     // pretty-printed to STDOUT
     targets.push({
       target: 'pino-pretty',

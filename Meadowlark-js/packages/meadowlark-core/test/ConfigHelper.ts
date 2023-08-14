@@ -15,7 +15,7 @@ export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymiz
         return 0;
       case 'MEADOWLARK_STAGE':
         return 'local';
-      case 'IS_LOCAL':
+      case 'LOG_PRETTY_PRINT':
         return true;
       case 'OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST':
         return 'https://a/b/oauth/token';

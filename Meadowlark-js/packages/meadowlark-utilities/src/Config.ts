@@ -44,7 +44,7 @@ export type ConfigKeys =
   | 'POSTGRES_PASSWORD'
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_TTL'
   | 'OAUTH_CLIENT_PROVIDED_TOKEN_CACHE_MAX_ENTRIES'
-  | 'IS_LOCAL'
+  | 'LOG_PRETTY_PRINT'
   | 'LOG_LEVEL'
   | 'LOG_TO_FILE'
   | 'LOG_FILE_LOCATION'
@@ -97,7 +97,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
   set('HTTP_PROTOCOL_AND_SERVER', await provider.getString('HTTP_PROTOCOL_AND_SERVER', 'http://localhost'));
   set('FASTIFY_RATE_LIMIT', await provider.getInt('FASTIFY_RATE_LIMIT', 0));
   set('MEADOWLARK_STAGE', await provider.getString('MEADOWLARK_STAGE', 'local'));
-  set('IS_LOCAL', await provider.getBool('IS_LOCAL', true));
+  set('LOG_PRETTY_PRINT', await provider.getBool('LOG_PRETTY_PRINT', false));
   set('LOG_LEVEL', await provider.getString('LOG_LEVEL', 'info'));
   set('LOG_TO_FILE', await provider.getBool('LOG_TO_FILE', false));
   set('LOG_FILE_LOCATION', await provider.getString('LOG_FILE_LOCATION', '/var/log/'));

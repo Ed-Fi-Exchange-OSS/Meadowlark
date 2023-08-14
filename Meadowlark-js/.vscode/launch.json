@@ -1,6 +1,5 @@
 {
   "configurations": [
-
     {
       "name": "meadowlark-fastify",
       "type": "node",
@@ -40,6 +39,17 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceRoot}/node_modules/jest-cli/bin/jest.js",
+      "args": [
+        "jest",
+        "--runInBand",
+      ]
     },
     {
       "type": "node",
