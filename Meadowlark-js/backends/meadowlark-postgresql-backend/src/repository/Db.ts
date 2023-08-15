@@ -6,7 +6,9 @@
 import { Pool, Client } from 'pg';
 import type { PoolClient } from 'pg';
 import { Config, Logger } from '@edfi/meadowlark-utilities';
-import { createDatabase, checkExistsAndCreateTables } from './SqlHelper';
+import {
+  createDatabase, checkExistsAndCreateTables
+} from './SqlHelper';
 
 let singletonDbPool: Pool | null = null;
 
