@@ -4,12 +4,19 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentStorePlugin } from '@edfi/meadowlark-core';
+import { AuthorizationStorePlugin } from '@edfi/meadowlark-authz-server';
 import {
   upsertDocument,
   deleteDocumentById,
   getDocumentById,
   updateDocumentById,
   securityMiddleware,
+  createAuthorizationClientDocument,
+  updateAuthorizationClientDocument,
+  getAuthorizationClientDocument,
+  getAllAuthorizationClientDocuments,
+  resetAuthorizationClientSecret,
+  tryCreateBootstrapAuthorizationAdminDocument,
   closeConnection,
 } from './BackendFacade';
 
@@ -21,6 +28,17 @@ export function initializeDocumentStore(): DocumentStorePlugin {
     deleteDocumentById,
     securityMiddleware,
     closeConnection,
+  };
+}
+
+export function initializeAuthorizationStore(): AuthorizationStorePlugin {
+  return {
+    createAuthorizationClient: createAuthorizationClientDocument,
+    tryCreateBootstrapAuthorizationAdmin: tryCreateBootstrapAuthorizationAdminDocument,
+    updateAuthorizationClient: updateAuthorizationClientDocument,
+    getAuthorizationClient: getAuthorizationClientDocument,
+    resetAuthorizationClientSecret,
+    getAllAuthorizationClients: getAllAuthorizationClientDocuments,
   };
 }
 

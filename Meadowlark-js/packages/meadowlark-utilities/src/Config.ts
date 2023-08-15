@@ -53,7 +53,8 @@ export type ConfigKeys =
   | 'FASTIFY_RATE_LIMIT'
   | 'HTTP_PROTOCOL_AND_SERVER'
   | 'DISABLE_LOG_ANONYMIZATION'
-  | 'MONGODB_MAX_NUMBER_OF_RETRIES';
+  | 'MONGODB_MAX_NUMBER_OF_RETRIES'
+  | 'AWS_REGION';
 
 const ThrowIfNotFound = undefined;
 const CpuCount = os.cpus().length;

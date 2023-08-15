@@ -510,6 +510,22 @@ const createDocumentUuidTableUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_document_uuid ON meadowlark.documents(document_uuid)';
 
 /**
+ * SQL query string to create authorizations document table
+ */
+export const createAuthorizationsTableSql = `
+  CREATE TABLE IF NOT EXISTS meadowlark.authorizations(
+  client_id VARCHAR PRIMARY KEY,
+  client_secret_hashed VARCHAR NOT NULL,
+  client_name VARCHAR NOT NULL,
+  roles TEXT[] NOT NULL,
+  is_bootstrap_admin BOOLEAN NOT NULL,
+  active BOOLEAN NOT NULL);`;
+
+// Index the client name
+export const createAuthorizationsTableUniqueIndexSql = 
+  'CREATE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)'; // should this be unique? - MaxP
+
+/**
  * SQL query string to create the references table
  */
 const createReferencesTableSql = `
