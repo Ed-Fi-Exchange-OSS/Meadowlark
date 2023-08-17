@@ -96,19 +96,14 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   createdBy: string;
 
   /*
-   * Creation date as  as Unix timestamp.
+   * Creation date as as Unix timestamp, or null if this is a document to be updated and we don't know the create time yet
    */
-  createdAt?: number | undefined;
+  createdAt: number | null;
 
   /*
-   * Last modified date as  as Unix timestamp.
+   * Last modified date as as Unix timestamp.
    */
-  lastModifiedAt?: number | undefined;
-
-  /*
-   * Last modified date (UTC Format).
-   */
-  _lastModifiedDate?: string | undefined;
+  lastModifiedAt: number;
 
   /**
    * An ObjectId managed by Meadowlark transactions for read locking. Optional because it does not need to be
@@ -124,17 +119,27 @@ function referencedDocumentIdsFrom(documentInfo: DocumentInfo): MeadowlarkId[] {
   ];
 }
 
-export function meadowlarkDocumentFrom(
-  resourceInfo: ResourceInfo,
-  documentInfo: DocumentInfo,
-  documentUuid: DocumentUuid,
-  meadowlarkId: MeadowlarkId,
-  edfiDoc: object,
-  validate: boolean,
-  createdBy: string,
-  createdAt: number,
-  lastModifiedAt: number,
-): MeadowlarkDocument {
+export function meadowlarkDocumentFrom({
+  resourceInfo,
+  documentInfo,
+  documentUuid,
+  meadowlarkId,
+  edfiDoc,
+  validate,
+  createdBy,
+  createdAt,
+  lastModifiedAt,
+}: {
+  resourceInfo: ResourceInfo;
+  documentInfo: DocumentInfo;
+  documentUuid: DocumentUuid;
+  meadowlarkId: MeadowlarkId;
+  edfiDoc: object;
+  validate: boolean;
+  createdBy: string;
+  createdAt: number | null;
+  lastModifiedAt: number;
+}): MeadowlarkDocument {
   const aliasMeadowlarkIds: MeadowlarkId[] = [meadowlarkId];
   if (documentInfo.superclassInfo != null) {
     aliasMeadowlarkIds.push(getMeadowlarkIdForSuperclassInfo(documentInfo.superclassInfo));

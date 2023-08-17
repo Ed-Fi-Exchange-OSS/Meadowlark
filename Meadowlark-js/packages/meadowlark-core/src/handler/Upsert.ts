@@ -14,7 +14,6 @@ import type { FrontendRequest } from './FrontendRequest';
 import type { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris, resourceUriFrom } from './UriBuilder';
 import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
-import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.Upsert';
 
@@ -36,7 +35,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
       edfiDoc: parsedBody,
       validateDocumentReferencesExist: frontendRequest.middleware.validateResources,
       security,
-      traceId: frontendRequest.traceId as TraceId,
+      traceId: frontendRequest.traceId,
     };
 
     await beforeUpsertDocument(request);

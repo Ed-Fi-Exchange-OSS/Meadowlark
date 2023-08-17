@@ -84,17 +84,17 @@ const academicWeekMeadowlarkId = meadowlarkIdForDocumentIdentity(
   academicWeekDocumentInfo.documentIdentity,
 );
 
-const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom(
-  academicWeekResourceInfo,
-  academicWeekDocumentInfo,
+const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom({
+  resourceInfo: academicWeekResourceInfo,
+  documentInfo: academicWeekDocumentInfo,
   documentUuid,
-  academicWeekMeadowlarkId,
-  {},
-  true,
-  '',
-  Date.now(),
-  Date.now(),
-);
+  meadowlarkId: academicWeekMeadowlarkId,
+  edfiDoc: {},
+  validate: true,
+  createdBy: '',
+  createdAt: Date.now(),
+  lastModifiedAt: Date.now(),
+});
 
 describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
   let client: MongoClient;

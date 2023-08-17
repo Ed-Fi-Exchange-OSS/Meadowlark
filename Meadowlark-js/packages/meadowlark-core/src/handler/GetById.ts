@@ -10,7 +10,6 @@ import { afterGetDocumentById, beforeGetDocumentById } from '../plugin/listener/
 import { GetResult } from '../message/GetResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
-import { TraceId } from '../model/BrandedTypes';
 
 const moduleName = 'core.handler.GetById';
 
@@ -28,7 +27,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     documentUuid: frontendRequest.middleware.pathComponents.documentUuid,
     resourceInfo: frontendRequest.middleware.resourceInfo,
     security: frontendRequest.middleware.security,
-    traceId: frontendRequest.traceId as TraceId,
+    traceId: frontendRequest.traceId,
   };
 
   await beforeGetDocumentById(request);

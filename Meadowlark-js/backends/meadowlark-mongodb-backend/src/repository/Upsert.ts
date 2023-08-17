@@ -37,10 +37,7 @@ export async function upsertDocumentTransaction(
 
   // the documentUuid of the existing document if this is an update, or a new one if this is an insert
   const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();
-  // Unix timestamp
-  const createdAt: number = existingDocument?.createdAt ?? Date.now();
-  // last modified date as an Unix timestamp.
-  const lastModifiedAt: number = Date.now();
+
   // Check whether this is an insert or update
   const isInsert: boolean = existingDocument == null;
 
@@ -114,17 +111,17 @@ export async function upsertDocumentTransaction(
 
   const document: MeadowlarkDocument =
     documentFromUpdate ??
-    meadowlarkDocumentFrom(
+    meadowlarkDocumentFrom({
       resourceInfo,
       documentInfo,
       documentUuid,
       meadowlarkId,
       edfiDoc,
-      validateDocumentReferencesExist,
-      security.clientId,
-      createdAt,
-      lastModifiedAt,
-    );
+      validate: validateDocumentReferencesExist,
+      createdBy: security.clientId,
+      createdAt: existingDocument?.createdAt ?? documentInfo.requestTimestamp,
+      lastModifiedAt: documentInfo.requestTimestamp,
+    });
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
   // Perform the document upsert

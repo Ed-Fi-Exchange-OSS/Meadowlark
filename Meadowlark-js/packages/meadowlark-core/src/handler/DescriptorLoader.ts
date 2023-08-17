@@ -21,7 +21,7 @@ import { descriptorDocumentInfoFrom } from '../model/DescriptorDocumentInfo';
 import type { UpsertRequest } from '../message/UpsertRequest';
 import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
 import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
-import type { TraceId } from '../model/BrandedTypes';
+import type { TraceId } from '../model/IdTypes';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 

@@ -113,7 +113,7 @@ export const onlyReturnId = (session: ClientSession): FindOptions => ({ projecti
 
 // MongoDB FindOption to return only the indexed documentUuid field, making this a covered query (MongoDB will optimize)
 export const onlyReturnDocumentUuid = (session: ClientSession): FindOptions => ({
-  projection: { documentUuid: 1, createdAt: 1 },
+  projection: { documentUuid: 1 },
   session,
 });
 

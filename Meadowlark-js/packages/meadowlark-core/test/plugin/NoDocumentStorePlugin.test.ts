@@ -15,7 +15,7 @@ import { DeleteRequest } from '../../src/message/DeleteRequest';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import { UpdateResult } from '../../src/message/UpdateResult';
 import { DeleteResult } from '../../src/message/DeleteResult';
-import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/IdTypes';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,

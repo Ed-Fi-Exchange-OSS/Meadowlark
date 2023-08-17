@@ -14,10 +14,10 @@ import { UpdateResult } from '../message/UpdateResult';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { blockingDocumentsToUris } from './UriBuilder';
-import { TraceId } from '../model/BrandedTypes';
-import { documentUuidForDocumentBody } from '../model/DocumentInfo';
 
 const moduleName = 'core.handler.Update';
+
+type MaybeHasIdField = { id: string | undefined };
 
 /**
  * Entry point for API update requests, which are "by id"
@@ -34,7 +34,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400);
       return { statusCode: 400, headers: headerMetadata };
     }
-    const documentUuidFromBody = documentUuidForDocumentBody(parsedBody);
+    const documentUuidFromBody = (parsedBody as MaybeHasIdField).id;
     if (documentUuidFromBody !== pathComponents.documentUuid) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
       writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
@@ -57,7 +57,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
       edfiDoc: parsedBody,
       validateDocumentReferencesExist: frontendRequest.middleware.validateResources,
       security,
-      traceId: frontendRequest.traceId as TraceId,
+      traceId: frontendRequest.traceId,
     };
 
     await beforeUpdateDocumentById(request);

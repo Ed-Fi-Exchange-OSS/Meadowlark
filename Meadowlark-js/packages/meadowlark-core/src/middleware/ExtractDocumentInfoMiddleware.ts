@@ -25,6 +25,7 @@ export async function documentInfoExtraction({
     frontendRequest.middleware.resourceInfo,
     frontendRequest.middleware.parsedBody,
     frontendRequest.middleware.matchingMetaEdModel,
+    frontendRequest.middleware.timestamp,
   );
 
   if (documentInfo === NoDocumentInfo) {

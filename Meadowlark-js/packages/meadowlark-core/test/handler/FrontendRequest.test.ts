@@ -37,6 +37,7 @@ const frontendRequest: FrontendRequest = {
         projectName: 'Test',
         resourceName: 'resource',
       },
+      requestTimestamp: 0,
     },
   },
 };

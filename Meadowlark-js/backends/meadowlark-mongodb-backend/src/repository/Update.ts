@@ -159,6 +159,8 @@ async function updateAllowingIdentityChange(
     return tryUpdateByReplacementResult;
   }
 
+  // TODO: RND-553 - fix bug where createdAt is lost if the document is deleted and re-added
+
   // Either the documentUuid doesn't exist or the identity has changed.
   // The following delete attempt will catch if documentUuid does not exist
   const deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
@@ -283,8 +285,6 @@ async function updateDocumentByDocumentUuidTransaction(
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
     updateRequest;
-  // last modified date as an Unix timestamp.
-  const lastModifiedAt: number = Date.now();
   if (validateDocumentReferencesExist) {
     const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
       updateRequest,
@@ -295,17 +295,17 @@ async function updateDocumentByDocumentUuidTransaction(
       return invalidReferenceResult;
     }
   }
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom({
     resourceInfo,
     documentInfo,
     documentUuid,
     meadowlarkId,
     edfiDoc,
-    validateDocumentReferencesExist,
-    security.clientId,
-    Date.now(),
-    lastModifiedAt,
-  );
+    validate: validateDocumentReferencesExist,
+    createdBy: security.clientId,
+    createdAt: null,
+    lastModifiedAt: documentInfo.requestTimestamp,
+  });
   if (resourceInfo.allowIdentityUpdates) {
     return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
   }

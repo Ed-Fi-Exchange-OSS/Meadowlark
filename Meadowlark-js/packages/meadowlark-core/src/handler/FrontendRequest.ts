@@ -10,6 +10,7 @@ import { PathComponents, NoPathComponents } from '../model/PathComponents';
 import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 import { Security, UndefinedSecurity } from '../security/Security';
 import type { Action } from './Action';
+import { TraceId } from '../model/IdTypes';
 
 export interface Headers {
   [header: string]: string | undefined;
@@ -22,14 +23,28 @@ export interface FrontendQueryParameters {
 export interface FrontendRequestMiddleware {
   security: Security;
   pathComponents: PathComponents;
+
+  /**
+   * The request body parsed into an object
+   */
   parsedBody: object;
+
   resourceInfo: ResourceInfo;
+
   // Note that TopLevelEntities are usually not JSON serializable
   matchingMetaEdModel: TopLevelEntity;
   documentInfo: DocumentInfo;
   headerMetadata: { [header: string]: string };
+
   // Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
   validateResources: boolean;
+
+  /**
+   * A timestamp, usually used to capture the time of an insert or update request.
+   * Can be used to total order inserts/updates when used in conjunction with the
+   * backend rejection of inserts/updates that do not provide an increasing timestamp.
+   */
+  timestamp: number;
 }
 
 export interface FrontendRequest {
@@ -46,7 +61,7 @@ export interface FrontendRequest {
   /**
    * A request identifier provided by the frontend service, used for log tracing
    */
-  traceId: string;
+  traceId: TraceId;
 
   /**
    * Unparsed request body provided by the frontend service as a string, or null if there is no body
@@ -79,6 +94,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     documentInfo: NoDocumentInfo,
     headerMetadata: {},
     validateResources: true,
+    timestamp: 0,
   };
 }
 
@@ -86,7 +102,7 @@ export function newFrontendRequest(): FrontendRequest {
   return {
     action: 'UNKNOWN',
     path: '',
-    traceId: '',
+    traceId: '' as TraceId,
     body: null,
     headers: {},
     queryParameters: {},

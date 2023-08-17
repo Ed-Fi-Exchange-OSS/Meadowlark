@@ -15,7 +15,7 @@ import {
   DeleteRequest,
   DeleteResult,
 } from '@edfi/meadowlark-core';
-import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/IdTypes';
 import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@opensearch-project/opensearch/.';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';

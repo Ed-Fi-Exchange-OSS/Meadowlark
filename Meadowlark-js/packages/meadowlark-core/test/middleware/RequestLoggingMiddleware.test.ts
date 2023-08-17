@@ -10,6 +10,7 @@ import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { logRequestBody } from '../../src/middleware/RequestLoggingMiddleware';
 import { parseBody } from '../../src/middleware/ParseBodyMiddleware';
 import { setupMockConfiguration } from '../ConfigHelper';
+import { TraceId } from '../../src/model/IdTypes';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -73,7 +74,7 @@ describe('flat doc example - given previous middleware has created a response wi
   });
 
   it('An anonymized version of the body is logged', async () => {
-    const traceId = 'traceid';
+    const traceId = 'traceid' as TraceId;
 
     const body = JSON.stringify({
       studentUniqueId: 'abca123',
@@ -119,7 +120,7 @@ describe('nested doc example - given previous middleware has created a response 
   });
 
   it('logs an anonymized version of the request body', async () => {
-    const traceId = 'traceid';
+    const traceId = 'traceid' as TraceId;
 
     const body = JSON.stringify({
       studentReference: {
@@ -180,7 +181,7 @@ describe('given previous middleware has created a response with info log level',
   });
 
   it('Logger is not called', async () => {
-    const traceId = 'traceid';
+    const traceId = 'traceid' as TraceId;
 
     const body = JSON.stringify({
       studentUniqueId: 'abca123',
@@ -220,7 +221,7 @@ describe('given anonymization is disabled', () => {
   });
 
   it('logs the original request body', async () => {
-    const traceId = 'traceid';
+    const traceId = 'traceid' as TraceId;
 
     const body = JSON.stringify({
       studentReference: {

@@ -9,7 +9,7 @@ import { AuthorizationStrategy } from '../../src/security/AuthorizationStrategy'
 import { PaginationParameters } from '../../src/message/PaginationParameters';
 import { QueryRequest } from '../../src/message/QueryRequest';
 import { QueryResult } from '../../src/message/QueryResult';
-import { TraceId } from '../../src/model/BrandedTypes';
+import { TraceId } from '../../src/model/IdTypes';
 
 const setupQueryRequest = (
   authorizationStrategy: AuthorizationStrategy,

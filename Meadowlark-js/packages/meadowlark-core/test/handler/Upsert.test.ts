@@ -11,7 +11,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { isDocumentUuidWellFormed } from '../../src/model/DocumentIdentity';
-import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {

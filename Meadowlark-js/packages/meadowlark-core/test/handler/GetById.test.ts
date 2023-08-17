@@ -10,7 +10,7 @@ import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendR
 import { PathComponents } from '../../src/model/PathComponents';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
-import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { DocumentUuid } from '../../src/model/IdTypes';
 
 const validPathComponents: PathComponents = {
   resourceName: '1',

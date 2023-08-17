@@ -9,6 +9,8 @@ import { DescriptorDocument } from '../../src/model/DescriptorDocument';
 import { extractDocumentInfo } from '../../src/extraction/DocumentInfoExtractor';
 import { DocumentIdentity } from '../../src/model/DocumentIdentity';
 
+const requestTimestamp = 10;
+
 const testModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
   metaEdName: 'Student',
@@ -180,7 +182,7 @@ describe('given IsDescriptor equal true', () => {
     isDescriptor: true,
   };
   beforeAll(async () => {
-    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel);
+    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel, requestTimestamp);
   });
   it('should return documentInfo.', async () => {
     // Assert
@@ -189,6 +191,7 @@ describe('given IsDescriptor equal true', () => {
       documentIdentity: {},
       documentReferences: [],
       superclassInfo: null,
+      requestTimestamp,
     });
   });
 });
@@ -208,7 +211,7 @@ describe('given isDescriptor False', () => {
     isDescriptor: false,
   };
   beforeAll(async () => {
-    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel);
+    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel, requestTimestamp);
   });
   it('should return superclass null.', async () => {
     // Assert
@@ -217,6 +220,7 @@ describe('given isDescriptor False', () => {
       documentIdentity: {},
       documentReferences: [],
       superclassInfo: null,
+      requestTimestamp,
     });
   });
 });
@@ -236,7 +240,7 @@ describe('given isDescriptor False', () => {
     isDescriptor: false,
   };
   beforeAll(async () => {
-    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel);
+    queryResult = await extractDocumentInfo(resourceInfoRequest, body, matchingMetaEdModel, requestTimestamp);
   });
   it('should return superclass.', async () => {
     // Assert
@@ -249,6 +253,7 @@ describe('given isDescriptor False', () => {
         projectName: 'Testing',
         resourceName: 'School',
       },
+      requestTimestamp,
     });
   });
 });
