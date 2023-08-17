@@ -104,6 +104,7 @@ describe('given the get of an existing document', () => {
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
+    requestTimestamp: 1683326572053,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -117,7 +118,7 @@ describe('given the get of an existing document', () => {
       documentInfo,
       edfiDoc: { inserted: 'yes' },
     };
-    Date.now = jest.fn(() => 1683326572053);
+
     // insert the initial version
     const upsertResult = await upsertDocument(upsertRequest, client);
     if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
@@ -156,11 +157,19 @@ describe('given the get of an updated document', () => {
     ...newResourceInfo(),
     resourceName: 'School',
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'getUpdatedDocument' },
+    requestTimestamp: 1683326572053,
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  const documentInfo2: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'getUpdatedDocument' },
+    requestTimestamp: 1683548337342,
+  };
+
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo1.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -169,19 +178,19 @@ describe('given the get of an updated document', () => {
     const upsertRequest: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
-      documentInfo,
+      documentInfo: documentInfo1,
       edfiDoc: { inserted: 'yes' },
     };
-    Date.now = jest.fn(() => 1683326572053);
+
     // insert the initial version
     const upsertResult = await upsertDocument(upsertRequest, client);
     if (upsertResult.response !== 'INSERT_SUCCESS') throw new Error();
-    Date.now = jest.fn(() => 1683548337342);
+
     const updateRequest: UpdateRequest = {
       ...newUpdateRequest(),
       documentUuid: upsertResult.newDocumentUuid,
       meadowlarkId,
-      documentInfo,
+      documentInfo: documentInfo2,
       edfiDoc: { natural: 'keyUpdated' },
     };
     const updateResult = await updateDocumentByDocumentUuid(updateRequest, client);

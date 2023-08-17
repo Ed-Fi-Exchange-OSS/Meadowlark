@@ -3,7 +3,7 @@ import axios from 'axios';
 import { faker } from '@faker-js/faker';
 import { getBearerToken } from './BearerToken';
 
-const AUTOCANNON_DURATION_IN_SECONDS = 60;
+const AUTOCANNON_DURATION_IN_SECONDS = 160;
 
 export type AutocannonParameters = {
   bearerToken: string;
@@ -72,6 +72,7 @@ export async function autocannonSchools({ bearerToken, urlPrefix }: AutocannonPa
   const instance = autocannon({
     url: urlPrefix,
     duration: AUTOCANNON_DURATION_IN_SECONDS,
+    connections: 25,
     requests: [
       {
         method: 'POST',
