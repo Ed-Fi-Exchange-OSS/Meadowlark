@@ -18,7 +18,13 @@ import {
 import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { writeLockReferencedDocuments, asUpsert, limitFive, getDocumentCollection, onlyReturnDocumentUuid } from './Db';
+import {
+  writeLockReferencedDocuments,
+  asUpsert,
+  limitFive,
+  getDocumentCollection,
+  onlyReturnDocumentUuidAndCreatedAt,
+} from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 
 const moduleName: string = 'mongodb.repository.Upsert';
@@ -32,7 +38,7 @@ export async function upsertDocumentTransaction(
   // Check whether this document exists in the db
   const existingDocument: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
     { _id: meadowlarkId },
-    onlyReturnDocumentUuid(session),
+    onlyReturnDocumentUuidAndCreatedAt(session),
   );
 
   // the documentUuid of the existing document if this is an update, or a new one if this is an insert
