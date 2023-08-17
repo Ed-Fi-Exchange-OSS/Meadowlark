@@ -38,6 +38,8 @@ const newUpsertRequest = (): UpsertRequest => ({
   traceId: 'traceId' as TraceId,
 });
 
+const requestTimestamp: number = 1683326572053;
+
 describe('given the upsert of a new document', () => {
   let client;
   let upsertResult: UpsertResult;
@@ -49,6 +51,7 @@ describe('given the upsert of a new document', () => {
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert1' },
+    requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -85,6 +88,13 @@ describe('given the upsert of a new document', () => {
     expect(result.documentUuid).toBe(upsertResult.newDocumentUuid);
   });
 
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp);
+  });
+
   it('should return insert success', async () => {
     expect(upsertResult.response).toBe('INSERT_SUCCESS');
   });
@@ -100,11 +110,11 @@ describe('given the upsert of an existing document three times', () => {
     ...newResourceInfo(),
     resourceName: 'School',
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
@@ -114,16 +124,18 @@ describe('given the upsert of an existing document three times', () => {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
       edfiDoc: { natural: 'key' },
     };
 
     const upsertRequest2: UpsertRequest = {
       ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
     };
 
     const upsertRequest3: UpsertRequest = {
       ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 2 },
     };
 
     upsertResult1 = await upsertDocument(upsertRequest1, client);
@@ -178,6 +190,13 @@ describe('given the upsert of an existing document three times', () => {
     const count: number = await collection.countDocuments();
     expect(count).toBe(1);
   });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp + 2);
+  });
 });
 
 describe('given an upsert of an existing non-identity-update supporting document, changing a non-identity portion of the edfiDoc', () => {
@@ -188,25 +207,30 @@ describe('given an upsert of an existing non-identity-update supporting document
     resourceName: 'School',
     allowIdentityUpdates: false,
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert3' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = {
+    const upsertRequest1: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
     };
 
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
+    const upsertRequest2: UpsertRequest = {
+      ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
+    };
+
+    await upsertDocument({ ...upsertRequest1, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
+    await upsertDocument({ ...upsertRequest2, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
   });
 
   afterAll(async () => {
@@ -224,6 +248,13 @@ describe('given an upsert of an existing non-identity-update supporting document
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const count: number = await collection.countDocuments();
     expect(count).toBe(1);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp + 1);
   });
 });
 
@@ -235,25 +266,30 @@ describe('given an upsert of an existing identity-update supporting document, ch
     resourceName: 'School',
     allowIdentityUpdates: true,
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert3' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const upsertRequest: UpsertRequest = {
+    const upsertRequest1: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
     };
 
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
-    await upsertDocument({ ...upsertRequest, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
+    const upsertRequest2: UpsertRequest = {
+      ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
+    };
+
+    await upsertDocument({ ...upsertRequest1, edfiDoc: { call: 'one', natural: 'upsert3' } }, client);
+    await upsertDocument({ ...upsertRequest2, edfiDoc: { call: 'two', natural: 'upsert3' } }, client);
   });
 
   afterAll(async () => {
@@ -271,6 +307,13 @@ describe('given an upsert of an existing identity-update supporting document, ch
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const count: number = await collection.countDocuments();
     expect(count).toBe(1);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp + 1);
   });
 });
 
@@ -287,10 +330,12 @@ describe('given an upsert of an existing non-identity update supporting document
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key1' },
+    requestTimestamp,
   };
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key2' },
+    requestTimestamp: requestTimestamp + 1,
   };
 
   const meadowlarkId1 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo1.documentIdentity);
@@ -345,6 +390,20 @@ describe('given an upsert of an existing non-identity update supporting document
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const count: number = await collection.countDocuments();
     expect(count).toBe(2);
+  });
+
+  it('should have correct createdAt and lastModifiedAt for 1st document', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId1 });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp);
+  });
+
+  it('should have correct createdAt and lastModifiedAt for 2nd document', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId2 });
+    expect(result.createdAt).toBe(requestTimestamp + 1);
+    expect(result.lastModifiedAt).toBe(requestTimestamp + 1);
   });
 });
 
@@ -361,10 +420,12 @@ describe('given an upsert of an existing identity update supporting document, ch
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key1' },
+    requestTimestamp,
   };
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'key2' },
+    requestTimestamp: requestTimestamp + 1,
   };
 
   const meadowlarkId1 = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo1.documentIdentity);
@@ -419,6 +480,20 @@ describe('given an upsert of an existing identity update supporting document, ch
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const count: number = await collection.countDocuments();
     expect(count).toBe(2);
+  });
+
+  it('should have correct createdAt and lastModifiedAt for 1st document', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId1 });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp);
+  });
+
+  it('should have correct createdAt and lastModifiedAt for 2nd document', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId2 });
+    expect(result.createdAt).toBe(requestTimestamp + 1);
+    expect(result.lastModifiedAt).toBe(requestTimestamp + 1);
   });
 });
 
