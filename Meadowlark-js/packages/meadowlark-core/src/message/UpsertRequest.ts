@@ -8,7 +8,7 @@ import { DocumentInfo } from '../model/DocumentInfo';
 import { ResourceInfo } from '../model/ResourceInfo';
 import { Security } from '../security/Security';
 
-export type UpsertRequest = {
+export interface UpsertRequest {
   meadowlarkId: MeadowlarkId;
   resourceInfo: ResourceInfo;
   documentInfo: DocumentInfo;
@@ -16,4 +16,4 @@ export type UpsertRequest = {
   validateDocumentReferencesExist: boolean;
   security: Security;
   traceId: TraceId;
-};
+}

@@ -35,7 +35,7 @@ import {
   findDocumentByMeadowlarkId,
   findReferencingMeadowlarkIds,
 } from '../../src/repository/SqlHelper';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../src/model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -131,7 +131,7 @@ describe('given the delete of an existing document', () => {
 
   it('should have deleted the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
-    expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
+    expect(result).toBe(NoMeadowlarkDocument);
   });
 });
 
@@ -308,7 +308,7 @@ describe('given an delete of a document with an outbound reference only, with va
   it('should have deleted the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
 
-    expect(isMeadowlarkDocumentEmpty(result)).toEqual(true);
+    expect(result).toBe(NoMeadowlarkDocument);
   });
 
   it('should have deleted the document alias in the db', async () => {
@@ -410,7 +410,7 @@ describe('given an delete of a document referenced by an existing document with 
 
   it('should not have the referenced document in the db', async () => {
     const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
-    expect(isMeadowlarkDocumentEmpty(docResult)).toEqual(true);
+    expect(docResult).toBe(NoMeadowlarkDocument);
   });
 
   it('should not be the parent document in the references table', async () => {

@@ -17,6 +17,20 @@ export interface MeadowlarkDocumentId {
   document_uuid: DocumentUuid;
 }
 
+export interface MeadowlarkDocumentIdAndAliasId extends MeadowlarkDocumentId {
+  /**
+   * Alias meadowlarkIds include the document meadowlarkId itself along with any superclass variations that the document
+   * satisfies. For example, a School is a subclass of EducationOrganization, so each School document has an additional
+   * alias meadowlarkId as an EducationOrganization.
+   */
+  alias_meadowlark_id: MeadowlarkId;
+}
+
+/**
+ * A MeadowlarkDocument is roughly equivalent to MeadowlarkDocuments in NoSQL datastores. It contains
+ * the Ed-Fi API document itself, plus metadata about the document including the documentUuid and
+ * meadowlarkId, and resource/version information.
+ */
 export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   /**
    * The identity elements extracted from the API document.
@@ -59,6 +73,16 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
    * Creator of this document
    */
   created_by: string;
+
+  /*
+   * Creation date as as Unix timestamp, or null if this is a document to be updated and we don't know the create time yet
+   */
+  created_at: number | null;
+
+  /*
+   * Last modified date as as Unix timestamp.
+   */
+  last_modified_at: number;
 }
 
 /**
@@ -76,6 +100,8 @@ export function newMeadowlarkDocument(): MeadowlarkDocument {
     validated: false,
     is_descriptor: false,
     created_by: '',
+    created_at: null,
+    last_modified_at: 0,
   };
 }
 
@@ -85,8 +111,3 @@ export function newMeadowlarkDocument(): MeadowlarkDocument {
 export const NoMeadowlarkDocument = Object.freeze({
   ...newMeadowlarkDocument(),
 });
-
-export function isMeadowlarkDocumentEmpty(meadowlarkDocument: MeadowlarkDocument): boolean {
-  const noMeadowlarkDocument = NoMeadowlarkDocument;
-  return meadowlarkDocument === noMeadowlarkDocument;
-}

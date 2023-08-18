@@ -7,7 +7,7 @@ import type { PoolClient } from 'pg';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByDocumentUuid } from './SqlHelper';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Get';
 
@@ -19,7 +19,7 @@ export async function getDocumentByDocumentUuid(
     Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
     const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
 
-    if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+    if (meadowlarkDocument === NoMeadowlarkDocument) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
 
     const response: GetResult = {
       response: 'GET_SUCCESS',

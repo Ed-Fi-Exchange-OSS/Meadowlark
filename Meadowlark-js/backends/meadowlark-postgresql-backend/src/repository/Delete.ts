@@ -17,7 +17,7 @@ import {
   rollbackTransaction,
   commitTransaction,
 } from './SqlHelper';
-import { MeadowlarkDocumentAndAliasId } from '../model/MeadowlarkDocumentAndAliasId';
+import { MeadowlarkDocumentIdAndAliasId } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Delete';
 
@@ -33,7 +33,7 @@ export async function deleteDocumentByDocumentUuid(
   try {
     await beginTransaction(client);
     // Find the alias meadowlarkIds for the document to be deleted
-    const documentAliasIdsResult: MeadowlarkDocumentAndAliasId[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
+    const documentAliasIdsResult: MeadowlarkDocumentIdAndAliasId[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
       client,
       documentUuid,
     );

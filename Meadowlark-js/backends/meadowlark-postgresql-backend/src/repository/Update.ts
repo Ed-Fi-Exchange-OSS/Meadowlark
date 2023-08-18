@@ -15,8 +15,7 @@ import {
 import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import {
-  insertOrUpdateDocument,
-  findAliasMeadowlarkIdsForDocumentByDocumentUuid,
+  updateDocument,
   deleteAliasesForDocumentByMeadowlarkId,
   insertAlias,
   deleteOutboundReferencesOfDocumentByMeadowlarkId,
@@ -25,23 +24,15 @@ import {
   beginTransaction,
   rollbackTransaction,
   commitTransaction,
+  findDocumentByDocumentUuid,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
-import { MeadowlarkDocumentAndAliasId } from '../model/MeadowlarkDocumentAndAliasId';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Update';
 
 export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest, client: PoolClient): Promise<UpdateResult> {
-  const {
-    meadowlarkId,
-    documentUuid,
-    resourceInfo,
-    documentInfo,
-    edfiDoc,
-    validateDocumentReferencesExist,
-    traceId,
-    security,
-  } = updateRequest;
+  const { meadowlarkId, documentUuid, resourceInfo, documentInfo, validateDocumentReferencesExist, traceId } = updateRequest;
   Logger.info(`${moduleName}.updateDocumentByDocumentUuid ${documentUuid}`, traceId);
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -52,18 +43,17 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
   try {
     await beginTransaction(client);
 
-    const recordExistsResult: MeadowlarkDocumentAndAliasId[] = await findAliasMeadowlarkIdsForDocumentByDocumentUuid(
-      client,
-      documentUuid,
-    );
-    // if this record doesn't exist, this function returns a failure
-    if (recordExistsResult.length === 0) {
-      updateResult = { response: 'UPDATE_FAILURE_NOT_EXISTS' };
-      return updateResult;
+    // Get the document to check for staleness and identity change
+    const documentFromDb: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
+
+    if (documentFromDb === NoMeadowlarkDocument) return { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+
+    // If request is stale, return conflict
+    if (documentFromDb.last_modified_at >= documentInfo.requestTimestamp) {
+      return { response: 'UPDATE_FAILURE_WRITE_CONFLICT' };
     }
-    // Each row contains documentUuid and corresponding meadowlarkId (meadowlark_id),
-    // we just need the first row to return the meadowlark_id
-    const existingMeadowlarkId: MeadowlarkId = recordExistsResult[0].meadowlark_id;
+
+    const existingMeadowlarkId: MeadowlarkId = documentFromDb.meadowlark_id;
     if (!resourceInfo.allowIdentityUpdates && existingMeadowlarkId !== meadowlarkId) {
       updateResult = { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
       return updateResult;
@@ -99,11 +89,8 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
     }
 
     // Perform the document update
-    const insertOrUpdateResult: boolean = await insertOrUpdateDocument(
-      client,
-      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
-      false,
-    );
+    const updateDocumentResult: boolean = await updateDocument(client, updateRequest);
+
     // Delete existing values from the aliases table
     await deleteAliasesForDocumentByMeadowlarkId(client, existingMeadowlarkId);
 
@@ -141,7 +128,7 @@ export async function updateDocumentByDocumentUuid(updateRequest: UpdateRequest,
 
     await commitTransaction(client);
 
-    updateResult = insertOrUpdateResult
+    updateResult = updateDocumentResult
       ? {
           response: 'UPDATE_SUCCESS',
         }
