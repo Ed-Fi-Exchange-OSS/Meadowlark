@@ -43,7 +43,7 @@ services:
     links:
       - kafka
     environment:
-      - BOOTSTRAP_SERVERS=kafka1:9092
+      - BOOTSTRAP_SERVERS=kafka:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=debezium_config
       - OFFSET_STORAGE_TOPIC=debezium_offset
