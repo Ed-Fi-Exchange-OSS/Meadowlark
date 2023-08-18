@@ -24,7 +24,11 @@ param(
   
   [Parameter(Mandatory=$false)]
   [Switch]
-  $PostgreSQL
+  $PostgreSQL,
+  
+  [Parameter(Mandatory=$false)]
+  [Switch]
+  $Kafka
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,6 +38,7 @@ if ($ElasticSearch) { $start += "meadowlark-elasticsearch-backend" }
 if ($OpenSearch) { $start += "meadowlark-opensearch-backend"}
 if ($MongoDB) { $start += "meadowlark-mongodb-backend" }
 if ($PostgreSQL) { $start += "meadowlark-postgresql-backend" }
+if ($Kafka) { $start += "meadowlark-kafka-stream" }
 
 $start | ForEach-Object {
   &docker compose `

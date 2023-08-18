@@ -43,7 +43,7 @@ async function closeConnection(): Promise<void> {
  * eachBatch handler will feed your function batches and provide some utility functions to give your code more
  * flexibility: resolveOffset, heartbeat, commitOffsetsIfNecessary, uncommittedOffsets, isRunning, isStale,
  * and pause. All resolved offsets will be automatically committed after the function is executed.
- * You will have to understand how session timeouts and heartbeats are connected1.
+ * You will have to understand how session timeouts and heartbeats are connected
  * @param groupId
  * @returns
  */
