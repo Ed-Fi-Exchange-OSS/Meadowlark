@@ -1,27 +1,26 @@
+/* eslint-disable no-console */
 import * as Kafka from 'node-rdkafka';
 
 const moduleName = 'rdkafka-worker.rdkafkaWorker';
-const topic = 'edfi.meadowlark.documents';
+const topicToRead = 'edfi.meadowlark.documents';
 let consumerClient: Kafka.KafkaConsumer | null = null;
 
 /**
- * Create and return an KAFKA connection object
+ * Create and return an rdkafka consumer object for the groupId
  */
-export async function getNewClient(groupId: string): Promise<Kafka.KafkaConsumer> {
-  const consumer = new Kafka.KafkaConsumer(
-    {
-      'group.id': groupId,
-      'metadata.broker.list': 'kafka1:9092',
-    },
-    {},
-  );
+async function getNewClient(groupId: string): Promise<Kafka.KafkaConsumer> {
+  const kafkaConfig: Kafka.ConsumerGlobalConfig = {
+    'group.id': groupId,
+    'metadata.broker.list': 'kafka1:9092',
+  };
+  const consumer = new Kafka.KafkaConsumer(kafkaConfig, {});
   return consumer;
 }
 
 /**
- * Return the shared client
+ * Return the Kafka consumer client connection.
  */
-export async function getClient(groupId: string): Promise<Kafka.KafkaConsumer> {
+async function getClient(groupId: string): Promise<Kafka.KafkaConsumer> {
   if (consumerClient == null) {
     consumerClient = await getNewClient(groupId);
     await consumerClient.connect();
@@ -29,32 +28,99 @@ export async function getClient(groupId: string): Promise<Kafka.KafkaConsumer> {
   return consumerClient;
 }
 
-export async function subscribeTopic(groupId: string): Promise<void> {
+/**
+ * Close kafka connection
+ */
+async function closeConnection(): Promise<void> {
+  if (consumerClient != null) {
+    await consumerClient.disconnect();
+  }
+  consumerClient = null;
+  console.log(`Module ${moduleName} Kafka connection: closed`, null);
+}
+
+/**
+ * subscribeTopic using Flowing Mode: This mode flows all of the messages it can read by maintaining an infinite loop
+ * in the event loop. It only stops when it detects the consumer has issued the unsubscribe or disconnect method.
+ * @param groupId
+ */
+async function readMessagesFromBatch(groupId: string): Promise<void> {
+  console.log('@ Each Message (Flowing mode) @');
   if (consumerClient == null) {
     consumerClient = await getClient(groupId);
   }
-  console.log(`${moduleName}.subscribeTopic Add subscription to Topic`, '');
+  console.log(`${moduleName}.readMessagesFromBatch Add subscription to Topic`, '');
   consumerClient.on('ready', () => {
-    consumerClient?.subscribe([topic]);
+    consumerClient?.subscribe([topicToRead]);
     consumerClient?.consume();
   });
   consumerClient.on('event.error', (err) => {
     console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n');
-    console.log(`${moduleName} Error from consumer ${err}`);
+    console.log(`${moduleName}.readMessagesFromBatch Error from consumer ${err}`);
     console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n');
   });
-}
-
-export async function readFromTopic(groupId: string): Promise<void> {
   consumerClient?.on('data', (data) => {
     console.log('*_____________________________________________________________________________*\n');
-    console.log(`${moduleName} - GroupId (${groupId}).readFromTopic message: ${data?.value?.toString()}`);
+    console.log(`${moduleName} - GroupId (${groupId}).readMessagesFromBatch message: ${data?.value?.toString()}`);
     console.log('********************************************************************************\n');
   });
 }
 
+/**
+ * Non-flowing mode. This mode reads a single message from Kafka at a time manually.
+ * This mode is useful when the application needs to control the rate at which it processes messages,
+ * for example, when processing each message is a memory-consuming task.
+ * @param groupId
+ */
+async function readEachMessageFromTopic(groupId: string): Promise<void> {
+  console.log('@ Batch (No-Flowing mode) @');
+  if (consumerClient == null) {
+    consumerClient = await getClient(groupId);
+  }
+  console.log(`${moduleName}.readEachMessageFromTopic Add subscription to Topic`, '');
+  consumerClient.on('ready', () => {
+    consumerClient?.subscribe([topicToRead]);
+    // Read one message every 1000 milliseconds
+    setInterval(() => {
+      consumerClient?.consume(1);
+    }, 1000);
+  });
+  consumerClient.on('event.error', (err) => {
+    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n');
+    console.log(`${moduleName}.readEachMessageFromTopic Error from consumer ${err}`);
+    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n');
+  });
+  consumerClient?.on('data', (data) => {
+    console.log('*_____________________________________________________________________________*\n');
+    console.log(`${moduleName} - GroupId (${groupId}).readEachMessageFromTopic message: ${data?.value?.toString()}`);
+    console.log('********************************************************************************\n');
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+process.on('SIGINT', async () => {
+  console.log('Terminating...');
+  process.exit(0);
+});
+
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+process.on('exit', async (): Promise<void> => {
+  console.log('Closing...');
+  await closeConnection();
+});
+
+async function initialize(groupId) {
+  consumerClient = await getClient(groupId);
+}
+
 (async () => {
-  console.log(`${moduleName}.Main start`, '');
-  await subscribeTopic('rdkafkaWorker-Group-01');
-  await readFromTopic('rdkafkaWorker-Group-01');
+  console.log(`º Start rdkafka client º`);
+  const groupId = process.argv[2] ?? 'rdkafka-Group';
+  const batch = process.argv[3] ?? '';
+  await initialize(groupId);
+  if (batch.toLowerCase() === 'batch') {
+    await readMessagesFromBatch(groupId);
+  } else {
+    await readEachMessageFromTopic(groupId);
+  }
 })();
