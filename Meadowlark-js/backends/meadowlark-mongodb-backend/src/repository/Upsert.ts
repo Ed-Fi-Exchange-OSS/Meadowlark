@@ -23,7 +23,7 @@ import {
   asUpsert,
   limitFive,
   getDocumentCollection,
-  onlyReturnDocumentUuidAndCreatedAt,
+  onlyReturnDocumentUuidAndTimestamps,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 
@@ -38,8 +38,14 @@ export async function upsertDocumentTransaction(
   // Check whether this document exists in the db
   const existingDocument: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
     { _id: meadowlarkId },
-    onlyReturnDocumentUuidAndCreatedAt(session),
+    onlyReturnDocumentUuidAndTimestamps(session),
   );
+
+  // If there is an existing document, ensure this request is not stale
+  if (existingDocument != null && existingDocument.lastModifiedAt >= documentInfo.requestTimestamp) {
+    // The upsert request is stale
+    return { response: 'UPSERT_FAILURE_WRITE_CONFLICT' };
+  }
 
   // the documentUuid of the existing document if this is an update, or a new one if this is an insert
   const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();

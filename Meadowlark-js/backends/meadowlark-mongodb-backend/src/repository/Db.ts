@@ -117,9 +117,9 @@ export const onlyReturnTimestamps = (session: ClientSession): FindOptions => ({
   session,
 });
 
-// MongoDB FindOption to return the indexed documentUuid and the createdAt fields
-export const onlyReturnDocumentUuidAndCreatedAt = (session: ClientSession): FindOptions => ({
-  projection: { documentUuid: 1, createdAt: 1 },
+// MongoDB FindOption to return the indexed documentUuid and the createdAt and lastModifiedAt fields
+export const onlyReturnDocumentUuidAndTimestamps = (session: ClientSession): FindOptions => ({
+  projection: { documentUuid: 1, createdAt: 1, lastModifiedAt: 1 },
   session,
 });
 

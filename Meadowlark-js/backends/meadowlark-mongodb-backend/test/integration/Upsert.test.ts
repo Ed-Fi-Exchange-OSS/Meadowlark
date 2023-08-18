@@ -944,6 +944,7 @@ describe('given an update of a document that references a non-existent document 
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert4' },
+    requestTimestamp,
   };
 
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -982,7 +983,7 @@ describe('given an update of a document that references a non-existent document 
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
-        documentInfo: documentWithReferencesInfo,
+        documentInfo: { ...documentWithReferencesInfo, requestTimestamp: requestTimestamp + 1 },
         validateDocumentReferencesExist: false,
       },
       client,
@@ -1021,6 +1022,7 @@ describe('given an update of a document that references an existing document wit
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert5' },
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -1041,6 +1043,7 @@ describe('given an update of a document that references an existing document wit
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert6' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
@@ -1082,7 +1085,7 @@ describe('given an update of a document that references an existing document wit
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
-        documentInfo: documentWithReferencesInfo,
+        documentInfo: { ...documentWithReferencesInfo, requestTimestamp: requestTimestamp + 2 },
         validateDocumentReferencesExist: true,
       },
       client,
@@ -1121,6 +1124,7 @@ describe('given an update of a document with one existing and one non-existent r
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert7' },
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -1148,6 +1152,7 @@ describe('given an update of a document with one existing and one non-existent r
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert8' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
@@ -1189,7 +1194,7 @@ describe('given an update of a document with one existing and one non-existent r
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferencesResourceInfo,
-        documentInfo: documentWithReferencesInfo,
+        documentInfo: { ...documentWithReferencesInfo, requestTimestamp: requestTimestamp + 2 },
         validateDocumentReferencesExist: true,
       },
       client,
@@ -1248,6 +1253,7 @@ describe('given an update of a subclass document referenced by an existing docum
     ...newDocumentInfo(),
     documentIdentity: { schoolId: '123' },
     superclassInfo,
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -1268,6 +1274,7 @@ describe('given an update of a subclass document referenced by an existing docum
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { week: 'update6' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
@@ -1309,7 +1316,7 @@ describe('given an update of a subclass document referenced by an existing docum
         ...newUpsertRequest(),
         meadowlarkId: documentWithReferencesId,
         resourceInfo: documentWithReferenceResourceInfo,
-        documentInfo: documentWithReferenceDocumentInfo,
+        documentInfo: { ...documentWithReferenceDocumentInfo, requestTimestamp: requestTimestamp + 2 },
         validateDocumentReferencesExist: true,
       },
       client,
@@ -1333,5 +1340,77 @@ describe('given an update of a subclass document referenced by an existing docum
         "BS3Ub80H5FHOD2j0qzdjhJXZsGSfcZtPWaiepA",
       ]
     `);
+  });
+});
+
+describe('given the upsert of an existing document with a stale request timestamp', () => {
+  let client;
+  let upsertResult1: UpsertResult;
+  let upsertResult2: UpsertResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfoBase: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'key' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+
+    client = (await getNewClient()) as MongoClient;
+    const upsertRequest1: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
+      edfiDoc: { natural: 'key' },
+    };
+
+    const upsertRequest2: UpsertRequest = {
+      ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp - 1 },
+    };
+
+    upsertResult1 = await upsertDocument(upsertRequest1, client);
+    upsertResult2 = await upsertDocument(upsertRequest2, client);
+  });
+
+  afterAll(async () => {
+    await getDocumentCollection(client).deleteMany({});
+    await client.close();
+  });
+
+  it('should return insert success on 1st upsert', async () => {
+    expect(upsertResult1.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should return update failure on 2nd upsert', async () => {
+    expect(upsertResult2.response).toBe('UPSERT_FAILURE_WRITE_CONFLICT');
+  });
+
+  it('should exist in the db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result._id).toBe(meadowlarkId);
+
+    if (upsertResult1.response !== 'INSERT_SUCCESS') throw new Error();
+    expect(result.documentUuid).toBe(upsertResult1.newDocumentUuid);
+  });
+
+  it('should have only one document in db', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const count: number = await collection.countDocuments();
+    expect(count).toBe(1);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: meadowlarkId });
+    expect(result.createdAt).toBe(requestTimestamp);
+    expect(result.lastModifiedAt).toBe(requestTimestamp);
   });
 });
