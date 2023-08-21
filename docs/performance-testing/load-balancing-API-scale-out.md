@@ -95,28 +95,28 @@ a little further, using this tool called [cadvisor](https://github.com/google/ca
 [mongodb compass](https://www.mongodb.com/products/compass).
 We suspect that mongodb is causing the bottle neck.
 
-| With load balancing and 4 Fastify threads    | Avg          |
+| With load balancing and 4 Fastify threads    |              |
 | -------------------------------------------- | ------------ |
 | Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/MeadowlarkAPI.jpg) |
 | mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Mongo.jpg) |
 | mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/mongo1_compass.jpg) |
 | Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Overall.jpg) |
 
-| With load balancing and 1 Fastify threads    | Avg          |
+| With load balancing and 1 Fastify threads    |              |
 | -------------------------------------------- | ------------ |
 | Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/MeadowlarkAPI.jpg) |
 | mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Mongo.jpg) |
 | mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/mongo1_compass.jpg) |
 | Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Overall.jpg) |
 
-| Without load balancing and 4 Fastify threads | Avg          |
+| Without load balancing and 4 Fastify threads |              |
 | -------------------------------------------- | ------------ |
 | Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.jpg) |
 | mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.jpg) |
 | mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.jpg) |
 | Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.jpg) |
 
-| Without load balancing and 1 Fastify threads | Avg          |
+| Without load balancing and 1 Fastify threads |            |
 | -------------------------------------------- | ------------ |
 | Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.jpg) |
 | mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.jpg) |
