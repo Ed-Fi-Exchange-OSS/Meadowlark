@@ -19,15 +19,18 @@ export async function getDocumentByDocumentUuid(
     Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
     const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
 
-    if (meadowlarkDocument === NoMeadowlarkDocument) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+    if (meadowlarkDocument === NoMeadowlarkDocument) {
+      return { response: 'GET_FAILURE_NOT_EXISTS', edfiDoc: {}, documentUuid, lastModifiedDate: 0 };
+    }
 
-    const response: GetResult = {
+    return {
       response: 'GET_SUCCESS',
-      document: { id: meadowlarkDocument.document_uuid, ...meadowlarkDocument.edfi_doc },
+      edfiDoc: meadowlarkDocument.edfi_doc,
+      documentUuid,
+      lastModifiedDate: meadowlarkDocument.last_modified_at,
     };
-    return response;
   } catch (e) {
     Logger.error(`${moduleName}.getDocumentByDocumentUuid Error retrieving DocumentUuid ${documentUuid}`, traceId, e);
-    return { response: 'UNKNOWN_FAILURE', document: [] };
+    return { response: 'UNKNOWN_FAILURE', edfiDoc: {}, documentUuid, lastModifiedDate: 0 };
   }
 }

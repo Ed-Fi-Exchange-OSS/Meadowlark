@@ -4,11 +4,15 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 import { ReferringDocumentInfo, DocumentUuid, MeadowlarkId, DeleteResult, UpdateRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
-import { Client, PoolClient, QueryResult } from 'pg';
+import { Client, PoolClient, QueryResult, types } from 'pg';
 import format from 'pg-format';
 import { MeadowlarkDocument, NoMeadowlarkDocument, MeadowlarkDocumentIdAndAliasId } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.SqlHelper';
+
+// node-postgres returns bigint as string. Add converter to return bigints as number.
+types.setTypeParser(types.builtins.INT8, (bigintAsString) => parseInt(bigintAsString, 10));
+
 /**
  * Executes a database begin transaction
  * @param client database connector client.
@@ -148,7 +152,7 @@ export async function findDocumentByMeadowlarkId(
 ): Promise<MeadowlarkDocument> {
   const querySelect = format(
     `
-    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, last_modified_at
        FROM meadowlark.documents
        WHERE meadowlark_id = %L;`,
     [meadowlarkId],
@@ -169,7 +173,7 @@ export async function findDocumentByDocumentUuid(
 ): Promise<MeadowlarkDocument> {
   const querySelect = format(
     `
-    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, last_modified_at
        FROM meadowlark.documents
        WHERE document_uuid = %L;`,
     [documentUuid],
@@ -362,7 +366,7 @@ export async function updateDocument(
     validateDocumentReferencesExist,
     security.clientId,
     edfiDoc,
-    // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly
+    // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
     documentUuid,
   );
 
@@ -390,7 +394,7 @@ export async function insertDocument(
       INSERT INTO meadowlark.documents
         (meadowlark_id, document_uuid, document_identity, project_name, resource_name, resource_version, is_descriptor,
         validated, created_by, edfi_doc, created_at, last_modified_at)
-        VALUES (%L)
+        VALUES (%L, ${documentInfo.requestTimestamp}, ${documentInfo.requestTimestamp})
         RETURNING document_uuid;`,
     [
       meadowlarkId,
@@ -403,8 +407,8 @@ export async function insertDocument(
       validateDocumentReferencesExist,
       security.clientId,
       edfiDoc,
-      documentInfo.requestTimestamp,
-      documentInfo.requestTimestamp,
+      // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
+      // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
     ],
   );
 

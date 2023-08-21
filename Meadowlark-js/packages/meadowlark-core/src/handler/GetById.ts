@@ -34,7 +34,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   const result: GetResult = await getDocumentStore().getDocumentById(request);
   await afterGetDocumentById(request, result);
 
-  const { response, document } = result;
+  const { response, lastModifiedDate } = result;
 
   if (response === 'UNKNOWN_FAILURE') {
     writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 500);
@@ -49,9 +49,12 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
     };
   }
 
+  // eslint-disable-next-line no-underscore-dangle
+  const _lastModifiedDate = new Date(lastModifiedDate).toISOString();
+
   writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 200);
   return {
-    body: document,
+    body: { id: result.documentUuid, ...result.edfiDoc, _lastModifiedDate },
     statusCode: 200,
     headers: frontendRequest.middleware.headerMetadata,
   };

@@ -93,6 +93,7 @@ describe('given the get of an existing document', () => {
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
+    requestTimestamp: 1000,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -123,6 +124,7 @@ describe('given the get of an existing document', () => {
 
   it('should return the document', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document.inserted).toBe('yes');
+    expect(getResult.edfiDoc.inserted).toBe('yes');
+    expect(getResult.lastModifiedDate).toBe(1000);
   });
 });
