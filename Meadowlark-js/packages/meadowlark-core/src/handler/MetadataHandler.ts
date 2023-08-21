@@ -140,7 +140,7 @@ async function getSwaggerSpecification(url: string, frontendRequest: FrontendReq
     const host =
       frontendRequest.headers['x-forwarded-host'] && frontendRequest.headers['x-forwarded-port']
         ? `${frontendRequest.headers['x-forwarded-host']}:${frontendRequest.headers['x-forwarded-port']}`
-        : frontendRequest.headers.host ?? '';
+        : frontendRequest.headers?.Host || '';
     return useTemplate(data, host, frontendRequest.stage);
   });
 }
