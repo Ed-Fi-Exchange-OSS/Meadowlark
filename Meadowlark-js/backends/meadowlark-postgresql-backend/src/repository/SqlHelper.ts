@@ -152,10 +152,10 @@ export async function findDocumentByMeadowlarkId(
 ): Promise<MeadowlarkDocument> {
   const querySelect = format(
     `
-    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, last_modified_at
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, created_at, last_modified_at
        FROM meadowlark.documents
        WHERE meadowlark_id = %L;`,
-    [meadowlarkId],
+    meadowlarkId,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
   return hasResults(queryResult) ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
@@ -173,10 +173,10 @@ export async function findDocumentByDocumentUuid(
 ): Promise<MeadowlarkDocument> {
   const querySelect = format(
     `
-    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, last_modified_at
+    SELECT document_uuid, meadowlark_id, document_identity, edfi_doc, created_at, last_modified_at
        FROM meadowlark.documents
        WHERE document_uuid = %L;`,
-    [documentUuid],
+    documentUuid,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);
   return hasResults(queryResult) ? (queryResult.rows[0] as MeadowlarkDocument) : NoMeadowlarkDocument;
@@ -341,36 +341,36 @@ export async function updateDocument(
     security,
   }: UpdateRequest,
 ): Promise<boolean> {
-  const documentSql = format(
+  const queryResult: QueryResult<any> = await client.query(
     `
       UPDATE meadowlark.documents
         SET
-        meadowlark_id = %L,
-        document_identity = %L,
-        project_name = %L,
-        resource_name = %L,
-        resource_version = %L,
-        is_descriptor = %L,
-        validated = %L,
-        created_by = %L,
-        edfi_doc = %L,
-        last_modified_at = ${documentInfo.requestTimestamp}
-        WHERE meadowlark.documents.document_uuid = %L;`,
-
-    meadowlarkId,
-    JSON.stringify(documentInfo.documentIdentity),
-    resourceInfo.projectName,
-    resourceInfo.resourceName,
-    resourceInfo.resourceVersion,
-    resourceInfo.isDescriptor,
-    validateDocumentReferencesExist,
-    security.clientId,
-    edfiDoc,
-    // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
-    documentUuid,
+        meadowlark_id = $1,
+        document_identity = $2,
+        project_name = $3,
+        resource_name = $4,
+        resource_version = $5,
+        is_descriptor = $6,
+        validated = $7,
+        created_by = $8,
+        edfi_doc = $9,
+        last_modified_at = $10
+        WHERE meadowlark.documents.document_uuid = $11;`,
+    [
+      meadowlarkId,
+      JSON.stringify(documentInfo.documentIdentity),
+      resourceInfo.projectName,
+      resourceInfo.resourceName,
+      resourceInfo.resourceVersion,
+      resourceInfo.isDescriptor,
+      validateDocumentReferencesExist,
+      security.clientId,
+      edfiDoc,
+      documentInfo.requestTimestamp,
+      documentUuid,
+    ],
   );
 
-  const queryResult: QueryResult<any> = await client.query(documentSql);
   return hasResults(queryResult);
 }
 
@@ -389,12 +389,12 @@ export async function insertDocument(
     security,
   }: UpdateRequest,
 ): Promise<boolean> {
-  const documentSql = format(
+  const queryResult: QueryResult<any> = await client.query(
     `
       INSERT INTO meadowlark.documents
         (meadowlark_id, document_uuid, document_identity, project_name, resource_name, resource_version, is_descriptor,
         validated, created_by, edfi_doc, created_at, last_modified_at)
-        VALUES (%L, ${documentInfo.requestTimestamp}, ${documentInfo.requestTimestamp})
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING document_uuid;`,
     [
       meadowlarkId,
@@ -407,12 +407,11 @@ export async function insertDocument(
       validateDocumentReferencesExist,
       security.clientId,
       edfiDoc,
-      // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
-      // documentInfo.requestTimestamp should be here instead of template, but pg_format doesn't handle numbers correctly. Numeric types are not vulnerable to SQL injection
+      documentInfo.requestTimestamp,
+      documentInfo.requestTimestamp,
     ],
   );
 
-  const queryResult: QueryResult<any> = await client.query(documentSql);
   return hasResults(queryResult);
 }
 

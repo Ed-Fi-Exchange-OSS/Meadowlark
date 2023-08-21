@@ -451,6 +451,7 @@ describe('given an update of a document with one existing and one non-existent r
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update7' },
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -478,6 +479,7 @@ describe('given an update of a document with one existing and one non-existent r
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update8' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
@@ -521,7 +523,7 @@ describe('given an update of a document with one existing and one non-existent r
         documentUuid: upsertResult.newDocumentUuid,
         meadowlarkId: documentWithReferencesMeadowlarkId,
         resourceInfo: documentWithReferencesResourceInfo,
-        documentInfo: documentWithReferencesInfo,
+        documentInfo: { ...documentWithReferencesInfo, requestTimestamp: requestTimestamp + 2 },
         validateDocumentReferencesExist: true,
       },
       client,

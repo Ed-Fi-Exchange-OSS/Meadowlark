@@ -83,7 +83,9 @@ describe('given getDocumentById and no backend plugin has been configured', () =
     // Assert
     expect(result).toMatchInlineSnapshot(`
       {
-        "document": {},
+        "documentUuid": "",
+        "edfiDoc": {},
+        "lastModifiedDate": 0,
         "response": "UNKNOWN_FAILURE",
       }
     `);

@@ -28,7 +28,7 @@ import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
-jest.setTimeout(140_000);
+const requestTimestamp: number = 1683326572053;
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -87,7 +87,7 @@ describe('given the upsert of a new document', () => {
   });
 });
 
-describe('given the upsert of an existing document twice', () => {
+describe('given the upsert of an existing document three times', () => {
   let client: PoolClient;
   let upsertResult1: UpsertResult;
   let upsertResult2: UpsertResult;
@@ -97,25 +97,35 @@ describe('given the upsert of an existing document twice', () => {
     ...newResourceInfo(),
     resourceName: 'School',
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'upsert2' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     client = await getSharedClient();
-    const upsertRequest: UpsertRequest = {
+    const upsertRequest1: UpsertRequest = {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
       edfiDoc: { natural: 'key' },
     };
 
-    upsertResult1 = await upsertDocument(upsertRequest, client);
-    upsertResult2 = await upsertDocument(upsertRequest, client);
-    upsertResult3 = await upsertDocument(upsertRequest, client);
+    const upsertRequest2: UpsertRequest = {
+      ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
+    };
+
+    const upsertRequest3: UpsertRequest = {
+      ...upsertRequest1,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 2 },
+    };
+
+    upsertResult1 = await upsertDocument(upsertRequest1, client);
+    upsertResult2 = await upsertDocument(upsertRequest2, client);
+    upsertResult3 = await upsertDocument(upsertRequest3, client);
   });
 
   afterAll(async () => {
@@ -134,6 +144,17 @@ describe('given the upsert of an existing document twice', () => {
 
   it('should return update success on 3rd upsert', async () => {
     expect(upsertResult3.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should have the document in the db', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    expect(result.edfi_doc.call).toBe('key');
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp + 2);
   });
 });
 

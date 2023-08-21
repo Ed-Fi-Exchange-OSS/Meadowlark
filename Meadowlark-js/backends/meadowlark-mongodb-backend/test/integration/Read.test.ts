@@ -136,16 +136,12 @@ describe('given the get of an existing document', () => {
 
   it('should return the document', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document.inserted).toBe('yes');
+    expect(getResult.edfiDoc.inserted).toBe('yes');
   });
 
-  it('should return the _lastmodifiedDate', async () => {
+  it('should return the lastmodifiedDate', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document).toEqual(
-      expect.objectContaining({
-        _lastModifiedDate: '2023-05-05T22:42:52.053Z',
-      }),
-    );
+    expect(getResult.lastModifiedDate).toBe(1683326572053);
   });
 });
 
@@ -206,12 +202,13 @@ describe('given the get of an updated document', () => {
     await client.close();
   });
 
-  it('should return the updated _lastmodifiedDate', async () => {
+  it('should return the updated document', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document).toEqual(
-      expect.objectContaining({
-        _lastModifiedDate: '2023-05-08T12:18:57.342Z',
-      }),
-    );
+    expect(getResult.edfiDoc.natural).toBe('keyUpdated');
+  });
+
+  it('should return the updated lastmodifiedDate', async () => {
+    expect(getResult.response).toBe('GET_SUCCESS');
+    expect(getResult.lastModifiedDate).toBe(1683548337342);
   });
 });

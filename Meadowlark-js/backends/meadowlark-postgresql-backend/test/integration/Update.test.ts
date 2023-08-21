@@ -37,6 +37,8 @@ import {
 } from '../../src/repository/SqlHelper';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
+const requestTimestamp: number = 1683326572053;
+
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
 
@@ -124,11 +126,11 @@ describe('given the update of an existing document', () => {
     ...newResourceInfo(),
     resourceName: 'School',
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update2' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     client = await getSharedClient();
@@ -136,7 +138,7 @@ describe('given the update of an existing document', () => {
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
       edfiDoc: { natural: 'key' },
     };
     const updateRequest: UpdateRequest = {
@@ -144,7 +146,7 @@ describe('given the update of an existing document', () => {
       documentUuid,
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
       edfiDoc: { natural: 'key' },
     };
 
@@ -175,10 +177,84 @@ describe('given the update of an existing document', () => {
 
   it('should have updated the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
-
     expect(result.document_identity.natural).toBe('update2');
-
     expect(result.edfi_doc.changeToDoc).toBe(true);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp + 1);
+  });
+});
+
+describe('given the attempted update of an existing document with a stale request', () => {
+  let client: PoolClient;
+  let updateResult: UpdateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfoBase: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
+
+  beforeAll(async () => {
+    client = await getSharedClient();
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
+      edfiDoc: { natural: 'key' },
+    };
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      documentUuid,
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp - 1 },
+      edfiDoc: { natural: 'key' },
+    };
+
+    // insert the initial version
+    const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      resultDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      resultDocumentUuid = upsertResult.existingDocumentUuid;
+    } else {
+      resultDocumentUuid = '' as DocumentUuid;
+    }
+    updateResult = await updateDocumentByDocumentUuid(
+      { ...updateRequest, documentUuid: resultDocumentUuid, edfiDoc: { changeToDoc: true } },
+      client,
+    );
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return update failure due to conflict', async () => {
+    expect(updateResult.response).toBe('UPDATE_FAILURE_WRITE_CONFLICT');
+  });
+
+  it('should not have updated the document in the db', async () => {
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
+    expect(result.document_identity.natural).toBe('update2');
+    expect(result.edfi_doc.changeToDoc).toBeUndefined();
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp);
   });
 });
 
@@ -193,6 +269,7 @@ describe('given an update of a document that references a non-existent document 
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update4' },
+    requestTimestamp,
   };
 
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -223,8 +300,10 @@ describe('given an update of a document that references a non-existent document 
     );
     const upsertDocumentUuid: DocumentUuid =
       upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
+
     // Update the document with an invalid reference
     documentWithReferencesInfo.documentReferences = [invalidReference];
+    documentWithReferencesInfo.requestTimestamp = requestTimestamp + 1;
     updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
@@ -251,16 +330,19 @@ describe('given an update of a document that references a non-existent document 
   it('should have updated the document with an invalid reference in the db', async () => {
     const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
-
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
-
     expect(docResult.document_identity.natural).toBe('update4');
-
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
       ]
     `);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp + 1);
   });
 });
 
@@ -295,6 +377,7 @@ describe('given an update of a document that references an existing document wit
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update6' },
+    requestTimestamp,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
@@ -329,7 +412,10 @@ describe('given an update of a document that references an existing document wit
     const upsertDocumentUuid: DocumentUuid =
       upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // The updated document with a valid reference
+
     documentWithReferencesInfo.documentReferences = [validReference];
+    documentWithReferencesInfo.requestTimestamp = requestTimestamp + 1;
+
     updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
@@ -365,6 +451,12 @@ describe('given an update of a document that references an existing document wit
       ]
     `);
   });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp + 1);
+  });
 });
 
 describe('given an update of a document with one existing and one non-existent reference with validation on', () => {
@@ -378,6 +470,7 @@ describe('given an update of a document with one existing and one non-existent r
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update7' },
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -405,6 +498,7 @@ describe('given an update of a document with one existing and one non-existent r
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update8' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferencesResourceInfo,
@@ -446,7 +540,7 @@ describe('given an update of a document with one existing and one non-existent r
         meadowlarkId: documentWithReferencesId,
         documentUuid: upsertDocumentUuid,
         resourceInfo: documentWithReferencesResourceInfo,
-        documentInfo: documentWithReferencesInfo,
+        documentInfo: { ...documentWithReferencesInfo, requestTimestamp: requestTimestamp + 2 },
         validateDocumentReferencesExist: true,
       },
       client,
@@ -507,6 +601,7 @@ describe('given an update of a subclass document referenced by an existing docum
     ...newDocumentInfo(),
     documentIdentity: { schoolId: '123' },
     superclassInfo,
+    requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -527,6 +622,7 @@ describe('given an update of a subclass document referenced by an existing docum
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { week: 'update6' },
+    requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
     documentWithReferenceResourceInfo,
@@ -560,6 +656,7 @@ describe('given an update of a subclass document referenced by an existing docum
       upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
     // The updated document with reference as superclass
     documentWithReferenceDocumentInfo.documentReferences = [referenceAsSuperclass];
+    documentWithReferenceDocumentInfo.requestTimestamp = requestTimestamp + 2;
     updateResult = await updateDocumentByDocumentUuid(
       {
         ...newUpdateRequest(),
@@ -592,6 +689,12 @@ describe('given an update of a subclass document referenced by an existing docum
       ]
     `);
   });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
+    expect(result.created_at).toBe(requestTimestamp + 1);
+    expect(result.last_modified_at).toBe(requestTimestamp + 2);
+  });
 });
 
 describe('given the update of an existing document changing meadowlarkId with allowIdentityUpdates false,', () => {
@@ -604,11 +707,11 @@ describe('given the update of an existing document changing meadowlarkId with al
     resourceName: 'School',
     allowIdentityUpdates: false,
   };
-  const documentInfo: DocumentInfo = {
+  const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update 2' },
   };
-  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
   beforeAll(async () => {
     client = (await getSharedClient()) as PoolClient;
@@ -616,12 +719,13 @@ describe('given the update of an existing document changing meadowlarkId with al
       ...newUpsertRequest(),
       meadowlarkId,
       resourceInfo,
-      documentInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
       edfiDoc: { natural: 'key' },
     };
     const documentInfoUpdated: DocumentInfo = {
       ...newDocumentInfo(),
       documentIdentity: { natural: 'updated identity' },
+      requestTimestamp: requestTimestamp + 1,
     };
     const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
@@ -686,12 +790,14 @@ describe('given the update of an existing document changing meadowlarkId with al
     ...newDocumentInfo(),
     documentIdentity: { natural: 'updated identity allow identity updates' },
     documentReferences: [validReference],
+    requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const documentInfoUpdated: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'update 2' },
     documentReferences: [validReference],
+    requestTimestamp: requestTimestamp + 1,
   };
   const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
 
@@ -756,9 +862,90 @@ describe('given the update of an existing document changing meadowlarkId with al
     expect(result.length).toEqual(0);
   });
 
-  it('should have created the document reference  related to the new meadowlarkId in the db', async () => {
+  it('should have created the document reference related to the new meadowlarkId in the db', async () => {
     const result: MeadowlarkId[] = await findAliasMeadowlarkIdsForDocumentByMeadowlarkId(client, meadowlarkIdUpdated);
 
     expect(result.length).toEqual(1);
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkIdUpdated);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp + 1);
+  });
+});
+
+describe('given the attempted update of an existing document with a stale request with allowIdentityUpdates true,', () => {
+  let client;
+  let upsertResult: UpsertResult;
+  let updateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School Identity update',
+    allowIdentityUpdates: true,
+  };
+  const documentInfoBase: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update2' },
+    requestTimestamp,
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
+
+  beforeAll(async () => {
+    client = (await getSharedClient()) as PoolClient;
+
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
+      edfiDoc: { natural: 'key' },
+      validateDocumentReferencesExist: true,
+    };
+
+    // insert the initial version
+    upsertResult = await upsertDocument(upsertRequest, client);
+    let upsertDocumentUuid: DocumentUuid = '' as DocumentUuid;
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      upsertDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      upsertResult.existingDocumentUuid;
+    } else {
+      throw new Error();
+    }
+    const updateRequest: UpdateRequest = {
+      ...newUpdateRequest(),
+      meadowlarkId,
+      documentUuid: upsertDocumentUuid,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp - 1 },
+      edfiDoc: { natural: 'key change' },
+      validateDocumentReferencesExist: true,
+    };
+    // change document identity
+    updateResult = await updateDocumentByDocumentUuid({ ...updateRequest, edfiDoc: { changeToDoc: true } }, client);
+  });
+
+  afterAll(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should return update failure due to conflict', async () => {
+    expect(updateResult.response).toBe('UPDATE_FAILURE_WRITE_CONFLICT');
+  });
+
+  it('should not have updated the document in the db', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    expect(result.document_identity.natural).toBe('update2');
+    expect(result.edfi_doc.natural).toBe('key');
+  });
+
+  it('should have correct createdAt and lastModifiedAt', async () => {
+    const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    expect(result.created_at).toBe(requestTimestamp);
+    expect(result.last_modified_at).toBe(requestTimestamp);
   });
 });
