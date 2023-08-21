@@ -97,31 +97,31 @@ We suspect that mongodb is causing the bottle neck.
 
 | With load balancing and 4 Fastify threads    | Avg          |
 | -------------------------------------------- | ------------ |
-| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/MeadowlarkAPI.PNG) |
-| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Mongo.PNG) |
-| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/mongo1_compass.PNG) |
-| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Overall.PNG) |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/MeadowlarkAPI.jpg) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Mongo.jpg) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/mongo1_compass.jpg) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Overall.jpg) |
 
 | With load balancing and 1 Fastify threads    | Avg          |
 | -------------------------------------------- | ------------ |
-| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/MeadowlarkAPI.PNG) |
-| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Mongo.PNG) |
-| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/mongo1_compass.PNG) |
-| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Overall.PNG) |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/MeadowlarkAPI.jpg) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Mongo.jpg) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/mongo1_compass.jpg) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Overall.jpg) |
 
 | Without load balancing and 4 Fastify threads | Avg          |
 | -------------------------------------------- | ------------ |
-| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.PNG) |
-| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.PNG) |
-| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.PNG) |
-| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.PNG) |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.jpg) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.jpg) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.jpg) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.jpg) |
 
 | Without load balancing and 1 Fastify threads | Avg          |
 | -------------------------------------------- | ------------ |
-| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.PNG) |
-| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.PNG) |
-| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.PNG) |
-| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.PNG) |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.jpg) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.jpg) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.jpg) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.jpg) |
 
 Given the results we got with the tools indicated above, everything indicates that
 MongoDB is the bottle neck we have, and the reason why we are not getting a
