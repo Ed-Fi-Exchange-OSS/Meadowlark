@@ -3,6 +3,7 @@
 ## Goal
 
 Evaluate impact on application performance when scaling it out.
+We expect to get a better performance with the load balancer than without it.
 
 ## Methodology
 
@@ -27,6 +28,11 @@ Evaluate impact on application performance when scaling it out.
 6. Start everything over, but this time without NGiNX load balancer.
 
 ## Environment
+
+The bulk load client runs on the host machine. It has 16 GB of RAM,
+Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz   2.59 GHz processor, 6 cores and
+12 logical processors, using WSL2. Docker has been configured to use 8GB of RAM
+and 10 cores.
 
 Baseline `.env` configuration file:
 
@@ -59,7 +65,7 @@ FASTIFY_NUM_THREADS=4
 
 
 MEADOWLARK_STAGE=local
-LOG_LEVEL=debug
+LOG_LEVEL=warn
 IS_LOCAL=true
 
 BEGIN_ALLOWED_SCHOOL_YEAR=2022
@@ -77,39 +83,46 @@ LOG_FILE_LOCATION=c:/temp/
 | --------------------------------- | ------------ |
 | with load balancing, 4 threads    | 00:02:47.912 |
 | with load balancing, 2 threads    | 00:02:29.008 |
+| with load balancing, 1 thread     | 00:02:40.449 |
 | without load balancing, 4 threads | 00:02:28.290 |
 | without load balancing, 2 threads | 00:02:32.296 |
+| without load balancing, 1 thread  | 00:03:04.043 |
 
-## Raw Results
+## Further analysis
 
-WITH LOADBALANCING:
+Given that we did not see any improvement with the nginx load balancer, we decided to investigate
+a little further, using this tool called [cadvisor](https://github.com/google/cadvisor) and
+[mongodb compass](https://www.mongodb.com/products/compass).
+We suspect that mongodb is causing the bottle neck.
 
-FASTIFY_NUM_THREADS=4
-	Total Time: 00:02:47.7064319
-	Total Time: 00:02:37.4898545
-	Total Time: 00:02:40.2312613
-	Total Time: 00:02:35.9549423
-	Total Time: 00:02:43.1832261
+| With load balancing and 4 Fastify threads    | Avg          |
+| -------------------------------------------- | ------------ |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/MeadowlarkAPI.PNG) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Mongo.PNG) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/mongo1_compass.PNG) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_4FastifyThreads/Overall.PNG) |
 
-FASTIFY_NUM_THREADS=2
-	Total Time: 00:02:30.5095058
-	Total Time: 00:02:18.5902512
-	Total Time: 00:02:26.0740558
-	Total Time: 00:02:25.2780308
-	Total Time: 00:02:44.5890730
+| With load balancing and 1 Fastify threads    | Avg          |
+| -------------------------------------------- | ------------ |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/MeadowlarkAPI.PNG) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Mongo.PNG) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/mongo1_compass.PNG) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithLB_1FastifyThreads/Overall.PNG) |
 
-WITHOUT LOADBALANCING:
+| Without load balancing and 4 Fastify threads | Avg          |
+| -------------------------------------------- | ------------ |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.PNG) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.PNG) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.PNG) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.PNG) |
 
-FASTIFY_NUM_THREADS=4
-	Total Time: 00:02:26.6134977
-	Total Time: 00:02:28.2016753
-	Total Time: 00:02:36.1254584
-	Total Time: 00:02:29.2328461
-	Total Time: 00:02:21.2826979
+| Without load balancing and 1 Fastify threads | Avg          |
+| -------------------------------------------- | ------------ |
+| Meadowlark API                               | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/MeadowlarkAPI.PNG) |
+| mongodb                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo.PNG) |
+| mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.PNG) |
+| Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.PNG) |
 
-FASTIFY_NUM_THREADS=2
-	Total Time: 00:02:29.0765482
-	Total Time: 00:02:45.2344755
-	Total Time: 00:02:26.9476904
-	Total Time: 00:02:30.5897358
-	Total Time: 00:02:39.6380510
+Given the results we got with the tools indicated above, everything indicates that
+MongoDB is the bottle neck we have, and the reason why we are not getting a
+better performance with the load balancer.
