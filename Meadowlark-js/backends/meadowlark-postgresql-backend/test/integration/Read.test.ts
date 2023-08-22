@@ -25,7 +25,7 @@ import { deleteAll } from './TestHelper';
 import { getDocumentByDocumentUuid } from '../../src/repository/Get';
 import { findDocumentByMeadowlarkId } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../../src/model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
 const newGetRequest = (): GetRequest => ({
   documentUuid: 'deb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid,
@@ -74,7 +74,7 @@ describe('given the get of a non-existent document', () => {
   it('should not exist in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
 
-    expect(isMeadowlarkDocumentEmpty(result)).toBe(true);
+    expect(result).toBe(NoMeadowlarkDocument);
   });
 
   it('should return get failure', async () => {
@@ -93,6 +93,7 @@ describe('given the get of an existing document', () => {
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
     documentIdentity: { natural: 'get2' },
+    requestTimestamp: 1000,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -123,6 +124,7 @@ describe('given the get of an existing document', () => {
 
   it('should return the document', async () => {
     expect(getResult.response).toBe('GET_SUCCESS');
-    expect(getResult.document.inserted).toBe('yes');
+    expect(getResult.edfiDoc.inserted).toBe('yes');
+    expect(getResult.lastModifiedDate).toBe(1000);
   });
 });

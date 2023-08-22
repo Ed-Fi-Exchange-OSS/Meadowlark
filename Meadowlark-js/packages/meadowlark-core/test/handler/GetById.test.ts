@@ -10,7 +10,7 @@ import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendR
 import { PathComponents } from '../../src/model/PathComponents';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
-import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { DocumentUuid } from '../../src/model/IdTypes';
 
 const validPathComponents: PathComponents = {
   resourceName: '1',
@@ -60,7 +60,9 @@ describe('given database lookup has unknown failure', () => {
       getDocumentById: async () =>
         Promise.resolve({
           response: 'UNKNOWN_FAILURE',
-          document: {},
+          edfiDoc: {},
+          documentUuid: '' as DocumentUuid,
+          lastModifiedDate: 0,
         } as GetResult),
     });
 
@@ -95,7 +97,9 @@ describe('given id does not exist', () => {
       getDocumentById: async () =>
         Promise.resolve({
           response: 'GET_FAILURE_NOT_EXISTS',
-          document: {},
+          edfiDoc: {},
+          documentUuid: '' as DocumentUuid,
+          lastModifiedDate: 0,
         } as GetResult),
     });
 
@@ -122,7 +126,7 @@ describe('given a valid request', () => {
   let response: FrontendResponse;
   let mockDocumentStore: any;
   const metaEdHeaders = { header: 'one' };
-  const document = { document: 'd' };
+  const edfiDoc = { document: 'd' };
 
   beforeAll(async () => {
     request.middleware.headerMetadata = metaEdHeaders;
@@ -131,7 +135,9 @@ describe('given a valid request', () => {
       getDocumentById: async () =>
         Promise.resolve({
           response: 'GET_SUCCESS',
-          document,
+          edfiDoc,
+          documentUuid: '' as DocumentUuid,
+          lastModifiedDate: 0,
         } as GetResult),
     });
 
@@ -154,7 +160,9 @@ describe('given a valid request', () => {
   it('returns expected document', () => {
     expect(response.body).toMatchInlineSnapshot(`
       {
+        "_lastModifiedDate": "1970-01-01T00:00:00.000Z",
         "document": "d",
+        "id": "",
       }
     `);
   });

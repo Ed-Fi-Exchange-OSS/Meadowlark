@@ -8,7 +8,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import { SecurityResult } from '../security/SecurityResult';
 import { findOwnershipForDocumentByDocumentUuid, findOwnershipForDocumentByMeadowlarkId } from './SqlHelper';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 function extractIdIfUpsert(frontendRequest: FrontendRequest): MeadowlarkId | undefined {
   if (frontendRequest.action !== 'upsert') return undefined;
@@ -66,7 +66,7 @@ export async function rejectByOwnershipSecurity(
       return 'UNKNOWN_FAILURE';
     }
 
-    if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) {
+    if (meadowlarkDocument === NoMeadowlarkDocument) {
       Logger.debug(`${functionName} document not found for ${idLogMessage}`, frontendRequest.traceId);
       return 'NOT_APPLICABLE';
     }

@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-export type { DocumentUuid, MeadowlarkId, TraceId } from './model/BrandedTypes';
+export type { DocumentUuid, MeadowlarkId, TraceId } from './model/IdTypes';
 export type { DocumentStorePlugin } from './plugin/backend/DocumentStorePlugin';
 export { NoDocumentStorePlugin } from './plugin/backend/NoDocumentStorePlugin';
 export type { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';

@@ -9,7 +9,7 @@ import { FrontendResponse, newFrontendResponse } from '../../src/handler/Fronten
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { newResourceInfo, NoResourceInfo } from '../../src/model/ResourceInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
-import { DocumentUuid } from '../../src/model/BrandedTypes';
+import { DocumentUuid } from '../../src/model/IdTypes';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();

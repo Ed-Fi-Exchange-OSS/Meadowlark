@@ -5,7 +5,7 @@
 
 import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
-import { DocumentUuid, MeadowlarkId } from './BrandedTypes';
+import { DocumentUuid, MeadowlarkId } from './IdTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**

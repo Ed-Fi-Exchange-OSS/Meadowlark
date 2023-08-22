@@ -34,7 +34,7 @@ describe('given non-superclass document info with no references', () => {
   beforeAll(async () => {
     const createdAt = new Date('2023-01-16').getTime();
     const lastModifiedAt = new Date('2023-02-23').getTime();
-    meadowlarkDocument = meadowlarkDocumentFrom(
+    meadowlarkDocument = meadowlarkDocumentFrom({
       resourceInfo,
       documentInfo,
       documentUuid,
@@ -44,7 +44,7 @@ describe('given non-superclass document info with no references', () => {
       createdBy,
       createdAt,
       lastModifiedAt,
-    );
+    });
   });
 
   it('should be a complete document, with no outbound refs and a single alias id', async () => {
@@ -111,7 +111,7 @@ describe('given non-superclass document info with references', () => {
   beforeAll(async () => {
     const createdAt = new Date('2023-02-11').getTime();
     const lastModifiedAt = new Date('2023-02-27').getTime();
-    meadowlarkDocument = meadowlarkDocumentFrom(
+    meadowlarkDocument = meadowlarkDocumentFrom({
       resourceInfo,
       documentInfo,
       documentUuid,
@@ -121,7 +121,7 @@ describe('given non-superclass document info with references', () => {
       createdBy,
       createdAt,
       lastModifiedAt,
-    );
+    });
   });
 
   it('should have outbound references', async () => {
@@ -155,7 +155,7 @@ describe('given superclass document info', () => {
   beforeAll(async () => {
     const createdAt = new Date('2023-01-21').getTime();
     const lastModifiedAt = new Date('2023-01-31').getTime();
-    meadowlarkDocument = meadowlarkDocumentFrom(
+    meadowlarkDocument = meadowlarkDocumentFrom({
       resourceInfo,
       documentInfo,
       documentUuid,
@@ -165,7 +165,7 @@ describe('given superclass document info', () => {
       createdBy,
       createdAt,
       lastModifiedAt,
-    );
+    });
   });
 
   it('should have two alias ids', async () => {

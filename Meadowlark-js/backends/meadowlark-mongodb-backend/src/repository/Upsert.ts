@@ -18,7 +18,13 @@ import {
 import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { writeLockReferencedDocuments, asUpsert, limitFive, getDocumentCollection, onlyReturnDocumentUuid } from './Db';
+import {
+  writeLockReferencedDocuments,
+  asUpsert,
+  limitFive,
+  getDocumentCollection,
+  onlyReturnDocumentUuidAndTimestamps,
+} from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 
 const moduleName: string = 'mongodb.repository.Upsert';
@@ -32,15 +38,18 @@ export async function upsertDocumentTransaction(
   // Check whether this document exists in the db
   const existingDocument: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
     { _id: meadowlarkId },
-    onlyReturnDocumentUuid(session),
+    onlyReturnDocumentUuidAndTimestamps(session),
   );
+
+  // If there is an existing document, ensure this request is not stale
+  if (existingDocument != null && existingDocument.lastModifiedAt >= documentInfo.requestTimestamp) {
+    // The upsert request is stale
+    return { response: 'UPSERT_FAILURE_WRITE_CONFLICT' };
+  }
 
   // the documentUuid of the existing document if this is an update, or a new one if this is an insert
   const documentUuid: DocumentUuid | null = existingDocument?.documentUuid ?? generateDocumentUuid();
-  // Unix timestamp
-  const createdAt: number = existingDocument?.createdAt ?? Date.now();
-  // last modified date as an Unix timestamp.
-  const lastModifiedAt: number = Date.now();
+
   // Check whether this is an insert or update
   const isInsert: boolean = existingDocument == null;
 
@@ -114,17 +123,17 @@ export async function upsertDocumentTransaction(
 
   const document: MeadowlarkDocument =
     documentFromUpdate ??
-    meadowlarkDocumentFrom(
+    meadowlarkDocumentFrom({
       resourceInfo,
       documentInfo,
       documentUuid,
       meadowlarkId,
       edfiDoc,
-      validateDocumentReferencesExist,
-      security.clientId,
-      createdAt,
-      lastModifiedAt,
-    );
+      validate: validateDocumentReferencesExist,
+      createdBy: security.clientId,
+      createdAt: existingDocument?.createdAt ?? documentInfo.requestTimestamp,
+      lastModifiedAt: documentInfo.requestTimestamp,
+    });
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
   // Perform the document upsert

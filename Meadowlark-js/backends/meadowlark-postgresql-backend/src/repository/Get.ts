@@ -7,7 +7,7 @@ import type { PoolClient } from 'pg';
 import { GetResult, GetRequest } from '@edfi/meadowlark-core';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { findDocumentByDocumentUuid } from './SqlHelper';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Get';
 
@@ -19,15 +19,18 @@ export async function getDocumentByDocumentUuid(
     Logger.debug(`${moduleName}.getDocumentByDocumentUuid ${documentUuid}`, traceId);
     const meadowlarkDocument: MeadowlarkDocument = await findDocumentByDocumentUuid(client, documentUuid);
 
-    if (isMeadowlarkDocumentEmpty(meadowlarkDocument)) return { response: 'GET_FAILURE_NOT_EXISTS', document: {} };
+    if (meadowlarkDocument === NoMeadowlarkDocument) {
+      return { response: 'GET_FAILURE_NOT_EXISTS', edfiDoc: {}, documentUuid, lastModifiedDate: 0 };
+    }
 
-    const response: GetResult = {
+    return {
       response: 'GET_SUCCESS',
-      document: { id: meadowlarkDocument.document_uuid, ...meadowlarkDocument.edfi_doc },
+      edfiDoc: meadowlarkDocument.edfi_doc,
+      documentUuid,
+      lastModifiedDate: meadowlarkDocument.last_modified_at,
     };
-    return response;
   } catch (e) {
     Logger.error(`${moduleName}.getDocumentByDocumentUuid Error retrieving DocumentUuid ${documentUuid}`, traceId, e);
-    return { response: 'UNKNOWN_FAILURE', document: [] };
+    return { response: 'UNKNOWN_FAILURE', edfiDoc: {}, documentUuid, lastModifiedDate: 0 };
   }
 }

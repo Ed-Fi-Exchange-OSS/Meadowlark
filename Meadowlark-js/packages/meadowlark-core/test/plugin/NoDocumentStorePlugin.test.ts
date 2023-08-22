@@ -15,7 +15,7 @@ import { DeleteRequest } from '../../src/message/DeleteRequest';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import { UpdateResult } from '../../src/message/UpdateResult';
 import { DeleteResult } from '../../src/message/DeleteResult';
-import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId, TraceId } from '../../src/model/IdTypes';
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -83,7 +83,9 @@ describe('given getDocumentById and no backend plugin has been configured', () =
     // Assert
     expect(result).toMatchInlineSnapshot(`
       {
-        "document": {},
+        "documentUuid": "",
+        "edfiDoc": {},
+        "lastModifiedDate": 0,
         "response": "UNKNOWN_FAILURE",
       }
     `);

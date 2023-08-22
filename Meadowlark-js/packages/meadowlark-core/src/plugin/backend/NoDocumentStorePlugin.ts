@@ -14,6 +14,7 @@ import { UpsertRequest } from '../../message/UpsertRequest';
 import { UpsertResult } from '../../message/UpsertResult';
 import { DocumentStorePlugin } from './DocumentStorePlugin';
 import { MiddlewareModel } from '../../middleware/MiddlewareModel';
+import { DocumentUuid } from '../../model/IdTypes';
 
 const moduleName = 'core.plugin.backend.NoDocumentStorePlugin';
 
@@ -25,7 +26,12 @@ export const NoDocumentStorePlugin: DocumentStorePlugin = {
 
   getDocumentById: async ({ traceId }: GetRequest): Promise<GetResult> => {
     Logger.warn(`${moduleName}.getDocumentById No backend plugin has been configured`, traceId);
-    return Promise.resolve({ response: 'UNKNOWN_FAILURE', document: {} });
+    return Promise.resolve({
+      response: 'UNKNOWN_FAILURE',
+      edfiDoc: {},
+      documentUuid: '' as DocumentUuid,
+      lastModifiedDate: 0,
+    });
   },
 
   updateDocumentById: async ({ traceId }: UpdateRequest): Promise<UpdateResult> => {

@@ -8,7 +8,7 @@
 /* istanbul ignore file */
 import { Config, LOCATION_HEADER_NAME } from '@edfi/meadowlark-utilities';
 import { newFrontendRequest } from '@edfi/meadowlark-core';
-import type { FrontendRequest, FrontendResponse } from '@edfi/meadowlark-core';
+import type { FrontendRequest, FrontendResponse, TraceId } from '@edfi/meadowlark-core';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { extractPath, getHeaders, CompatibleParameters } from './FastifyUtility';
 
@@ -16,7 +16,7 @@ export function fromRequest(fastifyRequest: FastifyRequest): FrontendRequest {
   return {
     ...newFrontendRequest(),
     path: extractPath(fastifyRequest, Config.get('MEADOWLARK_STAGE')),
-    traceId: fastifyRequest.id ?? '',
+    traceId: (fastifyRequest.id ?? '') as TraceId,
     body: fastifyRequest.body as string,
     headers: getHeaders(fastifyRequest),
     queryParameters: (fastifyRequest.query as CompatibleParameters) ?? {},

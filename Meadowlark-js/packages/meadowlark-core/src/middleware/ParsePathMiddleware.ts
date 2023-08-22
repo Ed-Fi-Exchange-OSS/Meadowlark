@@ -6,7 +6,7 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { isDocumentUuidWellFormed } from '../model/DocumentIdentity';
 import type { PathComponents } from '../model/PathComponents';
-import type { DocumentUuid } from '../model/BrandedTypes';
+import type { DocumentUuid } from '../model/IdTypes';
 import type { MiddlewareModel } from './MiddlewareModel';
 
 const moduleName = 'core.middleware.ParsePathMiddleware';

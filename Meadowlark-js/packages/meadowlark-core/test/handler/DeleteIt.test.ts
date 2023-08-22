@@ -9,7 +9,7 @@ import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
-import { DocumentUuid, MeadowlarkId } from '../../src/model/BrandedTypes';
+import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),

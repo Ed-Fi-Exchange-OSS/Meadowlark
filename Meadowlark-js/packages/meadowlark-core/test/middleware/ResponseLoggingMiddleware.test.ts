@@ -10,6 +10,7 @@ import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { setupMockConfiguration } from '../ConfigHelper';
+import { TraceId } from '../../src/model/IdTypes';
 
 describe('when logging the response', () => {
   describe('given a success status code', () => {
@@ -54,7 +55,7 @@ describe('when logging the response', () => {
     });
 
     it('logs the message body unchanged', async () => {
-      const traceId = 'traceId';
+      const traceId = 'traceId' as TraceId;
       const body = {
         error: 'this is not the real 404 message, but it is the real shape of the response',
       };
@@ -121,7 +122,7 @@ describe('when logging the response', () => {
     });
 
     it('logs the message body unchanged', async () => {
-      const traceId = 'traceId';
+      const traceId = 'traceId' as TraceId;
       const body = JSON.stringify({
         error: [
           {
@@ -167,7 +168,7 @@ describe('when logging the response', () => {
       });
 
       it('anonymizes the payload', async () => {
-        const traceId = 'traceId';
+        const traceId = 'traceId' as TraceId;
         const body = {
           error: {
             message: 'Reference validation failed',
@@ -235,7 +236,7 @@ describe('when logging the response', () => {
       });
 
       it('logs the original payload', async () => {
-        const traceId = 'traceId';
+        const traceId = 'traceId' as TraceId;
         const body = {
           error: {
             message: 'Reference validation failed',
@@ -288,7 +289,7 @@ describe('when logging the response', () => {
     });
 
     it('logs the message body without anonymization', async () => {
-      const traceId = 'traceId';
+      const traceId = 'traceId' as TraceId;
       const body = {
         error: {
           message: 'Reference validation failed',

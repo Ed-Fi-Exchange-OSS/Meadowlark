@@ -60,7 +60,7 @@
     "test:unit:coverage": "rimraf coverage.unit/ && npm run test:unit",
     "test:unit:coverage:ci": "rimraf coverage.unit/ && npm run test:unit -- --maxWorkers=2 --ci",
     "test:integration:coverage": "rimraf coverage.integration/ && npm run test:integration -- --collectCoverage",
-    "test:e2e:jest:local": "cross-env USE_EXISTING_ENVIRONMENT=true NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects tests/config/e2e --runInBand",
+    "test:e2e:jest:local": "cross-env DEVELOPER_MODE=true USE_EXISTING_ENVIRONMENT=true NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=debug jest --projects tests/config/e2e --runInBand",
     "test:e2e:jest:tc": "cross-env NODE_OPTIONS=--max-old-space-size=6144 LOG_LEVEL=warn jest --projects tests/config/e2e --runInBand",
     "test:e2e:debug": "cross-env DEBUG=testcontainers* npm run test:e2e:jest:tc",
     "test:e2e:build": "npm run docker:build && npm run test:e2e:jest:tc",

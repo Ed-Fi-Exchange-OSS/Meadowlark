@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { MeadowlarkId } from '../../src/model/BrandedTypes';
+import { MeadowlarkId } from '../../src/model/IdTypes';
 import { meadowlarkIdForDocumentIdentity, resourceInfoHashFrom } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
 

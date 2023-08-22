@@ -18,6 +18,7 @@ export async function extractDocumentInfo(
   resourceInfo: ResourceInfo,
   body: object,
   matchingMetaEdModel: TopLevelEntity,
+  requestTimestamp: number,
 ): Promise<DocumentInfo> {
   const documentIdentity: DocumentIdentity = extractDocumentIdentity(matchingMetaEdModel, body);
 
@@ -32,5 +33,6 @@ export async function extractDocumentInfo(
     descriptorReferences: extractDescriptorValues(matchingMetaEdModel, body),
     documentIdentity,
     superclassInfo,
+    requestTimestamp,
   };
 }

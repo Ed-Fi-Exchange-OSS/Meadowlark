@@ -10,7 +10,7 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, limitFive, onlyReturnId, writeLockReferencedDocuments } from './Db';
+import { getDocumentCollection, limitFive, onlyReturnTimestamps, writeLockReferencedDocuments } from './Db';
 import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { upsertDocumentTransaction } from './Upsert';
@@ -91,11 +91,13 @@ async function tryUpdateByReplacement(
   mongoCollection: Collection<MeadowlarkDocument>,
   session: ClientSession,
 ): Promise<UpdateResult | null> {
-  // Try to update - for a matching documentUuid and matching identity (via meadowlarkId)
+  // Try to update - for a matching documentUuid and matching identity (via meadowlarkId),
+  // where the update request is not stale
   const { acknowledged, matchedCount } = await mongoCollection.updateOne(
     {
       _id: meadowlarkId,
       documentUuid,
+      lastModifiedAt: { $lt: document.lastModifiedAt },
     },
     {
       $set: {
@@ -145,7 +147,7 @@ async function updateAllowingIdentityChange(
 ): Promise<UpdateResult> {
   const { documentUuid, resourceInfo, traceId, security } = updateRequest;
 
-  // Optimize by trying a replacement update, which will succeed if there is no identity change
+  // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
     updateRequest,
@@ -159,8 +161,31 @@ async function updateAllowingIdentityChange(
     return tryUpdateByReplacementResult;
   }
 
-  // Either the documentUuid doesn't exist or the identity has changed.
-  // The following delete attempt will catch if documentUuid does not exist
+  // Failure to match means either:
+  //  1) document not there (invalid documentUuid)
+  //  2) this is an attempt to change the document identity (mismatched meadowlarkId)
+  //  3) the requestTimestamp for the update is too old
+
+  // See if the document is there
+  const documentByUuid: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
+    { documentUuid: updateRequest.documentUuid },
+    onlyReturnTimestamps(session),
+  );
+
+  if (documentByUuid == null) {
+    // The document is not there
+    return { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+  }
+
+  if (documentByUuid.lastModifiedAt >= document.lastModifiedAt) {
+    // The update request is stale
+    return { response: 'UPDATE_FAILURE_WRITE_CONFLICT' };
+  }
+
+  // Get the createdAt from the original document before deleting
+  document.createdAt = documentByUuid.createdAt;
+
+  // Attempt to delete document before insert. Will work only if meadowlarkIds match between old and new
   const deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
     { documentUuid, resourceInfo, security, validateNoReferencesToDocument: true, traceId },
     mongoCollection,
@@ -173,8 +198,11 @@ async function updateAllowingIdentityChange(
       // document was deleted, so we can insert the new version
       return insertUpdatedDocument(updateRequest, mongoCollection, session, document);
     case 'DELETE_FAILURE_NOT_EXISTS':
-      // document was not found on delete
-      return { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+      // document was not found on delete, which shouldn't happen
+      return {
+        response: 'UNKNOWN_FAILURE',
+        failureMessage: `Document uuid ${documentUuid} should have been found but was not`,
+      };
     case 'DELETE_FAILURE_REFERENCE':
       // We have an update cascade scenario
       //
@@ -219,14 +247,26 @@ async function updateDisallowingIdentityChange(
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 
-  // Failure to match means either document not there (invalid documentUuid) or this is an attempt to change
-  // the document identity (mismatched meadowlarkId). See if the document is there.
+  // Failure to match means either:
+  //  1) document not there (invalid documentUuid)
+  //  2) this is an attempt to change the document identity (mismatched meadowlarkId)
+  //  3) the requestTimestamp for the update is too old
+
+  // See if the document is there
   const documentByUuid: WithId<MeadowlarkDocument> | null = await mongoCollection.findOne(
     { documentUuid: updateRequest.documentUuid },
-    onlyReturnId(session),
+    onlyReturnTimestamps(session),
   );
 
-  if (documentByUuid == null) return { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+  if (documentByUuid == null) {
+    // The document is not there
+    return { response: 'UPDATE_FAILURE_NOT_EXISTS' };
+  }
+
+  if (documentByUuid.lastModifiedAt >= document.lastModifiedAt) {
+    // The update request is stale
+    return { response: 'UPDATE_FAILURE_WRITE_CONFLICT' };
+  }
 
   // The identity of the new document is different from the existing document
   return { response: 'UPDATE_FAILURE_IMMUTABLE_IDENTITY' };
@@ -283,8 +323,6 @@ async function updateDocumentByDocumentUuidTransaction(
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
     updateRequest;
-  // last modified date as an Unix timestamp.
-  const lastModifiedAt: number = Date.now();
   if (validateDocumentReferencesExist) {
     const invalidReferenceResult: UpdateResult | null = await checkForInvalidReferences(
       updateRequest,
@@ -295,17 +333,17 @@ async function updateDocumentByDocumentUuidTransaction(
       return invalidReferenceResult;
     }
   }
-  const document: MeadowlarkDocument = meadowlarkDocumentFrom(
+  const document: MeadowlarkDocument = meadowlarkDocumentFrom({
     resourceInfo,
     documentInfo,
     documentUuid,
     meadowlarkId,
     edfiDoc,
-    validateDocumentReferencesExist,
-    security.clientId,
-    Date.now(),
-    lastModifiedAt,
-  );
+    validate: validateDocumentReferencesExist,
+    createdBy: security.clientId,
+    createdAt: null, // null because this is a document update, createdAt must come from existing document
+    lastModifiedAt: documentInfo.requestTimestamp,
+  });
   if (resourceInfo.allowIdentityUpdates) {
     return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
   }

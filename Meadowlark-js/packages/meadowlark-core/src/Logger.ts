@@ -11,12 +11,12 @@ export function writeDebugStatusToLog(
   moduleName: string,
   request: FrontendRequest,
   method: string,
-  status?: number,
+  statusCode?: number,
   message?: string,
   extra?: any,
 ): void {
   if (isDebugEnabled()) {
-    Logger.debug(`${moduleName}.${method} ${status ?? ''} ${message ?? ''}`.trimEnd(), request.traceId, extra);
+    Logger.debug(`${moduleName}.${method} ${statusCode ?? ''} ${message ?? ''}`.trimEnd(), request.traceId, extra);
   }
 }
 
@@ -27,7 +27,11 @@ export function writeDebugObject(
   statusCode?: number,
   messageBody?: object,
 ): void {
-  Logger.debug(`${moduleName}.${method} ${statusCode}`.trimEnd(), request.traceId, messageBody);
+  Logger.debug(`${moduleName}.${method} ${statusCode}`, request.traceId, messageBody);
+}
+
+export function writeDebugMessage(moduleName: string, request: FrontendRequest, method: string, message: string): void {
+  Logger.debug(`${moduleName}.${method}`, request.traceId, message);
 }
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string, extra?: any): void {

@@ -111,9 +111,15 @@ export async function writeLockReferencedDocuments(
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
 export const onlyReturnId = (session: ClientSession): FindOptions => ({ projection: { _id: 1 }, session });
 
-// MongoDB FindOption to return only the indexed documentUuid field, making this a covered query (MongoDB will optimize)
-export const onlyReturnDocumentUuid = (session: ClientSession): FindOptions => ({
-  projection: { documentUuid: 1, createdAt: 1 },
+// MongoDB FindOption to return only createdAt and lastModifiedAt
+export const onlyReturnTimestamps = (session: ClientSession): FindOptions => ({
+  projection: { createdAt: 1, lastModifiedAt: 1 },
+  session,
+});
+
+// MongoDB FindOption to return the indexed documentUuid and the createdAt and lastModifiedAt fields
+export const onlyReturnDocumentUuidAndTimestamps = (session: ClientSession): FindOptions => ({
+  projection: { documentUuid: 1, createdAt: 1, lastModifiedAt: 1 },
   session,
 });
 

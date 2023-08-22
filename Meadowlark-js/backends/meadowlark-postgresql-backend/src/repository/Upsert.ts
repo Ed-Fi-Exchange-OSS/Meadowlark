@@ -18,7 +18,8 @@ import {
 import { Logger } from '@edfi/meadowlark-utilities';
 import {
   deleteOutboundReferencesOfDocumentByMeadowlarkId,
-  insertOrUpdateDocument,
+  insertDocument,
+  updateDocument,
   insertOutboundReferences,
   deleteAliasesForDocumentByMeadowlarkId,
   insertAlias,
@@ -30,14 +31,12 @@ import {
   commitTransaction,
 } from './SqlHelper';
 import { validateReferences } from './ReferenceValidation';
-import { MeadowlarkDocument, isMeadowlarkDocumentEmpty } from '../model/MeadowlarkDocument';
+import { MeadowlarkDocument, NoMeadowlarkDocument } from '../model/MeadowlarkDocument';
 
 const moduleName = 'postgresql.repository.Upsert';
 
-export async function upsertDocument(
-  { meadowlarkId, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
-  client: PoolClient,
-): Promise<UpsertResult> {
+export async function upsertDocument(upsertRequest: UpsertRequest, client: PoolClient): Promise<UpsertResult> {
+  const { meadowlarkId, resourceInfo, documentInfo, validateDocumentReferencesExist, traceId } = upsertRequest;
   Logger.info(`${moduleName}.upsertDocument`, traceId);
 
   const outboundRefs = documentInfo.documentReferences.map((dr: DocumentReference) =>
@@ -46,12 +45,18 @@ export async function upsertDocument(
   try {
     await beginTransaction(client);
 
-    // Check whether this is an insert or update
-    const documentExistsResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
-    const isInsert: boolean = isMeadowlarkDocumentEmpty(documentExistsResult);
-    const documentUuid: DocumentUuid = !isMeadowlarkDocumentEmpty(documentExistsResult)
-      ? documentExistsResult.document_uuid
-      : generateDocumentUuid();
+    // Attempt to get the document, to see whether this is an insert or update
+    const documentFromDb: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
+    const isInsert: boolean = documentFromDb === NoMeadowlarkDocument;
+
+    // Either get the existing document uuid or create a new one
+    const documentUuid: DocumentUuid = isInsert ? generateDocumentUuid() : documentFromDb.document_uuid;
+
+    // If an update, check the request for staleness. If request is stale, return conflict.
+    if (!isInsert && documentFromDb.last_modified_at >= documentInfo.requestTimestamp) {
+      return { response: 'UPSERT_FAILURE_WRITE_CONFLICT' };
+    }
+
     // If inserting a subclass, check whether the superclass identity is already claimed by a different subclass
     if (isInsert && documentInfo.superclassInfo != null) {
       const superclassAliasMeadowlarkIdInUseResult: MeadowlarkId[] = await findAliasMeadowlarkId(
@@ -113,13 +118,16 @@ export async function upsertDocument(
 
     // Perform the document upsert
     Logger.debug(`${moduleName}.upsertDocument: Upserting document meadowlarkId ${meadowlarkId}`, traceId);
-    await insertOrUpdateDocument(
-      client,
-      { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security },
-      isInsert,
-    );
+
+    if (isInsert) {
+      await insertDocument(client, { ...upsertRequest, documentUuid });
+    } else {
+      await updateDocument(client, { ...upsertRequest, documentUuid });
+    }
+
     // Delete existing values from the aliases table
     await deleteAliasesForDocumentByMeadowlarkId(client, meadowlarkId);
+
     // Perform insert of alias ids
     await insertAlias(client, documentUuid, meadowlarkId, meadowlarkId);
     if (documentInfo.superclassInfo != null) {
