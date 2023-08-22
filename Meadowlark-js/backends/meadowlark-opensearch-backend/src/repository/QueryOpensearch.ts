@@ -22,44 +22,19 @@ export function indexFromResourceInfo(resourceInfo: ResourceInfo): string {
 }
 
 /**
- * Sanitizes input by escaping single all apostrophes. If \' is present, then someone is trying to evade the sanitization. In
- * that case, replace the search term with an empty string.
+ * DSL querying
  */
-function sanitize(input: string): string {
-  if (input.indexOf(`\\'`) > -1) {
-    return '';
-  }
-
-  return input.replaceAll(`'`, `\\'`);
-}
-
-/**
- * Convert query string parameters from http request to OpenSearch
- * SQL WHERE conditions. Returns empty string if there are none.
- */
-function whereConditionsFrom(queryParameters: object): string {
-  return Object.entries(queryParameters)
-    .map(([field, value]) => `${field} = '${sanitize(value)}'`)
-    .join(' AND ');
-}
-
-/**
- * This mechanism of SQL querying is specific to OpenSearch (vs Elasticsearch)
- */
-async function performSqlQuery(client: Client, query: string): Promise<any> {
+async function performDslQuery(client: Client, path: string, query: any, size: number, from: number): Promise<any> {
   return client.transport.request({
     method: 'POST',
-    path: '/_opendistro/_sql',
-    body: { query },
+    path: `/${path}/_search`,
+    body: {
+      from,
+      query,
+      size,
+      sort: [{ _doc: { order: 'asc' } }],
+    },
   });
-}
-
-/**
- * Returns well-formed WHERE clause from existing where clause and new clause
- */
-function appendedWhereClause(existingWhereClause: string, newWhereClause: string): string {
-  if (existingWhereClause === '') return newWhereClause;
-  return `${existingWhereClause} AND ${newWhereClause}`;
 }
 
 /**
@@ -73,35 +48,49 @@ export async function queryDocuments(request: QueryRequest, client: Client): Pro
   let documents: any = [];
   let recordCount: number;
   try {
-    let query = `SELECT info FROM ${indexFromResourceInfo(resourceInfo)}`;
-    let whereClause: string = '';
+    const matches: any[] = [];
 
     // API client requested filters
     if (Object.entries(queryParameters).length > 0) {
-      whereClause = whereConditionsFrom(queryParameters);
+      Object.entries(queryParameters).forEach(([key, value]) => {
+        matches.push({
+          match_phrase: { [key]: value },
+        });
+      });
     }
 
     // Ownership-based security filter - if the resource is a descriptor we will ignore security
     if (request.security.authorizationStrategy.type === 'OWNERSHIP_BASED' && !resourceInfo.isDescriptor) {
-      const securityWhereClause = `createdBy = '${request.security.clientId}'`;
-      whereClause = appendedWhereClause(whereClause, securityWhereClause);
+      matches.push({
+        match: {
+          createdBy: request.security.clientId,
+        },
+      });
     }
 
-    if (whereClause !== '') {
-      query += ` WHERE ${whereClause}`;
+    const query = {
+      bool: {
+        must: matches,
+      },
+    };
+
+    if (isDebugEnabled()) {
+      Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${JSON.stringify(query)}`, traceId);
     }
+    const result = await performDslQuery(
+      client,
+      indexFromResourceInfo(resourceInfo),
+      query,
+      paginationParameters.limit as number,
+      paginationParameters.offset as number,
+    );
 
-    query += ' ORDER BY _doc';
+    recordCount = result.body.hits.total.value;
 
-    if (paginationParameters.limit != null) query += ` LIMIT ${paginationParameters.limit}`;
-    if (paginationParameters.offset != null) query += ` OFFSET ${paginationParameters.offset}`;
-
-    Logger.debug(`${moduleName}.queryDocuments queryDocuments executing query: ${query}`, traceId);
-
-    const { body } = await performSqlQuery(client, query);
-    recordCount = body.total;
-
-    documents = body.datarows.map((datarow) => JSON.parse(datarow));
+    if (recordCount > 0) {
+      // eslint-disable-next-line no-underscore-dangle
+      documents = result.body.hits.hits.map((datarow) => JSON.parse(datarow._source.info));
+    }
 
     if (isDebugEnabled()) {
       const idsForLogging: string[] = documents.map((document) => document.id);
