@@ -4,6 +4,10 @@ import { Consumer, Kafka, KafkaConfig } from 'kafkajs';
 const moduleName = 'kafkajs-worker.kafkaWorker';
 const topicToRead = 'edfi.meadowlark.documents';
 let consumerClient: Consumer | null = null;
+// eslint-disable-next-line prefer-const
+let subscriptionActive: boolean = false;
+// eslint-disable-next-line prefer-const
+let result: any = [];
 
 /**
  * Create and return an Kafkajs consumer object for the groupId
@@ -31,11 +35,13 @@ async function getClient(groupId: string): Promise<Consumer> {
 /**
  * Close kafka connection
  */
-async function closeConnection(): Promise<void> {
+export async function closeConnection(): Promise<void> {
   if (consumerClient != null) {
     await consumerClient.disconnect();
   }
   consumerClient = null;
+  result = [];
+  subscriptionActive = false;
   console.log(`Module ${moduleName} Kafka connection: closed`, null);
 }
 
@@ -47,31 +53,43 @@ async function closeConnection(): Promise<void> {
  * @param groupId
  * @returns
  */
-async function readMessagesFromBatch(groupId: string): Promise<void> {
-  console.log('@ Batch @');
-  await consumerClient?.subscribe({ topic: topicToRead, fromBeginning: true });
+export async function subscribeToReadMessagesFromBatch(groupId: string, printToConsole: Boolean = true): Promise<void> {
+  if (subscriptionActive) {
+    return;
+  }
+  if (printToConsole) {
+    console.log('@ Batch @');
+  }
   // Create subscription
   await consumerClient?.subscribe({ topic: topicToRead, fromBeginning: true });
+  subscriptionActive = true;
   await consumerClient?.run({
     eachBatchAutoResolve: false,
     eachBatch: async ({ batch, resolveOffset, heartbeat, isRunning, isStale }) => {
-      // eslint-disable-next-line no-restricted-syntax
-      console.log('======================================================================\n');
+      if (printToConsole) {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log('======================================================================\n');
+      }
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       batch.messages.forEach(async (message): Promise<void> => {
         if (!isRunning() || isStale()) {
           return;
         }
-        console.log(
-          `${moduleName}- GroupId (${groupId}).readMessagesFromBatch\n - key: ${message?.key?.toString()}\n - Offset: ${message?.offset?.toString()}\n - Timestamp: ${message?.timestamp?.toString()}\n - message: ${message?.value?.toString()}`,
-        );
+        if (printToConsole) {
+          console.log(
+            `${moduleName}- GroupId (${groupId}).subscribeToReadMessagesFromBatch\n - key: ${message?.key?.toString()}\n - Offset: ${message?.offset?.toString()}\n - Timestamp: ${message?.timestamp?.toString()}\n - message: ${message?.value?.toString()}`,
+          );
+        }
+        result.push(1);
         // Mark a message in the batch as processed.
         // In case of errors, the consumer will automatically commit the resolved offsets.
         resolveOffset(message?.offset);
         // It can be used to send heartbeat to the broker according to the set
         await heartbeat();
       });
-      console.log('==========**************************************************==========\n');
+      if (printToConsole) {
+        console.log('==========**************************************************==========\n');
+      }
     },
     partitionsConsumedConcurrently: 1,
   });
@@ -83,17 +101,26 @@ async function readMessagesFromBatch(groupId: string): Promise<void> {
  * your offsets and heartbeat at the configured interval.
  * @param groupId
  */
-async function readEachMessageFromTopic(groupId: string): Promise<void> {
-  console.log('@ Each Message @');
+export async function subscribeToReadEachMessageFromTopic(groupId: string, printToConsole: Boolean = true): Promise<void> {
+  if (subscriptionActive) {
+    return;
+  }
+  if (printToConsole) {
+    console.log('@ Each Message @');
+  }
   await consumerClient?.subscribe({ topic: topicToRead, fromBeginning: true });
+  subscriptionActive = true;
   await consumerClient?.run({
     // eslint-disable-next-line no-unused-vars
     eachMessage: async ({ message, heartbeat }) => {
-      console.log('#_____________________________________________________________________________#\n');
-      console.log(
-        `${moduleName} - GroupId (${groupId}).readFromTopic\n - key: ${message?.key?.toString()}\n - Timestamp: ${message?.timestamp?.toString()}\n - message: ${message?.value?.toString()}`,
-      );
-      console.log('********************************************************************************\n');
+      if (printToConsole) {
+        console.log('#_____________________________________________________________________________#\n');
+        console.log(
+          `${moduleName} - GroupId (${groupId}).readFromTopic\n - key: ${message?.key?.toString()}\n - Timestamp: ${message?.timestamp?.toString()}\n - message: ${message?.value?.toString()}`,
+        );
+        console.log('********************************************************************************\n');
+      }
+      result.push(1);
       if (message) {
         await heartbeat();
       }
@@ -113,8 +140,13 @@ process.on('exit', async (): Promise<void> => {
   await closeConnection();
 });
 
-async function initialize(groupId) {
+export async function initialize(groupId) {
+  result = [];
+  subscriptionActive = false;
   consumerClient = await getClient(groupId);
+}
+export function getCountMessages() {
+  return result.length ?? 0;
 }
 
 (async () => {
@@ -123,8 +155,8 @@ async function initialize(groupId) {
   const batch = process.argv[3] ?? '';
   await initialize(groupId);
   if (batch.toLowerCase() === 'batch') {
-    await readMessagesFromBatch(groupId);
+    await subscribeToReadMessagesFromBatch(groupId);
   } else {
-    await readEachMessageFromTopic(groupId);
+    await subscribeToReadEachMessageFromTopic(groupId);
   }
 })();

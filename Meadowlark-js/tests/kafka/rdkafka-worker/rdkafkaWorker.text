@@ -44,12 +44,12 @@ async function closeConnection(): Promise<void> {
  * in the event loop. It only stops when it detects the consumer has issued the unsubscribe or disconnect method.
  * @param groupId
  */
-async function readMessagesFromBatch(groupId: string): Promise<void> {
+async function subscribeToReadMessagesFromBatch(groupId: string): Promise<void> {
   console.log('@ Each Message (Flowing mode) @');
   if (consumerClient == null) {
     consumerClient = await getClient(groupId);
   }
-  console.log(`${moduleName}.readMessagesFromBatch Add subscription to Topic`, '');
+  console.log(`${moduleName}.subscribeToReadMessagesFromBatch Add subscription to Topic`, '');
   consumerClient.on('ready', () => {
     consumerClient?.subscribe([topicToRead]);
     consumerClient?.consume();
@@ -119,8 +119,8 @@ async function initialize(groupId) {
   const batch = process.argv[3] ?? '';
   await initialize(groupId);
   if (batch.toLowerCase() === 'batch') {
-    await readMessagesFromBatch(groupId);
+    await subscribeToReadMessagesFromBatch(groupId);
   } else {
-    await readEachMessageFromTopic(groupId);
+    await subscribeToReadEachMessageFromTopic(groupId);
   }
 })();

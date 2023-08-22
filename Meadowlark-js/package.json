@@ -87,7 +87,6 @@
   },
   "dependencies": {
     "@types/autocannon": "^7.9.1",
-    "kafkajs": "^2.2.4",
-    "node-rdkafka": "^2.17.0"
+    "kafkajs": "^2.2.4"
   }
 }
