@@ -13,5 +13,9 @@ const getHttpProtocol = (stage: string): string => (stage === 'local' ? 'http' :
  */
 export const buildBaseUrlFromRequest = (frontendRequest: FrontendRequest): string => {
   const protocol = getHttpProtocol(frontendRequest.stage);
-  return `${protocol}://${frontendRequest.headers.host}/${frontendRequest.stage}`;
+  const host =
+    frontendRequest.headers['x-forwarded-host'] && frontendRequest.headers['x-forwarded-port']
+      ? `${frontendRequest.headers['x-forwarded-host']}:${frontendRequest.headers['x-forwarded-port']}`
+      : frontendRequest.headers.host;
+  return `${protocol}://${host}/${frontendRequest.stage}`;
 };

@@ -136,9 +136,13 @@ async function getFileFromBlobStorage(
  * Retrieves and caches a swagger specification from an external URL.
  */
 async function getSwaggerSpecification(url: string, frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  return getFileFromBlobStorage(url, frontendRequest, (data: any) =>
-    useTemplate(data, frontendRequest.headers?.Host || '', frontendRequest.stage),
-  );
+  return getFileFromBlobStorage(url, frontendRequest, (data: any) => {
+    const host =
+      frontendRequest.headers['x-forwarded-host'] && frontendRequest.headers['x-forwarded-port']
+        ? `${frontendRequest.headers['x-forwarded-host']}:${frontendRequest.headers['x-forwarded-port']}`
+        : frontendRequest.headers?.Host || '';
+    return useTemplate(data, host, frontendRequest.stage);
+  });
 }
 
 /**

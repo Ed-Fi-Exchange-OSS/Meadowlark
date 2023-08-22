@@ -37,5 +37,5 @@ jobs:
       - name: Build the NPM Docker image
         # To confirm no errors occur. The "local" one will be built by the e2e
         # testing process.
-        run: docker build --build-arg ML_VERSION=pre .
+        run: docker build --build-arg ML_VERSION=latest .
         working-directory: docker
