@@ -3,9 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-// import { postRequiredSchoolReferences } from '../profiling/AutocannonSchools';
-/* import { baseURLRequest } from '@edfi/meadowlark-e2e-tests/helpers/Shared';
-import { faker } from '@faker-js/faker'; */
+/* eslint-disable no-console */
 import axios from 'axios';
 import { faker } from '@faker-js/faker';
 
@@ -104,6 +102,7 @@ describe('when sending a post to descriptors to read kafka batch message', () =>
     if (result.status === 201) {
       console.log('*******************************************************k');
     }
+    // eslint-disable-next-line no-promise-executor-return
     await new Promise((f) => setTimeout(f, 5000));
     const readResult = getCountMessages();
     expect(readResult > 0).toBeTruthy();
