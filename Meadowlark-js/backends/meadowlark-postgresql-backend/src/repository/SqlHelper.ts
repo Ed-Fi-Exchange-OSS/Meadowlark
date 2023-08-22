@@ -434,7 +434,7 @@ async function checkDeleteResult(
     return deleteResult;
   }
   if (countDeletedRows) {
-    return deleteQueryResult.rows[0].count === '0'
+    return deleteQueryResult.rows[0].count === 0
       ? { response: 'DELETE_FAILURE_NOT_EXISTS' }
       : { response: 'DELETE_SUCCESS' };
   }
