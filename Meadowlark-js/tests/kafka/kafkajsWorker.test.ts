@@ -50,7 +50,7 @@ describe('when sending a post to descriptors to read kafka each message', () => 
     const bearerToken: string = await getBearerToken(URL_PREFIX);
     const descriptorVariation = faker.number.int();
     // Create educationOrganizationCategoryDescriptors
-    const result = await axios.post(
+    await axios.post(
       `${URL_PREFIX}/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors`,
       {
         codeValue: `Other KAFKA-${descriptorVariation}`,
@@ -62,9 +62,6 @@ describe('when sending a post to descriptors to read kafka each message', () => 
         headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
       },
     );
-    if (result.status === 201) {
-      console.log('*******************************************************k');
-    }
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((f) => setTimeout(f, 5000));
     const readResult = getCountMessages();
@@ -87,7 +84,7 @@ describe('when sending a post to descriptors to read kafka batch message', () =>
     const bearerToken: string = await getBearerToken(URL_PREFIX);
     const descriptorVariation = faker.number.int();
     // Create educationOrganizationCategoryDescriptors
-    const result = await axios.post(
+    await axios.post(
       `${URL_PREFIX}/local/v3.3b/ed-fi/educationOrganizationCategoryDescriptors`,
       {
         codeValue: `Other KAFKA-${descriptorVariation}`,
@@ -99,9 +96,6 @@ describe('when sending a post to descriptors to read kafka batch message', () =>
         headers: { 'content-type': 'application/json', Authorization: `bearer ${bearerToken}` },
       },
     );
-    if (result.status === 201) {
-      console.log('*******************************************************k');
-    }
     // eslint-disable-next-line no-promise-executor-return
     await new Promise((f) => setTimeout(f, 5000));
     const readResult = getCountMessages();
