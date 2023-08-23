@@ -174,7 +174,7 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
@@ -222,7 +222,7 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
@@ -280,7 +280,7 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
