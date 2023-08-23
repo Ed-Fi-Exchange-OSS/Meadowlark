@@ -42,8 +42,7 @@ jobs:
       - name: Dependency Review ("Dependabot on PR")
         uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
 
-  # CodeQL breaks if you rename this job
-  analyze:
+  analyze-code:
     name: Analyze Code
     runs-on: ubuntu-latest
     env:
