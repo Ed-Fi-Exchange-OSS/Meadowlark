@@ -29,6 +29,8 @@ services:
       - zookeeper
     environment:
       - ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092
+
 
   connect:
     hostname: kafka-connect
@@ -41,7 +43,7 @@ services:
     links:
       - kafka
     environment:
-      - BOOTSTRAP_SERVERS=kafka:9092
+      - BOOTSTRAP_SERVERS=kafka1:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=debezium_config
       - OFFSET_STORAGE_TOPIC=debezium_offset
