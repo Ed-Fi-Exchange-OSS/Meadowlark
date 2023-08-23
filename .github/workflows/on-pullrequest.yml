@@ -44,7 +44,7 @@ jobs:
 
   # CodeQL breaks if you rename this job
   analyze-code:
-    name: Analyze Code
+    name: Analyze Code(PR)
     runs-on: ubuntu-latest
     env:
       SRC_DIR: Meadowlark-js
