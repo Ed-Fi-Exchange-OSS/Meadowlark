@@ -34,6 +34,30 @@ describe('When retrieving information', () => {
       schools = bulkCreation.resources;
     });
 
+    describe('when querying changing the casing of the query value to be all lowercase', () => {
+      it('should return correct result', async () => {
+        await baseURLRequest()
+          .get(`/v3.3b/ed-fi/schools?nameOfInstitution=new school 1`)
+          .auth(await getAccessToken('host'), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.headers['total-count']).toEqual('1');
+          });
+      });
+    });
+
+    describe('when querying changing the casing of the query value to be all uppercase', () => {
+      it('should return correct result', async () => {
+        await baseURLRequest()
+          .get(`/v3.3b/ed-fi/schools?nameOfInstitution=NEW SCHOOL 1`)
+          .auth(await getAccessToken('host'), { type: 'bearer' })
+          .expect(200)
+          .then((response) => {
+            expect(response.headers['total-count']).toEqual('1');
+          });
+      });
+    });
+
     describe('when querying with limit', () => {
       describe('when getting less than total', () => {
         // Use the assessment1 credentials to bypass additional validations
