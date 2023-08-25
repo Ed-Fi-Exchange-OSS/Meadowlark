@@ -295,6 +295,34 @@ describe('when querying for students', () => {
           mock.clearAll();
         });
       });
+
+      describe('when querying with a case different from the case in the datastore', () => {
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
+        let queryResult: QueryResult;
+        const studentUniqueIdOne = 'one';
+        const studentUniqueIdTwo = 'two';
+        const birthCity = 'a';
+        const matches = [
+          {
+            match_phrase: { birthCity: birthCity.toUpperCase() },
+          },
+        ];
+
+        beforeAll(async () => {
+          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], matches);
+          const request = setupQueryRequest(authorizationStrategy, { birthCity: birthCity.toUpperCase() }, {});
+
+          queryResult = await queryDocuments(request, client);
+        });
+
+        it('should return the two students regardless of the casing', async () => {
+          expect(queryResult.documents.length).toBe(2);
+        });
+
+        afterAll(() => {
+          mock.clearAll();
+        });
+      });
     });
   });
 });
