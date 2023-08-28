@@ -131,10 +131,7 @@ class GenerateIndexFromResourceTest {
         originalRecord = record(receivedObject);
 
         final var params = project + "," + resourceVersion + "," + resourceName;
-        var expectedResult = project + "$" + resourceVersion + "$" + resourceName;
-        if (isDescriptor.equals("true")) {
-            expectedResult += "descriptor";
-        }
+        var expectedResult = (project + "$" + resourceVersion + "$" + resourceName).replace(".", "-");
 
         final SinkRecord result = transformation(params).apply(originalRecord);
         assertThat(result).isEqualTo(setNewTopic(originalRecord, expectedResult));

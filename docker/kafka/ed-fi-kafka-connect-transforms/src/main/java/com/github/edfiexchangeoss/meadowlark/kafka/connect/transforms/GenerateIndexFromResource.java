@@ -59,7 +59,7 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
             throw new DataException("value must specify one or more field names comma separated.");
         }
 
-        final List<String> fieldList = Stream.of(config.fieldName().get().split(","))
+        final List<String> fieldList = Stream.of(config.fieldName().get().replace(".", "-").split(","))
                 .map(String::trim)
                 .collect(Collectors.toList());
 
@@ -74,10 +74,6 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
         });
 
         topicResult.replace(topicResult.length() - 1, topicResult.length(), "");
-
-        if (record.toString().contains("isDescriptor=true")) {
-            topicResult.append("descriptor");
-        }
 
         newTopic = Optional.of(topicResult.toString());
 
