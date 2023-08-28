@@ -32,14 +32,14 @@ Linux:
 
 ```bash
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
-    http://localhost:8083/connectors/ -d @opensearch_sink.json
+    http://localhost:8084/connectors/ -d @opensearch_sink.json
 ```
 
 Windows:
 
 ```pwsh
 Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json `
-    -uri http://localhost:8083/connectors/ -ContentType "application/json"
+    -uri http://localhost:8084/connectors/ -ContentType "application/json"
 ```
 
 ### Verify configuration
