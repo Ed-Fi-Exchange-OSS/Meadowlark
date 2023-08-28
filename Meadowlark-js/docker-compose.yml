@@ -248,9 +248,9 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092
 
 
-  connect-mongo:
-    hostname: kafka-connect-mongo
-    container_name: kafka-connect-mongo
+  connect-source:
+    hostname: kafka-connect-source
+    container_name: kafka-connect-source
     image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
     ports:
       - 8083:8083
@@ -263,9 +263,9 @@ services:
       - OFFSET_STORAGE_TOPIC=debezium_offset
       - STATUS_STORAGE_TOPIC=debezium_status
 
-  connect-opensearch:
-    hostname: kafka-connect-opensearch
-    container_name: kafka-connect-opensearch
+  connect-sync:
+    hostname: kafka-connect-sync
+    container_name: kafka-connect-sync
     image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
     ports:
       - 8084:8083
