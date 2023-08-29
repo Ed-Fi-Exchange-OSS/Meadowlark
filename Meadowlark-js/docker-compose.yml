@@ -27,7 +27,7 @@ services:
       OPENSEARCH_ENDPOINT: ${OPENSEARCH_ENDPOINT:-http://opensearch:9200}
       DOCUMENT_STORE_PLUGIN: "${DOCUMENT_STORE_PLUGIN:-@edfi/meadowlark-mongodb-backend}"
       QUERY_HANDLER_PLUGIN: "${QUERY_HANDLER_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
-      LISTENER1_PLUGIN: ""
+      LISTENER1_PLUGIN: "${LISTENER1_PLUGIN:-@edfi/meadowlark-opensearch-backend}"
       MONGO_URI: ${MONGO_URI}
       FASTIFY_RATE_LIMIT: ${FASTIFY_RATE_LIMIT:-false}
       FASTIFY_PORT: ${FASTIFY_PORT:-3000}
@@ -221,75 +221,6 @@ services:
       - meadowlark-oauth-ml-local-1
       - meadowlark-oauth-ml-local-2
 
-  # Zookeeper image from Debezium
-  zookeeper:
-    hostname: zookeeper1
-    container_name: zookeeper1
-    image: debezium/zookeeper:2.3@sha256:42b73151458b12c9dc1473807ee8369a917724278d6ec08d82702da8c46a9639
-    ports:
-      - 2181:2181
-      - 2888:2888
-      - 3888:3888
-    volumes:
-      - zookeeper-logs:/var/lib/zookeeper/log
-      - zookeeper-data:/var/lib/zookeeper/data
-
-  # Kafka image from Debezium
-  kafka:
-    hostname: kafka1
-    container_name: kafka1
-    image: debezium/kafka:2.3@sha256:ffe34d457bff18de31c5ed695f22291680608d9758f041ae55310439224781cf
-    ports:
-      - 9092:9092
-    links:
-      - zookeeper
-    environment:
-      - ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092
-
-
-  connect-source:
-    hostname: kafka-connect-source
-    container_name: kafka-connect-source
-    image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
-    ports:
-      - 8083:8083
-    links:
-      - kafka
-    environment:
-      - BOOTSTRAP_SERVERS=kafka1:9092
-      - GROUP_ID=1
-      - CONFIG_STORAGE_TOPIC=debezium_config
-      - OFFSET_STORAGE_TOPIC=debezium_offset
-      - STATUS_STORAGE_TOPIC=debezium_status
-
-  connect-sync:
-    hostname: kafka-connect-sync
-    container_name: kafka-connect-sync
-    image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
-    ports:
-      - 8084:8083
-    links:
-      - kafka
-    environment:
-      - BOOTSTRAP_SERVERS=kafka1:9092
-      - GROUP_ID=1
-      - CONFIG_STORAGE_TOPIC=debezium_config
-      - OFFSET_STORAGE_TOPIC=debezium_offset
-      - STATUS_STORAGE_TOPIC=debezium_status
-
-  # Kafka Web UI - https://github.com/obsidiandynamics/kafdrop
-  kafdrop:
-    hostname: kafdrop
-    container_name: kafdrop
-    image: obsidiandynamics/kafdrop:3.31.0@sha256:f89f34f56e72188aa61b557866dbece57238a74c599e88105b200c2532bb804b
-    ports:
-      - 9000:9000
-    environment:
-      KAFKA_BROKERCONNECT: kafka1:9092
-      JVM_OPTS: "-Xms32M -Xmx64M"
-      SERVER_SERVLET_CONTEXTPATH: "/"
-
 volumes:
   mongo-ml-local-data1:
     labels:
@@ -314,9 +245,6 @@ volumes:
   opensearch-ml-local-data:
     labels:
       edfi-ml: local
-  zookeeper-logs:
-  zookeeper-data:
-
   # pgsql-ml-data:
   #   driver: local
   # zookeeper-ml-local-logs:
