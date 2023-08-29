@@ -70,14 +70,10 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
             topicResult.append(
                     topicNameFromNamedField(record.toString(),
                             schemaAndValue.value(),
-                            field).get() + separator);
+                            field).get().replace(".", "-") + separator);
         });
 
         topicResult.replace(topicResult.length() - 1, topicResult.length(), "");
-
-        if (record.toString().contains("isDescriptor=true")) {
-            topicResult.append("descriptor");
-        }
 
         newTopic = Optional.of(topicResult.toString());
 

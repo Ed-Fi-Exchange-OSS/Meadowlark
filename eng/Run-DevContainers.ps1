@@ -9,23 +9,23 @@
     PostgreSQL. The MongoDB collection also includes Kafka with Debezium.
 #>
 param(
-    
+
   [Parameter(Mandatory=$false)]
   [Switch]
   $ElasticSearch,
-  
+
   [Parameter(Mandatory=$false)]
   [Switch]
   $OpenSearch,
-  
+
   [Parameter(Mandatory=$false)]
   [Switch]
   $MongoDB,
-  
+
   [Parameter(Mandatory=$false)]
   [Switch]
   $PostgreSQL,
-  
+
   [Parameter(Mandatory=$false)]
   [Switch]
   $Kafka
@@ -34,9 +34,9 @@ param(
 $ErrorActionPreference = "Stop"
 
 $start = @()
+if ($MongoDB) { $start += "meadowlark-mongodb-backend" }
 if ($ElasticSearch) { $start += "meadowlark-elasticsearch-backend" }
 if ($OpenSearch) { $start += "meadowlark-opensearch-backend"}
-if ($MongoDB) { $start += "meadowlark-mongodb-backend" }
 if ($PostgreSQL) { $start += "meadowlark-postgresql-backend" }
 if ($Kafka) { $start += "meadowlark-kafka-stream" }
 

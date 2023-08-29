@@ -118,24 +118,21 @@ class GenerateIndexFromResourceTest {
         final SinkRecord originalRecord;
         final var project = "project";
         final var resourceVersion = "resourceVersion";
+        final var resourceVersionValue = "major.minor.patch";
         final var resourceName = "resourceName";
-
+        final var resourceNameValue = "resourceName" + (isDescriptor.equals("true") ? "descriptor" : "");
         final Map<String, String> receivedObject = Stream.of(new String[][] {
                 {"project", project},
-                {"resourceVersion", resourceVersion},
-                {"resourceName", resourceName},
+                {"resourceVersion", resourceVersionValue},
+                {"resourceName", resourceNameValue},
                 {"additionalData", "additionalData"},
                 {"isDescriptor", isDescriptor},
         }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
         originalRecord = record(receivedObject);
+        final var expectedResult = (project + "$" + resourceVersionValue + "$" + resourceNameValue).replace(".", "-");
 
         final var params = project + "," + resourceVersion + "," + resourceName;
-        var expectedResult = project + "$" + resourceVersion + "$" + resourceName;
-        if (isDescriptor.equals("true")) {
-            expectedResult += "descriptor";
-        }
-
         final SinkRecord result = transformation(params).apply(originalRecord);
         assertThat(result).isEqualTo(setNewTopic(originalRecord, expectedResult));
     }

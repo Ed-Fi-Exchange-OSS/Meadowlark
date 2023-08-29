@@ -34,6 +34,22 @@ transforms.GenerateIndexFromResource.field.name=projectName,resourceVersion,reso
 
 ## Running transformations
 
+### Prerequisites
+
+- Install, if you don't have it, gradle version 7.2.4 according to the [installation guide](https://gradle.org/install/)
+- To verify your installation, pen a console (or a Windows command prompt) and run gradle -v to run gradle and display the version, e.g.:
+`> gradle -v`
+Result:
+```
+------------------------------------------------------------
+Gradle 7.2.4
+------------------------------------------------------------
+```
+
+- To run the transforms locally for the first time you need to build the gradle-wrapper.jar. To generate it, run the following command, this will add the gradle-wrapper.jar in the gradle\wrapper folder
+`> gradle wrapper`
+
+### Tasks
 This project includes a series of *gradle* tasks:
 
 - `./gradlew build`: Compile code
