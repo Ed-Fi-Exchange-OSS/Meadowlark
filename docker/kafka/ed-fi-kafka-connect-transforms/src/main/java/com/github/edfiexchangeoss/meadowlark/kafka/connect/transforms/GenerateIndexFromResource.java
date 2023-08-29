@@ -59,7 +59,7 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
             throw new DataException("value must specify one or more field names comma separated.");
         }
 
-        final List<String> fieldList = Stream.of(config.fieldName().get().replace(".", "-").split(","))
+        final List<String> fieldList = Stream.of(config.fieldName().get().split(","))
                 .map(String::trim)
                 .collect(Collectors.toList());
 
@@ -70,7 +70,7 @@ public class GenerateIndexFromResource<R extends ConnectRecord<R>> implements Tr
             topicResult.append(
                     topicNameFromNamedField(record.toString(),
                             schemaAndValue.value(),
-                            field).get() + separator);
+                            field).get().replace(".", "-") + separator);
         });
 
         topicResult.replace(topicResult.length() - 1, topicResult.length(), "");
