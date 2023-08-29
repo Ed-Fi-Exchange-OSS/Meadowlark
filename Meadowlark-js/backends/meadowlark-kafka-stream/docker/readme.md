@@ -37,7 +37,7 @@ Invoke-RestMethod http://localhost:8083/connector-plugins | ConvertTo-Json | Con
 
 This returns the debezium connector information.
 
-## Send Kafka Events to OpenSearch (Sync)
+## Send Kafka Events to OpenSearch (Synk)
 
 The Debezium Kafka Connector must be configured with the OpenSearch admin username and password to send the data streams to opensearch. To do this, copy the `opensearch_sink.json.example` file to `opensearch_sink.json`. Edit the json file and insert
 the connection username and password. Then send the configuration to the Debezium Kafka Connector:
@@ -56,9 +56,9 @@ Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json `
     -uri http://localhost:8084/connectors/ -ContentType "application/json"
 ```
 
-### Verify sync configuration
+### Verify synk configuration
 
-To check that sync connector is running, execute:
+To check that synk connector is running, execute:
 
 ```bash
 curl http://localhost:8084/connector-plugins | jq .

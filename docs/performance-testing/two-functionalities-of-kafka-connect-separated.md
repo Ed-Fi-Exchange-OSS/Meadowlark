@@ -84,8 +84,8 @@ LOG_FILE_LOCATION=c:/temp/
 
 | Scenario                                          | Avg      |
 | ------------------------------------------------- | -------- |
-| One container for source and sync                 | 2:39:647 |
-| One container for source and another one for sync | 2:33:290 |
+| One container for source and synk                 | 2:39:647 |
+| One container for source and another one for synk | 2:33:290 |
 
 Given the results we got, there is a tiny improvement in performance when executed
 the bulk load with 2 containers. Given these results we have decided to keep the code.

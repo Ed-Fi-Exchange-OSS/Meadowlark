@@ -48,9 +48,9 @@ services:
       - OFFSET_STORAGE_TOPIC=debezium_offset
       - STATUS_STORAGE_TOPIC=debezium_status
 
-  connect-sync:
-    hostname: kafka-connect-sync
-    container_name: kafka-connect-sync
+  connect-synk:
+    hostname: kafka-connect-synk
+    container_name: kafka-connect-synk
     image: edfialliance/connect-meadowlark:2.3-1@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
     ports:
       - 8084:8083
