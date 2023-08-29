@@ -45,7 +45,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     const { response, failureMessage } = result;
 
     if (response === 'INSERT_SUCCESS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 201);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'upsert', 201);
       return {
         statusCode: 201,
         headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, result.newDocumentUuid) },
@@ -53,7 +53,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 200);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'upsert', 200);
       return {
         statusCode: 200,
         headers: { ...headerMetadata, [LOCATION_HEADER_NAME]: resourceUriFrom(pathComponents, result.existingDocumentUuid) },
@@ -62,7 +62,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, blockingUris.join(','));
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'upsert', 409, blockingUris.join(','));
       return {
         // body: { error: { message: failureMessage, blockingUris } },
         body: R.is(String, failureMessage) ? { error: failureMessage, blockingUris } : failureMessage,
@@ -73,7 +73,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'INSERT_FAILURE_REFERENCE' || response === 'INSERT_FAILURE_CONFLICT') {
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409, blockingUris.join(','));
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'upsert', 409, blockingUris.join(','));
       return {
         body: R.is(String, failureMessage) ? { error: failureMessage, blockingUris } : failureMessage,
         statusCode: 409,
@@ -82,7 +82,7 @@ export async function upsert(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPSERT_FAILURE_WRITE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'upsert', 409);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'upsert', 409);
       return {
         statusCode: 409,
         headers: headerMetadata,

@@ -28,10 +28,7 @@ export { AuthorizationStrategy } from './security/AuthorizationStrategy';
 export type { DocumentReference } from './model/DocumentReference';
 export type { DocumentIdentity } from './model/DocumentIdentity';
 export type { MissingIdentity } from './model/DocumentIdentity';
-export type { FrontendRequest, Headers } from './handler/FrontendRequest';
-export { newFrontendRequest, newFrontendRequestMiddleware } from './handler/FrontendRequest';
-export type { FrontendResponse } from './handler/FrontendResponse';
-export { newFrontendResponse, newFrontendResponseSuccess } from './handler/FrontendResponse';
+export { newPathComponents } from './model/PathComponents';
 export { meadowlarkIdForDocumentIdentity, generateDocumentUuid, NoDocumentIdentity } from './model/DocumentIdentity';
 export { getMeadowlarkIdForDocumentReference } from './model/DocumentReference';
 export type { DocumentInfo } from './model/DocumentInfo';
@@ -57,3 +54,7 @@ export {
   dependencies,
   xsdMetadata,
 } from './handler/MetadataHandler';
+export type { FrontendRequest, Headers } from './handler/FrontendRequest';
+export { newFrontendRequest, newFrontendRequestMiddleware } from './handler/FrontendRequest';
+export type { FrontendResponse } from './handler/FrontendResponse';
+export { newFrontendResponse, newFrontendResponseSuccess } from './handler/FrontendResponse';

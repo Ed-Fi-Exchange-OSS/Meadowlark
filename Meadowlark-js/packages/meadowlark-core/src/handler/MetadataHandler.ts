@@ -4,9 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import axios from 'axios';
-import { Namespace } from '@edfi/metaed-core';
 import { Config } from '@edfi/meadowlark-utilities';
-import { loadMetaEdState } from '../metaed/LoadMetaEd';
 import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
 import { CreateApiVersionObject, OpenApiListTemplate, XsdTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
@@ -99,7 +97,7 @@ async function getFileFromBlobStorage(
   const resource: ExternalResource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, `getting ${url}`);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, `getting ${url}`);
     const response = await axios.get(url, {
       headers: { 'If-None-Match': resource.etag },
       validateStatus(status) {
@@ -108,13 +106,13 @@ async function getFileFromBlobStorage(
     });
 
     if (response.status === 200) {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '200 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, '200 from AWS');
       resource.etag = response.headers.etag;
       resource.body = transformer(response.data);
 
       resourceCache[url] = resource;
     } else {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '304 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, '304 from AWS');
     }
 
     return {

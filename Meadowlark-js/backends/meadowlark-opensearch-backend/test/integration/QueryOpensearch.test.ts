@@ -14,9 +14,11 @@ import {
   AuthorizationStrategy,
   DeleteRequest,
   DeleteResult,
+  DocumentUuid,
+  MeadowlarkId,
+  TraceId,
+  generateDocumentUuid,
 } from '@edfi/meadowlark-core';
-import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/IdTypes';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@opensearch-project/opensearch/.';
 import { queryDocuments } from '../../src/repository/QueryOpensearch';
 import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateOpensearch';

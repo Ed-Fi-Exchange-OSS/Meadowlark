@@ -4,11 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 /**
- * Base API resource information
+ * Base API resource information for passing along to backends
  */
 export interface BaseResourceInfo {
   /**
-   * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
+   * The project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
   projectName: string;
 
@@ -17,6 +17,7 @@ export interface BaseResourceInfo {
    * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
   resourceName: string;
+
   /**
    * Whether this resource is a descriptor. Descriptors are treated differently from other documents
    */
@@ -28,7 +29,7 @@ export interface BaseResourceInfo {
  */
 export interface ResourceInfo extends BaseResourceInfo {
   /**
-   * The MetaEd project version the entity belongs to.
+   * The project version the resource belongs to.
    */
   resourceVersion: string;
 

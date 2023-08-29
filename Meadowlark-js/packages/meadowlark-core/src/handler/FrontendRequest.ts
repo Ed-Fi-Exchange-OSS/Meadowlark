@@ -4,13 +4,13 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import R from 'ramda';
-import { NoTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
 import { PathComponents, NoPathComponents } from '../model/PathComponents';
 import { NoResourceInfo, ResourceInfo } from '../model/ResourceInfo';
 import { Security, UndefinedSecurity } from '../security/Security';
 import type { Action } from './Action';
 import { TraceId } from '../model/IdTypes';
+import { NoResourceSchema, ResourceSchema } from '../model/api-schema/ResourceSchema';
 
 export interface Headers {
   [header: string]: string | undefined;
@@ -22,6 +22,10 @@ export interface FrontendQueryParameters {
 
 export interface FrontendRequestMiddleware {
   security: Security;
+
+  /**
+   * The important parts of the request URL in object form
+   */
   pathComponents: PathComponents;
 
   /**
@@ -29,14 +33,29 @@ export interface FrontendRequestMiddleware {
    */
   parsedBody: object;
 
+  /**
+   * Base API resource information for passing along to backends
+   */
   resourceInfo: ResourceInfo;
 
-  // Note that TopLevelEntities are usually not JSON serializable
-  matchingMetaEdModel: TopLevelEntity;
+  /**
+   * Full API resource schema information describing the shape of a resource
+   */
+  resourceSchema: ResourceSchema;
+
+  /**
+   * Complete information on a validated API document
+   */
   documentInfo: DocumentInfo;
+
+  /**
+   * Additional header information to provide in the response
+   */
   headerMetadata: { [header: string]: string };
 
-  // Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
+  /**
+   * Whether to validate resources or not, currently pulled from role type 'assessment' from JWT
+   */
   validateResources: boolean;
 
   /**
@@ -90,7 +109,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     pathComponents: NoPathComponents,
     parsedBody: {},
     resourceInfo: NoResourceInfo,
-    matchingMetaEdModel: NoTopLevelEntity,
+    resourceSchema: NoResourceSchema,
     documentInfo: NoDocumentInfo,
     headerMetadata: {},
     validateResources: true,
@@ -112,12 +131,13 @@ export function newFrontendRequest(): FrontendRequest {
 }
 
 /**
- * Returns a copy of a FrontendRequest with the non-serializable 'matchingMetaEdModel' field removed
+ * Returns a copy of a FrontendRequest with JsonSchemas removed from the ResourceSchema
  */
-const removeMatchingMetaEdModel: (f: FrontendRequest) => FrontendRequest = R.dissocPath([
-  'middleware',
-  'matchingMetaEdModel',
-]);
+const removeJsonSchemas: (f: FrontendRequest) => FrontendRequest = R.pipe(
+  R.dissocPath(['middleware', 'resourceSchema', 'jsonSchemaForInsert']),
+  R.dissocPath(['middleware', 'resourceSchema', 'jsonSchemaForQuery']),
+  R.dissocPath(['middleware', 'resourceSchema', 'jsonSchemaForUpdate']),
+);
 
 /**
  * Returns a copy of a FrontendRequest with the sensitive data 'body' field removed
@@ -154,7 +174,7 @@ export const removeReferencesDocumentIdentity: (f: FrontendRequest) => FrontendR
  * Returns a copy of a FrontendRequest suitable for logging, such as with non-serializable fields or sensitive data removed
  */
 export const frontendRequestForLogging: (f: FrontendRequest) => FrontendRequest = R.pipe(
-  removeMatchingMetaEdModel,
+  removeJsonSchemas,
   removeBody,
   removeParsedBody,
   removeDocumentIdentity,

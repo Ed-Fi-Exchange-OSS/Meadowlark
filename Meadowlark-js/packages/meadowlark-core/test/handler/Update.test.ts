@@ -10,6 +10,9 @@ import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } fro
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -18,9 +21,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
       documentUuid,
     },
   },

@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
 import { DocumentUuid, MeadowlarkId } from './IdTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
@@ -49,10 +48,8 @@ function toHash(data: string, lengthInBytes: number): string {
 /**
  * Returns the 12 byte SHAKE256 Base64Url encoded hash form of a ResourceInfo.
  */
-export function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }: BaseResourceInfo) {
-  const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
-  const resourceInfoString = `${projectName}#${normalizedResourceName}`;
-  return toHash(resourceInfoString, 12);
+export function resourceInfoHashFrom({ projectName, resourceName }: BaseResourceInfo) {
+  return toHash(`${projectName}#${resourceName}`, 12);
 }
 
 /**

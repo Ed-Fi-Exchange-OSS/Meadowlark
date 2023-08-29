@@ -18,6 +18,11 @@ export async function timestampRequest({ frontendRequest, frontendResponse }: Mi
   writeRequestToLog(moduleName, frontendRequest, 'timestampRequest');
 
   frontendRequest.middleware.timestamp = Date.now();
-  writeDebugMessage(moduleName, frontendRequest, 'timestampRequest', `Timestamp: ${frontendRequest.middleware.timestamp}`);
+  writeDebugMessage(
+    moduleName,
+    'timestampRequest',
+    frontendRequest.traceId,
+    `Timestamp: ${frontendRequest.middleware.timestamp}`,
+  );
   return { frontendRequest, frontendResponse: null };
 }

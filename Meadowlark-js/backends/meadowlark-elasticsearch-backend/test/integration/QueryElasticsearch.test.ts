@@ -14,9 +14,11 @@ import {
   AuthorizationStrategy,
   DeleteRequest,
   DeleteResult,
+  generateDocumentUuid,
+  DocumentUuid,
+  MeadowlarkId,
+  TraceId,
 } from '@edfi/meadowlark-core';
-import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/IdTypes';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@elastic/elasticsearch';
 import { queryDocuments } from '../../src/repository/QueryElasticsearch';
 import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateElasticsearch';

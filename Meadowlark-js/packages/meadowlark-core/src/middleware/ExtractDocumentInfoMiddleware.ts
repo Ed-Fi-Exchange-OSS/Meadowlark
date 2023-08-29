@@ -30,7 +30,7 @@ export async function documentInfoExtraction({
 
   if (documentInfo === NoDocumentInfo) {
     const statusCode = 404;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'documentInfoExtraction', statusCode);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'documentInfoExtraction', statusCode);
     return {
       frontendRequest,
       frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },

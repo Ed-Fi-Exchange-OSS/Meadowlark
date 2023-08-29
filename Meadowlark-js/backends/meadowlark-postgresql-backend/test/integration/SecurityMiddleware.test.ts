@@ -17,9 +17,9 @@ import {
   DocumentUuid,
   UpsertRequest,
   TraceId,
+  newFrontendRequestMiddleware,
+  newPathComponents,
 } from '@edfi/meadowlark-core';
-import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
-import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';

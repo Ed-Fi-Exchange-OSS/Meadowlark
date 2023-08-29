@@ -8,12 +8,14 @@ import { PathComponents } from '../model/PathComponents';
 import { FrontendRequest } from './FrontendRequest';
 import { ReferringDocumentInfo } from '../message/ReferringDocumentInfo';
 import { versionAbbreviationFor } from '../metaed/MetaEdProjectMetadata';
+import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
+import { EndpointName } from '../model/api-schema/EndpointName';
 
 /**
  * Derives the resource URI from the pathComponents and resourceId
  */
 export function resourceUriFrom(pathComponents: PathComponents, documentUuid: string): string {
-  return `/${pathComponents.version}/${pathComponents.namespace}/${pathComponents.resourceName}/${documentUuid}`;
+  return `/${pathComponents.projectShortVersion}/${pathComponents.projectNamespace}/${pathComponents.endpointName}/${documentUuid}`;
 }
 
 /**
@@ -28,9 +30,9 @@ export function blockingDocumentsToUris(
     referringDocumentInfo.forEach((document) => {
       let uri = resourceUriFrom(
         {
-          version: versionAbbreviationFor(document.resourceVersion),
-          namespace: document.projectName.toLowerCase(), // Lower casing is correct for Ed-Fi models, not sure about alternatives
-          resourceName: uncapitalize(pluralize(document.resourceName)),
+          projectShortVersion: versionAbbreviationFor(document.resourceVersion),
+          projectNamespace: document.projectName.toLowerCase() as ProjectNamespace, // Lower casing is correct for Ed-Fi models, not sure about alternatives
+          endpointName: uncapitalize(pluralize(document.resourceName)) as EndpointName,
         },
         document.documentUuid,
       );

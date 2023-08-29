@@ -17,9 +17,9 @@ import {
   UpsertRequest,
   TraceId,
   UpsertResult,
+  newFrontendRequestMiddleware,
+  newPathComponents,
 } from '@edfi/meadowlark-core';
-import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
-import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
 import { MongoClient } from 'mongodb';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
 import { rejectByOwnershipSecurity } from '../../src/repository/OwnershipSecurity';

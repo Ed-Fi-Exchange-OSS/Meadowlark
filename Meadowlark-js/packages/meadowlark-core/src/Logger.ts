@@ -6,32 +6,23 @@
 import { isDebugEnabled, isInfoEnabled, Logger, writeErrorToLog as logError } from '@edfi/meadowlark-utilities';
 
 import { FrontendRequest } from './handler/FrontendRequest';
+import { TraceId } from './model/IdTypes';
 
 export function writeDebugStatusToLog(
   moduleName: string,
-  request: FrontendRequest,
+  traceId: TraceId,
   method: string,
   statusCode?: number,
   message?: string,
   extra?: any,
 ): void {
   if (isDebugEnabled()) {
-    Logger.debug(`${moduleName}.${method} ${statusCode ?? ''} ${message ?? ''}`.trimEnd(), request.traceId, extra);
+    Logger.debug(`${moduleName}.${method} ${statusCode ?? ''} ${message ?? ''}`.trimEnd(), traceId, extra);
   }
 }
 
-export function writeDebugObject(
-  moduleName: string,
-  request: FrontendRequest,
-  method: string,
-  statusCode?: number,
-  messageBody?: object,
-): void {
-  Logger.debug(`${moduleName}.${method} ${statusCode}`, request.traceId, messageBody);
-}
-
-export function writeDebugMessage(moduleName: string, request: FrontendRequest, method: string, message: string): void {
-  Logger.debug(`${moduleName}.${method}`, request.traceId, message);
+export function writeDebugMessage(moduleName: string, method: string, traceId: TraceId, message: string): void {
+  Logger.debug(`${moduleName}.${method}`, traceId, message);
 }
 
 export function writeRequestToLog(moduleName: string, request: FrontendRequest, method: string, extra?: any): void {
@@ -40,6 +31,6 @@ export function writeRequestToLog(moduleName: string, request: FrontendRequest, 
   }
 }
 
-export function writeErrorToLog(moduleName: string, traceId: string, functionName: string, error: any): void {
+export function writeErrorToLog(moduleName: string, traceId: TraceId, functionName: string, error: any): void {
   logError(moduleName, traceId, functionName, undefined, error);
 }

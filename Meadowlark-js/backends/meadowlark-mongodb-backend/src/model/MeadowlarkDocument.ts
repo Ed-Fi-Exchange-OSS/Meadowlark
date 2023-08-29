@@ -96,12 +96,12 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   createdBy: string;
 
   /*
-   * Creation date as as Unix timestamp, or null if this is a document to be updated and we don't know the create time yet
+   * Creation date as a Unix timestamp, or null if this is a document to be updated and we don't know the create time yet
    */
   createdAt: number | null;
 
   /*
-   * Last modified date as as Unix timestamp.
+   * Last modified date as a Unix timestamp.
    */
   lastModifiedAt: number;
 

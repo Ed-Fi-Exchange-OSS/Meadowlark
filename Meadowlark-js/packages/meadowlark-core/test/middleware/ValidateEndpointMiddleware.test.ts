@@ -3,13 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as ResourceValidator from '../../src/validation/ResourceValidator';
-import { resourceValidation } from '../../src/middleware/ValidateResourceMiddleware';
+import * as EndpointValidator from '../../src/validation/EndpointValidator';
+import { endpointValidation } from '../../src/middleware/ValidateEndpointMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { newResourceInfo, NoResourceInfo } from '../../src/model/ResourceInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { DocumentUuid } from '../../src/model/IdTypes';
+import { EndpointValidationResult } from '../../src/validation/EndpointValidationResult';
+import { NoResourceSchema } from '../../src/model/api-schema/ResourceSchema';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -18,10 +23,10 @@ describe('given a previous middleware has created a response', () => {
   let mockResourceValidator: any;
 
   beforeAll(async () => {
-    mockResourceValidator = jest.spyOn(ResourceValidator, 'validateResource');
+    mockResourceValidator = jest.spyOn(EndpointValidator, 'validateEndpoint');
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -48,18 +53,18 @@ describe('given an error response and no document info from resourceValidation',
   let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: ResourceValidator.ResourceValidationResult = {
+    const validationResult: EndpointValidationResult = {
       resourceInfo: NoResourceInfo,
       errorBody,
-      resourceName: '',
+      resourceSchema: NoResourceSchema,
     };
 
     mockResourceValidator = jest
-      .spyOn(ResourceValidator, 'validateResource')
+      .spyOn(EndpointValidator, 'validateEndpoint')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -86,18 +91,18 @@ describe('given an error response and document info from resourceValidation', ()
   let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: ResourceValidator.ResourceValidationResult = {
+    const validationResult: EndpointValidationResult = {
       resourceInfo: newResourceInfo(),
       errorBody,
-      resourceName: '',
+      resourceSchema: NoResourceSchema,
     };
 
     mockResourceValidator = jest
-      .spyOn(ResourceValidator, 'validateResource')
+      .spyOn(EndpointValidator, 'validateEndpoint')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -125,18 +130,18 @@ describe('given a valid response from resourceValidation', () => {
   let mockResourceValidator: any;
 
   beforeAll(async () => {
-    const validationResult: ResourceValidator.ResourceValidationResult = {
+    const validationResult: EndpointValidationResult = {
       resourceInfo,
-      resourceName: '',
+      resourceSchema: NoResourceSchema,
       headerMetadata,
     };
 
     mockResourceValidator = jest
-      .spyOn(ResourceValidator, 'validateResource')
+      .spyOn(EndpointValidator, 'validateEndpoint')
       .mockReturnValue(Promise.resolve(validationResult));
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -171,16 +176,16 @@ describe('given requesting abstract domain entity', () => {
       middleware: {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
-          resourceName: 'educationOrganizations',
-          namespace: 'ed-fi',
-          version: 'v3.3b',
+          endpointName: 'educationOrganizations' as EndpointName,
+          projectNamespace: 'ed-fi' as ProjectNamespace,
+          projectShortVersion: 'v3.3b' as ProjectShortVersion,
           documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse: null });
   });
 
   it('returns status 404', () => {
@@ -207,16 +212,16 @@ describe('given requesting abstract association', () => {
       middleware: {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
-          resourceName: 'generalStudentProgramAssociations',
-          namespace: 'ed-fi',
-          version: 'v3.3b',
+          endpointName: 'generalStudentProgramAssociations' as EndpointName,
+          projectNamespace: 'ed-fi' as ProjectNamespace,
+          projectShortVersion: 'v3.3b' as ProjectShortVersion,
           documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
       },
     };
 
     // Act
-    resultChain = await resourceValidation({ frontendRequest, frontendResponse: null });
+    resultChain = await endpointValidation({ frontendRequest, frontendResponse: null });
   });
 
   it('returns status 404', () => {

@@ -9,6 +9,9 @@ import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
@@ -16,9 +19,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
     },
   },
 };

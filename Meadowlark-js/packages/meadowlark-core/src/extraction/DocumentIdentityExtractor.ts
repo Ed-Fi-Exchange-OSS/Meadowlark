@@ -5,15 +5,6 @@
 
 import R from 'ramda';
 import { invariant } from 'ts-invariant';
-import { EntityProperty, TopLevelEntity } from '@edfi/metaed-core';
-import {
-  topLevelApiNameOnEntity,
-  ReferenceComponent,
-  isReferenceElement,
-  EntityApiSchemaData,
-  EntityPropertyApiSchemaData,
-} from '@edfi/metaed-plugin-edfi-api-schema';
-import { decapitalize } from '../Utility';
 import { SuperclassInfo } from '../model/SuperclassInfo';
 import { DocumentIdentity } from '../model/DocumentIdentity';
 import { DescriptorDocument } from '../model/DescriptorDocument';
@@ -21,89 +12,6 @@ import { descriptorDocumentIdentityFrom } from '../model/DescriptorDocumentInfo'
 import { SchoolYearEnumerationDocument } from '../model/SchoolYearEnumerationDocument';
 import { schoolYearEnumerationDocumentIdentityFrom } from '../model/SchoolYearEnumerationDocumentInfo';
 
-type NullableTopLevelEntity = { superclass: TopLevelEntity | null };
-
-/**
- * Takes a non-reference property representing a portion of the identity of a MetaEd entity,
- * an API JSON body matching that entity, and a path to the location of the property value
- * in the JSON body, and returns that portion of the document identity extracted from the JSON body.
- *
- * documentPath is a path in the JSON body as a string array with one path segment per array element.
- */
-function singleIdentityFrom(property: EntityProperty, body: object, documentPath: string[]): DocumentIdentity {
-  const { apiMapping } = property.data.edfiApiSchema as EntityPropertyApiSchemaData;
-
-  let path: string[];
-
-  if (property.type === 'schoolYearEnumeration' && property.roleName !== '') {
-    path = [...documentPath, 'schoolYear'];
-  } else {
-    path = [...documentPath, apiMapping.fullName];
-  }
-
-  const documentPathAsString: string = path.join('.');
-
-  const elementValue: string | undefined = R.path(path, body);
-
-  invariant(
-    elementValue != null,
-    `Identity element value for ${property.metaEdName} not found in ${JSON.stringify(body)} at ${documentPathAsString}`,
-  );
-
-  return { [documentPathAsString]: elementValue };
-}
-
-/**
- * Takes a ReferenceComponent representing an identity of a MetaEd entity along with
- * an API JSON body matching that entity and returns the document identity extracted
- * from the JSON body.
- *
- * documentPath is an accumulator allowing this function to recursively build up paths in the
- * JSON body as a string array with one path segment per array element. This allows use
- * of the path() function of the ramdajs library (https://ramdajs.com/docs/#path) to extract
- * values from the JSON body.
- */
-function documentIdentitiesFrom(
-  identityReferenceComponent: ReferenceComponent,
-  body: object,
-  entity: TopLevelEntity,
-  documentPath: string[],
-): DocumentIdentity[] {
-  if (isReferenceElement(identityReferenceComponent)) {
-    // SchoolYearEnumerations are an API one-off expressed as two levels in the document body
-    if (identityReferenceComponent.sourceProperty.type === 'schoolYearEnumeration') {
-      const { roleName } = identityReferenceComponent.sourceProperty;
-      if (roleName !== '') {
-        documentPath.push(`${decapitalize(roleName)}SchoolYearTypeReference`);
-      } else {
-        documentPath.push('schoolYearTypeReference');
-      }
-    }
-    return [singleIdentityFrom(identityReferenceComponent.sourceProperty, body, documentPath)];
-  }
-
-  const result: DocumentIdentity[] = [];
-  identityReferenceComponent.referenceComponents.forEach((childComponent: ReferenceComponent) => {
-    const identityTopLevelName = topLevelApiNameOnEntity(entity, identityReferenceComponent.sourceProperty);
-    const newDocumentPath: string[] = documentPath.length > 0 ? documentPath : [identityTopLevelName];
-    if (isReferenceElement(childComponent)) {
-      result.push(singleIdentityFrom(childComponent.sourceProperty, body, newDocumentPath));
-    } else {
-      result.push(...documentIdentitiesFrom(childComponent, body, entity, newDocumentPath));
-    }
-  });
-  return result;
-}
-
-/**
- * Collapses an array of DocumentIdentity objects into a single DocumentIdentity.
- */
-function documentIdentityFrom(documentIdentities: DocumentIdentity[]): DocumentIdentity {
-  return documentIdentities.reduce(
-    (accumulator: DocumentIdentity, current: DocumentIdentity) => ({ ...accumulator, ...current }),
-    {},
-  );
-}
 
 /**
  * Takes a MetaEd entity object and a API JSON body for the resource mapped to that MetaEd entity and

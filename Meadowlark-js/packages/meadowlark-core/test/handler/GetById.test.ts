@@ -11,11 +11,14 @@ import { PathComponents } from '../../src/model/PathComponents';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { DocumentUuid } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
 
 const validPathComponents: PathComponents = {
-  resourceName: '1',
-  namespace: '2',
-  version: '3',
+  endpointName: '1' as EndpointName,
+  projectNamespace: '2' as ProjectNamespace,
+  projectShortVersion: '3' as ProjectShortVersion,
   documentUuid: '6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7' as DocumentUuid,
 };
 

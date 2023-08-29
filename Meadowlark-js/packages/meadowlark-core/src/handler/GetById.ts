@@ -20,7 +20,7 @@ const moduleName = 'core.handler.GetById';
  */
 export async function getById(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   if (frontendRequest.middleware.pathComponents.documentUuid == null) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getById', 404);
     return { statusCode: 404 };
   }
   const request: GetRequest = {
@@ -37,12 +37,12 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   const { response, lastModifiedDate } = result;
 
   if (response === 'UNKNOWN_FAILURE') {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 500);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getById', 500);
     return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
   if (response === 'GET_FAILURE_NOT_EXISTS') {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 404);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getById', 404);
     return {
       statusCode: 404,
       headers: frontendRequest.middleware.headerMetadata,
@@ -52,7 +52,7 @@ export async function getById(frontendRequest: FrontendRequest): Promise<Fronten
   // eslint-disable-next-line no-underscore-dangle
   const _lastModifiedDate = new Date(lastModifiedDate).toISOString();
 
-  writeDebugStatusToLog(moduleName, frontendRequest, 'getById', 200);
+  writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getById', 200);
   return {
     body: { id: result.documentUuid, ...result.edfiDoc, _lastModifiedDate },
     statusCode: 200,

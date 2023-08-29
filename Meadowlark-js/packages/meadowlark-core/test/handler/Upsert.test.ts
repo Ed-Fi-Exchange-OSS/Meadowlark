@@ -12,6 +12,9 @@ import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStoreP
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { isDocumentUuidWellFormed } from '../../src/model/DocumentIdentity';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -20,9 +23,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
     },
   },
 };

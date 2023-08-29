@@ -3,8 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 import { JSONPath as jsonPath } from 'jsonpath-plus';
-import { TopLevelEntity } from '@edfi/metaed-core';
-import type { EntityApiSchemaData, EqualityConstraint } from '@edfi/metaed-plugin-edfi-api-schema';
+import { ResourceSchema } from '../model/api-schema/ResourceSchema';
+import { EqualityConstraint } from '../model/api-schema/EqualityConstraint';
 
 // By using the jsonpath library's "flatten" flag, we should only get back primitive types in the array
 type PrimitiveType = number | string | boolean;
@@ -24,12 +24,10 @@ function allEqual(array: PrimitiveType[]): boolean {
  *
  * Returns a list of validation failure messages.
  */
-export function validateEqualityConstraints(matchingMetaEdModel: TopLevelEntity, parsedBody: any): string[] {
+export function validateEqualityConstraints(resourceSchema: ResourceSchema, parsedBody: any): string[] {
   const validationFailures: string[] = [];
 
-  const { equalityConstraints } = matchingMetaEdModel.data.edfiApiSchema as EntityApiSchemaData;
-
-  equalityConstraints.forEach((equalityConstraint: EqualityConstraint) => {
+  resourceSchema.equalityConstraints.forEach((equalityConstraint: EqualityConstraint) => {
     const sourceValues: PrimitiveType[] = jsonPath({
       path: equalityConstraint.sourceJsonPath,
       json: parsedBody,
