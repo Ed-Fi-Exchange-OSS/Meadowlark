@@ -174,7 +174,7 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
@@ -222,7 +222,7 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
@@ -280,11 +280,39 @@ describe('when querying for students', () => {
           expect(queryResult.documents.findIndex((x: any) => x.studentUniqueId === studentUniqueIdTwo)).toBeGreaterThan(-1);
         });
 
-        it('should have used the correct SQL query', async () => {
+        it('should have used the correct query', async () => {
           expect(spyOnRequest.mock.calls.length).toBe(1);
           expect(spyOnRequest.mock.calls[0].length).toBe(1);
           const { body } = spyOnRequest.mock.calls[0][0];
           expect(body).toEqual(expectedQuery);
+        });
+
+        afterAll(() => {
+          mock.clearAll();
+        });
+      });
+
+      describe('when querying with a case different from the case in the datastore', () => {
+        const authorizationStrategy: AuthorizationStrategy = { type: 'FULL_ACCESS' };
+        let queryResult: QueryResult;
+        const studentUniqueIdOne = 'one';
+        const studentUniqueIdTwo = 'two';
+        const birthCity = 'a';
+        const matches = [
+          {
+            match_phrase: { birthCity: birthCity.toUpperCase() },
+          },
+        ];
+
+        beforeAll(async () => {
+          const client = setupMockRequestHappyPath([studentUniqueIdOne, studentUniqueIdTwo], matches);
+          const request = setupQueryRequest(authorizationStrategy, { birthCity: birthCity.toUpperCase() }, {});
+
+          queryResult = await queryDocuments(request, client);
+        });
+
+        it('should return the two students regardless of the casing', async () => {
+          expect(queryResult.documents.length).toBe(2);
         });
 
         afterAll(() => {

@@ -42,13 +42,13 @@ export async function handleOpenSearchError(
           const responseException = err as ResponseError;
           if (responseException?.message !== undefined) {
             if (responseException.message !== 'Response Error') {
-              let startPosition = responseException?.message?.indexOf('Reason:');
-              const position = responseException?.message?.indexOf(' Preview');
-              startPosition = startPosition > -1 ? startPosition : 0;
-              if (position > -1) {
-                responseException.message = responseException?.message?.substring(startPosition, position);
-              } else if (startPosition !== 0) {
-                responseException.message = responseException?.message?.substring(startPosition);
+              if (responseException?.message.indexOf('index_not_found_exception') !== -1) {
+                Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
+                return {
+                  response: 'QUERY_FAILURE_INVALID_QUERY',
+                  documents: [],
+                  failureMessage: 'IndexNotFoundException',
+                };
               }
               Logger.error(
                 `${moduleName} ${documentProcessError}`,
