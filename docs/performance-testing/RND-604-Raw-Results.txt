@@ -1,6 +1,6 @@
 
 
--- Code as it is:
+-- Before splitting functionalities of kafka connect:
 
 Invoke-RestMethod -Method Post -InFile .\debezium-mongodb.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
 Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
@@ -15,7 +15,7 @@ Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json -uri http://localh
 AVG: 2:39:647
 
 
--- After code changes:
+-- After splitting functionalities of kafka connect:
 
 Invoke-RestMethod -Method Post -InFile .\debezium-mongodb.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
 Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json -uri http://localhost:8084/connectors/ -ContentType "application/json"
