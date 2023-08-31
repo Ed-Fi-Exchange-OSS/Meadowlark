@@ -1,0 +1,30 @@
+
+
+-- Before splitting functionalities of kafka connect:
+
+Invoke-RestMethod -Method Post -InFile .\debezium-mongodb.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
+Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
+
+--- Time:
+00:02:50.4047199
+00:02:32.3251508
+00:02:34.7602723
+00:02:35.2213248
+00:02:45.5291286
+
+AVG: 2:39:647
+
+
+-- After splitting functionalities of kafka connect:
+
+Invoke-RestMethod -Method Post -InFile .\debezium-mongodb.json -uri http://localhost:8083/connectors/ -ContentType "application/json"
+Invoke-RestMethod -Method Post -InFile .\opensearch_sink.json -uri http://localhost:8084/connectors/ -ContentType "application/json"
+
+--- Time:
+00:02:32.0613715
+00:02:32.9250768
+00:02:19.7885605
+00:02:42.5871903
+00:02:39.0919751
+
+AVG: 2:33:290
