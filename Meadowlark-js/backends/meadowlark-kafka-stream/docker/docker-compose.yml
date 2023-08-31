@@ -34,7 +34,7 @@ services:
   connect-source:
     hostname: kafka-connect-source
     container_name: kafka-connect-source
-    image: edfialliance/connect-meadowlark:2.3-2@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
+    image: edfialliance/connect-meadowlark:2.3-2@sha256:e6792ab9c797a27ae15e2fba68e874cf9898658f947ba0448182b5e269b1bbb8
     ports:
       - 8083:8083
     networks:
@@ -51,7 +51,7 @@ services:
   connect-sink:
     hostname: kafka-connect-sink
     container_name: kafka-connect-sink
-    image: edfialliance/connect-meadowlark:2.3-2@sha256:6605d2f0ad1797ccf7e3f7a4dbe690bb0c9e198dd6a0d5720a7b170d0bc4ca95
+    image: edfialliance/connect-meadowlark:2.3-2@sha256:e6792ab9c797a27ae15e2fba68e874cf9898658f947ba0448182b5e269b1bbb8
     ports:
       - 8084:8083
     networks:
