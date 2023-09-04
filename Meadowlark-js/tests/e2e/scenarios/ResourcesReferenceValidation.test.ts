@@ -11,7 +11,7 @@ import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 describe('When creating a resource that has a reference to another resource', () => {
   describe('given a token with strict validation', () => {
     describe('given reference does not exist', () => {
-      it('should fail with code 400 and a message', async () => {
+      it('should fail with code 409 and a message', async () => {
         await baseURLRequest()
           .post('/v3.3b/ed-fi/locations')
           .auth(await getAccessToken('vendor'), { type: 'bearer' })
@@ -40,6 +40,68 @@ describe('When creating a resource that has a reference to another resource', ()
                 },
               }
             `);
+          });
+      });
+    });
+
+    describe('given descriptor references exists and two descriptor references do not exist', () => {
+      it('should fail with code 409 and a message', async () => {
+        await baseURLRequest()
+          .post('/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors')
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
+          .send({
+            codeValue: 'Other',
+            shortDescription: 'Other',
+            description: 'Other',
+            namespace: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor',
+          })
+          .expect(201);
+
+        await baseURLRequest()
+          .post('/v3.3b/ed-fi/schools')
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
+          .send({
+            schoolId: 124,
+            nameOfInstitution: 'A School',
+            educationOrganizationCategories: [
+              {
+                educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+              },
+            ],
+            schoolCategories: [
+              {
+                schoolCategoryDescriptor: 'uri://ed-fi.org/SchoolCategoryDescriptor#All Levels',
+              },
+            ],
+            gradeLevels: [
+              {
+                gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
+              },
+            ],
+          })
+          .expect(409)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": {
+                "failures": [
+                  {
+                    "identity": {
+                      "descriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
+                    },
+                    "resourceName": "GradeLevel",
+                  },
+                  {
+                    "identity": {
+                      "descriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels",
+                    },
+                    "resourceName": "SchoolCategory",
+                  },
+                ],
+                "message": "Reference validation failed",
+              },
+            }
+              `);
           });
       });
     });

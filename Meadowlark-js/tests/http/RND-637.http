@@ -1,0 +1,117 @@
+
+@admin_client_id=meadowlark_admin_key_1
+@admin_client_secret=meadowlark_admin_secret_1
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "Hometown SIS",
+    "roles": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
+# @name client1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "grant_type": "client_credentials",
+    "client_id": "{{client1_client_id}}",
+    "client_secret": "{{client1_client_secret}}"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/EducationOrganizationCategoryDescriptors
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+  "codeValue": "Other",
+  "shortDescription": "Other",
+  "description": "Other",
+  "namespace": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor"
+}
+
+### This returns 409 error, since uri://ed-fi.org/SchoolCategoryDescriptor#All Levels 
+# and uri://ed-fi.org/GradeLevelDescriptor#First Grade don't exist.
+POST http://localhost:3000/local/v3.3b/ed-fi/schools
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+    "schoolId": 124,
+    "nameOfInstitution": "A School",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}
+
+### These are the two descriptor needed in order to be able to successfully make the previous request.
+POST http://localhost:3000/local/v3.3b/ed-fi/SchoolCategoryDescriptors
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+  "codeValue": "All Levels",
+  "shortDescription": "All Levels",
+  "description": "All Levels",
+  "namespace": "uri://ed-fi.org/SchoolCategoryDescriptor"
+}
+
+###
+POST http://localhost:3000/local/v3.3b/ed-fi/GradeLevelDescriptors
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+  "codeValue": "First Grade",
+  "shortDescription": "First Grade",
+  "description": "First Grade",
+  "namespace": "uri://ed-fi.org/GradeLevelDescriptor"
+}
+
+#####
+GET http://localhost:3000/local/v3.3b/ed-fi/schools?nameOfInstitution=A School
+authorization: bearer {{authToken1}}
