@@ -51,7 +51,7 @@ export function findMissingReferences(
   // eslint-disable-next-line no-underscore-dangle
   const meadowlarkIdsOfRefsInDb: MeadowlarkId[] = refsInDb.map((outRef) =>
     // eslint-disable-next-line no-underscore-dangle
-    outRef.aliasMeadowlarkIds.length > 0 ? outRef.aliasMeadowlarkIds[0] : outRef._id,
+    outRef.aliasMeadowlarkIds && outRef.aliasMeadowlarkIds.length > 0 ? outRef.aliasMeadowlarkIds[0] : outRef._id,
   );
   const outRefMeadowlarkIdsNotInDb: MeadowlarkId[] = R.difference(documentOutboundRefs, meadowlarkIdsOfRefsInDb);
 
