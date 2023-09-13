@@ -37,19 +37,19 @@
     "secure-random": "^1.1.2",
     "semver": "^7.5.4",
     "ts-invariant": "^0.10.3",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.1.2",
+    "@types/fs-extra": "^11.0.1",
     "@types/inflection": "^1.13.0",
     "@types/js-yaml": "^4.0.5",
     "@types/pluralize": "^0.0.30",
     "@types/ramda": "0.29.3",
     "@types/semver": "^7.5.1",
-    "@types/xml2js": "^0.4.11",
+    "@types/xml2js": "^0.4.12",
     "copyfiles": "^2.4.1",
     "jsinspect": "^0.12.7",
-    "regenerator-runtime": "^0.13.11",
+    "regenerator-runtime": "^0.14.0",
     "rimraf": "^5.0.1"
   },
   "scripts": {
