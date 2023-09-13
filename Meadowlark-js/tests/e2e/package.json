@@ -17,7 +17,7 @@
     "chance": "^1.1.11",
     "dotenv": "^16.3.1",
     "fast-memoize": "^2.5.2",
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.1.1",
     "supertest": "^6.3.3",
     "testcontainers": "^10.0.2"
   },
