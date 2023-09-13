@@ -23,7 +23,7 @@
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
     "pg": "^8.11.1",
     "pg-format": "^1.0.4",
-    "ramda": "0.27.2",
+    "ramda": "0.29.0",
     "ts-invariant": "^0.10.3"
   },
   "devDependencies": {
