@@ -50,7 +50,7 @@
     "copyfiles": "^2.4.1",
     "jsinspect": "^0.12.7",
     "regenerator-runtime": "^0.13.11",
-    "rimraf": "^3.0.2"
+    "rimraf": "^5.0.1"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
