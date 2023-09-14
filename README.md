@@ -23,6 +23,7 @@ information on the background and design decisions for this project.
 
 * [Running on Localhost](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/LOCALHOST.md)
 * [Configuration](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/CONFIGURATION.md)
+* [Data Authorization](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/DATA-AUTHORIZATION.md)
 * [Developer getting started notes](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/README.md)
 * [Additional technical details](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/TECHNICAL.md)
 * [Docker for Local Meadowlark Development](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/docs/DOCKER-LOCAL-DEV.md)
