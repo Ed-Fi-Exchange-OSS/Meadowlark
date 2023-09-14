@@ -28,7 +28,7 @@ This mode is specific to the internal OAuth2 provider and client management API,
 
 Assign "assessment" to the roles for this default authorization model when creating the API client.
 
-(warning) This is not a unique authorization model, and it should be used in addition to "vendor". This role allows the API client to bypass the usual referential integrity checks when issuing a POST or PUT request.
+(warning) This is not a unique authorization model, and it should be used in addition to "vendor". This role allows the API client to bypass the usual reference validation checks when issuing a POST or PUT request.
 
 ## Descriptors
 
@@ -55,4 +55,4 @@ Implementing these rules is considerably simpler and demands no customized SQL o
 
 Clearly, in the context in which data is being read out of the API the ODS EdOrg authorization pattern becomes potentially much more useful.  But in many cases of data out – particularly early one – the scope of that authorization in field work still tends to be "all district data across these API resources for school year X"
 
-In summary, the ODS API pattern of using EdOrg relationships to drive authorization is powerful and worth preserving, but the Meadowlark project suggests that a set of simpler patterns might eliminate complexity from many early field projects. As a implementation advances in complexity, an API host may choose to enable more powerful and complex designs.
+In summary, the ODS API pattern of using EdOrg relationships to drive authorization is powerful and worth preserving, but the Meadowlark project suggests that a set of simpler patterns might eliminate complexity from many early field projects.
