@@ -21,7 +21,7 @@
   "dependencies": {
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
-    "@opensearch-project/opensearch": "^2.2.1"
+    "@opensearch-project/opensearch": "^2.3.1"
   },
   "devDependencies": {
     "@short.io/opensearch-mock": "^0.3.1",
