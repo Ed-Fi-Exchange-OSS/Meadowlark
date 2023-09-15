@@ -59,7 +59,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
@@ -94,7 +94,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
@@ -124,7 +124,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
@@ -165,7 +165,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
@@ -253,7 +253,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: "16"
+          node-version: "18"
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
