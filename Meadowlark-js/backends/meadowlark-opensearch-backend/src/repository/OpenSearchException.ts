@@ -45,7 +45,7 @@ export async function handleOpenSearchError(
               if (responseException?.message.indexOf('index_not_found_exception') !== -1) {
                 Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
                 return {
-                  response: 'QUERY_FAILURE_INVALID_QUERY',
+                  response: 'QUERY_FAILURE_INDEX_NOT_FOUND',
                   documents: [],
                   failureMessage: 'IndexNotFoundException',
                 };
@@ -65,7 +65,7 @@ export async function handleOpenSearchError(
                     // No object has been uploaded for the requested type
                     Logger.warn(`${moduleName} ${documentProcessError} index not found`, traceId);
                     return {
-                      response: 'QUERY_FAILURE_INVALID_QUERY',
+                      response: 'QUERY_FAILURE_INDEX_NOT_FOUND',
                       documents: [],
                       failureMessage: 'IndexNotFoundException',
                     };
