@@ -56,6 +56,39 @@ describe('given persistence is going to fail', () => {
   });
 });
 
+describe('given persistence fails with connection error', () => {
+  let response: FrontendResponse;
+  let mockQueryHandler: any;
+  const expectedError = 'Error';
+
+  beforeAll(async () => {
+    mockQueryHandler = jest.spyOn(PluginLoader, 'getQueryHandler').mockReturnValue({
+      ...NoDocumentStorePlugin,
+      queryDocuments: async () =>
+        Promise.resolve({
+          response: 'QUERY_FAILURE_CONNECTION_ERROR',
+          documents: [],
+          failureMessage: expectedError,
+        }),
+    });
+
+    // Act
+    response = await query(frontendRequest);
+  });
+
+  afterAll(() => {
+    mockQueryHandler.mockRestore();
+  });
+
+  it('returns status 502', () => {
+    expect(response.statusCode).toEqual(502);
+  });
+
+  it('does not return a message body', () => {
+    expect(response.body).toBeUndefined();
+  });
+});
+
 describe('given successful query result', () => {
   let response: FrontendResponse;
   let mockQueryHandler: any;

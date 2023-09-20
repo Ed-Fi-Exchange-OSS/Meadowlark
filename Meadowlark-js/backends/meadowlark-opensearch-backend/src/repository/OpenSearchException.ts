@@ -20,7 +20,21 @@ export async function handleOpenSearchError(
     if (openSearchClientError?.name !== undefined) {
       switch (openSearchClientError.name) {
         case 'ConfigurationError':
-        case 'ConnectionError':
+        case 'ConnectionError': {
+          if (openSearchClientError?.message !== undefined) {
+            Logger.error(
+              `${moduleName} ${documentProcessError}`,
+              traceId,
+              `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
+            );
+            return {
+              response: 'QUERY_FAILURE_CONNECTION_ERROR',
+              documents: [],
+              failureMessage: openSearchClientError.message,
+            };
+          }
+          break;
+        }
         case 'DeserializationError':
         case 'NoLivingConnectionsError':
         case 'NotCompatibleError':

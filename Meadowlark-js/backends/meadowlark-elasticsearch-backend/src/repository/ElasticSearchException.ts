@@ -21,7 +21,21 @@ export async function handleElasticSearchError(
     if (elasticSearchClientError?.name !== undefined) {
       switch (elasticSearchClientError.name) {
         case 'ConfigurationError':
-        case 'ConnectionError':
+        case 'ConnectionError': {
+          if (elasticSearchClientError?.message !== undefined) {
+            Logger.error(
+              `${moduleName} ${documentProcessError}`,
+              traceId,
+              `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
+            );
+            return {
+              response: 'QUERY_FAILURE_CONNECTION_ERROR',
+              documents: [],
+              failureMessage: elasticSearchClientError.message,
+            };
+          }
+          break;
+        }
         case 'DeserializationError':
         case 'NoLivingConnectionsError':
         case 'NotCompatibleError':
