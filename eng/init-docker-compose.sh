@@ -66,7 +66,7 @@ pushd $(dirname "${BASH_SOURCE[0]}")/../Meadowlark-js
 
   # Now, let's configure a container with a shared key file for the MongoDB instances
   echo "Configuring MongoDB shared key file..."
-  $docker run -d --name mongo-temp -v mongo-ml-local-auth:/auth mongo:4.0.28
+  $docker run -d --name mongo-temp -v mongo-ml-local-auth:/auth mongo:6.0
   $docker exec mongo-temp mkdir /scripts
   $docker cp ./backends/meadowlark-mongodb-backend/docker/scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
   $docker exec mongo-temp /scripts/mongo-key-file-setup.sh

@@ -12,7 +12,7 @@ let startedContainer: StartedTestContainer;
 export async function setup(network: StartedNetwork) {
   try {
     const container = new MongoDBContainer(
-      'mongo:4.0.28@sha256:f68f07e0c0ee86b1d848a30b27e5573e9c960748a02f7c288e28282297117644',
+      'mongo:6.0@sha256:f462722e606fe097ad00c0d39f97680ee050b90df43e1484543c2a31cb61b039',
     )
       .withNetwork(network)
       .withNetworkAliases('mongo-t1')

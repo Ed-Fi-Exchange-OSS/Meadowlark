@@ -4,7 +4,7 @@
 # See the LICENSE and NOTICES files in the project root for more information.
 
 chmod -R +x ./scripts
-docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
+docker run -d --name mongo-temp -v mongo-auth:/auth mongo:6.0
 docker exec mongo-temp mkdir /scripts
 docker cp ./backends/meadowlark-mongodb-backend/docker/scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
 docker exec mongo-temp ./scripts/mongo-key-file-setup.sh

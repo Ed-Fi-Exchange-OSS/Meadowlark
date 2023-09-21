@@ -5,7 +5,7 @@
 
 This images was created to support loading [Ed-Fi
 Meadowlark](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark) deployments using
-MongoDB 4.0.28 with a three node cluster and appropriate security. Anyone
+MongoDB 6.0 with a three node cluster and appropriate security. Anyone
 wishing for more nodes can easily tweak the initialization script or simply
 reconfigure replication after initialization.
 

@@ -41,7 +41,7 @@ at startup to enable Keyfile Authentication. Once the keyfile is created in the 
 container is deleted. These commands should work on any operating system.
 
 ```bash
-docker run -d --name mongo-temp -v mongo-auth:/auth mongo:4.0.28
+docker run -d --name mongo-temp -v mongo-auth:/auth mongo:6.0
 docker exec mongo-temp mkdir /scripts
 docker cp ./scripts/mongo-key-file-setup.sh mongo-temp:/scripts/mongo-key-file-setup.sh
 docker exec mongo-temp chmod 777 /scripts/mongo-key-file-setup.sh
@@ -78,7 +78,7 @@ Wait a few seconds before running this command. If `mongo1` is not yet the
 primary, you will get an error to that effect and need to retry.
 
 ```bash
-docker exec -e ADMIN_USERNAME=<username> -e ADMIN_PASSWORD=<password> mongo1 /scripts/mongo-user-setup.sh
+docker exec -e ADMIN_USERNAME=edfiuser -e ADMIN_PASSWORD=gapuser1234 mongo1 /scripts/mongo-user-setup.sh
 ```
 
 ### Browsing MongoDB

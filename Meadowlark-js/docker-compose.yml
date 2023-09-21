@@ -140,7 +140,7 @@ services:
 
   # Primary MongoDB node
   mongo1:
-    image: edfi-mongo:4.0.28
+    image: edfi-mongo:6.0
     container_name: mongo1-ml-local
     hostname: mongo1
     ports:
@@ -165,7 +165,7 @@ services:
 
   # Secondary MongoDB node
   mongo2:
-    image: edfi-mongo:4.0.28
+    image: edfi-mongo:6.0
     container_name: mongo2-ml-local
     hostname: mongo2
     ports:
@@ -181,7 +181,7 @@ services:
 
   # Tertiary MongoDB node
   mongo3:
-    image: edfi-mongo:4.0.28
+    image: edfi-mongo:6.0
     container_name: mongo3-ml-local
     hostname: mongo3
     ports:

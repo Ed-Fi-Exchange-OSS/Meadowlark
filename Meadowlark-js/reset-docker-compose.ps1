@@ -11,7 +11,7 @@
 
 # Make sure the custom image is built locally
 Push-Location ../docker/mongodb
-docker build -t edfi-mongo:4.0.28 .
+docker build -t edfi-mongo:6.0 .
 Pop-Location
 
 # Clean up
@@ -22,7 +22,7 @@ Start-Sleep 2
 
 # Re-initialize
 docker volume create --label edfi-ml=local mongo-ml-local-auth
-docker run -d --name mongo-temp -v mongo-ml-local-auth:/auth edfi-mongo:4.0.28 
+docker run -d --name mongo-temp -v mongo-ml-local-auth:/auth edfi-mongo:6.0
 docker exec mongo-temp /usr/local/bin/mongo-key-file-setup.sh
 docker rm -f mongo-temp
 
