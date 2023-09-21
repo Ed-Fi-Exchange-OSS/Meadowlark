@@ -67,7 +67,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
     return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
-  if (response === 'QUERY_FAILURE_INVALID_QUERY' && result.failureMessage !== 'IndexNotFoundException') {
+  if (response === 'QUERY_FAILURE_INVALID_QUERY') {
     const invalidQueryHeaders = {
       ...frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
@@ -79,6 +79,16 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
       headers: invalidQueryHeaders,
     };
   }
+
+  if (response === 'QUERY_FAILURE_INDEX_NOT_FOUND') {
+    const invalidQueryHeaders = {
+      ...frontendRequest.middleware.headerMetadata,
+      [TOTAL_COUNT_HEADER_NAME]: '0',
+    };
+    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
+    return { statusCode: 200, headers: invalidQueryHeaders, body: documents };
+  }
+
   writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
 
   const headers = {

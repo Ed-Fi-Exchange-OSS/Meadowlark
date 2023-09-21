@@ -133,7 +133,7 @@ describe('When querying for documents', () => {
         invalidResourceInfo.projectName = 'wrong-project';
         const result = await queryDocuments(setupQueryRequest({}, {}, invalidResourceInfo), client);
 
-        expect(result.response).toEqual('QUERY_FAILURE_INVALID_QUERY');
+        expect(result.response).toEqual('QUERY_FAILURE_INDEX_NOT_FOUND');
         expect(result.documents).toHaveLength(0);
         expect(result.totalCount).toBeUndefined();
       });
