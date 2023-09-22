@@ -6,7 +6,16 @@ import { ReferringDocumentInfo, DocumentUuid, MeadowlarkId, DeleteResult, Update
 import { Logger } from '@edfi/meadowlark-utilities';
 import { Client, PoolClient, QueryResult, types } from 'pg';
 import format from 'pg-format';
+import {
+  AuthorizationClientRole,
+  GetAllAuthorizationClientsResult,
+  GetAuthorizationClientResult,
+  ResetAuthorizationClientSecretRequest,
+  ResetAuthorizationClientSecretResult,
+  UpdateAuthorizationClientRequest,
+} from '@edfi/meadowlark-authz-server';
 import { MeadowlarkDocument, NoMeadowlarkDocument, MeadowlarkDocumentIdAndAliasId } from '../model/MeadowlarkDocument';
+import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 const moduleName = 'postgresql.repository.SqlHelper';
 
@@ -491,6 +500,152 @@ export async function deleteAliasesForDocumentByMeadowlarkId(
   return hasResults(deleteQueryResult);
 }
 
+// Authorization
+/**
+ * @param client database connector client.
+ * @param authorizationClient authorization client
+ * @returns query result
+ */
+export async function insertOrUpdateAuthorization(
+  client: PoolClient,
+  authorizationClient: AuthorizationDocument,
+): Promise<boolean> {
+  const documentSql: string = format(
+    `
+  INSERT INTO meadowlark.authorizations (client_id, client_secret_hashed, client_name, roles, is_bootstrap_admin, active)
+  VALUES ($1, $2, $3, $4, $5, $6)
+  ON CONFLICT (client_id) DO UPDATE
+  SET client_secret_hashed = EXCLUDED.client_secret_hashed,
+      client_name = EXCLUDED.client_name,
+      roles = EXCLUDED.roles,
+      is_bootstrap_admin = EXCLUDED.is_bootstrap_admin,
+      active = EXCLUDED.active;`,
+    [
+      // eslint-disable-next-line no-underscore-dangle
+      authorizationClient._id,
+      authorizationClient.clientSecretHashed,
+      authorizationClient.clientName,
+      JSON.stringify(authorizationClient.roles),
+      authorizationClient.isBootstrapAdmin,
+      authorizationClient.active,
+    ],
+  );
+  const queryResult: QueryResult<any> = await client.query(documentSql);
+  return hasResults(queryResult);
+}
+
+export async function getAuthorizationClientDocumentList(client: PoolClient): Promise<GetAllAuthorizationClientsResult> {
+  const selectAllAuthorizationClientsSql = `
+  SELECT client_id, client_name, active, roles
+  FROM meadowlark.authorizations;`;
+
+  const queryResult: QueryResult<any> = await client.query(selectAllAuthorizationClientsSql);
+  if (!hasResults(queryResult)) return { response: 'GET_FAILURE_NOT_EXISTS' };
+  return {
+    response: 'GET_SUCCESS',
+    clients: queryResult.rows.map((x) => ({
+      clientId: x.client_id,
+      clientName: x.client_name,
+      active: x.active,
+      roles: x.roles as AuthorizationClientRole[], // Assuming roles are stored as an array in the database
+    })),
+  };
+}
+
+export async function getAuthorizationClientDocumentById(
+  clientId,
+  client: PoolClient,
+): Promise<GetAuthorizationClientResult> {
+  const selectAuthorizationClientByIdSql = `
+      SELECT client_id, client_name, active, roles, client_secret_hashed
+      FROM meadowlark.authorizations
+      WHERE client_id = $1;`;
+  const queryResult: QueryResult<any> = await client.query(selectAuthorizationClientByIdSql, [clientId]);
+
+  if (hasResults(queryResult)) return { response: 'GET_FAILURE_NOT_EXISTS' };
+
+  const result = queryResult.rows[0];
+
+  return {
+    response: 'GET_SUCCESS',
+    clientName: result.client_name,
+    roles: result.roles as AuthorizationClientRole[], // Assuming roles are stored as an array in the database
+    active: result.active,
+    clientSecretHashed: result.client_secret_hashed,
+  };
+}
+
+export async function resetAuthorizationClientSecretByClientId(
+  request: ResetAuthorizationClientSecretRequest,
+  client: PoolClient,
+): Promise<ResetAuthorizationClientSecretResult> {
+  const resetAuthorizationClientSecretSql = `
+  UPDATE meadowlark.authorizations
+  SET client_secret_hashed = $1
+  WHERE client_id = $2
+  RETURNING *;`;
+  const resetResult: ResetAuthorizationClientSecretResult = { response: 'UNKNOWN_FAILURE' };
+  const queryResult: QueryResult<any> = await client.query(resetAuthorizationClientSecretSql, [
+    request.clientSecretHashed,
+    request.clientId,
+  ]);
+
+  if (hasResults(queryResult)) {
+    resetResult.response = 'RESET_FAILED_NOT_EXISTS';
+  } else {
+    resetResult.response = 'RESET_SUCCESS';
+  }
+  return resetResult;
+}
+
+export async function checkBootstrapAdminExists(client: PoolClient): Promise<boolean> {
+  const checkBootstrapAdminExistsSql = `
+  SELECT count(1)
+  FROM meadowlark.authorizations
+  WHERE is_bootstrap_admin = true;
+`;
+  const queryResult: QueryResult<any> = await client.query(checkBootstrapAdminExistsSql);
+  return hasResults(queryResult);
+}
+
+export async function insertBootstrapAdmin(
+  authorizationClient: AuthorizationDocument,
+  client: PoolClient,
+): Promise<boolean> {
+  const insertBootstrapAdminSql = `
+  INSERT INTO meadowlark.authorizations(client_id, client_secret_hashed, client_name, roles, is_bootstrap_admin, active)
+  VALUES($1, $2, $3, $4, $5, $6);
+`;
+  const queryResult: QueryResult<any> = await client.query(insertBootstrapAdminSql, [
+    // eslint-disable-next-line no-underscore-dangle
+    authorizationClient._id,
+    authorizationClient.clientSecretHashed,
+    authorizationClient.clientName,
+    JSON.stringify(authorizationClient.roles),
+    authorizationClient.isBootstrapAdmin,
+    authorizationClient.active,
+  ]);
+  return hasResults(queryResult);
+}
+
+export async function updateAuthorizationClientDocumentByClientId(
+  updateAuthorizationClientRequest: UpdateAuthorizationClientRequest,
+  client: PoolClient,
+): Promise<boolean> {
+  const updateSql = `
+  UPDATE meadowlark.authorizations
+  SET client_name = $1, roles = $2, active = $3
+  WHERE client_id = $4
+  RETURNING *;
+`;
+  const queryResult: QueryResult<any> = await client.query(updateSql, [
+    updateAuthorizationClientRequest.clientName,
+    JSON.stringify(updateAuthorizationClientRequest.roles),
+    updateAuthorizationClientRequest.active,
+    updateAuthorizationClientRequest.clientId,
+  ]);
+  return hasResults(queryResult);
+}
 // SQL for DDL
 
 /**
@@ -540,6 +695,22 @@ const createDocumentTableMeadowlarkIdUniqueIndexSql =
 // Index for queries on document_uuid, which must be unique
 const createDocumentTableDocumentUuidUniqueIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS ux_meadowlark_document_uuid ON meadowlark.documents(document_uuid)';
+
+/**
+ * SQL query string to create authorizations document table
+ */
+export const createAuthorizationsTableSql = `
+  CREATE TABLE IF NOT EXISTS meadowlark.authorizations(
+  client_id VARCHAR PRIMARY KEY,
+  client_secret_hashed VARCHAR NOT NULL,
+  client_name VARCHAR NOT NULL,
+  roles TEXT[] NOT NULL,
+  is_bootstrap_admin BOOLEAN NOT NULL,
+  active BOOLEAN NOT NULL);`;
+
+  // Index the client name
+export const createAuthorizationsTableUniqueIndexSql =
+  'CREATE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)';
 
 /**
  * SQL query string to create the references table.
@@ -604,6 +775,8 @@ export async function checkExistsAndCreateTables(client: PoolClient) {
     await client.query(createAliasesTableMeadowlarkIdIndexSql);
     await client.query(createAliasesTableDocumentUuidIndexSql);
     await client.query(createAliasesTableAliasMeadowlarkIdIndexSql);
+    await client.query(createAuthorizationsTableSql);
+    await client.query(createAuthorizationsTableUniqueIndexSql);
   } catch (e) {
     Logger.error(`${moduleName}.checkExistsAndCreateTables error connecting to PostgreSQL`, null, e);
     throw e;
