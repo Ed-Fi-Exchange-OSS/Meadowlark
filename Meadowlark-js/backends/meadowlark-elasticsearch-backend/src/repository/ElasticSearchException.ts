@@ -21,27 +21,8 @@ export async function handleElasticSearchError(
     if (elasticSearchClientError?.name !== undefined) {
       switch (elasticSearchClientError.name) {
         case 'ConfigurationError':
-        case 'ConnectionError': {
-          if (elasticSearchClientError?.message !== undefined) {
-            Logger.error(
-              `${moduleName} ${documentProcessError}`,
-              traceId,
-              `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
-            );
-            return {
-              response: 'QUERY_FAILURE_CONNECTION_ERROR',
-              documents: [],
-              failureMessage: elasticSearchClientError.message,
-            };
-          }
-          break;
-        }
-        case 'DeserializationError':
-        case 'NoLivingConnectionsError':
-        case 'NotCompatibleError':
-        case 'ElasticsearchClientError':
+        case 'ConnectionError':
         case 'RequestAbortedError':
-        case 'SerializationError':
         case 'TimeoutError': {
           if (elasticSearchClientError?.message !== undefined) {
             Logger.error(
@@ -50,7 +31,7 @@ export async function handleElasticSearchError(
               `(${elasticSearchClientError.name}) - ${elasticSearchClientError.message}`,
             );
             return {
-              response: 'QUERY_FAILURE_INVALID_QUERY',
+              response: 'QUERY_FAILURE_CONNECTION_ERROR',
               documents: [],
               failureMessage: elasticSearchClientError.message,
             };
@@ -79,6 +60,11 @@ export async function handleElasticSearchError(
           }
           break;
         }
+        case 'DeserializationError':
+        case 'NoLivingConnectionsError':
+        case 'NotCompatibleError':
+        case 'ElasticsearchClientError':
+        case 'SerializationError':
         default: {
           break;
         }

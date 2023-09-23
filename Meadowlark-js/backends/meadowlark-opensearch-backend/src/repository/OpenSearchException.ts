@@ -20,7 +20,9 @@ export async function handleOpenSearchError(
     if (openSearchClientError?.name !== undefined) {
       switch (openSearchClientError.name) {
         case 'ConfigurationError':
-        case 'ConnectionError': {
+        case 'ConnectionError':
+        case 'RequestAbortedError':
+        case 'TimeoutError': {
           if (openSearchClientError?.message !== undefined) {
             Logger.error(
               `${moduleName} ${documentProcessError}`,
@@ -32,23 +34,6 @@ export async function handleOpenSearchError(
               documents: [],
               failureMessage: openSearchClientError.message,
             };
-          }
-          break;
-        }
-        case 'DeserializationError':
-        case 'NoLivingConnectionsError':
-        case 'NotCompatibleError':
-        case 'OpenSearchClientError':
-        case 'RequestAbortedError':
-        case 'SerializationError':
-        case 'TimeoutError': {
-          if (openSearchClientError?.message !== undefined) {
-            Logger.error(
-              `${moduleName} ${documentProcessError}`,
-              traceId,
-              `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
-            );
-            return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: openSearchClientError.message };
           }
           break;
         }
@@ -108,6 +93,11 @@ export async function handleOpenSearchError(
           }
           break;
         }
+        case 'DeserializationError':
+        case 'NoLivingConnectionsError':
+        case 'NotCompatibleError':
+        case 'OpenSearchClientError':
+        case 'SerializationError':
         default: {
           break;
         }

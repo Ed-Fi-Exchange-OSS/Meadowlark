@@ -322,6 +322,48 @@ describe('when querying for students', () => {
     });
   });
 
+  describe('given there is an invalid query error', () => {
+    let queryResult: QueryResult;
+    const setupMockRequestConnectionError = (): Client => {
+      mock.add(
+        {
+          method: 'POST',
+          path: `/${indexFromResourceInfo(resourceInfo)}/_search`,
+        },
+        () =>
+          new errors.ResponseError({
+            body: { errors: {}, status: 500 },
+            statusCode: 500,
+            warnings: ['index_not_found_exception'],
+            meta: {} as any,
+          }),
+      );
+
+      const client = new Client({
+        node: 'http://localhost:9200',
+        Connection: mock.getConnection(),
+      });
+      return client;
+    };
+
+    beforeAll(async () => {
+      const client = setupMockRequestConnectionError();
+      const request = setupQueryRequest({ type: 'FULL_ACCESS' }, {}, {});
+
+      queryResult = await queryDocuments(request, client);
+    });
+
+    it('should return connection error', async () => {
+      expect(queryResult.failureMessage).toMatchInlineSnapshot('"{"errors":{},"status":500}"');
+      expect(queryResult.response).toBe('QUERY_FAILURE_INVALID_QUERY');
+      expect(queryResult.documents.length).toBe(0);
+    });
+
+    afterAll(() => {
+      mock.clearAll();
+    });
+  });
+
   describe('given there is a connection error', () => {
     let queryResult: QueryResult;
     const setupMockRequestConnectionError = (): Client => {
