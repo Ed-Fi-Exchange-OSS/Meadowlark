@@ -72,10 +72,21 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
       ...frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
     };
+    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 500);
+    return {
+      statusCode: 500,
+      headers: invalidQueryHeaders,
+    };
+  }
+
+  if (response === 'QUERY_FAILURE_CONNECTION_ERROR') {
+    const invalidQueryHeaders = {
+      ...frontendRequest.middleware.headerMetadata,
+      [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
+    };
     writeDebugStatusToLog(moduleName, frontendRequest, 'query', 502);
     return {
       statusCode: 502,
-      body: documents,
       headers: invalidQueryHeaders,
     };
   }

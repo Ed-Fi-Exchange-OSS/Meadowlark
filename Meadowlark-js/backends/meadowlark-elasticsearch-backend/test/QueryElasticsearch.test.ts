@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Client } from '@elastic/elasticsearch';
+import { Client, errors } from '@elastic/elasticsearch';
 import Mock from '@elastic/elasticsearch-mock';
 import {
   PaginationParameters,
@@ -319,6 +319,84 @@ describe('when querying for students', () => {
           mock.clearAll();
         });
       });
+    });
+  });
+
+  describe('given there is an invalid query error', () => {
+    let queryResult: QueryResult;
+    const setupMockRequestConnectionError = (): Client => {
+      mock.add(
+        {
+          method: 'POST',
+          path: `/${indexFromResourceInfo(resourceInfo)}/_search`,
+        },
+        () =>
+          new errors.ResponseError({
+            body: { errors: {}, status: 500 },
+            statusCode: 500,
+            warnings: ['index_not_found_exception'],
+            meta: {} as any,
+          }),
+      );
+
+      const client = new Client({
+        node: 'http://localhost:9200',
+        Connection: mock.getConnection(),
+      });
+      return client;
+    };
+
+    beforeAll(async () => {
+      const client = setupMockRequestConnectionError();
+      const request = setupQueryRequest({ type: 'FULL_ACCESS' }, {}, {});
+
+      queryResult = await queryDocuments(request, client);
+    });
+
+    it('should return connection error', async () => {
+      expect(queryResult.failureMessage).toMatchInlineSnapshot('"{"errors":{},"status":500}"');
+      expect(queryResult.response).toBe('QUERY_FAILURE_INVALID_QUERY');
+      expect(queryResult.documents.length).toBe(0);
+    });
+
+    afterAll(() => {
+      mock.clearAll();
+    });
+  });
+
+  describe('given there is a connection error', () => {
+    let queryResult: QueryResult;
+    const setupMockRequestConnectionError = (): Client => {
+      mock.add(
+        {
+          method: 'POST',
+          path: `/${indexFromResourceInfo(resourceInfo)}/_search`,
+        },
+        () => new errors.ConnectionError('Connection error failure message'),
+      );
+
+      const client = new Client({
+        node: 'http://localhost:9200',
+        Connection: mock.getConnection(),
+      });
+      return client;
+    };
+
+    beforeAll(async () => {
+      const client = setupMockRequestConnectionError();
+      const request = setupQueryRequest({ type: 'FULL_ACCESS' }, {}, {});
+
+      queryResult = await queryDocuments(request, client);
+    });
+
+    it('should return connection error', async () => {
+      expect(queryResult.failureMessage).toBe('Connection error failure message');
+      expect(queryResult.response).toBe('QUERY_FAILURE_CONNECTION_ERROR');
+      expect(queryResult.documents.length).toBe(0);
+    });
+
+    afterAll(() => {
+      mock.clearAll();
     });
   });
 });

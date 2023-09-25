@@ -9,7 +9,8 @@ export type QueryResult = {
     | 'QUERY_FAILURE_INVALID_QUERY'
     | 'QUERY_FAILURE_AUTHORIZATION'
     | 'UNKNOWN_FAILURE'
-    | 'QUERY_FAILURE_INDEX_NOT_FOUND';
+    | 'QUERY_FAILURE_INDEX_NOT_FOUND'
+    | 'QUERY_FAILURE_CONNECTION_ERROR';
   documents: Array<object>;
   failureMessage?: string;
   totalCount?: number;

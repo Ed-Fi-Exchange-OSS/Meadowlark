@@ -21,12 +21,7 @@ export async function handleOpenSearchError(
       switch (openSearchClientError.name) {
         case 'ConfigurationError':
         case 'ConnectionError':
-        case 'DeserializationError':
-        case 'NoLivingConnectionsError':
-        case 'NotCompatibleError':
-        case 'OpenSearchClientError':
         case 'RequestAbortedError':
-        case 'SerializationError':
         case 'TimeoutError': {
           if (openSearchClientError?.message !== undefined) {
             Logger.error(
@@ -34,7 +29,11 @@ export async function handleOpenSearchError(
               traceId,
               `(${openSearchClientError.name}) - ${openSearchClientError.message}`,
             );
-            return { response: 'QUERY_FAILURE_INVALID_QUERY', documents: [], failureMessage: openSearchClientError.message };
+            return {
+              response: 'QUERY_FAILURE_CONNECTION_ERROR',
+              documents: [],
+              failureMessage: openSearchClientError.message,
+            };
           }
           break;
         }
@@ -94,6 +93,11 @@ export async function handleOpenSearchError(
           }
           break;
         }
+        case 'DeserializationError':
+        case 'NoLivingConnectionsError':
+        case 'NotCompatibleError':
+        case 'OpenSearchClientError':
+        case 'SerializationError':
         default: {
           break;
         }
