@@ -19,6 +19,7 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
+    "@edfi/meadowlark-authz-server": "^0.3.6-pre-36",
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
     "pg": "^8.11.1",
