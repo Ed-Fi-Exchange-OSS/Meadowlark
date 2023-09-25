@@ -22,9 +22,8 @@ export async function documentInfoExtraction({
   writeRequestToLog(moduleName, frontendRequest, 'documentInfoExtraction');
 
   const documentInfo: DocumentInfo = await extractDocumentInfo(
-    frontendRequest.middleware.resourceInfo,
+    frontendRequest.middleware.resourceSchema,
     frontendRequest.middleware.parsedBody,
-    frontendRequest.middleware.matchingMetaEdModel,
     frontendRequest.middleware.timestamp,
   );
 

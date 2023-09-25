@@ -6,20 +6,22 @@
 import crypto from 'node:crypto';
 import { DocumentUuid, MeadowlarkId } from './IdTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
+import { DocumentObjectKey } from './api-schema/DocumentObjectKey';
 
 /**
- * A DocumentIdentity is an object with key-value pairs that represents the complete identity of an Ed-Fi document.
+ * A simple tuple containing the key and corresponding document value that makes up part of a document identity.
+ */
+export type DocumentIdentityElement = { documentKey: DocumentObjectKey; documentValue: any };
+
+/**
+ * A DocumentIdentity is an array of key-value pairs that represents the complete identity of an Ed-Fi document.
  * In Ed-Fi documents, these are always a list of document elements from the top level of the document
- * (never nested in sub-objects, and never collections). The keys are the document path (dot-separated).
+ * (never nested in sub-objects, and never collections). The keys are DocumentObjectKeys. A DocumentIdentity
+ * must maintain a strict ordering, as there may be duplicate DocumentObjectKeys.
  *
- * This can be a series of key-value pairs because many documents have multiple values as part of their identity.
+ * This can be aa array of key-value pairs because many documents have multiple values as part of their identity.
  */
-export type DocumentIdentity = { [key: string]: string };
-
-/**
- * The null object for DocumentIdentity
- */
-export const NoDocumentIdentity: DocumentIdentity = {};
+export type DocumentIdentity = DocumentIdentityElement[];
 
 /*
  * For use in error messages
@@ -56,9 +58,8 @@ export function resourceInfoHashFrom({ projectName, resourceName }: BaseResource
  * Returns the 16 byte SHAKE256 Base64Url encoded hash form of a DocumentIdentity.
  */
 function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
-  const documentIdentityString = Object.keys(documentIdentity)
-    .sort()
-    .map((key) => `${key}=${documentIdentity[key]}`)
+  const documentIdentityString = documentIdentity
+    .map((element: DocumentIdentityElement) => `${element.documentKey}=${element.documentValue}`)
     .join('#');
   return toHash(documentIdentityString, 16);
 }

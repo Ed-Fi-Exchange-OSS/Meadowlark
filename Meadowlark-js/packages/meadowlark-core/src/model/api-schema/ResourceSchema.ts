@@ -25,6 +25,11 @@ export type BaseResourceSchema = {
   isDescriptor: boolean;
 
   /**
+   * Whether this resource is a schoolYearEnumeration. They are treated differently from other resources
+   */
+  isSchoolYearEnumeration: boolean;
+
+  /**
    * Whether API clients are permitted to modify the identity of an existing resource document.
    */
   allowIdentityUpdates: boolean;
@@ -110,6 +115,7 @@ export type ResourceSchema =
 export const NoResourceSchema: ResourceSchema = Object.freeze({
   resourceName: 'NoResourceSchema' as MetaEdResourceName,
   isDescriptor: false,
+  isSchoolYearEnumeration: false,
   allowIdentityUpdates: false,
   jsonSchemaForInsert: NoSchemaRoot,
   jsonSchemaForUpdate: NoSchemaRoot,
