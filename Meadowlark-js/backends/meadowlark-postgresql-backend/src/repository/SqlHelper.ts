@@ -534,6 +534,11 @@ export async function insertOrUpdateAuthorization(
   return hasResults(queryResult);
 }
 
+/**
+ * Returns a list of authorization clients
+ * @param client
+ * @returns
+ */
 export async function getAuthorizationClientDocumentList(client: PoolClient): Promise<GetAllAuthorizationClientsResult> {
   const selectAllAuthorizationClientsSql = `
   SELECT client_id, client_name, active, roles
@@ -552,6 +557,12 @@ export async function getAuthorizationClientDocumentList(client: PoolClient): Pr
   };
 }
 
+/**
+ * Returns the authorization client by Id
+ * @param clientId
+ * @param client
+ * @returns
+ */
 export async function getAuthorizationClientDocumentById(
   clientId,
   client: PoolClient,
@@ -575,6 +586,12 @@ export async function getAuthorizationClientDocumentById(
   };
 }
 
+/**
+ * Reset an authorization client by its ClientId
+ * @param request
+ * @param client
+ * @returns
+ */
 export async function resetAuthorizationClientSecretByClientId(
   request: ResetAuthorizationClientSecretRequest,
   client: PoolClient,
@@ -598,6 +615,11 @@ export async function resetAuthorizationClientSecretByClientId(
   return resetResult;
 }
 
+/**
+ * Checks if the bootstrap Admin exists.
+ * @param client
+ * @returns
+ */
 export async function checkBootstrapAdminExists(client: PoolClient): Promise<boolean> {
   const checkBootstrapAdminExistsSql = `
   SELECT count(1)
@@ -608,6 +630,12 @@ export async function checkBootstrapAdminExists(client: PoolClient): Promise<boo
   return hasResults(queryResult);
 }
 
+/**
+ * Inserts a bootstrap Admin to use the authorization.
+ * @param authorizationClient
+ * @param client
+ * @returns
+ */
 export async function insertBootstrapAdmin(
   authorizationClient: AuthorizationDocument,
   client: PoolClient,
@@ -628,6 +656,12 @@ export async function insertBootstrapAdmin(
   return hasResults(queryResult);
 }
 
+/**
+ * Updates the document authorization by ClientId
+ * @param updateAuthorizationClientRequest
+ * @param client
+ * @returns
+ */
 export async function updateAuthorizationClientDocumentByClientId(
   updateAuthorizationClientRequest: UpdateAuthorizationClientRequest,
   client: PoolClient,
@@ -708,7 +742,7 @@ export const createAuthorizationsTableSql = `
   is_bootstrap_admin BOOLEAN NOT NULL,
   active BOOLEAN NOT NULL);`;
 
-  // Index the client name
+// Index the client name
 export const createAuthorizationsTableUniqueIndexSql =
   'CREATE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)';
 
