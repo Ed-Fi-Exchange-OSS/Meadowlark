@@ -9,7 +9,6 @@ import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { deleteAllAuthorizations } from '../TestHelper';
 import { getAuthorizationClientDocumentById } from '../../../src/repository/SqlHelper';
-import { NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientId = 'clientId';
 
@@ -56,6 +55,10 @@ describe('given the create of a new authorization client', () => {
   });
 
   it('should return insert success', async () => {
-    expect(createClientRequest).toMatchObject(NoAuthorizationDocument());
+    expect(createClientRequest).toMatchInlineSnapshot(`
+    {
+      "response": "CREATE_SUCCESS",
+    }
+    `);
   });
 });
