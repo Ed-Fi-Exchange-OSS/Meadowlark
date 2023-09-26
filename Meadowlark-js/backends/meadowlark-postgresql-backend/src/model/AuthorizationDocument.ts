@@ -55,3 +55,17 @@ export function authorizationDocumentFromCreate(
 export function bootstrapAdminDocumentFromCreate(request: CreateAuthorizationClientRequest): AuthorizationDocument {
   return authorizationDocumentFromCreate(request, true);
 }
+
+export /**
+ * Creates a new empty newMeadowlarkDocument object
+ */
+function NoAuthorizationDocument(): AuthorizationDocument {
+  return {
+    _id: '',
+    clientSecretHashed: '',
+    clientName: '',
+    roles: [],
+    isBootstrapAdmin: false,
+    active: false,
+  };
+}

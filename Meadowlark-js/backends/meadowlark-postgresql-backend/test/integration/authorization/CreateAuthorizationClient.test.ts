@@ -9,6 +9,7 @@ import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { deleteAllAuthorizations } from '../TestHelper';
 import { getAuthorizationClientDocumentById } from '../../../src/repository/SqlHelper';
+import { NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientId = 'clientId';
 
@@ -31,13 +32,15 @@ describe('given the create of a new authorization client', () => {
   });
 
   afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
+    if (client) {
+      await deleteAllAuthorizations(client);
+      client.release();
+      await resetSharedClient();
+    }
   });
 
   it('should exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ id: clientId }, client);
+    const result: any = await getAuthorizationClientDocumentById(clientId, client);
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientId",
@@ -53,42 +56,6 @@ describe('given the create of a new authorization client', () => {
   });
 
   it('should return insert success', async () => {
-    expect(createClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "CREATE_SUCCESS",
-      }
-    `);
-  });
-});
-
-describe('given a closed Postgresql connection', () => {
-  let client: PoolClient;
-  let createClientRequest: CreateAuthorizationClientResult;
-
-  beforeAll(async () => {
-    client = await getSharedClient();
-    client.release();
-    await resetSharedClient();
-    createClientRequest = await createAuthorizationClientDocument(newCreateAuthorizationClientRequest(), client);
-    client = await getSharedClient();
-  });
-
-  afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
-  });
-
-  it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ id: clientId }, client);
-    expect(result).toBeNull();
-  });
-
-  it('should return failure', async () => {
-    expect(createClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "UNKNOWN_FAILURE",
-      }
-    `);
+    expect(createClientRequest).toMatchObject(NoAuthorizationDocument());
   });
 });

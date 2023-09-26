@@ -25,10 +25,13 @@ export async function createAuthorizationClientDocument(
     } else {
       const msg = 'Error inserting or updating the authorization client in the PostgreSQL database.';
       Logger.error(functionName, request.traceId, msg);
+      await rollbackTransaction(client);
     }
     await commitTransaction(client);
   } catch (e) {
-    await rollbackTransaction(client);
+    if (client) {
+      await rollbackTransaction(client);
+    }
     Logger.error(functionName, request.traceId, e);
   }
 

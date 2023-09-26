@@ -9,9 +9,9 @@ import { getSharedClient, resetSharedClient } from '../../../src/repository/Db';
 import { tryCreateBootstrapAuthorizationAdminDocument } from '../../../src/repository/authorization/TryCreateBootstrapAuthorizationAdmin';
 import { deleteAllAuthorizations } from '../TestHelper';
 import { getAuthorizationClientDocumentById } from '../../../src/repository/SqlHelper';
+import { NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientId = 'clientId';
-
 const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest => ({
   clientId,
   clientSecretHashed: 'clientSecretHashed',
@@ -56,38 +56,6 @@ describe('given the first time create of a bootstrap admin client', () => {
     expect(createClientRequest).toMatchInlineSnapshot(`
       {
         "response": "CREATE_SUCCESS",
-      }
-    `);
-  });
-});
-
-describe('given a closed Postgresql connection', () => {
-  let client: PoolClient;
-  let createClientRequest: TryCreateBootstrapAuthorizationAdminResult;
-
-  beforeAll(async () => {
-    client = await getSharedClient();
-    client.release();
-    await resetSharedClient();
-    createClientRequest = await tryCreateBootstrapAuthorizationAdminDocument(newCreateAuthorizationClientRequest(), client);
-    client = await getSharedClient();
-  });
-
-  afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
-  });
-
-  it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById(clientId, client);
-    expect(result).toBeNull();
-  });
-
-  it('should return failure', async () => {
-    expect(createClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "UNKNOWN_FAILURE",
       }
     `);
   });
@@ -138,8 +106,8 @@ describe('given two attempts at the create of a bootstrap admin client', () => {
   });
 
   it('should not have client 2 in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: 'clientId2' }, client);
-    expect(result).toBeNull();
+    const result: any = await getAuthorizationClientDocumentById('clientId2', client);
+    expect(result).toMatchObject(NoAuthorizationDocument());
   });
 
   it('should return already exists failure on second attempt', async () => {

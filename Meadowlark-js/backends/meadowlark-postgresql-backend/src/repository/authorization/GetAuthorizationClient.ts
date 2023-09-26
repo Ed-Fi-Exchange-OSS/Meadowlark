@@ -2,16 +2,21 @@ import { PoolClient } from 'pg';
 import { Logger } from '@edfi/meadowlark-utilities';
 import { GetAuthorizationClientRequest, GetAuthorizationClientResult } from '@edfi/meadowlark-authz-server';
 import { getAuthorizationClientDocumentById } from '../SqlHelper';
+import { AuthorizationDocument } from '../../model/AuthorizationDocument';
 
 export async function getAuthorizationClientDocument(
   { clientId, traceId }: GetAuthorizationClientRequest,
   client: PoolClient,
 ): Promise<GetAuthorizationClientResult> {
   try {
-    const getAuthorizationClientResult: GetAuthorizationClientResult = await getAuthorizationClientDocumentById(
-      clientId,
-      client,
-    );
+    const authorizationClientResult: AuthorizationDocument = await getAuthorizationClientDocumentById(clientId, client);
+    const getAuthorizationClientResult: GetAuthorizationClientResult = {
+      response: 'GET_SUCCESS',
+      clientSecretHashed: authorizationClientResult.clientSecretHashed,
+      clientName: authorizationClientResult.clientName,
+      active: authorizationClientResult.active,
+      roles: authorizationClientResult.roles,
+    };
     return getAuthorizationClientResult;
   } catch (e) {
     Logger.error('GetAuthorizationClient.getAuthorizationClientDocument', traceId, e);

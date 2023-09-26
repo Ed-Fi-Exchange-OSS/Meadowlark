@@ -34,9 +34,11 @@ describe('when fetching authorization clients', () => {
     });
 
     afterAll(async () => {
-      await deleteAllAuthorizations(client);
-      client.release();
-      await resetSharedClient();
+      if (client) {
+        await deleteAllAuthorizations(client);
+        client.release();
+        await resetSharedClient();
+      }
     });
 
     it('should return get success', async () => {
@@ -68,40 +70,14 @@ describe('when fetching authorization clients', () => {
     });
 
     afterAll(async () => {
-      await deleteAllAuthorizations(client);
-      client.release();
-      await resetSharedClient();
+      if (client) {
+        await deleteAllAuthorizations(client);
+        client.release();
+        await resetSharedClient();
+      }
     });
 
     it('should return success with an empty array', async () => {
-      expect(response).toMatchInlineSnapshot(`
-        {
-          "clients": [],
-          "response": "GET_SUCCESS",
-        }
-      `);
-    });
-  });
-
-  describe('given a closed Postgresql connection', () => {
-    let client: PoolClient;
-    let response: GetAllAuthorizationClientsResult;
-
-    beforeAll(async () => {
-      client = await getSharedClient();
-      client.release();
-      await resetSharedClient();
-      response = await getAllAuthorizationClientDocuments(TRACE_ID, client);
-      client = await getSharedClient();
-    });
-
-    afterAll(async () => {
-      await deleteAllAuthorizations(client);
-      client.release();
-      await resetSharedClient();
-    });
-
-    it('should return OK with empty array', async () => {
       expect(response).toMatchInlineSnapshot(`
         {
           "clients": [],

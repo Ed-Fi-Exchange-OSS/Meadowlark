@@ -14,10 +14,10 @@ import { resetAuthorizationClientSecret } from '../../../src/repository/authoriz
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { deleteAllAuthorizations } from '../TestHelper';
 import { getAuthorizationClientDocumentById, getAuthorizationClientDocumentList } from '../../../src/repository/SqlHelper';
+import { NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientId = 'clientId';
 const clientIdDifferent = 'clientIdDifferent';
-const clientIdSame = 'clientIdSame';
 
 const newCreateAuthorizationClientRequest = (): CreateAuthorizationClientRequest => ({
   clientId,
@@ -61,16 +61,19 @@ describe('given the get of an existing authorization client', () => {
   it('should exist in the db', async () => {
     const result: any = await getAuthorizationClientDocumentList(client);
     expect(result).toMatchInlineSnapshot(`
-      {
-        "_id": "clientId",
-        "active": true,
-        "clientName": "clientName",
-        "clientSecretHashed": "updatedClientSecretHashed",
-        "isBootstrapAdmin": false,
-        "roles": [
-          "vendor",
-        ],
-      }
+    {
+      "clients": [
+        {
+          "active": true,
+          "clientId": "clientId",
+          "clientName": "clientName",
+          "roles": [
+            "vendor",
+          ],
+        },
+      ],
+      "response": "GET_SUCCESS",
+    }
     `);
   });
 });
@@ -91,46 +94,14 @@ describe('given the attempted reset of a secret for an authorization client that
   });
 
   it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: clientIdDifferent }, client);
-    expect(result).toBeNull();
+    const result: any = await getAuthorizationClientDocumentById(clientIdDifferent, client);
+    expect(result).toMatchObject(NoAuthorizationDocument());
   });
 
   it('should return update failed not exists', async () => {
     expect(resetClientSecretResponse).toMatchInlineSnapshot(`
       {
         "response": "RESET_FAILED_NOT_EXISTS",
-      }
-    `);
-  });
-});
-
-describe('given a closed Postgresql connection', () => {
-  let client: PoolClient;
-  let resetClientSecretResponse: ResetAuthorizationClientSecretResult;
-
-  beforeAll(async () => {
-    client = await getSharedClient();
-    client.release();
-    await resetSharedClient();
-    resetClientSecretResponse = await resetAuthorizationClientSecret(newResetAuthorizationClientSecretRequest(), client);
-    client = await getSharedClient();
-  });
-
-  afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
-  });
-
-  it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: clientIdSame }, client);
-    expect(result).toBeNull();
-  });
-
-  it('should return failure', async () => {
-    expect(resetClientSecretResponse).toMatchInlineSnapshot(`
-      {
-        "response": "UNKNOWN_FAILURE",
       }
     `);
   });

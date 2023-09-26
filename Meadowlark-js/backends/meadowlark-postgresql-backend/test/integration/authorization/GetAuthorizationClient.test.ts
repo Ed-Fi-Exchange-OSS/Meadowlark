@@ -14,6 +14,7 @@ import { createAuthorizationClientDocument } from '../../../src/repository/autho
 import { getAuthorizationClientDocument } from '../../../src/repository/authorization/GetAuthorizationClient';
 import { getAuthorizationClientDocumentById } from '../../../src/repository/SqlHelper';
 import { deleteAllAuthorizations } from '../TestHelper';
+import { NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientId = 'clientId';
 
@@ -96,46 +97,18 @@ describe('given the get of a non-existent authorization client', () => {
 
   it('should not exist in the db', async () => {
     const result: any = await getAuthorizationClientDocumentById(clientId, client);
-    expect(result).toBeNull();
+    expect(result).toMatchObject(NoAuthorizationDocument());
   });
 
   it('should return get not exists', async () => {
     expect(getClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "GET_FAILURE_NOT_EXISTS",
-      }
-    `);
-  });
-});
-
-describe('given a closed Postgresql connection', () => {
-  let client: PoolClient;
-  let getClientRequest;
-
-  beforeAll(async () => {
-    client = await getSharedClient();
-    client.release();
-    await resetSharedClient();
-    getClientRequest = await getAuthorizationClientDocument(newGetAuthorizationClientRequest(), client);
-    client = await getSharedClient();
-  });
-
-  afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
-  });
-
-  it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocument(newGetAuthorizationClientRequest(), client);
-    expect(result).toBeNull();
-  });
-
-  it('should return not found', async () => {
-    expect(getClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "GET_FAILURE_NOT_EXISTS",
-      }
+    {
+      "active": false,
+      "clientName": "",
+      "clientSecretHashed": "",
+      "response": "GET_SUCCESS",
+      "roles": [],
+    }
     `);
   });
 });

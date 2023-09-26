@@ -9,13 +9,12 @@ import format from 'pg-format';
 import {
   AuthorizationClientRole,
   GetAllAuthorizationClientsResult,
-  GetAuthorizationClientResult,
   ResetAuthorizationClientSecretRequest,
   ResetAuthorizationClientSecretResult,
   UpdateAuthorizationClientRequest,
 } from '@edfi/meadowlark-authz-server';
 import { MeadowlarkDocument, NoMeadowlarkDocument, MeadowlarkDocumentIdAndAliasId } from '../model/MeadowlarkDocument';
-import { AuthorizationDocument } from '../model/AuthorizationDocument';
+import { AuthorizationDocument, NoAuthorizationDocument } from '../model/AuthorizationDocument';
 
 const moduleName = 'postgresql.repository.SqlHelper';
 
@@ -510,8 +509,7 @@ export async function insertOrUpdateAuthorization(
   client: PoolClient,
   authorizationClient: AuthorizationDocument,
 ): Promise<boolean> {
-  const documentSql: string = format(
-    `
+  const documentSql: string = `
   INSERT INTO meadowlark.authorizations (client_id, client_secret_hashed, client_name, roles, is_bootstrap_admin, active)
   VALUES ($1, $2, $3, $4, $5, $6)
   ON CONFLICT (client_id) DO UPDATE
@@ -519,18 +517,16 @@ export async function insertOrUpdateAuthorization(
       client_name = EXCLUDED.client_name,
       roles = EXCLUDED.roles,
       is_bootstrap_admin = EXCLUDED.is_bootstrap_admin,
-      active = EXCLUDED.active;`,
-    [
-      // eslint-disable-next-line no-underscore-dangle
-      authorizationClient._id,
-      authorizationClient.clientSecretHashed,
-      authorizationClient.clientName,
-      JSON.stringify(authorizationClient.roles),
-      authorizationClient.isBootstrapAdmin,
-      authorizationClient.active,
-    ],
-  );
-  const queryResult: QueryResult<any> = await client.query(documentSql);
+      active = EXCLUDED.active;`;
+  const queryResult: QueryResult<any> = await client.query(documentSql, [
+    // eslint-disable-next-line no-underscore-dangle
+    authorizationClient._id,
+    authorizationClient.clientSecretHashed,
+    authorizationClient.clientName,
+    authorizationClient.roles,
+    authorizationClient.isBootstrapAdmin,
+    authorizationClient.active,
+  ]);
   return hasResults(queryResult);
 }
 
@@ -545,7 +541,7 @@ export async function getAuthorizationClientDocumentList(client: PoolClient): Pr
   FROM meadowlark.authorizations;`;
 
   const queryResult: QueryResult<any> = await client.query(selectAllAuthorizationClientsSql);
-  if (!hasResults(queryResult)) return { response: 'GET_FAILURE_NOT_EXISTS' };
+  if (!hasResults(queryResult)) return { response: 'GET_SUCCESS', clients: [] };
   return {
     response: 'GET_SUCCESS',
     clients: queryResult.rows.map((x) => ({
@@ -563,25 +559,26 @@ export async function getAuthorizationClientDocumentList(client: PoolClient): Pr
  * @param client
  * @returns
  */
-export async function getAuthorizationClientDocumentById(
-  clientId,
-  client: PoolClient,
-): Promise<GetAuthorizationClientResult> {
-  const selectAuthorizationClientByIdSql = `
-      SELECT client_id, client_name, active, roles, client_secret_hashed
+export async function getAuthorizationClientDocumentById(clientId, client: PoolClient): Promise<AuthorizationDocument> {
+  const selectAuthorizationClientByIdSql = format(
+    `
+      SELECT client_id, client_name, active, roles, client_secret_hashed, is_bootstrap_admin
       FROM meadowlark.authorizations
-      WHERE client_id = $1;`;
-  const queryResult: QueryResult<any> = await client.query(selectAuthorizationClientByIdSql, [clientId]);
+      WHERE client_id = %L;`,
+    [clientId],
+  );
+  const queryResult: QueryResult<any> = await client.query(selectAuthorizationClientByIdSql);
 
-  if (hasResults(queryResult)) return { response: 'GET_FAILURE_NOT_EXISTS' };
+  if (!hasResults(queryResult)) return NoAuthorizationDocument();
 
   const result = queryResult.rows[0];
 
   return {
-    response: 'GET_SUCCESS',
+    _id: result.client_id,
     clientName: result.client_name,
     roles: result.roles as AuthorizationClientRole[], // Assuming roles are stored as an array in the database
     active: result.active,
+    isBootstrapAdmin: result.is_bootstrap_admin,
     clientSecretHashed: result.client_secret_hashed,
   };
 }
@@ -607,7 +604,7 @@ export async function resetAuthorizationClientSecretByClientId(
     request.clientId,
   ]);
 
-  if (hasResults(queryResult)) {
+  if (!hasResults(queryResult)) {
     resetResult.response = 'RESET_FAILED_NOT_EXISTS';
   } else {
     resetResult.response = 'RESET_SUCCESS';
@@ -622,12 +619,12 @@ export async function resetAuthorizationClientSecretByClientId(
  */
 export async function checkBootstrapAdminExists(client: PoolClient): Promise<boolean> {
   const checkBootstrapAdminExistsSql = `
-  SELECT count(1)
+  SELECT count(1) as total
   FROM meadowlark.authorizations
   WHERE is_bootstrap_admin = true;
 `;
   const queryResult: QueryResult<any> = await client.query(checkBootstrapAdminExistsSql);
-  return hasResults(queryResult);
+  return hasResults(queryResult) && queryResult.rows[0].total > 0;
 }
 
 /**
@@ -649,7 +646,7 @@ export async function insertBootstrapAdmin(
     authorizationClient._id,
     authorizationClient.clientSecretHashed,
     authorizationClient.clientName,
-    JSON.stringify(authorizationClient.roles),
+    authorizationClient.roles,
     authorizationClient.isBootstrapAdmin,
     authorizationClient.active,
   ]);
@@ -674,7 +671,7 @@ export async function updateAuthorizationClientDocumentByClientId(
 `;
   const queryResult: QueryResult<any> = await client.query(updateSql, [
     updateAuthorizationClientRequest.clientName,
-    JSON.stringify(updateAuthorizationClientRequest.roles),
+    updateAuthorizationClientRequest.roles,
     updateAuthorizationClientRequest.active,
     updateAuthorizationClientRequest.clientId,
   ]);

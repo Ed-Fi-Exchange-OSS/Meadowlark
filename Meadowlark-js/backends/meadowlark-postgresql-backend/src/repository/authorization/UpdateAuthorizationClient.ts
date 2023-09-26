@@ -22,7 +22,7 @@ export async function updateAuthorizationClientDocument(
       request,
       client,
     );
-    if (updateAuthorizationClientDocumentByClientIdResult) {
+    if (updateAuthorizationClientDocumentByClientIdResult === false) {
       Logger.debug(`${functionName}: client id ${request.clientId} does not exist`, request.traceId);
       updateResult.response = 'UPDATE_FAILED_NOT_EXISTS';
     } else {

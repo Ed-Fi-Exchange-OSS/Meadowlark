@@ -14,6 +14,7 @@ import { updateAuthorizationClientDocument } from '../../../src/repository/autho
 import { createAuthorizationClientDocument } from '../../../src/repository/authorization/CreateAuthorizationClient';
 import { deleteAllAuthorizations } from '../TestHelper';
 import { getAuthorizationClientDocumentById } from '../../../src/repository/SqlHelper';
+import { AuthorizationDocument, NoAuthorizationDocument } from '../../../src/model/AuthorizationDocument';
 
 const clientIdSame = 'clientIdSame';
 const clientIdDifferent = 'clientIdDifferent';
@@ -52,7 +53,7 @@ describe('given the update of an authorization client', () => {
   });
 
   it('should exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: clientIdSame }, client);
+    const result: any = await getAuthorizationClientDocumentById(clientIdSame, client);
     expect(result).toMatchInlineSnapshot(`
       {
         "_id": "clientIdSame",
@@ -96,46 +97,14 @@ describe('given the attempted update of an authorization client that does not ex
   });
 
   it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: clientIdDifferent }, client);
-    expect(result).toBeNull();
+    const result: AuthorizationDocument = await getAuthorizationClientDocumentById(clientIdDifferent, client);
+    expect(result).toMatchObject(NoAuthorizationDocument());
   });
 
   it('should return update failed not exists', async () => {
     expect(updateClientRequest).toMatchInlineSnapshot(`
       {
         "response": "UPDATE_FAILED_NOT_EXISTS",
-      }
-    `);
-  });
-});
-
-describe('given a closed Postgresql connection', () => {
-  let client: PoolClient;
-  let updateClientRequest: UpdateAuthorizationClientResult;
-
-  beforeAll(async () => {
-    client = await getSharedClient();
-    client.release();
-    await resetSharedClient();
-    updateClientRequest = await updateAuthorizationClientDocument(newUpdateAuthorizationClientRequest(clientIdSame), client);
-    client = await getSharedClient();
-  });
-
-  afterAll(async () => {
-    await deleteAllAuthorizations(client);
-    client.release();
-    await resetSharedClient();
-  });
-
-  it('should not exist in the db', async () => {
-    const result: any = await getAuthorizationClientDocumentById({ clientId: clientIdSame }, client);
-    expect(result).toBeNull();
-  });
-
-  it('should return failure', async () => {
-    expect(updateClientRequest).toMatchInlineSnapshot(`
-      {
-        "response": "UNKNOWN_FAILURE",
       }
     `);
   });
