@@ -12,6 +12,7 @@ import { TraceId } from '../model/IdTypes';
 import { EndpointName } from '../model/api-schema/EndpointName';
 import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
 import { ProjectShortVersion } from '../model/ProjectShortVersion';
+import { SemVer } from '../model/api-schema/SemVer';
 
 const moduleName = 'LoadProjectSchema';
 
@@ -20,7 +21,7 @@ const dataStandard50pre1Path: string = path.resolve(__dirname, '../ds-schemas/Da
 
 const projectNamespaceEdfi: ProjectNamespace = 'ed-fi' as ProjectNamespace;
 
-const projectShortVersion33b: ProjectShortVersion = 'v3.3b' as ProjectShortVersion;
+export const projectShortVersion33b: ProjectShortVersion = 'v3.3b' as ProjectShortVersion;
 const projectShortVersion50pre1: ProjectShortVersion = 'v5.0-pre.1' as ProjectShortVersion;
 
 /**
@@ -109,4 +110,18 @@ export function validEndpointNamesFor(
   const projectSchema: ProjectSchema | undefined = getProjectSchemaFromCache(projectNamespace, projectShortVersion);
   if (projectSchema == null) return [];
   return Object.keys(projectSchema.resourceSchemas) as EndpointName[];
+}
+
+/**
+ * Returns the hardcoded ProjectShortVersion for a given project semver.
+ */
+export function versionAbbreviationFor(projectVersion: SemVer): ProjectShortVersion {
+  switch (projectVersion) {
+    case '3.3.1-b':
+      return projectShortVersion33b;
+    case '5.0.0-pre.1':
+      return projectShortVersion50pre1;
+    default:
+      return '' as ProjectShortVersion;
+  }
 }

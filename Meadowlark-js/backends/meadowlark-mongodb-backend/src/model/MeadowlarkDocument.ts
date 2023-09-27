@@ -12,6 +12,9 @@ import {
   MeadowlarkId,
   ResourceInfo,
   DocumentUuid,
+  MetaEdProjectName,
+  MetaEdResourceName,
+  SemVer,
 } from '@edfi/meadowlark-core';
 
 export interface MeadowlarkDocumentId {
@@ -36,19 +39,19 @@ export interface MeadowlarkDocument extends MeadowlarkDocumentId {
   /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
 
   /**
    * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
    * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  resourceName: string;
+  resourceName: MetaEdResourceName;
 
   /**
    * The resource version as a string. This is the same as the MetaEd project version
    * the entity is defined in e.g. "3.3.1-b" for a 3.3b data standard entity.
    */
-  resourceVersion: string;
+  resourceVersion: SemVer;
 
   /**
    * The Ed-Fi ODS/API document itself.

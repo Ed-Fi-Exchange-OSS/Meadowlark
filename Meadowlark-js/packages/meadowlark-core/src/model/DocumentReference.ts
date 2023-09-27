@@ -6,18 +6,20 @@
 import { MeadowlarkId } from './IdTypes';
 import { meadowlarkIdForDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
+import { MetaEdProjectName } from './api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from './api-schema/MetaEdResourceName';
 
 export type DocumentReference = {
   /**
    * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
 
   /**
    * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
    * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  resourceName: string;
+  resourceName: MetaEdResourceName;
 
   /**
    * Whether this document is a descriptor. Descriptors are treated differently from other documents

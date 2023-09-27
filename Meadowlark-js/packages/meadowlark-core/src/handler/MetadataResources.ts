@@ -5,7 +5,7 @@
 
 import { Config } from '@edfi/meadowlark-utilities';
 
-export const CreateApiVersionObject = (serverBaseUrl: string) => ({
+export const createApiVersionObject = (serverBaseUrl: string) => ({
   version: '1.0.0',
   apiMode: 'SharedInstance',
   dataModels: [
@@ -23,7 +23,7 @@ export const CreateApiVersionObject = (serverBaseUrl: string) => ({
   },
 });
 
-export const OpenApiListTemplate = (serverBaseUrl: string) => [
+export const openApiListTemplate = (serverBaseUrl: string) => [
   {
     name: 'Descriptors',
     endpointUri: `${serverBaseUrl}/metadata/descriptors/swagger.json`,

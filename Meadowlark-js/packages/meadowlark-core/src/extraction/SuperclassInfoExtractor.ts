@@ -3,6 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { DocumentIdentity } from '../model/DocumentIdentity';
+import { SuperclassInfo } from '../model/SuperclassInfo';
+import type { ResourceSchema } from '../model/api-schema/ResourceSchema';
+
 /**
  * Create a SuperclassInfo from an already constructed DocumentIdentity, if the entity should have one.
  * If the entity is a subclass with an identity rename, replace the renamed identity property with the
@@ -13,31 +17,31 @@
  * equivalent superclass identity for this School would be { name: educationOrganizationId, value: 123 }.
  *
  */
-export function deriveSuperclassInfoFrom(entity: TopLevelEntity, documentIdentity: DocumentIdentity): SuperclassInfo | null {
-  const { superclass }: NullableTopLevelEntity = (entity.data.edfiApiSchema as EntityApiSchemaData).apiMapping;
-  if (superclass == null) return null;
-  const identityRename: EntityProperty | undefined = entity.identityProperties.find((p) => p.isIdentityRename);
-  if (identityRename == null) {
-    return { resourceName: superclass.metaEdName, documentIdentity, projectName: superclass.namespace.projectName };
+export function deriveSuperclassInfoFrom(
+  resourceSchema: ResourceSchema,
+  documentIdentity: DocumentIdentity,
+): SuperclassInfo | null {
+  if (!resourceSchema.isSubclass) return null;
+
+  // Associations do not rename the identity fields in MetaEd, so the DocumentIdentity portion is the same
+  if (resourceSchema.subclassType === 'association') {
+    return {
+      resourceName: resourceSchema.superclassResourceName,
+      projectName: resourceSchema.superclassProjectName,
+      documentIdentity,
+    };
   }
 
-  const subclassName = decapitalize(identityRename.metaEdName);
-  const superclassName = decapitalize(identityRename.baseKeyName);
-
-  if (documentIdentity[subclassName] == null) {
-    return { resourceName: superclass.metaEdName, documentIdentity, projectName: superclass.namespace.projectName };
-  }
-
-  // copy the DocumentIdentity so the original is not affected
+  // Copy the DocumentIdentity so the original is not affected
   const superclassIdentity: DocumentIdentity = { ...documentIdentity };
 
-  // Replace subclassName with superclassName
-  delete superclassIdentity[subclassName];
-  superclassIdentity[superclassName] = documentIdentity[subclassName];
+  // Replace subclassIdentityFullname with superclassIdentityFullname
+  delete superclassIdentity[resourceSchema.subclassIdentityFullname];
+  superclassIdentity[resourceSchema.superclassIdentityFullname] = documentIdentity[resourceSchema.subclassIdentityFullname];
 
   return {
-    resourceName: superclass.metaEdName,
-    projectName: superclass.namespace.projectName,
+    resourceName: resourceSchema.superclassResourceName,
+    projectName: resourceSchema.superclassProjectName,
     documentIdentity: superclassIdentity,
   };
 }

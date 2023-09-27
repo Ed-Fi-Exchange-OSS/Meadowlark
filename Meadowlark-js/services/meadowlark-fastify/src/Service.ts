@@ -15,7 +15,6 @@ import { Config, Logger } from '@edfi/meadowlark-utilities';
 import { deleteIt, get, update, upsert } from './handler/CrudHandler';
 import { closeMeadowlarkConnection } from './handler/MeadowlarkConnection';
 import {
-  metaed,
   apiVersion,
   swaggerForResourcesAPI,
   swaggerForDescriptorsAPI,
@@ -116,9 +115,6 @@ export function buildService(): FastifyInstance {
     fastify.post(`/${stage}/*`, upsert);
     fastify.put(`/${stage}/*`, update);
     fastify.delete(`/${stage}/*`, deleteIt);
-
-    // MetaEd metadata handler
-    fastify.get(`/${stage}/metaed`, metaed);
 
     // API version handler
     fastify.get(`/${stage}`, apiVersion);

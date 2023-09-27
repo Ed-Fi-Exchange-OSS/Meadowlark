@@ -5,6 +5,8 @@
 
 import { DocumentObjectKey } from './DocumentObjectKey';
 import { JsonPath } from './JsonPath';
+import { MetaEdProjectName } from './MetaEdProjectName';
+import { MetaEdResourceName } from './MetaEdResourceName';
 
 type BaseDocumentPaths = {
   /**
@@ -41,13 +43,13 @@ export type ReferencePaths = BaseDocumentPaths & {
   /**
    * The MetaEd project name the referenced API resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
 
   /**
    * The name of the referenced API resource. Typically, this is the same as the corresponding MetaEd entity name. However,
    * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  resourceName: string;
+  resourceName: MetaEdResourceName;
 
   /**
    * Whether this reference is a descriptor. Descriptors are treated differently from other documents

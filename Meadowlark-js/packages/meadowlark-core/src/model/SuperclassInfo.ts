@@ -4,7 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkId } from './IdTypes';
-import { meadowlarkIdForDocumentIdentity, NoDocumentIdentity } from './DocumentIdentity';
+import { meadowlarkIdForDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { BaseResourceInfo } from './ResourceInfo';
 
@@ -47,7 +47,7 @@ export type SuperclassInfo = {
  */
 export function newSuperclassInfo(): SuperclassInfo {
   return {
-    documentIdentity: NoDocumentIdentity,
+    documentIdentity: [],
     projectName: '',
     resourceName: '',
   };

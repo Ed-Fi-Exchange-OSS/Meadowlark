@@ -9,14 +9,6 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { respondWith, fromRequest } from './MeadowlarkConverter';
 
 /**
- * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd
- * project and returns MetaEd project metadata in the response header.
- */
-export async function metaed(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  respondWith(await Meadowlark.metaed(fromRequest(request)), reply);
-}
-
-/**
  * Base endpoint that returns the DS version and supported extensions
  */
 export async function apiVersion(request: FastifyRequest, reply: FastifyReply): Promise<void> {

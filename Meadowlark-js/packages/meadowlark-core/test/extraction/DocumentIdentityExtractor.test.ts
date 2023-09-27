@@ -21,12 +21,12 @@ import {
   propertyCollectingEnhancer,
 } from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
-import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
+import { DocumentIdentity } from '../../src/model/DocumentIdentity';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     notImportant: false,
@@ -102,7 +102,7 @@ describe('when extracting natural key from domain entity referencing another ref
 describe('when extracting natural key from domain entity with school year in identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     sessionName: 's',
@@ -156,7 +156,7 @@ describe('when extracting natural key from domain entity with school year in ide
 describe('when extracting natural key from domain entity with school year that has a role name', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
   let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     graduationSchoolYearTypeReference: {
