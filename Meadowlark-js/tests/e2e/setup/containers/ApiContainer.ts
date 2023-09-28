@@ -46,7 +46,7 @@ export async function setup(network: StartedNetwork) {
         MEADOWLARK_STAGE: 'local',
         LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
         LOG_PRETTY_PRINT: 'false',
-        AUTHORIZATION_STORE_PLUGIN: '@edfi/meadowlark-mongodb-backend',
+        AUTHORIZATION_STORE_PLUGIN: process.env.AUTHORIZATION_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend',
         POSTGRES_HOST: 'pg-test',
         POSTGRES_USER: process.env.POSTGRES_USER ?? 'postgres',
         POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD ?? 'abcdefgh1!',
