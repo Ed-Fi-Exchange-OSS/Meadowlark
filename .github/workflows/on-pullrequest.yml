@@ -1,4 +1,4 @@
-zname: On Pull Request
+name: On Pull Request
 
 on:
   push:
