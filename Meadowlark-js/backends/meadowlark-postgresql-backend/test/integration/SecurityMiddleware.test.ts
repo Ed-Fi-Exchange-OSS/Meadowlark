@@ -19,6 +19,8 @@ import {
   TraceId,
   newFrontendRequestMiddleware,
   newPathComponents,
+  DocumentObjectKey,
+  MetaEdResourceName,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -97,11 +99,11 @@ describe('given the getById of a document owned by the requestor', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'get2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -155,11 +157,11 @@ describe('given the getById of a document not owned by the requestor', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'get2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 

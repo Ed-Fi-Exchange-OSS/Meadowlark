@@ -15,6 +15,9 @@ import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
 import { EndpointName } from '../../src/model/api-schema/EndpointName';
 import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
 import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { SemVer } from '../../src/model/api-schema/SemVer';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -33,11 +36,11 @@ const frontendRequest: FrontendRequest = {
 describe('given persistence is going to throw a reference error on insert', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
   const expectedError = 'Error message';
@@ -117,11 +120,11 @@ describe('given upsert has write conflict failure', () => {
 describe('given persistence is going to throw a conflict error on insert', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
   const expectedError = 'Error message';
@@ -165,11 +168,11 @@ describe('given persistence is going to throw a conflict error on insert', () =>
 describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
 

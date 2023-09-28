@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { MetaEdProjectName } from './MetaEdProjectName';
 import { ResourceSchema } from './ResourceSchema';
 import { ResourceSchemaMapping } from './ResourceSchemaMapping';
 import { SemVer } from './SemVer';
@@ -14,7 +15,7 @@ export type ProjectSchema = {
   /**
    * The MetaEd project name the referenced API resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
   projectVersion: SemVer;
   isExtensionProject: boolean;
   description: string;
@@ -31,7 +32,7 @@ export type ProjectSchema = {
 };
 
 export const NoProjectSchema: ProjectSchema = {
-  projectName: 'NoProjectName',
+  projectName: 'NoProjectName' as MetaEdProjectName,
   projectVersion: '0.0.0' as SemVer,
   isExtensionProject: false,
   description: 'NoProjectSchema',

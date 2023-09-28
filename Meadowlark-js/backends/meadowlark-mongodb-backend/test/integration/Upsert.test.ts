@@ -21,6 +21,9 @@ import {
   MeadowlarkId,
   TraceId,
   UpsertResult,
+  DocumentObjectKey,
+  MetaEdResourceName,
+  MetaEdProjectName,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -46,11 +49,11 @@ describe('given the upsert of a new document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert1' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert1' }],
     requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
@@ -108,7 +111,7 @@ describe('given the upsert of an existing document three times', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
@@ -204,7 +207,7 @@ describe('given an upsert of an existing non-identity-update supporting document
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
     allowIdentityUpdates: false,
   };
   const documentInfoBase: DocumentInfo = {
@@ -263,7 +266,7 @@ describe('given an upsert of an existing identity-update supporting document, ch
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
     allowIdentityUpdates: true,
   };
   const documentInfoBase: DocumentInfo = {
@@ -324,7 +327,7 @@ describe('given an upsert of an existing non-identity update supporting document
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
     allowIdentityUpdates: false,
   };
   const documentInfo1: DocumentInfo = {
@@ -414,7 +417,7 @@ describe('given an upsert of an existing identity update supporting document, ch
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
     allowIdentityUpdates: true,
   };
   const documentInfo1: DocumentInfo = {
@@ -503,7 +506,7 @@ describe('given an upsert of a new document that references a non-existent docum
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -563,7 +566,7 @@ describe('given an upsert of a new document that references an existing document
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -583,7 +586,7 @@ describe('given an upsert of a new document that references an existing document
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -646,7 +649,7 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -673,7 +676,7 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -751,15 +754,15 @@ describe('given an upsert of a subclass document referenced by an existing docum
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
-    projectName: 'Ed-Fi',
+    resourceName: 'School' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
     documentIdentity: { educationOrganizationId: '123' },
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
@@ -781,7 +784,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
 
   const documentWithReferenceResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -851,13 +854,13 @@ describe('given an upsert of a subclass document when a different subclass has t
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
     documentIdentity,
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const existingSubclassResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const existingSubclassDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -871,7 +874,7 @@ describe('given an upsert of a subclass document when a different subclass has t
 
   const sameSuperclassIdentityResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'LocalEducationAgency',
+    resourceName: 'LocalEducationAgency' as MetaEdResourceName,
   };
   const sameSuperclassIdentityDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -939,7 +942,7 @@ describe('given an update of a document that references a non-existent document 
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1017,7 +1020,7 @@ describe('given an update of a document that references an existing document wit
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1038,7 +1041,7 @@ describe('given an update of a document that references an existing document wit
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1119,7 +1122,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1147,7 +1150,7 @@ describe('given an update of a document with one existing and one non-existent r
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1238,15 +1241,15 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
-    projectName: 'Ed-Fi',
+    resourceName: 'School' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
     documentIdentity: { educationOrganizationId: '123' },
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
@@ -1269,7 +1272,7 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const documentWithReferenceResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
@@ -1350,7 +1353,7 @@ describe('given the upsert of an existing document with a stale request timestam
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),

@@ -23,6 +23,9 @@ import {
   TraceId,
   UpsertRequest,
   UpsertResult,
+  DocumentObjectKey,
+  MetaEdResourceName,
+  MetaEdProjectName,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
@@ -76,11 +79,11 @@ describe('given the update of a non-existent document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update1' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update1' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -124,11 +127,11 @@ describe('given the update of an existing document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -177,7 +180,8 @@ describe('given the update of an existing document', () => {
 
   it('should have updated the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
-    expect(result.document_identity.natural).toBe('update2');
+    expect(result.document_identity[0].documentKey).toBe('natural');
+    expect(result.document_identity[0].documentValue).toBe('update2');
     expect(result.edfi_doc.changeToDoc).toBe(true);
   });
 
@@ -194,11 +198,11 @@ describe('given the attempted update of an existing document with a stale reques
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -247,7 +251,8 @@ describe('given the attempted update of an existing document with a stale reques
 
   it('should not have updated the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByDocumentUuid(client, resultDocumentUuid);
-    expect(result.document_identity.natural).toBe('update2');
+    expect(result.document_identity[0].documentKey).toBe('natural');
+    expect(result.document_identity[0].documentValue).toBe('update2');
     expect(result.edfi_doc.changeToDoc).toBeUndefined();
   });
 
@@ -264,11 +269,11 @@ describe('given an update of a document that references a non-existent document 
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update4' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update4' }],
     requestTimestamp,
   };
 
@@ -280,7 +285,7 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not a valid reference' }],
     isDescriptor: false,
   };
 
@@ -331,7 +336,8 @@ describe('given an update of a document that references a non-existent document 
     const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesId);
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
-    expect(docResult.document_identity.natural).toBe('update4');
+    expect(docResult.document_identity[0].documentKey).toBe('natural');
+    expect(docResult.document_identity[0].documentValue).toBe('update4');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
@@ -352,11 +358,11 @@ describe('given an update of a document that references an existing document wit
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update5' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -372,11 +378,11 @@ describe('given an update of a document that references an existing document wit
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update6' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update6' }],
     requestTimestamp,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -444,7 +450,8 @@ describe('given an update of a document that references an existing document wit
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
-    expect(docResult.document_identity.natural).toBe('update6');
+    expect(docResult.document_identity[0].documentKey).toBe('natural');
+    expect(docResult.document_identity[0].documentValue).toBe('update6');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "Qw5FvPdKxAXWnGghsMh3I61yLFfls4Q949Fk2w",
@@ -465,11 +472,11 @@ describe('given an update of a document with one existing and one non-existent r
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update7' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update7' }],
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -487,17 +494,17 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not a valid reference' }],
     isDescriptor: false,
   };
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update8' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update8' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -586,20 +593,20 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
-    projectName: 'Ed-Fi',
+    resourceName: 'School' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: { educationOrganizationId: '123' },
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    documentIdentity: [{ documentKey: 'educationOrganizationId' as DocumentObjectKey, documentValue: '123' }],
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
     superclassInfo,
     requestTimestamp,
   };
@@ -617,11 +624,12 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const documentWithReferenceResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { week: 'update6' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'update6' }],
+
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -704,12 +712,12 @@ describe('given the update of an existing document changing meadowlarkId with al
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
     allowIdentityUpdates: false,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update 2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update 2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -724,7 +732,8 @@ describe('given the update of an existing document changing meadowlarkId with al
     };
     const documentInfoUpdated: DocumentInfo = {
       ...newDocumentInfo(),
-      documentIdentity: { natural: 'updated identity' },
+      documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'updated identity' }],
+
       requestTimestamp: requestTimestamp + 1,
     };
     const meadowlarkIdUpdated = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoUpdated.documentIdentity);
@@ -763,11 +772,11 @@ describe('given the update of an existing document changing meadowlarkId with al
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update5' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -783,19 +792,23 @@ describe('given the update of an existing document changing meadowlarkId with al
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School Identity update',
+    resourceName: 'School Identity update' as MetaEdResourceName,
     allowIdentityUpdates: true,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'updated identity allow identity updates' },
+    documentIdentity: [
+      { documentKey: 'natural' as DocumentObjectKey, documentValue: 'updated identity allow identity updates' },
+    ],
+
     documentReferences: [validReference],
     requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const documentInfoUpdated: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update 2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update 2' }],
+
     documentReferences: [validReference],
     requestTimestamp: requestTimestamp + 1,
   };
@@ -882,12 +895,13 @@ describe('given the attempted update of an existing document with a stale reques
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School Identity update',
+    resourceName: 'School Identity update' as MetaEdResourceName,
     allowIdentityUpdates: true,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'update2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'update2' }],
+
     requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
@@ -939,7 +953,8 @@ describe('given the attempted update of an existing document with a stale reques
 
   it('should not have updated the document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
-    expect(result.document_identity.natural).toBe('update2');
+    expect(result.document_identity[0].documentKey).toBe('natural');
+    expect(result.document_identity[0].documentValue).toBe('update2');
     expect(result.edfi_doc.natural).toBe('key');
   });
 

@@ -8,6 +8,7 @@ import { DocumentInfo } from '../../src/model/DocumentInfo';
 import { DescriptorDocument } from '../../src/model/DescriptorDocument';
 import { extractDocumentInfo } from '../../src/extraction/DocumentInfoExtractor';
 import { DocumentIdentity } from '../../src/model/DocumentIdentity';
+import { DocumentObjectKey } from '../../src/model/api-schema/DocumentObjectKey';
 
 const requestTimestamp = 10;
 
@@ -172,7 +173,7 @@ const testSchoolModel = (): TopLevelEntity => ({
 });
 
 describe('given IsDescriptor equal true', () => {
-  const body: DocumentIdentity = { schoolYear: '2023' };
+  const body: DocumentIdentity = [{ documentKey: 'schoolYear' as DocumentObjectKey, documentValue: '2023' }],
   const matchingMetaEdModel: TopLevelEntity = {
     ...testModel(),
   };

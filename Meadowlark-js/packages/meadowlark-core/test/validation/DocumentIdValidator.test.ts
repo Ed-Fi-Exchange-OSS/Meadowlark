@@ -4,8 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MeadowlarkId } from '../../src/model/IdTypes';
-import { meadowlarkIdForDocumentIdentity, resourceInfoHashFrom } from '../../src/model/DocumentIdentity';
+import { DocumentIdentity, meadowlarkIdForDocumentIdentity, resourceInfoHashFrom } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
+import { DocumentObjectKey } from '../../src/model/api-schema/DocumentObjectKey';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
 
 /**
  * Returns true if resource info hash matches resource info portion of meadowlark id
@@ -29,13 +32,11 @@ describe('given a valid id', () => {
   beforeAll(async () => {
     validResourceInfo = {
       isDescriptor: false,
-      projectName: 'ProjectName',
-      resourceName: 'ResourceName',
+      projectName: 'ProjectName' as MetaEdProjectName,
+      resourceName: 'ResourceName' as MetaEdResourceName,
     };
 
-    const validDocumentIdentity = {
-      key: 'value',
-    };
+    const validDocumentIdentity: DocumentIdentity = [{ documentKey: 'key' as DocumentObjectKey, documentValue: 'value' }];
 
     // Act
     id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
@@ -57,19 +58,17 @@ describe('given a valid id with a mismatched resource info', () => {
   beforeAll(async () => {
     const validResourceInfo: BaseResourceInfo = {
       isDescriptor: false,
-      projectName: 'ProjectName',
-      resourceName: 'ResourceName',
+      projectName: 'ProjectName' as MetaEdProjectName,
+      resourceName: 'ResourceName' as MetaEdResourceName,
     };
 
     mismatchedResourceInfo = {
       isDescriptor: false,
-      projectName: 'MismatchedProjectName',
-      resourceName: 'MismatchedResourceName',
+      projectName: 'MismatchedProjectName' as MetaEdProjectName,
+      resourceName: 'MismatchedResourceName' as MetaEdResourceName,
     };
 
-    const validDocumentIdentity = {
-      key: 'value',
-    };
+    const validDocumentIdentity: DocumentIdentity = [{ documentKey: 'key' as DocumentObjectKey, documentValue: 'value' }];
 
     // Act
     id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
@@ -88,8 +87,8 @@ describe('given an invalid id', () => {
   const invalidId: MeadowlarkId = 'NotAValidId' as MeadowlarkId;
   const mismatchedResourceInfo: BaseResourceInfo = {
     isDescriptor: false,
-    projectName: 'MismatchedProjectName',
-    resourceName: 'MismatchedResourceName',
+    projectName: 'MismatchedProjectName' as MetaEdProjectName,
+    resourceName: 'MismatchedResourceName' as MetaEdResourceName,
   };
 
   it('should not be well formed', () => {

@@ -3,71 +3,36 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { newEntityProperty, newTopLevelEntity, TopLevelEntity } from '@edfi/metaed-core';
 import { FrontendQueryParameters } from '../../src/handler/FrontendRequest';
 import { validateQueryString } from '../../src/validation/QueryStringValidator';
+import { ResourceSchema, newResourceSchema } from '../../src/model/api-schema/ResourceSchema';
 
-const createModel = (): TopLevelEntity => ({
-  ...newTopLevelEntity(),
-  metaEdName: 'Student',
-  properties: [{ ...newEntityProperty(), metaEdName: 'uniqueId', isPartOfIdentity: true }],
-  data: {
-    edfiApiSchema: {
-      jsonSchemaForInsert: {
-        $schema: 'https://json-schema.org/draft/2020-12/schema',
-        additionalProperties: false,
+const resourceSchema: ResourceSchema = {
+  ...newResourceSchema(),
+  jsonSchemaForInsert: {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    additionalProperties: false,
+    description: 'doc',
+    properties: {
+      uniqueId: {
         description: 'doc',
-        properties: {
-          uniqueId: {
-            description: 'doc',
-            maxLength: 30,
-            type: 'string',
-          },
-          name: {
-            description: 'doc',
-            maxLength: 50,
-            type: 'string',
-          },
-          age: {
-            description: 'doc',
-            type: 'integer',
-          },
-        },
-        required: ['uniqueId'],
-        title: 'EdFi.Student',
-        type: 'object',
+        maxLength: 30,
+        type: 'string',
       },
-      jsonSchemaForUpdate: {
-        $schema: 'https://json-schema.org/draft/2020-12/schema',
-        additionalProperties: false,
+      name: {
         description: 'doc',
-        properties: {
-          id: {
-            description: 'The item id',
-            type: 'string',
-          },
-          uniqueId: {
-            description: 'doc',
-            maxLength: 30,
-            type: 'string',
-          },
-          name: {
-            description: 'doc',
-            maxLength: 50,
-            type: 'string',
-          },
-          age: {
-            description: 'doc',
-            type: 'integer',
-          },
-        },
-        required: ['id', 'uniqueId'],
-        title: 'EdFi.Student',
-        type: 'object',
+        maxLength: 50,
+        type: 'string',
+      },
+      age: {
+        description: 'doc',
+        type: 'integer',
       },
     },
+    title: 'EdFi.Student',
+    type: 'object',
   },
-});
+};
 
 describe('when validating a querystring', () => {
   describe('given a valid querystring in the URL', () => {
@@ -82,14 +47,14 @@ describe('when validating a querystring', () => {
         age: 13,
       }, // "numeric" age; does not include the "required" uniqueId
     ])('accepts querystring %s', async (queryStrings: FrontendQueryParameters) => {
-      const result = await validateQueryString(queryStrings, createModel());
+      const result = await validateQueryString(queryStrings, resourceSchema);
       expect(result).toEqual({});
     });
   });
 
   describe('given an invalid property', () => {
     it('responds with an error', async () => {
-      const result = await validateQueryString({ another: 'property' }, createModel());
+      const result = await validateQueryString({ another: 'property' }, resourceSchema);
       // Don't confirm exact structure at this time.
       expect(result).toHaveProperty('errorBody');
     });
@@ -105,7 +70,7 @@ describe('when validating a querystring', () => {
       { age: "'13'" },
       { age: '%2730%27' },
     ])('responds to %s with an error', async (queryStrings: FrontendQueryParameters) => {
-      const result = await validateQueryString(queryStrings, createModel());
+      const result = await validateQueryString(queryStrings, resourceSchema);
       // Don't confirm exact structure at this time.
       expect(result).toHaveProperty('errorBody');
     });

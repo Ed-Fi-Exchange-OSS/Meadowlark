@@ -7,6 +7,8 @@ import { MeadowlarkId } from './IdTypes';
 import { meadowlarkIdForDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { BaseResourceInfo } from './ResourceInfo';
+import { MetaEdProjectName } from './api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from './api-schema/MetaEdResourceName';
 
 /**
  * The optional superclass information for a DocumentInfo. Applies only to documents that are subclasses,
@@ -31,7 +33,7 @@ export type SuperclassInfo = {
    *          and it subclasses GeneralStudentProgramAssociation from the data standard.
    *          The project name would be 'Ed-Fi'.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
 
   /**
    * This is the resource name of the superclass.
@@ -39,7 +41,7 @@ export type SuperclassInfo = {
    * Example: If the entity for this mapping is School (subclass of EducationOrganization),
    *          then the resourceName would be EducationOrganization.
    */
-  resourceName: string;
+  resourceName: MetaEdResourceName;
 };
 
 /**
@@ -48,8 +50,8 @@ export type SuperclassInfo = {
 export function newSuperclassInfo(): SuperclassInfo {
   return {
     documentIdentity: [],
-    projectName: '',
-    resourceName: '',
+    projectName: '' as MetaEdProjectName,
+    resourceName: '' as MetaEdResourceName,
   };
 }
 

@@ -110,18 +110,28 @@ export type ResourceSchema =
     });
 
 /**
+ * Creates an empty ResourceSchema
+ */
+export function newResourceSchema(): ResourceSchema {
+  return {
+    resourceName: '' as MetaEdResourceName,
+    isDescriptor: false,
+    isSchoolYearEnumeration: false,
+    allowIdentityUpdates: false,
+    jsonSchemaForInsert: NoSchemaRoot,
+    jsonSchemaForUpdate: NoSchemaRoot,
+    jsonSchemaForQuery: NoSchemaRoot,
+    equalityConstraints: [],
+    identityFullnames: [],
+    documentPathsMapping: {},
+    isSubclass: false,
+  };
+}
+
+/**
  * The ResourceSchema null object
  */
 export const NoResourceSchema: ResourceSchema = Object.freeze({
+  ...newResourceSchema(),
   resourceName: 'NoResourceSchema' as MetaEdResourceName,
-  isDescriptor: false,
-  isSchoolYearEnumeration: false,
-  allowIdentityUpdates: false,
-  jsonSchemaForInsert: NoSchemaRoot,
-  jsonSchemaForUpdate: NoSchemaRoot,
-  jsonSchemaForQuery: NoSchemaRoot,
-  equalityConstraints: [],
-  identityFullnames: [],
-  documentPathsMapping: {},
-  isSubclass: false,
 });

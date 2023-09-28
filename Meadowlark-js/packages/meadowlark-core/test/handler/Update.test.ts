@@ -13,6 +13,9 @@ import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
 import { EndpointName } from '../../src/model/api-schema/EndpointName';
 import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
 import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { SemVer } from '../../src/model/api-schema/SemVer';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -65,11 +68,11 @@ describe('given the requested document does not exist', () => {
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid: 'documentUuid' as DocumentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   const expectedError = 'this is the message';
   let response: FrontendResponse;

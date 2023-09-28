@@ -9,33 +9,38 @@ import {
   newFrontendRequestMiddleware,
   removeReferencesDocumentIdentity,
 } from '../../src/handler/FrontendRequest';
+import { DocumentObjectKey } from '../../src/model/api-schema/DocumentObjectKey';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   middleware: {
     ...newFrontendRequestMiddleware(),
     documentInfo: {
-      documentIdentity: { rootIdentity: 'keyRoot' },
+      documentIdentity: [{ documentKey: 'rootIdentity' as DocumentObjectKey, documentValue: 'keyRoot' }],
       documentReferences: [
         {
-          documentIdentity: { documentReference: 'keySensitiveToBeRemoved' },
+          documentIdentity: [
+            { documentKey: 'documentReference' as DocumentObjectKey, documentValue: 'keySensitiveToBeRemoved' },
+          ],
           isDescriptor: false,
-          projectName: 'projectName',
-          resourceName: 'resourceName',
+          projectName: 'projectName' as MetaEdProjectName,
+          resourceName: 'resourceName' as MetaEdResourceName,
         },
       ],
       descriptorReferences: [
         {
-          documentIdentity: { descriptorReference: 'keyDescriptor' },
+          documentIdentity: [{ documentKey: 'descriptorReference' as DocumentObjectKey, documentValue: 'keyDescriptor' }],
           isDescriptor: true,
-          projectName: 'projectName',
-          resourceName: 'resourceName2',
+          projectName: 'projectName' as MetaEdProjectName,
+          resourceName: 'resourceName2' as MetaEdResourceName,
         },
       ],
       superclassInfo: {
-        documentIdentity: { superclassInfo: 'keySuperclassInfo' },
-        projectName: 'Test',
-        resourceName: 'resource',
+        documentIdentity: [{ documentKey: 'superclassInfo' as DocumentObjectKey, documentValue: 'keySuperclassInfo' }],
+        projectName: 'Test' as MetaEdProjectName,
+        resourceName: 'resource' as MetaEdResourceName,
       },
       requestTimestamp: 0,
     },

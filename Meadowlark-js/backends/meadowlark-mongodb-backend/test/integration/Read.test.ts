@@ -18,6 +18,8 @@ import {
   MeadowlarkId,
   DocumentUuid,
   UpdateRequest,
+  MetaEdResourceName,
+  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -61,11 +63,11 @@ describe('given the get of a non-existent document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'get1' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get1' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -99,11 +101,11 @@ describe('given the get of an existing document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'get2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
     requestTimestamp: 1683326572053,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
@@ -151,17 +153,17 @@ describe('given the get of an updated document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'getUpdatedDocument' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'getUpdatedDocument' }],
     requestTimestamp: 1683326572053,
   };
 
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'getUpdatedDocument' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'getUpdatedDocument' }],
     requestTimestamp: 1683548337342,
   };
 

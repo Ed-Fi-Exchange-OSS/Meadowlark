@@ -47,6 +47,7 @@ export type { SuperclassInfo } from './model/SuperclassInfo';
 export { newSuperclassInfo, getMeadowlarkIdForSuperclassInfo } from './model/SuperclassInfo';
 export type { MetaEdProjectName } from './model/api-schema/MetaEdProjectName';
 export type { MetaEdResourceName } from './model/api-schema/MetaEdResourceName';
+export type { DocumentObjectKey } from './model/api-schema/DocumentObjectKey';
 export type { SemVer } from './model/api-schema/SemVer';
 
 // Handlers
