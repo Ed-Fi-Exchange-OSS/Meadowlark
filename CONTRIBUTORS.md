@@ -9,3 +9,6 @@ contributors
 graph](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/network/dependencies).
 New contributors should add their name and e-mail address or link to GitHub
 profile to this file with their first pull request.
+
+Max Paulson <max_paulson@dpsk12.net>
+
