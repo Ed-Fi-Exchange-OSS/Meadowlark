@@ -1,4 +1,4 @@
-name: On Pull Request
+zname: On Pull Request
 
 on:
   push:
@@ -276,6 +276,7 @@ jobs:
       - name: End to End tests for ${{matrix.store.db}} as store and ${{matrix.query_handler.provider}} as query handler
         run: npm run test:e2e:build -- --ci
         env:
+          AUTHORIZATION_STORE_PLUGIN: ${{ matrix.store.plugin }}
           DOCUMENT_STORE_PLUGIN: ${{ matrix.store.plugin }}
           QUERY_HANDLER_PLUGIN: ${{ matrix.query_handler.plugin }}
           LISTENER1_PLUGIN: ${{ matrix.query_handler.plugin }}

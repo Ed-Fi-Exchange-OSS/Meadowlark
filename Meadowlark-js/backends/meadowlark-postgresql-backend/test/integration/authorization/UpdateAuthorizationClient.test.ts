@@ -98,7 +98,7 @@ describe('given the attempted update of an authorization client that does not ex
 
   it('should not exist in the db', async () => {
     const result: AuthorizationDocument = await getAuthorizationClientDocumentById(clientIdDifferent, client);
-    expect(result).toMatchObject(NoAuthorizationDocument());
+    expect(result).toMatchObject(NoAuthorizationDocument);
   });
 
   it('should return update failed not exists', async () => {

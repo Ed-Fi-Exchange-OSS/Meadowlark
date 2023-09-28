@@ -59,13 +59,11 @@ export function bootstrapAdminDocumentFromCreate(request: CreateAuthorizationCli
 export /**
  * Creates a new empty newMeadowlarkDocument object
  */
-function NoAuthorizationDocument(): AuthorizationDocument {
-  return {
-    _id: '',
-    clientSecretHashed: '',
-    clientName: '',
-    roles: [],
-    isBootstrapAdmin: false,
-    active: false,
-  };
-}
+const NoAuthorizationDocument: AuthorizationDocument = Object.freeze({
+  _id: '',
+  clientSecretHashed: '',
+  clientName: '',
+  roles: [],
+  isBootstrapAdmin: false,
+  active: false,
+});

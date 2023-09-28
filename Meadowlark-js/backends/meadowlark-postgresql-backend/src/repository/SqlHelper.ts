@@ -569,7 +569,7 @@ export async function getAuthorizationClientDocumentById(clientId, client: PoolC
   );
   const queryResult: QueryResult<any> = await client.query(selectAuthorizationClientByIdSql);
 
-  if (!hasResults(queryResult)) return NoAuthorizationDocument();
+  if (!hasResults(queryResult)) return NoAuthorizationDocument;
 
   const result = queryResult.rows[0];
 

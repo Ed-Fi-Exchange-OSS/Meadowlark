@@ -95,7 +95,7 @@ describe('given the attempted reset of a secret for an authorization client that
 
   it('should not exist in the db', async () => {
     const result: any = await getAuthorizationClientDocumentById(clientIdDifferent, client);
-    expect(result).toMatchObject(NoAuthorizationDocument());
+    expect(result).toMatchObject(NoAuthorizationDocument);
   });
 
   it('should return update failed not exists', async () => {

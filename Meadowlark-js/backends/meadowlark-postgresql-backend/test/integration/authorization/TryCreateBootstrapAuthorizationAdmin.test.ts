@@ -107,7 +107,7 @@ describe('given two attempts at the create of a bootstrap admin client', () => {
 
   it('should not have client 2 in the db', async () => {
     const result: any = await getAuthorizationClientDocumentById('clientId2', client);
-    expect(result).toMatchObject(NoAuthorizationDocument());
+    expect(result).toMatchObject(NoAuthorizationDocument);
   });
 
   it('should return already exists failure on second attempt', async () => {

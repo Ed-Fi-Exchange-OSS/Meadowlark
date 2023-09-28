@@ -97,7 +97,7 @@ describe('given the get of a non-existent authorization client', () => {
 
   it('should not exist in the db', async () => {
     const result: any = await getAuthorizationClientDocumentById(clientId, client);
-    expect(result).toMatchObject(NoAuthorizationDocument());
+    expect(result).toMatchObject(NoAuthorizationDocument);
   });
 
   it('should return get not exists', async () => {
