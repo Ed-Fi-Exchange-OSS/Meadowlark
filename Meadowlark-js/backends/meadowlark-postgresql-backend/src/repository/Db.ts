@@ -95,7 +95,6 @@ export async function getSharedClient(): Promise<PoolClient> {
     await checkExistsAndCreateTables(client);
     return client;
   }
-
   // Returns new Postgres Client
   return singletonDbPool.connect();
 }

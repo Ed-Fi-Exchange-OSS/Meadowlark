@@ -6,6 +6,10 @@ import { MeadowlarkId } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
 import format from 'pg-format';
 
+export async function deleteAllAuthorizations(client: PoolClient): Promise<void> {
+  await client.query('TRUNCATE TABLE meadowlark.authorizations');
+}
+
 export async function deleteAll(client: PoolClient): Promise<void> {
   await client.query('TRUNCATE TABLE meadowlark.documents');
   await client.query('TRUNCATE TABLE meadowlark.references');
