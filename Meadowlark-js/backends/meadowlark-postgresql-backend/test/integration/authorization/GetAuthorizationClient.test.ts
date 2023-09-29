@@ -103,11 +103,7 @@ describe('given the get of a non-existent authorization client', () => {
   it('should return get not exists', async () => {
     expect(getClientRequest).toMatchInlineSnapshot(`
     {
-      "active": false,
-      "clientName": "",
-      "clientSecretHashed": "",
-      "response": "GET_SUCCESS",
-      "roles": [],
+      "response": "GET_FAILURE_NOT_EXISTS",
     }
     `);
   });

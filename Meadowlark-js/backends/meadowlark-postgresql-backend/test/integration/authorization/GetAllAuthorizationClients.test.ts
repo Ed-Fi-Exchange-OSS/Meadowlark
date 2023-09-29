@@ -77,11 +77,10 @@ describe('when fetching authorization clients', () => {
       }
     });
 
-    it('should return success with an empty array', async () => {
+    it('should return not exists', async () => {
       expect(response).toMatchInlineSnapshot(`
         {
-          "clients": [],
-          "response": "GET_SUCCESS",
+          "response": "GET_FAILURE_NOT_EXISTS",
         }
       `);
     });
