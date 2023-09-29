@@ -20,6 +20,7 @@ const getDbConfiguration = () => {
     user: Config.get<string>('POSTGRES_USER'),
     password: Config.get<string>('POSTGRES_PASSWORD'),
     database: Config.get<string>('MEADOWLARK_DATABASE_NAME'),
+    max: 30,
   };
   return dbConfiguration;
 };
@@ -95,7 +96,6 @@ export async function getSharedClient(): Promise<PoolClient> {
     await checkExistsAndCreateTables(client);
     return client;
   }
-
   // Returns new Postgres Client
   return singletonDbPool.connect();
 }

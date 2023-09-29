@@ -19,7 +19,7 @@ export async function createAuthorizationClientDocument(
   try {
     await beginTransaction(client);
     const authorizationClient: AuthorizationDocument = authorizationDocumentFromCreate(request);
-    const hasResults = await insertOrUpdateAuthorization(client, authorizationClient);
+    const hasResults = await insertOrUpdateAuthorization(authorizationClient, client);
     if (hasResults) {
       createResult.response = 'CREATE_SUCCESS';
     } else {

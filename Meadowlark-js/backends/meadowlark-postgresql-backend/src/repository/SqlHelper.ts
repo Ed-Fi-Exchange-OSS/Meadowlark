@@ -506,8 +506,8 @@ export async function deleteAliasesForDocumentByMeadowlarkId(
  * @returns query result
  */
 export async function insertOrUpdateAuthorization(
-  client: PoolClient,
   authorizationClient: AuthorizationDocument,
+  client: PoolClient,
 ): Promise<boolean> {
   const documentSql: string = `
   INSERT INTO meadowlark.authorizations (client_id, client_secret_hashed, client_name, roles, is_bootstrap_admin, active)
@@ -637,20 +637,7 @@ export async function insertBootstrapAdmin(
   authorizationClient: AuthorizationDocument,
   client: PoolClient,
 ): Promise<boolean> {
-  const insertBootstrapAdminSql = `
-  INSERT INTO meadowlark.authorizations(client_id, client_secret_hashed, client_name, roles, is_bootstrap_admin, active)
-  VALUES($1, $2, $3, $4, $5, $6);
-`;
-  const queryResult: QueryResult<any> = await client.query(insertBootstrapAdminSql, [
-    // eslint-disable-next-line no-underscore-dangle
-    authorizationClient._id,
-    authorizationClient.clientSecretHashed,
-    authorizationClient.clientName,
-    authorizationClient.roles,
-    authorizationClient.isBootstrapAdmin,
-    authorizationClient.active,
-  ]);
-  return hasResults(queryResult);
+  return insertOrUpdateAuthorization({ ...authorizationClient, isBootstrapAdmin: true }, client);
 }
 
 /**
@@ -741,7 +728,10 @@ export const createAuthorizationsTableSql = `
 
 // Index the client name
 export const createAuthorizationsTableUniqueIndexSql =
-  'CREATE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)';
+  'CREATE UNIQUE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)';
+
+export const createAuthorizationsTableUniqueClientIdIndexSql =
+  'CREATE UNIQUE INDEX IF NOT EXISTS idx_authorizations_client_id ON meadowlark.authorizations(client_id);';
 
 /**
  * SQL query string to create the references table.
@@ -808,6 +798,7 @@ export async function checkExistsAndCreateTables(client: PoolClient) {
     await client.query(createAliasesTableAliasMeadowlarkIdIndexSql);
     await client.query(createAuthorizationsTableSql);
     await client.query(createAuthorizationsTableUniqueIndexSql);
+    await client.query(createAuthorizationsTableUniqueClientIdIndexSql);
   } catch (e) {
     Logger.error(`${moduleName}.checkExistsAndCreateTables error connecting to PostgreSQL`, null, e);
     throw e;
