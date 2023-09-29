@@ -624,7 +624,7 @@ export async function checkBootstrapAdminExists(client: PoolClient): Promise<boo
   WHERE is_bootstrap_admin = true;
 `;
   const queryResult: QueryResult<any> = await client.query(checkBootstrapAdminExistsSql);
-  return hasResults(queryResult) && queryResult.rows[0].total > 0;
+  return hasResults(queryResult) && queryResult.rows[0].total > 1;
 }
 
 /**
