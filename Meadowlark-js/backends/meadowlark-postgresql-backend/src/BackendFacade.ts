@@ -92,35 +92,65 @@ export async function securityMiddleware(middlewareModel: MiddlewareModel): Prom
 export async function createAuthorizationClientDocument(
   request: CreateAuthorizationClientRequest,
 ): Promise<CreateAuthorizationClientResult> {
-  return CreateAuthorizationClient.createAuthorizationClientDocument(request, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return CreateAuthorizationClient.createAuthorizationClientDocument(request, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 
 export async function tryCreateBootstrapAuthorizationAdminDocument(
   request: CreateAuthorizationClientRequest,
 ): Promise<TryCreateBootstrapAuthorizationAdminResult> {
-  return TryCreateBootstrapAuthorizationAdmin.tryCreateBootstrapAuthorizationAdminDocument(request, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return TryCreateBootstrapAuthorizationAdmin.tryCreateBootstrapAuthorizationAdminDocument(request, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 
 export async function getAuthorizationClientDocument(
   request: GetAuthorizationClientRequest,
 ): Promise<GetAuthorizationClientResult> {
-  return GetAuthorizationClient.getAuthorizationClientDocument(request, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return GetAuthorizationClient.getAuthorizationClientDocument(request, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 
 export async function getAllAuthorizationClientDocuments(traceId: string): Promise<GetAllAuthorizationClientsResult> {
-  return GetAllAuthorizationClients.getAllAuthorizationClientDocuments(traceId, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return GetAllAuthorizationClients.getAllAuthorizationClientDocuments(traceId, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 
 export async function updateAuthorizationClientDocument(
   request: UpdateAuthorizationClientRequest,
 ): Promise<UpdateAuthorizationClientResult> {
-  return UpdateAuthorizationClient.updateAuthorizationClientDocument(request, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return UpdateAuthorizationClient.updateAuthorizationClientDocument(request, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 
 export async function resetAuthorizationClientSecret(
   request: ResetAuthorizationClientSecretRequest,
 ): Promise<ResetAuthorizationClientSecretResult> {
-  return ResetAuthorizationClientSecret.resetAuthorizationClientSecret(request, await getSharedClient());
+  const poolClient: PoolClient = await getSharedClient();
+  try {
+    return ResetAuthorizationClientSecret.resetAuthorizationClientSecret(request, poolClient);
+  } finally {
+    poolClient.release();
+  }
 }
 // End AuthorizationStore implementation
 
