@@ -11,6 +11,7 @@ export async function getAllAuthorizationClientDocuments(
     const getAllAuthorizationClientsResult: GetAllAuthorizationClientsResult = await getAuthorizationClientDocumentList(
       client,
     );
+
     return getAllAuthorizationClientsResult;
   } catch (e) {
     Logger.error('GetAuthorizationClient.getAuthorizationClientDocument', traceId, e);

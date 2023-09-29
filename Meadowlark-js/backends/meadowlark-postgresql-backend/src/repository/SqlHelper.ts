@@ -524,8 +524,8 @@ export async function insertOrUpdateAuthorization(
     authorizationClient.clientSecretHashed,
     authorizationClient.clientName,
     authorizationClient.roles,
-    authorizationClient.isBootstrapAdmin,
-    authorizationClient.active,
+    authorizationClient.isBootstrapAdmin ?? false,
+    authorizationClient.active ?? true,
   ]);
   return hasResults(queryResult);
 }
@@ -541,7 +541,7 @@ export async function getAuthorizationClientDocumentList(client: PoolClient): Pr
   FROM meadowlark.authorizations;`;
 
   const queryResult: QueryResult<any> = await client.query(selectAllAuthorizationClientsSql);
-  if (!hasResults(queryResult)) return { response: 'GET_SUCCESS', clients: [] };
+  if (!hasResults(queryResult)) return { response: 'GET_FAILURE_NOT_EXISTS' };
   return {
     response: 'GET_SUCCESS',
     clients: queryResult.rows.map((x) => ({
@@ -577,8 +577,8 @@ export async function getAuthorizationClientDocumentById(clientId, client: PoolC
     _id: result.client_id,
     clientName: result.client_name,
     roles: result.roles as AuthorizationClientRole[], // Assuming roles are stored as an array in the database
-    active: result.active,
-    isBootstrapAdmin: result.is_bootstrap_admin,
+    active: result.active ?? true,
+    isBootstrapAdmin: result.is_bootstrap_admin ?? false,
     clientSecretHashed: result.client_secret_hashed,
   };
 }
@@ -659,7 +659,7 @@ export async function updateAuthorizationClientDocumentByClientId(
   const queryResult: QueryResult<any> = await client.query(updateSql, [
     updateAuthorizationClientRequest.clientName,
     updateAuthorizationClientRequest.roles,
-    updateAuthorizationClientRequest.active,
+    updateAuthorizationClientRequest.active ?? true,
     updateAuthorizationClientRequest.clientId,
   ]);
   return hasResults(queryResult);
@@ -726,10 +726,7 @@ export const createAuthorizationsTableSql = `
   is_bootstrap_admin BOOLEAN NOT NULL,
   active BOOLEAN NOT NULL);`;
 
-// Index the client name
-export const createAuthorizationsTableUniqueIndexSql =
-  'CREATE UNIQUE INDEX IF NOT EXISTS idx_authorizations_client_name ON meadowlark.authorizations(client_name)';
-
+// Index the client id
 export const createAuthorizationsTableUniqueClientIdIndexSql =
   'CREATE UNIQUE INDEX IF NOT EXISTS idx_authorizations_client_id ON meadowlark.authorizations(client_id);';
 
@@ -797,7 +794,6 @@ export async function checkExistsAndCreateTables(client: PoolClient) {
     await client.query(createAliasesTableDocumentUuidIndexSql);
     await client.query(createAliasesTableAliasMeadowlarkIdIndexSql);
     await client.query(createAuthorizationsTableSql);
-    await client.query(createAuthorizationsTableUniqueIndexSql);
     await client.query(createAuthorizationsTableUniqueClientIdIndexSql);
   } catch (e) {
     Logger.error(`${moduleName}.checkExistsAndCreateTables error connecting to PostgreSQL`, null, e);
