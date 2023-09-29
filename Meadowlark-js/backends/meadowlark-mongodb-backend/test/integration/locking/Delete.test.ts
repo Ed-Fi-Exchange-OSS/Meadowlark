@@ -15,6 +15,8 @@ import {
   newResourceInfo,
   DocumentUuid,
   TraceId,
+  MetaEdResourceName,
+  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
@@ -60,12 +62,12 @@ const edfiSchoolDoc = {
 
 const schoolResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
-  resourceName: 'School',
+  resourceName: 'School' as MetaEdResourceName,
 };
 
 const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: { schoolId: '123' },
+  documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
 };
 
 const schoolMeadowlarkId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
@@ -101,15 +103,14 @@ const schoolDocument: MeadowlarkDocument = meadowlarkDocumentFrom({
 
 const academicWeekResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
-  resourceName: 'AcademicWeek',
+  resourceName: 'AcademicWeek' as MetaEdResourceName,
 };
 const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: {
-    schoolId: '123',
-    weekIdentifier: '123456',
-  },
-
+  documentIdentity: [
+    { documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' },
+    { documentKey: 'weekIdentifier' as DocumentObjectKey, documentValue: '123456' },
+  ],
   documentReferences: [referenceToSchool],
 };
 const academicWeekMeadowlarkId = meadowlarkIdForDocumentIdentity(

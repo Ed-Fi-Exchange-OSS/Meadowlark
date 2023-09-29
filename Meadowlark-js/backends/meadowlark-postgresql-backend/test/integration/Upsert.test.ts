@@ -17,7 +17,6 @@ import {
   SuperclassInfo,
   newSuperclassInfo,
   UpsertResult,
-  DocumentIdentity,
   MeadowlarkId,
   TraceId,
   MetaEdResourceName,

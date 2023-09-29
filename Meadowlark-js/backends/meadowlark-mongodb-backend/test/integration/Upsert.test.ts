@@ -115,7 +115,7 @@ describe('given the upsert of an existing document three times', () => {
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -212,7 +212,7 @@ describe('given an upsert of an existing non-identity-update supporting document
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert3' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert3' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -271,7 +271,7 @@ describe('given an upsert of an existing identity-update supporting document, ch
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert3' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert3' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -332,12 +332,12 @@ describe('given an upsert of an existing non-identity update supporting document
   };
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key1' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key1' }],
     requestTimestamp,
   };
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key2' }],
     requestTimestamp: requestTimestamp + 1,
   };
 
@@ -422,12 +422,12 @@ describe('given an upsert of an existing identity update supporting document, ch
   };
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key1' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key1' }],
     requestTimestamp,
   };
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key2' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key2' }],
     requestTimestamp: requestTimestamp + 1,
   };
 
@@ -510,7 +510,7 @@ describe('given an upsert of a new document that references a non-existent docum
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert4' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert4' }],
   };
 
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -521,7 +521,7 @@ describe('given an upsert of a new document that references a non-existent docum
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not valid' }],
     isDescriptor: false,
   };
   documentWithReferencesInfo.documentReferences = [invalidReference];
@@ -570,7 +570,7 @@ describe('given an upsert of a new document that references an existing document
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert5' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -590,7 +590,7 @@ describe('given an upsert of a new document that references an existing document
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert6' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert6' }],
     documentReferences: [validReference],
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -653,7 +653,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert7' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert7' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -670,7 +670,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not valid' }],
     isDescriptor: false,
   };
 
@@ -680,7 +680,7 @@ describe('given an upsert of a new document with one existing and one non-existe
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert8' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'upsert8' }],
     documentReferences: [validReference, invalidReference],
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -760,14 +760,14 @@ describe('given an upsert of a subclass document referenced by an existing docum
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: { educationOrganizationId: '123' },
+    documentIdentity: [{ documentKey: 'educationOrganizationId' as DocumentObjectKey, documentValue: '123' }],
     resourceName: 'EducationOrganization' as MetaEdResourceName,
     projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
     superclassInfo,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -788,7 +788,7 @@ describe('given an upsert of a subclass document referenced by an existing docum
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { week: 'update6' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'update6' }],
     documentReferences: [referenceAsSuperclass],
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -849,7 +849,9 @@ describe('given an upsert of a subclass document when a different subclass has t
   let client;
   let upsertResult;
 
-  const documentIdentity: DocumentIdentity = { educationOrganizationId: '123' };
+  const documentIdentity: DocumentIdentity = [
+    { documentKey: 'educationOrganizationId' as DocumentObjectKey, documentValue: '123' },
+  ];
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
@@ -864,7 +866,8 @@ describe('given an upsert of a subclass document when a different subclass has t
   };
   const existingSubclassDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
+
     superclassInfo,
   };
   const existingSubclassId = meadowlarkIdForDocumentIdentity(
@@ -878,7 +881,7 @@ describe('given an upsert of a subclass document when a different subclass has t
   };
   const sameSuperclassIdentityDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { localEducationAgencyId: '123' },
+    documentIdentity: [{ documentKey: 'localEducationAgencyId' as DocumentObjectKey, documentValue: '123' }],
     superclassInfo,
   };
   const sameSuperclassIdentityId = meadowlarkIdForDocumentIdentity(
@@ -946,7 +949,7 @@ describe('given an update of a document that references a non-existent document 
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert4' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'upsert4' }],
     requestTimestamp,
   };
 
@@ -958,7 +961,7 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not valid' }],
     isDescriptor: false,
   };
 
@@ -1024,7 +1027,7 @@ describe('given an update of a document that references an existing document wit
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert5' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'upsert5' }],
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -1045,7 +1048,7 @@ describe('given an update of a document that references an existing document wit
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert6' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'upsert6' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -1126,7 +1129,7 @@ describe('given an update of a document with one existing and one non-existent r
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert7' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'upsert7' }],
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -1144,7 +1147,7 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'not valid' }],
     isDescriptor: false,
   };
 
@@ -1154,7 +1157,7 @@ describe('given an update of a document with one existing and one non-existent r
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert8' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'upsert8' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -1247,14 +1250,14 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: { educationOrganizationId: '123' },
+    documentIdentity: [{ documentKey: 'educationOrganizationId' as DocumentObjectKey, documentValue: '123' }],
     resourceName: 'EducationOrganization' as MetaEdResourceName,
     projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
     superclassInfo,
     requestTimestamp,
   };
@@ -1276,7 +1279,7 @@ describe('given an update of a subclass document referenced by an existing docum
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { week: 'update6' },
+    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'update6' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesId = meadowlarkIdForDocumentIdentity(
@@ -1357,7 +1360,7 @@ describe('given the upsert of an existing document with a stale request timestam
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key' },
+    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
