@@ -101,3 +101,83 @@ When I comment out the index creation for aliasMeadowlarkIds: 1:46:556
 
 The performance improves about 5% when I comment out each index creation, individually. But for the reads, the performance
 doesn't improve. The reason could be that we don't have enough data in the mongo database.
+
+### Method 3, general review of the memory usage, cpu, connections, etc
+
+The bulk load client runs on the host machine. It has 16 GB of RAM,
+Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz   2.59 GHz processor, 6 cores and
+12 logical processors, using WSL2. Docker has been configured to use 8GB of RAM
+and 10 cores.
+
+Ran bulk load scripts with 8Gb assigned to docker and the time it takes to execute the scripts don't change significantly.
+
+While the script is running:
+   In terms of memory, all 3 instances of mongodb use similar amount of memory.
+   Mongo1, uses a lot more cpu: about 170%. This is because it is receiving all the write operations.
+   Maximum number of connections was 101.
+   Maximum amount of memory used by mongo 1 was about 350Mb.
+   Maximum number of operations per second, about 1700
+
+Meadowlark:
+   Maximum memory usage for the each instance 650Mb. Average is about 450Mb
+   Maximum CPU percentage is 140% while average is about 40%.
+
+### Method 4, general review with Mongodb Compass stats while changing the number of connections
+
+For these tests I used Autocannon
+
+1. 5000 requests and 1 connection:
+AVG time: 2:44:849
+AVG number of operations per second: 187
+AVG number of connections: 27
+
+2. 5000 requests and 10 connections:
+AVG time: 1:30:880
+AVG number of operations per second: 1393
+AVG number of connections: 51
+
+3. 5000 requests and 25 connections:
+AVG time: 3:17:107
+AVG number of operations per second: 1705
+AVG number of connections: 91
+
+4. 5000 requests and 50 connections:
+AVG time: 4:36:431
+AVG number of operations per second: 1857
+AVG number of connections: 172
+
+### Method 5, Reviewing Connection pooling
+
+I initially used the bulk load tool, with different connection pooling configurations.
+
+1. maxPoolSize: 100 and minPoolSize: 10:
+AVG time: 3:42:418
+AVG number of operations per second: 1330
+AVG number of connections: 82
+
+2. maxPoolSize: 200 and minPoolSize: 10:
+AVG time: 4:09:067
+AVG number of operations per second: 1248
+AVG number of connections: 82
+
+3. maxPoolSize: 50 and minPoolSize: 10:
+AVG time: 3:32:659
+AVG number of operations per second: 1543
+AVG number of connections: 85
+
+Then I tried with Autocannon tool, to make changes on the number of connections
+
+1. maxPoolSize: 50 and on mongo client minPoolSize: 10. On Autocannon: 5000 requests and 100 connections:
+AVG time: 4:54:574
+AVG number of operations per second: 2738
+AVG number of connections: 289
+
+2. maxPoolSize: 50 and on mongo client minPoolSize: 10. On Autocannon: 5000 requests and 50 connections:
+AVG time: 4:37:150
+AVG number of operations per second: 1936
+AVG number of connections: 148
+
+3. maxPoolSize: 50 and on mongo client minPoolSize: 10. On Autocannon: 5000 requests and 25 connections:
+AVG time: 3:06:876
+AVG number of operations per second: 1763
+AVG number of connections: 95
