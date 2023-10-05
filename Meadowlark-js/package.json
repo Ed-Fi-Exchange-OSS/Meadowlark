@@ -5,6 +5,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.1.0",
     "@shelf/jest-mongodb": "^4.1.7",
+    "@types/autocannon": "^7.12.1",
     "@types/eslint": "^8.44.3",
     "@types/jest": "^29.5.5",
     "@types/node": "16.18.57",
@@ -26,6 +27,7 @@
     "eslint-plugin-prettier": "4.2.1",
     "jest": "^29.7.0",
     "jest-environment-node": "^29.7.0",
+    "kafkajs": "^2.2.4",
     "lerna": "^7.3.0",
     "mongodb": "^5.9.0",
     "pg": "^8.11.3",
@@ -84,9 +86,5 @@
     "compose:down:wsl1": "docker.exe compose --env-file .env-docker down",
     "compose:rm": "docker compose rm --stop --volumes --force && docker volume rm mongo-ml-local-auth && docker volume ls -q --filter label=edfi-ml | xargs docker volume rm",
     "compose:rm:wsl1": "docker.exe compose rm --stop --volumes --force && docker.exe volume rm mongo-ml-local-auth && docker.exe volume ls -q --filter label=edfi-ml | xargs docker.exe volume rm"
-  },
-  "dependencies": {
-    "@types/autocannon": "^7.12.1",
-    "kafkajs": "^2.2.4"
   }
 }
