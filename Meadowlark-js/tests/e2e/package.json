@@ -7,7 +7,6 @@
   "private": true,
   "files": [],
   "devDependencies": {
-    "@edfi/meadowlark-fastify": "^v0.3.6-pre-68",
     "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
     "@testcontainers/mongodb": "^10.2.1",
     "@testcontainers/postgresql": "^10.2.1",
