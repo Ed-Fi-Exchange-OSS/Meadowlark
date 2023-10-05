@@ -21,7 +21,7 @@
   "dependencies": {
     "@edfi/meadowlark-authz-server": "^v0.3.6-pre-68",
     "@edfi/meadowlark-core": "^v0.3.6-pre-68",
-    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^v0.3.6-pre-68",
     "async-retry": "^1.3.3",
     "mongodb": "^5.9.0",
     "ramda": "0.29.1"
