@@ -33,7 +33,7 @@
     "inquirer": "^9.2.11",
     "jsonpath-plus": "^7.2.0",
     "njwt": "^2.0.0",
-    "ramda": "0.29.0",
+    "ramda": "0.29.1",
     "secure-random": "^1.1.2",
     "semver": "^7.5.4",
     "ts-invariant": "^0.10.3",
