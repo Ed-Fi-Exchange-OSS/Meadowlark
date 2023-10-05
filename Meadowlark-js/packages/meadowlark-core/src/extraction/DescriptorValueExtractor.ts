@@ -33,15 +33,16 @@ export function extractDescriptorValues(resourceSchema: ResourceSchema, document
 
     const descriptorJsonPath: JsonPath = documentPaths.paths[descriptorKey];
 
-    const descriptorValue: any = jsonPath({
+    const descriptorValues: any[] = jsonPath({
       path: descriptorJsonPath,
       json: documentBody,
       flatten: true,
     });
 
-    const documentIdentity: DocumentIdentity = [
-      { documentKey: 'descriptor' as DocumentObjectKey, documentValue: descriptorValue },
-    ];
+    const documentIdentity: DocumentIdentity = descriptorValues.map((descriptorValue) => ({
+      documentKey: 'descriptor' as DocumentObjectKey,
+      documentValue: descriptorValue,
+    }));
 
     result.push({
       documentIdentity,
