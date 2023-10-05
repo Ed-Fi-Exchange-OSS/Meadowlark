@@ -52,7 +52,7 @@ function extractForDescriptorCollection(
         },
 
         isDescriptor: true,
-      } as DocumentReference),
+      }) as DocumentReference,
   );
 }
 

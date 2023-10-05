@@ -53,9 +53,8 @@ export async function resetAuthorizationClientSecret(
       traceId: authorizationRequest.traceId,
     };
 
-    const updateResult: ResetAuthorizationClientSecretResult = await getAuthorizationStore().resetAuthorizationClientSecret(
-      updateSecretRequest,
-    );
+    const updateResult: ResetAuthorizationClientSecretResult =
+      await getAuthorizationStore().resetAuthorizationClientSecret(updateSecretRequest);
 
     const { response } = updateResult;
 
