@@ -20,7 +20,7 @@ import {
   referenceComponentEnhancer,
   apiPropertyMappingEnhancer,
   propertyCollectingEnhancer,
-  jsonPathsMappingEnhancer,
+  allJsonPathsMappingEnhancer,
   equalityConstraintEnhancer,
 } from '@edfi/metaed-plugin-edfi-api-schema';
 import { validateEqualityConstraints } from '../../src/validation/EqualityConstraintValidator';
@@ -80,7 +80,7 @@ function sectionDomainEntity(): DomainEntity {
   apiPropertyMappingEnhancer(metaEd);
   propertyCollectingEnhancer(metaEd);
   apiEntityMappingEnhancer(metaEd);
-  jsonPathsMappingEnhancer(metaEd);
+  allJsonPathsMappingEnhancer(metaEd);
   equalityConstraintEnhancer(metaEd);
 
   const namespace: Namespace = metaEd.namespace.get('EdFi') as Namespace;
