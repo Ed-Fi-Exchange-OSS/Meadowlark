@@ -14,7 +14,7 @@
   "dependencies": {
     "@edfi/meadowlark-authz-server": "^v0.3.6-pre-68",
     "@edfi/meadowlark-core": "^v0.3.6-pre-68",
-    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^v0.3.6-pre-68",
     "@fastify/rate-limit": "^6.0.1",
     "dotenv": "^16.3.1",
     "fastify": "^3.29.5"

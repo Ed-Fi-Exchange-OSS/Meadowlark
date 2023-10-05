@@ -21,11 +21,11 @@
   "dependencies": {
     "@edfi/meadowlark-authz-server": "^0.3.6-pre-68",
     "@edfi/meadowlark-core": "^v0.3.6-pre-68",
-    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^v0.3.6-pre-68",
     "pg": "^8.11.3",
     "pg-format": "^1.0.4",
-    "ramda": "0.29.1",
-    "ts-invariant": "^0.10.3"
+    "ramda": "0.29.1"
+
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^10.2.1",

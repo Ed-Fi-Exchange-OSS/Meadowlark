@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@edfi/meadowlark-core": "^v0.3.6-pre-68",
-    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
+    "@edfi/meadowlark-utilities": "^v0.3.6-pre-68",
     "@opensearch-project/opensearch": "^2.4.0"
   },
   "devDependencies": {
