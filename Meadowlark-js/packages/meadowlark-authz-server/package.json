@@ -19,7 +19,7 @@
     "dotenv": "^16.3.1",
     "fast-memoize": "^2.5.2",
     "njwt": "^2.0.0",
-    "ramda": "0.29.0",
+    "ramda": "0.29.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
