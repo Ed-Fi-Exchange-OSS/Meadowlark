@@ -19,15 +19,15 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-core": "^v0.3.6-pre-36",
-    "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
-    "@opensearch-project/opensearch": "^2.3.1"
+    "@edfi/meadowlark-core": "^v0.3.6-pre-68",
+    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
+    "@opensearch-project/opensearch": "^2.4.0"
   },
   "devDependencies": {
     "@short.io/opensearch-mock": "^0.3.1",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.3.1",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.5",
     "testcontainers": "^10.2.1"
   }
 }

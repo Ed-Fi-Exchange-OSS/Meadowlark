@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
-    "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
+    "@edfi/meadowlark-utilities": "^v0.4.0-dev.0",
     "ajv": "^8.12.0",
     "dotenv": "^16.3.1",
     "fast-memoize": "^2.5.2",
@@ -23,9 +23,9 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.3",
+    "@types/uuid": "^9.0.4",
     "copyfiles": "^2.4.1",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.5"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
