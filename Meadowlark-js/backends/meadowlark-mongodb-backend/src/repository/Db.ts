@@ -7,10 +7,14 @@ import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, ObjectId, 
 import { Logger, Config } from '@edfi//meadowlark-utilities';
 import { MeadowlarkId } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 export const DOCUMENT_COLLECTION_NAME = 'documents';
 export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
+
+// RND-644
+export const CONCURRENCY_COLLECTION_NAME = 'concurrences';
 
 let singletonClient: MongoClient | null = null;
 
@@ -41,6 +45,12 @@ export async function getNewClient(): Promise<MongoClient> {
       .db(databaseName)
       .collection(AUTHORIZATION_COLLECTION_NAME);
     await authorizationCollection.createIndex({ clientName: 1 });
+
+    // Create concurrency collection if not exists
+    const concurrencyCollection: Collection<ConcurrencyDocument> = newClient
+      .db(databaseName)
+      .collection(CONCURRENCY_COLLECTION_NAME);
+    await concurrencyCollection.createIndex({ meadowlarkId: 1 });
 
     return newClient;
   } catch (e) {
@@ -88,6 +98,10 @@ export function getDocumentCollection(client: MongoClient): Collection<Meadowlar
 export function getAuthorizationCollection(client: MongoClient): Collection<AuthorizationDocument> {
   return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(AUTHORIZATION_COLLECTION_NAME);
 }
+// RND-644
+export function getConcurrencyCollection(client: MongoClient): Collection<ConcurrencyDocument> {
+  return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(CONCURRENCY_COLLECTION_NAME);
+}
 
 /**
  * Write lock referenced documents as part of the upsert/update process. This will prevent the issue of
@@ -134,3 +148,21 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 
 // MongoDB FindOption to return at most 5 documents
 export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
+
+/**
+ * Alternative to writeLockReferencedDocuments function. RND-644
+ * */
+export async function insertMeadowlarkIdOnConcurrencyCollection(
+  concurrencyCollection: Collection<ConcurrencyDocument>,
+  meadowlarkId: MeadowlarkId,
+  document: ConcurrencyDocument,
+  session: ClientSession,
+): Promise<void> {
+  const { acknowledged, upsertedCount, modifiedCount } = await concurrencyCollection.replaceOne(
+    { _id: meadowlarkId },
+    document,
+    asUpsert(session),
+  );
+
+  console.log(acknowledged, upsertedCount, modifiedCount);
+}

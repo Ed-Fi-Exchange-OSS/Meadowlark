@@ -24,14 +24,18 @@ import {
   limitFive,
   getDocumentCollection,
   onlyReturnDocumentUuidAndTimestamps,
+  insertMeadowlarkIdOnConcurrencyCollection,
+  getConcurrencyCollection,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocumentTransaction(
   { resourceInfo, documentInfo, meadowlarkId, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
   session: ClientSession,
   documentFromUpdate?: MeadowlarkDocument,
 ): Promise<UpsertResult> {
@@ -136,6 +140,13 @@ export async function upsertDocumentTransaction(
     });
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+
+  const concurrencyDocument: ConcurrencyDocument = {
+    meadowlarkId,
+    meadowlarkIds: document.outboundRefs,
+  };
+
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, meadowlarkId, concurrencyDocument, session); // RND-644
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
@@ -172,6 +183,7 @@ export async function upsertDocumentTransaction(
  */
 export async function upsertDocument(upsertRequest: UpsertRequest, client: MongoClient): Promise<UpsertResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+  const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
   try {
@@ -180,7 +192,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, session);
+          upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, concurrencyCollection, session);
           if (upsertResult.response !== 'UPDATE_SUCCESS' && upsertResult.response !== 'INSERT_SUCCESS') {
             await session.abortTransaction();
           }
