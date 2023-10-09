@@ -10,8 +10,16 @@ import { DeleteResult, DeleteRequest, ReferringDocumentInfo, DocumentUuid, Trace
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, limitFive, onlyReturnId } from './Db';
+import {
+  deleteMeadowlarkIdOnConcurrencyCollection,
+  getConcurrencyCollection,
+  getDocumentCollection,
+  insertMeadowlarkIdOnConcurrencyCollection,
+  limitFive,
+  onlyReturnId,
+} from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
 const moduleName: string = 'mongodb.repository.Delete';
 
@@ -75,6 +83,7 @@ async function checkForReferencesToDocument(
 export async function deleteDocumentByMeadowlarkIdTransaction(
   { documentUuid, validateNoReferencesToDocument, traceId }: DeleteRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
   session: ClientSession,
 ): Promise<DeleteResult> {
   if (validateNoReferencesToDocument) {
@@ -93,7 +102,17 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     traceId,
   );
 
+  const concurrencyDocuments: ConcurrencyDocument[] = [
+    {
+      _id: documentUuid,
+    },
+  ];
+
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
+
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
   if (!acknowledged) {
     const msg =
@@ -119,13 +138,19 @@ export async function deleteDocumentByDocumentUuid(
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   try {
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
 
     const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES');
 
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          deleteResult = await deleteDocumentByMeadowlarkIdTransaction(deleteRequest, mongoCollection, session);
+          deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
+            deleteRequest,
+            mongoCollection,
+            concurrencyCollection,
+            session,
+          );
           if (deleteResult.response !== 'DELETE_SUCCESS') {
             await session.abortTransaction();
           }

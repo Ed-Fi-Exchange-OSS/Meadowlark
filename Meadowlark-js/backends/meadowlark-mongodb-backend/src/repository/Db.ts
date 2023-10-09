@@ -154,15 +154,20 @@ export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, s
  * */
 export async function insertMeadowlarkIdOnConcurrencyCollection(
   concurrencyCollection: Collection<ConcurrencyDocument>,
-  meadowlarkId: MeadowlarkId,
-  document: ConcurrencyDocument,
-  session: ClientSession,
+  meadowlarkIds: ConcurrencyDocument[],
 ): Promise<void> {
-  const { acknowledged, upsertedCount, modifiedCount } = await concurrencyCollection.replaceOne(
-    { _id: meadowlarkId },
-    document,
-    asUpsert(session),
-  );
+  const { acknowledged, insertedCount, insertedIds } = await concurrencyCollection.insertMany(meadowlarkIds);
 
-  console.log(acknowledged, upsertedCount, modifiedCount);
+  // eslint-disable-next-line no-console
+  console.log(acknowledged, insertedCount, insertedIds);
+}
+
+export async function deleteMeadowlarkIdOnConcurrencyCollection(
+  concurrencyCollection: Collection<ConcurrencyDocument>,
+  meadowlarkIds: ConcurrencyDocument[],
+): Promise<void> {
+  const { acknowledged, deletedCount } = await concurrencyCollection.deleteMany({ meadowlarkIds });
+
+  // eslint-disable-next-line no-console
+  console.log(acknowledged, deletedCount);
 }

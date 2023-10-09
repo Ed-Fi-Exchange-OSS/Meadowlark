@@ -17,6 +17,7 @@ import {
   writeLockReferencedDocuments,
   insertMeadowlarkIdOnConcurrencyCollection,
   getConcurrencyCollection,
+  deleteMeadowlarkIdOnConcurrencyCollection,
 } from './Db';
 import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
@@ -170,17 +171,12 @@ async function updateAllowingIdentityChange(
     // Ensure referenced documents are not modified in other transactions
     await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-    const concurrencyDocument: ConcurrencyDocument = {
-      meadowlarkId: updateRequest.meadowlarkId,
-      meadowlarkIds: document.outboundRefs,
-    };
+    const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
+      _id: ref,
+    }));
+    concurrencyDocuments.push({ _id: updateRequest.meadowlarkId });
 
-    await insertMeadowlarkIdOnConcurrencyCollection(
-      concurrencyCollection,
-      updateRequest.meadowlarkId,
-      concurrencyDocument,
-      session,
-    ); // RND-644
+    await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
     return tryUpdateByReplacementResult;
   }
@@ -213,6 +209,7 @@ async function updateAllowingIdentityChange(
   const deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
     { documentUuid, resourceInfo, security, validateNoReferencesToDocument: true, traceId },
     mongoCollection,
+    concurrencyCollection,
     session,
   );
   Logger.debug(`${moduleName}.updateAllowingIdentityChange: Updating document uuid ${documentUuid}`, traceId);
@@ -263,17 +260,12 @@ async function updateDisallowingIdentityChange(
   // Ensure referenced documents are not modified in other transactions
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-  const concurrencyDocument: ConcurrencyDocument = {
-    meadowlarkId: updateRequest.meadowlarkId,
-    meadowlarkIds: document.outboundRefs,
-  };
+  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
+    _id: ref,
+  }));
+  concurrencyDocuments.push({ _id: updateRequest.meadowlarkId });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(
-    concurrencyCollection,
-    updateRequest.meadowlarkId,
-    concurrencyDocument,
-    session,
-  ); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -281,6 +273,8 @@ async function updateDisallowingIdentityChange(
     mongoCollection,
     session,
   );
+
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 

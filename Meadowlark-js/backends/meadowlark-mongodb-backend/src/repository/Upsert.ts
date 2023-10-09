@@ -26,6 +26,7 @@ import {
   onlyReturnDocumentUuidAndTimestamps,
   insertMeadowlarkIdOnConcurrencyCollection,
   getConcurrencyCollection,
+  deleteMeadowlarkIdOnConcurrencyCollection,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
@@ -141,12 +142,12 @@ export async function upsertDocumentTransaction(
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-  const concurrencyDocument: ConcurrencyDocument = {
-    meadowlarkId,
-    meadowlarkIds: document.outboundRefs,
-  };
+  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
+    _id: ref,
+  }));
+  concurrencyDocuments.push({ _id: meadowlarkId });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, meadowlarkId, concurrencyDocument, session); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
@@ -155,6 +156,8 @@ export async function upsertDocumentTransaction(
     document,
     asUpsert(session),
   );
+
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
   if (!acknowledged) {
     const msg =
@@ -200,7 +203,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
       },
       {
         retries: numberOfRetries,
-        onRetry: () => {
+        onRetry: async () => {
           Logger.warn(
             `${moduleName}.upsertDocument got write conflict error for meadowlarkId ${upsertRequest.meadowlarkId}. Retrying...`,
             upsertRequest.traceId,
