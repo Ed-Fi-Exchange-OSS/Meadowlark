@@ -171,6 +171,18 @@ when the code that creates the indexes as been removed.
 
 As a first step we want to know the performance impact of the creation of the indexes, adding more connections and removing the Share Not Wait. We are going to do this with the bulk load tool.
 
+To capture statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
+
+- xact_commit: number of transactions in the database that have been completed successfully.
+- xact_rollback: number of transactions that have been cancelled or rolled back.
+- blks_read: number of disk blocks that have been read directly from the disk
+- blks_hit: This is the number of times that the needed data was found in the cache or buffer.
+- tup_returned: number of rows returned by queries in the database
+- tup_fetched: number of rows fetched by queries in the database
+- tup_inserted: number of rows inserted
+- tup_updated: number of rows updated
+- tup_deleted: number of rows deleted
+
 1. Start postgresql and open search containers.
 
 2. Clean database Tables.
