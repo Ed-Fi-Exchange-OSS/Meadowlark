@@ -12,7 +12,7 @@ To test performance we have two Methods:
 
 With these methods we test different scenarios to validate changes in the code. We capture at least 3 execution cycles for each scenario.
 
-To capture database statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
+To capture statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
 
 - xact_commit: number of transactions in the database that have been completed successfully.
 - xact_rollback: number of transactions that have been cancelled or rolled back.
