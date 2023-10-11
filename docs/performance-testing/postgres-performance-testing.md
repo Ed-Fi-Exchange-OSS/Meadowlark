@@ -12,22 +12,10 @@ To test performance we have two Methods:
 
 With these methods we test different scenarios to validate changes in the code. We capture at least 3 execution cycles for each scenario.
 
-To capture statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
-
-- xact_commit: number of transactions in the database that have been completed successfully.
-- xact_rollback: number of transactions that have been cancelled or rolled back.
-- blks_read: number of disk blocks that have been read directly from the disk
-- blks_hit: This is the number of times that the needed data was found in the cache or buffer.
-- tup_returned: number of rows returned by queries in the database
-- tup_fetched: number of rows fetched by queries in the database
-- tup_inserted: number of rows inserted
-- tup_updated: number of rows updated
-- tup_deleted: number of rows deleted
-
-## Method 2
+## Method 1: Postgres Connection Pool
 
 As a first step we are execute the Autocannon tool changing the amount of connections.
-First we executed a base case with 1 connection and then more cases were executed to compare the behavior.
+First we executed a base case with 1 connection and then more cases were executed to compare the behavior. Then, we change the max pool size to validate the behavior.
 
 1. Start postgresql and open search containers.
 
@@ -41,63 +29,84 @@ First we executed a base case with 1 connection and then more cases were execute
 
 6. Repeat for a total of 3 measurements with the same settings
 
-8. After the third execution, change the amount and connections and repeat from step 1.
+8. After the third execution, change the amount of connections and repeat from step 1.
    1. Connections tested
-      1. 1 connection (baseline)
-      2. 25 connections
+      1. 1 connection
       3. 50 connections
-      4. 100 connections.
 
-### Results
+### Autocannon results
+First, we test Meadowlark with the default max pool size for Postgresql (max: 10), using 1 Autocannon connection and 50 connections.
 
-In this table we can see the average by second of these metrics for each scenario.
+|Test|Request|Latency|Throughput|2xxx|
+| :--- | ---: | ---: | ---: | ---: |
+1 conn|18.11333333|55.11|6320.383333|2879
+50 conn|1047.44|48.01666667|16758.55667|10967.33333
 
-| # Conn | Avg commit | Avg rollback | Avg disk blocks read | Avg blocks hit cache | Avg tuples returned | Avg tuples fetched | Avg tuples_inserted | Avg tuples updated | Avg tuples deleted |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Test 1 connections|1|1|34.31|0.00|3.35|1955.14|441.25|81.84|68.22|17.43|68.22|
-| Test 25 connections|1|1|296.05|0.00|3.69|6872.55|6896.46|428.13|194.08|48.94|194.16 |
-| Test 50 connections|1|1|301.23|0.00|6.29|5916.13|3947.04|440.38|192.42|48.55|192.64|
-| Test 100 connections|1|1|246.20|0.00|3.57|4909.01|2056.77|429.03|186.58|47.01|186.77|
+For the second iteration, we changed the max pool size to 25.
+|Test|Request|Latency|Throughput|2xxx|
+| :--- | ---: | ---: | ---: | ---: |
+1 conn|54.84333333|18.19|6347.05|2903.666667
+50 conn|1099.82|45.67|15938.95|7260.666667
 
-Based on these values we can compare each control test against the base scenario (Test with 1 connection), to see the differences.
+With 1 connection the results were:
+|Test|Request|latency|throughput|2xxx|
+| :--- | ---: | ---: | ---: | ---: |
+1 conn (max pool: 10)|18.11333333|55.11|6320.383333|2879
+1 conn (max pool: 25)|54.84333333|18.19|6347.05|2903.666667
+**Difference**|**203%**|**-67%**|**0%**|**1%***
 
-| # Conn | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Base test 25 connections|762.89|0.00|10.26|251.51|366.13|423.12|184.49|180.83|184.61
-| Base test 50 connections|777.97|0.00|87.77|202.59|794.52|438.09|182.05|178.54|182.37
-| Base test 100 connections|617.59|0.00|6.52|151.08|1462.94|424.21|173.50|169.75|173.77
+In this case, when we increased the Pool, the request amount increased 203% and the latency decreased by 67%.
 
-### Method 2, Conclusion
+For the second scenario with 50 autocannon connections we have:
+|Test|Request|latency|throughput|2xxx|
+| :--- | ---: | ---: | ---: | ---: |
+50 conn|1047.44|48.01666667|16758.55667|7634
+50 conn|1099.82|45.67|15938.95|7260.666667
+**Difference**|**5%**|**-5%**|**-5%**|**5%**
 
-<TODO: Update table of connections to include conclusions>
+For this second case, the request amount increased by 5%, and the latency also decreased by 5%.
 
-## Method 2
+## Method 2: Database changes
 
 As a second step, we are going to run performance tests with bulkload
 when the code that creates the indexes as been removed.
 
 As a first step we want to know the performance impact of the creation of the indexes, adding more connections and removing the Share Not Wait. We are going to do this with the bulk load tool.
 
+To capture statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
+
+- xact_commit: number of transactions in the database that have been completed successfully.
+- xact_rollback: number of transactions that have been cancelled or rolled back.
+- blks_read: number of disk blocks that have been read directly from the disk
+- blks_hit: This is the number of times that the needed data was found in the cache or buffer.
+- tup_returned: number of rows returned by queries in the database
+- tup_fetched: number of rows fetched by queries in the database
+- tup_inserted: number of rows inserted
+- tup_updated: number of rows updated
+- tup_deleted: number of rows deleted
+
 1. Start postgresql and open search containers.
 
-2. Start Meadowlark on the host machine with Fastify service.
+2. Clean database Tables.
 
-3. Run the process to capture postgres statistics.
+3. Start Meadowlark on the host machine with Fastify service.
 
-4. Bulk upload the "partial grand bend" data set, capturing the time taken.
+4. Run the process to capture postgres statistics.
+
+5. Bulk upload the "partial grand bend" data set, capturing the time taken.
 
    ```pwsh
    cd ../eng/performance
    .\BulkLoad-Performance.ps1 -Template "PartialGrandBend"
    ```
 
-5. Repeat for a total of 3 measurements with the same settings
+6. Repeat for a total of 3 measurements with the same settings
 
-6. Comment out, individually, the createIndex calls on SqlHelper.ts.
+7. Comment out, individually, the createIndex calls on SqlHelper.ts.
 
-7. Repeat the measurement process.
+8. Repeat the measurement process.
 
-### Method 2, Results
+### Database Results
 
 |Test | Avg commit | Avg rollback | Avg disk blocks read | Avg blocks hit cache | Avg tuples returned | Avg tuples fetched | Avg tuples_inserted | Avg tuples updated | Avg tuples deleted |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -111,7 +120,7 @@ Remove AliasesTableAliasMeadowlarkIdIndex |163.59|4.01|7.37|1060.49|2666.83|51.7
 Remove SHARE NOT WAIT AliasMeadowlarkIdsForDocumentByDocumentUuid |147.67|5.69|8.91|1024.87|1385.07|82.33|67.23|0.55|0.45
 Remove SHARE NOT WAIT AliasMeadowlarkIdsForDocumentByMeadowlarkId |170.22|10.07|10.68|1177.13|2109.52|69.74|74.79|0.56|0.37
 
-### Method 2, Comparing values
+### Comparing metrics
 
 With these test, we can compare the control test (a test with no code changes) to see the impact of each change.
 | # Conn | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
@@ -124,8 +133,6 @@ Remove AliasesTableDocumentUuid |0.10|0.00|23.76|0.32|0.00|-0.35|0.09|17.59|14.6
 Remove AliasesTableAliasMeadowlarkIdIndex |-36.17|100.00|-39.50|-55.49|0.00|-51.29|-56.86|10.97|-7.04
 Remove SHARE NOT WAIT AliasMeadowlarkIdsForDocumentByDocumentUuid |-42.38|100.00|-26.87|-56.99|0.00|-22.52|-61.94|116.54|91.15
 Remove SHARE NOT WAIT AliasMeadowlarkIdsForDocumentByMeadowlarkId |-33.59|100.00|-12.30|-50.60|0.00|-34.36|-57.66|122.01|56.57
-
-### Method 2, Conclusion
 
 In the tests, on the one hand, it can be observed that by increasing the pool of connections there is an improvement in most of the metrics.
 
