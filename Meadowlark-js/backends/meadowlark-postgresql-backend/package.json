@@ -19,21 +19,21 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "^0.3.6-pre-36",
+    "@edfi/meadowlark-authz-server": "^v0.3.6-pre-36",
     "@edfi/meadowlark-core": "^v0.3.6-pre-36",
     "@edfi/meadowlark-utilities": "^v0.3.6-pre-36",
-    "pg": "^8.11.1",
+    "pg": "^8.11.3",
     "pg-format": "^1.0.4",
-    "ramda": "0.29.0",
-    "ts-invariant": "^0.10.3"
+    "ramda": "0.29.1"
+
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^10.2.1",
-    "@types/pg": "^8.10.2",
-    "@types/pg-format": "^1.0.2",
+    "@types/pg": "^8.10.3",
+    "@types/pg-format": "^1.0.3",
     "copyfiles": "^2.4.1",
     "dotenv": "^16.3.1",
-    "rimraf": "^5.0.1",
+    "rimraf": "^5.0.5",
     "testcontainers": "^10.2.1"
   }
 }

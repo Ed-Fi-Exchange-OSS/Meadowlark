@@ -148,9 +148,8 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
       return tryCreateBootstrapAdmin(createRequest, clientSecretBuffer.toString('hex'), authorizationRequest.path);
     }
 
-    const createResult: CreateAuthorizationClientResult = await getAuthorizationStore().createAuthorizationClient(
-      createRequest,
-    );
+    const createResult: CreateAuthorizationClientResult =
+      await getAuthorizationStore().createAuthorizationClient(createRequest);
 
     const { response } = createResult;
 

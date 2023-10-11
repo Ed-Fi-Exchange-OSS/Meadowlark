@@ -8,9 +8,8 @@ export async function getAllAuthorizationClientDocuments(
   client: PoolClient,
 ): Promise<GetAllAuthorizationClientsResult> {
   try {
-    const getAllAuthorizationClientsResult: GetAllAuthorizationClientsResult = await getAuthorizationClientDocumentList(
-      client,
-    );
+    const getAllAuthorizationClientsResult: GetAllAuthorizationClientsResult =
+      await getAuthorizationClientDocumentList(client);
 
     return getAllAuthorizationClientsResult;
   } catch (e) {

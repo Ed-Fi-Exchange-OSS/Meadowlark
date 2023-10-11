@@ -5,7 +5,7 @@
 
 # This file builds a Meadowlark Ed-Fi API from source code.
 
-FROM node:16.17.0-bullseye-slim@sha256:fa84c820c0a1106e170137241a66583f80c899d9b4483e4d2d8a1a9e413c2978 as base 
+FROM node:18.18.0-bullseye-slim@sha256:9027d0d778368a3091ee36b0bfdc98ebf3d7815ee4e2811b05cc40ec2a0adf4e as base 
 RUN apt-get update && \
   apt-get upgrade -y && \
   # dumb-init is useful for running node properly (not as PID 1)

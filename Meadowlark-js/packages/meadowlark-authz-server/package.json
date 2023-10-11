@@ -19,13 +19,13 @@
     "dotenv": "^16.3.1",
     "fast-memoize": "^2.5.2",
     "njwt": "^2.0.0",
-    "ramda": "0.29.0",
+    "ramda": "0.29.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.3",
+    "@types/uuid": "^9.0.4",
     "copyfiles": "^2.4.1",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.5"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:copy-non-ts && npm run build:dist",
