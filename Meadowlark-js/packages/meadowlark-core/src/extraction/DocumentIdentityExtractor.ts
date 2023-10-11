@@ -35,8 +35,13 @@ export function extractDocumentIdentity(resourceSchema: ResourceSchema, document
       const documentValue: any = jsonPath({
         path: documentJsonPath,
         json: documentBody,
-        flatten: true,
+        wrap: false,
       });
+
+      invariant(
+        !Array.isArray(documentValue),
+        `Identity for path ${documentJsonPath} should not be multiple values but was ${documentValue}`,
+      );
       documentIdentity.push({ documentKey, documentValue });
     });
   });

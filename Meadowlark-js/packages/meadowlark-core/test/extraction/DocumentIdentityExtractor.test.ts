@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable dot-notation */
+
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
@@ -22,10 +24,12 @@ import {
 } from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentIdentity } from '../../src/model/DocumentIdentity';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
+import { apiSchemaFrom } from '../TestHelper';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentIdentity = [];
 
   const body = {
@@ -81,27 +85,41 @@ describe('when extracting natural key from domain entity referencing another ref
     propertyCollectingEnhancer(metaEd);
     apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const section = namespace.entity.domainEntity.get('Section');
-    result = extractDocumentIdentity(section, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "classPeriodReference.classPeriodName": "z",
-        "classPeriodReference.schoolId": "23",
-        "courseOfferingReference.localCourseCode": "abc",
-        "courseOfferingReference.schoolId": "23",
-        "sectionIdentifier": "Bob",
-      }
+      [
+        {
+          "documentKey": "sectionIdentifier",
+          "documentValue": "Bob",
+        },
+        {
+          "documentKey": "localCourseCode",
+          "documentValue": "abc",
+        },
+        {
+          "documentKey": "schoolId",
+          "documentValue": "23",
+        },
+        {
+          "documentKey": "classPeriodName",
+          "documentValue": "z",
+        },
+        {
+          "documentKey": "schoolId",
+          "documentValue": "23",
+        },
+      ]
     `);
   });
 });
 
 describe('when extracting natural key from domain entity with school year in identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentIdentity = [];
 
   const body = {
@@ -138,24 +156,29 @@ describe('when extracting natural key from domain entity with school year in ide
     propertyCollectingEnhancer(metaEd);
     apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const session = namespace.entity.domainEntity.get('Session');
-    result = extractDocumentIdentity(session, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sessions'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "schoolYearTypeReference.schoolYear": 2022,
-        "sessionName": "s",
-      }
+      [
+        {
+          "documentKey": "sessionName",
+          "documentValue": "s",
+        },
+        {
+          "documentKey": "schoolYear",
+          "documentValue": 2022,
+        },
+      ]
     `);
   });
 });
 
 describe('when extracting natural key from domain entity with school year that has a role name', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentIdentity = [];
 
   const body = {
@@ -190,16 +213,19 @@ describe('when extracting natural key from domain entity with school year that h
     propertyCollectingEnhancer(metaEd);
     apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const session = namespace.entity.domainEntity.get('GraduationPlan');
-    result = extractDocumentIdentity(session, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['graduationPlans'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "graduationSchoolYearTypeReference.schoolYear": 2022,
-      }
+      [
+        {
+          "documentKey": "schoolYear",
+          "documentValue": 2022,
+        },
+      ]
     `);
   });
 });
