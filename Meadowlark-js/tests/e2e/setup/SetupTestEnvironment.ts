@@ -13,7 +13,11 @@ const environment = require('./SetupTestContainers');
 if (process.env.USE_EXISTING_ENVIRONMENT) {
   dotenv.config({ path: join(process.cwd(), './services/meadowlark-fastify/.env') });
 } else {
-  dotenv.config({ path: join(__dirname, './.env-e2e') });
+  const result = dotenv.config({ path: join(__dirname, './.env-e2e') });
+
+  if (result.error) {
+    throw new Error(`An error ocurred loading .env-e2e file:\n${result.error}`);
+  }
 }
 
 module.exports = async () => {
