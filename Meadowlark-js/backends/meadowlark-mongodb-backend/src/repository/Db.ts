@@ -14,7 +14,7 @@ export const DOCUMENT_COLLECTION_NAME = 'documents';
 export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
 
 // RND-644
-export const CONCURRENCY_COLLECTION_NAME = 'concurrences';
+export const CONCURRENCY_COLLECTION_NAME = 'concurrency';
 
 let singletonClient: MongoClient | null = null;
 
@@ -50,7 +50,7 @@ export async function getNewClient(): Promise<MongoClient> {
     const concurrencyCollection: Collection<ConcurrencyDocument> = newClient
       .db(databaseName)
       .collection(CONCURRENCY_COLLECTION_NAME);
-    await concurrencyCollection.createIndex({ meadowlarkId: 1 });
+    await concurrencyCollection.createIndex({ meadowlarkId: 1, documentUuid: 1 }, { unique: true }); // RND-644
 
     return newClient;
   } catch (e) {
@@ -154,9 +154,9 @@ export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, s
  * */
 export async function insertMeadowlarkIdOnConcurrencyCollection(
   concurrencyCollection: Collection<ConcurrencyDocument>,
-  meadowlarkIds: ConcurrencyDocument[],
+  concurrencyDocuments: ConcurrencyDocument[],
 ): Promise<void> {
-  const { acknowledged, insertedCount, insertedIds } = await concurrencyCollection.insertMany(meadowlarkIds);
+  const { acknowledged, insertedCount, insertedIds } = await concurrencyCollection.insertMany(concurrencyDocuments);
 
   // eslint-disable-next-line no-console
   console.log(acknowledged, insertedCount, insertedIds);
@@ -164,9 +164,25 @@ export async function insertMeadowlarkIdOnConcurrencyCollection(
 
 export async function deleteMeadowlarkIdOnConcurrencyCollection(
   concurrencyCollection: Collection<ConcurrencyDocument>,
-  meadowlarkIds: ConcurrencyDocument[],
+  concurrencyDocuments: ConcurrencyDocument[],
 ): Promise<void> {
-  const { acknowledged, deletedCount } = await concurrencyCollection.deleteMany({ meadowlarkIds });
+  const meadowlarkIds: any[] = concurrencyDocuments.map((document) => document.meadowlarkId);
+  const documentUuids: any[] = concurrencyDocuments.map((document) => document.documentUuid);
+
+  const { acknowledged, deletedCount } = await concurrencyCollection.deleteMany({
+    $and: [
+      {
+        meadowlarkId: {
+          $in: meadowlarkIds,
+        },
+      },
+      {
+        documentUuid: {
+          $in: documentUuids,
+        },
+      },
+    ],
+  });
 
   // eslint-disable-next-line no-console
   console.log(acknowledged, deletedCount);

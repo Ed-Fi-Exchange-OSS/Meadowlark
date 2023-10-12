@@ -104,7 +104,8 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
 
   const concurrencyDocuments: ConcurrencyDocument[] = [
     {
-      _id: documentUuid,
+      meadowlarkId: null,
+      documentUuid,
     },
   ];
 

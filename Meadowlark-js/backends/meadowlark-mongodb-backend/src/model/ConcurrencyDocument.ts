@@ -6,5 +6,6 @@
 import { DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
 
 export interface ConcurrencyDocument {
-  _id: MeadowlarkId | DocumentUuid;
+  meadowlarkId: MeadowlarkId | null;
+  documentUuid: DocumentUuid;
 }

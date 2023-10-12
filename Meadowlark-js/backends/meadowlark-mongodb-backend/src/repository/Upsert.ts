@@ -142,10 +142,11 @@ export async function upsertDocumentTransaction(
 
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
-    _id: ref,
+  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
+    meadowlarkId: reference,
+    documentUuid,
   }));
-  concurrencyDocuments.push({ _id: meadowlarkId });
+  concurrencyDocuments.push({ meadowlarkId, documentUuid });
 
   await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
   // Perform the document upsert

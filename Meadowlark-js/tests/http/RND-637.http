@@ -64,13 +64,14 @@ authorization: bearer {{authToken1}}
 
 ### This returns 409 error, since uri://ed-fi.org/SchoolCategoryDescriptor#All Levels 
 # and uri://ed-fi.org/GradeLevelDescriptor#First Grade don't exist.
+# @name theSchool
 POST http://localhost:3000/local/v3.3b/ed-fi/schools
 content-type: application/json
 authorization: bearer {{authToken1}}
 
 {
-    "schoolId": 124,
-    "nameOfInstitution": "A School",
+    "schoolId": 125,
+    "nameOfInstitution": "A School 127",
     "educationOrganizationCategories" : [
         {
             "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
@@ -115,3 +116,30 @@ authorization: bearer {{authToken1}}
 #####
 GET http://localhost:3000/local/v3.3b/ed-fi/schools?nameOfInstitution=A School
 authorization: bearer {{authToken1}}
+
+### This returns 409 error, since uri://ed-fi.org/SchoolCategoryDescriptor#All Levels 
+# and uri://ed-fi.org/GradeLevelDescriptor#First Grade don't exist.
+PUT http://localhost:3000{{theSchool.response.headers.location}}
+content-type: application/json
+authorization: bearer {{authToken1}}
+
+{
+    "id": "28daa358-6154-4973-aad3-2f4073c6544f",
+    "schoolId": 125,
+    "nameOfInstitution": "A School 127",
+    "educationOrganizationCategories" : [
+        {
+            "educationOrganizationCategoryDescriptor": "uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other"
+        }
+    ],
+    "schoolCategories": [
+        {
+             "schoolCategoryDescriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels"
+        }
+    ],
+    "gradeLevels": [
+        {
+            "gradeLevelDescriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade"
+        }
+    ]
+}

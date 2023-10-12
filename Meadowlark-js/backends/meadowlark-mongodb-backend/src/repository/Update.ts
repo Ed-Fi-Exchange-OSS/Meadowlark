@@ -171,10 +171,11 @@ async function updateAllowingIdentityChange(
     // Ensure referenced documents are not modified in other transactions
     await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-    const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
-      _id: ref,
+    const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
+      meadowlarkId: reference,
+      documentUuid: updateRequest.documentUuid,
     }));
-    concurrencyDocuments.push({ _id: updateRequest.meadowlarkId });
+    concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
     await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
@@ -260,10 +261,11 @@ async function updateDisallowingIdentityChange(
   // Ensure referenced documents are not modified in other transactions
   await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
-  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((ref) => ({
-    _id: ref,
+  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
+    meadowlarkId: reference,
+    documentUuid: updateRequest.documentUuid,
   }));
-  concurrencyDocuments.push({ _id: updateRequest.meadowlarkId });
+  concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
   await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
