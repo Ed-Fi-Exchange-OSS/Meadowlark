@@ -19,7 +19,7 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import {
-  writeLockReferencedDocuments,
+  // writeLockReferencedDocuments,
   asUpsert,
   limitFive,
   getDocumentCollection,
@@ -140,7 +140,7 @@ export async function upsertDocumentTransaction(
       lastModifiedAt: documentInfo.requestTimestamp,
     });
 
-  await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+  // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
   const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
     meadowlarkId: reference,

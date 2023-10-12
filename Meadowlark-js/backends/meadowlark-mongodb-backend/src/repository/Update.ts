@@ -14,7 +14,7 @@ import {
   getDocumentCollection,
   limitFive,
   onlyReturnTimestamps,
-  writeLockReferencedDocuments,
+  // writeLockReferencedDocuments,
   insertMeadowlarkIdOnConcurrencyCollection,
   getConcurrencyCollection,
   deleteMeadowlarkIdOnConcurrencyCollection,
@@ -169,7 +169,7 @@ async function updateAllowingIdentityChange(
 
   if (tryUpdateByReplacementResult != null) {
     // Ensure referenced documents are not modified in other transactions
-    await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+    // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
     const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
       meadowlarkId: reference,
@@ -259,7 +259,7 @@ async function updateDisallowingIdentityChange(
   );
 
   // Ensure referenced documents are not modified in other transactions
-  await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+  // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
   const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
     meadowlarkId: reference,

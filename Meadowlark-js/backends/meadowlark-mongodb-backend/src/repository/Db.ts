@@ -156,10 +156,7 @@ export async function insertMeadowlarkIdOnConcurrencyCollection(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
 ): Promise<void> {
-  const { acknowledged, insertedCount, insertedIds } = await concurrencyCollection.insertMany(concurrencyDocuments);
-
-  // eslint-disable-next-line no-console
-  console.log(acknowledged, insertedCount, insertedIds);
+  await concurrencyCollection.insertMany(concurrencyDocuments);
 }
 
 export async function deleteMeadowlarkIdOnConcurrencyCollection(
@@ -169,7 +166,7 @@ export async function deleteMeadowlarkIdOnConcurrencyCollection(
   const meadowlarkIds: any[] = concurrencyDocuments.map((document) => document.meadowlarkId);
   const documentUuids: any[] = concurrencyDocuments.map((document) => document.documentUuid);
 
-  const { acknowledged, deletedCount } = await concurrencyCollection.deleteMany({
+  await concurrencyCollection.deleteMany({
     $and: [
       {
         meadowlarkId: {
@@ -183,7 +180,4 @@ export async function deleteMeadowlarkIdOnConcurrencyCollection(
       },
     ],
   });
-
-  // eslint-disable-next-line no-console
-  console.log(acknowledged, deletedCount);
 }

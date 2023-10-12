@@ -18,6 +18,11 @@ describe('given a transaction on a resource', () => {
       deleteOne: deleteOneMock,
     } as any);
 
+    jest.spyOn(DB, 'getConcurrencyCollection').mockReturnValue({
+      insertMany: jest.fn(),
+      deleteMany: jest.fn(),
+    } as any);
+
     mongoClientMock = {
       startSession: jest.fn().mockReturnValue({
         withTransaction: async (cb: any) => {
