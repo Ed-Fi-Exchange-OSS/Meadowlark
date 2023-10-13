@@ -30,7 +30,11 @@ module.exports = async () => {
   if (process.env.USE_EXISTING_ENVIRONMENT) {
     console.info('Using existing environment, Verify that variables are set');
   } else {
-    await environment.configure(initialize);
+    try {
+      await environment.configure(initialize);
+    } catch (error) {
+      throw new Error(`⚠️ Error initializing containers.⚠️\n${error}`);
+    }
   }
 
   process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
