@@ -9,6 +9,7 @@ import { NoSchemaRoot, SchemaRoot } from './JsonSchema';
 import { MetaEdPropertyFullName } from './MetaEdPropertyFullName';
 import { MetaEdResourceName } from './MetaEdResourceName';
 import { MetaEdProjectName } from './MetaEdProjectName';
+import { DocumentObjectKey } from './DocumentObjectKey';
 
 /**
  * API resource schema information common between regular and subclass resources
@@ -60,6 +61,12 @@ export type BaseResourceSchema = {
    * for this resource, in lexical order
    */
   identityFullnames: MetaEdPropertyFullName[];
+
+  /**
+   * A list of the DocumentObjectKey paths that are part of the identity for this resource, in lexical order.
+   * Duplicates due to key unification are removed.
+   */
+  identityPathOrder: DocumentObjectKey[];
 
   /**
    * A collection of MetaEd property fullnames mapped to DocumentPaths objects,
@@ -123,6 +130,7 @@ export function newResourceSchema(): ResourceSchema {
     jsonSchemaForQuery: NoSchemaRoot,
     equalityConstraints: [],
     identityFullnames: [],
+    identityPathOrder: [],
     documentPathsMapping: {},
     isSubclass: false,
   };
