@@ -23,7 +23,6 @@ export async function setup(network: StartedNetwork) {
       .withName('postgres-test')
       .withNetwork(network)
       .withNetworkAliases('pg-test')
-      .withReuse()
       .withDatabase(process.env.MEADOWLARK_DATABASE_NAME)
       .withUsername(process.env.POSTGRES_USER)
       .withPassword(process.env.POSTGRES_PASSWORD)

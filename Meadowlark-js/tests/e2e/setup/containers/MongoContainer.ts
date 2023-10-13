@@ -17,7 +17,6 @@ export async function setup(network: StartedNetwork) {
       .withNetwork(network)
       .withNetworkAliases('mongo-t1')
       .withName('mongo-test')
-      .withReuse()
       .withCommand([
         '/usr/bin/mongod',
         '--bind_ip_all',

@@ -16,7 +16,6 @@ export async function setup(network: StartedNetwork) {
     )
       .withName('opensearch-test')
       .withNetwork(network)
-      .withReuse()
       .withExposedPorts({
         container: openSearchPort,
         host: openSearchPort,

@@ -16,7 +16,6 @@ export async function setup(network: StartedNetwork) {
     )
       .withName('elasticsearch-node-test')
       .withNetwork(network)
-      .withReuse()
       .withExposedPorts({
         container: elasticSearchPort,
         host: elasticSearchPort,

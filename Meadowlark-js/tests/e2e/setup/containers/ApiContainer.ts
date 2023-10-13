@@ -23,7 +23,6 @@ export async function setup(network: StartedNetwork) {
         container: fastifyPort,
         host: fastifyPort,
       })
-      .withReuse()
       .withEnvironment({
         OAUTH_SIGNING_KEY: process.env.OAUTH_SIGNING_KEY ?? '',
         OAUTH_HARD_CODED_CREDENTIALS_ENABLED: 'true',
