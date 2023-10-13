@@ -5,7 +5,6 @@
 
 import {
   DocumentInfo,
-  NoDocumentInfo,
   newDocumentInfo,
   newSecurity,
   meadowlarkIdForDocumentIdentity,
@@ -15,17 +14,18 @@ import {
   ResourceInfo,
   newResourceInfo,
   DocumentUuid,
-  MeadowlarkId,
   TraceId,
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
 import {
   asUpsert,
+  getConcurrencyCollection,
   getDocumentCollection,
   getNewClient,
+  insertMeadowlarkIdOnConcurrencyCollection,
   onlyReturnId,
-  writeLockReferencedDocuments,
+  // writeLockReferencedDocuments,
 } from '../../../src/repository/Db';
 import {
   validateReferences,
@@ -34,19 +34,30 @@ import {
 } from '../../../src/repository/ReferenceValidation';
 import { upsertDocument } from '../../../src/repository/Upsert';
 import { setupConfigForIntegration } from '../Config';
+import { ConcurrencyDocument } from '../../../src/model/ConcurrencyDocument';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 
 // A bunch of setup stuff
-const newUpsertRequest = (): UpsertRequest => ({
-  meadowlarkId: '' as MeadowlarkId,
-  resourceInfo: NoResourceInfo,
-  documentInfo: NoDocumentInfo,
-  edfiDoc: {},
-  validateDocumentReferencesExist: false,
-  security: { ...newSecurity() },
-  traceId: 'traceId' as TraceId,
-});
+const edfiSchoolDoc = {
+  schoolId: 123,
+  nameOfInstitution: 'A School 123',
+  educationOrganizationCategories: [
+    {
+      educationOrganizationCategoryDescriptor: 'uri://ed-fi.org/EducationOrganizationCategoryDescriptor#Other',
+    },
+  ],
+  schoolCategories: [
+    {
+      schoolCategoryDescriptor: 'uri://ed-fi.org/SchoolCategoryDescriptor#All Levels',
+    },
+  ],
+  gradeLevels: [
+    {
+      gradeLevelDescriptor: 'uri://ed-fi.org/GradeLevelDescriptor#First Grade',
+    },
+  ],
+};
 
 const schoolResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
@@ -57,7 +68,18 @@ const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
   documentIdentity: { schoolId: '123' },
 };
+
 const schoolMeadowlarkId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
+
+const newUpsertRequest = (): UpsertRequest => ({
+  meadowlarkId: schoolMeadowlarkId,
+  resourceInfo: NoResourceInfo,
+  documentInfo: schoolDocumentInfo,
+  edfiDoc: edfiSchoolDoc,
+  validateDocumentReferencesExist: false,
+  security: { ...newSecurity() },
+  traceId: 'traceId' as TraceId,
+});
 
 const referenceToSchool: DocumentReference = {
   projectName: schoolResourceInfo.projectName,
@@ -65,6 +87,18 @@ const referenceToSchool: DocumentReference = {
   documentIdentity: schoolDocumentInfo.documentIdentity,
   isDescriptor: false,
 };
+
+const schoolDocument: MeadowlarkDocument = meadowlarkDocumentFrom({
+  resourceInfo: schoolResourceInfo,
+  documentInfo: schoolDocumentInfo,
+  documentUuid,
+  meadowlarkId: schoolMeadowlarkId,
+  edfiDoc: edfiSchoolDoc,
+  validate: true,
+  createdBy: '',
+  createdAt: Date.now(),
+  lastModifiedAt: Date.now(),
+});
 
 const academicWeekResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
@@ -103,7 +137,8 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     await setupConfigForIntegration();
 
     client = (await getNewClient()) as MongoClient;
-    const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const mongoDocumentCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const mongoConcurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
 
     // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
     await upsertDocument(
@@ -121,7 +156,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     const upsertFailures = await validateReferences(
       academicWeekDocumentInfo.documentReferences,
       [],
-      mongoCollection,
+      mongoDocumentCollection,
       upsertSession,
       '',
     );
@@ -131,7 +166,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // ***** Read-for-write lock the validated referenced documents in the insert
     // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outboundRefs, upsertSession);
+    // await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outboundRefs, upsertSession);
 
     // ----
     // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
@@ -140,13 +175,13 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     deleteSession.startTransaction();
 
     // Get the aliasMeadowlarkIds for the School document, used to check for references to it as School or as EducationOrganization
-    const deleteCandidate: any = await mongoCollection.findOne(
+    const deleteCandidate: any = await mongoDocumentCollection.findOne(
       { _id: schoolMeadowlarkId },
       onlyReturnAliasIds(deleteSession),
     );
 
     // Check for any references to the School document
-    const anyReferences = await mongoCollection.findOne(
+    const anyReferences = await mongoDocumentCollection.findOne(
       onlyDocumentsReferencing(deleteCandidate.aliasMeadowlarkIds),
       onlyReturnId(deleteSession),
     );
@@ -155,7 +190,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     expect(anyReferences).toBeNull();
 
     // Perform the insert of AcademicWeek document, adding a reference to to to-be-deleted document
-    const { upsertedCount } = await mongoCollection.replaceOne(
+    const { upsertedCount } = await mongoDocumentCollection.replaceOne(
       { _id: academicWeekMeadowlarkId },
       academicWeekDocument,
       asUpsert(upsertSession),
@@ -164,18 +199,37 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // **** The insert of AcademicWeek document should have been successful
     expect(upsertedCount).toBe(1);
 
+    // RND-644
+    // Adds the academic week and the, to be updated, school to the concurrency collection.
+    const concurrencyDocumentsAcademicWeek: ConcurrencyDocument[] = [];
+    concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
+    concurrencyDocumentsAcademicWeek.push({ meadowlarkId: schoolMeadowlarkId, documentUuid: schoolDocument.documentUuid });
+
+    await insertMeadowlarkIdOnConcurrencyCollection(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek);
+
     // ----
     // End transaction to insert the AcademicWeek document
     // ----
     await upsertSession.commitTransaction();
 
+    // RND-644
+    const concurrencyDocumentsSchool: ConcurrencyDocument[] = [];
+    concurrencyDocumentsSchool.push({
+      meadowlarkId: schoolMeadowlarkId,
+      documentUuid: schoolDocument.documentUuid,
+    });
+
     // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
     try {
-      await mongoCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
+      await insertMeadowlarkIdOnConcurrencyCollection(mongoConcurrencyCollection, concurrencyDocumentsSchool);
+
+      await mongoDocumentCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
     } catch (e) {
       expect(e).toMatchInlineSnapshot(
-        `[MongoServerError: WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.]`,
+        `[MongoBulkWriteError: E11000 duplicate key error collection: meadowlark.concurrency index: meadowlarkId_1_documentUuid_1 dup key: { meadowlarkId: "Qw5FvPdKxAXWnGght_4HOBmlPt_xB_pA20fKyQ", documentUuid: "2edb604f-eab0-412c-a242-508d6529214d" }]`,
       );
+      expect(e.name).toBe('MongoBulkWriteError');
+      expect(e.code).toBe(11000);
     }
 
     // ----

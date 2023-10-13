@@ -141,8 +141,11 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
     const mongoDocumentCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const mongoConcurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
 
-    // Insert a School document - it will be referenced by an AcademicWeek document while being updated
-    await upsertDocument({ ...newUpsertRequest() }, client);
+    // Insert a School document - it will be referenced by an AcademicWeek document while being deleted
+    await upsertDocument(
+      { ...newUpsertRequest(), meadowlarkId: schoolMeadowlarkId, documentInfo: schoolDocumentInfo },
+      client,
+    );
 
     // ----
     // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School update
@@ -224,19 +227,18 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
       schoolDocument.edfiDoc.nameOfInstitution = 'A School 124';
 
       await mongoDocumentCollection.replaceOne({ _id: schoolMeadowlarkId }, schoolDocument, asUpsert(updateSession));
-      await updateSession.commitTransaction();
     } catch (e) {
       expect(e).toMatchInlineSnapshot(
         `[MongoBulkWriteError: E11000 duplicate key error collection: meadowlark.concurrency index: meadowlarkId_1_documentUuid_1 dup key: { meadowlarkId: "Qw5FvPdKxAXWnGght_4HOBmlPt_xB_pA20fKyQ", documentUuid: "2edb604f-eab0-412c-a242-508d6529214d" }]`,
       );
       expect(e.name).toBe('MongoBulkWriteError');
       expect(e.code).toBe(11000);
-    } finally {
-      // ----
-      // End transaction to update the School document
-      // ----
-      await updateSession.abortTransaction();
     }
+
+    // ----
+    // End transaction to update the School document
+    // ----
+    await updateSession.abortTransaction();
   });
 
   it('should still have the initial nameOfInstitution: A School 123', async () => {
