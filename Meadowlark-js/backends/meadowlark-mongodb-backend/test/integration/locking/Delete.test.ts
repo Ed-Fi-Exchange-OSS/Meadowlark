@@ -25,7 +25,6 @@ import {
   getNewClient,
   insertMeadowlarkIdOnConcurrencyCollection,
   onlyReturnId,
-  // writeLockReferencedDocuments,
 } from '../../../src/repository/Db';
 import {
   validateReferences,
@@ -223,9 +222,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
       await mongoDocumentCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
     } catch (e) {
-      expect(e).toMatchInlineSnapshot(
-        `[MongoBulkWriteError: E11000 duplicate key error collection: meadowlark.concurrency index: meadowlarkId_1_documentUuid_1 dup key: { meadowlarkId: "Qw5FvPdKxAXWnGght_4HOBmlPt_xB_pA20fKyQ", documentUuid: "2edb604f-eab0-412c-a242-508d6529214d" }]`,
-      );
+      expect(e.message).toContain('E11000 duplicate key error collection');
       expect(e.name).toBe('MongoBulkWriteError');
       expect(e.code).toBe(11000);
     }

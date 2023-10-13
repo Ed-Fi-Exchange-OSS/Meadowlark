@@ -8,7 +8,7 @@ describe('given a transaction on a resource', () => {
   let mongoClientMock = {};
   let deleteOneMock = jest.fn();
   const error = {
-    codeName: 'WriteConflict',
+    code: 11000,
   };
 
   beforeAll(() => {

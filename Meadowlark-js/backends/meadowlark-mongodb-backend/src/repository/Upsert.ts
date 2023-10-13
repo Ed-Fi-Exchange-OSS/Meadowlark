@@ -19,7 +19,6 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import {
-  // writeLockReferencedDocuments,
   asUpsert,
   limitFive,
   getDocumentCollection,

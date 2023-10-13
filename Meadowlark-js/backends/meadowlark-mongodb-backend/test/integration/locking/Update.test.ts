@@ -35,8 +35,6 @@ import { upsertDocument } from '../../../src/repository/Upsert';
 import { setupConfigForIntegration } from '../Config';
 import { ConcurrencyDocument } from '../../../src/model/ConcurrencyDocument';
 
-jest.setTimeout(120_000);
-
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 
 // A bunch of setup stuff
@@ -226,9 +224,7 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
 
       await mongoDocumentCollection.replaceOne({ _id: schoolMeadowlarkId }, schoolDocument, asUpsert(updateSession));
     } catch (e) {
-      expect(e).toMatchInlineSnapshot(
-        `[MongoBulkWriteError: E11000 duplicate key error collection: meadowlark.concurrency index: meadowlarkId_1_documentUuid_1 dup key: { meadowlarkId: "Qw5FvPdKxAXWnGght_4HOBmlPt_xB_pA20fKyQ", documentUuid: "2edb604f-eab0-412c-a242-508d6529214d" }]`,
-      );
+      expect(e.message).toContain('E11000 duplicate key error collection');
       expect(e.name).toBe('MongoBulkWriteError');
       expect(e.code).toBe(11000);
     }

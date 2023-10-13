@@ -50,7 +50,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries greater than zero has been configured', () => {
       beforeAll(async () => {
-        // jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(retryNumberOfTimes);
         result = await upsertDocument(newUpsertRequest(), mongoClientMock as any);
       });
@@ -70,7 +69,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries equal to zero has been configured', () => {
       beforeAll(async () => {
-        // jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(0);
         result = await upsertDocument(newUpsertRequest(), mongoClientMock as any);
       });
@@ -86,7 +84,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries was not configured', () => {
       beforeAll(async () => {
-        // jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         result = await upsertDocument(newUpsertRequest(), mongoClientMock as any);
       });
 
