@@ -16,6 +16,7 @@ export async function setup(network: StartedNetwork) {
     )
       .withName('elasticsearch-node-test')
       .withNetwork(network)
+      .withLogConsumer(async (stream) => setElasticSearchLog(stream))
       .withExposedPorts({
         container: elasticSearchPort,
         host: elasticSearchPort,
@@ -33,8 +34,6 @@ export async function setup(network: StartedNetwork) {
   } catch (error) {
     throw new Error(`\nUnexpected error setting up elastic search container:\n${error}`);
   }
-
-  await setElasticSearchLog(startedContainer);
 }
 
 export async function stop(): Promise<void> {

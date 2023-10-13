@@ -16,6 +16,7 @@ export async function setup(network: StartedNetwork) {
     )
       .withName('opensearch-test')
       .withNetwork(network)
+      .withLogConsumer(async (stream) => setOpenSearchLog(stream))
       .withExposedPorts({
         container: openSearchPort,
         host: openSearchPort,
@@ -32,8 +33,6 @@ export async function setup(network: StartedNetwork) {
   } catch (error) {
     throw new Error(`\nUnexpected error setting up open search container:\n${error}`);
   }
-
-  await setOpenSearchLog(startedContainer);
 }
 
 export async function stop(): Promise<void> {

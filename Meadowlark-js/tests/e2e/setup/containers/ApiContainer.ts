@@ -19,6 +19,7 @@ export async function setup(network: StartedNetwork) {
     container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark')
       .withName('meadowlark-api-test')
       .withNetwork(network)
+      .withLogConsumer(async (stream) => setAPILog(stream))
       .withExposedPorts({
         container: fastifyPort,
         host: fastifyPort,
@@ -62,7 +63,6 @@ export async function setup(network: StartedNetwork) {
 
     throw new Error(`\nUnexpected error setting up API container:\n${error}`);
   }
-  await setAPILog(startedContainer);
 }
 
 export async function stop(): Promise<void> {
