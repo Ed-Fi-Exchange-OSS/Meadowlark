@@ -83,7 +83,7 @@ async function checkForReferencesToDocument(
 export async function deleteDocumentByMeadowlarkIdTransaction(
   { documentUuid, validateNoReferencesToDocument, traceId }: DeleteRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
-  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<DeleteResult> {
   if (validateNoReferencesToDocument) {
@@ -109,11 +109,11 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     },
   ];
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   if (!acknowledged) {
     const msg =

@@ -154,7 +154,7 @@ async function updateAllowingIdentityChange(
   document: MeadowlarkDocument,
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
-  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   const { documentUuid, resourceInfo, traceId, security } = updateRequest;
@@ -165,7 +165,7 @@ async function updateAllowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
@@ -175,7 +175,7 @@ async function updateAllowingIdentityChange(
     session,
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   if (tryUpdateByReplacementResult != null) {
     // Ensure referenced documents are not modified in other transactions
@@ -251,7 +251,7 @@ async function updateDisallowingIdentityChange(
   document: MeadowlarkDocument,
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
-  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   // Perform the document update
@@ -269,7 +269,7 @@ async function updateDisallowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -278,7 +278,7 @@ async function updateDisallowingIdentityChange(
     session,
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 
@@ -354,7 +354,7 @@ async function checkForInvalidReferences(
 async function updateDocumentByDocumentUuidTransaction(
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
-  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
@@ -381,7 +381,7 @@ async function updateDocumentByDocumentUuidTransaction(
     lastModifiedAt: documentInfo.requestTimestamp,
   });
   if (resourceInfo.allowIdentityUpdates) {
-    return updateAllowingIdentityChange(document, updateRequest, mongoCollection, concurrencyCollection, session); // RND-644
+    return updateAllowingIdentityChange(document, updateRequest, mongoCollection, concurrencyCollection, session);
   }
   return updateDisallowingIdentityChange(document, updateRequest, mongoCollection, concurrencyCollection, session);
 }
@@ -398,7 +398,7 @@ export async function updateDocumentByDocumentUuid(
   Logger.info(`${moduleName}.updateDocumentByDocumentUuid ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-  const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client); // RND-644
+  const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
   const session: ClientSession = client.startSession();
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -411,7 +411,7 @@ export async function updateDocumentByDocumentUuid(
           updateResult = await updateDocumentByDocumentUuidTransaction(
             updateRequest,
             mongoCollection,
-            concurrencyCollection, // RND-644
+            concurrencyCollection,
             session,
           );
           if (updateResult.response !== 'UPDATE_SUCCESS') {

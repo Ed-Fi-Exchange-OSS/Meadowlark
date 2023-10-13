@@ -199,7 +199,6 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // **** The insert of AcademicWeek document should have been successful
     expect(upsertedCount).toBe(1);
 
-    // RND-644
     // Adds the academic week and the, to be updated, school to the concurrency collection.
     const concurrencyDocumentsAcademicWeek: ConcurrencyDocument[] = [];
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
@@ -212,7 +211,6 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // ----
     await upsertSession.commitTransaction();
 
-    // RND-644
     const concurrencyDocumentsSchool: ConcurrencyDocument[] = [];
     concurrencyDocumentsSchool.push({
       meadowlarkId: schoolMeadowlarkId,

@@ -12,8 +12,6 @@ import { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 export const DOCUMENT_COLLECTION_NAME = 'documents';
 export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
-
-// RND-644
 export const CONCURRENCY_COLLECTION_NAME = 'concurrency';
 
 let singletonClient: MongoClient | null = null;
@@ -50,7 +48,7 @@ export async function getNewClient(): Promise<MongoClient> {
     const concurrencyCollection: Collection<ConcurrencyDocument> = newClient
       .db(databaseName)
       .collection(CONCURRENCY_COLLECTION_NAME);
-    await concurrencyCollection.createIndex({ meadowlarkId: 1, documentUuid: 1 }, { unique: true }); // RND-644
+    await concurrencyCollection.createIndex({ meadowlarkId: 1, documentUuid: 1 }, { unique: true });
 
     return newClient;
   } catch (e) {
@@ -98,7 +96,7 @@ export function getDocumentCollection(client: MongoClient): Collection<Meadowlar
 export function getAuthorizationCollection(client: MongoClient): Collection<AuthorizationDocument> {
   return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(AUTHORIZATION_COLLECTION_NAME);
 }
-// RND-644
+
 export function getConcurrencyCollection(client: MongoClient): Collection<ConcurrencyDocument> {
   return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(CONCURRENCY_COLLECTION_NAME);
 }
@@ -150,7 +148,7 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
 /**
- * Alternative to writeLockReferencedDocuments function. RND-644
+ * Alternative to writeLockReferencedDocuments function.
  * */
 export async function insertMeadowlarkIdOnConcurrencyCollection(
   concurrencyCollection: Collection<ConcurrencyDocument>,

@@ -36,7 +36,7 @@ const moduleName: string = 'mongodb.repository.Upsert';
 export async function upsertDocumentTransaction(
   { resourceInfo, documentInfo, meadowlarkId, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
-  concurrencyCollection: Collection<ConcurrencyDocument>, // RND-644
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
   documentFromUpdate?: MeadowlarkDocument,
 ): Promise<UpsertResult> {
@@ -148,7 +148,7 @@ export async function upsertDocumentTransaction(
   }));
   concurrencyDocuments.push({ meadowlarkId, documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
@@ -158,7 +158,7 @@ export async function upsertDocumentTransaction(
     asUpsert(session),
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   if (!acknowledged) {
     const msg =
