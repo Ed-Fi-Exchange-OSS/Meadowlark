@@ -20,7 +20,6 @@ export async function setup() {
   try {
     const container = new PostgreSqlContainer(image)
       .withName('postgres-test')
-      .withReuse()
       .withDatabase(process.env.MEADOWLARK_DATABASE_NAME)
       .withUsername(process.env.POSTGRES_USER)
       .withPassword(process.env.POSTGRES_PASSWORD);

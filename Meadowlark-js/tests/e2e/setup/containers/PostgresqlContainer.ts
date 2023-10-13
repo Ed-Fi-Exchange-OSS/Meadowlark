@@ -23,7 +23,7 @@ export async function setup(network: StartedNetwork) {
       .withName('postgres-test')
       .withNetwork(network)
       .withNetworkAliases('pg-test')
-      .withReuse()
+      .withLogConsumer(async (stream) => setPostgresLog(stream))
       .withDatabase(process.env.MEADOWLARK_DATABASE_NAME)
       .withUsername(process.env.POSTGRES_USER)
       .withPassword(process.env.POSTGRES_PASSWORD)
@@ -33,8 +33,6 @@ export async function setup(network: StartedNetwork) {
 
     process.env.POSTGRES_HOST = startedContainer.getHost();
     process.env.POSTGRES_PORT = `${startedContainer.getFirstMappedPort()}`;
-
-    await setPostgresLog(startedContainer);
   } catch (error) {
     throw new Error(`\nUnexpected error setting up postgres container:\n${error}`);
   }

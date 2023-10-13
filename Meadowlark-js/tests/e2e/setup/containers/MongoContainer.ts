@@ -17,7 +17,7 @@ export async function setup(network: StartedNetwork) {
       .withNetwork(network)
       .withNetworkAliases('mongo-t1')
       .withName('mongo-test')
-      .withReuse()
+      .withLogConsumer(async (stream) => setMongoLog(stream))
       .withCommand([
         '/usr/bin/mongod',
         '--bind_ip_all',
@@ -33,8 +33,6 @@ export async function setup(network: StartedNetwork) {
   } catch (error) {
     throw new Error(`\nUnexpected error setting up mongo container:\n${error}`);
   }
-
-  await setMongoLog(startedContainer);
 }
 
 export async function stop(): Promise<void> {
