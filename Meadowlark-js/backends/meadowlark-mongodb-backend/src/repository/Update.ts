@@ -159,6 +159,14 @@ async function updateAllowingIdentityChange(
 ): Promise<UpdateResult> {
   const { documentUuid, resourceInfo, traceId, security } = updateRequest;
 
+  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
+    meadowlarkId: reference,
+    documentUuid: updateRequest.documentUuid,
+  }));
+  concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
+
+  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -167,17 +175,11 @@ async function updateAllowingIdentityChange(
     session,
   );
 
+  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
+
   if (tryUpdateByReplacementResult != null) {
     // Ensure referenced documents are not modified in other transactions
     // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
-    const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
-      meadowlarkId: reference,
-      documentUuid: updateRequest.documentUuid,
-    }));
-    concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
-
-    await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments); // RND-644
 
     return tryUpdateByReplacementResult;
   }
@@ -431,8 +433,8 @@ export async function updateDocumentByDocumentUuid(
     Logger.error(`${moduleName}.updateDocumentByDocumentUuid`, traceId, e);
     await session.abortTransaction();
 
-    // If this is a MongoError, it has a codeName
-    if (e.codeName === 'WriteConflict') {
+    // Codes 11000 and 11001 are both Duplicate Key Error
+    if (e.code === 11000 || e.code === 11001) {
       return {
         response: 'UPDATE_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources.',

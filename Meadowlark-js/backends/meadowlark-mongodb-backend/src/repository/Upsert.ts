@@ -216,8 +216,8 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
     await session.abortTransaction();
 
-    // If this is a MongoError, it has a codeName
-    if (e.codeName === 'WriteConflict') {
+    // Codes 11000 and 11001 are both Duplicate Key Error
+    if (e.code === 11000 || e.code === 11001) {
       return {
         response: 'UPSERT_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources',
