@@ -12,68 +12,7 @@ To test performance we have two Methods:
 
 With these methods we test different scenarios to validate changes in the code. We capture at least 3 execution cycles for each scenario.
 
-## Method 1: Postgres Connection Pool
-
-As a first step we are execute the Autocannon tool changing the amount of connections.
-First we executed a base case with 1 connection and then more cases were executed to compare the behavior. Then, we change the max pool size to validate the behavior.
-
-1. Start postgresql and open search containers.
-
-2. Start Meadowlark on the host machine with Fastify service.
-
-3. Run the process to capture postgres statistics.
-
-4. Run Autocannon tool
-
-5. Reset statistics and clean database tables.
-
-6. Repeat for a total of 3 measurements with the same settings
-
-8. After the third execution, change the amount of connections and repeat from step 1.
-   1. Connections tested
-      1. 1 connection
-      3. 50 connections
-
-### Autocannon results
-First, we test Meadowlark with the default max pool size for Postgresql (max: 10), using 1 Autocannon connection and 50 connections.
-
-|Test|Request|Latency|Throughput|2xxx|
-| :--- | ---: | ---: | ---: | ---: |
-1 conn|18.11333333|55.11|6320.383333|2879
-50 conn|1047.44|48.01666667|16758.55667|10967.33333
-
-For the second iteration, we changed the max pool size to 25.
-|Test|Request|Latency|Throughput|2xxx|
-| :--- | ---: | ---: | ---: | ---: |
-1 conn|54.84333333|18.19|6347.05|2903.666667
-50 conn|1099.82|45.67|15938.95|7260.666667
-
-With 1 connection the results were:
-|Test|Request|latency|throughput|2xxx|
-| :--- | ---: | ---: | ---: | ---: |
-1 conn (max pool: 10)|18.11333333|55.11|6320.383333|2879
-1 conn (max pool: 25)|54.84333333|18.19|6347.05|2903.666667
-**Difference**|**203%**|**-67%**|**0%**|**1%***
-
-In this case, when we increased the Pool, the request amount increased 203% and the latency decreased by 67%.
-
-For the second scenario with 50 autocannon connections we have:
-|Test|Request|latency|throughput|2xxx|
-| :--- | ---: | ---: | ---: | ---: |
-50 conn|1047.44|48.01666667|16758.55667|7634
-50 conn|1099.82|45.67|15938.95|7260.666667
-**Difference**|**5%**|**-5%**|**-5%**|**5%**
-
-For this second case, the request amount increased by 5%, and the latency also decreased by 5%.
-
-## Method 2: Database changes
-
-As a second step, we are going to run performance tests with bulkload
-when the code that creates the indexes as been removed.
-
-As a first step we want to know the performance impact of the creation of the indexes, adding more connections and removing the Share Not Wait. We are going to do this with the bulk load tool.
-
-To capture statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
+To capture database statistics we are reading data from pg_stat_database. A process runs each 5 seconds and inserts a row with the current statistics. With all the rows inserted, we can get an average of some indicators. From pg_stat_database we can get:
 
 - xact_commit: number of transactions in the database that have been completed successfully.
 - xact_rollback: number of transactions that have been cancelled or rolled back.
@@ -84,6 +23,152 @@ To capture statistics we are reading data from pg_stat_database. A process runs 
 - tup_inserted: number of rows inserted
 - tup_updated: number of rows updated
 - tup_deleted: number of rows deleted
+
+## Method 1: Postgres Connection Pool
+
+As a first step we are execute the Autocannon tool changing the amount of connections. Pool sizes tested:
+
+- Default: 10
+- 25
+- 35
+- 50
+
+First we executed a base case with 1 connection and then more cases were executed to compare the behavior. Then, we change the max pool size to validate the behavior.
+
+1. Start postgresql and open search containers.
+
+2. Start Meadowlark on the host machine with Fastify service.
+
+3. Run the process to capture postgres statistics.
+
+4. Run Autocannon tool
+
+5. Reset statistics, clean database tables and restart postgresql container.
+
+6. Repeat for a total of 3 measurements with the same settings
+
+7. After the third execution, change the amount of connections and repeat from step 1.
+   1. Connections tested
+      1. 1 connection
+      2. 25 connections
+      3. 50 connections
+
+### Autocannon: 1 Autocannon connection
+
+First, we tested Autocannon with Connection: 1 and four different pool sizes.
+
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 10|18.11|55.11|6320.38|2879.33
+Pool: 25|18.19|54.84|6347.05|2903.67
+Pool: 35|14.05|71.51|4904.25|2234.00
+Pool: 50|17.25|57.91|6016.39|2746.67
+
+For this case, if we compare the results of the base code (the default pool size: 10), we have these results:
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 25|0.44%|-0.49%|0.42%|0.85%|0.40%
+Pool: 35|-22.42%|29.76%|-22.41%|-22.41%|-100.00%
+Pool: 50|-4.77%|5.09%|-4.81%|-4.61%|0.17%
+
+In terms of metrics, with a pool size of 25 there was an increase in request and throughput and a reduction in latency. For other cases, the behavior is the opposite.
+
+Also, if we compare database metrics, these results are consistent with autocannon.
+
+|Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Pool: 25|1.92|0.00|3.32|5.77|0.00|-27.35|1.82|1.73|1.75
+Pool: 35|-20.27|0.00|5.65|-32.85|0.00|-36.53|-20.40|-19.96|-20.41
+Pool: 50|-2.80|0.00|3.73|0.26|0.00|-7.28|-2.83|-2.76|-2.83
+
+### Autocannon: 25 Autocannon connections
+
+Similar to the first scenario, we tested Autocannon with 25 Autocannon connections and four different pool sizes.
+
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 10|45.99|546.48|16048.36|7311
+Pool: 25|44.35|566.59|15476.04|7050.33
+Pool: 35|43.9|571.76|15321.25|6979.67
+Pool: 50|41.45|607.92|14466.72|6590.33
+
+For this case, if we compare the results of the base code (the default pool size: 10), we have these results:
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 25|-3.57%|3.68%|-3.57%|-3.57%
+Pool: 35|-4.54%|4.63%|-4.53%|-4.53%|
+Pool: 50|-9.87%|11.24%|-9.86%|-9.86%|
+
+For this case, the default pool size had better metrics. And again, we can contrast thiswith postgres statistics
+|Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Pool: 25|-2.40|0.00|13.75|1.02|0.00|7.41|-1.29|-0.99|-1.12
+Pool: 35|-1.37|0.00|16.09|4.98|0.00|-5.51|-2.90|-2.49|-2.64
+Pool: 50|-6.05|0.00|12.70|6.50|0.00|-16.95|-8.33|-8.17|-8.37
+
+### Autocannon: 35 Autocannon connections
+
+Similar to the first scenario, we tested Autocannon with 25 autocannon connections and four different pool sizes.
+
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 10|45.99|546.48|16048.36|7311
+Pool: 25|44.35|566.59|15476.04|7050.33
+Pool: 35|43.9|571.76|15321.25|6979.67
+Pool: 50|41.45|607.92|14466.72|6590.33
+
+For this case, if we compare the results of the base code (the default pool size: 10), we have these results:
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 25|-3.57%|3.68%|-3.57%|-3.57%
+Pool: 35|-4.54%|4.63%|-4.53%|-4.53%|
+Pool: 50|-9.87%|11.24%|-9.86%|-9.86%|
+
+For this case, the default pool size had better metrics. And again, we can contrast thiswith postgres statistics
+|Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Pool: 25|-2.40|0.00|13.75|1.02|0.00|7.41|-1.29|-0.99|-1.12
+Pool: 35|-1.37|0.00|16.09|4.98|0.00|-5.51|-2.90|-2.49|-2.64
+Pool: 50|-6.05|0.00|12.70|6.50|0.00|-16.95|-8.33|-8.17|-8.37
+
+### Autocannon: 50 Autocannon connections
+
+The last case uses 50 Autocannon connections with different pool sizes.
+
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 10|48.02|1047.44|16758.56|7634.00
+Pool: 25|45.67|1099.82|15938.95|7260.67
+Pool: 35|45.85|1094.93|15999.63|7304.33
+Pool: 50|45.47|1104.55|15868.14|7244.33
+
+For this case, if we compare the results of the base code (the default pool size: 10), we have these results:
+||Request|Latency|Throughput|2xxx
+| :--- | ---: | ---: | ---: | ---: |
+Pool: 25|-4.89%|5.00%|-4.89%|-4.89%
+Pool: 35|-4.52%|4.53%|-4.53%|-4.32%
+Pool: 50|-5.32%|5.45%|-5.31%|-5.10%
+
+In a similar way to using a max pool size of 35, with 50 connections a reduction in the main indicators is seen with respect to the base case.
+
+|Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Pool: 25|-4.50|0.00|-24.76|-2.11|0.00|-10.66|-3.45|-3.13|-2.94
+Pool: 35|-2.25|0.00|15.00|-8.00|0.00|-4.78|-3.37|-3.48|-3.63
+Pool: 50|-8.16|0.00|-8.35|-13.29|0.00|-4.23|-4.61|-4.85|-4.88
+
+### Conclusion
+
+Of the scenarios analyzed, the improvement received occurred when Autocannon used a connection with a max pool size equal to 25.
+
+In the other cases, the increase in the Connection Pool showed worse metrics compared to the base case of the default Pool size (max: 10).
+
+## Method 2: Database changes
+
+As a second step, we are going to run performance tests with bulkload
+when the code that creates the indexes as been removed.
+
+As a first step we want to know the performance impact of the creation of the indexes, adding more connections and removing the Share Not Wait. We are going to do this with the bulk load tool.
 
 1. Start postgresql and open search containers.
 
