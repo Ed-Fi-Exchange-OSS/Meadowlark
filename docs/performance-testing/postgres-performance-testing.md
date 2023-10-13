@@ -75,6 +75,14 @@ In terms of metrics, with a pool size of 25 there was an increase in request and
 
 Also, if we compare database metrics, these results are consistent with autocannon.
 
+|Pool Size | Avg commit | Avg rollback | Avg disk blocks read | Avg blocks hit cache | Avg tuples returned | Avg tuples fetched | Avg tuples_inserted | Avg tuples updated | Avg tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Default: 10 |35.21|0.00|14.01|4819.40|438.46|20.99|70.06|17.85|70.07
+Pool: 25|35.88|0.00|14.48|5097.58|378.85|15.25|71.34|18.15|71.30
+Pool: 35|28.07|0.00|14.80|3236.27|316.53|13.32|55.76|14.28|55.76
+Pool: 50|34.22|0.00|14.53|4831.98|431.36|19.47|68.08|17.35|68.09
+
+Differences compared to base test.
 |Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 Pool: 25|1.92|0.00|3.32|5.77|0.00|-27.35|1.82|1.73|1.75
@@ -99,32 +107,16 @@ Pool: 25|-3.57%|3.68%|-3.57%|-3.57%
 Pool: 35|-4.54%|4.63%|-4.53%|-4.53%|
 Pool: 50|-9.87%|11.24%|-9.86%|-9.86%|
 
-For this case, the default pool size had better metrics. And again, we can contrast thiswith postgres statistics
-|Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
+For this case, the default pool size had better metrics. And again, we can contrast this with postgres statistics
+
+|Pool Size | Avg commit | Avg rollback | Avg disk blocks read | Avg blocks hit cache | Avg tuples returned | Avg tuples fetched | Avg tuples_inserted | Avg tuples updated | Avg tuples deleted |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-Pool: 25|-2.40|0.00|13.75|1.02|0.00|7.41|-1.29|-0.99|-1.12
-Pool: 35|-1.37|0.00|16.09|4.98|0.00|-5.51|-2.90|-2.49|-2.64
-Pool: 50|-6.05|0.00|12.70|6.50|0.00|-16.95|-8.33|-8.17|-8.37
+Default: 10|279.28|0.00|15.41|6201.33|5516.73|376.94|177.90|44.65|177.39
+Pool: 25|272.59|0.00|17.53|6264.49|6157.64|404.88|175.60|44.21|175.40
+Pool: 35|275.45|0.00|17.89|6510.12|6480.80|356.15|172.73|43.54|172.72
+Pool: 50|262.38|0.00|17.37|6604.71|5498.47|313.05|163.07|41.00|162.55
 
-### Autocannon: 35 Autocannon connections
-
-Similar to the first scenario, we tested Autocannon with 25 autocannon connections and four different pool sizes.
-
-||Request|Latency|Throughput|2xxx
-| :--- | ---: | ---: | ---: | ---: |
-Pool: 10|45.99|546.48|16048.36|7311
-Pool: 25|44.35|566.59|15476.04|7050.33
-Pool: 35|43.9|571.76|15321.25|6979.67
-Pool: 50|41.45|607.92|14466.72|6590.33
-
-For this case, if we compare the results of the base code (the default pool size: 10), we have these results:
-||Request|Latency|Throughput|2xxx
-| :--- | ---: | ---: | ---: | ---: |
-Pool: 25|-3.57%|3.68%|-3.57%|-3.57%
-Pool: 35|-4.54%|4.63%|-4.53%|-4.53%|
-Pool: 50|-9.87%|11.24%|-9.86%|-9.86%|
-
-For this case, the default pool size had better metrics. And again, we can contrast thiswith postgres statistics
+Here, we can see the differences between the default pool size and the rest of the pool sizes.
 |Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 Pool: 25|-2.40|0.00|13.75|1.02|0.00|7.41|-1.29|-0.99|-1.12
@@ -150,6 +142,15 @@ Pool: 35|-4.52%|4.53%|-4.53%|-4.32%
 Pool: 50|-5.32%|5.45%|-5.31%|-5.10%
 
 In a similar way to using a max pool size of 35, with 50 connections a reduction in the main indicators is seen with respect to the base case.
+
+|Pool Size | Avg commit | Avg rollback | Avg disk blocks read | Avg blocks hit cache | Avg tuples returned | Avg tuples fetched | Avg tuples_inserted | Avg tuples updated | Avg tuples deleted |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+Default: 10|298.77|0.00|16.48|6052.86|4015.65|429.07|186.90|46.82|185.92
+Pool: 25|285.33|0.00|12.40|5925.35|4321.19|383.33|180.46|45.36|180.45
+Pool: 35|292.03|0.00|18.95|5568.52|3793.43|408.56|180.60|45.19|179.17
+Pool: 50|274.39|0.00|15.10|5248.36|3037.52|410.90|178.28|44.55|176.84
+
+And difference between the default case and the rest of cases.
 
 |Pool Size | % commit | % rollback | % disk blocks read | % blocks hit cache | % tuples returned | % tuples fetched | % tuples_inserted | % tuples updated | % tuples deleted |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
