@@ -27,6 +27,7 @@ types.setTypeParser(types.builtins.INT8, (bigintAsString) => parseInt(bigintAsSt
  */
 export async function beginTransaction(client: PoolClient) {
   await client.query('BEGIN');
+  await client.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 }
 
 /**
