@@ -5,7 +5,7 @@
 
 /**
  * NOTE: If Postgres query transactions are modified to use SSI and the use of SELECT...FOR UPDATE/SHARE is removed,
- * this test case should be updated to adjust its logic and avoid deadlocks at the database level.
+ * this test case should be updated to adjust its logic and avoid deadlocks at the database level and some test will fail.
  */
 import {
   DocumentInfo,
