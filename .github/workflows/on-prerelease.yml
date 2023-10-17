@@ -198,7 +198,7 @@ jobs:
         id: sbom-hash-code
         shell: bash
         run: |
-          echo sbom-hash-code=$(iconv -f UTF-16 -t ASCII ./sbom/_manifest/spdx_2.2/manifest.spdx.json.sha256) >> $GITHUB_OUTPUT
+          echo sbom-hash-code=$(sha256sum ./sbom/_manifest/spdx_2.2/manifest.spdx.json | awk '{split($0,a); print a[1]}') >> $GITHUB_OUTPUT
 
   sbom-attach:
     name: Attach SBOM file
