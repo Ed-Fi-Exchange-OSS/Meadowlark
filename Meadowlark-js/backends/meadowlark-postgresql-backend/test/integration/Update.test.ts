@@ -24,6 +24,7 @@ import {
   UpsertRequest,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import * as utilities from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import { resetSharedClient, getSharedClient } from '../../src/repository/Db';
 import { updateDocumentByDocumentUuid } from '../../src/repository/Update';
@@ -35,10 +36,11 @@ import {
   findDocumentByDocumentUuid,
   findDocumentByMeadowlarkId,
 } from '../../src/repository/SqlHelper';
+import * as SqlHelper from '../../src/repository/SqlHelper';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
 
+jest.setTimeout(70000);
 const requestTimestamp: number = 1683326572053;
-
 const documentUuid: DocumentUuid = 'feb82f3e-3685-4868-86cf-f4b91749a799' as DocumentUuid;
 let resultDocumentUuid: DocumentUuid;
 
@@ -947,5 +949,123 @@ describe('given the attempted update of an existing document with a stale reques
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, meadowlarkId);
     expect(result.created_at).toBe(requestTimestamp);
     expect(result.last_modified_at).toBe(requestTimestamp);
+  });
+});
+
+describe('given the update of an existing document with Postgresql SSI', () => {
+  const retryNumberOfTimes = 2;
+  let client: PoolClient;
+  let updateResult: UpdateResult;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfoBase: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'update2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
+  let updateRequest: UpdateRequest;
+  let upsertRequest: UpsertRequest;
+
+  beforeEach(async () => {
+    client = await getSharedClient();
+    upsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp },
+      edfiDoc: { natural: 'key' },
+    };
+    updateRequest = {
+      ...newUpdateRequest(),
+      documentUuid,
+      meadowlarkId,
+      resourceInfo,
+      documentInfo: { ...documentInfoBase, requestTimestamp: requestTimestamp + 1 },
+      edfiDoc: { natural: 'key' },
+    };
+    // insert the initial version
+    const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
+    if (upsertResult.response === 'INSERT_SUCCESS') {
+      resultDocumentUuid = upsertResult.newDocumentUuid;
+    } else if (upsertResult.response === 'UPDATE_SUCCESS') {
+      resultDocumentUuid = upsertResult.existingDocumentUuid;
+    } else {
+      resultDocumentUuid = '' as DocumentUuid;
+    }
+  });
+
+  afterEach(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+    jest.clearAllMocks();
+  });
+
+  it('should retry on error 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findDocumentByDocumentUuid')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+    updateResult = await updateDocumentByDocumentUuid(
+      { ...updateRequest, documentUuid: resultDocumentUuid, edfiDoc: { changeToDoc: true } },
+      client,
+    );
+    expect(updateResult.response).toBe('UPDATE_SUCCESS');
+  });
+
+  it('should not retry on error not equal to 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = { code: '50000', message: 'Any exception different of SSI 40001' };
+    // Mock selectReferences to throw an error
+    jest.spyOn(SqlHelper, 'findDocumentByDocumentUuid').mockImplementation(() => {
+      throw mockError;
+    });
+    updateResult = await updateDocumentByDocumentUuid(
+      { ...updateRequest, documentUuid: resultDocumentUuid, edfiDoc: { changeToDoc: true } },
+      client,
+    );
+    expect(updateResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Any exception different of SSI 40001',
+    });
+  });
+
+  it('should Throw Error When Retry Limit Exceeded', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findDocumentByDocumentUuid')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+    updateResult = await updateDocumentByDocumentUuid(
+      { ...updateRequest, documentUuid: resultDocumentUuid, edfiDoc: { changeToDoc: true } },
+      client,
+    );
+    expect(updateResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Error after maximum retries',
+    });
   });
 });

@@ -24,6 +24,7 @@ import {
   generateDocumentUuid,
   UpsertResult,
 } from '@edfi/meadowlark-core';
+import * as utilities from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql } from './TestHelper';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
@@ -35,7 +36,10 @@ import {
   findDocumentByMeadowlarkId,
   findReferencingMeadowlarkIds,
 } from '../../src/repository/SqlHelper';
+import * as SqlHelper from '../../src/repository/SqlHelper';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
+
+jest.setTimeout(70000);
 
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
@@ -515,5 +519,109 @@ describe('given the delete of a subclass document referenced by an existing docu
   it('should still have the referenced document in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, referencedDocumentId);
     expect(result.document_identity.schoolId).toBe('123');
+  });
+});
+
+describe('given the delete of an existing document with Postgresql SSI', () => {
+  const retryNumberOfTimes = 2;
+  let client;
+  let upsertDocumentUuid;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'delete2' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeEach(async () => {
+    client = await getSharedClient();
+    const upsertRequest: UpsertRequest = {
+      ...newUpsertRequest(),
+      meadowlarkId,
+      documentInfo,
+      edfiDoc: { natural: 'key' },
+    };
+    // insert the initial version
+    const upsertResult: UpsertResult = await upsertDocument(upsertRequest, client);
+    upsertDocumentUuid = upsertResult.response === 'INSERT_SUCCESS' ? upsertResult?.newDocumentUuid : ('' as DocumentUuid);
+  });
+  afterEach(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+    jest.clearAllMocks();
+  });
+
+  it('should retry on error 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findAliasMeadowlarkIdsForDocumentByDocumentUuid')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+
+    const deleteResult = await deleteDocumentByDocumentUuid(
+      { ...newDeleteRequest(), documentUuid: upsertDocumentUuid, resourceInfo },
+      client,
+    );
+    expect(deleteResult.response).toBe('DELETE_SUCCESS');
+  });
+
+  it('should not retry on error not equal to 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = { code: '50000', message: 'Any exception different of SSI 40001' };
+    // Mock selectReferences to throw an error
+    jest.spyOn(SqlHelper, 'findAliasMeadowlarkIdsForDocumentByDocumentUuid').mockImplementation(() => {
+      throw mockError;
+    });
+    let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
+    deleteResult = await deleteDocumentByDocumentUuid(
+      { ...newDeleteRequest(), documentUuid: upsertDocumentUuid, resourceInfo },
+      client,
+    );
+    expect(deleteResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Any exception different of SSI 40001',
+    });
+  });
+
+  it('should Throw Error When Retry Limit Exceeded', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findAliasMeadowlarkIdsForDocumentByDocumentUuid')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+
+    let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
+    deleteResult = await deleteDocumentByDocumentUuid(
+      { ...newDeleteRequest(), documentUuid: upsertDocumentUuid, resourceInfo },
+      client,
+    );
+    expect(deleteResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Error after maximum retries',
+    });
   });
 });

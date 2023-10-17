@@ -91,10 +91,7 @@ export async function findAliasMeadowlarkIdsForDocumentByMeadowlarkId(
   client: PoolClient,
   meadowlarkId: MeadowlarkId,
 ): Promise<MeadowlarkId[]> {
-  const querySelect = format(
-    `SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE meadowlark_id = %L FOR SHARE NOWAIT`,
-    meadowlarkId,
-  );
+  const querySelect = format(`SELECT alias_meadowlark_id FROM meadowlark.aliases WHERE meadowlark_id = %L`, meadowlarkId);
   const queryResult: QueryResult<any> = await client.query(querySelect);
   return (hasResults(queryResult) ? queryResult.rows.map((ref) => ref.alias_meadowlark_id) : []) as MeadowlarkId[];
 }
@@ -115,7 +112,7 @@ export async function findAliasMeadowlarkIdsForDocumentByDocumentUuid(
   documentUuid: DocumentUuid,
 ): Promise<MeadowlarkDocumentIdAndAliasId[]> {
   const querySelect = format(
-    `SELECT alias_meadowlark_id, meadowlark_id FROM meadowlark.aliases WHERE document_uuid = %L FOR SHARE NOWAIT`,
+    `SELECT alias_meadowlark_id, meadowlark_id FROM meadowlark.aliases WHERE document_uuid = %L`,
     documentUuid,
   );
   const queryResult: QueryResult<any> = await client.query(querySelect);

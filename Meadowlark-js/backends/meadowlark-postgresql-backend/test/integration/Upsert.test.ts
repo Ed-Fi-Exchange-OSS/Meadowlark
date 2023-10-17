@@ -21,15 +21,17 @@ import {
   MeadowlarkId,
   TraceId,
 } from '@edfi/meadowlark-core';
+import * as utilities from '@edfi/meadowlark-utilities';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
 import { findDocumentByMeadowlarkId, findAliasMeadowlarkIdsForDocumentByMeadowlarkId } from '../../src/repository/SqlHelper';
 import { upsertDocument } from '../../src/repository/Upsert';
 import { deleteAll, retrieveReferencesByMeadowlarkIdSql, verifyAliasMeadowlarkId } from './TestHelper';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
+import * as SqlHelper from '../../src/repository/SqlHelper';
 
+jest.setTimeout(70000);
 const requestTimestamp: number = 1683326572053;
-
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
   resourceInfo: NoResourceInfo,
@@ -1012,5 +1014,117 @@ describe('given an update of a subclass document referenced by an existing docum
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
     expect(result.created_at).toBe(requestTimestamp + 1);
     expect(result.last_modified_at).toBe(requestTimestamp + 2);
+  });
+});
+
+describe('given the upsert of a new document with Postgresql SSI', () => {
+  let client: PoolClient;
+  let upsertResult: UpsertResult;
+  const retryNumberOfTimes = 2;
+
+  const resourceInfo: ResourceInfo = {
+    ...newResourceInfo(),
+    resourceName: 'School',
+  };
+  const documentInfo: DocumentInfo = {
+    ...newDocumentInfo(),
+    documentIdentity: { natural: 'upsert1' },
+  };
+  const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
+
+  beforeEach(async () => {
+    client = await getSharedClient();
+  });
+
+  afterEach(async () => {
+    await deleteAll(client);
+    client.release();
+    await resetSharedClient();
+  });
+
+  it('should retry on error 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findDocumentByMeadowlarkId')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
+      client,
+    );
+    expect(upsertResult.response).toBe('INSERT_SUCCESS');
+  });
+
+  it('should not retry on error not equal to 40001', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = { code: '50000', message: 'Any exception different of SSI 40001' };
+    // Mock selectReferences to throw an error
+    jest.spyOn(SqlHelper, 'findDocumentByMeadowlarkId').mockImplementation(() => {
+      throw mockError;
+    });
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
+      client,
+    );
+    expect(upsertResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Any exception different of SSI 40001',
+    });
+  });
+
+  it('should Throw Error When Retry Limit Exceeded', async () => {
+    jest.spyOn(utilities.Config, 'get').mockImplementationOnce(() => retryNumberOfTimes);
+    const mockError = {
+      code: '40001',
+      message: 'Could not serialize access due to read/write dependencies among transactions',
+    };
+    jest
+      .spyOn(SqlHelper, 'findDocumentByMeadowlarkId')
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      })
+      .mockImplementationOnce(() => {
+        throw mockError;
+      });
+    upsertResult = await upsertDocument(
+      {
+        ...newUpsertRequest(),
+        meadowlarkId,
+        resourceInfo,
+        documentInfo,
+        edfiDoc: { call: 'one' },
+        validateDocumentReferencesExist: false,
+      },
+      client,
+    );
+    expect(upsertResult).toMatchObject({
+      response: 'UNKNOWN_FAILURE',
+      failureMessage: 'Error after maximum retries',
+    });
   });
 });
