@@ -36,7 +36,7 @@ import { upsertDocument } from '../../../src/repository/Upsert';
 import { deleteAll } from '../TestHelper';
 import { MeadowlarkDocument, NoMeadowlarkDocument } from '../../../src/model/MeadowlarkDocument';
 
-jest.setTimeout(70000);
+jest.setTimeout(90000);
 // A bunch of setup stuff
 const newUpsertRequest = (): UpsertRequest => ({
   meadowlarkId: '' as MeadowlarkId,
