@@ -17,9 +17,9 @@ export type DocumentIdentityElement = { documentKey: DocumentObjectKey; document
  * A DocumentIdentity is an array of key-value pairs that represents the complete identity of an Ed-Fi document.
  * In Ed-Fi documents, these are always a list of document elements from the top level of the document
  * (never nested in sub-objects, and never collections). The keys are DocumentObjectKeys. A DocumentIdentity
- * must maintain a strict ordering, as there may be duplicate DocumentObjectKeys.
+ * must maintain a strict ordering.
  *
- * This can be aa array of key-value pairs because many documents have multiple values as part of their identity.
+ * This can be an array of key-value pairs because many documents have multiple values as part of their identity.
  */
 export type DocumentIdentity = DocumentIdentityElement[];
 

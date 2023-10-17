@@ -7,7 +7,7 @@ import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-api-schema';
 import { PathComponents } from '../model/PathComponents';
 import { FrontendRequest } from './FrontendRequest';
 import { ReferringDocumentInfo } from '../message/ReferringDocumentInfo';
-import { versionAbbreviationFor } from '../api-schema/ProjectSchemaFinder';
+import { versionAbbreviationFor } from '../api-schema/ApiSchemaLoader';
 import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
 import { EndpointName } from '../model/api-schema/EndpointName';
 

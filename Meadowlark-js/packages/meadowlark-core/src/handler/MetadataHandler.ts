@@ -11,7 +11,7 @@ import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { projectShortVersion33b } from '../api-schema/ProjectSchemaFinder';
+import { projectShortVersion33b } from '../api-schema/ApiSchemaLoader';
 
 interface ExternalResource {
   body: string;

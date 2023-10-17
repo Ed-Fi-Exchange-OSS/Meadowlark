@@ -9,6 +9,10 @@ import { DocumentObjectKey } from '../model/api-schema/DocumentObjectKey';
 import { DocumentPaths } from '../model/api-schema/DocumentPaths';
 import { ResourceSchema } from '../model/api-schema/ResourceSchema';
 import { DocumentIdentity } from '../model/DocumentIdentity';
+import { ApiSchema } from '../model/api-schema/ApiSchema';
+import { MetaEdProjectName } from '../model/api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from '../model/api-schema/MetaEdResourceName';
+import { ProjectSchema } from '../model/api-schema/ProjectSchema';
 
 /**
  * In extracting DocumentReferences, there is an intermediate step where document values are resolved
@@ -16,7 +20,7 @@ import { DocumentIdentity } from '../model/DocumentIdentity';
  * This is the case for collections of document references.
  *
  * This means that each path resolves to one document value in *each* document reference in the collection.
- * For each DocumentObjectKey of a reference, IntermediateDocumentReferences holds the array of resolved document values
+ * For each DocumentObjectKey of a reference, IntermediateDocumentIdentities holds the array of resolved document values
  * for a path.
  *
  * For example, given a document with a collection of ClassPeriod references:
@@ -39,23 +43,51 @@ import { DocumentIdentity } from '../model/DocumentIdentity';
  * With JsonPaths for ClassPeriod references:
  * "* $.classPeriods[*].classPeriodReference.schoolId" for schoolId and
  * "$.classPeriods[*].classPeriodReference.classPeriodName" for classPeriodName,
- * the IntermediateDocumentReferences would be:
+ * the IntermediateDocumentIdentities would be:
  *
  * {
  *   schoolId: ['24', '25'],
  *   classPeriodName: ['z1', 'z2']
  * }
  *
- * IntermediateDocumentReferences here contains information for two DocumentReferences, but as "slices" in the wrong
+ * IntermediateDocumentIdentities here contains information for two DocumentIdentities, but as "slices" in the wrong
  * orientation.
  */
-type IntermediateDocumentReferences = { [key: DocumentObjectKey]: any[] };
+type IntermediateDocumentIdentities = { [key: DocumentObjectKey]: any[] };
+
+/**
+ * All the information in a DocumentIdentity but as an object, meaning the keys are unsorted
+ */
+type UnsortedDocumentIdentity = { [key: DocumentObjectKey]: any };
+
+/**
+ * Finds the ResourceSchema for the document reference
+ */
+function resourceSchemaForReference(
+  apiSchema: ApiSchema,
+  projectName: MetaEdProjectName,
+  resourceName: MetaEdResourceName,
+): ResourceSchema {
+  const projectSchema: ProjectSchema | undefined = Object.values(apiSchema.projectSchemas).find(
+    (ps) => ps.projectName === projectName,
+  );
+  invariant(projectSchema != null, `Project schema with projectName ${projectName} was not found`);
+  const result: ResourceSchema | undefined = Object.values(projectSchema.resourceSchemas).find(
+    (resourceSchema) => resourceSchema.resourceName === resourceName,
+  );
+  invariant(result != null, `Resource schema with resourceName ${resourceName} was not found`);
+  return result;
+}
 
 /**
  * Takes a resource schema and an API document for that resource and
  * extracts the document reference information from the document.
  */
-export function extractDocumentReferences(resourceSchema: ResourceSchema, documentBody: object): DocumentReference[] {
+export function extractDocumentReferences(
+  apiSchema: ApiSchema,
+  resourceSchema: ResourceSchema,
+  documentBody: object,
+): DocumentReference[] {
   const result: DocumentReference[] = [];
 
   Object.values(resourceSchema.documentPathsMapping).forEach((documentPaths: DocumentPaths) => {
@@ -66,7 +98,7 @@ export function extractDocumentReferences(resourceSchema: ResourceSchema, docume
     if (documentPaths.isDescriptor) return;
 
     // Build up intermediateDocumentReferences
-    const intermediateDocumentReferences: IntermediateDocumentReferences = {};
+    const intermediateDocumentReferences: IntermediateDocumentIdentities = {};
     Object.entries(documentPaths.paths).forEach(([documentKey, documentJsonPath]) => {
       const documentValuesSlice: any[] = jsonPath({
         path: documentJsonPath,
@@ -98,13 +130,29 @@ export function extractDocumentReferences(resourceSchema: ResourceSchema, docume
       ),
     );
 
+    // Look up identityPathOrder for this reference
+    const referenceResourceSchema: ResourceSchema = resourceSchemaForReference(
+      apiSchema,
+      documentPaths.projectName,
+      documentPaths.resourceName,
+    );
+
     // Reorient intermediateDocumentReferences into actual references
     for (let index = 0; index < documentValuesSlices[0].length; index += 1) {
-      const documentIdentity: DocumentIdentity = [];
+      const unsortedDocumentIdentity: UnsortedDocumentIdentity = {};
 
       // Build the document identity in the correct path order
       documentPaths.pathOrder.forEach((documentKey: DocumentObjectKey) => {
-        documentIdentity.push({ documentKey, documentValue: intermediateDocumentReferences[documentKey][index] });
+        unsortedDocumentIdentity[documentKey] = intermediateDocumentReferences[documentKey][index];
+      });
+
+      const documentIdentity: DocumentIdentity = [];
+
+      referenceResourceSchema.identityPathOrder.forEach((documentKey: DocumentObjectKey) => {
+        documentIdentity.push({
+          documentKey,
+          documentValue: unsortedDocumentIdentity[documentKey],
+        });
       });
 
       result.push({

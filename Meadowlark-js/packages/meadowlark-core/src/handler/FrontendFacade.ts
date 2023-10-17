@@ -25,6 +25,7 @@ import { logRequestBody } from '../middleware/RequestLoggingMiddleware';
 import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 import { equalityConstraintValidation } from '../middleware/ValidateEqualityConstraintMiddleware';
 import { timestampRequest } from '../middleware/TimestampRequestMiddleware';
+import { loadApiSchema } from '../middleware/ApiSchemaLoadingMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -43,6 +44,7 @@ function postStack(): MiddlewareStack {
   return R.once(
     R.pipe(
       timestampRequest,
+      R.andThen(loadApiSchema),
       R.andThen(authorize),
       R.andThen(parsePath),
       R.andThen(parseBody),
@@ -62,6 +64,7 @@ function putStack(): MiddlewareStack {
   return R.once(
     R.pipe(
       timestampRequest,
+      R.andThen(loadApiSchema),
       R.andThen(authorize),
       R.andThen(parsePath),
       R.andThen(parseBody),
@@ -80,7 +83,8 @@ function putStack(): MiddlewareStack {
 function deleteStack(): MiddlewareStack {
   return R.once(
     R.pipe(
-      authorize,
+      loadApiSchema,
+      R.andThen(authorize),
       R.andThen(parsePath),
       R.andThen(endpointValidation),
       R.andThen(getDocumentStore().securityMiddleware),
@@ -93,7 +97,8 @@ function deleteStack(): MiddlewareStack {
 function getByIdStack(): MiddlewareStack {
   return R.once(
     R.pipe(
-      authorize,
+      loadApiSchema,
+      R.andThen(authorize),
       R.andThen(endpointValidation),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
@@ -103,7 +108,15 @@ function getByIdStack(): MiddlewareStack {
 
 // Middleware stack builder for Query - parsePath gets run earlier, no body
 function queryStack(): MiddlewareStack {
-  return R.once(R.pipe(authorize, R.andThen(endpointValidation), R.andThen(queryValidation), R.andThen(logTheResponse)));
+  return R.once(
+    R.pipe(
+      loadApiSchema,
+      R.andThen(authorize),
+      R.andThen(endpointValidation),
+      R.andThen(queryValidation),
+      R.andThen(logTheResponse),
+    ),
+  );
 }
 
 /**

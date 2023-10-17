@@ -11,6 +11,7 @@ import { Security, UndefinedSecurity } from '../security/Security';
 import type { Action } from './Action';
 import { TraceId } from '../model/IdTypes';
 import { NoResourceSchema, ResourceSchema } from '../model/api-schema/ResourceSchema';
+import { ApiSchema, NoApiSchema } from '../model/api-schema/ApiSchema';
 
 export interface Headers {
   [header: string]: string | undefined;
@@ -39,7 +40,12 @@ export interface FrontendRequestMiddleware {
   resourceInfo: ResourceInfo;
 
   /**
-   * Full API resource schema information describing the shape of a resource
+   * Full API schema information describing all resources and resource extensions
+   */
+  apiSchema: ApiSchema;
+
+  /**
+   * Full API resource schema information describing the shape of this resource
    */
   resourceSchema: ResourceSchema;
 
@@ -109,6 +115,7 @@ export function newFrontendRequestMiddleware(): FrontendRequestMiddleware {
     pathComponents: NoPathComponents,
     parsedBody: {},
     resourceInfo: NoResourceInfo,
+    apiSchema: NoApiSchema,
     resourceSchema: NoResourceSchema,
     documentInfo: NoDocumentInfo,
     headerMetadata: {},

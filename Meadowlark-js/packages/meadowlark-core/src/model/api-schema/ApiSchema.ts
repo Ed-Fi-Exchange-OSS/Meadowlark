@@ -18,3 +18,5 @@ export type ApiSchema = {
 export function newApiSchema(): ApiSchema {
   return { projectSchemas: {} };
 }
+
+export const NoApiSchema: ApiSchema = Object.freeze(newApiSchema());

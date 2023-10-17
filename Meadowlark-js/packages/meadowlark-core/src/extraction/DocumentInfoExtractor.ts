@@ -10,11 +10,13 @@ import { SuperclassInfo } from '../model/SuperclassInfo';
 import { DocumentIdentity } from '../model/DocumentIdentity';
 import { ResourceSchema } from '../model/api-schema/ResourceSchema';
 import { deriveSuperclassInfoFrom } from './SuperclassInfoExtractor';
+import { ApiSchema } from '../model/api-schema/ApiSchema';
 
 /**
  * Extracts document identity and document reference information from the request body.
  */
 export async function extractDocumentInfo(
+  apiSchema: ApiSchema,
   resourceSchema: ResourceSchema,
   body: object,
   requestTimestamp: number,
@@ -28,7 +30,7 @@ export async function extractDocumentInfo(
   }
 
   return {
-    documentReferences: extractDocumentReferences(resourceSchema, body),
+    documentReferences: extractDocumentReferences(apiSchema, resourceSchema, body),
     descriptorReferences: extractDescriptorValues(resourceSchema, body),
     documentIdentity,
     superclassInfo,

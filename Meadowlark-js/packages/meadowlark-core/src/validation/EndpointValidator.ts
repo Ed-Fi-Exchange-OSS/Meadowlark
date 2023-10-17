@@ -9,10 +9,12 @@ import { NoResourceInfo } from '../model/ResourceInfo';
 import { TraceId } from '../model/IdTypes';
 import { NoResourceSchema, ResourceSchema } from '../model/api-schema/ResourceSchema';
 import { findResourceSchema } from '../api-schema/ResourceSchemaFinder';
-import { findProjectSchema, validEndpointNamesFor } from '../api-schema/ProjectSchemaFinder';
 import { EndpointName } from '../model/api-schema/EndpointName';
 import { ProjectSchema } from '../model/api-schema/ProjectSchema';
 import { EndpointValidationResult } from './EndpointValidationResult';
+import { ApiSchema } from '../model/api-schema/ApiSchema';
+import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
+import { findProjectSchema } from '../api-schema/ProjectSchemaFinder';
 
 /** The result of an attempt to match an EndpointName with a ResourceSchema */
 type MatchResourceSchemaResult = {
@@ -28,18 +30,29 @@ type MatchResourceSchemaResult = {
 };
 
 /**
+ * Returns a list of the valid endpoint names for a ProjectNamespace.
+ */
+function validEndpointNamesFor(apiSchema: ApiSchema, projectNamespace: ProjectNamespace): EndpointName[] {
+  return Object.keys(apiSchema.projectSchemas[projectNamespace].resourceSchemas) as EndpointName[];
+}
+
+/**
  * Finds the ResourceSchema that matches the EndpointName of the API request, or provides a suggestion
  * if no match is found.
  */
-async function matchResourceSchema(pathComponents: PathComponents, traceId: TraceId): Promise<MatchResourceSchemaResult> {
-  const matchingResourceSchema: ResourceSchema | undefined = await findResourceSchema(pathComponents, traceId);
+async function matchResourceSchema(
+  apiSchema: ApiSchema,
+  pathComponents: PathComponents,
+  traceId: TraceId,
+): Promise<MatchResourceSchemaResult> {
+  const matchingResourceSchema: ResourceSchema | undefined = await findResourceSchema(apiSchema, pathComponents, traceId);
   if (matchingResourceSchema != null) {
     return { matchingResourceSchema };
   }
 
   const suggestion = didYouMean(
     pathComponents.endpointName,
-    validEndpointNamesFor(pathComponents.projectNamespace, pathComponents.projectShortVersion),
+    validEndpointNamesFor(apiSchema, pathComponents.projectNamespace),
   );
   if (suggestion == null) return {};
 
@@ -50,8 +63,12 @@ async function matchResourceSchema(pathComponents: PathComponents, traceId: Trac
 /**
  * Validates that an endpoint maps to a ResourceSchema
  */
-export async function validateEndpoint(pathComponents: PathComponents, traceId: TraceId): Promise<EndpointValidationResult> {
-  const { matchingResourceSchema, suggestedEndpointName } = await matchResourceSchema(pathComponents, traceId);
+export async function validateEndpoint(
+  apiSchema: ApiSchema,
+  pathComponents: PathComponents,
+  traceId: TraceId,
+): Promise<EndpointValidationResult> {
+  const { matchingResourceSchema, suggestedEndpointName } = await matchResourceSchema(apiSchema, pathComponents, traceId);
 
   if (suggestedEndpointName !== null) {
     const invalidResourceMessage = `Invalid resource '${pathComponents.endpointName}'. The most similar resource is '${suggestedEndpointName}'.`;
@@ -73,11 +90,7 @@ export async function validateEndpoint(pathComponents: PathComponents, traceId: 
     };
   }
 
-  const projectSchema: ProjectSchema = await findProjectSchema(
-    pathComponents.projectNamespace,
-    pathComponents.projectShortVersion,
-    traceId,
-  );
+  const projectSchema: ProjectSchema = await findProjectSchema(apiSchema, pathComponents.projectNamespace, traceId);
 
   return {
     resourceSchema: matchingResourceSchema,

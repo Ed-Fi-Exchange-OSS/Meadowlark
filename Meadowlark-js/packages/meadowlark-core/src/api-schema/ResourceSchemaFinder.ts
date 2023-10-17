@@ -5,21 +5,19 @@
 
 import type { PathComponents } from '../model/PathComponents';
 import type { ResourceSchema } from '../model/api-schema/ResourceSchema';
-import { findProjectSchema } from './ProjectSchemaFinder';
 import type { TraceId } from '../model/IdTypes';
 import { ProjectSchema } from '../model/api-schema/ProjectSchema';
+import { ApiSchema } from '../model/api-schema/ApiSchema';
+import { findProjectSchema } from './ProjectSchemaFinder';
 
 /**
  * Finds the ResourceSchema that represents the given REST resource path.
  */
 export async function findResourceSchema(
+  apiSchema: ApiSchema,
   pathComponents: PathComponents,
   traceId: TraceId,
 ): Promise<ResourceSchema | undefined> {
-  const projectSchema: ProjectSchema = await findProjectSchema(
-    pathComponents.projectNamespace,
-    pathComponents.projectShortVersion,
-    traceId,
-  );
+  const projectSchema: ProjectSchema = await findProjectSchema(apiSchema, pathComponents.projectNamespace, traceId);
   return projectSchema.resourceSchemas[pathComponents.endpointName];
 }
