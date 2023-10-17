@@ -3,6 +3,10 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/**
+ * NOTE: If Postgres query transactions are modified to use SSI and the use of SELECT...FOR UPDATE/SHARE is removed,
+ * this test case should be updated to adjust its logic and avoid deadlocks at the database level.
+ */
 import {
   DocumentInfo,
   NoDocumentInfo,
