@@ -55,3 +55,10 @@ These results are consistent with the Autocannon results:
 
 - SSI version has less commits than previous version, and more rollbacks than previous version, that makes sense because we are not locking the database and we are executing a rollback to retry.
 - Also, SSI version returned more tuples but affected tuples are less compared to previous version. That behavior is consistent with a retry mechanism, because when we need to retry, we need to restart the process.
+
+## Conclusion
+- The version with SSI reduces latency but also generates a large amount of rollback, so the number of altered records is smaller.
+
+- Additionally, in cases like locking\delete.test.ts, removing the SELECT...FOR UPDATE/SHARE can cause errors and deadlocks.
+
+- For SSI to be effective, retry logic must be implemented, otherwise many transactions would fail without altering any records.
