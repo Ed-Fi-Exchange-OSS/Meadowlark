@@ -19,6 +19,7 @@ export async function endpointValidation({ frontendRequest, frontendResponse }: 
   writeRequestToLog(moduleName, frontendRequest, 'resourceValidation');
 
   const { resourceSchema, resourceInfo, errorBody, headerMetadata } = await validateEndpoint(
+    frontendRequest.middleware.apiSchema,
     frontendRequest.middleware.pathComponents,
     frontendRequest.traceId,
   );

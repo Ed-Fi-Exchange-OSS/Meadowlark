@@ -11,7 +11,9 @@ import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { projectShortVersion33b } from '../api-schema/ApiSchemaLoader';
+
+// TODO: this can be removed when we drop short version from URL
+const projectShortVersion33b = 'v3.3b';
 
 interface ExternalResource {
   body: string;

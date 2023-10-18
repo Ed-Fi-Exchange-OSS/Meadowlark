@@ -100,7 +100,7 @@ describe('given a valid response from documentValidation for Insert', () => {
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(Promise.resolve(null));
+    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(null);
 
     // Act
     resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
