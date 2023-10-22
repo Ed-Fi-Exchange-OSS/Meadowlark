@@ -4,6 +4,7 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { MetaEdProjectName } from './MetaEdProjectName';
+import { ResourceNameMapping } from './ResourceNameMapping';
 import { ResourceSchema } from './ResourceSchema';
 import { ResourceSchemaMapping } from './ResourceSchemaMapping';
 import { SemVer } from './SemVer';
@@ -26,6 +27,11 @@ export type ProjectSchema = {
   resourceSchemas: ResourceSchemaMapping;
 
   /**
+   * A collection of ResourceNames mapped to EndpointNames
+   */
+  resourceNameMapping: ResourceNameMapping;
+
+  /**
    * SchoolYearEnumeration is not a resource but has a ResourceSchema
    */
   schoolYearEnumeration?: ResourceSchema;
@@ -37,4 +43,5 @@ export const NoProjectSchema: ProjectSchema = {
   isExtensionProject: false,
   description: 'NoProjectSchema',
   resourceSchemas: {},
+  resourceNameMapping: {},
 };

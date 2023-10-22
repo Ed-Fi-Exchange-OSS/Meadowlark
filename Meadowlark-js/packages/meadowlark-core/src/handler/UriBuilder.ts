@@ -3,13 +3,18 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { pluralize, uncapitalize } from '@edfi/metaed-plugin-edfi-api-schema';
+import invariant from 'ts-invariant';
 import { PathComponents } from '../model/PathComponents';
 import { FrontendRequest } from './FrontendRequest';
 import { ReferringDocumentInfo } from '../message/ReferringDocumentInfo';
-import { versionAbbreviationFor } from '../api-schema/ApiSchemaLoader';
 import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
 import { EndpointName } from '../model/api-schema/EndpointName';
+import { SemVer } from '../model/api-schema/SemVer';
+
+TODO: Find ticket for replacing this
+function versionAbbreviationFor(_resourceVersion: SemVer) {
+  return '3.3b';
+}
 
 /**
  * Derives the resource URI from the pathComponents and resourceId
@@ -26,13 +31,27 @@ export function blockingDocumentsToUris(
   referringDocumentInfo?: ReferringDocumentInfo[],
 ): string[] {
   const result: string[] = [];
+  const { apiSchema } = frontendRequest.middleware;
   if (referringDocumentInfo) {
     referringDocumentInfo.forEach((document) => {
+      const projectNamespace: ProjectNamespace | undefined = apiSchema.projectNameMapping[document.projectName];
+      invariant(
+        projectNamespace != null,
+        `Project name '${document.projectName}' on document resource ${document.resourceName} with documentUuid ${document.documentUuid} does not match any known ProjectNamespace. Mismatch between database data and loaded ApiSchema?`,
+      );
+
+      const endpointName: EndpointName | undefined =
+        apiSchema.projectSchemas[projectNamespace].resourceNameMapping[document.resourceName];
+      invariant(
+        endpointName != null,
+        `Resource name '${document.resourceName}' on document with documentUuid ${document.documentUuid} does not match any known EndpointName. Mismatch between database data and loaded ApiSchema?`,
+      );
+
       let uri = resourceUriFrom(
         {
           projectShortVersion: versionAbbreviationFor(document.resourceVersion),
-          projectNamespace: document.projectName.toLowerCase() as ProjectNamespace, // Lower casing is correct for Ed-Fi models, not sure about alternatives
-          endpointName: uncapitalize(pluralize(document.resourceName)) as EndpointName,
+          projectNamespace,
+          endpointName,
         },
         document.documentUuid,
       );

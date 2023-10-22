@@ -12,9 +12,6 @@ import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
 import { writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
 
-// TODO: this can be removed when we drop short version from URL
-const projectShortVersion33b = 'v3.3b';
-
 interface ExternalResource {
   body: string;
   etag: string | undefined;
@@ -45,7 +42,7 @@ function useTemplate(data: string, host: string, stage: string): string {
   // the schemes with quotation marks that won't be encoded, but when
   // we do so, handlebars ends up escaping every quotation mark.
   // Just use a straight string replacement without handlebars.
-  const basePath = `/${stage}/${projectShortVersion33b}/`;
+  const basePath = `/${stage}/v3.3b`;
   const basePathToken = /{{ basePath }}/g;
 
   const tokenUrlToken = /{{ tokenUrl }}/g;
