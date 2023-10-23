@@ -59,9 +59,12 @@ describe('given non-superclass document info with no references', () => {
         ],
         "createdAt": 1673827200000,
         "createdBy": "createdBy",
-        "documentIdentity": {
-          "natural": "key",
-        },
+        "documentIdentity": [
+          {
+            "documentKey": "natural",
+            "documentValue": "key",
+          },
+        ],
         "documentUuid": "3018d452-a7b7-4f1c-aa91-26ccc48cf4b8",
         "edfiDoc": {
           "edfi": "doc",
@@ -131,7 +134,7 @@ describe('given non-superclass document info with references', () => {
     expect(meadowlarkDocument.outboundRefs).toMatchInlineSnapshot(`
       [
         "dfR7WrhrnYMh8lF_mnIhAN2Ur2Ji2MmlGBcSUg",
-        "t9LSXi1nFRmwyLTPkxiA9RG1ItGTlsxaGzTwKA",
+        "7tIjvqhWCIKdHjfSkxiA9RG1ItGTlsxaGzTwKA",
       ]
     `);
   });

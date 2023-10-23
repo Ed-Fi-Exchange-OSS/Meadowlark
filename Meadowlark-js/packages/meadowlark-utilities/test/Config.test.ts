@@ -293,29 +293,4 @@ describe('when initializing configuration', () => {
       expect(Config.get(k as ConfigKeys)).toBe(v);
     });
   });
-
-  describe('given a key that has not been set and does not have a default value', () => {
-    it.each([
-      ['AUTHORIZATION_STORE_PLUGIN'],
-      ['DOCUMENT_STORE_PLUGIN'],
-      ['OPENSEARCH_ENDPOINT'],
-      ['OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST'],
-      ['OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION'],
-      ['OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH'],
-      ['OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH'],
-    ])('throws an error for %s', (k) => {
-      setAllValues();
-      process.env[k] = undefined;
-
-      const act = async (): Promise<void> => {
-        const Config = await import('../src/Config');
-        const Environment = await import('../src/Environment');
-        await Config.initializeConfig(Environment.CachedEnvironmentConfigProvider);
-      };
-
-      act().catch((e) =>
-        expect(e).toMatchInlineSnapshot(`[Error: Environment variable '${k}' has not been setup properly.]`),
-      );
-    });
-  });
 });

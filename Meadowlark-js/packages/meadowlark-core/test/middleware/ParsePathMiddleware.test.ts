@@ -86,9 +86,9 @@ describe('given a valid path without resourceId', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
       {
         "documentUuid": undefined,
-        "namespace": "2",
-        "resourceName": "3",
-        "version": "1",
+        "endpointName": "3",
+        "projectNamespace": "2",
+        "projectShortVersion": "1",
       }
     `);
   });
@@ -117,9 +117,9 @@ describe('given a valid path with resourceId', () => {
     expect(resultChain.frontendRequest.middleware.pathComponents).toMatchInlineSnapshot(`
       {
         "documentUuid": "7825fba8-0b3d-4fc9-ae72-5ad8194d3ce2",
-        "namespace": "2",
-        "resourceName": "3",
-        "version": "1",
+        "endpointName": "3",
+        "projectNamespace": "2",
+        "projectShortVersion": "1",
       }
     `);
   });

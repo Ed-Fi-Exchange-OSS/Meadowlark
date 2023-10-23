@@ -3,6 +3,15 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import {
+  MetaEdEnvironment,
+  newMetaEdEnvironment,
+  MetaEdTextBuilder,
+  NamespaceBuilder,
+  DomainEntityBuilder,
+  AssociationBuilder,
+} from '@edfi/metaed-core';
+import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
 import * as EndpointValidator from '../../src/validation/EndpointValidator';
 import { endpointValidation } from '../../src/middleware/ValidateEndpointMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
@@ -15,6 +24,8 @@ import { NoResourceSchema } from '../../src/model/api-schema/ResourceSchema';
 import { EndpointName } from '../../src/model/api-schema/EndpointName';
 import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
 import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { apiSchemaFrom } from '../TestHelper';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
@@ -169,6 +180,22 @@ describe('given requesting abstract domain entity', () => {
   let resultChain: MiddlewareModel;
 
   beforeAll(async () => {
+    const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+
+      .withStartAbstractEntity('EducationOrganization')
+      .withDocumentation('doc')
+      .withStringIdentity('EducationOrganizationId', 'doc', '30')
+      .withEndAbstractEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
       body: '{"documentUuid": "db4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
@@ -177,10 +204,11 @@ describe('given requesting abstract domain entity', () => {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
           endpointName: 'educationOrganizations' as EndpointName,
-          projectNamespace: 'ed-fi' as ProjectNamespace,
+          projectNamespace: 'edfi' as ProjectNamespace,
           projectShortVersion: 'v3.3b' as ProjectShortVersion,
           documentUuid: 'db4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
+        apiSchema,
       },
     };
 
@@ -195,7 +223,7 @@ describe('given requesting abstract domain entity', () => {
   it('returns the expected message body', () => {
     expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
       {
-        "error": "Invalid resource 'educationOrganizations'. The most similar resource is 'educationOrganizationNetworks'.",
+        "error": "Invalid resource 'educationOrganizations'.",
       }
     `);
   });
@@ -204,7 +232,36 @@ describe('given requesting abstract domain entity', () => {
 describe('given requesting abstract association', () => {
   let resultChain: MiddlewareModel;
 
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+
   beforeAll(async () => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+
+      .withStartAssociation('GeneralStudentProgramAssociation')
+      .withDocumentation('doc')
+      .withAssociationDomainEntityProperty('Student', 'doc')
+      .withAssociationDomainEntityProperty('Program', 'doc')
+      .withEndAssociation()
+
+      .withStartDomainEntity('Student')
+      .withDocumentation('doc')
+      .withStringIdentity('StudentId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Program')
+      .withDocumentation('doc')
+      .withStringIdentity('ProgramId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new AssociationBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+
     const frontendRequest: FrontendRequest = {
       ...newFrontendRequest(),
       body: '{"documentUuid": "df4f71a9-30dd-407a-ace4-07a056f781a3", "body": "a body"}',
@@ -213,10 +270,11 @@ describe('given requesting abstract association', () => {
         ...newFrontendRequestMiddleware(),
         pathComponents: {
           endpointName: 'generalStudentProgramAssociations' as EndpointName,
-          projectNamespace: 'ed-fi' as ProjectNamespace,
+          projectNamespace: 'edfi' as ProjectNamespace,
           projectShortVersion: 'v3.3b' as ProjectShortVersion,
           documentUuid: 'df4f71a9-30dd-407a-ace4-07a056f781a3' as DocumentUuid,
         },
+        apiSchema,
       },
     };
 
@@ -231,7 +289,7 @@ describe('given requesting abstract association', () => {
   it('returns the expected message body', () => {
     expect(resultChain.frontendResponse?.body).toMatchInlineSnapshot(`
       {
-        "error": "Invalid resource 'generalStudentProgramAssociations'. The most similar resource is 'studentProgramAssociations'.",
+        "error": "Invalid resource 'generalStudentProgramAssociations'.",
       }
     `);
   });

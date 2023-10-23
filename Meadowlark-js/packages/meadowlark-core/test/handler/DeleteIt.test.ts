@@ -5,6 +5,7 @@
 
 import { deleteIt } from '../../src/handler/Delete';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
@@ -157,6 +158,8 @@ describe('given id does not exist', () => {
 
 describe('given the document to be deleted is referenced by other documents ', () => {
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
+
   const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid: 'documentUuid' as DocumentUuid,
@@ -175,6 +178,7 @@ describe('given the document to be deleted is referenced by other documents ', (
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await deleteIt(frontendRequest);
@@ -182,6 +186,7 @@ describe('given the document to be deleted is referenced by other documents ', (
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -193,7 +198,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       {
         "error": {
           "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentUuid",
+            "blocking/uri",
           ],
           "message": "The resource cannot be deleted because it is a dependency of other documents",
         },

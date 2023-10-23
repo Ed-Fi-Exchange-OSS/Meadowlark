@@ -9,7 +9,7 @@ import { ResourceSchema, newResourceSchema } from '../../src/model/api-schema/Re
 
 const resourceSchema: ResourceSchema = {
   ...newResourceSchema(),
-  jsonSchemaForInsert: {
+  jsonSchemaForQuery: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     additionalProperties: false,
     description: 'doc',

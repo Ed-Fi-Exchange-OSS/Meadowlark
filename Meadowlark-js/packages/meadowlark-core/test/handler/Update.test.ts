@@ -5,6 +5,7 @@
 
 import { update } from '../../src/handler/Update';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
@@ -67,6 +68,8 @@ describe('given the requested document does not exist', () => {
 
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
+
   const expectedBlockingDocument: ReferringDocumentInfo = {
     resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid: 'documentUuid' as DocumentUuid,
@@ -88,6 +91,8 @@ describe('given the new document has an invalid reference ', () => {
         }),
     });
 
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
+
     const frontendRequestTest = frontendRequest;
     frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
@@ -96,6 +101,7 @@ describe('given the new document has an invalid reference ', () => {
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -107,7 +113,7 @@ describe('given the new document has an invalid reference ', () => {
     expect(response.body).toMatchInlineSnapshot(`
     {
       "blockingUris": [
-        "/v3.3b/ed-fi/resourceNames/documentUuid",
+        "blocking/uri",
       ],
       "error": "this is the message",
     }

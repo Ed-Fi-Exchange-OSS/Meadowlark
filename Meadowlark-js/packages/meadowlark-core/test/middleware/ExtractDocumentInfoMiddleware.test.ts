@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import * as ExtractDocumentInfoMiddleware from '../../src/middleware/ExtractDocumentInfoMiddleware';
+import * as BuildDocumentInfo from '../../src/extraction/BuildDocumentInfo';
+import { documentInfoExtraction } from '../../src/middleware/ExtractDocumentInfoMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
 import { newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
@@ -16,10 +17,10 @@ describe('given a previous middleware has created a response', () => {
   let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo');
+    mockDocumentInfoBuilder = jest.spyOn(BuildDocumentInfo, 'buildDocumentInfo');
 
     // Act
-    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
@@ -45,10 +46,10 @@ describe('given a no document info response from extractDocumentInfo', () => {
   let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo').mockReturnValue(NoDocumentInfo);
+    mockDocumentInfoBuilder = jest.spyOn(BuildDocumentInfo, 'buildDocumentInfo').mockImplementation(() => NoDocumentInfo);
 
     // Act
-    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse: null });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
@@ -76,10 +77,10 @@ describe('given a document info response from extractDocumentInfo', () => {
   let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo').mockReturnValue(documentInfo);
+    mockDocumentInfoBuilder = jest.spyOn(BuildDocumentInfo, 'buildDocumentInfo').mockImplementation(() => documentInfo);
 
     // Act
-    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse: null });
+    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {

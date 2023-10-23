@@ -42,7 +42,7 @@ function useTemplate(data: string, host: string, stage: string): string {
   // the schemes with quotation marks that won't be encoded, but when
   // we do so, handlebars ends up escaping every quotation mark.
   // Just use a straight string replacement without handlebars.
-  const basePath = `/${stage}/v3.3b`;
+  const basePath = `/${stage}/v3.3b/`;
   const basePathToken = /{{ basePath }}/g;
 
   const tokenUrlToken = /{{ tokenUrl }}/g;
