@@ -11,19 +11,8 @@ import {
   DomainEntityBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
-  DomainEntity,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-  allJsonPathsMappingEnhancer,
-  equalityConstraintEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 import { validateEqualityConstraints } from '../../src/validation/EqualityConstraintValidator';
 import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
 import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
@@ -78,14 +67,6 @@ function sectionResourceSchema(): ResourceSchema {
     .sendToListener(new DomainEntityBuilder(metaEd, []));
 
   domainEntityReferenceEnhancer(metaEd);
-  entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-  entityApiSchemaDataSetupEnhancer(metaEd);
-  referenceComponentEnhancer(metaEd);
-  apiPropertyMappingEnhancer(metaEd);
-  propertyCollectingEnhancer(metaEd);
-  apiEntityMappingEnhancer(metaEd);
-  allJsonPathsMappingEnhancer(metaEd);
-  equalityConstraintEnhancer(metaEd);
 
   const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
   return apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];

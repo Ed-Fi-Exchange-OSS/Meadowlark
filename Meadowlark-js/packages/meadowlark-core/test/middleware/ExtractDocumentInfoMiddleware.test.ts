@@ -3,27 +3,27 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { documentInfoExtraction } from '../../src/middleware/ExtractDocumentInfoMiddleware';
+import * as ExtractDocumentInfoMiddleware from '../../src/middleware/ExtractDocumentInfoMiddleware';
 import { FrontendResponse, newFrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest } from '../../src/handler/FrontendRequest';
-import { DocumentInfo, newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
+import { newDocumentInfo, NoDocumentInfo } from '../../src/model/DocumentInfo';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 
 describe('given a previous middleware has created a response', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   const frontendResponse: FrontendResponse = newFrontendResponse();
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentInfoExtractor, 'extractDocumentInfo');
+    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo');
 
     // Act
-    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse });
+    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockDocumentInfoBuilder.mockRestore();
   });
 
   it('returns the given request', () => {
@@ -35,28 +35,24 @@ describe('given a previous middleware has created a response', () => {
   });
 
   it('never calls documentInfoExtraction', () => {
-    expect(mockDocumentValidator).not.toHaveBeenCalled();
+    expect(mockDocumentInfoBuilder).not.toHaveBeenCalled();
   });
 });
 
 describe('given a no document info response from extractDocumentInfo', () => {
   const frontendRequest: FrontendRequest = newFrontendRequest();
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    const validationResult: DocumentInfo = NoDocumentInfo;
-
-    mockDocumentValidator = jest
-      .spyOn(DocumentInfoExtractor, 'extractDocumentInfo')
-      .mockReturnValue(Promise.resolve(validationResult));
+    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo').mockReturnValue(NoDocumentInfo);
 
     // Act
-    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
+    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockDocumentInfoBuilder.mockRestore();
   });
 
   it('returns the given request', () => {
@@ -77,21 +73,17 @@ describe('given a document info response from extractDocumentInfo', () => {
   const documentInfo = newDocumentInfo();
   const headerMetadata = {};
   let resultChain: MiddlewareModel;
-  let mockDocumentValidator: any;
+  let mockDocumentInfoBuilder: any;
 
   beforeAll(async () => {
-    const validationResult = documentInfo;
-
-    mockDocumentValidator = jest
-      .spyOn(DocumentInfoExtractor, 'extractDocumentInfo')
-      .mockReturnValue(Promise.resolve(validationResult));
+    mockDocumentInfoBuilder = jest.spyOn(ExtractDocumentInfoMiddleware, 'buildDocumentInfo').mockReturnValue(documentInfo);
 
     // Act
-    resultChain = await documentInfoExtraction({ frontendRequest, frontendResponse: null });
+    resultChain = await ExtractDocumentInfoMiddleware.documentInfoExtraction({ frontendRequest, frontendResponse: null });
   });
 
   afterAll(() => {
-    mockDocumentValidator.mockRestore();
+    mockDocumentInfoBuilder.mockRestore();
   });
 
   it('returns the given request', () => {

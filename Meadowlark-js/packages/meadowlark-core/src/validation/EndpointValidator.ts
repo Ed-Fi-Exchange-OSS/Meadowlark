@@ -70,7 +70,7 @@ export async function validateEndpoint(
 ): Promise<EndpointValidationResult> {
   const { matchingResourceSchema, suggestedEndpointName } = await matchResourceSchema(apiSchema, pathComponents, traceId);
 
-  if (suggestedEndpointName !== null) {
+  if (suggestedEndpointName != null) {
     const invalidResourceMessage = `Invalid resource '${pathComponents.endpointName}'. The most similar resource is '${suggestedEndpointName}'.`;
 
     return {

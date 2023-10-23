@@ -20,7 +20,7 @@ const moduleName = 'core.middleware.ExtractDocumentInfoMiddleware';
 /**
  * Builds a DocumentInfo using the various extractors
  */
-function buildDocumentInfo(
+export function buildDocumentInfo(
   apiSchema: ApiSchema,
   resourceSchema: ResourceSchema,
   body: object,

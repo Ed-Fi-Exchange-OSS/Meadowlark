@@ -13,14 +13,6 @@ import {
   NamespaceBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentReferences } from '../../src/extraction/DocumentReferenceExtractor';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
@@ -102,12 +94,6 @@ describe('when comparing identities with references from domain entity referenci
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
     const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
     const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
@@ -218,12 +204,6 @@ describe('when comparing identities with references with three levels of identit
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
     const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
     const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
@@ -307,12 +287,6 @@ describe('when comparing identities with references with two levels of identitie
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
     const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
     const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];

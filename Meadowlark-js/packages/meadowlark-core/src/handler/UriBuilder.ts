@@ -10,10 +10,11 @@ import { ReferringDocumentInfo } from '../message/ReferringDocumentInfo';
 import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
 import { EndpointName } from '../model/api-schema/EndpointName';
 import { SemVer } from '../model/api-schema/SemVer';
+import { ProjectShortVersion } from '../model/ProjectShortVersion';
 
-TODO: Find ticket for replacing this
-function versionAbbreviationFor(_resourceVersion: SemVer) {
-  return '3.3b';
+// TODO: See RND-382 on what to do with this
+function versionAbbreviationFor(_resourceVersion: SemVer): ProjectShortVersion {
+  return '3.3b' as ProjectShortVersion;
 }
 
 /**
