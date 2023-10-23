@@ -5,6 +5,7 @@
 
 import * as MeadowlarkUtilities from '@edfi/meadowlark-utilities';
 import { Logger } from '@edfi/meadowlark-utilities';
+import * as CoreLogger from '../../src/Logger';
 import { logTheResponse } from '../../src/middleware/ResponseLoggingMiddleware';
 import { MiddlewareModel } from '../../src/middleware/MiddlewareModel';
 import { newFrontendResponse } from '../../src/handler/FrontendResponse';
@@ -45,7 +46,7 @@ describe('when logging the response', () => {
     let loggerSpy: any;
 
     beforeEach(() => {
-      loggerSpy = jest.spyOn(Logger, 'debug');
+      loggerSpy = jest.spyOn(CoreLogger, 'writeDebugStatusToLog');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
       setupMockConfiguration();
     });
@@ -74,7 +75,14 @@ describe('when logging the response', () => {
 
       await logTheResponse(model);
 
-      expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 404', traceId, body);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'core.middleware.ResponseLoggingMiddleware',
+        traceId,
+        'logTheResponse',
+        404,
+        '',
+        body,
+      );
     });
   });
 
@@ -112,7 +120,7 @@ describe('when logging the response', () => {
     let loggerSpy: any;
 
     beforeEach(() => {
-      loggerSpy = jest.spyOn(Logger, 'debug');
+      loggerSpy = jest.spyOn(CoreLogger, 'writeDebugStatusToLog');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
       setupMockConfiguration();
     });
@@ -147,9 +155,14 @@ describe('when logging the response', () => {
 
       await logTheResponse(model);
 
-      expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 400', traceId, {
-        error: body,
-      });
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'core.middleware.ResponseLoggingMiddleware',
+        traceId,
+        'logTheResponse',
+        400,
+        '{"error":[{"message":"{requestBody} must have required property \'contentIdentifier\'","path":"{requestBody}","context":{"errorType":"required"}}]}',
+        undefined,
+      );
     });
   });
 
@@ -158,7 +171,7 @@ describe('when logging the response', () => {
       let loggerSpy: any;
 
       beforeEach(() => {
-        loggerSpy = jest.spyOn(Logger, 'debug');
+        loggerSpy = jest.spyOn(CoreLogger, 'writeDebugStatusToLog');
         jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
         setupMockConfiguration();
       });
@@ -187,16 +200,16 @@ describe('when logging the response', () => {
         // In the expectedBody, the object values have been anonymized
         const expectedBody = {
           error: {
-            message: 'Reference validation failed',
             failures: [
               {
-                resourceName: 'Intervention',
                 identity: {
                   'educationOrganizationReference.educationOrganizationId': '*',
                   interventionIdentificationCode: '*',
                 },
+                resourceName: 'Intervention',
               },
             ],
+            message: 'Reference validation failed',
           },
         };
 
@@ -215,8 +228,11 @@ describe('when logging the response', () => {
         await logTheResponse(model);
 
         expect(loggerSpy).toHaveBeenCalledWith(
-          'core.middleware.ResponseLoggingMiddleware.logTheResponse 400',
-          traceId,
+          'core.middleware.ResponseLoggingMiddleware',
+          'traceId',
+          'logTheResponse',
+          400,
+          '',
           expectedBody,
         );
       });
@@ -279,7 +295,7 @@ describe('when logging the response', () => {
     let loggerSpy: any;
 
     beforeEach(() => {
-      loggerSpy = jest.spyOn(Logger, 'debug');
+      loggerSpy = jest.spyOn(CoreLogger, 'writeDebugStatusToLog');
       jest.spyOn(MeadowlarkUtilities, 'isDebugEnabled').mockImplementation(() => true);
       setupMockConfiguration();
     });
@@ -292,15 +308,13 @@ describe('when logging the response', () => {
       const traceId = 'traceId' as TraceId;
       const body = {
         error: {
-          message: 'Reference validation failed',
           failures: [
             {
+              identity: { descriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation' },
               resourceName: 'ContentClassDescriptor',
-              identity: {
-                descriptor: 'uri://ed-fi.org/ContentClassDescriptor#Presentation',
-              },
             },
           ],
+          message: 'Reference validation failed',
         },
       };
 
@@ -318,7 +332,14 @@ describe('when logging the response', () => {
 
       await logTheResponse(model);
 
-      expect(loggerSpy).toHaveBeenCalledWith('core.middleware.ResponseLoggingMiddleware.logTheResponse 400', traceId, body);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'core.middleware.ResponseLoggingMiddleware',
+        'traceId',
+        'logTheResponse',
+        400,
+        '',
+        body,
+      );
     });
   });
 });

@@ -6,6 +6,7 @@
 import { upsert } from '../../src/handler/Upsert';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
@@ -43,6 +44,7 @@ describe('given persistence is going to throw a reference error on insert', () =
     resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
   const expectedError = 'Error message';
 
   beforeAll(async () => {
@@ -55,6 +57,7 @@ describe('given persistence is going to throw a reference error on insert', () =
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -62,6 +65,7 @@ describe('given persistence is going to throw a reference error on insert', () =
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -73,7 +77,7 @@ describe('given persistence is going to throw a reference error on insert', () =
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Error message",
       }
@@ -127,6 +131,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
     resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
   const expectedError = 'Error message';
 
   beforeAll(async () => {
@@ -139,6 +144,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -146,6 +152,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -157,7 +164,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Error message",
       }
@@ -175,6 +182,7 @@ describe('given persistence is going to throw a reference error on update though
     resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
 
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
@@ -186,6 +194,7 @@ describe('given persistence is going to throw a reference error on update though
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -193,6 +202,7 @@ describe('given persistence is going to throw a reference error on update though
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -203,7 +213,7 @@ describe('given persistence is going to throw a reference error on update though
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Reference failure",
       }
