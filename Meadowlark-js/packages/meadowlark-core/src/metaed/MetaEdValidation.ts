@@ -24,7 +24,7 @@ export type ResourceSchemaValidators = {
 };
 
 function initializeAjv(): Ajv {
-  const removeAdditional = getBooleanFromEnvironment('ALLOW_OVERPOSTING', true);
+  const removeAdditional = getBooleanFromEnvironment('ALLOW_OVERPOSTING', false);
   const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);
 
   const ajv = new Ajv({ allErrors: true, coerceTypes, removeAdditional });
