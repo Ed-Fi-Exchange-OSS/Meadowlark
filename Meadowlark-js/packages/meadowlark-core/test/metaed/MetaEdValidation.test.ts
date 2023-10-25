@@ -140,7 +140,7 @@ describe('given query parameters with allow overposting is true have two extrane
     jest.clearAllMocks();
     jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
       if (key === 'ALLOW_OVERPOSTING') {
-        return false;
+        return true;
       }
       return Environment.getBooleanFromEnvironment(key);
     });
