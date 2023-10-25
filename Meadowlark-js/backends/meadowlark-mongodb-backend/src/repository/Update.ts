@@ -177,9 +177,6 @@ async function updateAllowingIdentityChange(
   await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
 
   if (tryUpdateByReplacementResult != null) {
-    // Ensure referenced documents are not modified in other transactions
-    // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
     return tryUpdateByReplacementResult;
   }
 
@@ -258,9 +255,6 @@ async function updateDisallowingIdentityChange(
     `${moduleName}.updateDisallowingIdentityChange: Updating DocumentUuid ${updateRequest.documentUuid}`,
     updateRequest.traceId,
   );
-
-  // Ensure referenced documents are not modified in other transactions
-  // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
 
   const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
     meadowlarkId: reference,

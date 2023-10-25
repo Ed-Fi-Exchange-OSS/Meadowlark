@@ -163,10 +163,6 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     // Should be no reference validation failures for AcademicWeek document
     expect(upsertFailures).toHaveLength(0);
 
-    // ***** Read-for-write lock the validated referenced documents in the insert
-    // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    // await writeLockReferencedDocuments(mongoCollection, academicWeekDocument.outboundRefs, upsertSession);
-
     // ----
     // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
     // ----

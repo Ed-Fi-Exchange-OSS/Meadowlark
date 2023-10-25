@@ -163,10 +163,6 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
     // Should be no reference validation failures for AcademicWeek document
     expect(upsertFailures).toHaveLength(0);
 
-    // ***** Read-for-write lock the validated referenced documents in the insert
-    // see https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
-    // await writeLockReferencedDocuments(mongoDocumentCollection, academicWeekDocument.outboundRefs, upsertSession);
-
     // ----
     // Start transaction to update the School document - interferes with the AcademicWeek insert referencing the School
     // ----

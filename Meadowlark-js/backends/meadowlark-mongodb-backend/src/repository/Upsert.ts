@@ -139,8 +139,6 @@ export async function upsertDocumentTransaction(
       lastModifiedAt: documentInfo.requestTimestamp,
     });
 
-  // await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
-
   const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
     meadowlarkId: reference,
     documentUuid,
