@@ -10,7 +10,8 @@ const credentials = require('../helpers/Credentials');
 // @ts-ignore
 const environment = require('./SetupTestContainers');
 
-if (process.env.USE_EXISTING_ENVIRONMENT) {
+dotenv.config({ path: join(process.cwd(), './services/meadowlark-fastify/.env') });
+/* if (process.env.USE_EXISTING_ENVIRONMENT) {
   dotenv.config({ path: join(process.cwd(), './services/meadowlark-fastify/.env') });
 } else {
   const result = dotenv.config({ path: join(__dirname, './.env-e2e') });
@@ -18,26 +19,26 @@ if (process.env.USE_EXISTING_ENVIRONMENT) {
   if (result.error) {
     throw new Error(`An error ocurred loading .env-e2e file:\n${result.error}`);
   }
-}
+} */
 
 module.exports = async () => {
   console.time('Setup Time');
 
   console.debug('\n-- Configuring Environment --');
 
-  const initialize = process.env.DEVELOPER_MODE !== 'true';
+  // const initialize = process.env.DEVELOPER_MODE !== 'true';
 
   if (process.env.USE_EXISTING_ENVIRONMENT) {
     console.info('Using existing environment, Verify that variables are set');
   } else {
     try {
-      await environment.configure(initialize);
+      // await environment.configure(initialize);
     } catch (error) {
       throw new Error(`⚠️ Error initializing containers.⚠️\n${error}`);
     }
   }
 
-  process.env.ROOT_URL = `http://localhost:${process.env.FASTIFY_PORT ?? 3001}`;
+  process.env.ROOT_URL = `http://127.0.0.1:${process.env.FASTIFY_PORT ?? 3000}`;
   process.env.DOCUMENT_STORE_PLUGIN = process.env.DOCUMENT_STORE_PLUGIN ?? '@edfi/meadowlark-mongodb-backend';
   console.info(`\n🧪 Running e2e tests for ${process.env.ROOT_URL} with: ${process.env.DOCUMENT_STORE_PLUGIN} 🧪\n`);
 
