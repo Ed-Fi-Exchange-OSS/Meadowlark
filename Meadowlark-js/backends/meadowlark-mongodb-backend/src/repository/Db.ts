@@ -4,10 +4,11 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, FindOptions, ReplaceOptions } from 'mongodb';
-import { Logger, Config } from '@edfi//meadowlark-utilities';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
-import { AuthorizationDocument } from '../model/AuthorizationDocument';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
+import type { DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
+import type { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import type { ConcurrencyDocument } from '../model/ConcurrencyDocument';
+import type { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 export const DOCUMENT_COLLECTION_NAME = 'documents';
 export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
@@ -127,19 +128,27 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 // MongoDB FindOption to return at most 5 documents
 export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
 
-export async function insertMeadowlarkIdOnConcurrencyCollection(
+/**
+ * Lock in-use meadowlark documents, both those being directly updated and those being referenced.
+ */
+export async function writeLockDocuments(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
 ): Promise<void> {
   await concurrencyCollection.insertMany(concurrencyDocuments);
 }
 
-export async function deleteMeadowlarkIdOnConcurrencyCollection(
+/**
+ * Remove the locks on in-use meadowlark documents, both those being directly updated and those being referenced.
+ */
+export async function removeDocumentLocks(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
 ): Promise<void> {
-  const meadowlarkIds: any[] = concurrencyDocuments.map((document) => document.meadowlarkId);
-  const documentUuids: any[] = concurrencyDocuments.map((document) => document.documentUuid);
+  const meadowlarkIds: MeadowlarkId[] = concurrencyDocuments
+    .map((document: ConcurrencyDocument) => document.meadowlarkId)
+    .filter((meadowlarkId: MeadowlarkId | null) => meadowlarkId != null) as MeadowlarkId[];
+  const documentUuids: DocumentUuid[] = concurrencyDocuments.map((document) => document.documentUuid);
 
   await concurrencyCollection.deleteMany({
     $and: [

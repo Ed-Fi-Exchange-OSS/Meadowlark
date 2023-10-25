@@ -11,10 +11,10 @@ import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import {
-  deleteMeadowlarkIdOnConcurrencyCollection,
+  removeDocumentLocks,
   getConcurrencyCollection,
   getDocumentCollection,
-  insertMeadowlarkIdOnConcurrencyCollection,
+  writeLockDocuments,
   limitFive,
   onlyReturnId,
 } from './Db';
@@ -109,11 +109,22 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     },
   ];
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  try {
+    await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
+  } catch (e) {
+    // Codes 11000 and 11001 are both Duplicate Key Error
+    if (e.code === 11000 || e.code === 11001) {
+      return {
+        response: 'DELETE_FAILURE_WRITE_CONFLICT',
+        failureMessage: 'Write conflict due to concurrent access to this or related resources',
+      };
+    }
 
+    throw e;
+  }
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
 
   if (!acknowledged) {
     const msg =

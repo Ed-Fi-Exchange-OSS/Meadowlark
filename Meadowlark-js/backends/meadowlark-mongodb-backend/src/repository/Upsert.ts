@@ -23,9 +23,9 @@ import {
   limitFive,
   getDocumentCollection,
   onlyReturnDocumentUuidAndTimestamps,
-  insertMeadowlarkIdOnConcurrencyCollection,
+  writeLockDocuments,
   getConcurrencyCollection,
-  deleteMeadowlarkIdOnConcurrencyCollection,
+  removeDocumentLocks,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
@@ -145,7 +145,7 @@ export async function upsertDocumentTransaction(
   }));
   concurrencyDocuments.push({ meadowlarkId, documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
@@ -155,7 +155,7 @@ export async function upsertDocumentTransaction(
     asUpsert(session),
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
 
   if (!acknowledged) {
     const msg =

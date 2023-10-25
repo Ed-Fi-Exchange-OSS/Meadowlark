@@ -14,9 +14,9 @@ import {
   getDocumentCollection,
   limitFive,
   onlyReturnTimestamps,
-  insertMeadowlarkIdOnConcurrencyCollection,
+  writeLockDocuments,
   getConcurrencyCollection,
-  deleteMeadowlarkIdOnConcurrencyCollection,
+  removeDocumentLocks,
 } from './Db';
 import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
@@ -164,7 +164,7 @@ async function updateAllowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
 
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
@@ -174,7 +174,7 @@ async function updateAllowingIdentityChange(
     session,
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
 
   if (tryUpdateByReplacementResult != null) {
     return tryUpdateByReplacementResult;
@@ -262,7 +262,7 @@ async function updateDisallowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await insertMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -271,7 +271,7 @@ async function updateDisallowingIdentityChange(
     session,
   );
 
-  await deleteMeadowlarkIdOnConcurrencyCollection(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 
