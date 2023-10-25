@@ -134,8 +134,9 @@ export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, s
 export async function writeLockDocuments(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
+  session: ClientSession,
 ): Promise<void> {
-  await concurrencyCollection.insertMany(concurrencyDocuments);
+  await concurrencyCollection.insertMany(concurrencyDocuments, { session });
 }
 
 /**
@@ -144,24 +145,28 @@ export async function writeLockDocuments(
 export async function removeDocumentLocks(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
+  session: ClientSession,
 ): Promise<void> {
   const meadowlarkIds: MeadowlarkId[] = concurrencyDocuments
     .map((document: ConcurrencyDocument) => document.meadowlarkId)
     .filter((meadowlarkId: MeadowlarkId | null) => meadowlarkId != null) as MeadowlarkId[];
   const documentUuids: DocumentUuid[] = concurrencyDocuments.map((document) => document.documentUuid);
 
-  await concurrencyCollection.deleteMany({
-    $and: [
-      {
-        meadowlarkId: {
-          $in: meadowlarkIds,
+  await concurrencyCollection.deleteMany(
+    {
+      $and: [
+        {
+          meadowlarkId: {
+            $in: meadowlarkIds,
+          },
         },
-      },
-      {
-        documentUuid: {
-          $in: documentUuids,
+        {
+          documentUuid: {
+            $in: documentUuids,
+          },
         },
-      },
-    ],
-  });
+      ],
+    },
+    { session },
+  );
 }

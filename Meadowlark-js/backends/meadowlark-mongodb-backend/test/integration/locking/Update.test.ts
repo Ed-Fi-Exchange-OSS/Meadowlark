@@ -24,7 +24,7 @@ import {
   getDocumentCollection,
   getNewClient,
   onlyReturnId,
-  insertMeadowlarkIdOnConcurrencyCollection,
+  writeLockDocuments,
 } from '../../../src/repository/Db';
 import {
   validateReferences,
@@ -199,7 +199,7 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: schoolMeadowlarkId, documentUuid: schoolDocument.documentUuid });
 
-    await insertMeadowlarkIdOnConcurrencyCollection(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek);
+    await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
 
     // ----
     // End transaction to insert the AcademicWeek document
@@ -214,15 +214,17 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
 
     // Try updating the School document - should fail thanks to the conflict in concurrency collection
     try {
-      await insertMeadowlarkIdOnConcurrencyCollection(mongoConcurrencyCollection, concurrencyDocumentsSchool);
+      await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, updateSession);
 
       schoolDocument.edfiDoc.nameOfInstitution = 'A School 124';
 
       await mongoDocumentCollection.replaceOne({ _id: schoolMeadowlarkId }, schoolDocument, asUpsert(updateSession));
     } catch (e) {
-      expect(e.message).toContain('E11000 duplicate key error collection');
+      expect(e.message).toContain(
+        'WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.',
+      );
       expect(e.name).toBe('MongoBulkWriteError');
-      expect(e.code).toBe(11000);
+      expect(e.code).toBe(112);
     }
 
     // ----

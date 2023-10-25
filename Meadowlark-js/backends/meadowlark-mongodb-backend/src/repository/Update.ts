@@ -164,7 +164,7 @@ async function updateAllowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
@@ -174,7 +174,7 @@ async function updateAllowingIdentityChange(
     session,
   );
 
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (tryUpdateByReplacementResult != null) {
     return tryUpdateByReplacementResult;
@@ -262,7 +262,7 @@ async function updateDisallowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -271,7 +271,7 @@ async function updateDisallowingIdentityChange(
     session,
   );
 
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 
@@ -426,8 +426,7 @@ export async function updateDocumentByDocumentUuid(
     Logger.error(`${moduleName}.updateDocumentByDocumentUuid`, traceId, e);
     await session.abortTransaction();
 
-    // Codes 11000 and 11001 are both Duplicate Key Error
-    if (e.code === 11000 || e.code === 11001) {
+    if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPDATE_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources.',

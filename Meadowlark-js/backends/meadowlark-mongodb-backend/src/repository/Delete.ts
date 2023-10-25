@@ -109,22 +109,11 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     },
   ];
 
-  try {
-    await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
-  } catch (e) {
-    // Codes 11000 and 11001 are both Duplicate Key Error
-    if (e.code === 11000 || e.code === 11001) {
-      return {
-        response: 'DELETE_FAILURE_WRITE_CONFLICT',
-        failureMessage: 'Write conflict due to concurrent access to this or related resources',
-      };
-    }
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
-    throw e;
-  }
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
 
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (!acknowledged) {
     const msg =
@@ -180,20 +169,16 @@ export async function deleteDocumentByDocumentUuid(
     );
   } catch (e) {
     Logger.error(`${moduleName}.deleteDocumentByDocumentUuid`, deleteRequest.traceId, e);
+    await session.abortTransaction();
 
-    let response: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-
-    // Codes 11000 and 11001 are both Duplicate Key Error
-    if (e.code === 11000 || e.code === 11001) {
-      response = {
+    if (e.codeName === 'WriteConflict') {
+      return {
         response: 'DELETE_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources',
       };
     }
 
-    await session.abortTransaction();
-
-    return response;
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }

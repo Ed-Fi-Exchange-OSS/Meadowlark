@@ -145,9 +145,10 @@ export async function upsertDocumentTransaction(
   }));
   concurrencyDocuments.push({ meadowlarkId, documentUuid });
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments);
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
+
+  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const { acknowledged, upsertedCount, modifiedCount } = await mongoCollection.replaceOne(
     { _id: meadowlarkId },
@@ -155,7 +156,7 @@ export async function upsertDocumentTransaction(
     asUpsert(session),
   );
 
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments);
+  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (!acknowledged) {
     const msg =
@@ -213,8 +214,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
     await session.abortTransaction();
 
-    // Codes 11000 and 11001 are both Duplicate Key Error
-    if (e.code === 11000 || e.code === 11001) {
+    if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPSERT_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources',
