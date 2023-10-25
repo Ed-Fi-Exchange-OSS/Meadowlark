@@ -324,16 +324,21 @@ describe('When performing crud operations with extraneous elements with allow ov
     extraneousElement2: 'extraneousElement2',
   };
   let resourceBodyWithExtraneousElementsUpdate;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return Environment.getBooleanFromEnvironment(key);
+    });
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
   describe('when creating a new resource', () => {
     beforeAll(async () => {
-      jest.clearAllMocks();
-      jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-        if (key === 'ALLOW_OVERPOSTING') {
-          return true;
-        }
-        return Environment.getBooleanFromEnvironment(key);
-      });
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -344,7 +349,6 @@ describe('When performing crud operations with extraneous elements with allow ov
     });
 
     afterAll(async () => {
-      jest.restoreAllMocks();
       await rootURLRequest()
         .delete(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' });
@@ -357,17 +361,6 @@ describe('When performing crud operations with extraneous elements with allow ov
 
   describe('when getting an inserted resource', () => {
     beforeAll(async () => {
-      jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
-        jest.clearAllMocks();
-        jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-          if (key === 'ALLOW_OVERPOSTING') {
-            return true;
-          }
-          return Environment.getBooleanFromEnvironment(key);
-        });
-        // Fall back to the original implementation for other cases
-        return Environment.getBooleanFromEnvironment(key);
-      });
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -383,7 +376,6 @@ describe('When performing crud operations with extraneous elements with allow ov
         });
     });
     afterAll(async () => {
-      jest.restoreAllMocks();
       await rootURLRequest()
         .delete(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' });
@@ -401,13 +393,6 @@ describe('When performing crud operations with extraneous elements with allow ov
   describe('when updating a resource', () => {
     let resourceLocation;
     beforeAll(async () => {
-      jest.clearAllMocks();
-      jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-        if (key === 'ALLOW_OVERPOSTING') {
-          return true;
-        }
-        return Environment.getBooleanFromEnvironment(key);
-      });
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -435,7 +420,6 @@ describe('When performing crud operations with extraneous elements with allow ov
     });
 
     afterAll(async () => {
-      jest.restoreAllMocks();
       await rootURLRequest()
         .delete(resourceLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' });
@@ -463,16 +447,22 @@ describe('When performing crud operations with extraneous elements with allow ov
   };
   let resourceBodyWithExtraneousElementsUpdate;
 
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return Environment.getBooleanFromEnvironment(key);
+    });
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe('when creating a new resource', () => {
     beforeAll(async () => {
-      jest.resetModules();
-      jest.clearAllMocks();
-      jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-        if (key === 'ALLOW_OVERPOSTING') {
-          return false;
-        }
-        return Environment.getBooleanFromEnvironment(key);
-      });
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -483,7 +473,6 @@ describe('When performing crud operations with extraneous elements with allow ov
     });
 
     afterAll(async () => {
-      jest.restoreAllMocks();
       await rootURLRequest()
         .delete(resourceResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' });
@@ -496,13 +485,6 @@ describe('When performing crud operations with extraneous elements with allow ov
   describe('when updating a resource', () => {
     let resourceLocation;
     beforeAll(async () => {
-      jest.clearAllMocks();
-      jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-        if (key === 'ALLOW_OVERPOSTING') {
-          return false;
-        }
-        return Environment.getBooleanFromEnvironment(key);
-      });
       await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
@@ -529,7 +511,6 @@ describe('When performing crud operations with extraneous elements with allow ov
     });
 
     afterAll(async () => {
-      jest.restoreAllMocks();
       await rootURLRequest()
         .delete(resourceLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' });
