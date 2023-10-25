@@ -493,9 +493,12 @@ describe('given an upsert of a new document with one existing and one non-existe
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "documentKey": "natural",
+                  "documentValue": "not a valid reference",
+                },
+              ],
               "resourceName": "School",
             },
           ],
@@ -886,9 +889,12 @@ describe('given an update of a document with one existing and one non-existent r
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "documentKey": "natural",
+                  "documentValue": "not a valid reference",
+                },
+              ],
               "resourceName": "School",
             },
           ],
