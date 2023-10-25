@@ -10,14 +10,7 @@ import { DeleteResult, DeleteRequest, ReferringDocumentInfo, DocumentUuid, Trace
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import {
-  removeDocumentLocks,
-  getConcurrencyCollection,
-  getDocumentCollection,
-  writeLockDocuments,
-  limitFive,
-  onlyReturnId,
-} from './Db';
+import { getConcurrencyCollection, getDocumentCollection, lockDocuments, limitFive, onlyReturnId } from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
 import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
@@ -109,11 +102,9 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     },
   ];
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
-
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (!acknowledged) {
     const msg =

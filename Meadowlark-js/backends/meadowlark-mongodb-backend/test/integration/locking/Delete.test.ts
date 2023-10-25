@@ -23,7 +23,7 @@ import {
   getConcurrencyCollection,
   getDocumentCollection,
   getNewClient,
-  writeLockDocuments,
+  lockDocuments,
   onlyReturnId,
 } from '../../../src/repository/Db';
 import {
@@ -199,7 +199,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: schoolMeadowlarkId, documentUuid: schoolDocument.documentUuid });
 
-    await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
+    await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
 
     // ----
     // End transaction to insert the AcademicWeek document
@@ -214,7 +214,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
     try {
-      await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, deleteSession);
+      await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, deleteSession);
 
       await mongoDocumentCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
     } catch (e) {

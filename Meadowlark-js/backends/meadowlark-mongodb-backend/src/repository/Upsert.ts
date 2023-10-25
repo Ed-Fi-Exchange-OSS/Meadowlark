@@ -23,9 +23,8 @@ import {
   limitFive,
   getDocumentCollection,
   onlyReturnDocumentUuidAndTimestamps,
-  writeLockDocuments,
+  lockDocuments,
   getConcurrencyCollection,
-  removeDocumentLocks,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
@@ -148,15 +147,13 @@ export async function upsertDocumentTransaction(
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const { acknowledged, upsertedCount, modifiedCount } = await mongoCollection.replaceOne(
     { _id: meadowlarkId },
     document,
     asUpsert(session),
   );
-
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (!acknowledged) {
     const msg =

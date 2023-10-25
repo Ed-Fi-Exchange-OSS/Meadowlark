@@ -24,7 +24,7 @@ import {
   getDocumentCollection,
   getNewClient,
   onlyReturnId,
-  writeLockDocuments,
+  lockDocuments,
 } from '../../../src/repository/Db';
 import {
   validateReferences,
@@ -199,7 +199,7 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
     concurrencyDocumentsAcademicWeek.push({ meadowlarkId: schoolMeadowlarkId, documentUuid: schoolDocument.documentUuid });
 
-    await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
+    await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
 
     // ----
     // End transaction to insert the AcademicWeek document
@@ -214,7 +214,7 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
 
     // Try updating the School document - should fail thanks to the conflict in concurrency collection
     try {
-      await writeLockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, updateSession);
+      await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, updateSession);
 
       schoolDocument.edfiDoc.nameOfInstitution = 'A School 124';
 

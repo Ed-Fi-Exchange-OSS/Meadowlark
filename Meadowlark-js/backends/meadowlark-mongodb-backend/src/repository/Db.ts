@@ -131,22 +131,13 @@ export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, s
 /**
  * Lock in-use meadowlark documents, both those being directly updated and those being referenced.
  */
-export async function writeLockDocuments(
+export async function lockDocuments(
   concurrencyCollection: Collection<ConcurrencyDocument>,
   concurrencyDocuments: ConcurrencyDocument[],
   session: ClientSession,
 ): Promise<void> {
   await concurrencyCollection.insertMany(concurrencyDocuments, { session });
-}
 
-/**
- * Remove the locks on in-use meadowlark documents, both those being directly updated and those being referenced.
- */
-export async function removeDocumentLocks(
-  concurrencyCollection: Collection<ConcurrencyDocument>,
-  concurrencyDocuments: ConcurrencyDocument[],
-  session: ClientSession,
-): Promise<void> {
   const meadowlarkIds: MeadowlarkId[] = concurrencyDocuments
     .map((document: ConcurrencyDocument) => document.meadowlarkId)
     .filter((meadowlarkId: MeadowlarkId | null) => meadowlarkId != null) as MeadowlarkId[];

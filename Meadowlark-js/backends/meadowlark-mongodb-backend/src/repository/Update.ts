@@ -10,14 +10,7 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import {
-  getDocumentCollection,
-  limitFive,
-  onlyReturnTimestamps,
-  writeLockDocuments,
-  getConcurrencyCollection,
-  removeDocumentLocks,
-} from './Db';
+import { getDocumentCollection, limitFive, onlyReturnTimestamps, lockDocuments, getConcurrencyCollection } from './Db';
 import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { upsertDocumentTransaction } from './Upsert';
@@ -164,7 +157,7 @@ async function updateAllowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
@@ -173,8 +166,6 @@ async function updateAllowingIdentityChange(
     mongoCollection,
     session,
   );
-
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (tryUpdateByReplacementResult != null) {
     return tryUpdateByReplacementResult;
@@ -262,7 +253,7 @@ async function updateDisallowingIdentityChange(
   }));
   concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
 
-  await writeLockDocuments(concurrencyCollection, concurrencyDocuments, session);
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -270,8 +261,6 @@ async function updateDisallowingIdentityChange(
     mongoCollection,
     session,
   );
-
-  await removeDocumentLocks(concurrencyCollection, concurrencyDocuments, session);
 
   if (tryUpdateByReplacementResult != null) return tryUpdateByReplacementResult;
 
