@@ -51,3 +51,46 @@ describe('when lockDocuments is called with a given number of documents', () => 
     await client.close();
   });
 });
+
+describe('when lockDocuments is called with a given number of documents with meadowlarkId equal to null', () => {
+  let client;
+  let session;
+
+  beforeAll(async () => {
+    await setupConfigForIntegration();
+    client = (await getNewClient()) as MongoClient;
+    session = client.startSession();
+
+    const concurrencyDocuments: ConcurrencyDocument[] = [
+      {
+        meadowlarkId: null,
+        documentUuid: '123' as DocumentUuid,
+      },
+      {
+        meadowlarkId: null,
+        documentUuid: '456' as DocumentUuid,
+      },
+    ];
+
+    await lockDocuments(getConcurrencyCollection(client), concurrencyDocuments, session);
+  });
+
+  it('concurrencyCollection should be empty after the function is called', async () => {
+    const documents = await getConcurrencyCollection(client).countDocuments({
+      $and: [
+        {
+          meadowlarkId: {
+            $in: ['123', '456'],
+          },
+        },
+      ],
+    });
+
+    expect(documents).toBe(0);
+  });
+
+  afterAll(async () => {
+    session.endSession();
+    await client.close();
+  });
+});
