@@ -221,7 +221,8 @@ describe('given the delete of a document referenced by an existing document with
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: referencedMeadowlarkId });
-    expect(result.documentIdentity.natural).toBe('delete5');
+    expect(result.documentIdentity[0].documentKey).toBe('natural');
+    expect(result.documentIdentity[0].documentValue).toBe('delete5');
   });
 });
 
@@ -511,6 +512,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: referencedMeadowlarkId });
-    expect(result.documentIdentity.schoolId).toBe('123');
+    expect(result.documentIdentity[0].documentKey).toBe('schoolId');
+    expect(result.documentIdentity[0].documentValue).toBe('123');
   });
 });

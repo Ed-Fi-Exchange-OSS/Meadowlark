@@ -243,6 +243,13 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
   it('should have still have the School document in the db - a success', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: schoolMeadowlarkId });
-    expect(result.documentIdentity.schoolId).toBe('123');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "schoolId",
+          "documentValue": "123",
+        },
+      ]
+    `);
   });
 });

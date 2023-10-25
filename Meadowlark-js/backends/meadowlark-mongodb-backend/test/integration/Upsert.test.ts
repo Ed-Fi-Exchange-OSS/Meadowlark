@@ -556,7 +556,8 @@ describe('given an upsert of a new document that references a non-existent docum
   it('should have inserted the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity.natural).toBe('upsert4');
+    expect(result.documentIdentity[0].documentKey).toBe('natural');
+    expect(result.documentIdentity[0].documentValue).toBe('upsert4');
   });
 });
 
@@ -639,7 +640,8 @@ describe('given an upsert of a new document that references an existing document
   it('should have inserted the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity.natural).toBe('upsert6');
+    expect(result.documentIdentity[0].documentKey).toBe('natural');
+    expect(result.documentIdentity[0].documentValue).toBe('upsert6');
   });
 });
 
@@ -729,9 +731,12 @@ describe('given an upsert of a new document with one existing and one non-existe
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "documentKey": "natural",
+                  "documentValue": "not valid",
+                },
+              ],
               "resourceName": "School",
             },
           ],
@@ -1008,10 +1013,11 @@ describe('given an update of a document that references a non-existent document 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity.natural).toBe('upsert4');
+    expect(result.documentIdentity[0].documentKey).toBe('week');
+    expect(result.documentIdentity[0].documentValue).toBe('upsert4');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
-        "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
+        "QtykK4uDYZK7VOChzZNTfqxhrlznYfnql5kIHg",
       ]
     `);
   });
@@ -1110,10 +1116,11 @@ describe('given an update of a document that references an existing document wit
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesId });
-    expect(result.documentIdentity.natural).toBe('upsert6');
+    expect(result.documentIdentity[0].documentKey).toBe('week');
+    expect(result.documentIdentity[0].documentValue).toBe('upsert6');
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
-        "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
+        "Qw5FvPdKxAXWnGghJNiT2FU22MBPJwl7FpuNdw",
       ]
     `);
   });
@@ -1219,9 +1226,12 @@ describe('given an update of a document with one existing and one non-existent r
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "documentKey": "natural",
+                  "documentValue": "not valid",
+                },
+              ],
               "resourceName": "School",
             },
           ],

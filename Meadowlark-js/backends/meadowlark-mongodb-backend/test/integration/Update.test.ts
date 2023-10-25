@@ -160,7 +160,14 @@ describe('given the update of an existing document', () => {
   it('should have updated the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: meadowlarkId });
-    expect(result.documentIdentity.natural).toBe('update2');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "natural",
+          "documentValue": "update2",
+        },
+      ]
+    `);
     expect(result.edfiDoc.changeToDoc).toBe(true);
   });
 
@@ -226,7 +233,15 @@ describe('given the attempted update of an existing document with a stale reques
   it('should not have updated the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: meadowlarkId });
-    expect(result.documentIdentity.natural).toBe('update2');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "natural",
+          "documentValue": "update2",
+        },
+      ]
+    `);
+
     expect(result.edfiDoc.natural).toBe('key');
   });
 
@@ -313,7 +328,15 @@ describe('given an update of a document that references a non-existent document 
   it('should have updated the document with an invalid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
-    expect(result.documentIdentity.natural).toBe('update4');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "natural",
+          "documentValue": "update4",
+        },
+      ]
+    `);
+
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
@@ -426,7 +449,15 @@ describe('given an update of a document that references an existing document wit
   it('should have updated the document with a valid reference in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: documentWithReferencesMeadowlarkId });
-    expect(result.documentIdentity.natural).toBe('update6');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "natural",
+          "documentValue": "update6",
+        },
+      ]
+    `);
+
     expect(result.outboundRefs).toMatchInlineSnapshot(`
       [
         "Qw5FvPdKxAXWnGghsMh3I61yLFfls4Q949Fk2w",
@@ -544,9 +575,12 @@ describe('given an update of a document with one existing and one non-existent r
       {
         "failures": [
           {
-            "identity": {
-              "natural": "not a valid reference",
-            },
+            "identity": [
+              {
+                "documentKey": "natural",
+                "documentValue": "not valid",
+              },
+            ],
             "resourceName": "School",
           },
         ],
@@ -889,7 +923,14 @@ describe('given the attempted update of an existing document with a stale reques
   it('should not have updated the document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: meadowlarkId });
-    expect(result.documentIdentity.natural).toBe('update2');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+      [
+        {
+          "documentKey": "natural",
+          "documentValue": "update2",
+        },
+      ]
+    `);
     expect(result.edfiDoc.natural).toBe('key');
   });
 
