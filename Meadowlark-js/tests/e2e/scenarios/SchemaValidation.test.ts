@@ -376,6 +376,12 @@ describe('When performing crud operations with extraneous elements with allow ov
         });
     });
 
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(resourceLocation)
+        .auth(await getAccessToken('host'), { type: 'bearer' });
+    });
+
     it('returns 400', () => {
       expect(resourceResponse.statusCode).toBe(400);
     });
