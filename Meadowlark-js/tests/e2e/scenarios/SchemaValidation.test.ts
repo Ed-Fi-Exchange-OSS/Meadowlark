@@ -328,12 +328,6 @@ describe('When performing crud operations with extraneous elements with allow ov
   beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
-    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
-      if (key === 'ALLOW_OVERPOSTING') {
-        return true;
-      }
-      return Environment.getBooleanFromEnvironment(key);
-    });
   });
   afterEach(() => {
     jest.restoreAllMocks();
@@ -351,16 +345,11 @@ describe('When performing crud operations with extraneous elements with allow ov
         });
     });
 
-    afterAll(async () => {
-      await rootURLRequest()
-        .delete(resourceLocation)
-        .auth(await getAccessToken('host'), { type: 'bearer' });
-    });
-
     it('returns 400', () => {
       expect(resourceResponse.statusCode).toBe(400);
     });
   });
+
   describe('when updating a resource', () => {
     beforeAll(async () => {
       await baseURLRequest()
@@ -386,12 +375,6 @@ describe('When performing crud operations with extraneous elements with allow ov
         .then((response) => {
           resourceResponse = response;
         });
-    });
-
-    afterAll(async () => {
-      await rootURLRequest()
-        .delete(resourceLocation)
-        .auth(await getAccessToken('host'), { type: 'bearer' });
     });
 
     it('returns 400', () => {
