@@ -309,6 +309,7 @@ describe('When creating a resource', () => {
 
 describe('When performing crud operations with extraneous elements with allow overposting false', () => {
   let resourceResponse;
+  let resourceLocation;
   const resource = 'contentClassDescriptors';
   const resourceEndpoint = `/v3.3b/ed-fi/${resource}`;
   const resourceBody = {
@@ -346,12 +347,13 @@ describe('When performing crud operations with extraneous elements with allow ov
         .send(resourceBodyWithExtraneousElements)
         .then((response) => {
           resourceResponse = response;
+          resourceLocation = response.headers.location;
         });
     });
 
     afterAll(async () => {
       await rootURLRequest()
-        .delete(resourceResponse.headers.location)
+        .delete(resourceLocation)
         .auth(await getAccessToken('host'), { type: 'bearer' });
     });
 
@@ -360,7 +362,6 @@ describe('When performing crud operations with extraneous elements with allow ov
     });
   });
   describe('when updating a resource', () => {
-    let resourceLocation;
     beforeAll(async () => {
       await baseURLRequest()
         .post(resourceEndpoint)
