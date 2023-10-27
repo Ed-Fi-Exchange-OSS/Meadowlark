@@ -47165,6 +47165,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "academicHonorCategoryDescriptors": {
@@ -47265,6 +47267,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "academicSubjectDescriptors": {
@@ -47365,6 +47369,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "accommodationDescriptors": {
@@ -47465,6 +47471,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "accountTypeDescriptors": {
@@ -47565,6 +47573,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "achievementCategoryDescriptors": {
@@ -47665,6 +47675,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "additionalCreditTypeDescriptors": {
@@ -47765,6 +47777,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "addressTypeDescriptors": {
@@ -47865,6 +47879,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "administrationEnvironmentDescriptors": {
@@ -47965,6 +47981,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "administrativeFundingControlDescriptors": {
@@ -48065,6 +48083,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "ancestryEthnicOriginDescriptors": {
@@ -48165,6 +48185,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentCategoryDescriptors": {
@@ -48265,6 +48287,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentIdentificationSystemDescriptors": {
@@ -48365,6 +48389,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentItemCategoryDescriptors": {
@@ -48465,6 +48491,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentItemResultDescriptors": {
@@ -48565,6 +48593,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentPeriodDescriptors": {
@@ -48665,6 +48695,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assessmentReportingMethodDescriptors": {
@@ -48765,6 +48797,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "assignmentLateStatusDescriptors": {
@@ -48865,6 +48899,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "attemptStatusDescriptors": {
@@ -48965,6 +49001,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "attendanceEventCategoryDescriptors": {
@@ -49065,6 +49103,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "barrierToInternetAccessInResidenceDescriptors": {
@@ -49165,6 +49205,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "behaviorDescriptors": {
@@ -49265,6 +49307,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "calendarEventDescriptors": {
@@ -49365,6 +49409,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "calendarTypeDescriptors": {
@@ -49465,6 +49511,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "careerPathwayDescriptors": {
@@ -49565,6 +49613,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "charterApprovalAgencyTypeDescriptors": {
@@ -49665,6 +49715,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "charterStatusDescriptors": {
@@ -49765,6 +49817,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "citizenshipStatusDescriptors": {
@@ -49865,6 +49919,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "classroomPositionDescriptors": {
@@ -49965,6 +50021,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "cohortScopeDescriptors": {
@@ -50065,6 +50123,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "cohortTypeDescriptors": {
@@ -50165,6 +50225,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "cohortYearTypeDescriptors": {
@@ -50265,6 +50327,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "competencyLevelDescriptors": {
@@ -50365,6 +50429,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "contactTypeDescriptors": {
@@ -50465,6 +50531,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "contentClassDescriptors": {
@@ -50565,6 +50633,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "continuationOfServicesReasonDescriptors": {
@@ -50665,6 +50735,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "costRateDescriptors": {
@@ -50765,6 +50837,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "countryDescriptors": {
@@ -50865,6 +50939,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseAttemptResultDescriptors": {
@@ -50965,6 +51041,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseDefinedByDescriptors": {
@@ -51065,6 +51143,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseGPAApplicabilityDescriptors": {
@@ -51165,6 +51245,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseIdentificationSystemDescriptors": {
@@ -51265,6 +51347,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseLevelCharacteristicDescriptors": {
@@ -51365,6 +51449,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "courseRepeatCodeDescriptors": {
@@ -51465,6 +51551,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "credentialFieldDescriptors": {
@@ -51565,6 +51653,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "credentialTypeDescriptors": {
@@ -51665,6 +51755,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "creditCategoryDescriptors": {
@@ -51765,6 +51857,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "creditTypeDescriptors": {
@@ -51865,6 +51959,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "cTEProgramServiceDescriptors": {
@@ -51965,6 +52061,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "curriculumUsedDescriptors": {
@@ -52065,6 +52163,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "deliveryMethodDescriptors": {
@@ -52165,6 +52265,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "diagnosisDescriptors": {
@@ -52265,6 +52367,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "diplomaLevelDescriptors": {
@@ -52365,6 +52469,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "diplomaTypeDescriptors": {
@@ -52465,6 +52571,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disabilityDescriptors": {
@@ -52565,6 +52673,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disabilityDesignationDescriptors": {
@@ -52665,6 +52775,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disabilityDeterminationSourceTypeDescriptors": {
@@ -52765,6 +52877,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disciplineDescriptors": {
@@ -52865,6 +52979,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disciplineActionLengthDifferenceReasonDescriptors": {
@@ -52965,6 +53081,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "disciplineIncidentParticipationCodeDescriptors": {
@@ -53065,6 +53183,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "educationalEnvironmentDescriptors": {
@@ -53165,6 +53285,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "educationOrganizationAssociationTypeDescriptors": {
@@ -53265,6 +53387,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "educationOrganizationCategoryDescriptors": {
@@ -53365,6 +53489,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "educationOrganizationIdentificationSystemDescriptors": {
@@ -53465,6 +53591,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "educationPlanDescriptors": {
@@ -53565,6 +53693,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "electronicMailTypeDescriptors": {
@@ -53665,6 +53795,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "eligibilityDelayReasonDescriptors": {
@@ -53765,6 +53897,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "eligibilityEvaluationTypeDescriptors": {
@@ -53865,6 +53999,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "employmentStatusDescriptors": {
@@ -53965,6 +54101,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "enrollmentTypeDescriptors": {
@@ -54065,6 +54203,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "entryGradeLevelReasonDescriptors": {
@@ -54165,6 +54305,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "entryTypeDescriptors": {
@@ -54265,6 +54407,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "evaluationDelayReasonDescriptors": {
@@ -54365,6 +54509,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "eventCircumstanceDescriptors": {
@@ -54465,6 +54611,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "exitWithdrawTypeDescriptors": {
@@ -54565,6 +54713,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "financialCollectionDescriptors": {
@@ -54665,6 +54815,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gradebookEntryTypeDescriptors": {
@@ -54765,6 +54917,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gradeLevelDescriptors": {
@@ -54865,6 +55019,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gradePointAverageTypeDescriptors": {
@@ -54965,6 +55121,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gradeTypeDescriptors": {
@@ -55065,6 +55223,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gradingPeriodDescriptors": {
@@ -55165,6 +55325,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "graduationPlanTypeDescriptors": {
@@ -55265,6 +55427,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "gunFreeSchoolsActReportingStatusDescriptors": {
@@ -55365,6 +55529,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "homelessPrimaryNighttimeResidenceDescriptors": {
@@ -55465,6 +55631,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "homelessProgramServiceDescriptors": {
@@ -55565,6 +55733,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "iDEAPartDescriptors": {
@@ -55665,6 +55835,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "identificationDocumentUseDescriptors": {
@@ -55765,6 +55937,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "incidentLocationDescriptors": {
@@ -55865,6 +56039,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "indicatorDescriptors": {
@@ -55965,6 +56141,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "indicatorGroupDescriptors": {
@@ -56065,6 +56243,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "indicatorLevelDescriptors": {
@@ -56165,6 +56345,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "institutionTelephoneNumberTypeDescriptors": {
@@ -56265,6 +56447,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "interactivityStyleDescriptors": {
@@ -56365,6 +56549,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "internetAccessDescriptors": {
@@ -56465,6 +56651,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "internetAccessTypeInResidenceDescriptors": {
@@ -56565,6 +56753,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "internetPerformanceInResidenceDescriptors": {
@@ -56665,6 +56855,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "interventionClassDescriptors": {
@@ -56765,6 +56957,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "interventionEffectivenessRatingDescriptors": {
@@ -56865,6 +57059,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "languageDescriptors": {
@@ -56965,6 +57161,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "languageInstructionProgramServiceDescriptors": {
@@ -57065,6 +57263,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "languageUseDescriptors": {
@@ -57165,6 +57365,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "learningStandardCategoryDescriptors": {
@@ -57265,6 +57467,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "learningStandardEquivalenceStrengthDescriptors": {
@@ -57365,6 +57569,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "learningStandardScopeDescriptors": {
@@ -57465,6 +57671,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "levelOfEducationDescriptors": {
@@ -57565,6 +57773,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "licenseStatusDescriptors": {
@@ -57665,6 +57875,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "licenseTypeDescriptors": {
@@ -57765,6 +57977,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "limitedEnglishProficiencyDescriptors": {
@@ -57865,6 +58079,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "localeDescriptors": {
@@ -57965,6 +58181,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "localEducationAgencyCategoryDescriptors": {
@@ -58065,6 +58283,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "magnetSpecialProgramEmphasisSchoolDescriptors": {
@@ -58165,6 +58385,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "mediumOfInstructionDescriptors": {
@@ -58265,6 +58487,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "methodCreditEarnedDescriptors": {
@@ -58365,6 +58589,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "migrantEducationProgramServiceDescriptors": {
@@ -58465,6 +58691,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "modelEntityDescriptors": {
@@ -58565,6 +58793,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "monitoredDescriptors": {
@@ -58665,6 +58895,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "neglectedOrDelinquentProgramDescriptors": {
@@ -58765,6 +58997,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "neglectedOrDelinquentProgramServiceDescriptors": {
@@ -58865,6 +59099,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "networkPurposeDescriptors": {
@@ -58965,6 +59201,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "operationalStatusDescriptors": {
@@ -59065,6 +59303,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "otherNameTypeDescriptors": {
@@ -59165,6 +59405,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "participationDescriptors": {
@@ -59265,6 +59507,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "participationStatusDescriptors": {
@@ -59365,6 +59609,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "performanceBaseConversionDescriptors": {
@@ -59465,6 +59711,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "performanceLevelDescriptors": {
@@ -59565,6 +59813,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "personalInformationVerificationDescriptors": {
@@ -59665,6 +59915,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "platformTypeDescriptors": {
@@ -59765,6 +60017,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "populationServedDescriptors": {
@@ -59865,6 +60119,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "postingResultDescriptors": {
@@ -59965,6 +60221,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "postSecondaryEventCategoryDescriptors": {
@@ -60065,6 +60323,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "postSecondaryInstitutionLevelDescriptors": {
@@ -60165,6 +60425,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "primaryLearningDeviceAccessDescriptors": {
@@ -60265,6 +60527,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "primaryLearningDeviceAwayFromSchoolDescriptors": {
@@ -60365,6 +60629,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "primaryLearningDeviceProviderDescriptors": {
@@ -60465,6 +60731,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "proficiencyDescriptors": {
@@ -60565,6 +60833,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "programAssignmentDescriptors": {
@@ -60665,6 +60935,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "programCharacteristicDescriptors": {
@@ -60765,6 +61037,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "programSponsorDescriptors": {
@@ -60865,6 +61139,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "programTypeDescriptors": {
@@ -60965,6 +61241,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "progressDescriptors": {
@@ -61065,6 +61343,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "progressLevelDescriptors": {
@@ -61165,6 +61445,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "providerCategoryDescriptors": {
@@ -61265,6 +61547,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "providerProfitabilityDescriptors": {
@@ -61365,6 +61649,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "providerStatusDescriptors": {
@@ -61465,6 +61751,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "publicationStatusDescriptors": {
@@ -61565,6 +61853,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "questionFormDescriptors": {
@@ -61665,6 +61955,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "raceDescriptors": {
@@ -61765,6 +62057,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "reasonExitedDescriptors": {
@@ -61865,6 +62159,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "reasonNotTestedDescriptors": {
@@ -61965,6 +62261,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "recognitionTypeDescriptors": {
@@ -62065,6 +62363,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "relationDescriptors": {
@@ -62165,6 +62465,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "repeatIdentifierDescriptors": {
@@ -62265,6 +62567,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "reporterDescriptionDescriptors": {
@@ -62365,6 +62669,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "reportingTagDescriptors": {
@@ -62465,6 +62771,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "residencyStatusDescriptors": {
@@ -62565,6 +62873,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "responseIndicatorDescriptors": {
@@ -62665,6 +62975,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "responsibilityDescriptors": {
@@ -62765,6 +63077,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "restraintEventReasonDescriptors": {
@@ -62865,6 +63179,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "resultDatatypeTypeDescriptors": {
@@ -62965,6 +63281,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "retestIndicatorDescriptors": {
@@ -63065,6 +63383,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "schoolCategoryDescriptors": {
@@ -63165,6 +63485,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "schoolChoiceBasisDescriptors": {
@@ -63265,6 +63587,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "schoolChoiceImplementStatusDescriptors": {
@@ -63365,6 +63689,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "schoolFoodServiceProgramServiceDescriptors": {
@@ -63465,6 +63791,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "schoolTypeDescriptors": {
@@ -63565,6 +63893,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "sectionCharacteristicDescriptors": {
@@ -63665,6 +63995,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "separationDescriptors": {
@@ -63765,6 +64097,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "separationReasonDescriptors": {
@@ -63865,6 +64199,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "serviceDescriptors": {
@@ -63965,6 +64301,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "sexDescriptors": {
@@ -64065,6 +64403,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "sourceSystemDescriptors": {
@@ -64165,6 +64505,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "specialEducationProgramServiceDescriptors": {
@@ -64265,6 +64607,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "specialEducationSettingDescriptors": {
@@ -64365,6 +64709,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "staffClassificationDescriptors": {
@@ -64465,6 +64811,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "staffIdentificationSystemDescriptors": {
@@ -64565,6 +64913,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "staffLeaveEventCategoryDescriptors": {
@@ -64665,6 +65015,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "stateAbbreviationDescriptors": {
@@ -64765,6 +65117,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "studentCharacteristicDescriptors": {
@@ -64865,6 +65219,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "studentIdentificationSystemDescriptors": {
@@ -64965,6 +65321,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "studentParticipationCodeDescriptors": {
@@ -65065,6 +65423,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "submissionStatusDescriptors": {
@@ -65165,6 +65525,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "surveyCategoryDescriptors": {
@@ -65265,6 +65627,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "surveyLevelDescriptors": {
@@ -65365,6 +65729,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "teachingCredentialDescriptors": {
@@ -65465,6 +65831,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "teachingCredentialBasisDescriptors": {
@@ -65565,6 +65933,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "technicalSkillsAssessmentDescriptors": {
@@ -65665,6 +66035,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "telephoneNumberTypeDescriptors": {
@@ -65765,6 +66137,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "termDescriptors": {
@@ -65865,6 +66239,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "titleIPartAParticipantDescriptors": {
@@ -65965,6 +66341,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "titleIPartAProgramServiceDescriptors": {
@@ -66065,6 +66443,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "titleIPartASchoolDesignationDescriptors": {
@@ -66165,6 +66545,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "tribalAffiliationDescriptors": {
@@ -66265,6 +66647,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "visaDescriptors": {
@@ -66365,6 +66749,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "weaponDescriptors": {
@@ -66465,6 +66851,8 @@
           },
           "equalityConstraints": [],
           "identityFullnames": [],
+          "documentPathsMapping": {},
+          "identityPathOrder": [],
           "isSubclass": false
         },
         "communityOrganizations": {
@@ -67994,6 +68382,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "communityOrganizationId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -69697,6 +70088,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "communityProviderId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -71257,6 +71651,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "educationOrganizationNetworkId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -72842,6 +73239,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "educationServiceCenterId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -74954,6 +75354,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "localEducationAgencyId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -76563,6 +76966,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "organizationDepartmentId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -78211,6 +78617,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "postSecondaryInstitutionId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -80152,6 +80561,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "schoolId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -81887,6 +82299,9 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "stateEducationAgencyId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "EducationOrganization",
@@ -82635,6 +83050,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -83354,6 +83776,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -84241,6 +84670,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -85111,6 +85547,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -85836,6 +86279,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -86489,6 +86939,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -87163,6 +87620,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -88485,6 +88949,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
@@ -89164,6 +89635,13 @@
               "isReference": false
             }
           },
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ],
           "isSubclass": true,
           "superclassProjectName": "Ed-Fi",
           "superclassResourceName": "GeneralStudentProgramAssociation",
