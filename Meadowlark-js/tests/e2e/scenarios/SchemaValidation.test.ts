@@ -3,8 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config, Environment } from '@edfi/meadowlark-utilities';
 import { getAccessToken } from '../helpers/Credentials';
-import { baseURLRequest } from '../helpers/Shared';
+import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('When creating a resource', () => {
   describe('given a missing property on a required collection', () => {
@@ -302,6 +303,98 @@ describe('When creating a resource', () => {
             }
           `);
         });
+    });
+  });
+});
+
+describe('When performing crud operations with extraneous elements with allow overposting false', () => {
+  let resourceResponse;
+  const resource = 'contentClassDescriptors';
+  const resourceEndpoint = `/v3.3b/ed-fi/${resource}`;
+  const resourceBody = {
+    codeValue: 'Presentation extraneous elements fails',
+    description: 'Presentation extraneous elements fails',
+    shortDescription: 'Presentation extraneous elements fails',
+    namespace: 'uri://ed-fi.org/ContentClassDescriptor',
+  };
+  const resourceBodyWithExtraneousElements = {
+    ...resourceBody,
+    extraneousElement: 'extraneousElement',
+    extraneousElement2: 'extraneousElement2',
+  };
+  let resourceBodyWithExtraneousElementsUpdate;
+
+  beforeEach(() => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return Environment.getBooleanFromEnvironment(key);
+    });
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  describe('when creating a new resource', () => {
+    beforeAll(async () => {
+      await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBodyWithExtraneousElements)
+        .then((response) => {
+          resourceResponse = response;
+        });
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(resourceResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' });
+    });
+
+    it('returns 400', () => {
+      expect(resourceResponse.statusCode).toBe(400);
+    });
+  });
+  describe('when updating a resource', () => {
+    let resourceLocation;
+    beforeAll(async () => {
+      await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody)
+        .then((response) => {
+          resourceBodyWithExtraneousElementsUpdate = {
+            ...resourceBodyWithExtraneousElements,
+            id: response.headers.location.split('/').pop(),
+            shortDescription: 'Presentation extraneous elements 2',
+            extraneousElement: 'extraneousElement',
+            extraneousElement2: 'extraneousElement2',
+            extraneousElement3: 'extraneousElement3',
+          };
+          resourceLocation = response.headers.location;
+        });
+
+      await rootURLRequest()
+        .put(resourceLocation)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBodyWithExtraneousElementsUpdate)
+        .then((response) => {
+          resourceResponse = response;
+        });
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(resourceLocation)
+        .auth(await getAccessToken('host'), { type: 'bearer' });
+    });
+
+    it('returns 400', () => {
+      expect(resourceResponse.statusCode).toBe(400);
     });
   });
 });

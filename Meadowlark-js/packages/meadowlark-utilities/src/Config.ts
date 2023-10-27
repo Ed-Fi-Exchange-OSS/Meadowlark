@@ -21,6 +21,7 @@ export type ConfigKeys =
   | 'OAUTH_HARD_CODED_CREDENTIALS_ENABLED'
   | 'ALLOW_TYPE_COERCION'
   | 'ALLOW__EXT_PROPERTY'
+  | 'ALLOW_OVERPOSTING'
   | 'FASTIFY_NUM_THREADS'
   | 'MEADOWLARK_DATABASE_NAME'
   | 'MONGO_URI'
@@ -151,6 +152,7 @@ export async function initializeConfig(provider: ConfigPlugin) {
 
   set('ALLOW_TYPE_COERCION', await provider.getBool('ALLOW_TYPE_COERCION', false));
   set('ALLOW__EXT_PROPERTY', await provider.getBool('ALLOW__EXT_PROPERTY', false));
+  set('ALLOW_OVERPOSTING', await provider.getBool('ALLOW_OVERPOSTING', false));
   set('FASTIFY_NUM_THREADS', await provider.getInt('FASTIFY_NUM_THREADS', CpuCount));
   set('FASTIFY_PORT', await provider.getInt('FASTIFY_PORT', 3000));
 

@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { Config, Environment } from '@edfi/meadowlark-utilities';
 import { newTopLevelEntity, newEntityProperty, TopLevelEntity } from '@edfi/metaed-core';
 import { validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdValidation';
 
@@ -99,13 +100,23 @@ describe('given query parameters have a valid property', () => {
   });
 });
 
-describe('given query parameters have two invalid properties and a valid one', () => {
+describe('given query parameters with allow overposting is false have two invalid properties and a valid one', () => {
   let validationResult: string[];
 
   beforeAll(() => {
     const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
-
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return false;
+      }
+      return Environment.getBooleanFromEnvironment(key);
+    });
     validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   it('should have two errors', () => {
@@ -118,6 +129,29 @@ describe('given query parameters have two invalid properties and a valid one', (
 
   it('should contain property `two`', () => {
     expect(validationResult).toContain("Student does not include property 'two'");
+  });
+});
+
+describe('given query parameters with allow overposting is true have two extraneous properties and a valid one', () => {
+  let validationResult: string[];
+
+  beforeAll(() => {
+    const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return Environment.getBooleanFromEnvironment(key);
+    });
+    validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+  });
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should not have errors', () => {
+    expect(validationResult).toHaveLength(0);
   });
 });
 
