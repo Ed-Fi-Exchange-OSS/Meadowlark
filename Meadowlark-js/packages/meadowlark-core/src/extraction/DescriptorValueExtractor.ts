@@ -39,6 +39,9 @@ export function extractDescriptorValues(resourceSchema: ResourceSchema, document
       flatten: true,
     });
 
+    // Path can be empty if descriptor reference is optional
+    if (descriptorValues.length === 0) return;
+
     const documentIdentity: DocumentIdentity = descriptorValues.map((descriptorValue) => ({
       documentKey: 'descriptor' as DocumentObjectKey,
       documentValue: descriptorValue,
