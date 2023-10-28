@@ -22,7 +22,6 @@ import {
   MeadowlarkId,
   TraceId,
   DocumentUuid,
-  DocumentObjectKey,
   MetaEdResourceName,
 } from '@edfi/meadowlark-core';
 import { PoolClient } from 'pg';
@@ -60,7 +59,7 @@ const schoolResourceInfo: ResourceInfo = {
 
 const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
+  documentIdentity: [{ schoolId: '123' }],
 };
 const schoolMeadowlarkId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
 
@@ -77,10 +76,7 @@ const academicWeekResourceInfo: ResourceInfo = {
 };
 const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [
-    { documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' },
-    { documentKey: 'weekIdentifier' as DocumentObjectKey, documentValue: '123456' },
-  ],
+  documentIdentity: [{ schoolId: '123' }, { weekIdentifier: '123456' }],
   documentReferences: [referenceToSchool],
 };
 const academicWeekMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -194,8 +190,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
   it('should have still have the School document in the db - a success', async () => {
     const docResult: MeadowlarkDocument = await findDocumentByMeadowlarkId(insertClient, schoolMeadowlarkId);
-    expect(docResult.document_identity[0].documentKey).toBe('schoolId');
-    expect(docResult.document_identity[0].documentValue).toBe('123');
+    expect(docResult.document_identity[0].schoolId).toBe('123');
   });
 });
 

@@ -60,7 +60,7 @@ export function extractDocumentIdentity(resourceSchema: ResourceSchema, document
     );
     invariant(documentValue != null, `Identity for path ${documentJsonPath} was not found in the document`);
 
-    documentIdentity.push({ documentKey, documentValue });
+    documentIdentity.push({ [documentKey]: documentValue });
   });
 
   invariant(

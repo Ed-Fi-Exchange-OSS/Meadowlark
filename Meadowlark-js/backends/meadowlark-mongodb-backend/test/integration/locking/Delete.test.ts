@@ -16,7 +16,6 @@ import {
   DocumentUuid,
   TraceId,
   MetaEdResourceName,
-  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
@@ -67,7 +66,7 @@ const schoolResourceInfo: ResourceInfo = {
 
 const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
+  documentIdentity: [{ schoolId: '123' }],
 };
 
 const schoolMeadowlarkId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
@@ -107,10 +106,7 @@ const academicWeekResourceInfo: ResourceInfo = {
 };
 const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: [
-    { documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' },
-    { documentKey: 'weekIdentifier' as DocumentObjectKey, documentValue: '123456' },
-  ],
+  documentIdentity: [{ schoolId: '123' }, { weekIdentifier: '123456' }],
   documentReferences: [referenceToSchool],
 };
 const academicWeekMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -246,8 +242,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     expect(result.documentIdentity).toMatchInlineSnapshot(`
       [
         {
-          "documentKey": "schoolId",
-          "documentValue": "123",
+          "schoolId": "123",
         },
       ]
     `);

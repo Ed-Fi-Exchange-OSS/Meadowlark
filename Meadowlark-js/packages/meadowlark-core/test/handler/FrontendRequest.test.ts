@@ -9,7 +9,6 @@ import {
   newFrontendRequestMiddleware,
   removeReferencesDocumentIdentity,
 } from '../../src/handler/FrontendRequest';
-import { DocumentObjectKey } from '../../src/model/api-schema/DocumentObjectKey';
 import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
 import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
 
@@ -18,12 +17,10 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     documentInfo: {
-      documentIdentity: [{ documentKey: 'rootIdentity' as DocumentObjectKey, documentValue: 'keyRoot' }],
+      documentIdentity: [{ rootIdentity: 'keyRoot' }],
       documentReferences: [
         {
-          documentIdentity: [
-            { documentKey: 'documentReference' as DocumentObjectKey, documentValue: 'keySensitiveToBeRemoved' },
-          ],
+          documentIdentity: [{ documentReference: 'keySensitiveToBeRemoved' }],
           isDescriptor: false,
           projectName: 'projectName' as MetaEdProjectName,
           resourceName: 'resourceName' as MetaEdResourceName,
@@ -31,14 +28,14 @@ const frontendRequest: FrontendRequest = {
       ],
       descriptorReferences: [
         {
-          documentIdentity: [{ documentKey: 'descriptorReference' as DocumentObjectKey, documentValue: 'keyDescriptor' }],
+          documentIdentity: [{ descriptorReference: 'keyDescriptor' }],
           isDescriptor: true,
           projectName: 'projectName' as MetaEdProjectName,
           resourceName: 'resourceName2' as MetaEdResourceName,
         },
       ],
       superclassInfo: {
-        documentIdentity: [{ documentKey: 'superclassInfo' as DocumentObjectKey, documentValue: 'keySuperclassInfo' }],
+        documentIdentity: [{ superclassInfo: 'keySuperclassInfo' }],
         projectName: 'Test' as MetaEdProjectName,
         resourceName: 'resource' as MetaEdResourceName,
       },

@@ -4,14 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import crypto from 'node:crypto';
+import invariant from 'ts-invariant';
 import { DocumentUuid, MeadowlarkId } from './IdTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
-import { DocumentObjectKey } from './api-schema/DocumentObjectKey';
 
 /**
- * A simple tuple containing the key and corresponding document value that makes up part of a document identity.
+ * A simple tuple containing the DocumentObjectKey and corresponding document value that makes up part of a document identity.
  */
-export type DocumentIdentityElement = { documentKey: DocumentObjectKey; documentValue: any };
+export type DocumentIdentityElement = { [documentObjectKey: string]: any };
 
 /**
  * A DocumentIdentity is an array of key-value pairs that represents the complete identity of an Ed-Fi document.
@@ -41,7 +41,7 @@ function toBase64Url(base64: string): string {
 }
 
 /**
- * Hashes a string with the SHAKE256, returning a Base64Url hash with the specified length given in bytes
+ * Hashes a string with SHAKE256, returning a Base64Url hash with the specified length given in bytes
  */
 function toHash(data: string, lengthInBytes: number): string {
   return toBase64Url(crypto.createHash('shake256', { outputLength: lengthInBytes }).update(data).digest('base64'));
@@ -58,9 +58,20 @@ export function resourceInfoHashFrom({ projectName, resourceName }: BaseResource
  * Returns the 16 byte SHAKE256 Base64Url encoded hash form of a DocumentIdentity.
  */
 function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
-  const documentIdentityString = documentIdentity
-    .map((element: DocumentIdentityElement) => `${element.documentKey}=${element.documentValue}`)
+  const documentIdentityString: string = documentIdentity
+    .map((element: DocumentIdentityElement) => {
+      const documentIdentityElementEntries: [string, any][] = Object.entries(element);
+
+      invariant(
+        documentIdentityElementEntries.length === 1,
+        `DocumentIdentityElement for ${JSON.stringify(documentIdentity)} is invalid, must only have a single entry`,
+      );
+
+      const [documentKey, documentValue] = documentIdentityElementEntries[0];
+      return `${documentKey}=${documentValue}`;
+    })
     .join('#');
+
   return toHash(documentIdentityString, 16);
 }
 

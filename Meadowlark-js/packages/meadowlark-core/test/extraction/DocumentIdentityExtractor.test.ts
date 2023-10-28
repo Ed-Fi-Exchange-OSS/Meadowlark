@@ -80,20 +80,16 @@ describe('when extracting natural key from domain entity referencing another ref
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentKey": "classPeriodName",
-          "documentValue": "z",
+          "classPeriodName": "z",
         },
         {
-          "documentKey": "localCourseCode",
-          "documentValue": "abc",
+          "localCourseCode": "abc",
         },
         {
-          "documentKey": "schoolId",
-          "documentValue": "23",
+          "schoolId": "23",
         },
         {
-          "documentKey": "sectionIdentifier",
-          "documentValue": "Bob",
+          "sectionIdentifier": "Bob",
         },
       ]
     `);
@@ -140,12 +136,10 @@ describe('when extracting natural key from domain entity with school year in ide
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentKey": "schoolYear",
-          "documentValue": 2022,
+          "schoolYear": 2022,
         },
         {
-          "documentKey": "sessionName",
-          "documentValue": "s",
+          "sessionName": "s",
         },
       ]
     `);
@@ -190,8 +184,7 @@ describe('when extracting natural key from domain entity with school year that h
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentKey": "schoolYear",
-          "documentValue": 2022,
+          "schoolYear": 2022,
         },
       ]
     `);
@@ -250,16 +243,13 @@ describe('when extracting document identity with two levels of identities', () =
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentKey": "classPeriodName",
-          "documentValue": "c1",
+          "classPeriodName": "c1",
         },
         {
-          "documentKey": "schoolId",
-          "documentValue": "23",
+          "schoolId": "23",
         },
         {
-          "documentKey": "sessionName",
-          "documentValue": "s1",
+          "sessionName": "s1",
         },
       ]
     `);

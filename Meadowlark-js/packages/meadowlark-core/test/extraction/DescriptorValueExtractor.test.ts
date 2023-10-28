@@ -68,8 +68,7 @@ describe('when extracting single descriptor value from domain entity', () => {
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade",
+              "descriptor": "uri://ed-fi.org/grade",
             },
           ],
           "isDescriptor": true,
@@ -130,8 +129,7 @@ describe('when extracting single descriptor value from common with role name', (
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade",
+              "descriptor": "uri://ed-fi.org/grade",
             },
           ],
           "isDescriptor": true,
@@ -185,8 +183,7 @@ describe('when extracting descriptor values from domain entity with the same nam
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade",
+              "descriptor": "uri://ed-fi.org/grade",
             },
           ],
           "isDescriptor": true,
@@ -249,16 +246,13 @@ describe('when extracting array of descriptor values from domain entity', () => 
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade1",
+              "descriptor": "uri://ed-fi.org/grade1",
             },
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade2",
+              "descriptor": "uri://ed-fi.org/grade2",
             },
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/grade3",
+              "descriptor": "uri://ed-fi.org/grade3",
             },
           ],
           "isDescriptor": true,
@@ -330,8 +324,7 @@ describe('when extracting collection from domain entity subclass with naming col
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/schoolValue",
+              "descriptor": "uri://ed-fi.org/schoolValue",
             },
           ],
           "isDescriptor": true,
@@ -341,8 +334,7 @@ describe('when extracting collection from domain entity subclass with naming col
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/edOrgValue",
+              "descriptor": "uri://ed-fi.org/edOrgValue",
             },
           ],
           "isDescriptor": true,
@@ -410,8 +402,7 @@ describe('when extracting collection from domain entity subclass with no naming 
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/schoolValue",
+              "descriptor": "uri://ed-fi.org/schoolValue",
             },
           ],
           "isDescriptor": true,
@@ -421,8 +412,7 @@ describe('when extracting collection from domain entity subclass with no naming 
         {
           "documentIdentity": [
             {
-              "documentKey": "descriptor",
-              "documentValue": "uri://ed-fi.org/edOrgValue",
+              "descriptor": "uri://ed-fi.org/edOrgValue",
             },
           ],
           "isDescriptor": true,

@@ -18,7 +18,6 @@ import {
   DocumentUuid,
   TraceId,
   MeadowlarkId,
-  DocumentObjectKey,
   MetaEdResourceName,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
@@ -56,7 +55,7 @@ describe('given the get of a non-existent document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get1' }],
+    documentIdentity: [{ natural: 'get1' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const documentUuid = 'ffb6ea15-fa93-4389-89a8-1428fb617490' as DocumentUuid;
@@ -94,7 +93,7 @@ describe('given the get of an existing document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
+    documentIdentity: [{ natural: 'get2' }],
     requestTimestamp: 1000,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);

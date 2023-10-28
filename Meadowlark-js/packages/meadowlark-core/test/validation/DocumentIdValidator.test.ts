@@ -6,7 +6,6 @@
 import { MeadowlarkId } from '../../src/model/IdTypes';
 import { DocumentIdentity, meadowlarkIdForDocumentIdentity, resourceInfoHashFrom } from '../../src/model/DocumentIdentity';
 import { BaseResourceInfo } from '../../src/model/ResourceInfo';
-import { DocumentObjectKey } from '../../src/model/api-schema/DocumentObjectKey';
 import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
 import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
 
@@ -36,7 +35,7 @@ describe('given a valid id', () => {
       resourceName: 'ResourceName' as MetaEdResourceName,
     };
 
-    const validDocumentIdentity: DocumentIdentity = [{ documentKey: 'key' as DocumentObjectKey, documentValue: 'value' }];
+    const validDocumentIdentity: DocumentIdentity = [{ key: 'value' }];
 
     // Act
     id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);
@@ -68,7 +67,7 @@ describe('given a valid id with a mismatched resource info', () => {
       resourceName: 'MismatchedResourceName' as MetaEdResourceName,
     };
 
-    const validDocumentIdentity: DocumentIdentity = [{ documentKey: 'key' as DocumentObjectKey, documentValue: 'value' }];
+    const validDocumentIdentity: DocumentIdentity = [{ key: 'value' }];
 
     // Act
     id = meadowlarkIdForDocumentIdentity(validResourceInfo, validDocumentIdentity);

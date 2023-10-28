@@ -22,7 +22,6 @@ import {
   TraceId,
   UpsertResult,
   MetaEdResourceName,
-  DocumentObjectKey,
   MetaEdProjectName,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
@@ -91,7 +90,7 @@ describe('given the delete of an existing document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete2' }],
+    documentIdentity: [{ natural: 'delete2' }],
   };
 
   beforeAll(async () => {
@@ -143,7 +142,7 @@ describe('given the delete of a document referenced by an existing document with
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete5' }],
+    documentIdentity: [{ natural: 'delete5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -163,7 +162,7 @@ describe('given the delete of a document referenced by an existing document with
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete6' }],
+    documentIdentity: [{ natural: 'delete6' }],
     documentReferences: [validReference],
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -221,8 +220,7 @@ describe('given the delete of a document referenced by an existing document with
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: referencedMeadowlarkId });
-    expect(result.documentIdentity[0].documentKey).toBe('natural');
-    expect(result.documentIdentity[0].documentValue).toBe('delete5');
+    expect(result.documentIdentity[0].natural).toBe('delete5');
   });
 });
 
@@ -238,7 +236,7 @@ describe('given an delete of a document with an outbound reference only, with va
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete15' }],
+    documentIdentity: [{ natural: 'delete15' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -258,7 +256,7 @@ describe('given an delete of a document with an outbound reference only, with va
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete16' }],
+    documentIdentity: [{ natural: 'delete16' }],
     documentReferences: [validReference],
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -331,7 +329,7 @@ describe('given the delete of a document referenced by an existing document with
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete5' }],
+    documentIdentity: [{ natural: 'delete5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -351,7 +349,7 @@ describe('given the delete of a document referenced by an existing document with
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'delete6' }],
+    documentIdentity: [{ natural: 'delete6' }],
     documentReferences: [validReference],
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -426,14 +424,14 @@ describe('given the delete of a subclass document referenced by an existing docu
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: [{ documentKey: 'educationOrganizationId' as DocumentObjectKey, documentValue: '123' }],
+    documentIdentity: [{ educationOrganizationId: '123' }],
     resourceName: 'EducationOrganization' as MetaEdResourceName,
     projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'schoolId' as DocumentObjectKey, documentValue: '123' }],
+    documentIdentity: [{ schoolId: '123' }],
     superclassInfo,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -454,7 +452,7 @@ describe('given the delete of a subclass document referenced by an existing docu
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'week' as DocumentObjectKey, documentValue: 'delete6' }],
+    documentIdentity: [{ week: 'delete6' }],
     documentReferences: [referenceAsSuperclass],
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -512,7 +510,6 @@ describe('given the delete of a subclass document referenced by an existing docu
   it('should still have the referenced document in the db', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: referencedMeadowlarkId });
-    expect(result.documentIdentity[0].documentKey).toBe('schoolId');
-    expect(result.documentIdentity[0].documentValue).toBe('123');
+    expect(result.documentIdentity[0].schoolId).toBe('123');
   });
 });

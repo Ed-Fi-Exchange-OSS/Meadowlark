@@ -19,7 +19,6 @@ import {
   DocumentUuid,
   UpdateRequest,
   MetaEdResourceName,
-  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { Collection, MongoClient } from 'mongodb';
 import { MeadowlarkDocument } from '../../src/model/MeadowlarkDocument';
@@ -67,7 +66,7 @@ describe('given the get of a non-existent document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get1' }],
+    documentIdentity: [{ natural: 'get1' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -105,7 +104,7 @@ describe('given the get of an existing document', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
+    documentIdentity: [{ natural: 'get2' }],
     requestTimestamp: 1683326572053,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
@@ -157,13 +156,13 @@ describe('given the get of an updated document', () => {
   };
   const documentInfo1: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'getUpdatedDocument' }],
+    documentIdentity: [{ natural: 'getUpdatedDocument' }],
     requestTimestamp: 1683326572053,
   };
 
   const documentInfo2: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'getUpdatedDocument' }],
+    documentIdentity: [{ natural: 'getUpdatedDocument' }],
     requestTimestamp: 1683548337342,
   };
 

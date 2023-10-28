@@ -8,18 +8,15 @@ import { DocumentIdentity } from './DocumentIdentity';
 import { DocumentInfo, newDocumentInfo } from './DocumentInfo';
 import { DocumentObjectKey } from './api-schema/DocumentObjectKey';
 
+const schoolYearKey = 'schoolYear' as DocumentObjectKey;
+
 /**
  * Creates a new DocumentIdentity from the given SchoolYearEnumerationDocument
  */
 export function schoolYearEnumerationDocumentIdentityFrom(
   schoolYearEnumerationDocument: SchoolYearEnumerationDocument,
 ): DocumentIdentity {
-  return [
-    {
-      documentKey: 'schoolYear' as DocumentObjectKey,
-      documentValue: schoolYearEnumerationDocument.schoolYear.toString(),
-    },
-  ];
+  return [{ [schoolYearKey]: schoolYearEnumerationDocument.schoolYear.toString() }];
 }
 
 /**

@@ -148,11 +148,9 @@ export function extractDocumentReferences(
 
       const documentIdentity: DocumentIdentity = [];
 
+      // Put the unsorted documentIdentity fields into an ordered DocumentIdentity
       referenceResourceSchema.identityPathOrder.forEach((documentKey: DocumentObjectKey) => {
-        documentIdentity.push({
-          documentKey,
-          documentValue: unsortedDocumentIdentity[documentKey],
-        });
+        documentIdentity.push({ [documentKey]: unsortedDocumentIdentity[documentKey] });
       });
 
       result.push({

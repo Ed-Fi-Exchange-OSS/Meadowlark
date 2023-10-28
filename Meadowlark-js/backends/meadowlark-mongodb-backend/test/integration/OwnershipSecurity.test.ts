@@ -20,7 +20,6 @@ import {
   newFrontendRequestMiddleware,
   newPathComponents,
   MetaEdResourceName,
-  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { MongoClient } from 'mongodb';
 import { getDocumentCollection, getNewClient } from '../../src/repository/Db';
@@ -141,7 +140,7 @@ describe('given the getById of a document owned by the requestor', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
+    documentIdentity: [{ natural: 'get2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -201,7 +200,7 @@ describe('given the getById of a document not owned by the requestor', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'get2' }],
+    documentIdentity: [{ natural: 'get2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
   const upsertRequest: UpsertRequest = {

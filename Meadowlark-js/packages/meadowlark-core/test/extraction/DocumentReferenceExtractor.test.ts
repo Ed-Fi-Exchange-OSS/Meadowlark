@@ -93,12 +93,10 @@ describe('when extracting document references from domain entity referencing one
         {
           "documentIdentity": [
             {
-              "documentKey": "localCourseCode",
-              "documentValue": "abc",
+              "localCourseCode": "abc",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "23",
+              "schoolId": "23",
             },
           ],
           "isDescriptor": false,
@@ -108,12 +106,10 @@ describe('when extracting document references from domain entity referencing one
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "z1",
+              "classPeriodName": "z1",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "24",
+              "schoolId": "24",
             },
           ],
           "isDescriptor": false,
@@ -123,12 +119,10 @@ describe('when extracting document references from domain entity referencing one
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "z2",
+              "classPeriodName": "z2",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "25",
+              "schoolId": "25",
             },
           ],
           "isDescriptor": false,
@@ -183,8 +177,7 @@ describe('when extracting with optional reference in body', () => {
         {
           "documentIdentity": [
             {
-              "documentKey": "localCourseCode",
-              "documentValue": "abc",
+              "localCourseCode": "abc",
             },
           ],
           "isDescriptor": false,
@@ -285,8 +278,7 @@ describe('when extracting with one optional reference in body and one not', () =
         {
           "documentIdentity": [
             {
-              "documentKey": "localCourseCode",
-              "documentValue": "abc",
+              "localCourseCode": "abc",
             },
           ],
           "isDescriptor": false,
@@ -349,8 +341,7 @@ describe('when extracting optional collection in body', () => {
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "z1",
+              "classPeriodName": "z1",
             },
           ],
           "isDescriptor": false,
@@ -360,8 +351,7 @@ describe('when extracting optional collection in body', () => {
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "z2",
+              "classPeriodName": "z2",
             },
           ],
           "isDescriptor": false,
@@ -483,16 +473,13 @@ describe('when extracting document references with two levels of identities on a
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "c1",
+              "classPeriodName": "c1",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "24",
+              "schoolId": "24",
             },
             {
-              "documentKey": "sessionName",
-              "documentValue": "s1",
+              "sessionName": "s1",
             },
           ],
           "isDescriptor": false,
@@ -502,16 +489,13 @@ describe('when extracting document references with two levels of identities on a
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "c2",
+              "classPeriodName": "c2",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "25",
+              "schoolId": "25",
             },
             {
-              "documentKey": "sessionName",
-              "documentValue": "s2",
+              "sessionName": "s2",
             },
           ],
           "isDescriptor": false,
@@ -606,24 +590,19 @@ describe('when extracting document references with three levels of identities on
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "c1",
+              "classPeriodName": "c1",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "24",
+              "schoolId": "24",
             },
             {
-              "documentKey": "secondLevelName",
-              "documentValue": "e1",
+              "secondLevelName": "e1",
             },
             {
-              "documentKey": "sessionName",
-              "documentValue": "s1",
+              "sessionName": "s1",
             },
             {
-              "documentKey": "thirdLevelName",
-              "documentValue": "t1",
+              "thirdLevelName": "t1",
             },
           ],
           "isDescriptor": false,
@@ -633,24 +612,19 @@ describe('when extracting document references with three levels of identities on
         {
           "documentIdentity": [
             {
-              "documentKey": "classPeriodName",
-              "documentValue": "c2",
+              "classPeriodName": "c2",
             },
             {
-              "documentKey": "schoolId",
-              "documentValue": "25",
+              "schoolId": "25",
             },
             {
-              "documentKey": "secondLevelName",
-              "documentValue": "e2",
+              "secondLevelName": "e2",
             },
             {
-              "documentKey": "sessionName",
-              "documentValue": "s2",
+              "sessionName": "s2",
             },
             {
-              "documentKey": "thirdLevelName",
-              "documentValue": "t2",
+              "thirdLevelName": "t2",
             },
           ],
           "isDescriptor": false,
@@ -715,12 +689,10 @@ describe('when extracting with school year reference in body', () => {
         {
           "documentIdentity": [
             {
-              "documentKey": "schoolYear",
-              "documentValue": 2022,
+              "schoolYear": 2022,
             },
             {
-              "documentKey": "sessionName",
-              "documentValue": "def",
+              "sessionName": "def",
             },
           ],
           "isDescriptor": false,
@@ -821,8 +793,7 @@ describe('when extracting with school year reference in body', () => {
 //         {
 //           "documentIdentity": [
 //             {
-//               "documentKey": "studentUniqueId",
-//               "documentValue": "s0zf6d1123d3e",
+//               "natural": "s0zf6d1123d3e",
 //             },
 //           ],
 //           "isDescriptor": false,
@@ -832,8 +803,7 @@ describe('when extracting with school year reference in body', () => {
 //         {
 //           "documentIdentity": [
 //             {
-//               "documentKey": "schoolId",
-//               "documentValue": 123,
+//               "schoolId": 123,
 //             },
 //           ],
 //           "isDescriptor": false,
@@ -843,16 +813,13 @@ describe('when extracting with school year reference in body', () => {
 //         {
 //           "documentIdentity": [
 //             {
-//               "documentKey": "educationOrganizationId",
-//               "documentValue": 123,
+//               "educationOrganizationId": 123,
 //             },
 //             {
-//               "documentKey": "graduationPlanTypeDescriptor",
-//               "documentValue": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
+//               "graduationPlanTypeDescriptor": "uri://ed-fi.org/GraduationPlanTypeDescriptor#Minimum",
 //             },
 //             {
-//               "documentKey": "graduationSchoolYear",
-//               "documentValue": 2024,
+//               "graduationSchoolYear": 2024,
 //             },
 //           ],
 //           "isDescriptor": false,

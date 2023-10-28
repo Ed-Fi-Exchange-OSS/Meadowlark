@@ -12,7 +12,6 @@ import {
   DocumentUuid,
   MetaEdResourceName,
   MetaEdProjectName,
-  DocumentObjectKey,
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../src/model/MeadowlarkDocument';
 
@@ -25,7 +24,7 @@ describe('given non-superclass document info with no references', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key' }],
+    documentIdentity: [{ natural: 'key' }],
   };
 
   const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
@@ -61,8 +60,7 @@ describe('given non-superclass document info with no references', () => {
         "createdBy": "createdBy",
         "documentIdentity": [
           {
-            "documentKey": "natural",
-            "documentValue": "key",
+            "natural": "key",
           },
         ],
         "documentUuid": "3018d452-a7b7-4f1c-aa91-26ccc48cf4b8",
@@ -90,10 +88,10 @@ describe('given non-superclass document info with references', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key' }],
+    documentIdentity: [{ natural: 'key' }],
     documentReferences: [
       {
-        documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key2' }],
+        documentIdentity: [{ natural: 'key2' }],
         isDescriptor: false,
         projectName: 'projectName' as MetaEdProjectName,
         resourceName: 'resourceName' as MetaEdResourceName,
@@ -101,7 +99,7 @@ describe('given non-superclass document info with references', () => {
     ],
     descriptorReferences: [
       {
-        documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key3' }],
+        documentIdentity: [{ natural: 'key3' }],
         isDescriptor: true,
         projectName: 'projectName' as MetaEdProjectName,
         resourceName: 'resourceName2' as MetaEdResourceName,
@@ -149,9 +147,9 @@ describe('given superclass document info', () => {
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key' }],
+    documentIdentity: [{ natural: 'key' }],
     superclassInfo: {
-      documentIdentity: [{ documentKey: 'natural' as DocumentObjectKey, documentValue: 'key2' }],
+      documentIdentity: [{ natural: 'key2' }],
       projectName: 'projectName' as MetaEdProjectName,
       resourceName: 'resourceName' as MetaEdResourceName,
     },

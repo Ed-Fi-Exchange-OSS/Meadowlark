@@ -43,8 +43,7 @@ export function extractDescriptorValues(resourceSchema: ResourceSchema, document
     if (descriptorValues.length === 0) return;
 
     const documentIdentity: DocumentIdentity = descriptorValues.map((descriptorValue) => ({
-      documentKey: 'descriptor' as DocumentObjectKey,
-      documentValue: descriptorValue,
+      descriptor: descriptorValue,
     }));
 
     result.push({
