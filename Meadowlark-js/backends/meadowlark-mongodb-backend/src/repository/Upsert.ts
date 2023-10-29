@@ -138,16 +138,32 @@ export async function upsertDocumentTransaction(
       lastModifiedAt: documentInfo.requestTimestamp,
     });
 
-  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
-    meadowlarkId: reference,
-    documentUuid,
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        $and: [
+          {
+            aliasMeadowlarkIds: {
+              $in: document.outboundRefs,
+            },
+          },
+        ],
+      },
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
+
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
   }));
-  concurrencyDocuments.push({ meadowlarkId, documentUuid });
+  concurrencyDocuments.push({ _id: documentUuid });
+
+  // Inserting the same DocumentUuid in Concurrency Collection will result in a WriteConflict error
+  // By generating this conflict we handle concurrency
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
-
-  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const { acknowledged, upsertedCount, modifiedCount } = await mongoCollection.replaceOne(
     { _id: meadowlarkId },

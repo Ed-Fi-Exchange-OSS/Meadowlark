@@ -5,7 +5,7 @@
 
 import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, FindOptions, ReplaceOptions } from 'mongodb';
 import { Logger, Config } from '@edfi/meadowlark-utilities';
-import type { DocumentUuid, MeadowlarkId } from '@edfi/meadowlark-core';
+import type { DocumentUuid } from '@edfi/meadowlark-core';
 import type { MeadowlarkDocument } from '../model/MeadowlarkDocument';
 import type { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 import type { AuthorizationDocument } from '../model/AuthorizationDocument';
@@ -44,11 +44,11 @@ export async function getNewClient(): Promise<MongoClient> {
       .collection(AUTHORIZATION_COLLECTION_NAME);
     await authorizationCollection.createIndex({ clientName: 1 });
 
-    // Create concurrency collection if not exists
+    // Create concurrency collection if not exists.
     const concurrencyCollection: Collection<ConcurrencyDocument> = newClient
       .db(databaseName)
       .collection(CONCURRENCY_COLLECTION_NAME);
-    await concurrencyCollection.createIndex({ meadowlarkId: 1, documentUuid: 1 }, { unique: true });
+    await concurrencyCollection.createIndex({ _id: 1 });
 
     return newClient;
   } catch (e) {
@@ -138,21 +138,14 @@ export async function lockDocuments(
 ): Promise<void> {
   await concurrencyCollection.insertMany(concurrencyDocuments, { session });
 
-  const meadowlarkIds: MeadowlarkId[] = concurrencyDocuments
-    .map((document: ConcurrencyDocument) => document.meadowlarkId)
-    .filter((meadowlarkId: MeadowlarkId | null) => meadowlarkId != null) as MeadowlarkId[];
-  const documentUuids: DocumentUuid[] = concurrencyDocuments.map((document) => document.documentUuid);
+  // eslint-disable-next-line no-underscore-dangle
+  const documentUuids: DocumentUuid[] = concurrencyDocuments.map((document) => document._id);
 
   await concurrencyCollection.deleteMany(
     {
       $and: [
         {
-          meadowlarkId: {
-            $in: meadowlarkIds,
-          },
-        },
-        {
-          documentUuid: {
+          _id: {
             $in: documentUuids,
           },
         },

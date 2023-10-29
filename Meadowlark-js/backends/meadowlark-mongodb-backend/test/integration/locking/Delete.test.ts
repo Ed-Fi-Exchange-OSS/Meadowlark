@@ -16,7 +16,7 @@ import {
   DocumentUuid,
   TraceId,
 } from '@edfi/meadowlark-core';
-import { ClientSession, Collection, MongoClient } from 'mongodb';
+import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
 import {
   asUpsert,
@@ -196,8 +196,13 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     // Adds the academic week and the, to be updated, school to the concurrency collection.
     const concurrencyDocumentsAcademicWeek: ConcurrencyDocument[] = [];
-    concurrencyDocumentsAcademicWeek.push({ meadowlarkId: academicWeekMeadowlarkId, documentUuid });
-    concurrencyDocumentsAcademicWeek.push({ meadowlarkId: schoolMeadowlarkId, documentUuid: schoolDocument.documentUuid });
+    concurrencyDocumentsAcademicWeek.push({ _id: documentUuid });
+
+    const schoolDocumentUuid: WithId<MeadowlarkDocument> | null = await mongoDocumentCollection.findOne(
+      { _id: schoolMeadowlarkId },
+      { projection: { documentUuid: 1 } },
+    );
+    if (schoolDocumentUuid) concurrencyDocumentsAcademicWeek.push({ _id: schoolDocumentUuid?.documentUuid });
 
     await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsAcademicWeek, upsertSession);
 
@@ -208,8 +213,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
     const concurrencyDocumentsSchool: ConcurrencyDocument[] = [];
     concurrencyDocumentsSchool.push({
-      meadowlarkId: schoolMeadowlarkId,
-      documentUuid: schoolDocument.documentUuid,
+      _id: schoolDocument.documentUuid,
     });
 
     // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
@@ -222,6 +226,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
         'WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.',
       );
       expect(e.name).toBe('MongoBulkWriteError');
+      expect(e.codeName).toBe('WriteConflict');
       expect(e.code).toBe(112);
     }
 

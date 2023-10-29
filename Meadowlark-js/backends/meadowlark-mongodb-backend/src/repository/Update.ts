@@ -151,11 +151,26 @@ async function updateAllowingIdentityChange(
 ): Promise<UpdateResult> {
   const { documentUuid, resourceInfo, traceId, security } = updateRequest;
 
-  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
-    meadowlarkId: reference,
-    documentUuid: updateRequest.documentUuid,
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        $and: [
+          {
+            aliasMeadowlarkIds: {
+              $in: document.outboundRefs,
+            },
+          },
+        ],
+      },
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
+
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
   }));
-  concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
+
+  concurrencyDocuments.push({ _id: updateRequest.documentUuid });
 
   await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
@@ -247,12 +262,29 @@ async function updateDisallowingIdentityChange(
     updateRequest.traceId,
   );
 
-  const concurrencyDocuments: ConcurrencyDocument[] = document.outboundRefs.map((reference) => ({
-    meadowlarkId: reference,
-    documentUuid: updateRequest.documentUuid,
-  }));
-  concurrencyDocuments.push({ meadowlarkId: updateRequest.meadowlarkId, documentUuid: updateRequest.documentUuid });
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        $and: [
+          {
+            aliasMeadowlarkIds: {
+              $in: document.outboundRefs,
+            },
+          },
+        ],
+      },
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
 
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
+  }));
+
+  concurrencyDocuments.push({ _id: updateRequest.documentUuid });
+
+  // Inserting the same DocumentUuid in Concurrency Collection will result in a WriteConflict error
+  // By generating this conflict we handle concurrency
   await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(

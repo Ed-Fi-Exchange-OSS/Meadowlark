@@ -27,6 +27,7 @@ describe('given a transaction on a resource', () => {
       updateMany: jest.fn(),
       findOne: jest.fn(),
       updateOne: updateOneMock,
+      find: jest.fn(() => ({ toArray: (_) => [{ some: 'content' }] })),
     } as any);
 
     jest.spyOn(DB, 'getConcurrencyCollection').mockReturnValue({
