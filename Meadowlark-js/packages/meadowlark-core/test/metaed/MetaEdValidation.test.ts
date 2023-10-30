@@ -3,10 +3,12 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Config, Environment } from '@edfi/meadowlark-utilities';
+import { ValidationError } from '@apideck/better-ajv-errors';
+import { Config, Environment, getBooleanFromEnvironment } from '@edfi/meadowlark-utilities';
 import { newTopLevelEntity, newEntityProperty, TopLevelEntity } from '@edfi/metaed-core';
-import { validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdValidation';
+import { validateEntityBodyAgainstSchema, validateQueryParametersAgainstSchema } from '../../src/metaed/MetaEdValidation';
 
+const originalGetBooleanFromEnvironment = getBooleanFromEnvironment;
 const createModel = (): TopLevelEntity => ({
   ...newTopLevelEntity(),
   metaEdName: 'Student',
@@ -106,11 +108,11 @@ describe('given query parameters with allow overposting is false have two invali
   beforeAll(() => {
     const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
     jest.clearAllMocks();
-    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
       if (key === 'ALLOW_OVERPOSTING') {
         return false;
       }
-      return Environment.getBooleanFromEnvironment(key);
+      return originalGetBooleanFromEnvironment(key, false);
     });
     validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
   });
@@ -138,11 +140,11 @@ describe('given query parameters with allow overposting is true have two extrane
   beforeAll(() => {
     const queryParameters = { uniqueId: 'a', one: 'one', two: 'two' };
     jest.clearAllMocks();
-    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementationOnce((key: Config.ConfigKeys) => {
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
       if (key === 'ALLOW_OVERPOSTING') {
         return true;
       }
-      return Environment.getBooleanFromEnvironment(key);
+      return originalGetBooleanFromEnvironment(key, false);
     });
     validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
   });
@@ -310,5 +312,143 @@ describe('given a bad decimal query parameter value', () => {
         "/someDecimalParameter must be number",
       ]
     `);
+  });
+});
+
+describe('given body insert with allow overposting is false have two invalid properties and a valid one', () => {
+  let validationResult: ValidationError[] | null;
+
+  beforeAll(() => {
+    const bodyParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return false;
+      }
+      return originalGetBooleanFromEnvironment(key, false);
+    });
+    validationResult = validateEntityBodyAgainstSchema(createModel(), bodyParameters);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should have two errors', () => {
+    expect(validationResult).toHaveLength(2);
+  });
+
+  it('should return validation errors', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+    [
+      {
+        "context": {
+          "errorType": "additionalProperties",
+        },
+        "message": "'one' property is not expected to be here",
+        "path": "{requestBody}",
+      },
+      {
+        "context": {
+          "errorType": "additionalProperties",
+        },
+        "message": "'two' property is not expected to be here",
+        "path": "{requestBody}",
+      },
+    ]
+    `);
+  });
+});
+
+describe('given body update with allow overposting is false have two invalid properties and a valid one', () => {
+  let validationResult: ValidationError[] | null;
+
+  beforeAll(() => {
+    const bodyParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return false;
+      }
+      return originalGetBooleanFromEnvironment(key, false);
+    });
+    validationResult = validateEntityBodyAgainstSchema(createModel(), bodyParameters);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should have two errors', () => {
+    expect(validationResult).toHaveLength(2);
+  });
+
+  it('should return validation errors', () => {
+    expect(validationResult).toMatchInlineSnapshot(`
+    [
+      {
+        "context": {
+          "errorType": "additionalProperties",
+        },
+        "message": "'one' property is not expected to be here",
+        "path": "{requestBody}",
+      },
+      {
+        "context": {
+          "errorType": "additionalProperties",
+        },
+        "message": "'two' property is not expected to be here",
+        "path": "{requestBody}",
+      },
+    ]
+    `);
+  });
+});
+
+describe('given body insert with allow overposting is true have two invalid properties and a valid one', () => {
+  let validationResult: ValidationError[] | null;
+
+  beforeAll(() => {
+    const bodyParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return originalGetBooleanFromEnvironment(key, false);
+    });
+    validationResult = validateEntityBodyAgainstSchema(createModel(), bodyParameters);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should not have errors', () => {
+    expect(validationResult).toBeNull();
+  });
+});
+
+describe('given body update with allow overposting is true have two invalid properties and a valid one', () => {
+  let validationResult: ValidationError[] | null;
+
+  beforeAll(() => {
+    const bodyParameters = { uniqueId: 'a', one: 'one', two: 'two' };
+    jest.clearAllMocks();
+    jest.spyOn(Environment, 'getBooleanFromEnvironment').mockImplementation((key: Config.ConfigKeys) => {
+      if (key === 'ALLOW_OVERPOSTING') {
+        return true;
+      }
+      return originalGetBooleanFromEnvironment(key, false);
+    });
+    validationResult = validateEntityBodyAgainstSchema(createModel(), bodyParameters);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should not have errors', () => {
+    expect(validationResult).toBeNull();
   });
 });

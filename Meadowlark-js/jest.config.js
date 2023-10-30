@@ -5,6 +5,7 @@ module.exports = {
     '<rootDir>/backends/meadowlark-mongodb-backend/test/config/integration/jest.config.js',
     '<rootDir>/backends/meadowlark-opensearch-backend/test/config/integration/jest.config.js',
     '<rootDir>/backends/meadowlark-postgresql-backend/test/config/integration/jest.config.js',
+    '<rootDir>/packages/meadowlark-core/test/config/integration/jest.config.js',
   ],
   coverageThreshold: {
     global: {

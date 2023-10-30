@@ -53,6 +53,10 @@ export const setupMockConfiguration = (isDebug: boolean = false, disableAnonymiz
         return 'mwc';
       case 'MONGO_READ_CONCERN':
         return 'mrc';
+      case 'ALLOW_TYPE_COERCION':
+        return false;
+      case 'ALLOW_OVERPOSTING':
+        return false;
       default:
         throw new Error(`Key '${key}' not configured`);
     }
