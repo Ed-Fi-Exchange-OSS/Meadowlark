@@ -3,7 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { DocumentIdentity } from '../model/DocumentIdentity';
+import invariant from 'ts-invariant';
+import { DocumentIdentity, DocumentIdentityElement } from '../model/DocumentIdentity';
 import { SuperclassInfo } from '../model/SuperclassInfo';
 import type { ResourceSchema } from '../model/api-schema/ResourceSchema';
 
@@ -33,11 +34,31 @@ export function deriveSuperclassInfoFrom(
   }
 
   // Copy the DocumentIdentity so the original is not affected
-  const superclassIdentity: DocumentIdentity = { ...documentIdentity };
+  const superclassIdentity: DocumentIdentity = [...documentIdentity];
 
-  // Replace subclassIdentityFullname with superclassIdentityFullname
-  delete superclassIdentity[resourceSchema.subclassIdentityFullname];
-  superclassIdentity[resourceSchema.superclassIdentityFullname] = documentIdentity[resourceSchema.subclassIdentityFullname];
+  // Find location of element for rename
+  const indexForRename = superclassIdentity.findIndex(
+    (element: DocumentIdentityElement) => element[resourceSchema.subclassIdentityDocumentKey] != null,
+  );
+  invariant(
+    indexForRename !== -1,
+    `deriveSuperclassInfoFrom found no identity element with name ${resourceSchema.subclassIdentityDocumentKey}`,
+  );
+
+  // Get value for renamed element
+  const valueForRename: any = superclassIdentity[indexForRename][resourceSchema.subclassIdentityDocumentKey];
+  invariant(
+    valueForRename != null,
+    `deriveSuperclassInfoFrom found no value for ${resourceSchema.subclassIdentityDocumentKey}`,
+  );
+
+  // Create renamed element
+  const renamedIdentityElement: DocumentIdentityElement = {
+    [resourceSchema.superclassIdentityDocumentKey]: valueForRename,
+  };
+
+  // Overwrite renamed element (array was cloned, so this is ok)
+  superclassIdentity[indexForRename] = renamedIdentityElement;
 
   return {
     resourceName: resourceSchema.superclassResourceName,

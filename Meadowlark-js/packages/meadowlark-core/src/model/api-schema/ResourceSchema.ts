@@ -95,8 +95,8 @@ export type DomainEntitySubclassResourceSchema = AssociationSubclassResourceSche
    * This is found in MetaEd as an "identity rename". MetaEd only allows the super/subclass
    * relationship of Domain Entities to have a single common identity field.
    */
-  superclassIdentityFullname: MetaEdPropertyFullName;
-  subclassIdentityFullname: MetaEdPropertyFullName;
+  superclassIdentityDocumentKey: DocumentObjectKey;
+  subclassIdentityDocumentKey: DocumentObjectKey;
 };
 
 /**
