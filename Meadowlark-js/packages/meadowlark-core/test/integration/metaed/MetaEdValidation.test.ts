@@ -17,6 +17,7 @@ import { setupMockConfiguration } from '../../ConfigHelper';
 import { UpsertResult } from '../../../src/message/UpsertResult';
 import { UpdateResult } from '../../../src/message/UpdateResult';
 import { DocumentUuid } from '../../../src/model/IdTypes';
+import { clearAllValidatorCache } from '../../../src/metaed/MetaEdValidation';
 
 let upsertResponse: FrontendResponse;
 let updateResponse: FrontendResponse;
@@ -72,6 +73,7 @@ const frontendRequestUpdateAdditionalProperties: FrontendRequest = {
 
 describe('given Allow Overposting equals to false', () => {
   beforeAll(async () => {
+    clearAllValidatorCache();
     setupMockConfiguration();
     initializeLogging();
     jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(NoDocumentStorePlugin);
@@ -151,6 +153,7 @@ describe('given Allow Overposting equals to false', () => {
 
 describe('given Allow Overposting equals to true', () => {
   beforeAll(async () => {
+    clearAllValidatorCache();
     setupMockConfiguration();
     initializeLogging();
     jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue(NoDocumentStorePlugin);

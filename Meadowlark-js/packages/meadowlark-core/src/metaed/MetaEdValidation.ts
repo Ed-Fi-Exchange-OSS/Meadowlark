@@ -60,6 +60,12 @@ function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaVali
 }
 
 /**
+ * Function to delete all item from validatorCache for testing purposes.
+ */
+export function clearAllValidatorCache(): void {
+  validatorCache.clear();
+}
+/**
  * Creates a new empty ResourceMatchResult object
  */
 export function newResourceMatchResult(): ResourceMatchResult {
