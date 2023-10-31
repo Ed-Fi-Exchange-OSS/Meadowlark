@@ -32,13 +32,9 @@ describe('when lockDocuments is called with a given number of documents', () => 
 
   it('concurrencyCollection should be empty after the function is called', async () => {
     const documents = await getConcurrencyCollection(client).countDocuments({
-      $and: [
-        {
-          meadowlarkId: {
-            $in: ['123', '456'],
-          },
-        },
-      ],
+      meadowlarkId: {
+        $in: ['123', '456'],
+      },
     });
 
     expect(documents).toBe(0);

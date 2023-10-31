@@ -143,13 +143,9 @@ export async function lockDocuments(
 
   await concurrencyCollection.deleteMany(
     {
-      $and: [
-        {
-          _id: {
-            $in: documentUuids,
-          },
-        },
-      ],
+      _id: {
+        $in: documentUuids,
+      },
     },
     { session },
   );

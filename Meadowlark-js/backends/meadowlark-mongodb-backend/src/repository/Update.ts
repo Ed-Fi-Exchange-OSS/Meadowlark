@@ -154,14 +154,11 @@ async function updateAllowingIdentityChange(
   const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
     .find(
       {
-        $and: [
-          {
-            aliasMeadowlarkIds: {
-              $in: document.outboundRefs,
-            },
-          },
-        ],
+        aliasMeadowlarkIds: {
+          $in: document.outboundRefs,
+        },
       },
+
       { projection: { documentUuid: 1 } },
     )
     .toArray();
@@ -265,13 +262,9 @@ async function updateDisallowingIdentityChange(
   const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
     .find(
       {
-        $and: [
-          {
-            aliasMeadowlarkIds: {
-              $in: document.outboundRefs,
-            },
-          },
-        ],
+        aliasMeadowlarkIds: {
+          $in: document.outboundRefs,
+        },
       },
       { projection: { documentUuid: 1 } },
     )
