@@ -306,7 +306,7 @@ describe('When creating a resource', () => {
   });
 });
 
-describe('When performing crud operations with extraneous elements with allow overposting false', () => {
+describe('given some crud operations with extraneous elements and allow overposting false', () => {
   let resourceResponse;
   let resourceLocation;
   const resource = 'contentClassDescriptors';

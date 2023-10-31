@@ -133,7 +133,7 @@ describe('given Allow Overposting equals to false', () => {
     jest.restoreAllMocks();
   });
 
-  describe('given the upsert of a document without extraneous properties and Allow Overposting equals to false', () => {
+  describe('when upserting a document without extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest,
@@ -164,7 +164,7 @@ describe('given Allow Overposting equals to false', () => {
     });
   });
 
-  describe('given the update of a document without extraneous properties and Allow Overposting equals to false', () => {
+  describe('when updating a document without extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestUpdate,
@@ -194,7 +194,7 @@ describe('given Allow Overposting equals to false', () => {
     });
   });
 
-  describe('given the upsert of a document with Allow Overposting equals to false', () => {
+  describe('when upserting a document with extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestAdditionalProperties,
@@ -225,7 +225,7 @@ describe('given Allow Overposting equals to false', () => {
     });
   });
 
-  describe('given the update of a document with Allow Overposting equals to false', () => {
+  describe('when updating a document with extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestUpdateAdditionalProperties,
@@ -274,7 +274,7 @@ describe('given Allow Overposting equals to true', () => {
     jest.restoreAllMocks();
   });
 
-  describe('given the upsert of a document without extraneous properties and Allow Overposting equals to true', () => {
+  describe('when upserting a document without extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest,
@@ -305,7 +305,7 @@ describe('given Allow Overposting equals to true', () => {
     });
   });
 
-  describe('given the update of a document without extraneous properties and Allow Overposting equals to true', () => {
+  describe('when updating a document without extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestUpdate,
@@ -335,7 +335,7 @@ describe('given Allow Overposting equals to true', () => {
     });
   });
 
-  describe('given the upsert of a document with extraneous properties and Allow Overposting equals to true', () => {
+  describe('when upserting a document with extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestAdditionalProperties,
@@ -366,7 +366,7 @@ describe('given Allow Overposting equals to true', () => {
     });
   });
 
-  describe('given the update of a document with extraneous properties and Allow Overposting equals to true', () => {
+  describe('when updating a document with extraneous properties', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestUpdateAdditionalProperties,
