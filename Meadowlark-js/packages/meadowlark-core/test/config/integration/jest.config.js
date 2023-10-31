@@ -1,13 +1,12 @@
+const rootDir = '../../../../../';
 // eslint-disable-next-line import/no-extraneous-dependencies
-const defaultConfig = require('../jest.config.js');
+const defaultConfig = require(`${rootDir}/tests/config/jest.config`);
 
 module.exports = {
-  displayName: 'Integration Tests',
+  displayName: 'Integration Tests: meadowlark-core',
   ...defaultConfig,
-  preset: '@shelf/jest-mongodb',
-  testMatch: ['<rootDir>/**/integration/**/*.(spec|test).[jt]s?(x)'],
+  testMatch: ['**/meadowlark-core/test/integration/**/*.(spec|test).[jt]s?(x)'],
   watchPathIgnorePatterns: ['globalConfig'], // jest-mongodb setup
-  testPathIgnorePatterns: ['meadowlark-opensearch-backend|meadowlark-opensearch-backend|meadowlark-postgresql-backend|meadowlark-core'],
   coverageThreshold: {
     global: {
       branches: 52,
@@ -16,5 +15,6 @@ module.exports = {
       statements: 60,
     },
   },
+  rootDir,
   workerIdleMemoryLimit: '200MB',
 };

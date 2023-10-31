@@ -51,6 +51,7 @@ describe('when initializing configuration', () => {
   const OPENSEARCH_USERNAME = 'b5';
   const OPENSEARCH_PASSWORD = 'b6';
   const ALLOW_TYPE_COERCION = true;
+  const ALLOW_OVERPOSTING = false;
   const ALLOW__EXT_PROPERTY = true;
   const FASTIFY_NUM_THREADS = 99;
   const OAUTH_EXPIRATION_MINUTES = -10;
@@ -94,6 +95,7 @@ describe('when initializing configuration', () => {
     process.env.FASTIFY_NUM_THREADS = FASTIFY_NUM_THREADS.toString();
     process.env.ALLOW__EXT_PROPERTY = ALLOW__EXT_PROPERTY.toString();
     process.env.ALLOW_TYPE_COERCION = ALLOW_TYPE_COERCION.toString();
+    process.env.ALLOW_OVERPOSTING = ALLOW_OVERPOSTING.toString();
     process.env.OPENSEARCH_PASSWORD = OPENSEARCH_PASSWORD;
     process.env.OPENSEARCH_USERNAME = OPENSEARCH_USERNAME;
     process.env.OPENSEARCH_ENDPOINT = OPENSEARCH_ENDPOINT;
@@ -185,6 +187,7 @@ describe('when initializing configuration', () => {
       ['OPENSEARCH_PASSWORD', OPENSEARCH_PASSWORD],
       ['ALLOW_TYPE_COERCION', ALLOW_TYPE_COERCION],
       ['ALLOW__EXT_PROPERTY', ALLOW__EXT_PROPERTY],
+      ['ALLOW_OVERPOSTING', ALLOW_OVERPOSTING],
       ['FASTIFY_NUM_THREADS', FASTIFY_NUM_THREADS],
       ['OAUTH_EXPIRATION_MINUTES', OAUTH_EXPIRATION_MINUTES],
       ['OAUTH_TOKEN_ISSUER', OAUTH_TOKEN_ISSUER],
@@ -227,6 +230,7 @@ describe('when initializing configuration', () => {
       process.env.QUERY_HANDLER_PLUGIN = undefined;
       process.env.ALLOW_TYPE_COERCION = undefined;
       process.env.ALLOW__EXT_PROPERTY = undefined;
+      process.env.ALLOW_OVERPOSTING = undefined;
       process.env.FASTIFY_NUM_THREADS = undefined;
       process.env.OAUTH_EXPIRATION_MINUTES = undefined;
       process.env.OAUTH_TOKEN_ISSUER = undefined;
@@ -272,6 +276,7 @@ describe('when initializing configuration', () => {
       ['QUERY_HANDLER_PLUGIN', ''],
       ['ALLOW_TYPE_COERCION', false],
       ['ALLOW__EXT_PROPERTY', false],
+      ['ALLOW_OVERPOSTING', false],
       ['FASTIFY_NUM_THREADS', CpuCount],
       ['OAUTH_EXPIRATION_MINUTES', 60],
       ['OAUTH_TOKEN_ISSUER', 'edfi-meadowlark-issuer'],
