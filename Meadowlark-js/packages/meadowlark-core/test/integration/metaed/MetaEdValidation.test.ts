@@ -47,6 +47,29 @@ const frontendRequest: FrontendRequest = {
   },
 };
 
+const frontendRequestUpdate: FrontendRequest = {
+  ...frontendRequest,
+  body: `{
+    "id": "6b48af60-afe7-4df2-b783-dc614ec9bb64",
+    "weekIdentifier": "123456",
+    "schoolReference": {
+      "schoolId": 123
+    },
+    "beginDate": "2023-10-30",
+    "endDate": "2023-10-30",
+    "totalInstructionalDays": 10
+  }`,
+  middleware: {
+    ...newFrontendRequestMiddleware(),
+    pathComponents: {
+      resourceName: 'academicWeeks',
+      namespace: 'ed-fi',
+      version: 'v3.3b',
+      documentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64' as DocumentUuid,
+    },
+  },
+};
+
 const frontendRequestAdditionalProperties: FrontendRequest = {
   ...newFrontendRequest(),
   body: `{
@@ -144,7 +167,7 @@ describe('given Allow Overposting equals to false', () => {
   describe('given the update of a document without extraneous properties and Allow Overposting equals to false', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
-        frontendRequest,
+        frontendRequest: frontendRequestUpdate,
         frontendResponse: null,
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
@@ -159,7 +182,7 @@ describe('given Allow Overposting equals to false', () => {
           } as unknown as UpdateResult),
       });
       // Act
-      updateResponse = await update(frontendRequest);
+      updateResponse = await update(frontendRequestUpdate);
     });
 
     afterAll(() => {
@@ -285,7 +308,7 @@ describe('given Allow Overposting equals to true', () => {
   describe('given the update of a document without extraneous properties and Allow Overposting equals to true', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
-        frontendRequest,
+        frontendRequest: frontendRequestUpdate,
         frontendResponse: null,
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
@@ -300,7 +323,7 @@ describe('given Allow Overposting equals to true', () => {
           } as unknown as UpdateResult),
       });
       // Act
-      updateResponse = await update(frontendRequest);
+      updateResponse = await update(frontendRequestUpdate);
     });
 
     afterAll(() => {
