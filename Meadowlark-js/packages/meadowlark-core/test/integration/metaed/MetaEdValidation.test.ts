@@ -26,6 +26,27 @@ let mockUpdate: any;
 
 const originalGetBooleanFromEnvironment = getBooleanFromEnvironment;
 
+const frontendRequest: FrontendRequest = {
+  ...newFrontendRequest(),
+  body: `{
+    "weekIdentifier": "123456",
+    "schoolReference": {
+      "schoolId": 123
+    },
+    "beginDate": "2023-10-30",
+    "endDate": "2023-10-30",
+    "totalInstructionalDays": 10
+  }`,
+  middleware: {
+    ...newFrontendRequestMiddleware(),
+    pathComponents: {
+      resourceName: 'academicWeeks',
+      namespace: 'ed-fi',
+      version: 'v3.3b',
+    },
+  },
+};
+
 const frontendRequestAdditionalProperties: FrontendRequest = {
   ...newFrontendRequest(),
   body: `{
@@ -87,6 +108,67 @@ describe('given Allow Overposting equals to false', () => {
 
   afterAll(() => {
     jest.restoreAllMocks();
+  });
+
+  describe('given the upsert of a document without extraneous properties and Allow Overposting equals to false', () => {
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: null,
+      };
+      jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
+      jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
+      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
+      mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+        ...NoDocumentStorePlugin,
+        upsertDocument: async () =>
+          Promise.resolve({
+            response: 'INSERT_SUCCESS',
+            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
+            failureMessage: null,
+          } as unknown as UpsertResult),
+      });
+      // Act
+      upsertResponse = await upsert(frontendRequest);
+    });
+
+    afterAll(() => {
+      mockUpdate.mockRestore();
+    });
+
+    it('returns status 201', () => {
+      expect(upsertResponse.statusCode).toEqual(201);
+    });
+  });
+
+  describe('given the update of a document without extraneous properties and Allow Overposting equals to false', () => {
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: null,
+      };
+      jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
+      jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
+      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
+      mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+        ...NoDocumentStorePlugin,
+        updateDocumentById: async () =>
+          Promise.resolve({
+            response: 'UPDATE_SUCCESS',
+            failureMessage: null,
+          } as unknown as UpdateResult),
+      });
+      // Act
+      updateResponse = await update(frontendRequest);
+    });
+
+    afterAll(() => {
+      mockUpdate.mockRestore();
+    });
+
+    it('returns status 204', () => {
+      expect(updateResponse.statusCode).toEqual(204);
+    });
   });
 
   describe('given the upsert of a document with Allow Overposting equals to false', () => {
@@ -169,7 +251,68 @@ describe('given Allow Overposting equals to true', () => {
     jest.restoreAllMocks();
   });
 
-  describe('given the upsert of a document with Allow Overposting equals to false', () => {
+  describe('given the upsert of a document without extraneous properties and Allow Overposting equals to true', () => {
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: null,
+      };
+      jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
+      jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
+      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
+      mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+        ...NoDocumentStorePlugin,
+        upsertDocument: async () =>
+          Promise.resolve({
+            response: 'INSERT_SUCCESS',
+            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
+            failureMessage: null,
+          } as unknown as UpsertResult),
+      });
+      // Act
+      upsertResponse = await upsert(frontendRequest);
+    });
+
+    afterAll(() => {
+      mockUpdate.mockRestore();
+    });
+
+    it('returns status 201', () => {
+      expect(upsertResponse.statusCode).toEqual(201);
+    });
+  });
+
+  describe('given the update of a document without extraneous properties and Allow Overposting equals to true', () => {
+    beforeAll(async () => {
+      const model: MiddlewareModel = {
+        frontendRequest,
+        frontendResponse: null,
+      };
+      jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
+      jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
+      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
+      mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
+        ...NoDocumentStorePlugin,
+        updateDocumentById: async () =>
+          Promise.resolve({
+            response: 'UPDATE_SUCCESS',
+            failureMessage: null,
+          } as unknown as UpdateResult),
+      });
+      // Act
+      updateResponse = await update(frontendRequest);
+    });
+
+    afterAll(() => {
+      mockUpdate.mockRestore();
+    });
+
+    it('returns status 204', () => {
+      expect(updateResponse.statusCode).toEqual(204);
+    });
+  });
+
+  describe('given the upsert of a document with extraneous properties and Allow Overposting equals to true', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestAdditionalProperties,
@@ -200,7 +343,7 @@ describe('given Allow Overposting equals to true', () => {
     });
   });
 
-  describe('given the update of a document with Allow Overposting equals to false', () => {
+  describe('given the update of a document with extraneous properties and Allow Overposting equals to true', () => {
     beforeAll(async () => {
       const model: MiddlewareModel = {
         frontendRequest: frontendRequestUpdateAdditionalProperties,
