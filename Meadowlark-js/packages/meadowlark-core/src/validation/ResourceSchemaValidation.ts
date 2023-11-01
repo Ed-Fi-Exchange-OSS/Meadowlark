@@ -19,24 +19,28 @@ export type ResourceSchemaValidators = {
 };
 
 function initializeAjv(): Ajv {
+  const removeAdditional = false; // TODO: replace on merge with RND-651
   const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);
 
-  const ajv = new Ajv({ allErrors: true, coerceTypes });
+  const ajv = new Ajv({ allErrors: true, coerceTypes, removeAdditional });
   addFormatsTo(ajv);
 
   return ajv;
 }
 
-const ajv = initializeAjv();
+// Simple cache of a configured Ajv
+let ajv: Ajv | null = null;
 
 // simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
-/** This is a cache mapping MetaEd model objects to compiled ajv JSON Schema validators for the API resource */
+/** This is a cache mapping ResourceSchema objects to compiled ajv JSON Schema validators for the API resource */
 const validatorCache: Map<ResourceSchema, ResourceSchemaValidators> = new Map();
 
 /**
  * Returns the API resource JSON Schema validator functions for the given ResourceSchema. Caches results.
  */
 export function getSchemaValidatorsFor(resourceSchema: ResourceSchema): ResourceSchemaValidators {
+  if (ajv == null) ajv = initializeAjv();
+
   const cachedValidators: ResourceSchemaValidators | undefined = validatorCache.get(resourceSchema);
   if (cachedValidators != null) return cachedValidators;
 
@@ -47,4 +51,11 @@ export function getSchemaValidatorsFor(resourceSchema: ResourceSchema): Resource
   };
   validatorCache.set(resourceSchema, resourceValidators);
   return resourceValidators;
+}
+
+/**
+ * Function to remove all validators from validatorCache for testing purposes.
+ */
+export function clearAllValidatorCache(): void {
+  validatorCache.clear();
 }
