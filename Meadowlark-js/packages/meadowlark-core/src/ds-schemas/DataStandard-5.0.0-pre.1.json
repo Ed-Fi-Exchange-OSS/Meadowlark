@@ -15262,6 +15262,1538 @@
           ],
           "isSubclass": false
         },
+        "educationOrganizations": {
+          "resourceName": "EducationOrganization",
+          "isDescriptor": false,
+          "isSchoolYearEnumeration": false,
+          "allowIdentityUpdates": false,
+          "jsonSchemaForInsert": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Ed-Fi.EducationOrganization",
+            "description": "This entity represents any public or private institution, organization, or agency that provides instructional or support services to students or staff at any level.",
+            "type": "object",
+            "properties": {
+              "educationOrganizationId": {
+                "type": "integer",
+                "description": "The identifier assigned to an education organization."
+              },
+              "identificationCodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "identificationCode": {
+                      "type": "string",
+                      "description": "A unique number or alphanumeric code that is assigned to an education organization by a school, school system, state, or other agency or entity.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "educationOrganizationIdentificationSystemDescriptor": {
+                      "type": "string",
+                      "description": "The school system, state, or agency assigning the identification code."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "identificationCode",
+                    "educationOrganizationIdentificationSystemDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "nameOfInstitution": {
+                "type": "string",
+                "description": "The full, legally accepted name of the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "shortNameOfInstitution": {
+                "type": "string",
+                "description": "A short name for the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "educationOrganizationCategoryDescriptor": {
+                      "type": "string",
+                      "description": "An Ed-Fi Descriptor"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "educationOrganizationCategoryDescriptor"
+                  ]
+                },
+                "minItems": 1,
+                "uniqueItems": false
+              },
+              "addresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "streetNumberName": {
+                      "type": "string",
+                      "description": "The street number and street name or post office box number of an address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "apartmentRoomSuiteNumber": {
+                      "type": "string",
+                      "description": "The apartment, room, or suite number of an address.",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "buildingSiteNumber": {
+                      "type": "string",
+                      "description": "The number of the building on the site, if more than one building shares the same address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "city": {
+                      "type": "string",
+                      "description": "The name of the city in which an address is located.",
+                      "minLength": 2,
+                      "maxLength": 30
+                    },
+                    "stateAbbreviationDescriptor": {
+                      "type": "string",
+                      "description": "The abbreviation for the state (within the United States) or outlying area in which an address is located."
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "description": "The five or nine digit zip code or overseas postal code portion of an address.",
+                      "minLength": 1,
+                      "maxLength": 17
+                    },
+                    "nameOfCounty": {
+                      "type": "string",
+                      "description": "The name of the county, parish, borough, or comparable unit (within a state) in                      'which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "countyFIPSCode": {
+                      "type": "string",
+                      "description": "The Federal Information Processing Standards (FIPS) numeric code for the county issued by the National Institute of Standards and Technology (NIST). Counties are considered to be the \"first-order subdivisions\" of each State and statistically equivalent entity, regardless of their local designations (county, parish, borough, etc.) Counties in different States will have the same code. A unique county number is created when combined with the 2-digit FIPS State Code.",
+                      "minLength": 3,
+                      "maxLength": 5
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    },
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization.    For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "doNotPublishIndicator": {
+                      "type": "boolean",
+                      "description": "An indication that the address should not be published."
+                    },
+                    "congressionalDistrict": {
+                      "type": "string",
+                      "description": "The congressional district in which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "localeDescriptor": {
+                      "type": "string",
+                      "description": "A general geographic indicator that categorizes U.S. territory (e.g., City, Suburban)."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "streetNumberName",
+                    "city",
+                    "stateAbbreviationDescriptor",
+                    "postalCode",
+                    "addressTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "internationalAddresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization. For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "addressLine1": {
+                      "type": "string",
+                      "description": "The first line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine2": {
+                      "type": "string",
+                      "description": "The second line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine3": {
+                      "type": "string",
+                      "description": "The third line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine4": {
+                      "type": "string",
+                      "description": "The fourth line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "countryDescriptor": {
+                      "type": "string",
+                      "description": "The name of the country. It is strongly recommended that entries use only ISO 3166 2-letter country codes."
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "beginDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The first date the address is valid. For physical addresses, the date the individual moved to that address."
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The last date the address is valid. For physical addresses, the date the individual moved from that address."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "addressTypeDescriptor",
+                    "addressLine1",
+                    "countryDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "institutionTelephones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "telephoneNumber": {
+                      "type": "string",
+                      "description": "The telephone number including the area code, and extension, if applicable.",
+                      "minLength": 1,
+                      "maxLength": 24
+                    },
+                    "institutionTelephoneNumberTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of communication number listed for an individual or organization."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "telephoneNumber",
+                    "institutionTelephoneNumberTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "webSite": {
+                "type": "string",
+                "description": "The public web site address (URL) for the education organization.",
+                "minLength": 5,
+                "maxLength": 255
+              },
+              "operationalStatusDescriptor": {
+                "type": "string",
+                "description": "The current operational status of the education organization (e.g., active, inactive)."
+              },
+              "indicators": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "indicatorDescriptor": {
+                      "type": "string",
+                      "description": "The name or code for the indicator or metric."
+                    },
+                    "designatedBy": {
+                      "type": "string",
+                      "description": "The person, organization, or department that defined the metric.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorValue": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric. The semantics of an empty value is \"not submitted.\"",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorLevelDescriptor": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric, as a value from a controlled vocabulary. The semantics of an empty value is \"not submitted.\""
+                    },
+                    "indicatorGroupDescriptor": {
+                      "type": "string",
+                      "description": "The name for a group of indicators."
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "indicatorDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "_ext": {
+                "description": "optional extension collection",
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "educationOrganizationId",
+              "nameOfInstitution",
+              "categories"
+            ]
+          },
+          "jsonSchemaForUpdate": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Ed-Fi.EducationOrganization",
+            "description": "This entity represents any public or private institution, organization, or agency that provides instructional or support services to students or staff at any level.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The item id"
+              },
+              "educationOrganizationId": {
+                "type": "integer",
+                "description": "The identifier assigned to an education organization."
+              },
+              "identificationCodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "identificationCode": {
+                      "type": "string",
+                      "description": "A unique number or alphanumeric code that is assigned to an education organization by a school, school system, state, or other agency or entity.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "educationOrganizationIdentificationSystemDescriptor": {
+                      "type": "string",
+                      "description": "The school system, state, or agency assigning the identification code."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "identificationCode",
+                    "educationOrganizationIdentificationSystemDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "nameOfInstitution": {
+                "type": "string",
+                "description": "The full, legally accepted name of the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "shortNameOfInstitution": {
+                "type": "string",
+                "description": "A short name for the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "educationOrganizationCategoryDescriptor": {
+                      "type": "string",
+                      "description": "An Ed-Fi Descriptor"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "educationOrganizationCategoryDescriptor"
+                  ]
+                },
+                "minItems": 1,
+                "uniqueItems": false
+              },
+              "addresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "streetNumberName": {
+                      "type": "string",
+                      "description": "The street number and street name or post office box number of an address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "apartmentRoomSuiteNumber": {
+                      "type": "string",
+                      "description": "The apartment, room, or suite number of an address.",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "buildingSiteNumber": {
+                      "type": "string",
+                      "description": "The number of the building on the site, if more than one building shares the same address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "city": {
+                      "type": "string",
+                      "description": "The name of the city in which an address is located.",
+                      "minLength": 2,
+                      "maxLength": 30
+                    },
+                    "stateAbbreviationDescriptor": {
+                      "type": "string",
+                      "description": "The abbreviation for the state (within the United States) or outlying area in which an address is located."
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "description": "The five or nine digit zip code or overseas postal code portion of an address.",
+                      "minLength": 1,
+                      "maxLength": 17
+                    },
+                    "nameOfCounty": {
+                      "type": "string",
+                      "description": "The name of the county, parish, borough, or comparable unit (within a state) in                      'which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "countyFIPSCode": {
+                      "type": "string",
+                      "description": "The Federal Information Processing Standards (FIPS) numeric code for the county issued by the National Institute of Standards and Technology (NIST). Counties are considered to be the \"first-order subdivisions\" of each State and statistically equivalent entity, regardless of their local designations (county, parish, borough, etc.) Counties in different States will have the same code. A unique county number is created when combined with the 2-digit FIPS State Code.",
+                      "minLength": 3,
+                      "maxLength": 5
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    },
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization.    For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "doNotPublishIndicator": {
+                      "type": "boolean",
+                      "description": "An indication that the address should not be published."
+                    },
+                    "congressionalDistrict": {
+                      "type": "string",
+                      "description": "The congressional district in which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "localeDescriptor": {
+                      "type": "string",
+                      "description": "A general geographic indicator that categorizes U.S. territory (e.g., City, Suburban)."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "streetNumberName",
+                    "city",
+                    "stateAbbreviationDescriptor",
+                    "postalCode",
+                    "addressTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "internationalAddresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization. For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "addressLine1": {
+                      "type": "string",
+                      "description": "The first line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine2": {
+                      "type": "string",
+                      "description": "The second line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine3": {
+                      "type": "string",
+                      "description": "The third line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine4": {
+                      "type": "string",
+                      "description": "The fourth line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "countryDescriptor": {
+                      "type": "string",
+                      "description": "The name of the country. It is strongly recommended that entries use only ISO 3166 2-letter country codes."
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "beginDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The first date the address is valid. For physical addresses, the date the individual moved to that address."
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The last date the address is valid. For physical addresses, the date the individual moved from that address."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "addressTypeDescriptor",
+                    "addressLine1",
+                    "countryDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "institutionTelephones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "telephoneNumber": {
+                      "type": "string",
+                      "description": "The telephone number including the area code, and extension, if applicable.",
+                      "minLength": 1,
+                      "maxLength": 24
+                    },
+                    "institutionTelephoneNumberTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of communication number listed for an individual or organization."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "telephoneNumber",
+                    "institutionTelephoneNumberTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "webSite": {
+                "type": "string",
+                "description": "The public web site address (URL) for the education organization.",
+                "minLength": 5,
+                "maxLength": 255
+              },
+              "operationalStatusDescriptor": {
+                "type": "string",
+                "description": "The current operational status of the education organization (e.g., active, inactive)."
+              },
+              "indicators": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "indicatorDescriptor": {
+                      "type": "string",
+                      "description": "The name or code for the indicator or metric."
+                    },
+                    "designatedBy": {
+                      "type": "string",
+                      "description": "The person, organization, or department that defined the metric.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorValue": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric. The semantics of an empty value is \"not submitted.\"",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorLevelDescriptor": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric, as a value from a controlled vocabulary. The semantics of an empty value is \"not submitted.\""
+                    },
+                    "indicatorGroupDescriptor": {
+                      "type": "string",
+                      "description": "The name for a group of indicators."
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "indicatorDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "_ext": {
+                "description": "optional extension collection",
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "educationOrganizationId",
+              "nameOfInstitution",
+              "categories"
+            ]
+          },
+          "jsonSchemaForQuery": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Ed-Fi.EducationOrganization",
+            "description": "This entity represents any public or private institution, organization, or agency that provides instructional or support services to students or staff at any level.",
+            "type": "object",
+            "properties": {
+              "educationOrganizationId": {
+                "type": "integer",
+                "description": "The identifier assigned to an education organization."
+              },
+              "identificationCodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "identificationCode": {
+                      "type": "string",
+                      "description": "A unique number or alphanumeric code that is assigned to an education organization by a school, school system, state, or other agency or entity.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "educationOrganizationIdentificationSystemDescriptor": {
+                      "type": "string",
+                      "description": "The school system, state, or agency assigning the identification code."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "identificationCode",
+                    "educationOrganizationIdentificationSystemDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "nameOfInstitution": {
+                "type": "string",
+                "description": "The full, legally accepted name of the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "shortNameOfInstitution": {
+                "type": "string",
+                "description": "A short name for the institution.",
+                "minLength": 1,
+                "maxLength": 75
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "educationOrganizationCategoryDescriptor": {
+                      "type": "string",
+                      "description": "An Ed-Fi Descriptor"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "educationOrganizationCategoryDescriptor"
+                  ]
+                },
+                "minItems": 1,
+                "uniqueItems": false
+              },
+              "addresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "streetNumberName": {
+                      "type": "string",
+                      "description": "The street number and street name or post office box number of an address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "apartmentRoomSuiteNumber": {
+                      "type": "string",
+                      "description": "The apartment, room, or suite number of an address.",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "buildingSiteNumber": {
+                      "type": "string",
+                      "description": "The number of the building on the site, if more than one building shares the same address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "city": {
+                      "type": "string",
+                      "description": "The name of the city in which an address is located.",
+                      "minLength": 2,
+                      "maxLength": 30
+                    },
+                    "stateAbbreviationDescriptor": {
+                      "type": "string",
+                      "description": "The abbreviation for the state (within the United States) or outlying area in which an address is located."
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "description": "The five or nine digit zip code or overseas postal code portion of an address.",
+                      "minLength": 1,
+                      "maxLength": 17
+                    },
+                    "nameOfCounty": {
+                      "type": "string",
+                      "description": "The name of the county, parish, borough, or comparable unit (within a state) in                      'which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "countyFIPSCode": {
+                      "type": "string",
+                      "description": "The Federal Information Processing Standards (FIPS) numeric code for the county issued by the National Institute of Standards and Technology (NIST). Counties are considered to be the \"first-order subdivisions\" of each State and statistically equivalent entity, regardless of their local designations (county, parish, borough, etc.) Counties in different States will have the same code. A unique county number is created when combined with the 2-digit FIPS State Code.",
+                      "minLength": 3,
+                      "maxLength": 5
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    },
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization.    For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "doNotPublishIndicator": {
+                      "type": "boolean",
+                      "description": "An indication that the address should not be published."
+                    },
+                    "congressionalDistrict": {
+                      "type": "string",
+                      "description": "The congressional district in which an address is located.",
+                      "minLength": 1,
+                      "maxLength": 30
+                    },
+                    "localeDescriptor": {
+                      "type": "string",
+                      "description": "A general geographic indicator that categorizes U.S. territory (e.g., City, Suburban)."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "streetNumberName",
+                    "city",
+                    "stateAbbreviationDescriptor",
+                    "postalCode",
+                    "addressTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "internationalAddresses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "addressTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of address listed for an individual or organization. For example:  Physical Address, Mailing Address, Home Address, etc.)"
+                    },
+                    "addressLine1": {
+                      "type": "string",
+                      "description": "The first line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine2": {
+                      "type": "string",
+                      "description": "The second line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine3": {
+                      "type": "string",
+                      "description": "The third line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "addressLine4": {
+                      "type": "string",
+                      "description": "The fourth line of the address.",
+                      "minLength": 1,
+                      "maxLength": 150
+                    },
+                    "countryDescriptor": {
+                      "type": "string",
+                      "description": "The name of the country. It is strongly recommended that entries use only ISO 3166 2-letter country codes."
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "description": "The geographic latitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "description": "The geographic longitude of the physical address.",
+                      "minLength": 1,
+                      "maxLength": 20
+                    },
+                    "beginDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The first date the address is valid. For physical addresses, the date the individual moved to that address."
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The last date the address is valid. For physical addresses, the date the individual moved from that address."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "addressTypeDescriptor",
+                    "addressLine1",
+                    "countryDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "institutionTelephones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "telephoneNumber": {
+                      "type": "string",
+                      "description": "The telephone number including the area code, and extension, if applicable.",
+                      "minLength": 1,
+                      "maxLength": 24
+                    },
+                    "institutionTelephoneNumberTypeDescriptor": {
+                      "type": "string",
+                      "description": "The type of communication number listed for an individual or organization."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "telephoneNumber",
+                    "institutionTelephoneNumberTypeDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "webSite": {
+                "type": "string",
+                "description": "The public web site address (URL) for the education organization.",
+                "minLength": 5,
+                "maxLength": 255
+              },
+              "operationalStatusDescriptor": {
+                "type": "string",
+                "description": "The current operational status of the education organization (e.g., active, inactive)."
+              },
+              "indicators": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "indicatorDescriptor": {
+                      "type": "string",
+                      "description": "The name or code for the indicator or metric."
+                    },
+                    "designatedBy": {
+                      "type": "string",
+                      "description": "The person, organization, or department that defined the metric.",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorValue": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric. The semantics of an empty value is \"not submitted.\"",
+                      "minLength": 1,
+                      "maxLength": 60
+                    },
+                    "indicatorLevelDescriptor": {
+                      "type": "string",
+                      "description": "The value of the indicator or metric, as a value from a controlled vocabulary. The semantics of an empty value is \"not submitted.\""
+                    },
+                    "indicatorGroupDescriptor": {
+                      "type": "string",
+                      "description": "The name for a group of indicators."
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "beginDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the start of the period."
+                          },
+                          "endDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The month, day, and year for the end of the period."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "beginDate"
+                        ]
+                      },
+                      "minItems": 0,
+                      "uniqueItems": false
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "indicatorDescriptor"
+                  ]
+                },
+                "minItems": 0,
+                "uniqueItems": false
+              },
+              "_ext": {
+                "description": "optional extension collection",
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": false,
+            "required": []
+          },
+          "equalityConstraints": [],
+          "identityFullnames": [
+            "EducationOrganizationId"
+          ],
+          "documentPathsMapping": {
+            "EducationOrganizationId": {
+              "paths": {
+                "educationOrganizationId": "$.educationOrganizationId"
+              },
+              "pathOrder": [
+                "educationOrganizationId"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationIdentificationCode.IdentificationCode": {
+              "paths": {
+                "identificationCode": "$.identificationCodes[*].identificationCode"
+              },
+              "pathOrder": [
+                "identificationCode"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationIdentificationCode.EducationOrganizationIdentificationSystem": {
+              "paths": {
+                "educationOrganizationIdentificationSystemDescriptor": "$.identificationCodes[*].educationOrganizationIdentificationSystemDescriptor"
+              },
+              "pathOrder": [
+                "educationOrganizationIdentificationSystemDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "EducationOrganizationIdentificationSystemDescriptor"
+            },
+            "NameOfInstitution": {
+              "paths": {
+                "nameOfInstitution": "$.nameOfInstitution"
+              },
+              "pathOrder": [
+                "nameOfInstitution"
+              ],
+              "isReference": false
+            },
+            "ShortNameOfInstitution": {
+              "paths": {
+                "shortNameOfInstitution": "$.shortNameOfInstitution"
+              },
+              "pathOrder": [
+                "shortNameOfInstitution"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationCategory": {
+              "paths": {
+                "educationOrganizationCategoryDescriptor": "$.categories[*].educationOrganizationCategoryDescriptor"
+              },
+              "pathOrder": [
+                "educationOrganizationCategoryDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "EducationOrganizationCategoryDescriptor"
+            },
+            "Address.StreetNumberName": {
+              "paths": {
+                "streetNumberName": "$.addresses[*].streetNumberName"
+              },
+              "pathOrder": [
+                "streetNumberName"
+              ],
+              "isReference": false
+            },
+            "Address.ApartmentRoomSuiteNumber": {
+              "paths": {
+                "apartmentRoomSuiteNumber": "$.addresses[*].apartmentRoomSuiteNumber"
+              },
+              "pathOrder": [
+                "apartmentRoomSuiteNumber"
+              ],
+              "isReference": false
+            },
+            "Address.BuildingSiteNumber": {
+              "paths": {
+                "buildingSiteNumber": "$.addresses[*].buildingSiteNumber"
+              },
+              "pathOrder": [
+                "buildingSiteNumber"
+              ],
+              "isReference": false
+            },
+            "Address.City": {
+              "paths": {
+                "city": "$.addresses[*].city"
+              },
+              "pathOrder": [
+                "city"
+              ],
+              "isReference": false
+            },
+            "Address.StateAbbreviation": {
+              "paths": {
+                "stateAbbreviationDescriptor": "$.addresses[*].stateAbbreviationDescriptor"
+              },
+              "pathOrder": [
+                "stateAbbreviationDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "StateAbbreviationDescriptor"
+            },
+            "Address.PostalCode": {
+              "paths": {
+                "postalCode": "$.addresses[*].postalCode"
+              },
+              "pathOrder": [
+                "postalCode"
+              ],
+              "isReference": false
+            },
+            "Address.NameOfCounty": {
+              "paths": {
+                "nameOfCounty": "$.addresses[*].nameOfCounty"
+              },
+              "pathOrder": [
+                "nameOfCounty"
+              ],
+              "isReference": false
+            },
+            "Address.CountyFIPSCode": {
+              "paths": {
+                "countyFIPSCode": "$.addresses[*].countyFIPSCode"
+              },
+              "pathOrder": [
+                "countyFIPSCode"
+              ],
+              "isReference": false
+            },
+            "Address.Latitude": {
+              "paths": {
+                "latitude": "$.addresses[*].latitude"
+              },
+              "pathOrder": [
+                "latitude"
+              ],
+              "isReference": false
+            },
+            "Address.Longitude": {
+              "paths": {
+                "longitude": "$.addresses[*].longitude"
+              },
+              "pathOrder": [
+                "longitude"
+              ],
+              "isReference": false
+            },
+            "Address.Period.BeginDate": {
+              "paths": {
+                "beginDate": "$.addresses[*].periods[*].beginDate"
+              },
+              "pathOrder": [
+                "beginDate"
+              ],
+              "isReference": false
+            },
+            "Address.Period.EndDate": {
+              "paths": {
+                "endDate": "$.addresses[*].periods[*].endDate"
+              },
+              "pathOrder": [
+                "endDate"
+              ],
+              "isReference": false
+            },
+            "Address.AddressType": {
+              "paths": {
+                "addressTypeDescriptor": "$.addresses[*].addressTypeDescriptor"
+              },
+              "pathOrder": [
+                "addressTypeDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "AddressTypeDescriptor"
+            },
+            "Address.DoNotPublishIndicator": {
+              "paths": {
+                "doNotPublishIndicator": "$.addresses[*].doNotPublishIndicator"
+              },
+              "pathOrder": [
+                "doNotPublishIndicator"
+              ],
+              "isReference": false
+            },
+            "Address.CongressionalDistrict": {
+              "paths": {
+                "congressionalDistrict": "$.addresses[*].congressionalDistrict"
+              },
+              "pathOrder": [
+                "congressionalDistrict"
+              ],
+              "isReference": false
+            },
+            "Address.Locale": {
+              "paths": {
+                "localeDescriptor": "$.addresses[*].localeDescriptor"
+              },
+              "pathOrder": [
+                "localeDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "LocaleDescriptor"
+            },
+            "InternationalAddress.AddressType": {
+              "paths": {
+                "addressTypeDescriptor": "$.internationalAddresses[*].addressTypeDescriptor"
+              },
+              "pathOrder": [
+                "addressTypeDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "AddressTypeDescriptor"
+            },
+            "InternationalAddress.AddressLine1": {
+              "paths": {
+                "addressLine1": "$.internationalAddresses[*].addressLine1"
+              },
+              "pathOrder": [
+                "addressLine1"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.AddressLine2": {
+              "paths": {
+                "addressLine2": "$.internationalAddresses[*].addressLine2"
+              },
+              "pathOrder": [
+                "addressLine2"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.AddressLine3": {
+              "paths": {
+                "addressLine3": "$.internationalAddresses[*].addressLine3"
+              },
+              "pathOrder": [
+                "addressLine3"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.AddressLine4": {
+              "paths": {
+                "addressLine4": "$.internationalAddresses[*].addressLine4"
+              },
+              "pathOrder": [
+                "addressLine4"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.Country": {
+              "paths": {
+                "countryDescriptor": "$.internationalAddresses[*].countryDescriptor"
+              },
+              "pathOrder": [
+                "countryDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "CountryDescriptor"
+            },
+            "InternationalAddress.Latitude": {
+              "paths": {
+                "latitude": "$.internationalAddresses[*].latitude"
+              },
+              "pathOrder": [
+                "latitude"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.Longitude": {
+              "paths": {
+                "longitude": "$.internationalAddresses[*].longitude"
+              },
+              "pathOrder": [
+                "longitude"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.BeginDate": {
+              "paths": {
+                "beginDate": "$.internationalAddresses[*].beginDate"
+              },
+              "pathOrder": [
+                "beginDate"
+              ],
+              "isReference": false
+            },
+            "InternationalAddress.EndDate": {
+              "paths": {
+                "endDate": "$.internationalAddresses[*].endDate"
+              },
+              "pathOrder": [
+                "endDate"
+              ],
+              "isReference": false
+            },
+            "InstitutionTelephone.TelephoneNumber": {
+              "paths": {
+                "telephoneNumber": "$.institutionTelephones[*].telephoneNumber"
+              },
+              "pathOrder": [
+                "telephoneNumber"
+              ],
+              "isReference": false
+            },
+            "InstitutionTelephone.InstitutionTelephoneNumberType": {
+              "paths": {
+                "institutionTelephoneNumberTypeDescriptor": "$.institutionTelephones[*].institutionTelephoneNumberTypeDescriptor"
+              },
+              "pathOrder": [
+                "institutionTelephoneNumberTypeDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "InstitutionTelephoneNumberTypeDescriptor"
+            },
+            "WebSite": {
+              "paths": {
+                "webSite": "$.webSite"
+              },
+              "pathOrder": [
+                "webSite"
+              ],
+              "isReference": false
+            },
+            "OperationalStatus": {
+              "paths": {
+                "operationalStatusDescriptor": "$.operationalStatusDescriptor"
+              },
+              "pathOrder": [
+                "operationalStatusDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "OperationalStatusDescriptor"
+            },
+            "EducationOrganizationIndicator.Indicator": {
+              "paths": {
+                "indicatorDescriptor": "$.indicators[*].indicatorDescriptor"
+              },
+              "pathOrder": [
+                "indicatorDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "IndicatorDescriptor"
+            },
+            "EducationOrganizationIndicator.DesignatedBy": {
+              "paths": {
+                "designatedBy": "$.indicators[*].designatedBy"
+              },
+              "pathOrder": [
+                "designatedBy"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationIndicator.IndicatorValue": {
+              "paths": {
+                "indicatorValue": "$.indicators[*].indicatorValue"
+              },
+              "pathOrder": [
+                "indicatorValue"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationIndicator.IndicatorLevel": {
+              "paths": {
+                "indicatorLevelDescriptor": "$.indicators[*].indicatorLevelDescriptor"
+              },
+              "pathOrder": [
+                "indicatorLevelDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "IndicatorLevelDescriptor"
+            },
+            "EducationOrganizationIndicator.IndicatorGroup": {
+              "paths": {
+                "indicatorGroupDescriptor": "$.indicators[*].indicatorGroupDescriptor"
+              },
+              "pathOrder": [
+                "indicatorGroupDescriptor"
+              ],
+              "isReference": true,
+              "projectName": "Ed-Fi",
+              "isDescriptor": true,
+              "resourceName": "IndicatorGroupDescriptor"
+            },
+            "EducationOrganizationIndicator.Period.BeginDate": {
+              "paths": {
+                "beginDate": "$.indicators[*].periods[*].beginDate"
+              },
+              "pathOrder": [
+                "beginDate"
+              ],
+              "isReference": false
+            },
+            "EducationOrganizationIndicator.Period.EndDate": {
+              "paths": {
+                "endDate": "$.indicators[*].periods[*].endDate"
+              },
+              "pathOrder": [
+                "endDate"
+              ],
+              "isReference": false
+            }
+          },
+          "identityPathOrder": [
+            "educationOrganizationId"
+          ],
+          "isSubclass": false
+        },
         "functionDimensions": {
           "resourceName": "FunctionDimension",
           "isDescriptor": false,
@@ -103345,6 +104877,7 @@
         "DisciplineAction": "disciplineActions",
         "DisciplineIncident": "disciplineIncidents",
         "EducationContent": "educationContents",
+        "EducationOrganization": "educationOrganizations",
         "FunctionDimension": "functionDimensions",
         "FundDimension": "fundDimensions",
         "Grade": "grades",
@@ -103637,6 +105170,22 @@
         "StudentSchoolFoodServiceProgramAssociation": "studentSchoolFoodServiceProgramAssociations",
         "StudentSpecialEducationProgramAssociation": "studentSpecialEducationProgramAssociations",
         "StudentTitleIPartAProgramAssociation": "studentTitleIPartAProgramAssociations"
+      },
+      "abstractResources": {
+        "EducationOrganization": {
+          "identityPathOrder": [
+            "educationOrganizationId"
+          ]
+        },
+        "GeneralStudentProgramAssociation": {
+          "identityPathOrder": [
+            "beginDate",
+            "educationOrganizationId",
+            "programName",
+            "programTypeDescriptor",
+            "studentUniqueId"
+          ]
+        }
       }
     }
   },
