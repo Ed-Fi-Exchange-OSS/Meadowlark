@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { AbstractResourceMapping } from './AbstractResourceMapping';
 import { MetaEdProjectName } from './MetaEdProjectName';
 import { ResourceNameMapping } from './ResourceNameMapping';
 import { ResourceSchema } from './ResourceSchema';
@@ -35,6 +36,12 @@ export type ProjectSchema = {
    * SchoolYearEnumeration is not a resource but has a ResourceSchema
    */
   schoolYearEnumeration?: ResourceSchema;
+
+  /**
+   * A collection of ResourceNames of abstract resources (that don't materialize to endpoints) mapped to
+   * AbstractResourceInfos
+   */
+  abstractResources: AbstractResourceMapping;
 };
 
 export const NoProjectSchema: ProjectSchema = {
@@ -44,4 +51,5 @@ export const NoProjectSchema: ProjectSchema = {
   description: 'NoProjectSchema',
   resourceSchemas: {},
   resourceNameMapping: {},
+  abstractResources: {},
 };

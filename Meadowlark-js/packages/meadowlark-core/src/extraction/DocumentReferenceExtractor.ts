@@ -13,6 +13,7 @@ import { ApiSchema } from '../model/api-schema/ApiSchema';
 import { MetaEdProjectName } from '../model/api-schema/MetaEdProjectName';
 import { MetaEdResourceName } from '../model/api-schema/MetaEdResourceName';
 import { ProjectSchema } from '../model/api-schema/ProjectSchema';
+import { AbstractResourceInfo } from '../model/api-schema/AbstractResourceInfo';
 
 /**
  * In extracting DocumentReferences, there is an intermediate step where document values are resolved
@@ -61,22 +62,32 @@ type IntermediateDocumentIdentities = { [key: DocumentObjectKey]: any[] };
 type UnsortedDocumentIdentity = { [key: DocumentObjectKey]: any };
 
 /**
- * Finds the ResourceSchema for the document reference
+ * Finds the identityPathOrder for the document reference
  */
-function resourceSchemaForReference(
+function identityPathOrderForReference(
   apiSchema: ApiSchema,
   projectName: MetaEdProjectName,
   resourceName: MetaEdResourceName,
-): ResourceSchema {
+): DocumentObjectKey[] {
   const projectSchema: ProjectSchema | undefined = Object.values(apiSchema.projectSchemas).find(
     (ps) => ps.projectName === projectName,
   );
   invariant(projectSchema != null, `Project schema with projectName ${projectName} was not found`);
-  const result: ResourceSchema | undefined = Object.values(projectSchema.resourceSchemas).find(
-    (resourceSchema) => resourceSchema.resourceName === resourceName,
+
+  // Get the resource schema for the resource
+  const resourceSchema: ResourceSchema | undefined = Object.values(projectSchema.resourceSchemas).find(
+    (rs) => rs.resourceName === resourceName,
   );
-  invariant(result != null, `Resource schema with resourceName ${resourceName} was not found`);
-  return result;
+
+  if (resourceSchema != null) {
+    return resourceSchema.identityPathOrder;
+  }
+
+  // This must be an abstract resource reference then
+  const abstractResourceInfo: AbstractResourceInfo | undefined = projectSchema.abstractResources[resourceName];
+  invariant(abstractResourceInfo != null, `Resource schema with resourceName ${resourceName} was not found`);
+
+  return abstractResourceInfo.identityPathOrder;
 }
 
 /**
@@ -131,7 +142,7 @@ export function extractDocumentReferences(
     );
 
     // Look up identityPathOrder for this reference
-    const referenceResourceSchema: ResourceSchema = resourceSchemaForReference(
+    const identityPathOrder: DocumentObjectKey[] = identityPathOrderForReference(
       apiSchema,
       documentPaths.projectName,
       documentPaths.resourceName,
@@ -149,7 +160,7 @@ export function extractDocumentReferences(
       const documentIdentity: DocumentIdentity = [];
 
       // Put the unsorted documentIdentity fields into an ordered DocumentIdentity
-      referenceResourceSchema.identityPathOrder.forEach((documentKey: DocumentObjectKey) => {
+      identityPathOrder.forEach((documentKey: DocumentObjectKey) => {
         documentIdentity.push({ [documentKey]: unsortedDocumentIdentity[documentKey] });
       });
 
