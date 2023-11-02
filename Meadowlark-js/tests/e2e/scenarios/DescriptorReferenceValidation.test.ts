@@ -30,9 +30,11 @@ describe('When creating a resource that has a reference to a descriptor', () => 
                 "error": {
                   "failures": [
                     {
-                      "identity": {
-                        "descriptor": "uri://ed-fi.org/CountryDescriptor#AD3",
-                      },
+                      "identity": [
+                        {
+                          "descriptor": "uri://ed-fi.org/CountryDescriptor#AD3",
+                        },
+                      ],
                       "resourceName": "CountryDescriptor",
                     },
                   ],

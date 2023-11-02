@@ -48,40 +48,61 @@ describe('Sections', () => {
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "classPeriodName": "z1",
-                      "schoolReference.schoolId": 66,
-                    },
-                    "resourceName": "ClassPeriod",
-                  },
-                  {
-                    "identity": {
-                      "classPeriodName": "z2",
-                      "schoolReference.schoolId": 66,
-                    },
-                    "resourceName": "ClassPeriod",
-                  },
-                  {
-                    "identity": {
-                      "localCourseCode": "abc",
-                      "schoolReference.schoolId": 66,
-                      "sessionReference.schoolId": 66,
-                      "sessionReference.schoolYear": 2034,
-                      "sessionReference.sessionName": "d",
-                    },
+                    "identity": [
+                      {
+                        "localCourseCode": "abc",
+                      },
+                      {
+                        "schoolId": 66,
+                      },
+                      {
+                        "schoolYear": 2034,
+                      },
+                      {
+                        "sessionName": "d",
+                      },
+                    ],
                     "resourceName": "CourseOffering",
                   },
                   {
-                    "identity": {
-                      "classroomIdentificationCode": "1",
-                      "schoolReference.schoolId": 2,
-                    },
+                    "identity": [
+                      {
+                        "classroomIdentificationCode": "1",
+                      },
+                      {
+                        "schoolId": 2,
+                      },
+                    ],
                     "resourceName": "Location",
                   },
                   {
-                    "identity": {
-                      "descriptor": "k",
-                    },
+                    "identity": [
+                      {
+                        "classPeriodName": "z1",
+                      },
+                      {
+                        "schoolId": 66,
+                      },
+                    ],
+                    "resourceName": "ClassPeriod",
+                  },
+                  {
+                    "identity": [
+                      {
+                        "classPeriodName": "z2",
+                      },
+                      {
+                        "schoolId": 66,
+                      },
+                    ],
+                    "resourceName": "ClassPeriod",
+                  },
+                  {
+                    "identity": [
+                      {
+                        "descriptor": "k",
+                      },
+                    ],
                     "resourceName": "CreditTypeDescriptor",
                   },
                 ],

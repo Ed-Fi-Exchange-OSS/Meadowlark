@@ -37,7 +37,7 @@
         "--runInBand",
         "${relativeFile}",
       ],
-      "env": {"FASTIFY_PORT": "3000", "ADMIN_KEY": "7e44c15d-b20f-4cd3-8231-fc05843ea96a", "ADMIN_SECRET": "1fae0f6a425235424d79410bbfb4241a2c0eade9bf11a7fb912c9d709044d3c6" },
+      "env": {"FASTIFY_PORT": "3000", "ADMIN_KEY": "beff045b-b4aa-4482-be7e-d28bd64a8610", "ADMIN_SECRET": "bf9680b0db04a00b7e177686f8c9dd894efe736e01f4e5b52a70c3045e0c1eba" },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "port": 9229

@@ -29,17 +29,23 @@ describe('Student Intervention Association', () => {
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "educationOrganizationReference.educationOrganizationId": 123,
-                      "interventionIdentificationCode": "111",
-                    },
-                    "resourceName": "Intervention",
+                    "identity": [
+                      {
+                        "studentUniqueId": "s0zf6d1123d3e",
+                      },
+                    ],
+                    "resourceName": "Student",
                   },
                   {
-                    "identity": {
-                      "studentUniqueId": "s0zf6d1123d3e",
-                    },
-                    "resourceName": "Student",
+                    "identity": [
+                      {
+                        "educationOrganizationId": 123,
+                      },
+                      {
+                        "interventionIdentificationCode": "111",
+                      },
+                    ],
+                    "resourceName": "Intervention",
                   },
                 ],
                 "message": "Reference validation failed",
