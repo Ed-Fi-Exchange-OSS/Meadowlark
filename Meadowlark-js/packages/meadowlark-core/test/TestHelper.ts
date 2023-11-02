@@ -21,3 +21,7 @@ export function apiSchemaFrom(metaEd: MetaEdEnvironment): ApiSchema {
   const pluginEnvironment = metaEd.plugin.get('edfiApiSchema') as PluginEnvironment;
   return (pluginEnvironment.data as PluginEnvironmentEdfiApiSchema).apiSchema;
 }
+
+export function restoreSpies(spies: jest.SpyInstance[]) {
+  spies.forEach((spy) => spy.mockRestore());
+}
