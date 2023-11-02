@@ -33,7 +33,7 @@ function initializeAjv(): Ajv {
   return ajv;
 }
 
-let ajv;
+let ajv = initializeAjv();
 
 // simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
 /** This is a cache mapping MetaEd model objects to compiled ajv JSON Schema validators for the API resource */
@@ -45,7 +45,6 @@ const validatorCache: Map<TopLevelEntity, ResourceSchemaValidators> = new Map();
 function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaValidators {
   const cachedValidators: ResourceSchemaValidators | undefined = validatorCache.get(metaEdModel);
   if (cachedValidators != null) return cachedValidators;
-  ajv = initializeAjv();
   const resourceValidators: ResourceSchemaValidators = {
     insertValidator: ajv.compile(metaEdModel.data.edfiApiSchema.jsonSchemaForInsert),
     updateValidator: ajv.compile(metaEdModel.data.edfiApiSchema.jsonSchemaForUpdate),
@@ -64,6 +63,7 @@ function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaVali
  */
 export function clearAllValidatorCache(): void {
   validatorCache.clear();
+  ajv = initializeAjv();
 }
 /**
  * Creates a new empty ResourceMatchResult object
