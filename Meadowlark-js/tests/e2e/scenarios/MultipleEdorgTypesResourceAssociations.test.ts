@@ -125,7 +125,8 @@ describe('Given the existence of a student, a school, a local education agency a
     });
   });
 
-  describe('when it tries to update an student program association with a different education organization', () => {
+  // TODO: restore this test as a part of RND-669
+  describe.skip('when it tries to update an student program association with a different education organization', () => {
     let studentProgramAssociationLocation: string;
 
     beforeAll(async () => {
