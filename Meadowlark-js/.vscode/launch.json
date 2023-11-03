@@ -5,7 +5,7 @@
       "type": "node",
       "request": "launch",
       "runtimeArgs": ["--inspect", "--debug-port=9229"],
-      "env": {"FASTIFY_NUM_THREADS": "1", "FASTIFY_PORT": "3000" },
+      "env": {"FASTIFY_NUM_THREADS": "1", "FASTIFY_PORT": "3000", "OAUTH_HARD_CODED_CREDENTIALS_ENABLED": "true" },
       "program": "${workspaceFolder}/services/meadowlark-fastify/dist/index.js",
       "port": 9229,
       "console": "integratedTerminal",
@@ -37,7 +37,7 @@
         "--runInBand",
         "${relativeFile}",
       ],
-      "env": {"FASTIFY_PORT": "3000", "ADMIN_KEY": "beff045b-b4aa-4482-be7e-d28bd64a8610", "ADMIN_SECRET": "bf9680b0db04a00b7e177686f8c9dd894efe736e01f4e5b52a70c3045e0c1eba" },
+      "env": {"FASTIFY_PORT": "3000" },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "port": 9229
