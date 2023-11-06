@@ -224,11 +224,9 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
 
       await mongoDocumentCollection.replaceOne({ _id: schoolMeadowlarkId }, schoolDocument, asUpsert(updateSession));
     } catch (e) {
-      expect(e.message).toContain(
-        'WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.',
+      expect(e).toMatchInlineSnapshot(
+        '[MongoBulkWriteError: WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.]',
       );
-      expect(e.name).toBe('MongoBulkWriteError');
-      expect(e.codeName).toBe('WriteConflict');
       expect(e.code).toBe(112);
     }
 

@@ -222,11 +222,9 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
 
       await mongoDocumentCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
     } catch (e) {
-      expect(e.message).toContain(
-        'WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.',
+      expect(e).toMatchInlineSnapshot(
+        '[MongoBulkWriteError: WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.]',
       );
-      expect(e.name).toBe('MongoBulkWriteError');
-      expect(e.codeName).toBe('WriteConflict');
       expect(e.code).toBe(112);
     }
 
