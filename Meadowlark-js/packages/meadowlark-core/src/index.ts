@@ -10,7 +10,6 @@ export type { QueryHandlerPlugin } from './plugin/backend/QueryHandlerPlugin';
 export { NoQueryHandlerPlugin } from './plugin/backend/NoQueryHandlerPlugin';
 export type { SystemTestClient, SystemTestablePlugin } from './plugin/backend/SystemTestablePlugin';
 export { Subscribe } from './plugin/listener/Subscribe';
-// export * as PluginLoader from './plugin/PluginLoader';
 
 // Messages
 export type { GetResult } from './message/GetResult';

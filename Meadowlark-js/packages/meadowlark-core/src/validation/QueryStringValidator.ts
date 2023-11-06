@@ -18,7 +18,7 @@ export type QueryStringValidationResult = {
 /**
  * Validates that those queryParameters which are present are actually fields on the API resource
  */
-function validateQueryParameters(resourceSchema: ResourceSchema, queryParameters: FrontendQueryParameters): string[] {
+export function validateQueryParameters(resourceSchema: ResourceSchema, queryParameters: FrontendQueryParameters): string[] {
   const { queryValidator } = getSchemaValidatorsFor(resourceSchema);
 
   let errors: string[] = [];
@@ -69,10 +69,10 @@ function validateQueryParameters(resourceSchema: ResourceSchema, queryParameters
 /**
  * Validates that the query string keys are actually fields on the API resource.
  */
-export async function validateQueryString(
+export function validateQueryString(
   queryStrings: FrontendQueryParameters,
   resourceSchema: ResourceSchema,
-): Promise<QueryStringValidationResult> {
+): QueryStringValidationResult {
   const bodyValidation: string[] = validateQueryParameters(resourceSchema, queryStrings);
   if (bodyValidation.length > 0) {
     const modelState = Object.assign({}, ...bodyValidation.map((x) => ({ [x]: 'Invalid property' })));

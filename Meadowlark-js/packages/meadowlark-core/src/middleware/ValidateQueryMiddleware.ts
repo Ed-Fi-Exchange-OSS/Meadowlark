@@ -40,7 +40,7 @@ export async function queryValidation({ frontendRequest, frontendResponse }: Mid
   const removeDisallowedQueryParameters = R.omit(['offset', 'limit', 'totalCount']);
   const queryParameters = removeDisallowedQueryParameters(frontendRequest.queryParameters);
 
-  const { errorBody } = await validateQueryString(queryParameters, frontendRequest.middleware.resourceSchema);
+  const { errorBody } = validateQueryString(queryParameters, frontendRequest.middleware.resourceSchema);
 
   if (errorBody != null) {
     const statusCode = 400;
