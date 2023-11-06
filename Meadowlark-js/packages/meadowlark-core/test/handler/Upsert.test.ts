@@ -6,12 +6,19 @@
 import { upsert } from '../../src/handler/Upsert';
 import { UpsertResult } from '../../src/message/UpsertResult';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { isDocumentUuidWellFormed } from '../../src/model/DocumentIdentity';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { SemVer } from '../../src/model/api-schema/SemVer';
 
 const documentUuid = '3218d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -20,9 +27,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
     },
   },
 };
@@ -30,13 +37,14 @@ const frontendRequest: FrontendRequest = {
 describe('given persistence is going to throw a reference error on insert', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
   const expectedError = 'Error message';
 
   beforeAll(async () => {
@@ -49,6 +57,7 @@ describe('given persistence is going to throw a reference error on insert', () =
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -56,6 +65,7 @@ describe('given persistence is going to throw a reference error on insert', () =
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -67,7 +77,7 @@ describe('given persistence is going to throw a reference error on insert', () =
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Error message",
       }
@@ -114,13 +124,14 @@ describe('given upsert has write conflict failure', () => {
 describe('given persistence is going to throw a conflict error on insert', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
   const expectedError = 'Error message';
 
   beforeAll(async () => {
@@ -133,6 +144,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -140,6 +152,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -151,7 +164,7 @@ describe('given persistence is going to throw a conflict error on insert', () =>
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Error message",
       }
@@ -162,13 +175,14 @@ describe('given persistence is going to throw a conflict error on insert', () =>
 describe('given persistence is going to throw a reference error on update though did not on insert attempt', () => {
   let response: FrontendResponse;
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
 
   beforeAll(async () => {
     mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
@@ -180,6 +194,7 @@ describe('given persistence is going to throw a reference error on update though
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await upsert(frontendRequest);
@@ -187,6 +202,7 @@ describe('given persistence is going to throw a reference error on update though
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -197,7 +213,7 @@ describe('given persistence is going to throw a reference error on update though
     expect(response.body).toMatchInlineSnapshot(`
       {
         "blockingUris": [
-          "/v3.3b/ed-fi/resourceNames/${documentUuid}",
+          "blocking/uri",
         ],
         "error": "Reference failure",
       }

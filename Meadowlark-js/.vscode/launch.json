@@ -5,7 +5,7 @@
       "type": "node",
       "request": "launch",
       "runtimeArgs": ["--inspect", "--debug-port=9229"],
-      "env": {"FASTIFY_NUM_THREADS": "1", "OAUTH_HARD_CODED_CREDENTIALS_ENABLED": "true"},
+      "env": {"FASTIFY_NUM_THREADS": "1", "FASTIFY_PORT": "3000", "OAUTH_HARD_CODED_CREDENTIALS_ENABLED": "true" },
       "program": "${workspaceFolder}/services/meadowlark-fastify/dist/index.js",
       "port": 9229,
       "console": "integratedTerminal",
@@ -23,6 +23,21 @@
         "--runInBand",
         "${relativeFile}",
       ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    },
+    {
+      "name": "Jest :: File Linux e2e",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--runInBand",
+        "${relativeFile}",
+      ],
+      "env": {"FASTIFY_PORT": "3000" },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "port": 9229

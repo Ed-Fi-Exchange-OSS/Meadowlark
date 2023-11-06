@@ -10,6 +10,8 @@ import {
   ResourceInfo,
   newResourceInfo,
   DocumentUuid,
+  MetaEdResourceName,
+  MetaEdProjectName,
 } from '@edfi/meadowlark-core';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../src/model/MeadowlarkDocument';
 
@@ -18,11 +20,11 @@ describe('given non-superclass document info with no references', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key' },
+    documentIdentity: [{ natural: 'key' }],
   };
 
   const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
@@ -56,9 +58,11 @@ describe('given non-superclass document info with no references', () => {
         ],
         "createdAt": 1673827200000,
         "createdBy": "createdBy",
-        "documentIdentity": {
-          "natural": "key",
-        },
+        "documentIdentity": [
+          {
+            "natural": "key",
+          },
+        ],
         "documentUuid": "3018d452-a7b7-4f1c-aa91-26ccc48cf4b8",
         "edfiDoc": {
           "edfi": "doc",
@@ -80,25 +84,25 @@ describe('given non-superclass document info with references', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key' },
+    documentIdentity: [{ natural: 'key' }],
     documentReferences: [
       {
-        documentIdentity: { natural: 'key2' },
+        documentIdentity: [{ natural: 'key2' }],
         isDescriptor: false,
-        projectName: 'projectName',
-        resourceName: 'resourceName',
+        projectName: 'projectName' as MetaEdProjectName,
+        resourceName: 'resourceName' as MetaEdResourceName,
       },
     ],
     descriptorReferences: [
       {
-        documentIdentity: { natural: 'key3' },
+        documentIdentity: [{ natural: 'key3' }],
         isDescriptor: true,
-        projectName: 'projectName',
-        resourceName: 'resourceName2',
+        projectName: 'projectName' as MetaEdProjectName,
+        resourceName: 'resourceName2' as MetaEdResourceName,
       },
     ],
   };
@@ -128,7 +132,7 @@ describe('given non-superclass document info with references', () => {
     expect(meadowlarkDocument.outboundRefs).toMatchInlineSnapshot(`
       [
         "dfR7WrhrnYMh8lF_mnIhAN2Ur2Ji2MmlGBcSUg",
-        "t9LSXi1nFRmwyLTPkxiA9RG1ItGTlsxaGzTwKA",
+        "7tIjvqhWCIKdHjfSkxiA9RG1ItGTlsxaGzTwKA",
       ]
     `);
   });
@@ -139,12 +143,16 @@ describe('given superclass document info', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'key' },
-    superclassInfo: { documentIdentity: { natural: 'key2' }, projectName: 'projectName', resourceName: 'resourceName' },
+    documentIdentity: [{ natural: 'key' }],
+    superclassInfo: {
+      documentIdentity: [{ natural: 'key2' }],
+      projectName: 'projectName' as MetaEdProjectName,
+      resourceName: 'resourceName' as MetaEdResourceName,
+    },
   };
   const documentUuid = '3018d452-a7b7-4f1c-aa91-26ccc48cf4b8' as DocumentUuid;
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);

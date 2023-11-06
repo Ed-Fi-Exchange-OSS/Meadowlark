@@ -34,15 +34,19 @@ describe('Sessions', () => {
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "schoolId": 99,
-                    },
+                    "identity": [
+                      {
+                        "schoolId": 99,
+                      },
+                    ],
                     "resourceName": "School",
                   },
                   {
-                    "identity": {
-                      "descriptor": "uri://ed-fi.org/fake-uri",
-                    },
+                    "identity": [
+                      {
+                        "descriptor": "uri://ed-fi.org/fake-uri",
+                      },
+                    ],
                     "resourceName": "TermDescriptor",
                   },
                 ],

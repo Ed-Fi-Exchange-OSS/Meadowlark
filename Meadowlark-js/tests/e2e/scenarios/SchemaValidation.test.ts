@@ -115,10 +115,20 @@ describe('When creating a resource', () => {
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "descriptor": "abc",
-                    },
-                    "resourceName": "EducationOrganizationCategory",
+                    "identity": [
+                      {
+                        "descriptor": "",
+                      },
+                    ],
+                    "resourceName": "EducationOrganizationIdentificationSystemDescriptor",
+                  },
+                  {
+                    "identity": [
+                      {
+                        "descriptor": "abc",
+                      },
+                    ],
+                    "resourceName": "EducationOrganizationCategoryDescriptor",
                   },
                 ],
                 "message": "Reference validation failed",
@@ -251,10 +261,20 @@ describe('When creating a resource', () => {
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "descriptor": "abc",
-                    },
-                    "resourceName": "EducationOrganizationCategory",
+                    "identity": [
+                      {
+                        "descriptor": "def",
+                      },
+                    ],
+                    "resourceName": "EducationOrganizationIdentificationSystemDescriptor",
+                  },
+                  {
+                    "identity": [
+                      {
+                        "descriptor": "abc",
+                      },
+                    ],
+                    "resourceName": "EducationOrganizationCategoryDescriptor",
                   },
                 ],
                 "message": "Reference validation failed",

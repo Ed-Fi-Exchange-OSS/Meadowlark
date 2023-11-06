@@ -22,6 +22,9 @@ import type { UpsertRequest } from '../message/UpsertRequest';
 import { beforeUpsertDocument, afterUpsertDocument } from '../plugin/listener/Publish';
 import { meadowlarkIdForDocumentIdentity } from '../model/DocumentIdentity';
 import type { TraceId } from '../model/IdTypes';
+import type { MetaEdResourceName } from '../model/api-schema/MetaEdResourceName';
+import type { MetaEdProjectName } from '../model/api-schema/MetaEdProjectName';
+import type { SemVer } from '../model/api-schema/SemVer';
 
 export const descriptorPath: string = path.resolve(__dirname, '../../edfi-descriptors/3.3.1-a');
 
@@ -119,9 +122,9 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
 
       const resourceInfo: ResourceInfo = {
         ...newResourceInfo(),
-        resourceName: descriptorName,
-        projectName: 'Ed-Fi',
-        resourceVersion: '3.3.1-b',
+        resourceName: descriptorName as MetaEdResourceName,
+        projectName: 'Ed-Fi' as MetaEdProjectName,
+        resourceVersion: '3.3.1-b' as SemVer,
         isDescriptor: true,
       };
 

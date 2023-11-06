@@ -12,16 +12,19 @@ import {
   AuthorizationStrategy,
   TraceId,
   ResourceInfo,
+  MetaEdProjectName,
+  MetaEdResourceName,
+  SemVer,
 } from '@edfi/meadowlark-core';
 import { indexFromResourceInfo, queryDocuments } from '../src/repository/QueryOpensearch';
 
 const mock = new Mock();
 
 const resourceInfo: ResourceInfo = {
-  projectName: 'ed-fi',
-  resourceName: 'student',
+  projectName: 'ed-fi' as MetaEdProjectName,
+  resourceName: 'student' as MetaEdResourceName,
   isDescriptor: false,
-  resourceVersion: '3.3.1-b',
+  resourceVersion: '3.3.1-b' as SemVer,
   allowIdentityUpdates: false,
 };
 
@@ -70,10 +73,10 @@ describe('when querying for students', () => {
     clientId = 'hi',
   ): QueryRequest => ({
     resourceInfo: {
-      projectName: 'ed-fi',
-      resourceName: 'student',
+      projectName: 'ed-fi' as MetaEdProjectName,
+      resourceName: 'student' as MetaEdResourceName,
       isDescriptor: false,
-      resourceVersion: '3.3.1-b',
+      resourceVersion: '3.3.1-b' as SemVer,
       allowIdentityUpdates: false,
     },
     queryParameters,

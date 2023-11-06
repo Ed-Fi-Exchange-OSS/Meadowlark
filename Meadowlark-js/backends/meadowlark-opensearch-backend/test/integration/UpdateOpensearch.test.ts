@@ -8,11 +8,14 @@ import {
   DeleteResult,
   DocumentUuid,
   MeadowlarkId,
+  MetaEdProjectName,
+  MetaEdResourceName,
   newSecurity,
   NoDocumentInfo,
   PaginationParameters,
   QueryRequest,
   ResourceInfo,
+  SemVer,
   TraceId,
   UpdateRequest,
   UpdateResult,
@@ -31,10 +34,10 @@ import { getNewTestClient } from '../setup/OpenSearchSetupEnvironment';
 jest.setTimeout(120_000);
 
 const resourceInfo: ResourceInfo = {
-  projectName: 'ed-fi',
-  resourceName: 'student',
+  projectName: 'ed-fi' as MetaEdProjectName,
+  resourceName: 'student' as MetaEdResourceName,
   isDescriptor: false,
-  resourceVersion: '3.3.1-b',
+  resourceVersion: '3.3.1-b' as SemVer,
   allowIdentityUpdates: false,
 };
 

@@ -14,9 +14,14 @@ import {
   AuthorizationStrategy,
   DeleteRequest,
   DeleteResult,
+  generateDocumentUuid,
+  DocumentUuid,
+  MeadowlarkId,
+  TraceId,
+  MetaEdProjectName,
+  MetaEdResourceName,
+  SemVer,
 } from '@edfi/meadowlark-core';
-import { DocumentUuid, MeadowlarkId, TraceId } from '@edfi/meadowlark-core/src/model/IdTypes';
-import { generateDocumentUuid } from '@edfi/meadowlark-core/src/model/DocumentIdentity';
 import { Client } from '@elastic/elasticsearch';
 import { queryDocuments } from '../../src/repository/QueryElasticsearch';
 import { afterDeleteDocumentById, afterUpsertDocument } from '../../src/repository/UpdateElasticsearch';
@@ -25,10 +30,10 @@ import { getNewTestClient } from '../setup/ElasticSearchSetupEnvironment';
 jest.setTimeout(120_000);
 
 const resourceInfo: ResourceInfo = {
-  projectName: 'ed-fi',
-  resourceName: 'student',
+  projectName: 'ed-fi' as MetaEdProjectName,
+  resourceName: 'student' as MetaEdResourceName,
   isDescriptor: false,
-  resourceVersion: '3.3.1-b',
+  resourceVersion: '3.3.1-b' as SemVer,
   allowIdentityUpdates: false,
 };
 
@@ -130,7 +135,7 @@ describe('When querying for documents', () => {
     describe('when querying with wrong resource info', () => {
       it('should return invalid query', async () => {
         const invalidResourceInfo = { ...resourceInfo };
-        invalidResourceInfo.projectName = 'wrong-project';
+        invalidResourceInfo.projectName = 'wrong-project' as MetaEdProjectName;
         const result = await queryDocuments(setupQueryRequest({}, {}, invalidResourceInfo), client);
 
         expect(result.response).toEqual('QUERY_FAILURE_INDEX_NOT_FOUND');
@@ -237,10 +242,10 @@ describe('When querying for documents', () => {
 
     describe('when querying for descriptor', () => {
       const descriptorResourceInfo: ResourceInfo = {
-        projectName: 'ed-fi',
-        resourceName: 'countryDescriptor',
+        projectName: 'ed-fi' as MetaEdProjectName,
+        resourceName: 'countryDescriptor' as MetaEdResourceName,
         isDescriptor: true,
-        resourceVersion: '3.3.1-b',
+        resourceVersion: '3.3.1-b' as SemVer,
         allowIdentityUpdates: false,
       };
 

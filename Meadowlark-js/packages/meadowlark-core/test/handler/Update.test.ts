@@ -5,11 +5,18 @@
 
 import { update } from '../../src/handler/Update';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { SemVer } from '../../src/model/api-schema/SemVer';
 
 const documentUuid = '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid;
 const frontendRequest: FrontendRequest = {
@@ -18,9 +25,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
       documentUuid,
     },
   },
@@ -61,12 +68,14 @@ describe('given the requested document does not exist', () => {
 
 describe('given the new document has an invalid reference ', () => {
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
+
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid: 'documentUuid' as DocumentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   const expectedError = 'this is the message';
   let response: FrontendResponse;
@@ -82,6 +91,8 @@ describe('given the new document has an invalid reference ', () => {
         }),
     });
 
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
+
     const frontendRequestTest = frontendRequest;
     frontendRequestTest.middleware.parsedBody = { id: documentUuid };
     // Act
@@ -90,6 +101,7 @@ describe('given the new document has an invalid reference ', () => {
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -101,7 +113,7 @@ describe('given the new document has an invalid reference ', () => {
     expect(response.body).toMatchInlineSnapshot(`
     {
       "blockingUris": [
-        "/v3.3b/ed-fi/resourceNames/documentUuid",
+        "blocking/uri",
       ],
       "error": "this is the message",
     }

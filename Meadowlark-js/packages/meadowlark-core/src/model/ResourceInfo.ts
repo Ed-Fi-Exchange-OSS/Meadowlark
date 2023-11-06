@@ -3,20 +3,25 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import { SemVer } from './api-schema/SemVer';
+import { MetaEdProjectName } from './api-schema/MetaEdProjectName';
+import { MetaEdResourceName } from './api-schema/MetaEdResourceName';
+
 /**
- * Base API resource information
+ * Base API resource information for passing along to backends
  */
 export interface BaseResourceInfo {
   /**
-   * The MetaEd project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
+   * The project name the API document resource is defined in e.g. "EdFi" for a data standard entity.
    */
-  projectName: string;
+  projectName: MetaEdProjectName;
 
   /**
    * The name of the resource. Typically, this is the same as the corresponding MetaEd entity name. However,
    * there are exceptions, for example descriptors have a "Descriptor" suffix on their resource name.
    */
-  resourceName: string;
+  resourceName: MetaEdResourceName;
+
   /**
    * Whether this resource is a descriptor. Descriptors are treated differently from other documents
    */
@@ -28,9 +33,9 @@ export interface BaseResourceInfo {
  */
 export interface ResourceInfo extends BaseResourceInfo {
   /**
-   * The MetaEd project version the entity belongs to.
+   * The project version the resource belongs to.
    */
-  resourceVersion: string;
+  resourceVersion: SemVer;
 
   allowIdentityUpdates: boolean;
 }
@@ -40,10 +45,10 @@ export interface ResourceInfo extends BaseResourceInfo {
  */
 export function newResourceInfo(): ResourceInfo {
   return {
-    resourceName: '',
+    resourceName: '' as MetaEdResourceName,
     isDescriptor: false,
-    projectName: '',
-    resourceVersion: '',
+    projectName: '' as MetaEdProjectName,
+    resourceVersion: '' as SemVer,
     allowIdentityUpdates: false,
   };
 }
@@ -51,10 +56,10 @@ export function newResourceInfo(): ResourceInfo {
 /**
  * The null object for ResourceInfo
  */
-export const NoResourceInfo = Object.freeze({
-  ...newResourceInfo(),
-  resourceName: 'NoResourceName',
-  projectName: 'NoProjectName',
-  namespace: 'NoNamespace',
-  resourceVersion: '0.0.0',
+export const NoResourceInfo: ResourceInfo = Object.freeze({
+  resourceName: 'NoResourceName' as MetaEdResourceName,
+  projectName: 'NoProjectName' as MetaEdProjectName,
+  resourceVersion: '0.0.0' as SemVer,
+  allowIdentityUpdates: false,
+  isDescriptor: false,
 });

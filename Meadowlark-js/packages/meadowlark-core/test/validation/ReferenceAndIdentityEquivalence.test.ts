@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable dot-notation */
+
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
@@ -11,25 +13,19 @@ import {
   NamespaceBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentReferences } from '../../src/extraction/DocumentReferenceExtractor';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
-import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
+import { DocumentIdentity } from '../../src/model/DocumentIdentity';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
+import { apiSchemaFrom } from '../TestHelper';
 
 describe('when comparing identities with references from domain entity referencing one as identity and another as collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let referenceExtractionResult: DocumentReference[] = [];
-  let classPeriodIdentityExtractionResult: DocumentIdentity = NoDocumentIdentity;
-  let courseOfferingIdentityExtractionResult: DocumentIdentity = NoDocumentIdentity;
+  let classPeriodIdentityExtractionResult: DocumentIdentity = [];
+  let courseOfferingIdentityExtractionResult: DocumentIdentity = [];
 
   const bodyWithReferences = {
     sectionIdentifier: 'Bob',
@@ -98,38 +94,35 @@ describe('when comparing identities with references from domain entity referenci
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const section = namespace.entity.domainEntity.get('Section');
-    referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
-    const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
-    const courseOffering = namespace.entity.domainEntity.get('CourseOffering');
-    courseOfferingIdentityExtractionResult = extractDocumentIdentity(courseOffering, courseOfferingIdentityBody);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
+    const classPeriodResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['classPeriods'];
+    const courseOfferingResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['courseOfferings'];
+
+    referenceExtractionResult = extractDocumentReferences(apiSchema, sectionResourceSchema, bodyWithReferences);
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriodResourceSchema, classPeriodIdentityBody);
+    courseOfferingIdentityExtractionResult = extractDocumentIdentity(
+      courseOfferingResourceSchema,
+      courseOfferingIdentityBody,
+    );
   });
 
   it('should have classPeriod reference and identity match', () => {
-    const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
+    const [, classPeriodReferenceExtractionResult] = referenceExtractionResult;
+    expect(classPeriodReferenceExtractionResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 
   it('should have courseOffering reference and identity match', () => {
-    const [, , courseOfferingReferenceExtractonResult] = referenceExtractionResult;
-    expect(courseOfferingReferenceExtractonResult.documentIdentity).toEqual(courseOfferingIdentityExtractionResult);
+    const [courseOfferingReferenceExtractionResult] = referenceExtractionResult;
+    expect(courseOfferingReferenceExtractionResult.documentIdentity).toEqual(courseOfferingIdentityExtractionResult);
   });
 });
 
 describe('when comparing identities with references with three levels of identities on a collection reference', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let referenceExtractionResult: DocumentReference[] = [];
-  let classPeriodIdentityExtractionResult: DocumentIdentity = NoDocumentIdentity;
+  let classPeriodIdentityExtractionResult: DocumentIdentity = [];
 
   const bodyWithReferences = {
     sectionIdentifier: 'Bob',
@@ -211,31 +204,25 @@ describe('when comparing identities with references with three levels of identit
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const section = namespace.entity.domainEntity.get('Section');
-    referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
-    const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
+    const classPeriodResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['classPeriods'];
+
+    referenceExtractionResult = extractDocumentReferences(apiSchema, sectionResourceSchema, bodyWithReferences);
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriodResourceSchema, classPeriodIdentityBody);
   });
 
   it('should have classPeriod reference and identity match', () => {
-    const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
+    const [classPeriodReferenceExtractionResult] = referenceExtractionResult;
+    expect(classPeriodReferenceExtractionResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 });
 
 describe('when comparing identities with references with two levels of identities with a merge on School', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let referenceExtractionResult: DocumentReference[] = [];
-  let classPeriodIdentityExtractionResult: DocumentIdentity = NoDocumentIdentity;
+  let classPeriodIdentityExtractionResult: DocumentIdentity = [];
 
   const bodyWithReferences = {
     sectionIdentifier: 'Bob',
@@ -300,22 +287,17 @@ describe('when comparing identities with references with two levels of identitie
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const section = namespace.entity.domainEntity.get('Section');
-    referenceExtractionResult = extractDocumentReferences(section, bodyWithReferences);
-    const classPeriod = namespace.entity.domainEntity.get('ClassPeriod');
-    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriod, classPeriodIdentityBody);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const sectionResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
+    const classPeriodResourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['classPeriods'];
+
+    referenceExtractionResult = extractDocumentReferences(apiSchema, sectionResourceSchema, bodyWithReferences);
+    classPeriodIdentityExtractionResult = extractDocumentIdentity(classPeriodResourceSchema, classPeriodIdentityBody);
   });
 
   it('should have classPeriod reference and identity match', () => {
-    const [classPeriodReferenceExtractonResult] = referenceExtractionResult;
-    expect(classPeriodReferenceExtractonResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
+    const [classPeriodReferenceExtractionResult] = referenceExtractionResult;
+    expect(classPeriodReferenceExtractionResult.documentIdentity).toEqual(classPeriodIdentityExtractionResult);
   });
 });

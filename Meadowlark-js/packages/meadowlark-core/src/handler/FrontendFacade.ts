@@ -8,7 +8,7 @@ import { authorize } from '../middleware/AuthorizationMiddleware';
 import { MiddlewareModel } from '../middleware/MiddlewareModel';
 import { parsePath } from '../middleware/ParsePathMiddleware';
 import { parseBody } from '../middleware/ParseBodyMiddleware';
-import { resourceValidation } from '../middleware/ValidateResourceMiddleware';
+import { endpointValidation } from '../middleware/ValidateEndpointMiddleware';
 import { documentValidation } from '../middleware/ValidateDocumentMiddleware';
 import { FrontendRequest } from './FrontendRequest';
 import { FrontendResponse } from './FrontendResponse';
@@ -21,11 +21,11 @@ import * as Connection from './Connection';
 import { ensurePluginsLoaded, getDocumentStore } from '../plugin/PluginLoader';
 import { queryValidation } from '../middleware/ValidateQueryMiddleware';
 import { documentInfoExtraction } from '../middleware/ExtractDocumentInfoMiddleware';
-import { metaEdModelFinding } from '../middleware/FindMetaEdModelMiddleware';
 import { logRequestBody } from '../middleware/RequestLoggingMiddleware';
 import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 import { equalityConstraintValidation } from '../middleware/ValidateEqualityConstraintMiddleware';
 import { timestampRequest } from '../middleware/TimestampRequestMiddleware';
+import { loadApiSchema } from '../middleware/ApiSchemaLoadingMiddleware';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -44,12 +44,12 @@ function postStack(): MiddlewareStack {
   return R.once(
     R.pipe(
       timestampRequest,
+      R.andThen(loadApiSchema),
       R.andThen(authorize),
       R.andThen(parsePath),
       R.andThen(parseBody),
       R.andThen(logRequestBody),
-      R.andThen(resourceValidation),
-      R.andThen(metaEdModelFinding),
+      R.andThen(endpointValidation),
       R.andThen(documentValidation),
       R.andThen(equalityConstraintValidation),
       R.andThen(documentInfoExtraction),
@@ -64,12 +64,12 @@ function putStack(): MiddlewareStack {
   return R.once(
     R.pipe(
       timestampRequest,
+      R.andThen(loadApiSchema),
       R.andThen(authorize),
       R.andThen(parsePath),
       R.andThen(parseBody),
       R.andThen(logRequestBody),
-      R.andThen(resourceValidation),
-      R.andThen(metaEdModelFinding),
+      R.andThen(endpointValidation),
       R.andThen(documentValidation),
       R.andThen(equalityConstraintValidation),
       R.andThen(documentInfoExtraction),
@@ -83,9 +83,10 @@ function putStack(): MiddlewareStack {
 function deleteStack(): MiddlewareStack {
   return R.once(
     R.pipe(
-      authorize,
+      loadApiSchema,
+      R.andThen(authorize),
       R.andThen(parsePath),
-      R.andThen(resourceValidation),
+      R.andThen(endpointValidation),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
     ),
@@ -96,8 +97,9 @@ function deleteStack(): MiddlewareStack {
 function getByIdStack(): MiddlewareStack {
   return R.once(
     R.pipe(
-      authorize,
-      R.andThen(resourceValidation),
+      loadApiSchema,
+      R.andThen(authorize),
+      R.andThen(endpointValidation),
       R.andThen(getDocumentStore().securityMiddleware),
       R.andThen(logTheResponse),
     ),
@@ -108,9 +110,9 @@ function getByIdStack(): MiddlewareStack {
 function queryStack(): MiddlewareStack {
   return R.once(
     R.pipe(
-      authorize,
-      R.andThen(resourceValidation),
-      R.andThen(metaEdModelFinding),
+      loadApiSchema,
+      R.andThen(authorize),
+      R.andThen(endpointValidation),
       R.andThen(queryValidation),
       R.andThen(logTheResponse),
     ),

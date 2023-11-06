@@ -6,14 +6,19 @@
 import { DescriptorDocument } from './DescriptorDocument';
 import { DocumentIdentity } from './DocumentIdentity';
 import { DocumentInfo, newDocumentInfo } from './DocumentInfo';
+import { DocumentObjectKey } from './api-schema/DocumentObjectKey';
+
+const descriptorKey = 'descriptor' as DocumentObjectKey;
 
 /**
  * Creates a new DocumentIdentity from the given DescriptorDocument
  */
 export function descriptorDocumentIdentityFrom(descriptorDocument: DescriptorDocument): DocumentIdentity {
-  return {
-    descriptor: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
-  };
+  return [
+    {
+      [descriptorKey]: `${descriptorDocument.namespace}#${descriptorDocument.codeValue}`,
+    },
+  ];
 }
 
 /**

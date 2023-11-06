@@ -5,20 +5,27 @@
 
 import { deleteIt } from '../../src/handler/Delete';
 import * as PluginLoader from '../../src/plugin/PluginLoader';
+import * as UriBuilder from '../../src/handler/UriBuilder';
 import { FrontendResponse } from '../../src/handler/FrontendResponse';
 import { FrontendRequest, newFrontendRequest, newFrontendRequestMiddleware } from '../../src/handler/FrontendRequest';
 import { NoDocumentStorePlugin } from '../../src/plugin/backend/NoDocumentStorePlugin';
 import { ReferringDocumentInfo } from '../../src/message/ReferringDocumentInfo';
 import { DocumentUuid, MeadowlarkId } from '../../src/model/IdTypes';
+import { EndpointName } from '../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../src/model/ProjectShortVersion';
+import { MetaEdResourceName } from '../../src/model/api-schema/MetaEdResourceName';
+import { MetaEdProjectName } from '../../src/model/api-schema/MetaEdProjectName';
+import { SemVer } from '../../src/model/api-schema/SemVer';
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as EndpointName,
+      projectNamespace: 'ed-fi' as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as ProjectShortVersion,
       documentUuid: '2edb604f-eab0-412c-a242-508d6529214d' as DocumentUuid,
     },
   },
@@ -151,12 +158,14 @@ describe('given id does not exist', () => {
 
 describe('given the document to be deleted is referenced by other documents ', () => {
   let mockDocumentStore: any;
+  let mockUriBuilder: any;
+
   const expectedBlockingDocument: ReferringDocumentInfo = {
-    resourceName: 'resourceName',
+    resourceName: 'resourceName' as MetaEdResourceName,
     documentUuid: 'documentUuid' as DocumentUuid,
     meadowlarkId: 'meadowlarkId' as MeadowlarkId,
-    projectName: 'Ed-Fi',
-    resourceVersion: '3.3.1-b',
+    projectName: 'Ed-Fi' as MetaEdProjectName,
+    resourceVersion: '3.3.1-b' as SemVer,
   };
   let response: FrontendResponse;
 
@@ -169,6 +178,7 @@ describe('given the document to be deleted is referenced by other documents ', (
           referringDocumentInfo: [expectedBlockingDocument],
         }),
     });
+    mockUriBuilder = jest.spyOn(UriBuilder, 'blockingDocumentsToUris').mockReturnValue(['blocking/uri']);
 
     // Act
     response = await deleteIt(frontendRequest);
@@ -176,6 +186,7 @@ describe('given the document to be deleted is referenced by other documents ', (
 
   afterAll(() => {
     mockDocumentStore.mockRestore();
+    mockUriBuilder.mockRestore();
   });
 
   it('returns status 409', () => {
@@ -187,7 +198,7 @@ describe('given the document to be deleted is referenced by other documents ', (
       {
         "error": {
           "blockingUris": [
-            "/v3.3b/ed-fi/resourceNames/documentUuid",
+            "blocking/uri",
           ],
           "message": "The resource cannot be deleted because it is a dependency of other documents",
         },

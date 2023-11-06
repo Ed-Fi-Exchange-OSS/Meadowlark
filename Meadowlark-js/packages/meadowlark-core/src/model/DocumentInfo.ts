@@ -4,7 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import type { SuperclassInfo } from './SuperclassInfo';
-import { NoDocumentIdentity } from './DocumentIdentity';
 import type { DocumentIdentity } from './DocumentIdentity';
 import type { DocumentReference } from './DocumentReference';
 
@@ -43,7 +42,7 @@ export interface DocumentInfo {
  */
 export function newDocumentInfo(): DocumentInfo {
   return {
-    documentIdentity: NoDocumentIdentity,
+    documentIdentity: [],
     superclassInfo: null,
     documentReferences: [],
     descriptorReferences: [],

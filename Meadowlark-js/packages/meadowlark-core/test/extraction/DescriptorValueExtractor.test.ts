@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable dot-notation */
+
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
@@ -18,24 +20,15 @@ import {
   descriptorReferenceEnhancer,
   domainEntitySubclassBaseClassEnhancer,
 } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-  subclassPropertyNamingCollisionEnhancer,
-  subclassPropertyCollectingEnhancer,
-  subclassApiEntityMappingEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 
 import { extractDescriptorValues } from '../../src/extraction/DescriptorValueExtractor';
 import { DocumentReference } from '../../src/model/DocumentReference';
+import { apiSchemaFrom } from '../TestHelper';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
 
 describe('when extracting single descriptor value from domain entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const descriptorValue = 'uri://ed-fi.org/grade';
@@ -63,26 +56,21 @@ describe('when extracting single descriptor value from domain entity', () => {
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['entityNames'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntity.get('EntityName');
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have the descriptor value for a GradingPeriod', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade",
-          },
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/grade",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
@@ -94,7 +82,6 @@ describe('when extracting single descriptor value from domain entity', () => {
 
 describe('when extracting single descriptor value from common with role name', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const descriptorValue = 'uri://ed-fi.org/grade';
@@ -110,6 +97,7 @@ describe('when extracting single descriptor value from common with role name', (
       .withStartDescriptor('CreditType')
       .withDocumentation('Documentation')
       .withEndDescriptor()
+
       .withStartInlineCommon('Credits')
       .withDocumentation('Documentation')
       .withDescriptorProperty('CreditType', 'Documentation', false, false)
@@ -129,26 +117,21 @@ describe('when extracting single descriptor value from common with role name', (
 
     inlineCommonReferenceEnhancer(metaEd);
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntity.get('Section');
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have the descriptor value', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade",
-          },
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/grade",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "CreditTypeDescriptor",
@@ -160,7 +143,6 @@ describe('when extracting single descriptor value from common with role name', (
 
 describe('when extracting descriptor values from domain entity with the same names', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const gradingPeriod = 'GradingPeriod';
@@ -189,26 +171,21 @@ describe('when extracting descriptor values from domain entity with the same nam
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['gradingPeriods'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntity.get(gradingPeriod);
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have the descriptor value for a GradingPeriod', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade",
-          },
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/grade",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "GradingPeriodDescriptor",
@@ -220,7 +197,6 @@ describe('when extracting descriptor values from domain entity with the same nam
 
 describe('when extracting array of descriptor values from domain entity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const descriptorValue = 'uri://ed-fi.org/grade';
@@ -258,51 +234,30 @@ describe('when extracting array of descriptor values from domain entity', () => 
       .sendToListener(new DescriptorBuilder(metaEd, []));
 
     descriptorReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['entityNames'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntity.get('EntityName');
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have the descriptor values for the GradingPeriods', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade1",
-          },
-          "isAssignableFrom": false,
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/grade1",
+            },
+            {
+              "descriptor": "uri://ed-fi.org/grade2",
+            },
+            {
+              "descriptor": "uri://ed-fi.org/grade3",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
-          "resourceName": "GradingPeriod",
-          "resourceVersion": "",
-        },
-        {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade2",
-          },
-          "isAssignableFrom": false,
-          "isDescriptor": true,
-          "projectName": "EdFi",
-          "resourceName": "GradingPeriod",
-          "resourceVersion": "",
-        },
-        {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/grade3",
-          },
-          "isAssignableFrom": false,
-          "isDescriptor": true,
-          "projectName": "EdFi",
-          "resourceName": "GradingPeriod",
-          "resourceVersion": "",
+          "resourceName": "GradingPeriodDescriptor",
         },
       ]
     `);
@@ -311,7 +266,6 @@ describe('when extracting array of descriptor values from domain entity', () => 
 
 describe('when extracting collection from domain entity subclass with naming collision issue', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const body = {
@@ -339,6 +293,7 @@ describe('when extracting collection from domain entity subclass with naming col
 
       .withStartDomainEntitySubclass('School', 'EducationOrganization')
       .withDocumentation('doc')
+      .withIdentityRenameProperty('integer', 'SchoolId', 'Identity', 'doc')
       .withDescriptorProperty('SchoolCategory', 'doc', true, true)
       .withEndDomainEntity()
 
@@ -357,43 +312,34 @@ describe('when extracting collection from domain entity subclass with naming col
 
     descriptorReferenceEnhancer(metaEd);
     domainEntitySubclassBaseClassEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    subclassPropertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-    subclassApiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['schools'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntitySubclass.get('School');
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have values for body without collection prefix removal', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/schoolValue",
-          },
-          "isAssignableFrom": false,
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/schoolValue",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
-          "resourceName": "SchoolCategory",
-          "resourceVersion": "",
+          "resourceName": "SchoolCategoryDescriptor",
         },
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/edOrgValue",
-          },
-          "isAssignableFrom": false,
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/edOrgValue",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
-          "resourceName": "EducationOrganizationCategory",
-          "resourceVersion": "",
+          "resourceName": "EducationOrganizationCategoryDescriptor",
         },
       ]
     `);
@@ -402,7 +348,6 @@ describe('when extracting collection from domain entity subclass with naming col
 
 describe('when extracting collection from domain entity subclass with no naming collision issue due to one being a non-collection', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
   let result: DocumentReference[] = [];
 
   const body = {
@@ -426,6 +371,7 @@ describe('when extracting collection from domain entity subclass with no naming 
 
       .withStartDomainEntitySubclass('School', 'EducationOrganization')
       .withDocumentation('doc')
+      .withIdentityRenameProperty('integer', 'SchoolId', 'Identity', 'doc')
       .withDescriptorProperty('SchoolCategory', 'doc', true, false)
       .withEndDomainEntity()
 
@@ -444,41 +390,34 @@ describe('when extracting collection from domain entity subclass with no naming 
 
     descriptorReferenceEnhancer(metaEd);
     domainEntitySubclassBaseClassEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    subclassPropertyNamingCollisionEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    subclassPropertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-    subclassApiEntityMappingEnhancer(metaEd);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['schools'];
 
-    namespace = metaEd.namespace.get('EdFi');
-    const entity = namespace.entity.domainEntitySubclass.get('School');
-    result = extractDescriptorValues(entity, body);
+    result = extractDescriptorValues(resourceSchema, body);
   });
 
   it('should have values for body with collection prefix removal and without collection', () => {
     expect(result).toMatchInlineSnapshot(`
       [
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/schoolValue",
-          },
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/schoolValue",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
           "resourceName": "SchoolCategoryDescriptor",
         },
         {
-          "documentIdentity": {
-            "descriptor": "uri://ed-fi.org/edOrgValue",
-          },
-          "isAssignableFrom": false,
+          "documentIdentity": [
+            {
+              "descriptor": "uri://ed-fi.org/edOrgValue",
+            },
+          ],
           "isDescriptor": true,
           "projectName": "EdFi",
-          "resourceName": "EducationOrganizationCategory",
-          "resourceVersion": "",
+          "resourceName": "EducationOrganizationCategoryDescriptor",
         },
       ]
     `);

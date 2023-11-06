@@ -17,9 +17,10 @@ import {
   SuperclassInfo,
   newSuperclassInfo,
   UpsertResult,
-  DocumentIdentity,
   MeadowlarkId,
   TraceId,
+  MetaEdResourceName,
+  MetaEdProjectName,
 } from '@edfi/meadowlark-core';
 import type { PoolClient } from 'pg';
 import { getSharedClient, resetSharedClient } from '../../src/repository/Db';
@@ -46,11 +47,11 @@ describe('given the upsert of a new document', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert1' },
+    documentIdentity: [{ natural: 'upsert1' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
 
@@ -95,11 +96,11 @@ describe('given the upsert of an existing document three times', () => {
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfoBase: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert2' },
+    documentIdentity: [{ natural: 'upsert2' }],
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfoBase.documentIdentity);
 
@@ -163,11 +164,12 @@ describe('given an upsert of an existing document that changes the edfiDoc', () 
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert3' },
+    documentIdentity: [{ natural: 'upsert3' }],
+
     requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
@@ -212,11 +214,11 @@ describe('given an attempted upsert of an existing document with a stale request
 
   const resourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const documentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert3' },
+    documentIdentity: [{ natural: 'upsert3' }],
     requestTimestamp,
   };
   const meadowlarkId = meadowlarkIdForDocumentIdentity(resourceInfo, documentInfo.documentIdentity);
@@ -264,11 +266,11 @@ describe('given an upsert of a new document that references a non-existent docum
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert4' },
+    documentIdentity: [{ natural: 'upsert4' }],
   };
 
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -279,7 +281,8 @@ describe('given an upsert of a new document that references a non-existent docum
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ natural: 'not a valid reference' }],
+
     isDescriptor: false,
   };
   documentWithReferencesInfo.documentReferences = [invalidReference];
@@ -312,7 +315,7 @@ describe('given an upsert of a new document that references a non-existent docum
 
   it('should have inserted the document with an invalid reference in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
-    expect(result.document_identity.natural).toBe('upsert4');
+    expect(result.document_identity[0].natural).toBe('upsert4');
   });
 });
 
@@ -322,11 +325,11 @@ describe('given an upsert of a new document that references an existing document
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert5' },
+    documentIdentity: [{ natural: 'upsert5' }],
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
     referencedResourceInfo,
@@ -342,11 +345,12 @@ describe('given an upsert of a new document that references an existing document
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert6' },
+    documentIdentity: [{ natural: 'upsert6' }],
+
     documentReferences: [validReference],
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -393,7 +397,7 @@ describe('given an upsert of a new document that references an existing document
 
   it('should have inserted the document with a valid reference in the db', async () => {
     const result: MeadowlarkDocument = await findDocumentByMeadowlarkId(client, documentWithReferencesMeadowlarkId);
-    expect(result.document_identity.natural).toBe('upsert6');
+    expect(result.document_identity[0].natural).toBe('upsert6');
   });
 });
 
@@ -403,11 +407,12 @@ describe('given an upsert of a new document with one existing and one non-existe
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert7' },
+    documentIdentity: [{ natural: 'upsert7' }],
+
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -425,17 +430,18 @@ describe('given an upsert of a new document with one existing and one non-existe
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ natural: 'not a valid reference' }],
+
     isDescriptor: false,
   };
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert8' },
+    documentIdentity: [{ natural: 'upsert8' }],
     documentReferences: [validReference, invalidReference],
     requestTimestamp: requestTimestamp + 1,
   };
@@ -484,9 +490,11 @@ describe('given an upsert of a new document with one existing and one non-existe
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "natural": "not a valid reference",
+                },
+              ],
               "resourceName": "School",
             },
           ],
@@ -506,22 +514,20 @@ describe('given an upsert of a subclass document when a different subclass has t
   let client;
   let upsertResult;
 
-  const documentIdentity: DocumentIdentity = { educationOrganizationId: '123' };
-
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity,
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    documentIdentity: [{ educationOrganizationId: '123' }],
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const existingSubclassResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const existingSubclassDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ schoolId: '123' }],
     superclassInfo,
   };
   const existingSubclassMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -531,11 +537,11 @@ describe('given an upsert of a subclass document when a different subclass has t
 
   const sameSuperclassIdentityResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'LocalEducationAgency',
+    resourceName: 'LocalEducationAgency' as MetaEdResourceName,
   };
   const sameSuperclassIdentityDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { localEducationAgencyId: '123' },
+    documentIdentity: [{ localEducationAgencyId: '123' }],
     superclassInfo,
   };
   const sameSuperclassIdentityMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -597,11 +603,11 @@ describe('given an update of a document that references a non-existent document 
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert4' },
+    documentIdentity: [{ natural: 'upsert4' }],
     requestTimestamp,
   };
 
@@ -613,7 +619,8 @@ describe('given an update of a document that references a non-existent document 
   const invalidReference: DocumentReference = {
     projectName: documentWithReferencesResourceInfo.projectName,
     resourceName: documentWithReferencesResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ natural: 'not a valid reference' }],
+
     isDescriptor: false,
   };
 
@@ -661,7 +668,7 @@ describe('given an update of a document that references a non-existent document 
     const refsResult: any = await client.query(retrieveReferencesByMeadowlarkIdSql(documentWithReferencesMeadowlarkId));
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
-    expect(docResult.document_identity.natural).toBe('upsert4');
+    expect(docResult.document_identity[0].natural).toBe('upsert4');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "QtykK4uDYZK7VOChNxRsMDtOcAu6a0oe9ozl2Q",
@@ -676,11 +683,12 @@ describe('given an update of a document that references an existing document wit
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert5' },
+    documentIdentity: [{ natural: 'upsert5' }],
+
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -697,11 +705,12 @@ describe('given an update of a document that references an existing document wit
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert6' },
+    documentIdentity: [{ natural: 'upsert6' }],
+
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -765,7 +774,7 @@ describe('given an update of a document that references an existing document wit
 
     const outboundRefs = refsResult.rows.map((ref) => ref.referenced_meadowlark_id);
 
-    expect(docResult.document_identity.natural).toBe('upsert6');
+    expect(docResult.document_identity[0].natural).toBe('upsert6');
     expect(outboundRefs).toMatchInlineSnapshot(`
       [
         "Qw5FvPdKxAXWnGghUWv5LKuA2cXaJPWJGJRDBQ",
@@ -780,11 +789,11 @@ describe('given an update of a document with one existing and one non-existent r
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
+    resourceName: 'School' as MetaEdResourceName,
   };
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert7' },
+    documentIdentity: [{ natural: 'upsert7' }],
     requestTimestamp,
   };
   const referencedMeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -802,17 +811,18 @@ describe('given an update of a document with one existing and one non-existent r
   const invalidReference: DocumentReference = {
     projectName: referencedResourceInfo.projectName,
     resourceName: referencedResourceInfo.resourceName,
-    documentIdentity: { natural: 'not a valid reference' },
+    documentIdentity: [{ natural: 'not a valid reference' }],
+
     isDescriptor: false,
   };
 
   const documentWithReferencesResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferencesInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { natural: 'upsert8' },
+    documentIdentity: [{ natural: 'upsert8' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesMeadowlarkId: MeadowlarkId = meadowlarkIdForDocumentIdentity(
@@ -873,9 +883,11 @@ describe('given an update of a document with one existing and one non-existent r
         "error": {
           "failures": [
             {
-              "identity": {
-                "natural": "not a valid reference",
-              },
+              "identity": [
+                {
+                  "natural": "not a valid reference",
+                },
+              ],
               "resourceName": "School",
             },
           ],
@@ -905,20 +917,20 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const referencedResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'School',
-    projectName: 'Ed-Fi',
+    resourceName: 'School' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const superclassInfo: SuperclassInfo = {
     ...newSuperclassInfo(),
-    documentIdentity: { educationOrganizationId: '123' },
-    resourceName: 'EducationOrganization',
-    projectName: 'Ed-Fi',
+    documentIdentity: [{ educationOrganizationId: '123' }],
+    resourceName: 'EducationOrganization' as MetaEdResourceName,
+    projectName: 'Ed-Fi' as MetaEdProjectName,
   };
 
   const referencedDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { schoolId: '123' },
+    documentIdentity: [{ schoolId: '123' }],
     superclassInfo,
     requestTimestamp,
   };
@@ -936,11 +948,11 @@ describe('given an update of a subclass document referenced by an existing docum
 
   const documentWithReferenceResourceInfo: ResourceInfo = {
     ...newResourceInfo(),
-    resourceName: 'AcademicWeek',
+    resourceName: 'AcademicWeek' as MetaEdResourceName,
   };
   const documentWithReferenceDocumentInfo: DocumentInfo = {
     ...newDocumentInfo(),
-    documentIdentity: { week: 'update6' },
+    documentIdentity: [{ week: 'update6' }],
     requestTimestamp: requestTimestamp + 1,
   };
   const documentWithReferencesMeadowlarkId = meadowlarkIdForDocumentIdentity(

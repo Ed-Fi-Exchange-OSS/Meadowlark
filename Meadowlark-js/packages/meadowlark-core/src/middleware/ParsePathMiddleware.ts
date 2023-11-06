@@ -8,6 +8,10 @@ import { isDocumentUuidWellFormed } from '../model/DocumentIdentity';
 import type { PathComponents } from '../model/PathComponents';
 import type { DocumentUuid } from '../model/IdTypes';
 import type { MiddlewareModel } from './MiddlewareModel';
+import { decapitalize } from '../Utility';
+import { EndpointName } from '../model/api-schema/EndpointName';
+import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../model/ProjectShortVersion';
 
 const moduleName = 'core.middleware.ParsePathMiddleware';
 
@@ -16,7 +20,8 @@ export function pathComponentsFrom(path: string): PathComponents | null {
   // /v3.3b/ed-fi/Sections
   // /v3.3b/ed-fi/Sections/
   // /v3.3b/ed-fi/Sections/idValue
-  const pathExpression = /\/(?<version>[^/]+)\/(?<namespace>[^/]+)\/(?<resource>[^/]+)(\/|$)((?<documentUuid>[^/]*$))?/gm;
+  const pathExpression =
+    /\/(?<projectShortVersion>[^/]+)\/(?<projectNamespace>[^/]+)\/(?<endpointName>[^/]+)(\/|$)((?<documentUuid>[^/]*$))?/gm;
   const match = pathExpression.exec(path);
 
   if (match?.groups == null) {
@@ -26,9 +31,9 @@ export function pathComponentsFrom(path: string): PathComponents | null {
   const { documentUuid } = match.groups ?? null;
 
   return {
-    version: match.groups.version,
-    namespace: match.groups.namespace,
-    resourceName: match.groups.resource,
+    projectShortVersion: match.groups.projectShortVersion as ProjectShortVersion,
+    projectNamespace: match.groups.projectNamespace.toLowerCase() as ProjectNamespace,
+    endpointName: decapitalize(match.groups.endpointName) as EndpointName,
     documentUuid: documentUuid as DocumentUuid,
   };
 }
@@ -44,13 +49,13 @@ export async function parsePath({ frontendRequest, frontendResponse }: Middlewar
   const pathComponents: PathComponents | null = pathComponentsFrom(frontendRequest.path);
 
   if (pathComponents === null) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'parsePath', 404);
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }
 
   const { documentUuid } = pathComponents;
   if (documentUuid != null && !isDocumentUuidWellFormed(documentUuid)) {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'parsePath', 404, `Malformed resource id ${documentUuid}`);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'parsePath', 404, `Malformed resource id ${documentUuid}`);
     return { frontendRequest, frontendResponse: { statusCode: 404 } };
   }
 

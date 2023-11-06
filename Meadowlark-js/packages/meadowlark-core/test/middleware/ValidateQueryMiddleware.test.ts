@@ -137,9 +137,7 @@ describe('given an error response from validateQueryString', () => {
   let mockPaginationValidator: any;
 
   beforeAll(async () => {
-    mockQueryStringValidator = jest
-      .spyOn(QueryStringValidator, 'validateQueryString')
-      .mockReturnValue(Promise.resolve({ errorBody }));
+    mockQueryStringValidator = jest.spyOn(QueryStringValidator, 'validateQueryString').mockReturnValue({ errorBody });
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters').mockReturnValue(undefined);
 
     // Act
@@ -174,7 +172,7 @@ describe('given valid responses', () => {
   beforeAll(async () => {
     mockQueryStringValidator = jest
       .spyOn(QueryStringValidator, 'validateQueryString')
-      .mockReturnValue(Promise.resolve({ errorBody: undefined }));
+      .mockReturnValue({ errorBody: undefined });
     mockPaginationValidator = jest.spyOn(PaginationValidator, 'validatePaginationParameters').mockReturnValue(undefined);
 
     // Act

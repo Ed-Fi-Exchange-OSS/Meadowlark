@@ -27,7 +27,7 @@ const onlyPaginationParameters = R.pick(['offset', 'limit']);
 export async function query(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   writeDebugStatusToLog(
     moduleName,
-    frontendRequest,
+    frontendRequest.traceId,
     'query',
     undefined,
     `query string: ${JSON.stringify(frontendRequest.queryParameters)}`,
@@ -37,7 +37,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
   const paginationParameters: PaginationParameters = onlyPaginationParameters(frontendRequest.queryParameters);
   writeDebugStatusToLog(
     moduleName,
-    frontendRequest,
+    frontendRequest.traceId,
     'query',
     undefined,
     `cleansed query string: ${JSON.stringify(cleanQueryParameters)}`,
@@ -57,13 +57,8 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
 
   const { response, documents } = result;
 
-  if (response === 'QUERY_FAILURE_AUTHORIZATION') {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 400);
-    return { body: documents, statusCode: 400, headers: frontendRequest.middleware.headerMetadata };
-  }
-
   if (response === 'UNKNOWN_FAILURE') {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 500);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'query', 500);
     return { statusCode: 500, headers: frontendRequest.middleware.headerMetadata };
   }
 
@@ -72,7 +67,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
       ...frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
     };
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 500);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'query', 500);
     return {
       statusCode: 500,
       headers: invalidQueryHeaders,
@@ -84,7 +79,7 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
       ...frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: result.totalCount?.toString() ?? '0',
     };
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 502);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'query', 502);
     return {
       statusCode: 502,
       headers: invalidQueryHeaders,
@@ -96,11 +91,11 @@ export async function query(frontendRequest: FrontendRequest): Promise<FrontendR
       ...frontendRequest.middleware.headerMetadata,
       [TOTAL_COUNT_HEADER_NAME]: '0',
     };
-    writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'query', 200);
     return { statusCode: 200, headers: invalidQueryHeaders, body: documents };
   }
 
-  writeDebugStatusToLog(moduleName, frontendRequest, 'query', 200);
+  writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'query', 200);
 
   const headers = {
     ...frontendRequest.middleware.headerMetadata,

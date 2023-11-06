@@ -3,24 +3,25 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { normalizeDescriptorSuffix } from '@edfi/metaed-core';
 import crypto from 'node:crypto';
+import invariant from 'ts-invariant';
 import { DocumentUuid, MeadowlarkId } from './IdTypes';
 import type { BaseResourceInfo } from './ResourceInfo';
 
 /**
- * A DocumentIdentity is an object with key-value pairs that represents the complete identity of an Ed-Fi document.
- * In Ed-Fi documents, these are always a list of document elements from the top level of the document
- * (never nested in sub-objects, and never collections). The keys are the document path (dot-separated).
- *
- * This can be a series of key-value pairs because many documents have multiple values as part of their identity.
+ * A simple tuple containing the DocumentObjectKey and corresponding document value that makes up part of a document identity.
  */
-export type DocumentIdentity = { [key: string]: string };
+export type DocumentIdentityElement = { [documentObjectKey: string]: any };
 
 /**
- * The null object for DocumentIdentity
+ * A DocumentIdentity is an array of key-value pairs that represents the complete identity of an Ed-Fi document.
+ * In Ed-Fi documents, these are always a list of document elements from the top level of the document
+ * (never nested in sub-objects, and never collections). The keys are DocumentObjectKeys. A DocumentIdentity
+ * must maintain a strict ordering.
+ *
+ * This can be an array of key-value pairs because many documents have multiple values as part of their identity.
  */
-export const NoDocumentIdentity: DocumentIdentity = {};
+export type DocumentIdentity = DocumentIdentityElement[];
 
 /*
  * For use in error messages
@@ -40,7 +41,7 @@ function toBase64Url(base64: string): string {
 }
 
 /**
- * Hashes a string with the SHAKE256, returning a Base64Url hash with the specified length given in bytes
+ * Hashes a string with SHAKE256, returning a Base64Url hash with the specified length given in bytes
  */
 function toHash(data: string, lengthInBytes: number): string {
   return toBase64Url(crypto.createHash('shake256', { outputLength: lengthInBytes }).update(data).digest('base64'));
@@ -49,20 +50,28 @@ function toHash(data: string, lengthInBytes: number): string {
 /**
  * Returns the 12 byte SHAKE256 Base64Url encoded hash form of a ResourceInfo.
  */
-export function resourceInfoHashFrom({ projectName, resourceName, isDescriptor }: BaseResourceInfo) {
-  const normalizedResourceName = isDescriptor ? normalizeDescriptorSuffix(resourceName) : resourceName;
-  const resourceInfoString = `${projectName}#${normalizedResourceName}`;
-  return toHash(resourceInfoString, 12);
+export function resourceInfoHashFrom({ projectName, resourceName }: BaseResourceInfo) {
+  return toHash(`${projectName}#${resourceName}`, 12);
 }
 
 /**
  * Returns the 16 byte SHAKE256 Base64Url encoded hash form of a DocumentIdentity.
  */
 function documentIdentityHashFrom(documentIdentity: DocumentIdentity): string {
-  const documentIdentityString = Object.keys(documentIdentity)
-    .sort()
-    .map((key) => `${key}=${documentIdentity[key]}`)
+  const documentIdentityString: string = documentIdentity
+    .map((element: DocumentIdentityElement) => {
+      const documentIdentityElementEntries: [string, any][] = Object.entries(element);
+
+      invariant(
+        documentIdentityElementEntries.length === 1,
+        `DocumentIdentityElement for ${JSON.stringify(documentIdentity)} is invalid, must only have a single entry`,
+      );
+
+      const [documentKey, documentValue] = documentIdentityElementEntries[0];
+      return `${documentKey}=${documentValue}`;
+    })
     .join('#');
+
   return toHash(documentIdentityString, 16);
 }
 

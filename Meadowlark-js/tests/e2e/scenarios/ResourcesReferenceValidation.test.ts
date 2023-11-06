@@ -30,9 +30,11 @@ describe('When creating a resource that has a reference to another resource', ()
                 "error": {
                   "failures": [
                     {
-                      "identity": {
-                        "schoolId": 99,
-                      },
+                      "identity": [
+                        {
+                          "schoolId": 99,
+                        },
+                      ],
                       "resourceName": "School",
                     },
                   ],
@@ -86,16 +88,20 @@ describe('When creating a resource that has a reference to another resource', ()
               "error": {
                 "failures": [
                   {
-                    "identity": {
-                      "descriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
-                    },
-                    "resourceName": "GradeLevel",
+                    "identity": [
+                      {
+                        "descriptor": "uri://ed-fi.org/GradeLevelDescriptor#First Grade",
+                      },
+                    ],
+                    "resourceName": "GradeLevelDescriptor",
                   },
                   {
-                    "identity": {
-                      "descriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels",
-                    },
-                    "resourceName": "SchoolCategory",
+                    "identity": [
+                      {
+                        "descriptor": "uri://ed-fi.org/SchoolCategoryDescriptor#All Levels",
+                      },
+                    ],
+                    "resourceName": "SchoolCategoryDescriptor",
                   },
                 ],
                 "message": "Reference validation failed",

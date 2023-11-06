@@ -6,7 +6,7 @@
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { MiddlewareModel } from './MiddlewareModel';
 import { DocumentInfo, NoDocumentInfo } from '../model/DocumentInfo';
-import { extractDocumentInfo } from '../extraction/DocumentInfoExtractor';
+import { buildDocumentInfo } from '../extraction/BuildDocumentInfo';
 
 const moduleName = 'core.middleware.ExtractDocumentInfoMiddleware';
 
@@ -21,16 +21,16 @@ export async function documentInfoExtraction({
   if (frontendResponse != null) return { frontendRequest, frontendResponse };
   writeRequestToLog(moduleName, frontendRequest, 'documentInfoExtraction');
 
-  const documentInfo: DocumentInfo = await extractDocumentInfo(
-    frontendRequest.middleware.resourceInfo,
+  const documentInfo: DocumentInfo = buildDocumentInfo(
+    frontendRequest.middleware.apiSchema,
+    frontendRequest.middleware.resourceSchema,
     frontendRequest.middleware.parsedBody,
-    frontendRequest.middleware.matchingMetaEdModel,
     frontendRequest.middleware.timestamp,
   );
 
   if (documentInfo === NoDocumentInfo) {
     const statusCode = 404;
-    writeDebugStatusToLog(moduleName, frontendRequest, 'documentInfoExtraction', statusCode);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'documentInfoExtraction', statusCode);
     return {
       frontendRequest,
       frontendResponse: { statusCode, headers: frontendRequest.middleware.headerMetadata },

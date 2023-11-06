@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { writeDebugObject, writeRequestToLog } from '../Logger';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { validateEqualityConstraints } from '../validation/EqualityConstraintValidator';
 import { MiddlewareModel } from './MiddlewareModel';
 
@@ -22,14 +22,14 @@ export async function equalityConstraintValidation({
   writeRequestToLog(moduleName, frontendRequest, 'equalityConstraintValidation');
 
   const validationFailures: string[] = validateEqualityConstraints(
-    frontendRequest.middleware.matchingMetaEdModel,
+    frontendRequest.middleware.resourceSchema,
     frontendRequest.middleware.parsedBody,
   );
 
   if (validationFailures.length > 0) {
     const error = { error: validationFailures };
     const statusCode = 400;
-    writeDebugObject(moduleName, frontendRequest, 'documentValidation', statusCode, error);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'documentValidation', statusCode, '', error);
     return {
       frontendRequest,
       frontendResponse: { body: error, statusCode, headers: frontendRequest.middleware.headerMetadata },

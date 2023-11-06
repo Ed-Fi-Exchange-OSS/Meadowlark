@@ -31,13 +31,13 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     // Update must include the resourceId
     if (pathComponents.documentUuid == null) {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 400);
       return { statusCode: 400, headers: headerMetadata };
     }
     const documentUuidFromBody = (parsedBody as MaybeHasIdField).id;
     if (documentUuidFromBody !== pathComponents.documentUuid) {
       const failureMessage = 'The identity of the resource does not match the identity in the updated document.';
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, failureMessage);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 400, failureMessage);
 
       return {
         body: {
@@ -67,18 +67,18 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     const { response } = result;
 
     if (response === 'UPDATE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 204);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 204);
       return { statusCode: 204, headers: headerMetadata };
     }
 
     if (response === 'UPDATE_FAILURE_NOT_EXISTS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 404);
       return { statusCode: 404, headers: headerMetadata };
     }
 
     if (response === 'UPDATE_FAILURE_REFERENCE') {
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'reference error');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 409, 'reference error');
       return {
         body: R.is(String, result.failureMessage) ? { error: result.failureMessage, blockingUris } : result.failureMessage,
         statusCode: 409,
@@ -87,7 +87,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_CASCADE_REQUIRED') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, 'update cascade required');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 409, 'update cascade required');
       return {
         body: {
           error: {
@@ -101,7 +101,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_IMMUTABLE_IDENTITY') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 400, 'modify immutable identity error');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 400, 'modify immutable identity error');
       return {
         body: { error: { message: 'The identity fields of the document cannot be modified' } },
         statusCode: 400,
@@ -111,7 +111,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
 
     if (response === 'UPDATE_FAILURE_CONFLICT') {
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409, blockingUris.join(','));
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 409, blockingUris.join(','));
       return {
         body: { error: { message: result.failureMessage ?? '', blockingUris } },
         statusCode: 409,
@@ -120,7 +120,7 @@ export async function update(frontendRequest: FrontendRequest): Promise<Frontend
     }
 
     if (response === 'UPDATE_FAILURE_WRITE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'update', 409);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'update', 409);
       return {
         statusCode: 409,
         headers: headerMetadata,

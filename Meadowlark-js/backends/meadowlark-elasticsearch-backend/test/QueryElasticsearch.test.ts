@@ -12,16 +12,19 @@ import {
   AuthorizationStrategy,
   TraceId,
   ResourceInfo,
+  MetaEdProjectName,
+  MetaEdResourceName,
+  SemVer,
 } from '@edfi/meadowlark-core';
 import { queryDocuments, indexFromResourceInfo } from '../src/repository/QueryElasticsearch';
 
 const mock = new Mock();
 
 const resourceInfo: ResourceInfo = {
-  projectName: 'ed-fi',
-  resourceName: 'student',
+  projectName: 'ed-fi' as MetaEdProjectName,
+  resourceName: 'student' as MetaEdResourceName,
   isDescriptor: false,
-  resourceVersion: '3.3.1-b',
+  resourceVersion: '3.3.1-b' as SemVer,
   allowIdentityUpdates: false,
 };
 

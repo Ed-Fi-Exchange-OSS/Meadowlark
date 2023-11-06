@@ -9,9 +9,17 @@ import { CachedEnvironmentConfigProvider, Config } from '@edfi/meadowlark-utilit
 import { join } from 'path';
 
 export const setupConfigForIntegration = async () => {
-  const path = join(process.cwd(), '.env');
+  // First look for .env file paired with this Config.ts file
+  let path = join(__dirname, '.env');
+
   if (!existsSync(path)) {
-    throw new Error('Cannot run integration tests because there is no .env file in the repository root directory.');
+    path = join(process.cwd(), '.env');
+  }
+
+  if (!existsSync(path)) {
+    // eslint-disable-next-line no-console
+    console.error(`Cannot run integration tests because there is no .env file in '${path}'`);
+    process.exit(-1);
   }
 
   dotenv.config({ path });

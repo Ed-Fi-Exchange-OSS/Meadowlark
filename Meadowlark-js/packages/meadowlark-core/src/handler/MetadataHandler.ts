@@ -4,11 +4,8 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import axios from 'axios';
-import { Namespace } from '@edfi/metaed-core';
 import { Config } from '@edfi/meadowlark-utilities';
-import { loadMetaEdState } from '../metaed/LoadMetaEd';
-import { modelPackageFor } from '../metaed/MetaEdProjectMetadata';
-import { CreateApiVersionObject, OpenApiListTemplate, XsdTemplate } from './MetadataResources';
+import { createApiVersionObject, openApiListTemplate, XsdTemplate } from './MetadataResources';
 import { Constants } from '../Constants';
 import { buildBaseUrlFromRequest } from './UrlBuilder';
 import { FrontendRequest } from './FrontendRequest';
@@ -24,36 +21,12 @@ export const resourceCache: { [key: string]: ExternalResource } = {};
 const moduleName = 'core.handler.MetadataHandler';
 
 /**
- * An http handler for the metadata endpoint used for diagnostics. Loads the requested MetaEd
- * project and returns MetaEd project metadata in the response header.
- */
-export async function metaed(_frontendRequest: FrontendRequest): Promise<FrontendResponse> {
-  const modelNpmPackage = modelPackageFor(Constants.uriVersion33b);
-  const { metaEd, metaEdConfiguration } = await loadMetaEdState(modelNpmPackage);
-
-  const { entity, projectName, projectVersion } = metaEd.namespace.get('EdFi') as Namespace;
-  const common: string[] = Array.from(entity.common.values()).map((x) => x.metaEdName);
-  const descriptor: string[] = Array.from(entity.descriptor.values()).map((x) => x.metaEdName);
-  const domainEntity: string[] = Array.from(entity.domainEntity.values()).map((x) => x.metaEdName);
-  return {
-    body: { projectName, projectVersion, common, descriptor, domainEntity },
-    statusCode: 200,
-    headers: {
-      'X-MetaEd-Project-Name': metaEdConfiguration.projects[0].projectName,
-      'X-MetaEd-Project-Version': metaEdConfiguration.projects[0].projectVersion,
-      'X-MetaEd-Project-Package-Name': modelNpmPackage,
-      'Access-Control-Allow-Origin': '*',
-    },
-  };
-}
-
-/**
  * Base endpoint that returns the DS version and supported extensions
  */
 export async function apiVersion(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
   const baseUrl = buildBaseUrlFromRequest(frontendRequest);
   return {
-    body: CreateApiVersionObject(baseUrl),
+    body: createApiVersionObject(baseUrl),
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
@@ -69,7 +42,7 @@ function useTemplate(data: string, host: string, stage: string): string {
   // the schemes with quotation marks that won't be encoded, but when
   // we do so, handlebars ends up escaping every quotation mark.
   // Just use a straight string replacement without handlebars.
-  const basePath = `/${stage}/${Constants.uriVersion33b}/`;
+  const basePath = `/${stage}/v3.3b/`;
   const basePathToken = /{{ basePath }}/g;
 
   const tokenUrlToken = /{{ tokenUrl }}/g;
@@ -99,7 +72,7 @@ async function getFileFromBlobStorage(
   const resource: ExternalResource = url in resourceCache ? resourceCache[url] : { body: '', etag: '' };
 
   try {
-    writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, `getting ${url}`);
+    writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, `getting ${url}`);
     const response = await axios.get(url, {
       headers: { 'If-None-Match': resource.etag },
       validateStatus(status) {
@@ -108,13 +81,13 @@ async function getFileFromBlobStorage(
     });
 
     if (response.status === 200) {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '200 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, '200 from AWS');
       resource.etag = response.headers.etag;
       resource.body = transformer(response.data);
 
       resourceCache[url] = resource;
     } else {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'getFileFromBlobStorage', undefined, '304 from AWS');
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'getFileFromBlobStorage', undefined, '304 from AWS');
     }
 
     return {
@@ -165,7 +138,7 @@ export async function openApiUrlList(frontendRequest: FrontendRequest): Promise<
   const baseUrl = buildBaseUrlFromRequest(frontendRequest);
 
   return {
-    body: OpenApiListTemplate(baseUrl),
+    body: openApiListTemplate(baseUrl),
     statusCode: 200,
   };
 }

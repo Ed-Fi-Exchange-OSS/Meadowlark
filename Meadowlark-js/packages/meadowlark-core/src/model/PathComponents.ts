@@ -4,32 +4,47 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import { DocumentUuid } from './IdTypes';
+import { ProjectShortVersion } from './ProjectShortVersion';
+import { EndpointName } from './api-schema/EndpointName';
+import { ProjectNamespace } from './api-schema/ProjectNamespace';
 
+/**
+ * The important parts of the request URL in object form
+ */
 export type PathComponents = {
   /**
-   * Data standard version number
+   * Shortened project version number e.g. "v3.3b"
    */
-  version: string;
+  projectShortVersion: ProjectShortVersion;
+
   /**
-   * Data standard namespace
+   * Project namespace, all lowercased
    */
-  namespace: string;
+  projectNamespace: ProjectNamespace;
+
   /**
-   * Endpoint name (resource)
+   * Endpoint name, which has been decapitalized
    */
-  resourceName: string;
+  endpointName: EndpointName;
+
   /**
    * The resource identifier, which is a document uuid
    */
   documentUuid?: DocumentUuid;
 };
 
-export function newPathComponents() {
+/**
+ * Create a new PathComponents
+ */
+export function newPathComponents(): PathComponents {
   return {
-    version: '',
-    namespace: '',
-    resourceName: '',
+    projectShortVersion: '' as ProjectShortVersion,
+    projectNamespace: '' as ProjectNamespace,
+    endpointName: '' as EndpointName,
   };
 }
 
-export const NoPathComponents = Object.freeze(newPathComponents());
+/**
+ * The null object for PathComponents
+ */
+export const NoPathComponents: PathComponents = Object.freeze(newPathComponents());

@@ -15,7 +15,12 @@ export const setupConfigForIntegration = async () => {
     return;
   }
 
-  const path = join(process.cwd(), '.env');
+  // First look for .env file paired with this Config.ts file
+  let path = join(__dirname, '.env');
+
+  if (!existsSync(path)) {
+    path = join(process.cwd(), '.env');
+  }
 
   if (!existsSync(path)) {
     // eslint-disable-next-line no-console

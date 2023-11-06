@@ -74,8 +74,9 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
       traceId: authorizationRequest.traceId,
     };
 
-    const updateResult: UpdateAuthorizationClientResult =
-      await getAuthorizationStore().updateAuthorizationClient(updateRequest);
+    const updateResult: UpdateAuthorizationClientResult = await getAuthorizationStore().updateAuthorizationClient(
+      updateRequest,
+    );
 
     const { response } = updateResult;
 

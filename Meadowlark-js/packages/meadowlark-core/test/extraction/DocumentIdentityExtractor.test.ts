@@ -3,6 +3,8 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable dot-notation */
+
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
@@ -12,21 +14,15 @@ import {
   EnumerationBuilder,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer, enumerationReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 import { extractDocumentIdentity } from '../../src/extraction/DocumentIdentityExtractor';
-import { DocumentIdentity, NoDocumentIdentity } from '../../src/model/DocumentIdentity';
+import { DocumentIdentity } from '../../src/model/DocumentIdentity';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
+import { apiSchemaFrom } from '../TestHelper';
 
 describe('when extracting natural key from domain entity referencing another referencing another with identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     notImportant: false,
@@ -74,35 +70,35 @@ describe('when extracting natural key from domain entity referencing another ref
       .sendToListener(new DomainEntityBuilder(metaEd, []));
 
     domainEntityReferenceEnhancer(metaEd);
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
 
-    namespace = metaEd.namespace.get('EdFi');
-    const section = namespace.entity.domainEntity.get('Section');
-    result = extractDocumentIdentity(section, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "classPeriodReference.classPeriodName": "z",
-        "classPeriodReference.schoolId": "23",
-        "courseOfferingReference.localCourseCode": "abc",
-        "courseOfferingReference.schoolId": "23",
-        "sectionIdentifier": "Bob",
-      }
+      [
+        {
+          "classPeriodName": "z",
+        },
+        {
+          "localCourseCode": "abc",
+        },
+        {
+          "schoolId": "23",
+        },
+        {
+          "sectionIdentifier": "Bob",
+        },
+      ]
     `);
   });
 });
 
 describe('when extracting natural key from domain entity with school year in identity', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     sessionName: 's',
@@ -131,32 +127,28 @@ describe('when extracting natural key from domain entity with school year in ide
 
     enumerationReferenceEnhancer(metaEd);
 
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-
-    namespace = metaEd.namespace.get('EdFi');
-    const session = namespace.entity.domainEntity.get('Session');
-    result = extractDocumentIdentity(session, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['sessions'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "schoolYearTypeReference.schoolYear": 2022,
-        "sessionName": "s",
-      }
+      [
+        {
+          "schoolYear": 2022,
+        },
+        {
+          "sessionName": "s",
+        },
+      ]
     `);
   });
 });
 
 describe('when extracting natural key from domain entity with school year that has a role name', () => {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
-  let namespace: any = null;
-  let result: DocumentIdentity = NoDocumentIdentity;
+  let result: DocumentIdentity = [];
 
   const body = {
     graduationSchoolYearTypeReference: {
@@ -183,23 +175,83 @@ describe('when extracting natural key from domain entity with school year that h
 
     enumerationReferenceEnhancer(metaEd);
 
-    entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-    entityApiSchemaDataSetupEnhancer(metaEd);
-    referenceComponentEnhancer(metaEd);
-    apiPropertyMappingEnhancer(metaEd);
-    propertyCollectingEnhancer(metaEd);
-    apiEntityMappingEnhancer(metaEd);
-
-    namespace = metaEd.namespace.get('EdFi');
-    const session = namespace.entity.domainEntity.get('GraduationPlan');
-    result = extractDocumentIdentity(session, body);
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['graduationPlans'];
+    result = extractDocumentIdentity(resourceSchema, body);
   });
 
   it('should be correct', () => {
     expect(result).toMatchInlineSnapshot(`
-      {
-        "graduationSchoolYearTypeReference.schoolYear": 2022,
-      }
+      [
+        {
+          "schoolYear": 2022,
+        },
+      ]
+    `);
+  });
+});
+
+describe('when extracting document identity with two levels of identities', () => {
+  const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
+  let result: DocumentIdentity = [];
+
+  const body = {
+    classPeriodName: 'c1',
+    sessionReference: {
+      sessionName: 's1',
+      schoolId: '23',
+    },
+    schoolReference: {
+      schoolId: '23',
+    },
+  };
+
+  beforeAll(() => {
+    MetaEdTextBuilder.build()
+      .withBeginNamespace('EdFi')
+
+      .withStartDomainEntity('ClassPeriod')
+      .withDocumentation('doc')
+      .withStringIdentity('ClassPeriodName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withDomainEntityIdentity('Session', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('Session')
+      .withDocumentation('doc')
+      .withStringIdentity('SessionName', 'doc', '30')
+      .withDomainEntityIdentity('School', 'doc')
+      .withEndDomainEntity()
+
+      .withStartDomainEntity('School')
+      .withDocumentation('doc')
+      .withStringIdentity('SchoolId', 'doc', '30')
+      .withEndDomainEntity()
+
+      .withEndNamespace()
+      .sendToListener(new NamespaceBuilder(metaEd, []))
+      .sendToListener(new DomainEntityBuilder(metaEd, []));
+
+    domainEntityReferenceEnhancer(metaEd);
+
+    const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+    const resourceSchema: ResourceSchema = apiSchema.projectSchemas['edfi'].resourceSchemas['classPeriods'];
+    result = extractDocumentIdentity(resourceSchema, body);
+  });
+
+  it('should have two references down to "schoolId"', () => {
+    expect(result).toMatchInlineSnapshot(`
+      [
+        {
+          "classPeriodName": "c1",
+        },
+        {
+          "schoolId": "23",
+        },
+        {
+          "sessionName": "s1",
+        },
+      ]
     `);
   });
 });

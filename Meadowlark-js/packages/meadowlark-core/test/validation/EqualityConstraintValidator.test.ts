@@ -3,33 +3,26 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+/* eslint-disable dot-notation */
+
 import {
   newMetaEdEnvironment,
   MetaEdEnvironment,
   DomainEntityBuilder,
   MetaEdTextBuilder,
   NamespaceBuilder,
-  DomainEntity,
-  Namespace,
 } from '@edfi/metaed-core';
 import { domainEntityReferenceEnhancer } from '@edfi/metaed-plugin-edfi-unified';
-import {
-  entityPropertyApiSchemaDataSetupEnhancer,
-  apiEntityMappingEnhancer,
-  entityApiSchemaDataSetupEnhancer,
-  referenceComponentEnhancer,
-  apiPropertyMappingEnhancer,
-  propertyCollectingEnhancer,
-  allJsonPathsMappingEnhancer,
-  equalityConstraintEnhancer,
-} from '@edfi/metaed-plugin-edfi-api-schema';
 import { validateEqualityConstraints } from '../../src/validation/EqualityConstraintValidator';
+import { ResourceSchema } from '../../src/model/api-schema/ResourceSchema';
+import { ApiSchema } from '../../src/model/api-schema/ApiSchema';
+import { apiSchemaFrom } from '../TestHelper';
 
 /**
- * A MetaEd model of a Section with a merge on School between CourseOffering and ClassPeriod.
+ * A ResourceSchema for a Section with a merge on School between CourseOffering and ClassPeriod.
  *
  */
-function sectionDomainEntity(): DomainEntity {
+function sectionResourceSchema(): ResourceSchema {
   const metaEd: MetaEdEnvironment = newMetaEdEnvironment();
 
   MetaEdTextBuilder.build()
@@ -74,17 +67,9 @@ function sectionDomainEntity(): DomainEntity {
     .sendToListener(new DomainEntityBuilder(metaEd, []));
 
   domainEntityReferenceEnhancer(metaEd);
-  entityPropertyApiSchemaDataSetupEnhancer(metaEd);
-  entityApiSchemaDataSetupEnhancer(metaEd);
-  referenceComponentEnhancer(metaEd);
-  apiPropertyMappingEnhancer(metaEd);
-  propertyCollectingEnhancer(metaEd);
-  apiEntityMappingEnhancer(metaEd);
-  allJsonPathsMappingEnhancer(metaEd);
-  equalityConstraintEnhancer(metaEd);
 
-  const namespace: Namespace = metaEd.namespace.get('EdFi') as Namespace;
-  return namespace.entity.domainEntity.get('Section') as DomainEntity;
+  const apiSchema: ApiSchema = apiSchemaFrom(metaEd);
+  return apiSchema.projectSchemas['edfi'].resourceSchemas['sections'];
 }
 
 describe('when CourseOffering schoolId is a mismatch with a single ClassPeriod', () => {
@@ -108,8 +93,7 @@ describe('when CourseOffering schoolId is a mismatch with a single ClassPeriod',
   };
 
   beforeAll(() => {
-    const section: DomainEntity = sectionDomainEntity();
-    validationResult = validateEqualityConstraints(section, sectionBody);
+    validationResult = validateEqualityConstraints(sectionResourceSchema(), sectionBody);
   });
 
   it('should have a validation failure', () => {
@@ -148,8 +132,7 @@ describe('when CourseOffering schoolId is a mismatch with two ClassPeriods', () 
   };
 
   beforeAll(() => {
-    const section: DomainEntity = sectionDomainEntity();
-    validationResult = validateEqualityConstraints(section, sectionBody);
+    validationResult = validateEqualityConstraints(sectionResourceSchema(), sectionBody);
   });
 
   it('should have a validation failure', () => {
@@ -188,8 +171,7 @@ describe('when CourseOffering schoolId is a mismatch with one ClassPeriod but a 
   };
 
   beforeAll(() => {
-    const section: DomainEntity = sectionDomainEntity();
-    validationResult = validateEqualityConstraints(section, sectionBody);
+    validationResult = validateEqualityConstraints(sectionResourceSchema(), sectionBody);
   });
 
   it('should have a validation failure', () => {
@@ -214,8 +196,7 @@ describe('when ClassPeriods are not present', () => {
   };
 
   beforeAll(() => {
-    const section: DomainEntity = sectionDomainEntity();
-    validationResult = validateEqualityConstraints(section, sectionBody);
+    validationResult = validateEqualityConstraints(sectionResourceSchema(), sectionBody);
   });
 
   it('should have no validation failure', () => {
@@ -250,8 +231,7 @@ describe('when CourseOffering schoolId is a match with all ClassPeriods', () => 
   };
 
   beforeAll(() => {
-    const section: DomainEntity = sectionDomainEntity();
-    validationResult = validateEqualityConstraints(section, sectionBody);
+    validationResult = validateEqualityConstraints(sectionResourceSchema(), sectionBody);
   });
 
   it('should have no validation failure', () => {

@@ -3,9 +3,14 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { FrontendRequest, FrontendResponse, newFrontendRequest, newFrontendResponseSuccess } from '@edfi/meadowlark-core';
-import { newFrontendRequestMiddleware } from '@edfi/meadowlark-core/src/handler/FrontendRequest';
-import { newPathComponents } from '@edfi/meadowlark-core/src/model/PathComponents';
+import {
+  FrontendRequest,
+  FrontendResponse,
+  newFrontendRequest,
+  newFrontendResponseSuccess,
+  newFrontendRequestMiddleware,
+  newPathComponents,
+} from '@edfi/meadowlark-core';
 import { securityMiddleware } from '../../src/security/SecurityMiddleware';
 import * as OwnershipSecurity from '../../src/repository/OwnershipSecurity';
 

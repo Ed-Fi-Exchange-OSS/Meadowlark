@@ -58,9 +58,7 @@ describe('given an error response and document info from documentValidation', ()
   beforeAll(async () => {
     const validationResult = { error: errorBody };
 
-    mockDocumentValidator = jest
-      .spyOn(DocumentValidator, 'validateDocument')
-      .mockReturnValue(Promise.resolve(validationResult));
+    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(validationResult);
 
     // Act
     resultChain = await documentValidation({ frontendRequest, frontendResponse: null });
@@ -102,7 +100,7 @@ describe('given a valid response from documentValidation for Insert', () => {
   let mockDocumentValidator: any;
 
   beforeAll(async () => {
-    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(Promise.resolve(null));
+    mockDocumentValidator = jest.spyOn(DocumentValidator, 'validateDocument').mockReturnValue(null);
 
     // Act
     resultChain = await documentValidation({ frontendRequest, frontendResponse: null });

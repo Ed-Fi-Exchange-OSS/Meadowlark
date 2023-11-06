@@ -3,7 +3,6 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import R from 'ramda';
 import { isDebugEnabled, writeErrorToLog } from '@edfi/meadowlark-utilities';
 import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 import { getDocumentStore } from '../plugin/PluginLoader';
@@ -29,7 +28,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     writeRequestToLog(moduleName, frontendRequest, 'deleteIt');
 
     if (frontendRequest.middleware.pathComponents.documentUuid == null) {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'deleteIt', 404);
       return { statusCode: 404 };
     }
 
@@ -46,12 +45,12 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     await afterDeleteDocumentById(request, result);
 
     if (result.response === 'DELETE_SUCCESS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 204);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'deleteIt', 204);
       return { statusCode: 204, headers: frontendRequest.middleware.headerMetadata };
     }
 
     if (result.response === 'DELETE_FAILURE_NOT_EXISTS') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'deleteIt', 404);
       return { statusCode: 404, headers: frontendRequest.middleware.headerMetadata };
     }
 
@@ -59,7 +58,7 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
       const blockingUris: string[] = blockingDocumentsToUris(frontendRequest, result.referringDocumentInfo);
 
       if (isDebugEnabled()) {
-        writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 409, blockingUris.join(','));
+        writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'deleteIt', 409, blockingUris.join(','));
       }
 
       return {
@@ -70,11 +69,11 @@ export async function deleteIt(frontendRequest: FrontendRequest): Promise<Fronte
     }
 
     if (result.response === 'DELETE_FAILURE_WRITE_CONFLICT') {
-      writeDebugStatusToLog(moduleName, frontendRequest, 'deleteIt', 404);
+      writeDebugStatusToLog(moduleName, frontendRequest.traceId, 'deleteIt', 404);
       return {
         statusCode: 404,
         headers: frontendRequest.middleware.headerMetadata,
-        body: R.is(String, result.failureMessage) ? { error: result.failureMessage } : result.failureMessage,
+        body: { error: result.failureMessage },
       };
     }
 

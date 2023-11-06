@@ -5,7 +5,7 @@
 
 import { Config } from '@edfi/meadowlark-utilities';
 import * as R from 'ramda';
-import { writeDebugObject } from '../Logger';
+import { writeDebugStatusToLog } from '../Logger';
 import { MissingIdentity } from '../model/DocumentIdentity';
 import { MiddlewareModel } from './MiddlewareModel';
 
@@ -51,12 +51,13 @@ export async function logTheResponse({ frontendRequest, frontendResponse }: Midd
       }
     }
 
-    writeDebugObject(
+    writeDebugStatusToLog(
       moduleName,
-      frontendRequest,
+      frontendRequest.traceId,
       'logTheResponse',
       frontendResponse?.statusCode,
-      R.is(String, responseBody) ? { error: responseBody } : responseBody,
+      typeof responseBody === 'string' ? responseBody : '',
+      typeof responseBody === 'object' ? responseBody : undefined,
     );
   }
 
