@@ -23,8 +23,9 @@ export type ResourceSchemaValidators = {
   queryValidator: ValidateFunction;
 };
 
-function initializeAjv(): Ajv {
-  const removeAdditional = getBooleanFromEnvironment('ALLOW_OVERPOSTING', false);
+function initializeAjv(isQueryParameterValidator: boolean): Ajv {
+  // A query parameter validator cannot have additional properties
+  const removeAdditional = isQueryParameterValidator ? false : getBooleanFromEnvironment('ALLOW_OVERPOSTING', false);
   const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);
 
   const ajv = new Ajv({ allErrors: true, coerceTypes, removeAdditional });
@@ -38,14 +39,19 @@ let ajv;
 // simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
 /** This is a cache mapping MetaEd model objects to compiled ajv JSON Schema validators for the API resource */
 const validatorCache: Map<TopLevelEntity, ResourceSchemaValidators> = new Map();
+const queryValidatorCache: Map<TopLevelEntity, ResourceSchemaValidators> = new Map();
 
 /**
  * Returns the API resource JSON Schema validator functions for the given MetaEd model. Caches results.
  */
-function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaValidators {
-  const cachedValidators: ResourceSchemaValidators | undefined = validatorCache.get(metaEdModel);
+function getSchemaValidatorsFor(
+  metaEdModel: TopLevelEntity,
+  isQueryParameterValidator: boolean = false,
+): ResourceSchemaValidators {
+  const validatorCacheObject = isQueryParameterValidator ? queryValidatorCache : validatorCache;
+  const cachedValidators: ResourceSchemaValidators | undefined = validatorCacheObject.get(metaEdModel);
   if (cachedValidators != null) return cachedValidators;
-  ajv = initializeAjv();
+  ajv = initializeAjv(isQueryParameterValidator);
   const resourceValidators: ResourceSchemaValidators = {
     insertValidator: ajv.compile(metaEdModel.data.edfiApiSchema.jsonSchemaForInsert),
     updateValidator: ajv.compile(metaEdModel.data.edfiApiSchema.jsonSchemaForUpdate),
@@ -55,7 +61,7 @@ function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaVali
       required: [],
     }),
   };
-  validatorCache.set(metaEdModel, resourceValidators);
+  validatorCacheObject.set(metaEdModel, resourceValidators);
   return resourceValidators;
 }
 
@@ -64,6 +70,7 @@ function getSchemaValidatorsFor(metaEdModel: TopLevelEntity): ResourceSchemaVali
  */
 export function clearAllValidatorCache(): void {
   validatorCache.clear();
+  queryValidatorCache.clear();
 }
 /**
  * Creates a new empty ResourceMatchResult object
@@ -138,7 +145,7 @@ export function validateQueryParametersAgainstSchema(
   metaEdModel: TopLevelEntity,
   queryParameters: FrontendQueryParameters,
 ): string[] {
-  const { queryValidator } = getSchemaValidatorsFor(metaEdModel);
+  const { queryValidator } = getSchemaValidatorsFor(metaEdModel, true);
 
   let errors: string[] = [];
 
