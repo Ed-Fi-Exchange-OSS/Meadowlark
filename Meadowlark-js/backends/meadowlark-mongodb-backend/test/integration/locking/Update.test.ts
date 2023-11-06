@@ -15,6 +15,7 @@ import {
   newResourceInfo,
   DocumentUuid,
   TraceId,
+  MetaEdResourceName,
 } from '@edfi/meadowlark-core';
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../../../src/model/MeadowlarkDocument';
@@ -60,12 +61,12 @@ const edfiSchoolDoc = {
 
 const schoolResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
-  resourceName: 'School',
+  resourceName: 'School' as MetaEdResourceName,
 };
 
 const schoolDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: { schoolId: '123' },
+  documentIdentity: [{ schoolId: '123' }],
 };
 
 const schoolMeadowlarkId = meadowlarkIdForDocumentIdentity(schoolResourceInfo, schoolDocumentInfo.documentIdentity);
@@ -101,14 +102,18 @@ const schoolDocument: MeadowlarkDocument = meadowlarkDocumentFrom({
 
 const academicWeekResourceInfo: ResourceInfo = {
   ...newResourceInfo(),
-  resourceName: 'AcademicWeek',
+  resourceName: 'AcademicWeek' as MetaEdResourceName,
 };
 const academicWeekDocumentInfo: DocumentInfo = {
   ...newDocumentInfo(),
-  documentIdentity: {
-    schoolId: '123',
-    weekIdentifier: '123456',
-  },
+  documentIdentity: [
+    {
+      schoolId: '123',
+    },
+    {
+      weekIdentifier: '123456',
+    },
+  ],
 
   documentReferences: [referenceToSchool],
 };
@@ -239,7 +244,13 @@ describe('given an upsert (update) concurrent with an insert referencing the to-
   it('should still have the initial nameOfInstitution: A School 123', async () => {
     const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
     const result: any = await collection.findOne({ _id: schoolMeadowlarkId });
-    expect(result.documentIdentity.schoolId).toBe('123');
+    expect(result.documentIdentity).toMatchInlineSnapshot(`
+    [
+      {
+        "schoolId": "123",
+      },
+    ]
+  `);
     expect(result.edfiDoc.nameOfInstitution).toBe('A School 123');
   });
 
