@@ -19,19 +19,22 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
 import {
-  writeLockReferencedDocuments,
   asUpsert,
   limitFive,
   getDocumentCollection,
   onlyReturnDocumentUuidAndTimestamps,
+  lockDocuments,
+  getConcurrencyCollection,
 } from './Db';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
 const moduleName: string = 'mongodb.repository.Upsert';
 
 export async function upsertDocumentTransaction(
   { resourceInfo, documentInfo, meadowlarkId, edfiDoc, validateDocumentReferencesExist, traceId, security }: UpsertRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
   documentFromUpdate?: MeadowlarkDocument,
 ): Promise<UpsertResult> {
@@ -135,7 +138,26 @@ export async function upsertDocumentTransaction(
       lastModifiedAt: documentInfo.requestTimestamp,
     });
 
-  await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        aliasMeadowlarkIds: {
+          $in: document.outboundRefs,
+        },
+      },
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
+
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
+  }));
+  concurrencyDocuments.push({ _id: documentUuid });
+
+  // Inserting the same DocumentUuid in Concurrency Collection will result in a WriteConflict error
+  // By generating this conflict we handle concurrency
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
+
   // Perform the document upsert
   Logger.debug(`${moduleName}.upsertDocumentTransaction Upserting document uuid ${documentUuid}`, traceId);
 
@@ -172,6 +194,7 @@ export async function upsertDocumentTransaction(
  */
 export async function upsertDocument(upsertRequest: UpsertRequest, client: MongoClient): Promise<UpsertResult> {
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+  const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
   const session: ClientSession = client.startSession();
   let upsertResult: UpsertResult = { response: 'UNKNOWN_FAILURE' };
   try {
@@ -180,7 +203,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, session);
+          upsertResult = await upsertDocumentTransaction(upsertRequest, mongoCollection, concurrencyCollection, session);
           if (upsertResult.response !== 'UPDATE_SUCCESS' && upsertResult.response !== 'INSERT_SUCCESS') {
             await session.abortTransaction();
           }
@@ -188,7 +211,7 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
       },
       {
         retries: numberOfRetries,
-        onRetry: () => {
+        onRetry: async () => {
           Logger.warn(
             `${moduleName}.upsertDocument got write conflict error for meadowlarkId ${upsertRequest.meadowlarkId}. Retrying...`,
             upsertRequest.traceId,
@@ -200,7 +223,6 @@ export async function upsertDocument(upsertRequest: UpsertRequest, client: Mongo
     Logger.error(`${moduleName}.upsertDocument`, upsertRequest.traceId, e);
     await session.abortTransaction();
 
-    // If this is a MongoError, it has a codeName
     if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPSERT_FAILURE_WRITE_CONFLICT',

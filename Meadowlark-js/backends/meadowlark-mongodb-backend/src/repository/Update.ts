@@ -10,10 +10,11 @@ import { Logger, Config } from '@edfi/meadowlark-utilities';
 import { Collection, ClientSession, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument, meadowlarkDocumentFrom } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, limitFive, onlyReturnTimestamps, writeLockReferencedDocuments } from './Db';
+import { getDocumentCollection, limitFive, onlyReturnTimestamps, lockDocuments, getConcurrencyCollection } from './Db';
 import { deleteDocumentByMeadowlarkIdTransaction } from './Delete';
 import { onlyDocumentsReferencing, validateReferences } from './ReferenceValidation';
 import { upsertDocumentTransaction } from './Upsert';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
 const moduleName: string = 'mongodb.repository.Update';
 
@@ -26,6 +27,7 @@ const moduleName: string = 'mongodb.repository.Update';
 async function insertUpdatedDocument(
   { meadowlarkId, resourceInfo, documentInfo, edfiDoc, traceId, security }: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
   document: MeadowlarkDocument,
 ): Promise<UpdateResult> {
@@ -40,6 +42,7 @@ async function insertUpdatedDocument(
       security,
     },
     mongoCollection,
+    concurrencyCollection,
     session,
     document,
   );
@@ -143,9 +146,30 @@ async function updateAllowingIdentityChange(
   document: MeadowlarkDocument,
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   const { documentUuid, resourceInfo, traceId, security } = updateRequest;
+
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        aliasMeadowlarkIds: {
+          $in: document.outboundRefs,
+        },
+      },
+
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
+
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
+  }));
+
+  concurrencyDocuments.push({ _id: updateRequest.documentUuid });
+
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   // Optimize happy path by trying a replacement update, which will succeed if there is no identity change
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
@@ -156,8 +180,6 @@ async function updateAllowingIdentityChange(
   );
 
   if (tryUpdateByReplacementResult != null) {
-    // Ensure referenced documents are not modified in other transactions
-    await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
     return tryUpdateByReplacementResult;
   }
 
@@ -189,6 +211,7 @@ async function updateAllowingIdentityChange(
   const deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
     { documentUuid, resourceInfo, security, validateNoReferencesToDocument: true, traceId },
     mongoCollection,
+    concurrencyCollection,
     session,
   );
   Logger.debug(`${moduleName}.updateAllowingIdentityChange: Updating document uuid ${documentUuid}`, traceId);
@@ -196,7 +219,7 @@ async function updateAllowingIdentityChange(
   switch (deleteResult.response) {
     case 'DELETE_SUCCESS':
       // document was deleted, so we can insert the new version
-      return insertUpdatedDocument(updateRequest, mongoCollection, session, document);
+      return insertUpdatedDocument(updateRequest, mongoCollection, concurrencyCollection, session, document);
     case 'DELETE_FAILURE_NOT_EXISTS':
       // document was not found on delete, which shouldn't happen
       return {
@@ -227,6 +250,7 @@ async function updateDisallowingIdentityChange(
   document: MeadowlarkDocument,
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   // Perform the document update
@@ -235,8 +259,26 @@ async function updateDisallowingIdentityChange(
     updateRequest.traceId,
   );
 
-  // Ensure referenced documents are not modified in other transactions
-  await writeLockReferencedDocuments(mongoCollection, document.outboundRefs, session);
+  const referringDocumentUuids: WithId<MeadowlarkDocument>[] = await mongoCollection
+    .find(
+      {
+        aliasMeadowlarkIds: {
+          $in: document.outboundRefs,
+        },
+      },
+      { projection: { documentUuid: 1 } },
+    )
+    .toArray();
+
+  const concurrencyDocuments: ConcurrencyDocument[] = referringDocumentUuids.map((referringDocumentUuid) => ({
+    _id: referringDocumentUuid.documentUuid,
+  }));
+
+  concurrencyDocuments.push({ _id: updateRequest.documentUuid });
+
+  // Inserting the same DocumentUuid in Concurrency Collection will result in a WriteConflict error
+  // By generating this conflict we handle concurrency
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const tryUpdateByReplacementResult: UpdateResult | null = await tryUpdateByReplacement(
     document,
@@ -319,6 +361,7 @@ async function checkForInvalidReferences(
 async function updateDocumentByDocumentUuidTransaction(
   updateRequest: UpdateRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<UpdateResult> {
   const { meadowlarkId, documentUuid, resourceInfo, documentInfo, edfiDoc, validateDocumentReferencesExist, security } =
@@ -345,9 +388,9 @@ async function updateDocumentByDocumentUuidTransaction(
     lastModifiedAt: documentInfo.requestTimestamp,
   });
   if (resourceInfo.allowIdentityUpdates) {
-    return updateAllowingIdentityChange(document, updateRequest, mongoCollection, session);
+    return updateAllowingIdentityChange(document, updateRequest, mongoCollection, concurrencyCollection, session);
   }
-  return updateDisallowingIdentityChange(document, updateRequest, mongoCollection, session);
+  return updateDisallowingIdentityChange(document, updateRequest, mongoCollection, concurrencyCollection, session);
 }
 
 /**
@@ -362,6 +405,7 @@ export async function updateDocumentByDocumentUuid(
   Logger.info(`${moduleName}.updateDocumentByDocumentUuid ${documentUuid}`, traceId);
 
   const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+  const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
   const session: ClientSession = client.startSession();
   let updateResult: UpdateResult = { response: 'UNKNOWN_FAILURE' };
 
@@ -371,7 +415,12 @@ export async function updateDocumentByDocumentUuid(
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          updateResult = await updateDocumentByDocumentUuidTransaction(updateRequest, mongoCollection, session);
+          updateResult = await updateDocumentByDocumentUuidTransaction(
+            updateRequest,
+            mongoCollection,
+            concurrencyCollection,
+            session,
+          );
           if (updateResult.response !== 'UPDATE_SUCCESS') {
             await session.abortTransaction();
           }
@@ -391,7 +440,6 @@ export async function updateDocumentByDocumentUuid(
     Logger.error(`${moduleName}.updateDocumentByDocumentUuid`, traceId, e);
     await session.abortTransaction();
 
-    // If this is a MongoError, it has a codeName
     if (e.codeName === 'WriteConflict') {
       return {
         response: 'UPDATE_FAILURE_WRITE_CONFLICT',

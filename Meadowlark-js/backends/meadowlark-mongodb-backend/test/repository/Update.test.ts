@@ -16,6 +16,7 @@ describe('given a transaction on a resource', () => {
   let mongoClientMock = {};
   let updateOneMock = jest.fn();
   const error = {
+    code: 112,
     codeName: 'WriteConflict',
   };
 
@@ -26,6 +27,12 @@ describe('given a transaction on a resource', () => {
       updateMany: jest.fn(),
       findOne: jest.fn(),
       updateOne: updateOneMock,
+      find: jest.fn(() => ({ toArray: (_) => [{ some: 'content' }] })),
+    } as any);
+
+    jest.spyOn(DB, 'getConcurrencyCollection').mockReturnValue({
+      insertMany: jest.fn(),
+      deleteMany: jest.fn(),
     } as any);
 
     mongoClientMock = {
@@ -54,7 +61,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries greater than zero has been configured', () => {
       beforeAll(async () => {
-        jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(retryNumberOfTimes);
         result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
@@ -74,7 +80,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries equal to zero has been configured', () => {
       beforeAll(async () => {
-        jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         jest.spyOn(utilities.Config, 'get').mockReturnValue(0);
         result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
@@ -90,7 +95,6 @@ describe('given a transaction on a resource', () => {
 
     describe('given that a number of retries was not configured', () => {
       beforeAll(async () => {
-        jest.spyOn(DB, 'writeLockReferencedDocuments').mockImplementationOnce(async () => Promise.resolve());
         result = await updateDocumentByDocumentUuid(newUpdateRequest(), mongoClientMock as any);
       });
 

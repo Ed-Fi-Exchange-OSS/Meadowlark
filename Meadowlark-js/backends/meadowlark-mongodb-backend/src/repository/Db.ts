@@ -3,14 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, ObjectId, FindOptions, ReplaceOptions } from 'mongodb';
-import { Logger, Config } from '@edfi//meadowlark-utilities';
-import { MeadowlarkId } from '@edfi/meadowlark-core';
-import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { AuthorizationDocument } from '../model/AuthorizationDocument';
+import { Collection, MongoClient, ReadConcernLevel, W, ClientSession, FindOptions, ReplaceOptions } from 'mongodb';
+import { Logger, Config } from '@edfi/meadowlark-utilities';
+import type { DocumentUuid } from '@edfi/meadowlark-core';
+import type { MeadowlarkDocument } from '../model/MeadowlarkDocument';
+import type { ConcurrencyDocument } from '../model/ConcurrencyDocument';
+import type { AuthorizationDocument } from '../model/AuthorizationDocument';
 
 export const DOCUMENT_COLLECTION_NAME = 'documents';
 export const AUTHORIZATION_COLLECTION_NAME = 'authorizations';
+export const CONCURRENCY_COLLECTION_NAME = 'concurrency';
 
 let singletonClient: MongoClient | null = null;
 
@@ -41,6 +43,12 @@ export async function getNewClient(): Promise<MongoClient> {
       .db(databaseName)
       .collection(AUTHORIZATION_COLLECTION_NAME);
     await authorizationCollection.createIndex({ clientName: 1 });
+
+    // Create concurrency collection if not exists.
+    const concurrencyCollection: Collection<ConcurrencyDocument> = newClient
+      .db(databaseName)
+      .collection(CONCURRENCY_COLLECTION_NAME);
+    await concurrencyCollection.createIndex({ _id: 1 });
 
     return newClient;
   } catch (e) {
@@ -89,23 +97,8 @@ export function getAuthorizationCollection(client: MongoClient): Collection<Auth
   return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(AUTHORIZATION_COLLECTION_NAME);
 }
 
-/**
- * Write lock referenced documents as part of the upsert/update process. This will prevent the issue of
- * a concurrent delete operation removing a to-be referenced document in the middle of the transaction.
- * See https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
- *
- * This function expects Session to have an active transaction. Aborting the transaction on error is left to the caller.
- */
-export async function writeLockReferencedDocuments(
-  mongoCollection: Collection<MeadowlarkDocument>,
-  referencedMeadowlarkIds: MeadowlarkId[],
-  session: ClientSession,
-): Promise<void> {
-  await mongoCollection.updateMany(
-    { aliasMeadowlarkIds: { $in: referencedMeadowlarkIds } },
-    { $set: { lock: new ObjectId() } },
-    { session },
-  );
+export function getConcurrencyCollection(client: MongoClient): Collection<ConcurrencyDocument> {
+  return client.db(Config.get<string>('MEADOWLARK_DATABASE_NAME')).collection(CONCURRENCY_COLLECTION_NAME);
 }
 
 // MongoDB FindOption to return only the indexed _id field, making this a covered query (MongoDB will optimize)
@@ -134,3 +127,26 @@ export const asUpsert = (session: ClientSession): ReplaceOptions => ({ upsert: t
 
 // MongoDB FindOption to return at most 5 documents
 export const limitFive = (session: ClientSession): FindOptions => ({ limit: 5, session });
+
+/**
+ * Lock in-use meadowlark documents, both those being directly updated and those being referenced.
+ */
+export async function lockDocuments(
+  concurrencyCollection: Collection<ConcurrencyDocument>,
+  concurrencyDocuments: ConcurrencyDocument[],
+  session: ClientSession,
+): Promise<void> {
+  await concurrencyCollection.insertMany(concurrencyDocuments, { session });
+
+  // eslint-disable-next-line no-underscore-dangle
+  const documentUuids: DocumentUuid[] = concurrencyDocuments.map((document) => document._id);
+
+  await concurrencyCollection.deleteMany(
+    {
+      _id: {
+        $in: documentUuids,
+      },
+    },
+    { session },
+  );
+}

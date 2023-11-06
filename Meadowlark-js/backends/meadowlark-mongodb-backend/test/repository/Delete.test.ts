@@ -8,6 +8,7 @@ describe('given a transaction on a resource', () => {
   let mongoClientMock = {};
   let deleteOneMock = jest.fn();
   const error = {
+    code: 112,
     codeName: 'WriteConflict',
   };
 
@@ -16,6 +17,11 @@ describe('given a transaction on a resource', () => {
 
     jest.spyOn(DB, 'getDocumentCollection').mockReturnValue({
       deleteOne: deleteOneMock,
+    } as any);
+
+    jest.spyOn(DB, 'getConcurrencyCollection').mockReturnValue({
+      insertMany: jest.fn(),
+      deleteMany: jest.fn(),
     } as any);
 
     mongoClientMock = {

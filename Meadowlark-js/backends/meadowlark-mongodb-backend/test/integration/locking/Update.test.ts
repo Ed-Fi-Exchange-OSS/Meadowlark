@@ -23,8 +23,8 @@ import {
   getConcurrencyCollection,
   getDocumentCollection,
   getNewClient,
-  lockDocuments,
   onlyReturnId,
+  lockDocuments,
 } from '../../../src/repository/Db';
 import {
   validateReferences,
@@ -129,7 +129,7 @@ const academicWeekDocument: MeadowlarkDocument = meadowlarkDocumentFrom({
   lastModifiedAt: Date.now(),
 });
 
-describe('given a delete concurrent with an insert referencing the to-be-deleted document - using read lock scheme', () => {
+describe('given an upsert (update) concurrent with an insert referencing the to-be-updated document - using materialized conflict approach', () => {
   let client: MongoClient;
 
   beforeAll(async () => {
@@ -146,7 +146,7 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     );
 
     // ----
-    // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School delete
+    // Start transaction to insert an AcademicWeek - it references the School which will interfere with the School update
     // ----
     const upsertSession: ClientSession = client.startSession();
     upsertSession.startTransaction();
@@ -164,27 +164,27 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     expect(upsertFailures).toHaveLength(0);
 
     // ----
-    // Start transaction to delete the School document - interferes with the AcademicWeek insert referencing the School
+    // Start transaction to update the School document - interferes with the AcademicWeek insert referencing the School
     // ----
-    const deleteSession: ClientSession = client.startSession();
-    deleteSession.startTransaction();
+    const updateSession: ClientSession = client.startSession();
+    updateSession.startTransaction();
 
     // Get the aliasMeadowlarkIds for the School document, used to check for references to it as School or as EducationOrganization
-    const deleteCandidate: any = await mongoDocumentCollection.findOne(
+    const udpateCandidate: any = await mongoDocumentCollection.findOne(
       { _id: schoolMeadowlarkId },
-      onlyReturnAliasIds(deleteSession),
+      onlyReturnAliasIds(updateSession),
     );
 
     // Check for any references to the School document
     const anyReferences = await mongoDocumentCollection.findOne(
-      onlyDocumentsReferencing(deleteCandidate.aliasMeadowlarkIds),
-      onlyReturnId(deleteSession),
+      onlyDocumentsReferencing(udpateCandidate.aliasMeadowlarkIds),
+      onlyReturnId(updateSession),
     );
 
-    // Delete transaction sees no references yet, though we are about to add one
+    // Update transaction sees no references yet, though we are about to add one
     expect(anyReferences).toBeNull();
 
-    // Perform the insert of AcademicWeek document, adding a reference to to to-be-deleted document
+    // Perform the insert of AcademicWeek document, adding a reference to to to-be-updated document
     const { upsertedCount } = await mongoDocumentCollection.replaceOne(
       { _id: academicWeekMeadowlarkId },
       academicWeekDocument,
@@ -216,11 +216,13 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
       _id: schoolDocument.documentUuid,
     });
 
-    // Try deleting the School document - should fail thanks to AcademicWeek's read-for-write lock
+    // Try updating the School document - should fail thanks to the conflict in concurrency collection
     try {
-      await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, deleteSession);
+      await lockDocuments(mongoConcurrencyCollection, concurrencyDocumentsSchool, updateSession);
 
-      await mongoDocumentCollection.deleteOne({ _id: schoolMeadowlarkId }, { session: deleteSession });
+      schoolDocument.edfiDoc.nameOfInstitution = 'A School 124';
+
+      await mongoDocumentCollection.replaceOne({ _id: schoolMeadowlarkId }, schoolDocument, asUpsert(updateSession));
     } catch (e) {
       expect(e).toMatchInlineSnapshot(
         '[MongoBulkWriteError: WriteConflict error: this operation conflicted with another operation. Please retry your operation or multi-document transaction.]',
@@ -229,19 +231,21 @@ describe('given a delete concurrent with an insert referencing the to-be-deleted
     }
 
     // ----
-    // End transaction to delete the School document
+    // End transaction to update the School document
     // ----
-    await deleteSession.abortTransaction();
+    await updateSession.abortTransaction();
+  });
+
+  it('should still have the initial nameOfInstitution: A School 123', async () => {
+    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const result: any = await collection.findOne({ _id: schoolMeadowlarkId });
+    expect(result.documentIdentity.schoolId).toBe('123');
+    expect(result.edfiDoc.nameOfInstitution).toBe('A School 123');
   });
 
   afterAll(async () => {
     await getDocumentCollection(client).deleteMany({});
+    await getConcurrencyCollection(client).deleteMany({});
     await client.close();
-  });
-
-  it('should have still have the School document in the db - a success', async () => {
-    const collection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
-    const result: any = await collection.findOne({ _id: schoolMeadowlarkId });
-    expect(result.documentIdentity.schoolId).toBe('123');
   });
 });

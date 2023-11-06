@@ -10,8 +10,9 @@ import { DeleteResult, DeleteRequest, ReferringDocumentInfo, DocumentUuid, Trace
 import { ClientSession, Collection, MongoClient, WithId } from 'mongodb';
 import retry from 'async-retry';
 import { MeadowlarkDocument } from '../model/MeadowlarkDocument';
-import { getDocumentCollection, limitFive, onlyReturnId } from './Db';
+import { getConcurrencyCollection, getDocumentCollection, lockDocuments, limitFive, onlyReturnId } from './Db';
 import { onlyReturnAliasIds, onlyDocumentsReferencing } from './ReferenceValidation';
+import { ConcurrencyDocument } from '../model/ConcurrencyDocument';
 
 const moduleName: string = 'mongodb.repository.Delete';
 
@@ -75,6 +76,7 @@ async function checkForReferencesToDocument(
 export async function deleteDocumentByMeadowlarkIdTransaction(
   { documentUuid, validateNoReferencesToDocument, traceId }: DeleteRequest,
   mongoCollection: Collection<MeadowlarkDocument>,
+  concurrencyCollection: Collection<ConcurrencyDocument>,
   session: ClientSession,
 ): Promise<DeleteResult> {
   if (validateNoReferencesToDocument) {
@@ -92,6 +94,14 @@ export async function deleteDocumentByMeadowlarkIdTransaction(
     `${moduleName}.deleteDocumentByMeadowlarkIdTransaction: Deleting document documentUuid ${documentUuid}`,
     traceId,
   );
+
+  const concurrencyDocuments: ConcurrencyDocument[] = [
+    {
+      _id: documentUuid,
+    },
+  ];
+
+  await lockDocuments(concurrencyCollection, concurrencyDocuments, session);
 
   const { acknowledged, deletedCount } = await mongoCollection.deleteOne({ documentUuid }, { session });
 
@@ -119,13 +129,19 @@ export async function deleteDocumentByDocumentUuid(
   let deleteResult: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: '' };
   try {
     const mongoCollection: Collection<MeadowlarkDocument> = getDocumentCollection(client);
+    const concurrencyCollection: Collection<ConcurrencyDocument> = getConcurrencyCollection(client);
 
     const numberOfRetries: number = Config.get('MONGODB_MAX_NUMBER_OF_RETRIES');
 
     await retry(
       async () => {
         await session.withTransaction(async () => {
-          deleteResult = await deleteDocumentByMeadowlarkIdTransaction(deleteRequest, mongoCollection, session);
+          deleteResult = await deleteDocumentByMeadowlarkIdTransaction(
+            deleteRequest,
+            mongoCollection,
+            concurrencyCollection,
+            session,
+          );
           if (deleteResult.response !== 'DELETE_SUCCESS') {
             await session.abortTransaction();
           }
@@ -143,20 +159,16 @@ export async function deleteDocumentByDocumentUuid(
     );
   } catch (e) {
     Logger.error(`${moduleName}.deleteDocumentByDocumentUuid`, deleteRequest.traceId, e);
+    await session.abortTransaction();
 
-    let response: DeleteResult = { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
-
-    // If this is a MongoError, it has a codeName
     if (e.codeName === 'WriteConflict') {
-      response = {
+      return {
         response: 'DELETE_FAILURE_WRITE_CONFLICT',
         failureMessage: 'Write conflict due to concurrent access to this or related resources',
       };
     }
 
-    await session.abortTransaction();
-
-    return response;
+    return { response: 'UNKNOWN_FAILURE', failureMessage: e.message };
   } finally {
     await session.endSession();
   }
