@@ -25,7 +25,6 @@ let upsertResponse: FrontendResponse;
 let updateResponse: FrontendResponse;
 let getResponse: FrontendResponse;
 let mockDocumentStore: jest.SpyInstance;
-let mockParsePath: jest.SpyInstance;
 let mockAuthorizationMiddleware: jest.SpyInstance;
 let documentUuid: DocumentUuid;
 const originalGetBooleanFromEnvironment = getBooleanFromEnvironment;
@@ -39,13 +38,7 @@ const baseRequestBody = {
   totalInstructionalDays: 10,
 };
 const updateRequestBody = {
-  weekIdentifier: '123456',
-  schoolReference: {
-    schoolId: 123,
-  },
-  beginDate: '2023-10-30',
-  endDate: '2023-11-30',
-  totalInstructionalDays: 10,
+  ...baseRequestBody,
 };
 const updateResponseBody = {
   ...updateRequestBody,
@@ -58,6 +51,7 @@ const requestBodyAdditionalProperties = {
 };
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
+  path: '/v3.3b/ed-fi/academicWeeks/',
   body: JSON.stringify(baseRequestBody),
   middleware: {
     ...newFrontendRequestMiddleware(),
@@ -71,6 +65,24 @@ const frontendRequest: FrontendRequest = {
 const frontendRequestAdditionalProperties: FrontendRequest = {
   ...frontendRequest,
   body: JSON.stringify(requestBodyAdditionalProperties),
+};
+
+const upsertResult: UpsertResult = {
+  response: 'INSERT_SUCCESS',
+  newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
+  failureMessage: null,
+} as unknown as UpsertResult;
+
+const updateResult: UpdateResult = {
+  response: 'UPDATE_SUCCESS',
+  failureMessage: null,
+} as unknown as UpdateResult;
+
+const getResult: GetResult = {
+  response: 'GET_SUCCESS',
+  edfiDoc: undefined as unknown as object,
+  documentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64' as DocumentUuid,
+  lastModifiedDate: 0,
 };
 
 describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
@@ -92,7 +104,7 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
   });
 
   afterEach(() => {
-    restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+    restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
   });
 
   describe('when getting a document after invoke an upsert without extraneous properties', () => {
@@ -101,29 +113,23 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
         frontendRequest,
         frontendResponse: null,
       };
-      jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
-      mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
+      jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
+      mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
       // Act
       upsertResponse = await upsert(frontendRequest);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...frontendRequestAdditionalProperties.middleware,
           pathComponents: {
@@ -142,11 +148,9 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
+            ...getResult,
             edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
@@ -178,27 +182,21 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
       };
       jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
       mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
       // Act
       upsertResponse = await upsert(frontendRequestAdditionalProperties);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location?.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...frontendRequestAdditionalProperties.middleware,
           pathComponents: {
@@ -217,18 +215,16 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
+            ...getResult,
             edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
     });
 
     afterAll(() => {
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
     });
 
     it('returns status 400 on Upsert', () => {
@@ -273,25 +269,19 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
       };
       jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
       mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
       // Act
       upsertResponse = await upsert(frontendRequest);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location?.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       const FrontEndUpdateRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         body: JSON.stringify({
           ...requestBodyAdditionalProperties,
           id: documentUuid,
@@ -313,23 +303,19 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
       jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(getUpdateModel);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(FrontEndUpdateRequest);
       documentUuid = <DocumentUuid>(
         (updateResponse?.headers?.Location?.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...FrontEndUpdateRequest.middleware,
           pathComponents: {
@@ -348,18 +334,16 @@ describe('given a get with ALLOW_OVERPOSTING equals to false', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
-            edfiDoc: FrontEndUpdateRequest.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+            ...getResult,
+            edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
     });
 
     afterAll(() => {
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
     });
 
     it('returns status 201 on Upsert', () => {
@@ -422,28 +406,22 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
         frontendResponse: null,
       };
       jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
       // Act upsert
       upsertResponse = await upsert(frontendRequest);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequest,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...frontendRequest.middleware,
           pathComponents: {
@@ -462,11 +440,9 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
-            edfiDoc: frontendRequest.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+            ...getResult,
+            edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
@@ -494,28 +470,22 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
         frontendResponse: null,
       };
       jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
       // Act upsert
       upsertResponse = await upsert(frontendRequestAdditionalProperties);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...frontendRequestAdditionalProperties.middleware,
           pathComponents: {
@@ -534,11 +504,9 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
+            ...getResult,
             edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
@@ -566,25 +534,19 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
       };
       jest.spyOn(Publish, 'afterUpsertDocument').mockImplementation(async () => Promise.resolve());
       mockAuthorizationMiddleware = jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      mockParsePath = jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        upsertDocument: async () =>
-          Promise.resolve({
-            response: 'INSERT_SUCCESS',
-            newDocumentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64',
-            failureMessage: null,
-          } as unknown as UpsertResult),
+        upsertDocument: async () => Promise.resolve(upsertResult),
       });
       // Act
       upsertResponse = await upsert(frontendRequest);
       documentUuid = <DocumentUuid>(
         (upsertResponse?.headers?.Location?.split('/').pop() ?? (undefined as unknown as DocumentUuid))
       );
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       const FrontEndUpdateRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         body: JSON.stringify({
           ...requestBodyAdditionalProperties,
           id: documentUuid,
@@ -606,20 +568,16 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
       jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(getUpdateModel);
       mockDocumentStore = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(FrontEndUpdateRequest);
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
       // Finally, we want to get the document we just created.
       // Prepare request to invoke get.
       const FrontEndGetRequest: FrontendRequest = {
         ...frontendRequestAdditionalProperties,
-        path: `/ed-fi/v3.3b/academicWeeks/${documentUuid}`,
+        path: `${frontendRequestAdditionalProperties.path}${documentUuid}`,
         middleware: {
           ...FrontEndUpdateRequest.middleware,
           pathComponents: {
@@ -638,18 +596,16 @@ describe('given a get with ALLOW_OVERPOSTING equals to true', () => {
         ...NoDocumentStorePlugin,
         getDocumentById: async () =>
           Promise.resolve({
-            response: 'GET_SUCCESS',
-            edfiDoc: FrontEndUpdateRequest.middleware.parsedBody,
-            documentUuid,
-            lastModifiedDate: 0,
-          } as GetResult),
+            ...getResult,
+            edfiDoc: frontendRequestAdditionalProperties.middleware.parsedBody,
+          }),
       });
       // Act
       getResponse = await getById(FrontEndGetRequest);
     });
 
     afterAll(() => {
-      restoreSpies([mockDocumentStore, mockParsePath, mockAuthorizationMiddleware]);
+      restoreSpies([mockDocumentStore, mockAuthorizationMiddleware]);
     });
 
     it('returns status 201 on Upsert', () => {

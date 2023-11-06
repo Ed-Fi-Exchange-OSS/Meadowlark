@@ -12,7 +12,6 @@ import { NoDocumentStorePlugin } from '../../../src/plugin/backend/NoDocumentSto
 import * as PluginLoader from '../../../src/plugin/PluginLoader';
 import { MiddlewareModel } from '../../../src/middleware/MiddlewareModel';
 import * as AuthorizationMiddleware from '../../../src/middleware/AuthorizationMiddleware';
-import * as ParsePathMiddleware from '../../../src/middleware/ParsePathMiddleware';
 import { setupMockConfiguration } from '../../ConfigHelper';
 import { UpdateResult } from '../../../src/message/UpdateResult';
 import { DocumentUuid } from '../../../src/model/IdTypes';
@@ -21,19 +20,23 @@ import { clearAllValidatorCache } from '../../../src/metaed/MetaEdValidation';
 let updateResponse: FrontendResponse;
 let mockUpdate: any;
 
+const documentUuid: DocumentUuid = '6b48af60-afe7-4df2-b783-dc614ec9bb64' as DocumentUuid;
+const requestPath: string = '/v3.3b/ed-fi/academicWeeks/';
 const originalGetBooleanFromEnvironment = getBooleanFromEnvironment;
+const baseRequestBody = {
+  weekIdentifier: '123456',
+  schoolReference: {
+    schoolId: 123,
+  },
+  beginDate: '2023-10-30',
+  endDate: '2023-10-30',
+  totalInstructionalDays: 10,
+};
 
 const frontendRequest: FrontendRequest = {
   ...newFrontendRequest(),
-  body: `{
-    "weekIdentifier": "123456",
-    "schoolReference": {
-      "schoolId": 123
-    },
-    "beginDate": "2023-10-30",
-    "endDate": "2023-10-30",
-    "totalInstructionalDays": 10
-  }`,
+  path: requestPath,
+  body: JSON.stringify(baseRequestBody),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
@@ -46,40 +49,29 @@ const frontendRequest: FrontendRequest = {
 
 const frontendRequestUpdate: FrontendRequest = {
   ...frontendRequest,
-  body: `{
-    "id": "6b48af60-afe7-4df2-b783-dc614ec9bb64",
-    "weekIdentifier": "123456",
-    "schoolReference": {
-      "schoolId": 123
-    },
-    "beginDate": "2023-10-30",
-    "endDate": "2023-10-30",
-    "totalInstructionalDays": 10
-  }`,
+  path: `${requestPath}${documentUuid}`,
+  body: JSON.stringify({
+    ...baseRequestBody,
+    id: documentUuid,
+  }),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
       resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      documentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64' as DocumentUuid,
+      documentUuid: documentUuid as DocumentUuid,
     },
   },
 };
 
 const frontendRequestAdditionalProperties: FrontendRequest = {
   ...newFrontendRequest(),
-  body: `{
-    "weekIdentifier": "123456",
-    "schoolReference": {
-      "schoolId": 123
-    },
-    "beginDate": "2023-10-30",
-    "endDate": "2023-10-30",
-    "extraneousProperty": "LoremIpsum",
-    "secondExtraneousProperty": "Second additional",
-    "totalInstructionalDays": 10
-  }`,
+  body: JSON.stringify({
+    ...baseRequestBody,
+    extraneousProperty: 'LoremIpsum',
+    secondExtraneousProperty: 'Second additional',
+  }),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
@@ -91,28 +83,28 @@ const frontendRequestAdditionalProperties: FrontendRequest = {
 };
 const frontendRequestUpdateAdditionalProperties: FrontendRequest = {
   ...frontendRequestAdditionalProperties,
-  body: `{
-    "id": "6b48af60-afe7-4df2-b783-dc614ec9bb64",
-    "weekIdentifier": "123456",
-    "schoolReference": {
-      "schoolId": 123
-    },
-    "beginDate": "2023-10-30",
-    "endDate": "2023-10-30",
-    "extraneousProperty": "LoremIpsum",
-    "secondExtraneousProperty": "Second additional",
-    "totalInstructionalDays": 10
-  }`,
+  path: `${requestPath}${documentUuid}`,
+  body: JSON.stringify({
+    ...baseRequestBody,
+    extraneousProperty: 'LoremIpsum',
+    secondExtraneousProperty: 'Second additional',
+    id: documentUuid,
+  }),
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
       resourceName: 'academicWeeks',
       namespace: 'ed-fi',
       version: 'v3.3b',
-      documentUuid: '6b48af60-afe7-4df2-b783-dc614ec9bb64' as DocumentUuid,
+      documentUuid: documentUuid as DocumentUuid,
     },
   },
 };
+
+const updateResult: UpdateResult = {
+  response: 'UPDATE_SUCCESS',
+  failureMessage: null,
+} as unknown as UpdateResult;
 
 describe('given an update with Allow Overposting equals to false', () => {
   beforeAll(async () => {
@@ -140,14 +132,9 @@ describe('given an update with Allow Overposting equals to false', () => {
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
       jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(frontendRequestUpdate);
@@ -170,14 +157,9 @@ describe('given an update with Allow Overposting equals to false', () => {
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
       jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(frontendRequestUpdateAdditionalProperties);
@@ -244,14 +226,9 @@ describe('given an update with Allow Overposting equals to true', () => {
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
       jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(frontendRequestUpdate);
@@ -274,14 +251,9 @@ describe('given an update with Allow Overposting equals to true', () => {
       };
       jest.spyOn(Publish, 'afterUpdateDocumentById').mockImplementation(async () => Promise.resolve());
       jest.spyOn(AuthorizationMiddleware, 'authorize').mockResolvedValue(model);
-      jest.spyOn(ParsePathMiddleware, 'parsePath').mockResolvedValue(model);
       mockUpdate = jest.spyOn(PluginLoader, 'getDocumentStore').mockReturnValue({
         ...NoDocumentStorePlugin,
-        updateDocumentById: async () =>
-          Promise.resolve({
-            response: 'UPDATE_SUCCESS',
-            failureMessage: null,
-          } as unknown as UpdateResult),
+        updateDocumentById: async () => Promise.resolve(updateResult),
       });
       // Act
       updateResponse = await update(frontendRequestUpdateAdditionalProperties);

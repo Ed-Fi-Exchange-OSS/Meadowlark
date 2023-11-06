@@ -41,7 +41,27 @@ function createResourceSchema(): ResourceSchema {
   };
 }
 
-describe.skip('given query parameters with allow overposting is false have two invalid properties and a valid one', () => {
+describe('given query parameters have no properties', () => {
+  it('should not return an error', () => {
+    const queryParameters = {};
+
+    const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given query parameters have a valid property', () => {
+  it('should not return an error', () => {
+    const queryParameters = { uniqueId: 'a' };
+
+    const validationResult = validateQueryParametersAgainstSchema(createModel(), queryParameters);
+
+    expect(validationResult).toHaveLength(0);
+  });
+});
+
+describe('given query parameters with allow overposting is false have two extraneous properties and a valid one', () => {
   let validationResult: string[];
 
   beforeAll(() => {
@@ -91,8 +111,16 @@ describe.skip('given query parameters with allow overposting is true have two ex
     jest.restoreAllMocks();
   });
 
-  it('should not have errors', () => {
-    expect(validationResult).toHaveLength(0);
+  it('should have two errors', () => {
+    expect(validationResult).toHaveLength(2);
+  });
+
+  it('should contain property `one`', () => {
+    expect(validationResult).toContain("Student does not include property 'one'");
+  });
+
+  it('should contain property `two`', () => {
+    expect(validationResult).toContain("Student does not include property 'two'");
   });
 });
 
