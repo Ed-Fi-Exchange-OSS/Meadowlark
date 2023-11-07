@@ -15,11 +15,14 @@ import * as AuthorizationMiddleware from '../../../src/middleware/AuthorizationM
 import * as ParsePathMiddleware from '../../../src/middleware/ParsePathMiddleware';
 import { setupMockConfiguration } from '../../ConfigHelper';
 import { UpsertResult } from '../../../src/message/UpsertResult';
-import { clearAllValidatorCache } from '../../../src/metaed/MetaEdValidation';
+import { clearAllValidatorCache } from '../../../src/validation/ResourceSchemaValidation';
 import { GetResult } from '../../../src/message/GetResult';
 import { DocumentUuid } from '../../../src/model/IdTypes';
 import { restoreSpies } from '../../TestHelper';
 import { UpdateResult } from '../../../src/message/UpdateResult';
+import { EndpointName } from '../../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../../src/model/ProjectShortVersion';
 
 let upsertResponse: FrontendResponse;
 let updateResponse: FrontendResponse;
@@ -56,9 +59,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as unknown as EndpointName,
+      projectNamespace: 'ed-fi' as unknown as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as unknown as ProjectShortVersion,
     },
   },
 };

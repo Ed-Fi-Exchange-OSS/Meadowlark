@@ -15,7 +15,10 @@ import * as AuthorizationMiddleware from '../../../src/middleware/AuthorizationM
 import { setupMockConfiguration } from '../../ConfigHelper';
 import { UpdateResult } from '../../../src/message/UpdateResult';
 import { DocumentUuid } from '../../../src/model/IdTypes';
-import { clearAllValidatorCache } from '../../../src/metaed/MetaEdValidation';
+import { clearAllValidatorCache } from '../../../src/validation/ResourceSchemaValidation';
+import { EndpointName } from '../../../src/model/api-schema/EndpointName';
+import { ProjectNamespace } from '../../../src/model/api-schema/ProjectNamespace';
+import { ProjectShortVersion } from '../../../src/model/ProjectShortVersion';
 
 let updateResponse: FrontendResponse;
 let mockUpdate: any;
@@ -40,9 +43,9 @@ const frontendRequest: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as unknown as EndpointName,
+      projectNamespace: 'ed-fi' as unknown as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as unknown as ProjectShortVersion,
     },
   },
 };
@@ -57,9 +60,9 @@ const frontendRequestUpdate: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as unknown as EndpointName,
+      projectNamespace: 'ed-fi' as unknown as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as unknown as ProjectShortVersion,
       documentUuid: documentUuid as DocumentUuid,
     },
   },
@@ -75,9 +78,9 @@ const frontendRequestAdditionalProperties: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as unknown as EndpointName,
+      projectNamespace: 'ed-fi' as unknown as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as unknown as ProjectShortVersion,
     },
   },
 };
@@ -93,9 +96,9 @@ const frontendRequestUpdateAdditionalProperties: FrontendRequest = {
   middleware: {
     ...newFrontendRequestMiddleware(),
     pathComponents: {
-      resourceName: 'academicWeeks',
-      namespace: 'ed-fi',
-      version: 'v3.3b',
+      endpointName: 'academicWeeks' as unknown as EndpointName,
+      projectNamespace: 'ed-fi' as unknown as ProjectNamespace,
+      projectShortVersion: 'v3.3b' as unknown as ProjectShortVersion,
       documentUuid: documentUuid as DocumentUuid,
     },
   },
