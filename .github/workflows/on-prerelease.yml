@@ -42,14 +42,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
         run: npm ci
-
-      - name: Update version to match tag
-        working-directory: eng/version
-        run: |
-          npm ci --omit dev
-          node ./set.js ${{ env.REF }}
 
       - name: Transpile to JS
         run: npm run build --workspaces
@@ -74,9 +67,6 @@ jobs:
 
       - name: Publish
         run: npm publish --workspaces --tag dev
-        # NOTE: there are uncommitted version number changes in package.json. No
-        # problem! Our strategy is to rely on the tag history for version numbers,
-        # not on package.json.
 
       - name: Generate hash codes for npm tarballs
         id: hash-code

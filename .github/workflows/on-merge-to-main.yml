@@ -14,31 +14,56 @@ env:
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
 
 jobs:
-  create-pre-releases:
-    name: Create Pre-Releases
+  upgrade:
+    name: Upgrade packages
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: pwsh
-        working-directory: eng/version
+        working-directory: Meadowlark-js
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
     steps:
       - name: Checkout the Repo
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: Update versions
+        run:  npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
+
+      - name: Set Version
+        id: set-version
+        run: |
+          version=v$(cat lerna.json | jq -r .version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: planetscale/ghcommit-action@4131649dbf2fdf1eb34421702972a5af7b0a8731 # v0.1.18
         with:
-          # Need full Git history for calculating the version number
-          fetch-depth: 0w
+          commit_message: "${{ steps.set-version.outputs.version }}"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-pre-releases:
+    name: Create Pre-Releases
+    runs-on: ubuntu-latest
+    needs: upgrade
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: Meadowlark-js
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
       - name: Create Meadowlark Pre-Release
         run: |
-          npm install
-          $version = $(node ./bump.js)
-          if ($LASTEXITCODE -ne 0) {
-            throw 'Unable to retrieve version number'
-          }
 
-          "Creating pre-release $version" | Out-Host
+          $version="${{needs.upgrade.outputs.version}}"
+
           $body = @{
-            tag_name = "$version"
+            tag_name = $version
             target_commitish = "main"
             name = $version
             body = ""
