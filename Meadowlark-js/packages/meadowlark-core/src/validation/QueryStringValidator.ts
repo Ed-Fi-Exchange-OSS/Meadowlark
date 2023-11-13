@@ -19,7 +19,7 @@ export type QueryStringValidationResult = {
  * Validates that those queryParameters which are present are actually fields on the API resource
  */
 export function validateQueryParameters(resourceSchema: ResourceSchema, queryParameters: FrontendQueryParameters): string[] {
-  const { queryValidator } = getSchemaValidatorsFor(resourceSchema);
+  const { queryValidator } = getSchemaValidatorsFor(resourceSchema, true);
 
   let errors: string[] = [];
 

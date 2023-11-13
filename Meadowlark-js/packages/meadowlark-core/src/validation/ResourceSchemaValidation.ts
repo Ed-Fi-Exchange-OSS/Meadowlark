@@ -18,8 +18,9 @@ export type ResourceSchemaValidators = {
   updateValidator: ValidateFunction;
 };
 
-function initializeAjv(): Ajv {
-  const removeAdditional = false; // TODO: replace on merge with RND-651
+function initializeAjv(isQueryParameterValidator: boolean): Ajv {
+  // A query parameter validator cannot have additional properties
+  const removeAdditional = isQueryParameterValidator ? false : getBooleanFromEnvironment('ALLOW_OVERPOSTING', false);
   const coerceTypes = getBooleanFromEnvironment('ALLOW_TYPE_COERCION', false);
 
   const ajv = new Ajv({ allErrors: true, coerceTypes, removeAdditional });
@@ -34,16 +35,19 @@ let ajv: Ajv | null = null;
 // simple cache implementation, see: https://rewind.io/blog/simple-caching-in-aws-lambda-functions/
 /** This is a cache mapping ResourceSchema objects to compiled ajv JSON Schema validators for the API resource */
 const validatorCache: Map<ResourceSchema, ResourceSchemaValidators> = new Map();
+const queryValidatorCache: Map<ResourceSchema, ResourceSchemaValidators> = new Map();
 
 /**
  * Returns the API resource JSON Schema validator functions for the given ResourceSchema. Caches results.
  */
-export function getSchemaValidatorsFor(resourceSchema: ResourceSchema): ResourceSchemaValidators {
-  if (ajv == null) ajv = initializeAjv();
-
-  const cachedValidators: ResourceSchemaValidators | undefined = validatorCache.get(resourceSchema);
+export function getSchemaValidatorsFor(
+  resourceSchema: ResourceSchema,
+  isQueryParameterValidator: boolean = false,
+): ResourceSchemaValidators {
+  const validatorCacheObject = isQueryParameterValidator ? queryValidatorCache : validatorCache;
+  const cachedValidators: ResourceSchemaValidators | undefined = validatorCacheObject.get(resourceSchema);
   if (cachedValidators != null) return cachedValidators;
-
+  ajv = initializeAjv(isQueryParameterValidator);
   const resourceValidators: ResourceSchemaValidators = {
     insertValidator: ajv.compile(resourceSchema.jsonSchemaForInsert),
     queryValidator: ajv.compile(resourceSchema.jsonSchemaForQuery),
@@ -58,4 +62,5 @@ export function getSchemaValidatorsFor(resourceSchema: ResourceSchema): Resource
  */
 export function clearAllValidatorCache(): void {
   validatorCache.clear();
+  queryValidatorCache.clear();
 }
