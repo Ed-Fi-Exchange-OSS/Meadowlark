@@ -112,6 +112,41 @@ jobs:
       - name: Linter
         run: npm run test:lint
 
+  upgrade:
+    # Upgrade packages on PR only to avoid a double update when pushed to main
+    name: Upgrade packages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Meadowlark-js
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Update versions
+        run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
+
+      - name: Set Version
+        id: set-version
+        run: |
+          version=v$(cat lerna.json | jq -r .version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: planetscale/ghcommit-action@v0.1.18
+        with:
+          commit_message: "${{steps.set-version.outputs.version}}"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
   build:
     name: Build
     needs: lint
