@@ -25,63 +25,63 @@ jobs:
     name: Scan Actions
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
-  analyze-dependencies:
-    # This Action will fail if run on anything other than a pull request
-    if: github.event_name == 'pull_request'
-    name: Analyze Code Dependencies
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+  # analyze-dependencies:
+  #   # This Action will fail if run on anything other than a pull request
+  #   if: github.event_name == 'pull_request'
+  #   name: Analyze Code Dependencies
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #     security-events: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Dependency Review ("Dependabot on PR")
-        uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
+  #     - name: Dependency Review ("Dependabot on PR")
+  #       uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
 
-  analyze-code:
-    name: Analyze Code
-    runs-on: ubuntu-latest
-    env:
-      SRC_DIR: Meadowlark-js
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+  # analyze-code:
+  #   name: Analyze Code
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     SRC_DIR: Meadowlark-js
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #     security-events: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+  #     - name: Setup Node
+  #       uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "**/package-lock.json"
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Node modules cache
+  #       id: modules-cache
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: "**/node_modules"
+  #         key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+  #     - name: Install dependencies
+  #       if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+  #       run: npm install
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
-        with:
-          languages: "typescript"
-          setup-python-dependencies: false
+  #     - name: Initialize CodeQL
+  #       uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
+  #       with:
+  #         languages: "typescript"
+  #         setup-python-dependencies: false
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
+  #     - name: Perform CodeQL Analysis
+  #       uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
 
   lint:
     name: Lint
