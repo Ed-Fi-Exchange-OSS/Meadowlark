@@ -2,7 +2,7 @@
 
 Instructions for running a local "developer" environment on localhost:
 
-1. Install [Node.js 16.x](https://nodejs.org/en/download/releases/)
+1. Install [Node.js 18.x](https://nodejs.org/en/download/releases/)
 2. Install [Docker Desktop](https://www.docker.com)
 3. Review the [Docker Guidance for Meadowlark](./DOCKER.md) to startup relevant
    backend services.

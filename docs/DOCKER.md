@@ -95,8 +95,8 @@ Again the main package.json has a few useful shortcut commands:
 ### One Time Initialization
 
 💡 Windows users: you need to run this from Window Subsystem for Linux. Make sure that you run a Bash prompt from WSL, not
-the one provided by Git. You also need to have Node.js 16 installed _inside WSL_. The development team likes using
-[NVM](https://github.com/nvm-sh/nvm) to manage this installation of Node 16.
+the one provided by Git. You also need to have Node.js 18 installed _inside WSL_. The development team likes using
+[NVM](https://github.com/nvm-sh/nvm) to manage this installation of Node 18.
 
 From a Bash prompt, run init-docker-compose.sh.
 
