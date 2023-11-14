@@ -133,9 +133,9 @@ jobs:
         id: changes
         run: git diff --name-only -r origin/main HEAD -- '*lerna.json' && echo "changed=true" >>$GITHUB_OUTPUT
 
-
       - name: Test
         run: echo ${{ steps.changes.outputs.changed }}
+
 
       - name: Update versions
         if: ${{ steps.changes.outputs.changed != 'true' }}
