@@ -83,13 +83,13 @@ jobs:
   #     - name: Perform CodeQL Analysis
   #       uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       # - name: Setup Node
       #   uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -139,7 +139,6 @@ jobs:
 
       - name: Test
         run: echo ${{ steps.changes.outputs.changed }}
-
 
       - name: Update versions
         if: ${{ steps.changes.outputs.changed != 'true' }}
