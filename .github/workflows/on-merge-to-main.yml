@@ -14,31 +14,30 @@ env:
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
 
 jobs:
+
   create-pre-releases:
     name: Create Pre-Releases
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: pwsh
-        working-directory: eng/version
+        working-directory: Meadowlark-js
     steps:
       - name: Checkout the Repo
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-        with:
-          # Need full Git history for calculating the version number
-          fetch-depth: 0w
+
+      - name: Set Version
+        id: set-version
+        run: |
+          version=v$(cat lerna.json | jq -r .version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Create Meadowlark Pre-Release
+        shell: pwsh
         run: |
-          npm install
-          $version = $(node ./bump.js)
-          if ($LASTEXITCODE -ne 0) {
-            throw 'Unable to retrieve version number'
-          }
+          $version="${{steps.set-version.outputs.version}}"
 
-          "Creating pre-release $version" | Out-Host
           $body = @{
-            tag_name = "$version"
+            tag_name = $version
             target_commitish = "main"
             name = $version
             body = ""
