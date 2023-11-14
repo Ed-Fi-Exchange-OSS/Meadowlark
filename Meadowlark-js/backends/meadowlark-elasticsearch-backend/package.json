@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-elasticsearch-backend",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.9",
+  "version": "0.4.0-pre.10",
   "description": "Meadowlark backend plugin for elasticsearch",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -19,8 +19,8 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-core": "0.4.0-pre.9",
-    "@edfi/meadowlark-utilities": "0.4.0-pre.9",
+    "@edfi/meadowlark-core": "0.4.0-pre.10",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.10",
     "@elastic/elasticsearch": "^8.10.0",
     "@elastic/transport": "^8.3.4"
   },

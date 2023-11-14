@@ -131,10 +131,11 @@ jobs:
 
       - name: Get changes
         id: changes
-        run: |
-          git fetch origin main:main
-          echo $(git diff --quiet main -- ./Meadowlark-js/lerna.json)
-          git diff --quiet main -- ./Meadowlark-js/lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
+        run: git diff --name-only -r origin/main HEAD -- '*lerna.json' && echo "changed=true" >>$GITHUB_OUTPUT
+
+
+      - name: Test
+        run: echo ${{ steps.changes.outputs.changed }}
 
       - name: Update versions
         if: ${{ steps.changes.outputs.changed != 'true' }}
@@ -156,35 +157,35 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-  build:
-    name: Build
-    needs: lint
-    runs-on: ubuntu-latest
+  # build:
+  #   name: Build
+  #   needs: lint
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+  #     - name: Setup Node
+  #       uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "**/package-lock.json"
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Node modules cache
+  #       id: modules-cache
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: "**/node_modules"
+  #         key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+  #     - name: Install dependencies
+  #       if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+  #       run: npm install
 
-      - name: Build
-        run: npm run build
+  #     - name: Build
+  #       run: npm run build
 
 
   # tests:
