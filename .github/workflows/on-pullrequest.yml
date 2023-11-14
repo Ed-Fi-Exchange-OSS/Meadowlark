@@ -132,6 +132,7 @@ jobs:
       - name: Get changes
         id: changes
         run: |
+          git fetch origin main:main
           echo $(git diff --quiet main -- ./Meadowlark-js/lerna.json)
           git diff --quiet main -- ./Meadowlark-js/lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
 
