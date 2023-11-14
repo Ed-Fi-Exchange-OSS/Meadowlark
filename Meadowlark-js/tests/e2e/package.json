@@ -1,13 +1,13 @@
 {
   "name": "@edfi/meadowlark-e2e-tests",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.2",
+  "version": "0.4.0-pre.3",
   "description": "Meadowlark Ed-Fi API end to end tests",
   "license": "Apache-2.0",
   "private": true,
   "files": [],
   "devDependencies": {
-    "@edfi/meadowlark-utilities": "0.4.0-pre.2",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.3",
     "@testcontainers/mongodb": "^10.2.1",
     "@testcontainers/postgresql": "^10.2.1",
     "@types/chance": "^1.1.4",

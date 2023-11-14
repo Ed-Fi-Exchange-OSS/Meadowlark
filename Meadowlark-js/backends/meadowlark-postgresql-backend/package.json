@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-postgresql-backend",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.2",
+  "version": "0.4.0-pre.3",
   "description": "Meadowlark backend plugin for PostgreSQL",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -19,9 +19,9 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-authz-server": "0.4.0-pre.2",
-    "@edfi/meadowlark-core": "0.4.0-pre.2",
-    "@edfi/meadowlark-utilities": "0.4.0-pre.2",
+    "@edfi/meadowlark-authz-server": "0.4.0-pre.3",
+    "@edfi/meadowlark-core": "0.4.0-pre.3",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.3",
     "pg": "^8.11.3",
     "pg-format": "^1.0.4",
     "ramda": "0.29.1"
