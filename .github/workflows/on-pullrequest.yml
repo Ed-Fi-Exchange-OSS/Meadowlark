@@ -132,7 +132,7 @@ jobs:
       - name: Get changes
         id: changes
         run: |
-          changes=$(git diff --name-only -r main HEAD -- ./Meadowlark-js/lerna.json)
+          changes=$(git diff --name-only -r origin/main HEAD -- ./Meadowlark-js/lerna.json)
           echo "changes=$changes" >> "$GITHUB_OUTPUT"
 
       - name: Update versions
