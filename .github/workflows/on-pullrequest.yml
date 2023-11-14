@@ -137,6 +137,7 @@ jobs:
           current=$(git describe --tags $(git rev-list --tags --max-count=1))
           echo "changes=$([[ "$suggested" != "$current" ]] && echo true)" >>$GITHUB_OUTPUT
 
+
       - name: Update versions
         if: ${{ ! steps.changes.outputs.changes }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
