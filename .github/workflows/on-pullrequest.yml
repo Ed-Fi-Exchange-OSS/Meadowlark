@@ -112,6 +112,7 @@ jobs:
       # - name: Linter
       #   run: npm run test:lint
 
+
   upgrade:
     # Upgrade packages on PR only to avoid a double update when pushed to main
     name: Upgrade packages
