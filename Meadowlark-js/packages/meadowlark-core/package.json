@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-core",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.7",
+  "version": "0.4.0-pre.8",
   "description": "Meadowlark core functionality",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
-    "@edfi/meadowlark-utilities": "0.4.0-pre.7",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.8",
     "@isaacs/ttlcache": "^1.4.1",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
