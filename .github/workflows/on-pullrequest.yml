@@ -133,9 +133,6 @@ jobs:
         id: changes
         run: echo "changes=$(git diff --name-only -r origin/main HEAD -- '*lerna.json')" >>$GITHUB_OUTPUT
 
-      - name: Test
-        run: echo ${{ steps.changes.outputs.changes }}
-
       - name: Update versions
         if: ${{ ! steps.changes.outputs.changes }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
