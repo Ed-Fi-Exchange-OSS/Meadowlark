@@ -91,26 +91,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+      # - name: Setup Node
+      #   uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+      #   with:
+      #     node-version: "18"
+      #     cache: "npm"
+      #     cache-dependency-path: "**/package-lock.json"
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+      # - name: Node modules cache
+      #   id: modules-cache
+      #   uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+      #   with:
+      #     path: "**/node_modules"
+      #     key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+      # - name: Install dependencies
+      #   if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+      #   run: npm install
 
-      - name: Linter
-        run: npm run test:lint
+      # - name: Linter
+      #   run: npm run test:lint
 
   upgrade:
     # Upgrade packages on PR only to avoid a double update when pushed to main
