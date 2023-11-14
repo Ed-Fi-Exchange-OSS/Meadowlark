@@ -131,7 +131,11 @@ jobs:
 
       - name: Get changes
         id: changes
-        run: git diff --name-only -r origin/main HEAD -- '*lerna.json' && echo "changed=true" >>$GITHUB_OUTPUT
+        run: |
+          echo $(git remote -v)
+          echo $(git diff --name-only -r origin/main HEAD)
+          echo $(git diff --name-only -r origin/main HEAD -- '*lerna.json')
+          git diff --name-only -r origin/main HEAD -- '*lerna.json' && echo "changed=true" >>$GITHUB_OUTPUT
 
       - name: Test
         run: echo ${{ steps.changes.outputs.changed }}
