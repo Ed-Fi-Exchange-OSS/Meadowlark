@@ -140,6 +140,14 @@ jobs:
           echo "----"
           echo $(git diff --name-only -r origin/main HEAD)
           echo "-----"
+          echo $(git diff --name-only -r HEAD^..HEAD -- ./Meadowlark-js/lerna.json)
+          echo "------"
+          echo $(git diff --name-only -r HEAD^..HEAD -- Meadowlark-js/lerna.json)
+          echo "-------"
+          echo $(git diff --name-only -r HEAD^ HEAD -- Meadowlark-js/lerna.json)
+          echo "--------"
+          echo $(git diff --name-only -r HEAD^ HEAD -- ./Meadowlark-js/lerna.json)
+          echo "---------"
           echo "changes=$changes" >> "$GITHUB_OUTPUT"
 
       - name: Update versions
