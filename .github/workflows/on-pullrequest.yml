@@ -130,9 +130,13 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Get changes
-        run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
+        id: changes
+        run: |
+          changes=$(git diff --name-only -r main HEAD -- ./Meadowlark-js/lerna.json)
+          echo "changes=$changes" >> "$GITHUB_OUTPUT"
 
       - name: Update versions
+        if: ${{ steps.changes.outputs.changes != '' }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
 
       - name: Set Version
