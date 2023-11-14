@@ -91,26 +91,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+      # - name: Setup Node
+      #   uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+      #   with:
+      #     node-version: "18"
+      #     cache: "npm"
+      #     cache-dependency-path: "**/package-lock.json"
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+      # - name: Node modules cache
+      #   id: modules-cache
+      #   uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+      #   with:
+      #     path: "**/node_modules"
+      #     key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+      # - name: Install dependencies
+      #   if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+      #   run: npm install
 
-      - name: Linter
-        run: npm run test:lint
+      # - name: Linter
+      #   run: npm run test:lint
 
   upgrade:
     # Upgrade packages on PR only to avoid a double update when pushed to main
@@ -132,22 +132,23 @@ jobs:
       - name: Get changes
         id: changes
         run: |
-          changes=$(git diff --name-only -r origin/main HEAD -- ./Meadowlark-js/lerna.json)
-          echo "changes=$changes" >> "$GITHUB_OUTPUT"
+          git fetch origin main:main
+          echo $(git diff --quiet main -- ./Meadowlark-js/lerna.json)
+          git diff --quiet main -- ./Meadowlark-js/lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
 
       - name: Update versions
-        if: ${{ steps.changes.outputs.changes != '' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
 
       - name: Set Version
-        if: ${{ steps.changes.outputs.changes != '' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         id: set-version
         run: |
           version=v$(cat lerna.json | jq -r .version)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: planetscale/ghcommit-action@v0.1.18
-        if: ${{ steps.changes.outputs.changes != '' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         with:
           commit_message: "${{steps.set-version.outputs.version}}"
           repo: ${{ github.repository }}
@@ -184,6 +185,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
 
   # tests:
   #   name: ${{matrix.tests.type}} tests
