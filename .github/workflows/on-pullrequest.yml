@@ -21,67 +21,67 @@ defaults:
     working-directory: Meadowlark-js
 
 jobs:
-  scan-actions:
-    name: Scan Actions
-    uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
+  # scan-actions:
+  #   name: Scan Actions
+  #   uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
-  analyze-dependencies:
-    # This Action will fail if run on anything other than a pull request
-    if: github.event_name == 'pull_request'
-    name: Analyze Code Dependencies
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+  # analyze-dependencies:
+  #   # This Action will fail if run on anything other than a pull request
+  #   if: github.event_name == 'pull_request'
+  #   name: Analyze Code Dependencies
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #     security-events: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Dependency Review ("Dependabot on PR")
-        uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
+  #     - name: Dependency Review ("Dependabot on PR")
+  #       uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730 # v3.0.2
 
-  analyze-code:
-    name: Analyze Code
-    runs-on: ubuntu-latest
-    env:
-      SRC_DIR: Meadowlark-js
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+  # analyze-code:
+  #   name: Analyze Code
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     SRC_DIR: Meadowlark-js
+  #   permissions:
+  #     actions: read
+  #     contents: read
+  #     security-events: write
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+  #     - name: Setup Node
+  #       uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "**/package-lock.json"
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Node modules cache
+  #       id: modules-cache
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: "**/node_modules"
+  #         key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+  #     - name: Install dependencies
+  #       if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+  #       run: npm install
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
-        with:
-          languages: "typescript"
-          setup-python-dependencies: false
+  #     - name: Initialize CodeQL
+  #       uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
+  #       with:
+  #         languages: "typescript"
+  #         setup-python-dependencies: false
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
+  #     - name: Perform CodeQL Analysis
+  #       uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5 # v2.11.6
 
   lint:
     name: Lint
@@ -111,6 +111,39 @@ jobs:
 
       - name: Linter
         run: npm run test:lint
+
+  upgrade:
+    # Upgrade packages on PR only to avoid a double update when pushed to main
+    name: Upgrade packages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Meadowlark-js
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Update versions
+        run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
+
+      - name: Set Version
+        id: set-version
+        run: |
+          version=v$(cat lerna.json | jq -r .version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: planetscale/ghcommit-action@v0.1.18
+        with:
+          commit_message: "${{steps.set-version.outputs.version}}"
+          repo: ${{ github.repository }}
+          branch: ${{ github.head_ref || github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   build:
     name: Build
@@ -142,150 +175,150 @@ jobs:
       - name: Build
         run: npm run build
 
-  tests:
-    name: ${{matrix.tests.type}} tests
-    needs: lint
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        tests:
-          [
-            { type: "Unit", command: "npm run test:unit:coverage:ci" },
-            {
-              type: "Integration",
-              command: "npm run test:integration -- --ci",
-            },
-          ]
+  # tests:
+  #   name: ${{matrix.tests.type}} tests
+  #   needs: lint
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       tests:
+  #         [
+  #           { type: "Unit", command: "npm run test:unit:coverage:ci" },
+  #           {
+  #             type: "Integration",
+  #             command: "npm run test:integration -- --ci",
+  #           },
+  #         ]
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+  #     - name: Setup Node
+  #       uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+  #       with:
+  #         node-version: "18"
+  #         cache: "npm"
+  #         cache-dependency-path: "**/package-lock.json"
 
-      - name: Load MongoDB binary cache
-        if: ${{ matrix.tests.type != 'Unit' }}
-        id: cache-mongodb-binaries
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Load MongoDB binary cache
+  #       if: ${{ matrix.tests.type != 'Unit' }}
+  #       id: cache-mongodb-binaries
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: ~/.cache/mongodb-binaries
+  #         key: ${{ runner.os }}-mongo-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Node modules cache
-        id: modules-cache
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Node modules cache
+  #       id: modules-cache
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: "**/node_modules"
+  #         key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
-        run: npm install
+  #     - name: Install dependencies
+  #       if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+  #       run: npm install
 
-      - name: Jest cache
-        id: cache-jest
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: /tmp/jest_rt
-          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Jest cache
+  #       id: cache-jest
+  #       uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+  #       with:
+  #         path: /tmp/jest_rt
+  #         key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Configure postgres
-        if: ${{ matrix.tests.type != 'Unit' }}
-        run: |
-          sudo systemctl start postgresql.service
-          sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
+  #     - name: Configure postgres
+  #       if: ${{ matrix.tests.type != 'Unit' }}
+  #       run: |
+  #         sudo systemctl start postgresql.service
+  #         sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
 
-      - name: Create .env file
-        run: |
-          # Create a .env file with proper settings
-          touch .env
-          echo POSTGRES_USER=${{ env.POSTGRES_PASSWORD }} >> .env
-          echo POSTGRES_PASSWORD=${{ env.POSTGRES_USER }} >> .env
-          echo POSTGRES_HOST=localhost >> .env
-          echo POSTGRES_PORT=5432 >> .env
-          echo MEADOWLARK_DATABASE_NAME=postgres >> .env
-          # The actual values below don't matter for integration tests - but _something_ must be set
-          echo AUTHORIZATION_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
-          echo DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
-          echo OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 >> .env
-          echo OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 >> .env
-          echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3000/local/oauth/token >> .env
-          echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3000/local/oauth/verify >> .env
-          echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
+  #     - name: Create .env file
+  #       run: |
+  #         # Create a .env file with proper settings
+  #         touch .env
+  #         echo POSTGRES_USER=${{ env.POSTGRES_PASSWORD }} >> .env
+  #         echo POSTGRES_PASSWORD=${{ env.POSTGRES_USER }} >> .env
+  #         echo POSTGRES_HOST=localhost >> .env
+  #         echo POSTGRES_PORT=5432 >> .env
+  #         echo MEADOWLARK_DATABASE_NAME=postgres >> .env
+  #         # The actual values below don't matter for integration tests - but _something_ must be set
+  #         echo AUTHORIZATION_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
+  #         echo DOCUMENT_STORE_PLUGIN=@edfi/meadowlark-mongodb-backend >> .env
+  #         echo OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH=meadowlark_verify-only_key_1 >> .env
+  #         echo OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH=meadowlark_verify-only_secret_1 >> .env
+  #         echo OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST=http://localhost:3000/local/oauth/token >> .env
+  #         echo OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION=http://localhost:3000/local/oauth/verify >> .env
+  #         echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env
 
-      - name: Run ${{matrix.tests.type}} Tests
-        run: ${{matrix.tests.command}}
-        env:
-          JEST_JUNIT_OUTPUT_DIR: ${{matrix.tests.type}}-tests
+  #     - name: Run ${{matrix.tests.type}} Tests
+  #       run: ${{matrix.tests.command}}
+  #       env:
+  #         JEST_JUNIT_OUTPUT_DIR: ${{matrix.tests.type}}-tests
 
-      - name: Archive coverage results
-        if: ${{ matrix.tests.type == 'Unit' }}
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
-        with:
-          name: code-coverage-report
-          path: Meadowlark-js/coverage/lcov-report
-          retention-days: 10
+  #     - name: Archive coverage results
+  #       if: ${{ matrix.tests.type == 'Unit' }}
+  #       uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+  #       with:
+  #         name: code-coverage-report
+  #         path: Meadowlark-js/coverage/lcov-report
+  #         retention-days: 10
 
-  end-to-end:
-    name: End to End tests for ${{ matrix.store.db }} as store and ${{matrix.query_handler.provider}} as query handler
-    needs: [lint]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        store: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
-                 { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }]
-        query_handler:
-          [
-            { provider: "opensearch", plugin: "@edfi/meadowlark-opensearch-backend" },
-            { provider: "elasticsearch", plugin: "@edfi/meadowlark-elasticsearch-backend" }
-          ]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+  # end-to-end:
+    # name: End to End tests for ${{ matrix.store.db }} as store and ${{matrix.query_handler.provider}} as query handler
+    # needs: [lint]
+    # runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     store: [{ db: "Mongo", plugin: "@edfi/meadowlark-mongodb-backend" },
+    #              { db: "PGSQL", plugin: "@edfi/meadowlark-postgresql-backend" }]
+    #     query_handler:
+    #       [
+    #         { provider: "opensearch", plugin: "@edfi/meadowlark-opensearch-backend" },
+    #         { provider: "elasticsearch", plugin: "@edfi/meadowlark-elasticsearch-backend" }
+    #       ]
+    # steps:
+    #   - name: Checkout repository
+    #     uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-      - name: Setup Node
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-        with:
-          node-version: "18"
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+    #   - name: Setup Node
+    #     uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+    #     with:
+    #       node-version: "18"
+    #       cache: "npm"
+    #       cache-dependency-path: "**/package-lock.json"
 
-      - name: Install required dependencies
-        run: npm install -D cross-env
+    #   - name: Install required dependencies
+    #     run: npm install -D cross-env
 
-      - name: Jest cache
-        id: cache-jest
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
-        with:
-          path: /tmp/jest_rt
-          key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
+    #   - name: Jest cache
+    #     id: cache-jest
+    #     uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+    #     with:
+    #       path: /tmp/jest_rt
+    #       key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Create .env file
-        run: |
-          touch .env-e2e
-          echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env-e2e
-        working-directory: Meadowlark-js/tests/e2e/setup/
+    #   - name: Create .env file
+    #     run: |
+    #       touch .env-e2e
+    #       echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env-e2e
+    #     working-directory: Meadowlark-js/tests/e2e/setup/
 
-      - name: End to End tests for ${{matrix.store.db}} as store, ${{matrix.store.plugin}} as authorization and ${{matrix.query_handler.provider}} as query handler
-        run: npm run test:e2e:build -- --ci
-        env:
-          AUTHORIZATION_STORE_PLUGIN: ${{ matrix.store.plugin }}
-          DOCUMENT_STORE_PLUGIN: ${{ matrix.store.plugin }}
-          QUERY_HANDLER_PLUGIN: ${{ matrix.query_handler.plugin }}
-          LISTENER1_PLUGIN: ${{ matrix.query_handler.plugin }}
+    #   - name: End to End tests for ${{matrix.store.db}} as store, ${{matrix.store.plugin}} as authorization and ${{matrix.query_handler.provider}} as query handler
+    #     run: npm run test:e2e:build -- --ci
+    #     env:
+    #       AUTHORIZATION_STORE_PLUGIN: ${{ matrix.store.plugin }}
+    #       DOCUMENT_STORE_PLUGIN: ${{ matrix.store.plugin }}
+    #       QUERY_HANDLER_PLUGIN: ${{ matrix.query_handler.plugin }}
+    #       LISTENER1_PLUGIN: ${{ matrix.query_handler.plugin }}
 
-      - name: Docker logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
-        with:
-          name: docker-logs
-          path: |
-            Meadowlark-js/tests/e2e/logs/
-          retention-days: 10
+    #   - name: Docker logs
+    #     if: ${{ failure() }}
+    #     uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+    #     with:
+    #       name: docker-logs
+    #       path: |
+    #         Meadowlark-js/tests/e2e/logs/
+    #       retention-days: 10

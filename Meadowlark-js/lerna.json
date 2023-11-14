@@ -3,12 +3,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "v0.3.0-pre-35",
+  "version": "0.4.0-pre.1",
   "npmClient": "npm",
-  "useWorkspaces": true,
-  "command": {
-    "version": {
-      "allowBranch": "main"
-    }
-  }
+  "useWorkspaces": true
 }
