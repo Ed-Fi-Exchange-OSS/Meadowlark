@@ -133,7 +133,8 @@ jobs:
         id: changes
         run: |
           echo $(git diff --name-only -r origin/main HEAD)
-          git diff --quiet main HEAD && echo "changed=true" >>$GITHUB_OUTPUT
+          echo $(git diff --name-only -r origin/main HEAD -- .\Meadowlark-js\lerna.json)
+          git diff --quiet origin/main HEAD -- .\Meadowlark-js\lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
 
 
       - name: Update versions
