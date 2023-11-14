@@ -133,6 +133,11 @@ jobs:
         id: changes
         run: |
           changes=$(git diff --name-only -r origin/main HEAD -- ./lerna.json)
+          echo $changes
+          echo $(git diff --name-only -r ${{ github.event.before }} ${{ github.event.after }} -- ./lerna.json)
+          echo $(git diff --name-only -r ${{ github.event.before }} ${{ github.event.after }})
+          echo ${{ github.event.before }}
+          echo ${{ github.event.after }}
           echo "changes=$changes" >> "$GITHUB_OUTPUT"
 
       - name: Update versions
