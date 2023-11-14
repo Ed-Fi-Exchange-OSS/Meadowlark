@@ -133,23 +133,23 @@ jobs:
         id: changes
         run: |
           git fetch origin main:main
-          echo $(git diff main -- ./Meadowlark-js/lerna.json)
-          git diff --quiet main -- ./Meadowlark-js/lerna.json && echo "changed=true"
-          git diff --quiet main -- ./Meadowlark-js/lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
+          echo $(git diff main HEAD -- ./Meadowlark-js/lerna.json)
+          git diff --quiet main HEAD -- ./Meadowlark-js/lerna.json && echo "changed=true"
+          git diff --quiet main HEAD -- ./Meadowlark-js/lerna.json && echo "changed=true" >>$GITHUB_OUTPUT
 
       - name: Update versions
-        # if: ${{ steps.changes.outputs.changed != 'true' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
 
       - name: Set Version
-        # if: ${{ steps.changes.outputs.changed != 'true' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         id: set-version
         run: |
           version=v$(cat lerna.json | jq -r .version)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: planetscale/ghcommit-action@v0.1.18
-        # if: ${{ steps.changes.outputs.changed != 'true' }}
+        if: ${{ steps.changes.outputs.changed != 'true' }}
         with:
           commit_message: "${{steps.set-version.outputs.version}}"
           repo: ${{ github.repository }}
