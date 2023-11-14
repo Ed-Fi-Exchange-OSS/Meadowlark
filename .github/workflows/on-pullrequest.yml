@@ -134,6 +134,10 @@ jobs:
         run: |
           changes=$(git diff --name-only -r origin/main HEAD -- Meadowlark-js/lerna.json)
           echo $changes
+          echo $(git diff --name-only -r ${{ github.event.before }} ${{ github.event.after }} -- Meadowlark-js/lerna.json)
+          echo $(git diff --name-only -r origin/main HEAD -- Meadowlark-js/lerna.json)
+          echo $(git diff --name-only -r ${{ github.event.before }} ${{ github.event.after }})
+          echo $(git diff --name-only -r origin/main HEAD)
           echo "changes=$changes" >> "$GITHUB_OUTPUT"
 
       - name: Update versions
