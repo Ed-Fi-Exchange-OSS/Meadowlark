@@ -126,18 +126,26 @@ jobs:
       - name: Checkout the Repo
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
+          fetch-depth: 0w
           ref: ${{ github.event.pull_request.head.ref }}
 
+      - name: Get changes
+        id: changes
+        run: echo "changes=$(git diff --name-only -r origin/main HEAD -- '*lerna.json')" >>$GITHUB_OUTPUT
+
       - name: Update versions
+        if: ${{ ! steps.changes.outputs.changes }}
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
 
       - name: Set Version
+        if: ${{ ! steps.changes.outputs.changes }}
         id: set-version
         run: |
           version=v$(cat lerna.json | jq -r .version)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: planetscale/ghcommit-action@v0.1.18
+        if: ${{ ! steps.changes.outputs.changes }}
         with:
           commit_message: "${{steps.set-version.outputs.version}}"
           repo: ${{ github.repository }}
