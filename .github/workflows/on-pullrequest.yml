@@ -46,7 +46,7 @@ jobs:
       - name: Dependency Review ("Dependabot on PR")
         uses: actions/dependency-review-action@c090f4e553673e6e505ea70d6a95362ee12adb94 # v3.0.3
 
-  analyze-code:
+  analyze:
     name: Analyze Code
     runs-on: ubuntu-latest
     env:
