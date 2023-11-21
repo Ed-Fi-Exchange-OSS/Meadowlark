@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
     # If username and password not provided through and env file
-    # default to postres/abcdefgh1!
+    # default to postgres/abcdefgh1!
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-abcdefgh1!}
     ports:
@@ -17,3 +17,7 @@ services:
 volumes:
   meadowlark-pgsql:
     driver: local
+
+networks:
+  meadowlark-net:
+    external: true

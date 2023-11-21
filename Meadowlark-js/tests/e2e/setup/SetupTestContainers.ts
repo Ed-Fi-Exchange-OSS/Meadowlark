@@ -14,11 +14,14 @@ import { endLog } from './LogConfig';
 export async function stop() {
   endLog();
   console.info('-- Tearing down environment --');
-  await Promise.all([MongoContainer.stop(), ApiContainer.stop()]);
+  await ApiContainer.stop();
 
   if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
     console.info('-- Tearing down postgres --');
     await PostgreSqlContainer.stop();
+  } else {
+    console.info('-- Tearing down mongo --');
+    await MongoContainer.stop();
   }
 
   if (process.env.QUERY_HANDLER_PLUGIN === '@edfi/meadowlark-elasticsearch-backend') {
@@ -44,21 +47,30 @@ export async function configure(initialize = true) {
     );
   } else {
     console.info('-- Setting up containers --');
-    // Starting Mongo container since it's required for Authentication
-    await Promise.all([MongoContainer.setup(network), ApiContainer.setup(network)]);
 
-    if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
+    if (
+      process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend' ||
+      process.env.AUTHORIZATION_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend'
+    ) {
       console.info('-- Setting up postgres --');
       await PostgreSqlContainer.setup(network);
+    } else {
+      console.info('-- Setting up mongo --');
+      await MongoContainer.setup(network);
     }
 
-    if (process.env.QUERY_HANDLER_PLUGIN === '@edfi/meadowlark-elasticsearch-backend') {
+    if (
+      process.env.QUERY_HANDLER_PLUGIN === '@edfi/meadowlark-elasticsearch-backend' ||
+      process.env.LISTENER1_PLUGIN === '@edfi/meadowlark-elasticsearch-backend'
+    ) {
       console.info('-- Setting up elasticsearch --');
       await ElasticSearchContainer.setup(network);
     } else {
       console.info('-- Setting up opensearch --');
       await OpenSearchContainer.setup(network);
     }
+
+    await ApiContainer.setup(network);
   }
 
   console.debug('-- Environment Ready --');

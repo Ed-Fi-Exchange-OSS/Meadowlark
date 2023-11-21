@@ -30,9 +30,7 @@ jobs:
     uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
   upgrade:
-    # Upgrade packages on PR only to avoid a double update when pushed to main
     name: Upgrade packages
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,27 +43,29 @@ jobs:
         with:
           fetch-depth: 0w
 
-      - name: Get changes
-        id: changes
+      - name: Get version changes
+        id: versions
         run: |
-          suggested=v$(cat lerna.json | jq -r .version)
-          current=$(git describe --tags $(git rev-list --tags --max-count=1))
-          echo "Versions: Lerna: $suggested. Current: $current"
-          echo "changes=$([[ "$suggested" != "$current" ]] && echo true)" >>$GITHUB_OUTPUT
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            suggested=v$(cat lerna.json | jq -r .version)
+            current=$(git describe --tags $(git rev-list --tags --max-count=1))
+            echo "Versions: Lerna: $suggested. Current: $current"
+            echo "update-required=$([[ "$suggested" == "$current" ]] && echo true)" >>$GITHUB_OUTPUT
+          fi
 
       - name: Update versions
-        if: ${{ ! steps.changes.outputs.changes }}
+        if: steps.versions.outputs.update-required
         run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --yes
 
       - name: Set Version
-        if: ${{ ! steps.changes.outputs.changes }}
+        if: steps.versions.outputs.update-required
         id: set-version
         run: |
           version=v$(cat lerna.json | jq -r .version)
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: planetscale/ghcommit-action@4131649dbf2fdf1eb34421702972a5af7b0a8731 #v0.1.18
-        if: ${{ ! steps.changes.outputs.changes }}
+        if: steps.versions.outputs.update-required
         with:
           commit_message: "${{steps.set-version.outputs.version}}"
           repo: ${{ github.repository }}
@@ -159,7 +159,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        if: steps.modules-cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Linter
@@ -189,7 +189,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        if: steps.modules-cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Build
@@ -223,7 +223,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Load MongoDB binary cache
-        if: ${{ matrix.tests.type != 'Unit' }}
+        if: matrix.tests.type != 'Unit'
         id: cache-mongodb-binaries
         uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 #v3.3.2
         with:
@@ -238,7 +238,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        if: ${{ steps.modules-cache.outputs.cache-hit != 'true' }}
+        if: steps.modules-cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Jest cache
@@ -249,7 +249,7 @@ jobs:
           key: ${{ runner.os }}-jest-${{ hashFiles('**/package-lock.json') }}
 
       - name: Configure postgres
-        if: ${{ matrix.tests.type != 'Unit' }}
+        if: matrix.tests.type != 'Unit'
         run: |
           sudo systemctl start postgresql.service
           sudo -u postgres psql -U postgres -c "alter user postgres with password '${{env.POSTGRES_PASSWORD}}';"
@@ -287,7 +287,7 @@ jobs:
 
   end-to-end:
     name: End to End tests for ${{ matrix.store.db }} as store and ${{matrix.query_handler.provider}} as query handler
-    needs: [lint]
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -326,7 +326,7 @@ jobs:
           echo OAUTH_SIGNING_KEY="$( openssl rand -base64 256 | tr -d '\n' )" >> .env-e2e
         working-directory: Meadowlark-js/tests/e2e/setup/
 
-      - name: End to End tests for ${{matrix.store.db}} as store, ${{matrix.store.plugin}} as authorization and ${{matrix.query_handler.provider}} as query handler
+      - name: End to End tests for ${{matrix.store.db}} as store, ${{matrix.query_handler.provider}} as query handler
         run: npm run test:e2e:build -- --ci
         env:
           AUTHORIZATION_STORE_PLUGIN: ${{ matrix.store.plugin }}
@@ -335,7 +335,7 @@ jobs:
           LISTENER1_PLUGIN: ${{ matrix.query_handler.plugin }}
 
       - name: Docker logs
-        if: ${{ failure() }}
+        if: failure()
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
         with:
           name: docker-logs
