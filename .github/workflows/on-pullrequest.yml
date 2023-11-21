@@ -75,7 +75,7 @@ jobs:
 
   analyze-dependencies:
     # This Action will fail if run on anything other than a pull request
-    if: github.event_name == 'pull_request'
+    if: always() && !cancelled() && github.event_name == 'pull_request'
     name: Analyze Code Dependencies
     # Not mandatory, but better for this to go after the upgrade since it can change the code.
     needs: upgrade
@@ -96,6 +96,8 @@ jobs:
     name: Analyze Code
     # Not mandatory, but better for this to go after the upgrade since it can change the code.
     needs: upgrade
+    # Since the upgrade job only runs in Pull Requests, this is required to avoid skipping these steps
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
     env:
       SRC_DIR: Meadowlark-js
@@ -138,6 +140,7 @@ jobs:
   lint:
     name: Lint
     needs: upgrade
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
 
     steps:
