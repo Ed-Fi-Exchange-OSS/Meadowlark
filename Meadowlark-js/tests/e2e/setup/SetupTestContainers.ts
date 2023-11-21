@@ -14,11 +14,14 @@ import { endLog } from './LogConfig';
 export async function stop() {
   endLog();
   console.info('-- Tearing down environment --');
-  await Promise.all([MongoContainer.stop(), ApiContainer.stop()]);
+  await ApiContainer.stop();
 
   if (process.env.DOCUMENT_STORE_PLUGIN === '@edfi/meadowlark-postgresql-backend') {
     console.info('-- Tearing down postgres --');
     await PostgreSqlContainer.stop();
+  } else {
+    console.info('-- Tearing down mongo --');
+    await MongoContainer.stop();
   }
 
   if (process.env.QUERY_HANDLER_PLUGIN === '@edfi/meadowlark-elasticsearch-backend') {
