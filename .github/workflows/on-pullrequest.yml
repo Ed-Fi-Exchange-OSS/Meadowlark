@@ -27,7 +27,7 @@ defaults:
 jobs:
   scan-actions:
     name: Scan Actions
-    uses: ed-fi-alliance-oss/ed-fi-actions/.github/workflows/repository-scanner.yml@main
+    uses: andonyns/ed-fi-actions/.github/workflows/repository-scanner.yml@main
 
   upgrade:
     name: Upgrade packages
