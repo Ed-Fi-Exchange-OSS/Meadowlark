@@ -6,7 +6,6 @@
 import { GetAllClientsResponseBody, GetClientResponseBody } from '../model/GetClientResponseBody';
 import { ResetClientSecretResponseBody } from '../model/ResetClientSecretResponseBody';
 import { TokenErrorResponse, TokenSuccessResponse, VerificationResponse } from '../model/TokenResponse';
-import { SigningKeyResponse } from './CreateSigningKey';
 
 export interface AuthorizationResponse {
   statusCode: number;
@@ -18,7 +17,6 @@ export interface AuthorizationResponse {
     | ResetClientSecretResponseBody
     | GetClientResponseBody
     | GetAllClientsResponseBody
-    | SigningKeyResponse
     | undefined;
 }
 
