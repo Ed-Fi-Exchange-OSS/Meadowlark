@@ -58,52 +58,29 @@ describe('given a GET', () => {
     });
   });
 
-  describe('given a school query without path ending slash', () => {
+  describe('given a school query', () => {
     const schoolQueryRequest: InjectOptions = {
       method: 'GET',
-      url: '/local/v3.3b/ed-fi/schools?schoolId=123',
+      url: '',
       headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
     };
 
-    beforeAll(async () => {
-      // Act
-      await service.inject(schoolQueryRequest);
-    });
+    it.each([
+      { url: '/local/v3.3b/ed-fi/schools?schoolId=123', path: '/v3.3b/ed-fi/schools' },
+      { url: '/local/v3.3b/ed-fi/schools/?schoolId=123', path: '/v3.3b/ed-fi/schools/' },
+      { url: '/local/v3.3b/Ed-Fi/Schools?schoolId=123', path: '/v3.3b/Ed-Fi/Schools' },
+      { url: '/local/v3.3b/ED-FI/SCHOOLS/?schoolId=123', path: '/v3.3b/ED-FI/SCHOOLS/' },
+    ])('should send the expected FrontendRequest to Meadowlark', async (item) => {
+      schoolQueryRequest.url = item.url;
 
-    it('should send the expected FrontendRequest to Meadowlark', async () => {
+      await service.inject(schoolQueryRequest);
+
       expect(mockGet.mock.calls).toHaveLength(1);
       const mock = mockGet.mock.calls[0][0];
 
       expect(mock.body).toBeNull();
       expect(mock.headers.authorization).toBe('bearer 1234');
-      expect(mock.path).toBe('/v3.3b/ed-fi/schools');
-      expect(mock.queryParameters).toMatchInlineSnapshot(`
-        {
-          "schoolId": "123",
-        }
-      `);
-    });
-  });
-
-  describe('given a school query with path ending slash', () => {
-    const schoolQueryRequest: InjectOptions = {
-      method: 'GET',
-      url: '/local/v3.3b/ed-fi/schools/?schoolId=123',
-      headers: { authorization: 'bearer 1234', 'content-type': 'application/json' },
-    };
-
-    beforeAll(async () => {
-      // Act
-      await service.inject(schoolQueryRequest);
-    });
-
-    it('should send the expected FrontendRequest to Meadowlark', async () => {
-      expect(mockGet.mock.calls).toHaveLength(1);
-      const mock = mockGet.mock.calls[0][0];
-
-      expect(mock.body).toBeNull();
-      expect(mock.headers.authorization).toBe('bearer 1234');
-      expect(mock.path).toBe('/v3.3b/ed-fi/schools/');
+      expect(mock.path).toBe(item.path);
       expect(mock.queryParameters).toMatchInlineSnapshot(`
         {
           "schoolId": "123",
