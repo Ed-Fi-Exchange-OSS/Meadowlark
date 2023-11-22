@@ -9,13 +9,39 @@ import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 const ENDPOINT = `/oauth/clients`;
 
 describe("given it's managing the client authorization", () => {
+  let adminToken: string;
+  let location: string;
+  let responseBody: any;
+  const clientData = {
+    clientName: 'Test Vendor',
+    roles: ['vendor'],
+  };
+
+  describe('when generating a client and sending it to an uppercase url', () => {
+    beforeAll(async () => {
+      adminToken = await adminAccessToken();
+      await baseURLRequest()
+        .post(ENDPOINT.toUpperCase())
+        .send(clientData)
+        .expect(201)
+        .auth(adminToken, { type: 'bearer' })
+        .then((response) => {
+          location = response.headers.location;
+          responseBody = response.body;
+        });
+    });
+
+    it('it is created', () => {
+      expect(responseBody).toEqual(
+        expect.objectContaining({
+          clientName: 'Test Vendor',
+          roles: ['vendor'],
+        }),
+      );
+    });
+  });
+
   describe('given client already exists ', () => {
-    let adminToken: string;
-    let location: string;
-    const clientData = {
-      clientName: 'Test Vendor',
-      roles: ['vendor'],
-    };
     beforeAll(async () => {
       adminToken = await adminAccessToken();
       location = await baseURLRequest()
