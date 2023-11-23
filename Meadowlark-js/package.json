@@ -86,6 +86,7 @@
     "compose:down": "docker compose --env-file .env-docker down",
     "compose:down:wsl1": "docker.exe compose --env-file .env-docker down",
     "compose:rm": "docker compose rm --stop --volumes --force && docker volume rm mongo-ml-local-auth && docker volume ls -q --filter label=edfi-ml | xargs docker volume rm",
-    "compose:rm:wsl1": "docker.exe compose rm --stop --volumes --force && docker.exe volume rm mongo-ml-local-auth && docker.exe volume ls -q --filter label=edfi-ml | xargs docker.exe volume rm"
+    "compose:rm:wsl1": "docker.exe compose rm --stop --volumes --force && docker.exe volume rm mongo-ml-local-auth && docker.exe volume ls -q --filter label=edfi-ml | xargs docker.exe volume rm",
+    "createKey": "openssl rand -base64 256"
   }
 }

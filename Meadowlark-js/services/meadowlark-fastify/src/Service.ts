@@ -29,7 +29,6 @@ import {
   resetAuthorizationClientSecretHandler,
   updateAuthorizationClientHandler,
   verifyTokenAuthorizationHandler,
-  createSigningKeyHandler,
   getClientByIdHandler,
   getClientsHandler,
 } from './handler/authorization/AuthorizationHandler';
@@ -142,6 +141,5 @@ export function buildService(): FastifyInstance {
     fastify.post(`/${stage}/oauth/token/`, requestTokenAuthorizationHandler);
     fastify.post(`/${stage}/oauth/verify`, verifyTokenAuthorizationHandler);
     fastify.post(`/${stage}/oauth/verify/`, verifyTokenAuthorizationHandler);
-    fastify.get(`/${stage}/oauth/createSigningKey`, createSigningKeyHandler);
   }
 }
