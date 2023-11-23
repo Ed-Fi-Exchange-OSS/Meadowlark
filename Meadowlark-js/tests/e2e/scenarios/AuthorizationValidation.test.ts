@@ -31,7 +31,7 @@ describe("given it's managing the client authorization", () => {
         });
     });
 
-    it('it is created', () => {
+    it('is created', () => {
       expect(responseBody).toEqual(
         expect.objectContaining({
           clientName: 'Test Vendor',
