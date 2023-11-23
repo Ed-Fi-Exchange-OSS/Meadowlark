@@ -94,4 +94,27 @@ describe("given it's authenticating a client", () => {
         });
     });
   });
+
+  describe('when sending to an uppercase url', () => {
+    it('should be able to return access token', async () => {
+      await baseURLRequest()
+        .post('/OAUTH/TOKEN')
+        .send({
+          grant_type: 'client_credentials',
+          client_id: client.key,
+          client_secret: client.secret,
+        })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              access_token: expect.any(String),
+              expires_in: expect.any(Number),
+              refresh_token: 'not available',
+              token_type: 'bearer',
+            }),
+          );
+        });
+    });
+  });
 });

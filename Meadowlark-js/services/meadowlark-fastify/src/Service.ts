@@ -49,6 +49,7 @@ export function buildService(): FastifyInstance {
       logger: Logger as FastifyLoggerInstance,
       disableRequestLogging: true,
       genReqId: () => randomUUID(),
+      caseSensitive: false,
     });
   }
 
