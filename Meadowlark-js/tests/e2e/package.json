@@ -1,24 +1,24 @@
 {
   "name": "@edfi/meadowlark-e2e-tests",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.4",
+  "version": "0.4.0-pre.5",
   "description": "Meadowlark Ed-Fi API end to end tests",
   "license": "Apache-2.0",
   "private": true,
   "files": [],
   "devDependencies": {
-    "@edfi/meadowlark-utilities": "0.4.0-pre.4",
-    "@testcontainers/mongodb": "^10.2.1",
-    "@testcontainers/postgresql": "^10.2.1",
-    "@types/chance": "^1.1.4",
-    "@types/fs-extra": "^11.0.2",
-    "@types/supertest": "^2.0.14",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.5",
+    "@testcontainers/mongodb": "^10.3.1",
+    "@testcontainers/postgresql": "^10.3.1",
+    "@types/chance": "^1.1.6",
+    "@types/fs-extra": "^11.0.4",
+    "@types/supertest": "^2.0.16",
     "chance": "^1.1.11",
     "dotenv": "^16.3.1",
     "fast-memoize": "^2.5.2",
     "fs-extra": "^11.1.1",
     "supertest": "^6.3.3",
-    "testcontainers": "^10.2.1"
+    "testcontainers": "^10.3.1"
   },
   "scripts": {
     "build": "npm run build:clean",
