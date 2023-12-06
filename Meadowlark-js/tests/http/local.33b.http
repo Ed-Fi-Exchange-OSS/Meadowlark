@@ -14,7 +14,7 @@ POST http://localhost:3000/local/oauth/token
 content-type: application/json
 
 {
-    "grant_type": "client_credentials",
+    "grant_Type": "client_credentials",
     "client_id": "{{admin_client_id}}",
     "client_secret": "{{admin_client_secret}}"
 }
@@ -31,7 +31,7 @@ content-type: application/json
 {{auth_header_admin_1}}
 
 {
-    "clientName": "Hometown SIS",
+    "clientname": "Hometown SIS",
     "roles": [
         "vendor"
     ]

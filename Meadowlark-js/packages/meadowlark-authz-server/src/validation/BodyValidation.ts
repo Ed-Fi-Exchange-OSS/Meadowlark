@@ -3,14 +3,16 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import didYouMean from 'didyoumean2';
 import { ValidateFunction } from 'ajv';
-import { betterAjvErrors } from '@apideck/better-ajv-errors';
 import { ajv } from './SharedAjv';
+
 import { clientBodySchema } from '../model/ClientBody';
 import { requestTokenBodySchema } from '../model/RequestTokenBody';
 import { verifyTokenBodySchema } from '../model/VerifyTokenBody';
 
-export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: object };
+export type Suggestion = { current: string; suggested: string };
+export type BodyValidation = { isValid: true } | { isValid: false; suggestions: Suggestion[]; failureMessage: object };
 
 const createClientBodyValidator: ValidateFunction = ajv.compile(clientBodySchema);
 const requestTokenBodyValidator: ValidateFunction = ajv.compile(requestTokenBodySchema);
@@ -18,16 +20,41 @@ const verifyTokenBodyValidator: ValidateFunction = ajv.compile(verifyTokenBodySc
 
 function validateBody(body: object, schema: object, validateFunction: ValidateFunction): BodyValidation {
   const isValid: boolean = validateFunction(body);
+  const suggestions: Suggestion[] = [];
   if (isValid) return { isValid };
+
+  const { errors } = validateFunction;
+
+  // Should be typed
+  const requiredKeys = Object.keys((schema as any).properties);
+  const additionalKeys = errors
+    ? errors
+        .filter((key) => key.keyword === 'additionalProperties')
+        .map((property) => property.params.additionalProperty as string)
+    : [];
+
+  additionalKeys.forEach((current) => {
+    const suggested = didYouMean(current, requiredKeys);
+    if (suggested) {
+      suggestions.push({ current, suggested });
+    }
+  });
+
   return {
     isValid,
-    failureMessage: betterAjvErrors({
-      data: body,
-      schema,
-      errors: validateFunction.errors,
-      basePath: '{requestBody}',
-    }),
+    failureMessage: validateFunction.errors ?? {},
+    suggestions,
   };
+}
+
+export function applySuggestions(body: object, suggestions: Suggestion[]): object {
+  const bodyWithSuggestions = JSON.stringify(body);
+  suggestions.forEach((suggestion) => {
+    bodyWithSuggestions.replace(suggestion.current, suggestion.suggested);
+  });
+
+  const updatedBody = JSON.parse(bodyWithSuggestions);
+  return updatedBody;
 }
 
 export function validateCreateClientBody(body: object): BodyValidation {

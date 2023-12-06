@@ -11,7 +11,7 @@ import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { RequestTokenBody } from '../model/RequestTokenBody';
-import { BodyValidation, validateRequestTokenBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateRequestTokenBody } from '../validation/BodyValidation';
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
@@ -82,10 +82,22 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
     }
   }
 
-  const bodyValidation: BodyValidation = validateRequestTokenBody(unvalidatedBody);
+  let bodyValidation: BodyValidation = validateRequestTokenBody(unvalidatedBody);
   if (!bodyValidation.isValid) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid request body`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: bodyValidation.failureMessage };
+    if (bodyValidation.suggestions) {
+      Logger.debug(
+        `${moduleName}.parseRequestTokenBody: Invalid request body, checking for suggestions`,
+        authorizationRequest.traceId,
+      );
+      unvalidatedBody = applySuggestions(unvalidatedBody, bodyValidation.suggestions);
+      bodyValidation = validateRequestTokenBody(unvalidatedBody);
+      if (!bodyValidation.isValid) {
+        return { isValid: false, failureMessage: bodyValidation.failureMessage };
+      }
+    } else {
+      Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid request body`, authorizationRequest.traceId);
+      return { isValid: false, failureMessage: bodyValidation.failureMessage };
+    }
   }
 
   const validatedBody: RequestTokenBody = unvalidatedBody as RequestTokenBody;
