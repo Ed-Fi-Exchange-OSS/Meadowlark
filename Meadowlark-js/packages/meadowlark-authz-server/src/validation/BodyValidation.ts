@@ -3,7 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import didYouMean from 'didyoumean2';
+import didYouMean, { ThresholdTypeEnums } from 'didyoumean2';
 import { ValidateFunction } from 'ajv';
 import { ajv } from './SharedAjv';
 
@@ -34,7 +34,7 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
     : [];
 
   additionalKeys.forEach((current) => {
-    const suggested = didYouMean(current, requiredKeys);
+    const suggested = didYouMean(current, requiredKeys, { thresholdType: ThresholdTypeEnums.SIMILARITY, threshold: 1 });
     if (suggested) {
       suggestions.push({ current, suggested });
     }
@@ -48,9 +48,9 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
 }
 
 export function applySuggestions(body: object, suggestions: Suggestion[]): object {
-  const bodyWithSuggestions = JSON.stringify(body);
+  let bodyWithSuggestions = JSON.stringify(body);
   suggestions.forEach((suggestion) => {
-    bodyWithSuggestions.replace(suggestion.current, suggestion.suggested);
+    bodyWithSuggestions = bodyWithSuggestions.replace(suggestion.current, suggestion.suggested);
   });
 
   const updatedBody = JSON.parse(bodyWithSuggestions);
