@@ -16,6 +16,7 @@ import type { GetAuthorizationClientResult } from '../message/GetAuthorizationCl
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
 import { TokenSuccessResponse } from '../model/TokenResponse';
+import { writeDebugStatusToLog } from '../Logger';
 
 const moduleName = 'authz.handler.RequestToken';
 
@@ -63,49 +64,49 @@ function maskClientSecret(body: RequestTokenBody): string {
 function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): ParsedRequestTokenBody {
   if (authorizationRequest.body == null) return { isValid: false, failureMessage: { message: 'Request body is empty' } };
 
-  let unvalidatedBody: any;
+  let parsedBody: any;
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
     try {
-      unvalidatedBody = querystring.parse(authorizationRequest.body);
+      parsedBody = querystring.parse(authorizationRequest.body);
     } catch (error) {
       Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
       return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   } else {
     try {
-      unvalidatedBody = JSON.parse(authorizationRequest.body);
+      parsedBody = JSON.parse(authorizationRequest.body);
     } catch (error) {
       Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
       return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   }
 
-  let bodyValidation: BodyValidation = validateRequestTokenBody(unvalidatedBody);
-  if (!bodyValidation.isValid) {
-    if (bodyValidation.suggestions) {
-      Logger.debug(
-        `${moduleName}.parseRequestTokenBody: Invalid request body, checking for suggestions`,
-        authorizationRequest.traceId,
-      );
-      unvalidatedBody = applySuggestions(unvalidatedBody, bodyValidation.suggestions);
-      bodyValidation = validateRequestTokenBody(unvalidatedBody);
-      if (!bodyValidation.isValid) {
-        return { isValid: false, failureMessage: bodyValidation.failureMessage };
-      }
-    } else {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid request body`, authorizationRequest.traceId);
-      return { isValid: false, failureMessage: bodyValidation.failureMessage };
-    }
+  let validation: BodyValidation = validateRequestTokenBody(parsedBody);
+  if (!validation.isValid && validation.suggestions) {
+    writeDebugStatusToLog(
+      moduleName,
+      authorizationRequest,
+      'parseRequestTokenBody',
+      400,
+      'Invalid request body, checking for suggestions',
+    );
+    parsedBody = applySuggestions(parsedBody, validation.suggestions);
+    validation = validateRequestTokenBody(parsedBody);
   }
 
-  const validatedBody: RequestTokenBody = unvalidatedBody as RequestTokenBody;
+  if (!validation.isValid) {
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, 'Invalid request body');
+    return { isValid: false, failureMessage: validation.failureMessage };
+  }
+
+  const requestTokenBody: RequestTokenBody = parsedBody as RequestTokenBody;
 
   // client_id and client_secret can either be directly in the payload or encoded as an Authorization header.
   // Validation ensures that if one is in the body then both are.
-  if (validatedBody.client_id != null) {
-    return { isValid: true, requestTokenBody: validatedBody };
+  if (requestTokenBody.client_id != null) {
+    return { isValid: true, requestTokenBody };
   }
 
   const authorizationHeader: string | undefined = extractAuthorizationHeader(authorizationRequest);
@@ -127,9 +128,9 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
     return { isValid: false, failureMessage: { message: 'Invalid authorization header' } };
   }
 
-  [validatedBody.client_id, validatedBody.client_secret] = split;
+  [requestTokenBody.client_id, requestTokenBody.client_secret] = split;
 
-  return { isValid: true, requestTokenBody: validatedBody };
+  return { isValid: true, requestTokenBody };
 }
 
 /*
