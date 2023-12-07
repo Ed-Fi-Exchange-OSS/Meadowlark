@@ -5,6 +5,7 @@
 
 import didYouMean, { ThresholdTypeEnums } from 'didyoumean2';
 import { ValidateFunction } from 'ajv';
+import { betterAjvErrors } from '@apideck/better-ajv-errors';
 import { ajv } from './SharedAjv';
 
 import { clientBodySchema } from '../model/ClientBody';
@@ -42,7 +43,12 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
 
   return {
     isValid,
-    failureMessage: validateFunction.errors ?? {},
+    failureMessage: betterAjvErrors({
+      data: body,
+      schema,
+      errors: validateFunction.errors,
+      basePath: '{requestBody}',
+    }),
     suggestions,
   };
 }
