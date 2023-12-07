@@ -8,7 +8,7 @@ import { Logger } from '@edfi/meadowlark-utilities';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { VerifyTokenBody } from '../model/VerifyTokenBody';
-import { BodyValidation, validateVerifyTokenBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateVerifyTokenBody } from '../validation/BodyValidation';
 import { ensurePluginsLoaded } from '../plugin/AuthorizationPluginLoader';
 import {
   hasAdminOrVerifyOnlyRole,
@@ -17,6 +17,7 @@ import {
   ValidateTokenResult,
 } from '../security/TokenValidator';
 import { IntrospectionResponse } from '../model/TokenResponse';
+import { writeDebugStatusToLog } from '../Logger';
 
 const moduleName = 'authz.handler.VerifyToken';
 
@@ -34,7 +35,7 @@ type ParsedVerifyTokenBody =
 function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): ParsedVerifyTokenBody {
   if (authorizationRequest.body == null) return { isValid: false, failureMessage: 'Request body is empty' };
 
-  let unvalidatedBody: any;
+  let parsedBody: any;
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (!authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
@@ -44,20 +45,32 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
   }
 
   try {
-    unvalidatedBody = querystring.parse(authorizationRequest.body);
+    parsedBody = querystring.parse(authorizationRequest.body);
   } catch (e) {
     const error = `Malformed body: ${e.message}`;
     Logger.debug(`${moduleName}.parseRequestTokenBody: ${error}`, authorizationRequest.traceId);
     return { isValid: false, failureMessage: { error } };
   }
 
-  const bodyValidation: BodyValidation = validateVerifyTokenBody(unvalidatedBody);
-  if (!bodyValidation.isValid) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: ${bodyValidation.failureMessage}`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: bodyValidation.failureMessage };
+  let validation: BodyValidation = validateVerifyTokenBody(parsedBody);
+  if (!validation.isValid && validation.suggestions) {
+    writeDebugStatusToLog(
+      moduleName,
+      authorizationRequest,
+      'parseRequestTokenBody',
+      400,
+      'Invalid request body, checking for suggestions',
+    );
+    parsedBody = applySuggestions(parsedBody, validation.suggestions);
+    validation = validateVerifyTokenBody(parsedBody);
   }
 
-  const validatedBody: VerifyTokenBody = unvalidatedBody as VerifyTokenBody;
+  if (!validation.isValid) {
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, 'Invalid request body');
+    return { isValid: false, failureMessage: validation.failureMessage };
+  }
+
+  const validatedBody: VerifyTokenBody = parsedBody as VerifyTokenBody;
 
   return { isValid: true, verifyTokenBody: validatedBody };
 }
