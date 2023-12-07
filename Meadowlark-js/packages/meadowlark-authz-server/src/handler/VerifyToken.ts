@@ -4,7 +4,6 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import querystring from 'node:querystring';
-import { Logger } from '@edfi/meadowlark-utilities';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { VerifyTokenBody } from '../model/VerifyTokenBody';
@@ -17,7 +16,7 @@ import {
   ValidateTokenResult,
 } from '../security/TokenValidator';
 import { IntrospectionResponse } from '../model/TokenResponse';
-import { writeDebugStatusToLog } from '../Logger';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 
 const moduleName = 'authz.handler.VerifyToken';
 
@@ -40,7 +39,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (!authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
     const error = 'Requires application/x-www-form-urlencoded content type';
-    Logger.debug(`${moduleName}.parseVerifyTokenBody: ${error}`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400, error);
     return { isValid: false, failureMessage: error };
   }
 
@@ -48,7 +47,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
     parsedBody = querystring.parse(authorizationRequest.body);
   } catch (e) {
     const error = `Malformed body: ${e.message}`;
-    Logger.debug(`${moduleName}.parseRequestTokenBody: ${error}`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, error);
     return { isValid: false, failureMessage: { error } };
   }
 
@@ -66,7 +65,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
   }
 
   if (!validation.isValid) {
-    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, 'Invalid request body');
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400, 'Invalid request body');
     return { isValid: false, failureMessage: validation.failureMessage };
   }
 
@@ -80,7 +79,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
  */
 export async function verifyToken(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
-    Logger.info(`${moduleName}.verifyToken`, authorizationRequest.traceId);
+    writeRequestToLog(moduleName, authorizationRequest, 'verifyToken');
     await ensurePluginsLoaded();
 
     // Get the client id and roles for the requester
@@ -99,7 +98,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
     // Get the token to be introspected
     const parsedRequest: ParsedVerifyTokenBody = parseVerifyTokenBody(authorizationRequest);
     if (!parsedRequest.isValid) {
-      Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, parsedRequest.failureMessage);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400);
       return {
         body: { error: parsedRequest.failureMessage },
         statusCode: 400,
@@ -114,7 +113,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
 
     if (!introspectionResponse.isValid) {
       const message = 'Invalid token provided for introspection';
-      Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, message);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400);
       return {
         body: { error: message },
         statusCode: 400,
@@ -128,17 +127,17 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
       requesterTokenResult.clientId !== introspectedToken.client_id &&
       !hasAdminOrVerifyOnlyRole(requesterTokenResult.roles)
     ) {
-      Logger.debug(`${moduleName}.verifyToken: 401`, authorizationRequest.traceId);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 401);
       return { statusCode: 401 };
     }
 
-    Logger.debug(`${moduleName}.verifyToken: 200`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 200);
     return {
       body: introspectedToken,
       statusCode: 200,
     };
   } catch (e) {
-    Logger.error(`${moduleName}.verifyToken: 500`, authorizationRequest.traceId, e);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 500, e);
     return { statusCode: 500 };
   }
 }
