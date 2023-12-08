@@ -88,5 +88,8 @@
     "jest.autoRun": {
       "watch": false
     },
-    "sarif-viewer.connectToGithubCodeScanning": "off"
+    "sarif-viewer.connectToGithubCodeScanning": "off",
+    "cSpell.words": [
+        "Claimset"
+    ]
 }

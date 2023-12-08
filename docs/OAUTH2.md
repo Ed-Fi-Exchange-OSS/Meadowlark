@@ -1,5 +1,11 @@
 # Meadowlark Authentication with OAuth2
 
+> ![WARNING]
+> This document describes the authentication and authorization used in
+> Meadowlark 0.3 and 0.4. After 0.4, we will be moving to use a third
+> party OAuth server, and these notes will eventually become obsolete.
+> See [design/auth/README.md](./design/auth/README.md) for future state.
+
 Meadowlark contains a built-in [OAuth2 Provider](https://oauth.net/) that
 supports that [client-credentials
 grant](https://oauth.net/2/grant-types/client-credentials/). In the future,
