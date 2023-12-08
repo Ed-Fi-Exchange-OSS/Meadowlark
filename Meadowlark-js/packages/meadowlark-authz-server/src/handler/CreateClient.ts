@@ -13,7 +13,7 @@ import { AuthorizationRequest, extractAuthorizationHeader } from './Authorizatio
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { CreateClientResponseBody } from '../model/CreateClientResponseBody';
 import { writeDebugObject, writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { BodyValidation, validateCreateClientBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateCreateClientBody } from '../validation/BodyValidation';
 import { hashClientSecretBuffer } from '../security/HashClientSecret';
 import { TryCreateBootstrapAuthorizationAdminResult } from '../message/TryCreateBootstrapAuthorizationAdminResult';
 import { ClientId } from '../Utility';
@@ -119,7 +119,21 @@ export async function createClient(authorizationRequest: AuthorizationRequest): 
       return { body: { error }, statusCode: 400 };
     }
 
-    const validation: BodyValidation = validateCreateClientBody(parsedBody);
+    let validation: BodyValidation = validateCreateClientBody(parsedBody);
+    // The validation will return suggestions for properties not found that have a similar match,
+    // here will apply it and validate once more, if this does not pass validation will return failure with the error message.
+    if (!validation.isValid && validation.suggestions) {
+      writeDebugStatusToLog(
+        moduleName,
+        authorizationRequest,
+        'createClient',
+        400,
+        'Invalid request body, checking for suggestions',
+      );
+      parsedBody = applySuggestions(parsedBody, validation.suggestions);
+      validation = validateCreateClientBody(parsedBody);
+    }
+
     if (!validation.isValid) {
       writeDebugObject(moduleName, authorizationRequest, 'createClient', 400, validation.failureMessage);
       return {

@@ -4,11 +4,10 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 import querystring from 'node:querystring';
-import { Logger } from '@edfi/meadowlark-utilities';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { VerifyTokenBody } from '../model/VerifyTokenBody';
-import { BodyValidation, validateVerifyTokenBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateVerifyTokenBody } from '../validation/BodyValidation';
 import { ensurePluginsLoaded } from '../plugin/AuthorizationPluginLoader';
 import {
   hasAdminOrVerifyOnlyRole,
@@ -17,6 +16,7 @@ import {
   ValidateTokenResult,
 } from '../security/TokenValidator';
 import { IntrospectionResponse } from '../model/TokenResponse';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 
 const moduleName = 'authz.handler.VerifyToken';
 
@@ -34,30 +34,42 @@ type ParsedVerifyTokenBody =
 function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): ParsedVerifyTokenBody {
   if (authorizationRequest.body == null) return { isValid: false, failureMessage: 'Request body is empty' };
 
-  let unvalidatedBody: any;
+  let parsedBody: any;
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (!authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
     const error = 'Requires application/x-www-form-urlencoded content type';
-    Logger.debug(`${moduleName}.parseVerifyTokenBody: ${error}`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400, error);
     return { isValid: false, failureMessage: error };
   }
 
   try {
-    unvalidatedBody = querystring.parse(authorizationRequest.body);
+    parsedBody = querystring.parse(authorizationRequest.body);
   } catch (e) {
     const error = `Malformed body: ${e.message}`;
-    Logger.debug(`${moduleName}.parseRequestTokenBody: ${error}`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, error);
     return { isValid: false, failureMessage: { error } };
   }
 
-  const bodyValidation: BodyValidation = validateVerifyTokenBody(unvalidatedBody);
-  if (!bodyValidation.isValid) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: ${bodyValidation.failureMessage}`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: bodyValidation.failureMessage };
+  let validation: BodyValidation = validateVerifyTokenBody(parsedBody);
+  if (!validation.isValid && validation.suggestions) {
+    writeDebugStatusToLog(
+      moduleName,
+      authorizationRequest,
+      'parseRequestTokenBody',
+      400,
+      'Invalid request body, checking for suggestions',
+    );
+    parsedBody = applySuggestions(parsedBody, validation.suggestions);
+    validation = validateVerifyTokenBody(parsedBody);
   }
 
-  const validatedBody: VerifyTokenBody = unvalidatedBody as VerifyTokenBody;
+  if (!validation.isValid) {
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400, 'Invalid request body');
+    return { isValid: false, failureMessage: validation.failureMessage };
+  }
+
+  const validatedBody: VerifyTokenBody = parsedBody as VerifyTokenBody;
 
   return { isValid: true, verifyTokenBody: validatedBody };
 }
@@ -67,7 +79,7 @@ function parseVerifyTokenBody(authorizationRequest: AuthorizationRequest): Parse
  */
 export async function verifyToken(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
-    Logger.info(`${moduleName}.verifyToken`, authorizationRequest.traceId);
+    writeRequestToLog(moduleName, authorizationRequest, 'verifyToken');
     await ensurePluginsLoaded();
 
     // Get the client id and roles for the requester
@@ -86,7 +98,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
     // Get the token to be introspected
     const parsedRequest: ParsedVerifyTokenBody = parseVerifyTokenBody(authorizationRequest);
     if (!parsedRequest.isValid) {
-      Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, parsedRequest.failureMessage);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400);
       return {
         body: { error: parsedRequest.failureMessage },
         statusCode: 400,
@@ -101,7 +113,7 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
 
     if (!introspectionResponse.isValid) {
       const message = 'Invalid token provided for introspection';
-      Logger.debug(`${moduleName}.verifyToken: 400`, authorizationRequest.traceId, message);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 400);
       return {
         body: { error: message },
         statusCode: 400,
@@ -115,17 +127,17 @@ export async function verifyToken(authorizationRequest: AuthorizationRequest): P
       requesterTokenResult.clientId !== introspectedToken.client_id &&
       !hasAdminOrVerifyOnlyRole(requesterTokenResult.roles)
     ) {
-      Logger.debug(`${moduleName}.verifyToken: 401`, authorizationRequest.traceId);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 401);
       return { statusCode: 401 };
     }
 
-    Logger.debug(`${moduleName}.verifyToken: 200`, authorizationRequest.traceId);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 200);
     return {
       body: introspectedToken,
       statusCode: 200,
     };
   } catch (e) {
-    Logger.error(`${moduleName}.verifyToken: 500`, authorizationRequest.traceId, e);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'verifyToken', 500, e);
     return { statusCode: 500 };
   }
 }

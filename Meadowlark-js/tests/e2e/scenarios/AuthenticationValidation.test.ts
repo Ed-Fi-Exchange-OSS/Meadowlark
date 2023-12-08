@@ -35,6 +35,29 @@ describe("given it's authenticating a client", () => {
     });
   });
 
+  describe('when providing uppercase property names', () => {
+    it('should be able to return access token', async () => {
+      await baseURLRequest()
+        .post('/oauth/token')
+        .send({
+          Grant_Type: 'client_credentials',
+          Client_Id: client.key,
+          Client_Secret: client.secret,
+        })
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              access_token: expect.any(String),
+              expires_in: expect.any(Number),
+              refresh_token: 'not available',
+              token_type: 'bearer',
+            }),
+          );
+        });
+    });
+  });
+
   describe('when providing invalid grant type', () => {
     it('should return error message', async () => {
       await baseURLRequest()
@@ -91,6 +114,58 @@ describe("given it's authenticating a client", () => {
         .expect(401)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`""`);
+        });
+    });
+  });
+
+  describe('when providing invalid property name', () => {
+    it('should return 400 and error message', async () => {
+      await baseURLRequest()
+        .post('/oauth/token')
+        .send({
+          grand_type: 'client_credentials',
+          clientId: client.key,
+          client_secrets: 'secret',
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": [
+                {
+                  "context": {
+                    "errorType": "required",
+                  },
+                  "message": "{requestBody} must have required property 'grant_type'",
+                  "path": "{requestBody}",
+                },
+                {
+                  "context": {
+                    "errorType": "additionalProperties",
+                  },
+                  "message": "'grand_type' property is not expected to be here",
+                  "path": "{requestBody}",
+                  "suggestion": "Did you mean property 'grant_type'?",
+                },
+                {
+                  "context": {
+                    "errorType": "additionalProperties",
+                  },
+                  "message": "'clientId' property is not expected to be here",
+                  "path": "{requestBody}",
+                  "suggestion": "Did you mean property 'client_id'?",
+                },
+                {
+                  "context": {
+                    "errorType": "additionalProperties",
+                  },
+                  "message": "'client_secrets' property is not expected to be here",
+                  "path": "{requestBody}",
+                  "suggestion": "Did you mean property 'client_secret'?",
+                },
+              ],
+            }
+          `);
         });
     });
   });

@@ -1,0 +1,123 @@
+##### START AUTHENTICATION SETUP
+
+@admin_client_id=meadowlark_admin_key_1
+@admin_client_secret=meadowlark_admin_secret_1
+
+### Authenticate admin
+# @name admin1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "GRANT_TYPE": "client_credentials",
+    "client_id": "{{admin_client_id}}",
+    "client_secret": "{{admin_client_secret}}"
+}
+
+###
+@admin_token={{admin1.response.body.$.access_token}}
+@auth_header_admin_1=Authorization: bearer {{admin1.response.body.$.access_token}}
+
+
+### Create client1
+# @name created_client1
+POST http://localhost:3000/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientname": "Hometown SIS",
+    "rOLEs": [
+        "vendor"
+    ]
+}
+
+###
+@client1_client_id={{created_client1.response.body.$.client_id}}
+@client1_client_secret={{created_client1.response.body.$.client_secret}}
+
+### Authenticate client1
+# @name client1
+POST http://localhost:3000/local/oauth/token
+content-type: application/json
+
+{
+    "Grant_type": "client_credentials",
+    "Client_id": "{{client1_client_id}}",
+    "Client_secret": "{{client1_client_secret}}"
+}
+
+###
+@authToken1 = {{client1.response.body.$.access_token}}
+
+###
+
+
+### Create client4
+# This Should fail, values are not case sensitive
+POST http://localhost:3000/local/oauth/clients
+content-type: application/json
+{{auth_header_admin_1}}
+
+{
+    "clientName": "the-one-sis",
+    "roles": [
+        "VENDOR",
+        "assessment"
+    ]
+}
+
+###
+# @name contentClassDescriptor
+# This should fail, similar words, pluralization
+POST http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "goodValue": "Presentation",
+  "shortDescriptions": "Presentation",
+  "description": "Presentation",
+  "namespace": "uri://ed-fi.org/ContentClassDescriptor"
+}
+
+###
+# @name contentClassDescriptor
+# This should fail, wrong property
+POST http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "codeValue": "Presentation",
+  "shortDescription": "Presentation",
+  "description": "Presentation",
+  "uri": "uri://ed-fi.org/ContentClassDescriptor"
+}
+
+###
+# @name contentClassDescriptor
+# This should fail, missing property
+POST http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "codeValue": "Presentation",
+  "shortDescription": "Presentation",
+  "description": "Presentation"
+}
+
+###
+# @name contentClassDescriptor
+# This should work, uppercase keys
+POST http://localhost:3000/local/v3.3b/ed-fi/contentClassDescriptors
+authorization: bearer {{authToken1}}
+content-type: application/json
+
+{
+  "CODEVALUE": "Presentation",
+  "SHORTDESCRIPTION": "Presentation",
+  "DESCRIPTION": "Presentation",
+  "NAMESPACE": "uri://ed-fi.org/ContentClassDescriptor"
+}
