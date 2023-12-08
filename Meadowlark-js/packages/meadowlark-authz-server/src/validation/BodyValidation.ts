@@ -13,7 +13,7 @@ import { requestTokenBodySchema } from '../model/RequestTokenBody';
 import { verifyTokenBodySchema } from '../model/VerifyTokenBody';
 
 export type Suggestion = { current: string; suggested: string };
-export type BodyValidation = { isValid: true } | { isValid: false; suggestions: Suggestion[]; failureMessage: object };
+export type BodyValidation = { isValid: true } | { isValid: false; failureMessage: object; suggestions: Suggestion[] };
 
 const createClientBodyValidator: ValidateFunction = ajv.compile(clientBodySchema);
 const requestTokenBodyValidator: ValidateFunction = ajv.compile(requestTokenBodySchema);

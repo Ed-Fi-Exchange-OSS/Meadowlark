@@ -42,11 +42,17 @@ describe("given it's validating the request body", () => {
       beforeAll(() => {
         // Act
         validationResult = validateCreateClientBody(actual);
-        suggestions = validationResult.suggestions ?? [];
+        if (!validationResult.isValid) {
+          suggestions = validationResult.suggestions ?? [];
+        }
       });
 
       it('should return suggestions', () => {
-        expect(validationResult).toBeTruthy();
+        if (validationResult.isValid) {
+          expect(validationResult.isValid).toBeFalsy();
+          return;
+        }
+
         expect(validationResult.failureMessage).toMatchInlineSnapshot(`
           [
             {
@@ -114,7 +120,10 @@ describe("given it's validating the request body", () => {
       });
 
       it('should return error message with no suggestions', () => {
-        expect(validationResult).toBeTruthy();
+        if (validationResult.isValid) {
+          expect(validationResult.isValid).toBeFalsy();
+          return;
+        }
         expect(validationResult.failureMessage).toMatchInlineSnapshot(`
           [
             {
@@ -144,7 +153,10 @@ describe("given it's validating the request body", () => {
       });
 
       it('should return suggestions', () => {
-        expect(validationResult).toBeTruthy();
+        if (validationResult.isValid) {
+          expect(validationResult.isValid).toBeFalsy();
+          return;
+        }
         expect(validationResult.failureMessage).toMatchInlineSnapshot(`
           [
             {
@@ -207,11 +219,16 @@ describe("given it's validating the request body", () => {
       beforeAll(() => {
         // Act
         validationResult = validateRequestTokenBody(actual);
-        suggestions = validationResult.suggestions ?? [];
+        if (!validationResult.isValid) {
+          suggestions = validationResult.suggestions ?? [];
+        }
       });
 
       it('should return suggestions', () => {
-        expect(validationResult).toBeTruthy();
+        if (validationResult.isValid) {
+          expect(validationResult.isValid).toBeFalsy();
+          return;
+        }
         expect(validationResult.failureMessage).toMatchInlineSnapshot(`
           [
             {
@@ -285,7 +302,10 @@ describe("given it's validating the request body", () => {
       });
 
       it('should return suggestions', () => {
-        expect(validationResult).toBeTruthy();
+        if (validationResult.isValid) {
+          expect(validationResult.isValid).toBeFalsy();
+          return;
+        }
         expect(validationResult.failureMessage).toMatchInlineSnapshot(`
           [
             {
