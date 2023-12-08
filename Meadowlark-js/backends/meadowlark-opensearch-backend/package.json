@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-opensearch-backend",
   "main": "dist/index.js",
-  "version": "0.4.0-pre.5",
+  "version": "0.4.0-pre.6",
   "description": "Meadowlark backend plugin for OpenSearch",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -19,8 +19,8 @@
     "build:copy-non-ts": "copyfiles -u 1 -e \"**/*.ts\" \"src/**/*\" dist --verbose"
   },
   "dependencies": {
-    "@edfi/meadowlark-core": "0.4.0-pre.5",
-    "@edfi/meadowlark-utilities": "0.4.0-pre.5",
+    "@edfi/meadowlark-core": "0.4.0-pre.6",
+    "@edfi/meadowlark-utilities": "0.4.0-pre.6",
     "@opensearch-project/opensearch": "^2.4.0"
   },
   "devDependencies": {
