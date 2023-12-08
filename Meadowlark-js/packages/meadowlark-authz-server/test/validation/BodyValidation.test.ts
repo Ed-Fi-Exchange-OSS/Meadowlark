@@ -1,4 +1,10 @@
-import { BodyValidation, Suggestion, applySuggestions, validateCreateClientBody } from '../../src/validation/BodyValidation';
+import {
+  BodyValidation,
+  Suggestion,
+  applySuggestions,
+  validateCreateClientBody,
+  validateRequestTokenBody,
+} from '../../src/validation/BodyValidation';
 
 describe("given it's validating the request body", () => {
   describe("given it's validating the create client body", () => {
@@ -162,24 +168,161 @@ describe("given it's validating the request body", () => {
       });
     });
   });
-  //   describe("given it's validating the update client body", () => {
-  //     const body = {
-  //       clientName: 'a',
-  //       active: true,
-  //       roles: [],
-  //     };
-  //   });
-  //   describe("given it's validating the request token body", () => {
-  //     const body = {
-  //       grant_type: 'a',
-  //       client_id: 'b',
-  //       client_secret: 'c',
-  //     };
-  //   });
-  //   describe("given it's validating the verify token body", () => {
-  //     const body = {
-  //       token: 'a',
-  //       token_hint: '',
-  //     };
-  //   });
+
+  describe("given it's validating the request token body", () => {
+    describe("given it's valid", () => {
+      const expected = {
+        grant_type: 'client_credentials',
+        client_id: 'Hometown SIS',
+        client_secret: '123456',
+      };
+      let validationResult: BodyValidation;
+
+      beforeAll(() => {
+        // Act
+        validationResult = validateRequestTokenBody(expected);
+      });
+
+      it('should return valid', () => {
+        expect(validationResult).toBeTruthy();
+      });
+    });
+
+    describe('given it has different casing', () => {
+      const actual = {
+        GRANT_TYPE: 'client_credentials',
+        CLIENT_ID: 'Hometown SIS',
+        CLIENT_SECRET: '123456',
+      };
+
+      const expected = {
+        grant_type: 'client_credentials',
+        client_id: 'Hometown SIS',
+        client_secret: '123456',
+      };
+
+      let validationResult: BodyValidation;
+      let suggestions: Suggestion[] = [];
+
+      beforeAll(() => {
+        // Act
+        validationResult = validateRequestTokenBody(actual);
+        suggestions = validationResult.suggestions ?? [];
+      });
+
+      it('should return suggestions', () => {
+        expect(validationResult).toBeTruthy();
+        expect(validationResult.failureMessage).toMatchInlineSnapshot(`
+          [
+            {
+              "context": {
+                "errorType": "required",
+              },
+              "message": "{requestBody} must have required property 'grant_type'",
+              "path": "{requestBody}",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'GRANT_TYPE' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'grant_type'?",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'CLIENT_ID' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'client_id'?",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'CLIENT_SECRET' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'grant_type'?",
+            },
+          ]
+        `);
+        expect(validationResult.suggestions).toMatchInlineSnapshot(`
+          [
+            {
+              "current": "GRANT_TYPE",
+              "suggested": "grant_type",
+            },
+            {
+              "current": "CLIENT_ID",
+              "suggested": "client_id",
+            },
+            {
+              "current": "CLIENT_SECRET",
+              "suggested": "client_secret",
+            },
+          ]
+        `);
+      });
+
+      it('should apply suggestions correctly', () => {
+        expect(applySuggestions(actual, suggestions)).toMatchObject(expected);
+      });
+    });
+
+    describe('given it has a typo', () => {
+      const actual = {
+        grant_types: 'client_credentials',
+        clientid: 'Hometown SIS',
+        'client-secret': '123456',
+      };
+
+      let validationResult: BodyValidation;
+
+      beforeAll(() => {
+        // Act
+        validationResult = validateRequestTokenBody(actual);
+      });
+
+      it('should return suggestions', () => {
+        expect(validationResult).toBeTruthy();
+        expect(validationResult.failureMessage).toMatchInlineSnapshot(`
+          [
+            {
+              "context": {
+                "errorType": "required",
+              },
+              "message": "{requestBody} must have required property 'grant_type'",
+              "path": "{requestBody}",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'grant_types' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'grant_type'?",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'clientid' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'client_id'?",
+            },
+            {
+              "context": {
+                "errorType": "additionalProperties",
+              },
+              "message": "'client-secret' property is not expected to be here",
+              "path": "{requestBody}",
+              "suggestion": "Did you mean property 'client_secret'?",
+            },
+          ]
+        `);
+        expect(validationResult.suggestions).toEqual([]);
+      });
+    });
+  });
 });
