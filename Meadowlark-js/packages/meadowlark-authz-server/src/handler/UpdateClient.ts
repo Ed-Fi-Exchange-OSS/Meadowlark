@@ -11,7 +11,7 @@ import { validateAdminTokenForAccess } from '../security/TokenValidator';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import { AuthorizationResponse } from './AuthorizationResponse';
 import { writeDebugObject, writeDebugStatusToLog, writeErrorToLog, writeRequestToLog } from '../Logger';
-import { BodyValidation, validateUpdateClientBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateUpdateClientBody } from '../validation/BodyValidation';
 import { clientIdFrom } from '../Utility';
 
 const moduleName = 'authz.handler.UpdateClient';
@@ -57,7 +57,19 @@ export async function updateClient(authorizationRequest: AuthorizationRequest): 
       return { body: { error }, statusCode: 400 };
     }
 
-    const validation: BodyValidation = validateUpdateClientBody(parsedBody);
+    let validation: BodyValidation = validateUpdateClientBody(parsedBody);
+    if (!validation.isValid && validation.suggestions) {
+      writeDebugStatusToLog(
+        moduleName,
+        authorizationRequest,
+        'updateClient',
+        400,
+        'Invalid request body, checking for suggestions',
+      );
+      parsedBody = applySuggestions(parsedBody, validation.suggestions);
+      validation = validateUpdateClientBody(parsedBody);
+    }
+
     if (!validation.isValid) {
       writeDebugObject(moduleName, authorizationRequest, 'updateClient', 400, validation.failureMessage);
       return {

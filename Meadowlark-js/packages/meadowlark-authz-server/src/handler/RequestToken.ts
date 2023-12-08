@@ -5,17 +5,18 @@
 
 import querystring from 'node:querystring';
 import { create as createJwt } from 'njwt';
-import { Config, Logger, isDebugEnabled } from '@edfi/meadowlark-utilities';
+import { Config } from '@edfi/meadowlark-utilities';
 import { admin1, verifyOnly1 } from '../security/HardcodedCredential';
 import type { Jwt } from '../security/Jwt';
 import type { AuthorizationResponse } from './AuthorizationResponse';
 import { AuthorizationRequest, extractAuthorizationHeader } from './AuthorizationRequest';
 import type { RequestTokenBody } from '../model/RequestTokenBody';
-import { BodyValidation, validateRequestTokenBody } from '../validation/BodyValidation';
+import { BodyValidation, applySuggestions, validateRequestTokenBody } from '../validation/BodyValidation';
 import type { GetAuthorizationClientResult } from '../message/GetAuthorizationClientResult';
 import { ensurePluginsLoaded, getAuthorizationStore } from '../plugin/AuthorizationPluginLoader';
 import { hashClientSecretHexString } from '../security/HashClientSecret';
 import { TokenSuccessResponse } from '../model/TokenResponse';
+import { writeDebugStatusToLog, writeRequestToLog } from '../Logger';
 
 const moduleName = 'authz.handler.RequestToken';
 
@@ -63,61 +64,76 @@ function maskClientSecret(body: RequestTokenBody): string {
 function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): ParsedRequestTokenBody {
   if (authorizationRequest.body == null) return { isValid: false, failureMessage: { message: 'Request body is empty' } };
 
-  let unvalidatedBody: any;
+  let parsedBody: any;
 
   // startsWith accounts for possibility of the content-type being with or without encoding
   if (authorizationRequest.headers['content-type']?.startsWith('application/x-www-form-urlencoded')) {
     try {
-      unvalidatedBody = querystring.parse(authorizationRequest.body);
+      parsedBody = querystring.parse(authorizationRequest.body);
     } catch (error) {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, error.message);
       return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   } else {
     try {
-      unvalidatedBody = JSON.parse(authorizationRequest.body);
+      parsedBody = JSON.parse(authorizationRequest.body);
     } catch (error) {
-      Logger.debug(`${moduleName}.parseRequestTokenBody: Malformed body - ${error.message}`, authorizationRequest.traceId);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, error.message);
       return { isValid: false, failureMessage: { message: `Malformed body: ${error.message}` } };
     }
   }
 
-  const bodyValidation: BodyValidation = validateRequestTokenBody(unvalidatedBody);
-  if (!bodyValidation.isValid) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid request body`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: bodyValidation.failureMessage };
+  let validation: BodyValidation = validateRequestTokenBody(parsedBody);
+  if (!validation.isValid && validation.suggestions) {
+    writeDebugStatusToLog(
+      moduleName,
+      authorizationRequest,
+      'parseRequestTokenBody',
+      400,
+      'Invalid request body, checking for suggestions',
+    );
+    parsedBody = applySuggestions(parsedBody, validation.suggestions);
+    validation = validateRequestTokenBody(parsedBody);
   }
 
-  const validatedBody: RequestTokenBody = unvalidatedBody as RequestTokenBody;
+  if (!validation.isValid) {
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, 'Invalid request body');
+    return { isValid: false, failureMessage: validation.failureMessage };
+  }
+
+  const requestTokenBody: RequestTokenBody = parsedBody as RequestTokenBody;
 
   // client_id and client_secret can either be directly in the payload or encoded as an Authorization header.
   // Validation ensures that if one is in the body then both are.
-  if (validatedBody.client_id != null) {
-    return { isValid: true, requestTokenBody: validatedBody };
+  if (requestTokenBody.client_id != null) {
+    return { isValid: true, requestTokenBody };
   }
 
   const authorizationHeader: string | undefined = extractAuthorizationHeader(authorizationRequest);
 
   if (authorizationHeader == null) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Missing authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: { message: 'Missing authorization header' } };
+    const message = 'Missing authorization header';
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, message);
+    return { isValid: false, failureMessage: { message } };
   }
 
   if (!authorizationHeader.startsWith('Basic ')) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: { message: 'Invalid authorization header' } };
+    const message = 'Invalid authorization header';
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, message);
+    return { isValid: false, failureMessage: { message } };
   }
 
   // Extract from "Basic <encoded>" where encoded is the Base64 form of "client_id:client_secret"
   const split = Buffer.from(authorizationHeader.slice(6), 'base64').toString('binary').split(':');
   if (split.length !== 2) {
-    Logger.debug(`${moduleName}.parseRequestTokenBody: Invalid authorization header`, authorizationRequest.traceId);
-    return { isValid: false, failureMessage: { message: 'Invalid authorization header' } };
+    const message = 'Invalid authorization header';
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'parseRequestTokenBody', 400, message);
+    return { isValid: false, failureMessage: { message } };
   }
 
-  [validatedBody.client_id, validatedBody.client_secret] = split;
+  [requestTokenBody.client_id, requestTokenBody.client_secret] = split;
 
-  return { isValid: true, requestTokenBody: validatedBody };
+  return { isValid: true, requestTokenBody };
 }
 
 /*
@@ -125,7 +141,7 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
  */
 export async function requestToken(authorizationRequest: AuthorizationRequest): Promise<AuthorizationResponse> {
   try {
-    Logger.info(`${moduleName}.requestToken`, authorizationRequest.traceId);
+    writeRequestToLog(moduleName, authorizationRequest, 'requestToken');
     await ensurePluginsLoaded();
 
     const parsedRequest: ParsedRequestTokenBody = parseRequestTokenBody(authorizationRequest);
@@ -138,9 +154,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
     const { requestTokenBody } = parsedRequest;
 
-    if (isDebugEnabled()) {
-      Logger.debug(`${moduleName}.requestToken ${maskClientSecret(requestTokenBody)}`, authorizationRequest.traceId);
-    }
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 200);
 
     if (requestTokenBody.grant_type === 'client_credentials') {
       // Check hardcoded credentials first
@@ -149,24 +163,20 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       const enableHardCoded = Config.get('OAUTH_HARD_CODED_CREDENTIALS_ENABLED');
 
       if (!enableHardCoded && (clientId === admin1.key || clientId === verifyOnly1.key)) {
-        if (isDebugEnabled()) {
-          Logger.debug(
-            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Hard-coded credentials are not enabled`,
-            authorizationRequest.traceId,
-          );
-        }
+        writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 401);
+
         return { statusCode: 401 };
       }
 
       if (clientId === admin1.key && clientSecret === admin1.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded admin1`, authorizationRequest.traceId);
+        writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 200, 'Hardcoded admin1');
         return {
           body: tokenResponseFrom(createToken(admin1.key, admin1.vendor, admin1.role)),
           statusCode: 200,
         };
       }
       if (clientId === verifyOnly1.key && clientSecret === verifyOnly1.secret) {
-        Logger.debug(`${moduleName}.requestToken: 200 - Hardcoded verifyOnly1`, authorizationRequest.traceId);
+        writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 200, 'Hardcoded verifyOnly1');
         return {
           body: tokenResponseFrom(createToken(verifyOnly1.key, verifyOnly1.vendor, verifyOnly1.role)),
           statusCode: 200,
@@ -180,46 +190,44 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
       });
 
       if (result.response === 'UNKNOWN_FAILURE') {
-        if (isDebugEnabled()) {
-          Logger.debug(
-            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 500`,
-            authorizationRequest.traceId,
-          );
-        }
+        writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 500);
         return { statusCode: 500 };
       }
 
       if (result.response === 'GET_FAILURE_NOT_EXISTS') {
-        if (isDebugEnabled()) {
-          Logger.debug(
-            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client does not exist`,
-            authorizationRequest.traceId,
-          );
-        }
+        writeDebugStatusToLog(
+          moduleName,
+          authorizationRequest,
+          'requestToken',
+          401,
+          `${maskClientSecret(requestTokenBody)} Client does not exist`,
+        );
         return { statusCode: 401 };
       }
 
       if (!result.active) {
-        if (isDebugEnabled()) {
-          Logger.debug(
-            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} Client deactivated `,
-            authorizationRequest.traceId,
-          );
-        }
+        writeDebugStatusToLog(
+          moduleName,
+          authorizationRequest,
+          'requestToken',
+          403,
+          `${maskClientSecret(requestTokenBody)} Client deactivated`,
+        );
         return { statusCode: 403 };
       }
 
       if (hashClientSecretHexString(requestTokenBody.client_secret) !== result.clientSecretHashed) {
-        if (isDebugEnabled()) {
-          Logger.debug(
-            `${moduleName}.requestToken: ${maskClientSecret(requestTokenBody)} 401`,
-            authorizationRequest.traceId,
-          );
-        }
+        writeDebugStatusToLog(
+          moduleName,
+          authorizationRequest,
+          'requestToken',
+          401,
+          `${maskClientSecret(requestTokenBody)} 401`,
+        );
         return { statusCode: 401 };
       }
 
-      Logger.debug(`${moduleName}.requestToken authorized 200`, authorizationRequest.traceId);
+      writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 200);
 
       return {
         body: tokenResponseFrom(createToken(clientId, result.clientName, result.roles)),
@@ -229,7 +237,7 @@ export async function requestToken(authorizationRequest: AuthorizationRequest): 
 
     return { statusCode: 401 };
   } catch (e) {
-    Logger.debug(`${moduleName}.requestToken: 500`, authorizationRequest.traceId, e);
+    writeDebugStatusToLog(moduleName, authorizationRequest, 'requestToken', 500, e);
     return { statusCode: 500 };
   }
 }
