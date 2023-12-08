@@ -34,9 +34,10 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
         .map((property) => property.params.additionalProperty as string)
     : [];
 
-  // Will go through all additional properties found and tried to find match with the required
-  // properties. It is important to update the threshold for didYouMean to not allow words with similar lengths or typos.
+  // Check for expected values in the ajv error messages to compare with provided values.
+  // This will provide suggestions for properties with correct value but wrong case, allowing to have case insensitive requests
   additionalKeys.forEach((current) => {
+    // Update the threshold for didYouMean to not allow words with similar lengths or typos.
     const suggested = didYouMean(current, requiredKeys, { thresholdType: ThresholdTypeEnums.SIMILARITY, threshold: 1 });
     if (suggested) {
       suggestions.push({ current, suggested });
