@@ -84,6 +84,8 @@ function parseRequestTokenBody(authorizationRequest: AuthorizationRequest): Pars
   }
 
   let validation: BodyValidation = validateRequestTokenBody(parsedBody);
+  // The validation will return suggestions for properties not found that have a similar match,
+  // here will apply it and validate once more, if this does not pass validation will return failure with the error message.
   if (!validation.isValid && validation.suggestions) {
     writeDebugStatusToLog(
       moduleName,

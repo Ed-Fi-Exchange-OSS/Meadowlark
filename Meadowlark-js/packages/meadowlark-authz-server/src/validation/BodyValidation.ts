@@ -34,6 +34,8 @@ function validateBody(body: object, schema: object, validateFunction: ValidateFu
         .map((property) => property.params.additionalProperty as string)
     : [];
 
+  // Will go through all additional properties found and tried to find match with the required
+  // properties. It is important to update the threshold for didYouMean to not allow words with similar lengths or typos.
   additionalKeys.forEach((current) => {
     const suggested = didYouMean(current, requiredKeys, { thresholdType: ThresholdTypeEnums.SIMILARITY, threshold: 1 });
     if (suggested) {
