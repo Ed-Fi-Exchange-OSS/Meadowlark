@@ -17,267 +17,69 @@ describe("given it's managing the client authorization", () => {
     roles: ['vendor'],
   };
 
-  describe('given client already exists ', () => {
-    beforeAll(async () => {
-      adminToken = await adminAccessToken();
-      location = await baseURLRequest()
-        .post(ENDPOINT)
-        .send(clientData)
-        .expect(201)
-        .auth(adminToken, { type: 'bearer' })
-        .then((response) => response.headers.location);
+  describe("given it's creating a client", () => {
+    describe('when generating a client with invalid admin token', () => {
+      it('should return error message', async () => {
+        await baseURLRequest()
+          .post(ENDPOINT)
+          .auth('', { type: 'bearer' })
+          .send({
+            clientName: 'Automation Client',
+            roles: ['vendor'],
+          })
+          .expect(401)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+              {
+                "error": "invalid_client",
+                "error_description": "Authorization token not provided",
+              }
+            `);
+          });
+      });
     });
 
-    describe("given it's creating a client", () => {
-      describe('when generating a client with invalid admin token', () => {
-        it('should return error message', async () => {
-          await baseURLRequest()
-            .post(ENDPOINT)
-            .auth('', { type: 'bearer' })
-            .send({
-              clientName: 'Automation Client',
-              roles: ['vendor'],
-            })
-            .expect(401)
-            .then((response) => {
-              expect(response.body).toMatchInlineSnapshot(`
-                {
-                  "error": "invalid_client",
-                  "error_description": "Authorization token not provided",
-                }
-              `);
-            });
-        });
+    describe('when generating a client without admin token', () => {
+      it('should return error message', async () => {
+        await baseURLRequest()
+          .post(ENDPOINT)
+          .send({
+            clientName: 'Automation Client',
+            roles: ['vendor'],
+          })
+          .expect(401)
+          .then((response) => {
+            expect(response.body).toMatchInlineSnapshot(`
+              {
+                "error": "invalid_client",
+                "error_description": "Authorization token not provided",
+              }
+            `);
+          });
+      });
+    });
+
+    describe('when generating a client and sending it to an uppercase url', () => {
+      beforeAll(async () => {
+        adminToken = await adminAccessToken();
+        await baseURLRequest()
+          .post(ENDPOINT.toUpperCase())
+          .send(clientData)
+          .expect(201)
+          .auth(adminToken, { type: 'bearer' })
+          .then((response) => {
+            location = response.headers.location;
+            responseBody = response.body;
+          });
       });
 
-      describe('when generating a client without admin token', () => {
-        it('should return error message', async () => {
-          await baseURLRequest()
-            .post(ENDPOINT)
-            .send({
-              clientName: 'Automation Client',
-              roles: ['vendor'],
-            })
-            .expect(401)
-            .then((response) => {
-              expect(response.body).toMatchInlineSnapshot(`
-                {
-                  "error": "invalid_client",
-                  "error_description": "Authorization token not provided",
-                }
-              `);
-            });
-        });
-      });
-
-      describe('when generating a client and sending it to an uppercase url', () => {
-        beforeAll(async () => {
-          adminToken = await adminAccessToken();
-          await baseURLRequest()
-            .post(ENDPOINT.toUpperCase())
-            .send(clientData)
-            .expect(201)
-            .auth(adminToken, { type: 'bearer' })
-            .then((response) => {
-              location = response.headers.location;
-              responseBody = response.body;
-            });
-        });
-
-        it('is created', () => {
-          expect(responseBody).toEqual(
-            expect.objectContaining({
-              clientName: 'Test Vendor',
-              roles: ['vendor'],
-            }),
-          );
-        });
-      });
-
-      describe('when generating a client name with key name with different casing', () => {
-        beforeAll(async () => {
-          adminToken = await adminAccessToken();
-          const updatedClientData = {
-            clientname: 'Test Vendor',
-            ROLES: ['vendor'],
-          };
-
-          await baseURLRequest()
-            .post(ENDPOINT)
-            .send(updatedClientData)
-            .expect(201)
-            .auth(adminToken, { type: 'bearer' })
-            .then((response) => {
-              location = response.headers.location;
-              responseBody = response.body;
-            });
-        });
-
-        it('is created', () => {
-          expect(responseBody).toEqual(
-            expect.objectContaining({
-              clientName: 'Test Vendor',
-              roles: ['vendor'],
-            }),
-          );
-        });
-      });
-
-      describe('when generating a client name with additional properties', () => {
-        beforeAll(async () => {
-          adminToken = await adminAccessToken();
-          const updatedClientData = {
+      it('is created', () => {
+        expect(responseBody).toEqual(
+          expect.objectContaining({
             clientName: 'Test Vendor',
-            role: ['vendor'],
-            errors: true,
-          };
-
-          await baseURLRequest()
-            .post(ENDPOINT)
-            .send(updatedClientData)
-            .expect(400)
-            .auth(adminToken, { type: 'bearer' })
-            .then((response) => {
-              location = response.headers.location;
-              responseBody = response.body;
-            });
-        });
-
-        it('returns validation errors', () => {
-          expect(responseBody).toMatchInlineSnapshot(`
-            {
-              "error": [
-                {
-                  "context": {
-                    "errorType": "required",
-                  },
-                  "message": "{requestBody} must have required property 'roles'",
-                  "path": "{requestBody}",
-                },
-                {
-                  "context": {
-                    "errorType": "additionalProperties",
-                  },
-                  "message": "'role' property is not expected to be here",
-                  "path": "{requestBody}",
-                  "suggestion": "Did you mean property 'roles'?",
-                },
-                {
-                  "context": {
-                    "errorType": "additionalProperties",
-                  },
-                  "message": "'errors' property is not expected to be here",
-                  "path": "{requestBody}",
-                  "suggestion": "Did you mean property 'roles'?",
-                },
-              ],
-            }
-          `);
-        });
-      });
-
-      describe('when generating a client with a role combination', () => {
-        // This should be modified when RND-452 is done
-        describe('when using a valid combination of roles', () => {
-          it.each([
-            { roles: ['verify-only'] },
-            { roles: ['admin'] },
-            { roles: ['admin', 'assessment'] },
-            { roles: ['assessment', 'host'] },
-            { roles: ['assessment', 'vendor'] },
-          ])('should create client with %j', async (item) => {
-            const { roles } = item;
-
-            const clientInfo = {
-              clientName: 'Test Client',
-              roles,
-            };
-
-            await baseURLRequest()
-              .post(ENDPOINT)
-              .auth(await adminAccessToken(), { type: 'bearer' })
-              .send(clientInfo)
-              .expect(201)
-              .then((response) => {
-                expect(response.body).toEqual(expect.objectContaining(clientInfo));
-              });
-          });
-        });
-
-        describe('when generating a client with more than 2 roles', () => {
-          it('should return error message', async () => {
-            const roles = ['admin', 'vendor', 'host'];
-
-            await baseURLRequest()
-              .post(ENDPOINT)
-              .auth(await adminAccessToken(), { type: 'bearer' })
-              .send({
-                clientName: 'Admin Client',
-                roles,
-              })
-              .expect(400)
-              .then((response) => {
-                expect(response.body).toMatchInlineSnapshot(`
-                  {
-                    "error": [
-                      {
-                        "context": {
-                          "errorType": "maxItems",
-                        },
-                        "message": "property 'roles' must not have more than 2 items",
-                        "path": "{requestBody}.roles",
-                      },
-                    ],
-                  }
-                `);
-              });
-          });
-        });
-
-        describe('when generating a client with an invalid role', () => {
-          it('should return error message', async () => {
-            const roles = ['not-valid'];
-
-            await baseURLRequest()
-              .post(ENDPOINT)
-              .auth(await adminAccessToken(), { type: 'bearer' })
-              .send({
-                clientName: 'Admin Client',
-                roles,
-              })
-              .expect(400)
-              .then((response) => {
-                expect(response.body).toMatchInlineSnapshot(`
-                  {
-                    "error": [
-                      {
-                        "context": {
-                          "allowedValues": [
-                            "vendor",
-                            "host",
-                            "admin",
-                            "assessment",
-                            "verify-only",
-                          ],
-                          "errorType": "enum",
-                        },
-                        "message": "'0' property must be equal to one of the allowed values",
-                        "path": "{requestBody}.roles.0",
-                        "suggestion": "Did you mean 'host'?",
-                      },
-                      {
-                        "context": {
-                          "errorType": "contains",
-                        },
-                        "message": "property 'roles' must contain at least 1 valid item(s)",
-                        "path": "{requestBody}.roles",
-                      },
-                    ],
-                  }
-                `);
-              });
-          });
-        });
+            roles: ['vendor'],
+          }),
+        );
       });
     });
 
@@ -366,6 +168,204 @@ describe("given it's managing the client authorization", () => {
             });
         });
       });
+    });
+
+    describe('when generating a client name with key name with different casing', () => {
+      beforeAll(async () => {
+        adminToken = await adminAccessToken();
+        const updatedClientData = {
+          clientname: 'Test Vendor',
+          ROLES: ['vendor'],
+        };
+
+        await baseURLRequest()
+          .post(ENDPOINT)
+          .send(updatedClientData)
+          .expect(201)
+          .auth(adminToken, { type: 'bearer' })
+          .then((response) => {
+            location = response.headers.location;
+            responseBody = response.body;
+          });
+      });
+
+      it('is created', () => {
+        expect(responseBody).toEqual(
+          expect.objectContaining({
+            clientName: 'Test Vendor',
+            roles: ['vendor'],
+          }),
+        );
+      });
+    });
+
+    describe('when generating a client name with additional properties', () => {
+      beforeAll(async () => {
+        adminToken = await adminAccessToken();
+        const updatedClientData = {
+          clientName: 'Test Vendor',
+          role: ['vendor'],
+          errors: true,
+        };
+
+        await baseURLRequest()
+          .post(ENDPOINT)
+          .send(updatedClientData)
+          .expect(400)
+          .auth(adminToken, { type: 'bearer' })
+          .then((response) => {
+            location = response.headers.location;
+            responseBody = response.body;
+          });
+      });
+
+      it('returns validation errors', () => {
+        expect(responseBody).toMatchInlineSnapshot(`
+          {
+            "error": [
+              {
+                "context": {
+                  "errorType": "required",
+                },
+                "message": "{requestBody} must have required property 'roles'",
+                "path": "{requestBody}",
+              },
+              {
+                "context": {
+                  "errorType": "additionalProperties",
+                },
+                "message": "'role' property is not expected to be here",
+                "path": "{requestBody}",
+                "suggestion": "Did you mean property 'roles'?",
+              },
+              {
+                "context": {
+                  "errorType": "additionalProperties",
+                },
+                "message": "'errors' property is not expected to be here",
+                "path": "{requestBody}",
+                "suggestion": "Did you mean property 'roles'?",
+              },
+            ],
+          }
+        `);
+      });
+    });
+
+    describe('when generating a client with a role combination', () => {
+      // This should be modified when RND-452 is done
+      describe('when using a valid combination of roles', () => {
+        it.each([
+          { roles: ['verify-only'] },
+          { roles: ['admin'] },
+          { roles: ['admin', 'assessment'] },
+          { roles: ['assessment', 'host'] },
+          { roles: ['assessment', 'vendor'] },
+        ])('should create client with %j', async (item) => {
+          const { roles } = item;
+
+          const clientInfo = {
+            clientName: 'Test Client',
+            roles,
+          };
+
+          await baseURLRequest()
+            .post(ENDPOINT)
+            .auth(await adminAccessToken(), { type: 'bearer' })
+            .send(clientInfo)
+            .expect(201)
+            .then((response) => {
+              expect(response.body).toEqual(expect.objectContaining(clientInfo));
+            });
+        });
+      });
+
+      describe('when generating a client with more than 2 roles', () => {
+        it('should return error message', async () => {
+          const roles = ['admin', 'vendor', 'host'];
+
+          await baseURLRequest()
+            .post(ENDPOINT)
+            .auth(await adminAccessToken(), { type: 'bearer' })
+            .send({
+              clientName: 'Admin Client',
+              roles,
+            })
+            .expect(400)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot(`
+                {
+                  "error": [
+                    {
+                      "context": {
+                        "errorType": "maxItems",
+                      },
+                      "message": "property 'roles' must not have more than 2 items",
+                      "path": "{requestBody}.roles",
+                    },
+                  ],
+                }
+              `);
+            });
+        });
+      });
+
+      describe('when generating a client with an invalid role', () => {
+        it('should return error message', async () => {
+          const roles = ['not-valid'];
+
+          await baseURLRequest()
+            .post(ENDPOINT)
+            .auth(await adminAccessToken(), { type: 'bearer' })
+            .send({
+              clientName: 'Admin Client',
+              roles,
+            })
+            .expect(400)
+            .then((response) => {
+              expect(response.body).toMatchInlineSnapshot(`
+                {
+                  "error": [
+                    {
+                      "context": {
+                        "allowedValues": [
+                          "vendor",
+                          "host",
+                          "admin",
+                          "assessment",
+                          "verify-only",
+                        ],
+                        "errorType": "enum",
+                      },
+                      "message": "'0' property must be equal to one of the allowed values",
+                      "path": "{requestBody}.roles.0",
+                      "suggestion": "Did you mean 'host'?",
+                    },
+                    {
+                      "context": {
+                        "errorType": "contains",
+                      },
+                      "message": "property 'roles' must contain at least 1 valid item(s)",
+                      "path": "{requestBody}.roles",
+                    },
+                  ],
+                }
+              `);
+            });
+        });
+      });
+    });
+  });
+
+  describe('given client already exists ', () => {
+    beforeAll(async () => {
+      adminToken = await adminAccessToken();
+      location = await baseURLRequest()
+        .post(ENDPOINT)
+        .send(clientData)
+        .expect(201)
+        .auth(adminToken, { type: 'bearer' })
+        .then((response) => response.headers.location);
     });
 
     describe('when retrieving information', () => {
