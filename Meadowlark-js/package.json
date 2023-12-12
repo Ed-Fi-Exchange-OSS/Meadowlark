@@ -72,7 +72,7 @@
     "test:e2e:dev:exit": "bash ../eng/exit-dev-containers.sh",
     "start:local": "lerna run start:local",
     "docker:lint": "cat ./Dockerfile | docker run --rm -i hadolint/hadolint",
-    "docker:install": "npm i lerna@^6.0.2 rimraf@^3.0.2 copyfiles@^2.4.1 typescript@4.8.4 -g && npm ci --only=production",
+    "docker:install": "npm i lerna@^6.6.2 rimraf@^5.0.5 copyfiles@^2.4.1 typescript@4.9.5 -g && npm ci --only=production",
     "docker:build": "docker build -t meadowlark .",
     "docker:build:wsl1": "docker.exe build -t meadowlark .",
     "docker:start": "docker run -d --env-file ./.env-docker --name ml-api -p 3000:3000 meadowlark",
