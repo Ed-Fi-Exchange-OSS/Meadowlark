@@ -3,7 +3,7 @@
 To prevent a possible attack, we want to limit the users from authenticating
 multiple times in a short period of time, this can be done with the load
 balancer. As an example, we will use the NGINX
-[sample-load-balancer](../../Meadowlark-js/sample-load-balancer.conf)
+[sample-load-balancer](../../../Meadowlark-js/sample-load-balancer.conf)
 
 ## Configuration
 
@@ -15,7 +15,7 @@ https://www.nginx.com/blog/rate-limiting-nginx/ for guidance, and the
 ### Setup
 
 1. Define the `limit_req_zone` at the beginning of the
-   [file](../../Meadowlark-js/sample-load-balancer.conf#L1). The zone means the
+   [file](../../../Meadowlark-js/sample-load-balancer.conf#L1). The zone means the
    memory used to save IP addresses, and the `rate` represent how often the
    count will be restarted (every minute).
 
