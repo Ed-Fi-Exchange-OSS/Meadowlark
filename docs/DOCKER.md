@@ -26,6 +26,8 @@ developer does not need to do anything at runtime to make this work, other than
 follow the one-time "Global Docker Configuration" steps in
 [DOCKER-LOCAL-DEV](DOCKER-LOCAL-DEV.md).
 
+To run the End-to-End tests, follow the steps defined in the [e2e README](../Meadowlark-js/tests/e2e/readme.md).
+
 ## Dockerfile for Meadowlark API
 
 In the above scenarios, the Meadowlark API is running in Node.js directly in the

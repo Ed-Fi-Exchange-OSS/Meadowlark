@@ -38,8 +38,6 @@ See [Running on Localhost](LOCALHOST.md).
 * Start Visual Studio Code and open the `meadowlark-js` directory.
 * Install all extension recommendations.
 * Open a terminal in the meadowlark-js directory and run `npm install`.
-  * Note that `npm install` will add a git hook to run linters before pushing
-    with git.
 
 ## Test a local deploy
 
