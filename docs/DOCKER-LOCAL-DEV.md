@@ -3,9 +3,10 @@
 _Also see [DOCKER](DOCKER.md) for more general information about using Docker
 for Meadowlark in development, testing, and production_.
 
-:exclamation: These solutions should only be used on localhost with proper
-firewalls around external network access to the workstation. Not appropriate for
-production use.
+> [!WARNING]
+> These solutions should only be used on localhost with proper
+> firewalls around external network access to the workstation. Not appropriate
+> for production use.
 
 These compose files require [Docker Compose
 v2](https://github.com/docker/compose) (which comes with Docker Desktop for
@@ -96,4 +97,7 @@ and builds it there. There is a convenience script for PowerShell called
 up the local environment correctly. This is particularly useful for setting up a
 clean environment between performance test runs.
 
-> **Note**: you'll need a .env file for this.
+> [!NOTE]
+> This requires a local _meadowlark-api_ image built,
+> this can be done with `npm run docker:build`.
+> You'll also need a .env file for this.
