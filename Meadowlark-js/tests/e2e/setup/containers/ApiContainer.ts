@@ -13,10 +13,12 @@ export async function setup(network: StartedNetwork) {
 
   const fastifyPort = parseInt(process.env.FASTIFY_PORT ?? '3001', 10);
 
-  console.info(`Configuring Meadowlark API with docker image: ${process.env.API_IMAGE_NAME ?? 'meadowlark'}`);
+  const meadowlarkApiImageName = process.env.API_IMAGE_NAME ?? 'meadowlark-api';
+
+  console.info(`Configuring Meadowlark API with docker image: ${meadowlarkApiImageName}`);
 
   try {
-    container = new GenericContainer(process.env.API_IMAGE_NAME ?? 'meadowlark')
+    container = new GenericContainer(meadowlarkApiImageName)
       .withName('meadowlark-api-test')
       .withNetwork(network)
       .withLogConsumer(async (stream) => setAPILog(stream))
