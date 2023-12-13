@@ -119,7 +119,8 @@ curl http://$meadowlarkDnsLabel.southcentralus.azurecontainer.io:3000/stg | Conv
 
 This will output the summary of the deployment
 
-> **Warning** Not ready for production usage. This example is using a single mongo node with a simulated replica set and
+> [!WARNING]
+> Not ready for production usage. This example is using a single mongo node with a simulated replica set and
 > bypassing security with a direct connection, also, it's using the OAUTH hardcoded credentials. The current configuration is
 > initializing the mongo replica manually, and this is not saved. Therefore, if the container instance is stopped, it's
 > necessary to reinitialize the replica set.
