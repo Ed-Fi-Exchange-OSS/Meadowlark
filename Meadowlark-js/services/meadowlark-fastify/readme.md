@@ -12,15 +12,20 @@ Instructions for running a local "developer" environment:
      * If using MongoDB set the value to `@edfi/meadowlark-mongodb-backend`
        * Update `MONGO_URI` to the location of your Mongo Instance
          * If running MongoDB via the local [docker compose configuration](../../docker-compose.yml),
-           the default value for `MONGO_URI` is 
+           the default value for `MONGO_URI` is
            `mongodb://mongo:abcdefgh1!@mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0`
      * If using PostgreSQL set the value to `@edfi/meadowlark-postgresql-backend`
        * Update `POSTGRES_USERNAME` and `POSTGRES_PASSWORD`
        * If your PostgreSQL instance is not running on the default port (5432), you can set `POSTGRES_PORT` to
          the port PostgreSQL is using
-   * `QUERY_HANDLER_PLUGIN` and `LISTENER1_PLUGIN` - Uncomment these two for GET query support using OpenSearch
-   * `AUTHORIZATION_STORE_PLUGIN` This is the plugin for the authorization store, it should be set to a NPM package name
-     * To use the Meadowlark-js provided Authorization plugin, this should be set to `@edfi/meadowlark-mongodb-backend`
+     * `QUERY_HANDLER_PLUGIN` and `LISTENER1_PLUGIN` - The query handler and listener that Meadowlark will use.
+       * If using OpenSearch set the value to `@edfi/meadowlark-opensearch-backend`
+          * Set the `OPENSEARCH_ENDPOINT`, `OPENSEARCH_USERNAME` and `OPENSEARCH_PASSWORD`
+       * If using ElasticSearch set the value to `@edfi/meadowlark-elasticsearch-backend`
+          * Set the `ELASTICSEARCH_ENDPOINT`
+   * `AUTHORIZATION_STORE_PLUGIN` This is the plugin for the authorization store
+     * If using MongoDB set the value to `@edfi/meadowlark-mongodb-backend`
+     * If using PostgreSQL set the value to `@edfi/meadowlark-postgresql-backend`
    * `OAUTH_SIGNING_KEY` - The `OAUTH_SIGNING_KEY` may need quotation marks around the value, unlike other keys.
    * Logging configuration, as this can affect performance. For better performance, avoid `debug` and `info` levels for `LOG_LEVEL`, and set `LOG_PRETTY_PRINT` to false. Rather than log to console, use `LOG_TO_FILE` set to true and set the log file directory with `LOG_FILE_LOCATION`.
 1. If you have already built the Meadowlark-js project, you can skip to step 4, otherwise:
