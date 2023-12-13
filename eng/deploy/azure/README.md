@@ -107,45 +107,6 @@ az container create ... `
 To view the log information, follow [these
 steps](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#view-logs)
 
-## Deploy with Docker Azure Integration
-
-> **Warning** The Docker Azure Integration will be retired in November 2023.
-
-- [Log into Azure from Docker](https://docs.docker.com/cloud/aci-integration/#log-into-azure).
-
-- [Create an ACI Docker context](https://docs.docker.com/cloud/aci-integration/#create-an-aci-context)
-
-- Browse to `../eng/deploy/azure`
-
-- Create a .env file. Set the OAUTH_SIGNING_KEY, AZURE_REGION and ED_FI_DOMAIN_NAME. The combination of domain name an azure
-  region must be globally unique.
-
-- Execute the following script:
-
-```pwsh
-
-# Switch to the ACI Context
-docker context use myacicontext
-
-docker compose -p meadowlark --file ./azure-docker-compose.yml up -d
-
-# Initialize replica set
-az container exec --resource-group {resource group name} -n meadowlark `
-   --container-name ml-mongo1 --exec-command 'mongo --eval rs.initiate()'
-
-```
-
-> **Note** Not all functionality available in a Docker Compose file is available when deploying to ACI. To review the
-> available features, check [the documentation](https://docs.docker.com/cloud/aci-compose-features/) .
-
-### Removing the containers
-
-Given that `docker compose down` is not available. To remove all the containers in the group, execute:
-
-```pwsh
-az container delete --resource-group {resource group name} -n meadowlark
-```
-
 ## Test your deployment
 
 To verify your deployment, run:
