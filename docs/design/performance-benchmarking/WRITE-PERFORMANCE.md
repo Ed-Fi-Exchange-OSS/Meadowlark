@@ -31,13 +31,6 @@ The script receives two parameters:
 This script will enter the data into Meadowlark and will print the execution
 time.
 
-> **Warning** The LoadGrandBend script is returning errors related to incorrect casing on properties that
-> begin with acronyms ([METAED-1360](https://tracker.ed-fi.org/browse/METAED-1360)).
-
-List of issues:
-
-- [RND-583](https://tracker.ed-fi.org/browse/RND-583)
-
 ## Performance Testing Suite
 
 There are two performance test types that paths that cover the write
@@ -60,15 +53,3 @@ performance, Pipeclean Tests and Volume Tests.
   and secret. Set the values required for Meadowlark.
 - Run `poetry run python edfi_performance_test -t "VALUE"` where value can be
   "pipeclean" or "volume". [More details](https://github.com/Ed-Fi-Exchange-OSS/Suite-3-Performance-Testing/tree/main/src/edfi-performance-test)
-
-> **Warning** Currently there are a list of problems to run the performance tests,
-> therefore the process will not finish and you have to manually terminate the execution.
-
-List of issues:
-
-- [RND-583](https://tracker.ed-fi.org/browse/RND-583)
-- [RND-584](https://tracker.ed-fi.org/browse/RND-584)
-- [RND-585](https://tracker.ed-fi.org/browse/RND-585)
-- [PERF-298](https://tracker.ed-fi.org/browse/PERF-298)
-
-After fixing this errors, the tests should be executed as part of [RND-580](https://tracker.ed-fi.org/browse/RND-580)
