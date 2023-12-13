@@ -38,7 +38,8 @@ az container create --resource-group $resourceGroup -n ml-opensearch `
 
 ```
 
-> **Note** See [Enable Logging](#enable-logging) before setting up meadowlark container if you want to get log information.
+> > [!NOTE]
+> See [Enable Logging](#enable-logging) before setting up meadowlark container if you want to get log information.
 
 ```pwsh
 
@@ -92,7 +93,8 @@ Copy the `customerId` from the result.
 
 Copy the `primarySharedKey` from the result.
 
-> **Note** This information can be retrieved from the Portal, in Log Analytics Workspaces -> Settings -> Agents. [More
+> [!NOTE]
+> This information can be retrieved from the Portal, in Log Analytics Workspaces -> Settings -> Agents. [More
 > information](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-log-analytics#get-log-analytics-credentials)
 
 When creating the **meadowlark container**, include the customerId (workspace_id) and the primarySharedKey (workspace_key) as

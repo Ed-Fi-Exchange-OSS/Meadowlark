@@ -2,8 +2,8 @@
 
 ## Goal
 
-Evaluate impact on application performance when scaling it out.
-We expect to get a better performance with the load balancer than without it.
+Evaluate impact on application performance when scaling it out. We expect to get
+a better performance with the load balancer than without it.
 
 ## Methodology
 
@@ -29,10 +29,10 @@ We expect to get a better performance with the load balancer than without it.
 
 ## Environment
 
-The bulk load client runs on the host machine. It has 16 GB of RAM,
-Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz   2.59 GHz processor, 6 cores and
-12 logical processors, using WSL2. Docker has been configured to use 8GB of RAM
-and 10 cores.
+The bulk load client runs on the host machine. It has 16 GB of RAM, Intel(R)
+Core(TM) i7-9750H CPU @ 2.60GHz   2.59 GHz processor, 6 cores and 12 logical
+processors, using WSL2. Docker has been configured to use 8GB of RAM and 10
+cores.
 
 Baseline `.env` configuration file:
 
@@ -90,10 +90,11 @@ LOG_FILE_LOCATION=c:/temp/
 
 ## Further analysis
 
-Given that we did not see any improvement with the nginx load balancer, we decided to investigate
-a little further, using this tool called [cadvisor](https://github.com/google/cadvisor) and
-[mongodb compass](https://www.mongodb.com/products/compass).
-We suspect that mongodb is causing the bottle neck.
+Given that we did not see any improvement with the nginx load balancer, we
+decided to investigate a little further, using this tool called
+[cadvisor](https://github.com/google/cadvisor) and [mongodb
+compass](https://www.mongodb.com/products/compass). We suspect that mongodb is
+causing the bottle neck.
 
 | With load balancing and 4 Fastify threads    |              |
 | -------------------------------------------- | ------------ |
@@ -123,6 +124,6 @@ We suspect that mongodb is causing the bottle neck.
 | mongodb compass                              | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/mongo1_compas.jpg) |
 | Overall                                      | [Screenshot](./load-balancing-API-scale-out-screenshots/WithoutLB_4FastifyThreads/Overall.jpg) |
 
-Given the results we got with the tools indicated above, everything indicates that
-MongoDB is the bottle neck we have, and the reason why we are not getting a
+Given the results we got with the tools indicated above, everything indicates
+that MongoDB is the bottle neck we have, and the reason why we are not getting a
 better performance with the load balancer.

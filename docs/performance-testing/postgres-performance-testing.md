@@ -1,12 +1,13 @@
-# RND-647: Postgresql performance testing
+# RND-647: PostgreSQL performance testing
 
 ## Goal
 
-Run Postgresql performance testing to see the time required to execute Meadowlark on Postgresql.
+Run PostgreSQL performance testing to see the time required to execute Meadowlark on PostgreSQL.
 
 ## Description
 
 To test performance we have two Methods:
+
 - Autocannon tool
 - Bulk Load data
 

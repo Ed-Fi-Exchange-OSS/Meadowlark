@@ -131,7 +131,8 @@ the performance is discernibly worse with only one thread, whether using one or
 scenario does clearly yield an improved experience, reducing the average time to
 complete the test by roughly 69%.
 
-> **Note** Five executions of each test appears to be useful, but where timings
+> [!NOTE]
+> Five executions of each test appears to be useful, but where timings
 > are very close to one another, the number of data points is insufficient for
 > giving a useful statistical significance.
 

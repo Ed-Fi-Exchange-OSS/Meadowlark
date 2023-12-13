@@ -12,7 +12,8 @@ consistency of resource availability and limitations.
 
 ## Bulk Loading
 
-> **Note** To run the bulk loading tests it's important to start with a clean
+> [!NOTE]
+> To run the bulk loading tests it's important to start with a clean
 > database.
 
 To load the data, there are functions to load the GrandBend and PartialGrandBend
