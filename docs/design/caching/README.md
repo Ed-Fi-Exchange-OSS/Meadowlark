@@ -188,7 +188,7 @@ sequenceDiagram
     B-->>A: response
 ```
 
-> **Note**
+> [!NOTE]
 > In subsequent sequence diagrams, the `FrontEndFacade` will be
 > omitted.
 

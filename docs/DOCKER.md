@@ -26,6 +26,9 @@ developer does not need to do anything at runtime to make this work, other than
 follow the one-time "Global Docker Configuration" steps in
 [DOCKER-LOCAL-DEV](DOCKER-LOCAL-DEV.md).
 
+To run the End-to-End tests, follow the steps defined in the [e2e
+README](../Meadowlark-js/tests/e2e/readme.md).
+
 ## Dockerfile for Meadowlark API
 
 In the above scenarios, the Meadowlark API is running in Node.js directly in the
@@ -60,9 +63,10 @@ The Dockerfile copies the TypeScript code into a container and runs the
 TypeScript build in that context. It does not run eslint or any tests - so
 before building, be sure that all test are passing at the command line.
 
-:exclamation: You will need to rebuild the docker image with `docker:build` any
-time the source code changes. Be sure to stop and re-start any running
-Meadowlark API containers in order to see the changes.
+> [!WARNING]
+> You will need to rebuild the docker image with `docker:build` any
+> time the source code changes. Be sure to stop and re-start any running
+> Meadowlark API containers in order to see the changes.
 
 ### Testing the Meadowlark Image with Docker Compose
 
@@ -75,11 +79,9 @@ A better approach is to startup a new set of containers in a single network
 together, completely independent from the "Local Dev" containers. For that, you
 can use the local [docker-compose.yml](../Meadowlark-js/docker-compose.yml)
 file. This single file stitches together the Meadowlark API, OpenSearch, and
-MongoDB. Note that this does not support PostgreSQL at this time, because
-PostgreSQL is temporarily de-prioritized. The file also contains commented out
-code for running Debezium and Kafka; the code was left commented because the
-data were not flowing, and configuring the correct data flow is not important
-for the current release milestone.
+MongoDB. The file also contains commented out code for running PostgreSQL,
+Debezium and Kafka, to use this, follow the instructions defined in the readme
+for each backend.
 
 Again the main package.json has a few useful shortcut commands:
 
@@ -94,9 +96,12 @@ Again the main package.json has a few useful shortcut commands:
 
 ### One Time Initialization
 
-💡 Windows users: you need to run this from Window Subsystem for Linux. Make sure that you run a Bash prompt from WSL, not
-the one provided by Git. You also need to have Node.js 18 installed _inside WSL_. The development team likes using
-[NVM](https://github.com/nvm-sh/nvm) to manage this installation of Node 18.
+> [!TIP]
+> Windows users: you need to run this from Window Subsystem for Linux.
+> Make sure that you run a Bash prompt from WSL, not the one provided by Git.
+> You also need to have Node.js 18 installed _inside WSL_. The development team
+> likes using [NVM](https://github.com/nvm-sh/nvm) to manage this installation
+> of Node 18.
 
 From a Bash prompt, run init-docker-compose.sh.
 
@@ -123,4 +128,5 @@ Based on the default configuration:
 | OpenSearch Dashboard | http://localhost:5602                                                                  |
 | MongoDB              | mongodb://mongo:${MONGODB_PASS}@mongo1:27027,mongo2:27028,mongo3:27029/?replicaSet=rs0 |
 
-You can get the MongoDB password from the generated `Meadowlark-js/.env-docker` file.
+You can get the MongoDB password from the generated `Meadowlark-js/.env-docker`
+file.
