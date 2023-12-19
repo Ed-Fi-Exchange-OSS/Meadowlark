@@ -7,20 +7,20 @@ CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) or with the
 
 ## Deploy with Azure CLI
 
+> [!NOTE]
+> For Azure CLI, it's necessary to specify all environment variables in the
+> command line since it is not possible to read a .env file. Additionally, it is
+> not possible to add all containers into the same container group, it must be one
+> container per group.
+
 ### Prerequisites
 
-- Login to Azure
-
 ```pwsh
+# Login to Azure
 az login
 ```
 
 ### Configure backend
-
-For Azure CLI, it's necessary to specify all environment variables in the
-command line since it is not possible to read a .env file. Additionally, it is
-not possible to add all containers into the same container group, it must be one
-container per group.
 
 ```pwsh
 
