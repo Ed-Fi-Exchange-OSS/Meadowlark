@@ -1,8 +1,8 @@
+import { Response } from 'supertest';
 import { getAccessToken } from '../helpers/Credentials';
 import { baseURLRequest, rootURLRequest } from '../helpers/Shared';
 
 describe('when performing crud operations', () => {
-  let resourceResponse;
   const resource = 'contentClassDescriptors';
   const resourceEndpoint = `/v3.3b/ed-fi/${resource}`;
   const resourceBody = {
@@ -29,73 +29,104 @@ describe('when performing crud operations', () => {
   });
 
   describe('when creating a new resource', () => {
+    let response: Response;
     beforeAll(async () => {
-      await baseURLRequest()
+      response = await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBody)
-        .then((response) => {
-          resourceResponse = response;
-        });
+        .send(resourceBody);
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(response.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
     });
 
     it('returns 201', () => {
-      expect(resourceResponse.statusCode).toBe(201);
+      expect(response.statusCode).toBe(201);
     });
   });
 
   describe('when getting a resource by ID', () => {
     describe('given the resource exists', () => {
-      let getResponse;
-      it('returns 200', async () => {
-        await rootURLRequest()
-          .get(resourceResponse.headers.location)
+      let createResponse: Response;
+      let getResponse: Response;
+
+      beforeAll(async () => {
+        createResponse = await baseURLRequest()
+          .post(resourceEndpoint)
           .auth(await getAccessToken('host'), { type: 'bearer' })
-          .expect(200)
-          .then((response) => {
-            getResponse = response;
-          });
+          .send(resourceBody);
+
+        getResponse = await rootURLRequest()
+          .get(createResponse.headers.location)
+          .auth(await getAccessToken('host'), { type: 'bearer' });
+      });
+
+      afterAll(async () => {
+        await rootURLRequest()
+          .delete(createResponse.headers.location)
+          .auth(await getAccessToken('host'), { type: 'bearer' })
+          .send(resourceBody);
+      });
+
+      it('returns 200', () => {
+        expect(getResponse.statusCode).toEqual(200);
       });
 
       it('returns its body successfully.', () => {
         expect(getResponse.body).toEqual(expect.objectContaining(resourceBody));
       });
-    });
 
-    describe('given the resource does not exist', () => {
-      it('returns 404', async () => {
+      it('returns 404 when the resource does not exist', async () => {
         await rootURLRequest()
-          .get(`${resourceResponse.headers.location.slice(0, -1)}F`)
+          .get(`${createResponse.headers.location.slice(0, -1)}F`)
           .auth(await getAccessToken('host'), { type: 'bearer' })
           .expect(404);
       });
-    });
 
-    it('should match the location', async () => {
-      const id = await rootURLRequest()
-        .get(resourceResponse.headers.location)
-        .auth(await getAccessToken('vendor'), { type: 'bearer' })
-        .then((response) => response.body.id);
+      it('should match the location', async () => {
+        const id = await rootURLRequest()
+          .get(createResponse.headers.location)
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
+          .then((response) => response.body.id);
 
-      await baseURLRequest()
-        .get(`${resourceEndpoint}/${id}`)
-        .auth(await getAccessToken('vendor'), { type: 'bearer' })
-        .expect(200);
+        await baseURLRequest()
+          .get(`${resourceEndpoint}/${id}`)
+          .auth(await getAccessToken('vendor'), { type: 'bearer' })
+          .expect(200);
 
-      expect(resourceResponse.headers.location).toContain(`${resourceEndpoint}/${id}`);
+        expect(createResponse.headers.location).toContain(`${resourceEndpoint}/${id}`);
+      });
     });
   });
 
   describe('when getting all resources', () => {
-    let getAllResponse;
-    it('returns 200', async () => {
-      await baseURLRequest()
-        .get(resourceEndpoint)
+    let createResponse: Response;
+    let getAllResponse: Response;
+
+    beforeAll(async () => {
+      createResponse = await baseURLRequest()
+        .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .expect(200)
-        .then((response) => {
-          getAllResponse = response;
-        });
+        .send(resourceBody);
+
+      getAllResponse = await baseURLRequest()
+        .get(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' });
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(createResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+    });
+
+    it('returns 200', () => {
+      expect(getAllResponse.statusCode).toEqual(200);
     });
 
     it('returns one resource', async () => {
@@ -104,43 +135,82 @@ describe('when performing crud operations', () => {
   });
 
   describe('when upserting a resource', () => {
-    it('returns 200', async () => {
-      await baseURLRequest()
+    let insertResponse: Response;
+    let upsertResponse: Response;
+
+    beforeAll(async () => {
+      insertResponse = await baseURLRequest()
         .post(resourceEndpoint)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBodyUpdated)
-        .expect(200);
+        .send(resourceBody);
+
+      upsertResponse = await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBodyUpdated);
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(insertResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+    });
+
+    it('returns 200', () => {
+      expect(upsertResponse.statusCode).toEqual(200);
     });
 
     it('returns updated resource on get', async () => {
       await rootURLRequest()
-        .get(resourceResponse.headers.location)
+        .get(upsertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
-        .then((response) => {
-          expect(response.body).toEqual(expect.objectContaining(resourceBodyUpdated));
+        .then((updatedResponse) => {
+          expect(updatedResponse.body).toEqual(expect.objectContaining(resourceBodyUpdated));
         });
     });
   });
 
-  describe('when updating a resource with empty body', () => {
-    it('returns 400', async () => {
-      await rootURLRequest()
-        .put(resourceResponse.headers.location)
-        .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send({})
-        .expect(400);
-    });
-  });
-
   describe('when updating a resource', () => {
+    let insertResponse: Response;
+
+    beforeAll(async () => {
+      insertResponse = await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+
+      await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBodyUpdated);
+    });
+
+    afterAll(async () => {
+      await rootURLRequest()
+        .delete(insertResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+    });
+
+    describe('when updating a resource with empty body', () => {
+      it('returns 400', async () => {
+        await rootURLRequest()
+          .put(insertResponse.headers.location)
+          .auth(await getAccessToken('host'), { type: 'bearer' })
+          .send({})
+          .expect(400);
+      });
+    });
+
     it('returns 204', async () => {
       const id = await rootURLRequest()
-        .get(resourceResponse.headers.location)
+        .get(insertResponse.headers.location)
         .auth(await getAccessToken('vendor'), { type: 'bearer' })
         .then((response) => response.body.id);
 
       await rootURLRequest()
-        .put(resourceResponse.headers.location)
+        .put(insertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
           id,
@@ -152,7 +222,7 @@ describe('when performing crud operations', () => {
     it('should fail when resource ID is different in body on put', async () => {
       const id = 'differentId';
       await rootURLRequest()
-        .put(resourceResponse.headers.location)
+        .put(insertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send({
           id,
@@ -170,7 +240,7 @@ describe('when performing crud operations', () => {
 
     it('should fail when resource ID is not included in body on put', async () => {
       await rootURLRequest()
-        .put(resourceResponse.headers.location)
+        .put(insertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send(resourceBody)
         .expect(400)
@@ -191,7 +261,7 @@ describe('when performing crud operations', () => {
 
     it('returns updated resource on get', async () => {
       await rootURLRequest()
-        .get(resourceResponse.headers.location)
+        .get(insertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => {
           expect(response.body).toEqual(expect.objectContaining(resourceBody));
@@ -200,7 +270,7 @@ describe('when performing crud operations', () => {
 
     it('should fail when resource ID is included in body on post', async () => {
       const id = await rootURLRequest()
-        .get(resourceResponse.headers.location)
+        .get(insertResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .then((response) => response.body.id);
       await baseURLRequest()
@@ -227,28 +297,36 @@ describe('when performing crud operations', () => {
     });
   });
 
-  describe('when deleting a resource that does not exist', () => {
-    it('returns 404', async () => {
+  describe('when deleting a resource', () => {
+    let createResponse: Response;
+    let deleteResponse: Response;
+    beforeAll(async () => {
+      createResponse = await baseURLRequest()
+        .post(resourceEndpoint)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+
+      deleteResponse = await rootURLRequest()
+        .delete(createResponse.headers.location)
+        .auth(await getAccessToken('host'), { type: 'bearer' })
+        .send(resourceBody);
+    });
+
+    it('returns 404 when deleting a resource that does not exist', async () => {
       await rootURLRequest()
-        .delete(`${resourceResponse.headers.location.slice(0, -1)}F`)
+        .delete(`${createResponse.headers.location.slice(0, -1)}F`)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .send(resourceBody)
         .expect(404);
     });
-  });
 
-  describe('when deleting a resource', () => {
-    it('returns 204', async () => {
-      await rootURLRequest()
-        .delete(resourceResponse.headers.location)
-        .auth(await getAccessToken('host'), { type: 'bearer' })
-        .send(resourceBody)
-        .expect(204);
+    it('returns 204', () => {
+      expect(deleteResponse.statusCode).toEqual(204);
     });
 
     it('returns 404 on get', async () => {
       await rootURLRequest()
-        .get(resourceResponse.headers.location)
+        .get(createResponse.headers.location)
         .auth(await getAccessToken('host'), { type: 'bearer' })
         .expect(404);
     });
