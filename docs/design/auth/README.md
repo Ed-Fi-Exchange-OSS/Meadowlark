@@ -1,21 +1,35 @@
-# Client Authentication and Authorization for Meadowlark
+# Client Authentication and Authorization for the Ed-Fi Data Management Service
 
-This document introduces a proposed name for the core API application when
-serving up the Ed-Fi Resources API, Descriptors API, and the "version endpoint"
-(name of that API is pending): Meadowlark Data Management Service (DMS).
+> [!Note]
+> This document introduces a _proposed name_ for the core API application when
+> serving up the Ed-Fi Resources API, Descriptors API, and the "version endpoint"
+> (name of that API is pending): Data Management Service (DMS).
 
-The Meadowlark DMS will enforce data privacy and security through use of OAuth
+The DMS will enforce data privacy and security through use of OAuth
 2.0 for authentication and claim management, and it will map OAuth claims  to
 resource-level authorization. This document provides the requirements and design
 for the full lifecycle of authentication and authorization.
 
 ## Core Requirements
 
-1. Clients will authenticate client credentials flow with an [OAuth 2.0
-   provider](https://www.rfc-editor.org/info/rfc6749), generating a [bearer
+1. Clients will authenticate using the client credentials flow with an [OAuth
+   2.0 provider](https://www.rfc-editor.org/info/rfc6749), generating a [bearer
    token](https://www.rfc-editor.org/info/rfc6750).
 2. The OAuth provider will fully own management of client credentials.
-3. A Meadowlark Configuration Service (CS) will be responsible for storing any
+3. Clients will be granted authorization to resources based on one of the
+   following authorization strategies:
+   1. **Full access**: use with caution, for syncing services.
+   2. **Ownership**: can access resources created by the client.
+   3. **Namespace**: can access resources with that are assigned to a given
+      namespace.
+   4. **Relationship**: authorization granted based on education organization
+      and student / parent / staff relationships managed within the data.
+
+> [!WARNING]
+> Continue rewriting to make requirements & architecture distinct.
+
+
+3. An Ed-Fi Configuration Service (CS) will be responsible for storing any
    additional client configuration and Claimset metadata that are not otherwise
    stored in the OAuth provider.
 4. A [yet-to-be-determined
@@ -24,26 +38,61 @@ for the full lifecycle of authentication and authorization.
    1. Assigned [Claimset](#claimsets) as a role name
    2. Education Organization(s) as [entitlements](#entitlements)
    3. Potentially, Grade Level(s) as entitlements.
-5. On first receipt of a given token, the Meadowlark DMS will use an [OAuth
+5. On first receipt of a given token, the DMS will use an [OAuth
    token introspection](https://www.rfc-editor.org/info/rfc7662) request to
-   verify that the token has not been revoked, and potentially to retrieve
-   additional claim information.
-6. The Meadowlark DMS will use the assigned Claimset to retrieve access
+   verify that the token has not been revoked.
+6. The DMS will re-query the OAuth provider periodically to ensure the token has
+   not been revoked (ex: every 15 minutes).
+7. The DMS will use the assigned Claimset to retrieve access
    privileges for API resources from an [Admin API](#admin-api) exposed through
-   the Meadowlark CS.
+   the Configuration Service.
 
-(!) Looking for suggested improvement to the name "Configuration Service". This
-service will house tenant, vendor, and application information, as well as
-connection strings. At this time, it is not expected that running API instances
-retrieve their other runtime settings from this service.
+> [!Note]
+> Looking for suggested improvement to the name "Configuration Service". This
+> service will house tenant, vendor, and application information, as well as
+> connection strings. At this time, it is not expected that running API
+> instances retrieve their other runtime settings from this service, but that
+> could be in its future. Also, this document also may imply additions to the
+> Admin API specification.
 
 ## Options for Token Usage and Claim Management
 
 Three options are presented below: use of a plain string bearer token, and two
 variations on use of a [JSON Web Token](https://www.rfc-editor.org/info/rfc7519)
-(JWT). In all cases, the token will be connected to a Claimset name using the
-`role` claim, and the detailed permission granted by that Claimset will be
-stored in the Meadowlark Configuration Service.
+(JWT). In all cases, the detailed permission granted by that Claimset will be
+stored in the Configuration Service.
+
+### Claimset Caching
+
+In all options, detailed claimset information needs to be retrieved at startup
+from the Configuration Service. Additionally, there needs to be a mechanism
+for updating the cache. Two options for cache updates:
+
+1. Schedule a background task to re-query the Configuration Service.
+2. Create a secured endpoint in the DMS to force cache refresh
+   1. Could register as a webhook in Admin API, so that Admin API can invoke on
+      receipt of a new or updated claimSet definition.
+
+```mermaid
+sequenceDiagram
+  DMS ->> CS: GET /claimSets
+  CS -->> DMS: (claimSets)
+  DMS ->> DMS: cache(claimSets)
+
+  critical Update the cache
+
+  option On timer
+    DMS ->> CS: GET /claimSets
+    CS -->> DMS: (claimSets)
+    DMS ->> DMS: cache(claimSets)
+
+  option Webhook
+    CS ->> DMS: POST /admin/refreshClaimsets
+    DMS ->> CS: GET /claimSets
+    CS -->> DMS: (claimSets)
+    DMS ->> DMS: cache(claimSets)
+  end
+```
 
 ### Option 1: Simple Bearer Token
 
@@ -62,10 +111,10 @@ In this scenario, the access token is a unique identifier that does not encode
 any additional information. The client can store the expiration date, and can
 use the refresh token to request a new access token on expiry of the original.
 
-On initial receipt of the token, the the Meadowlark DMS will issue a token
-introspection request to the OAuth provider. The response must return the basic
-claims (including `role` and the entitlements for Education Organization ID(s)
-and Grade Level(s)). Example introspection response:
+On initial receipt of the token, the DMS will issue a token introspection
+request to the OAuth provider. The response must return the basic claims,
+including `role` and the entitlements for Education Organization ID(s) and Grade
+Level(s). Example introspection response:
 
 ```json
 {
@@ -81,8 +130,35 @@ and Grade Level(s)). Example introspection response:
 }
 ```
 
-(Details about how to handle "entitlements" needs to be worked out with
-additional investigation into how off-the-shelf tools can support this).
+> [!Note]
+> Details about how to handle "entitlements" needs to be worked out with
+> additional investigation into how off-the-shelf tools can support this.
+
+```mermaid
+sequenceDiagram
+    Client ->> OAuth: POST /oauth/token
+    OAuth -->> Client: (token)
+
+    Client ->> DMS: GET /ed-fi/students (token)
+    DMS ->> OAuth: /token/verify (token)
+    OAuth -->> DMS: (claims)
+
+    DMS ->> DMS: inspect(claims)
+
+    break when token is invalid
+        DMS -->> Client: 401
+    end
+
+    DMS ->> DMS: getClaimsetFromCache(claims.role): (claimset)
+    DMS ->> DMS: isAuthorized(claims, claimSet)
+
+    break when not authorized
+        DMS -->> Client: 401
+    end
+
+    DMS ->> DMS: getClientsFor(claims, claimSet)
+    DMS -->> Client: (students)
+```
 
 ### Option 2: JSON Web Token
 
