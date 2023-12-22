@@ -3,6 +3,7 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
+import request from 'supertest';
 import { Role, getAccessToken } from './Credentials';
 import { baseURLRequest, rootURLRequest } from './Shared';
 
@@ -53,4 +54,10 @@ export async function deleteResourceByLocation(location: string, resourceName = 
   } else {
     console.warn(`⚠️ Unable to delete ${resourceName}. Location not found. Verify that resource was created correctly ⚠️`);
   }
+}
+
+export async function getResourceByLocation(location: string): Promise<request.Response> {
+  return rootURLRequest()
+    .get(location)
+    .auth(await getAccessToken('host'), { type: 'bearer' });
 }
