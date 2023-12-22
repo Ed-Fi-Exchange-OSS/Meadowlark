@@ -1,0 +1,39 @@
+###
+
+GET http://localhost:3000/
+
+###
+
+POST http://localhost:3000/ed-fi/contentClassDescriptors/
+authorization: bearer 1234
+
+{
+    "contentIdentifier": "933zsd4350",
+    "namespace": "43210",
+    "shortDescription": "abc+",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "21430"
+}
+
+###
+
+POST http://localhost:3000/ed-fi/schools
+authorization: bearer 1234
+
+{
+    "contentIdentifier": "933zsd4350",
+    "namespace": "43210",
+    "shortDescription": "abc+",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "21430"
+}
+
+###
+
+PUT http://localhost:3000/
+
+###
+
+DELETE http://localhost:3000/
+
+###
