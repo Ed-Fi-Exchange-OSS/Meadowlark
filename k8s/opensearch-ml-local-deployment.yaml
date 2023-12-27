@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Program Files\Kompose\kompose.exe convert -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: opensearch-ml-local
+  name: opensearch-ml-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: opensearch-ml-local
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Kompose\kompose.exe convert -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/meadowlark-js-default: "true"
+        io.kompose.service: opensearch-ml-local
+    spec:
+      containers:
+        - env:
+            - name: DISABLE_INSTALL_DEMO_CONFIG
+              value: "true"
+            - name: DISABLE_SECURITY_PLUGIN
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: cluster.name
+              value: opensearch-cluster-ml-local
+            - name: discovery.type
+              value: single-node
+          image: opensearchproject/opensearch:2.7.0@sha256:55f1f67e7d3645aa838b63a589bce5645154ba275814e52d4638d371ca0f8cb5
+          livenessProbe:
+            exec:
+              command:
+                - curl -s http://localhost:9200/_cat/health >/dev/null || exit 1
+            failureThreshold: 50
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: opensearch-ml-local-node1
+          ports:
+            - containerPort: 9200
+              hostPort: 9201
+              protocol: TCP
+            - containerPort: 9600
+              hostPort: 9601
+              protocol: TCP
+          resources:
+            limits:
+              memory: "2147483648"
+          volumeMounts:
+            - mountPath: /usr/share/opensearch/data
+              name: opensearch-ml-local-data
+      hostname: opensearch
+      restartPolicy: Always
+      volumes:
+        - name: opensearch-ml-local-data
+          persistentVolumeClaim:
+            claimName: opensearch-ml-local-data
+status: {}
