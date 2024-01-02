@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
   labels:
-    io.kompose.service: pgsql-ml-data
+    serviceName: pgsql-ml-data
   name: pgsql-ml-data
 spec:
   accessModes:

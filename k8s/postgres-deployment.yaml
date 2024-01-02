@@ -1,29 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: C:\Program Files\Kompose\kompose.exe convert -f docker-compose.yml
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: postgres
+    serviceName: postgres
   name: postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: postgres
+      serviceName: postgres
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: C:\Program Files\Kompose\kompose.exe convert -f docker-compose.yml
-        kompose.version: 1.31.2 (a92241f79)
-      creationTimestamp: null
       labels:
         io.kompose.network/meadowlark-js-default: "true"
-        io.kompose.service: postgres
+        serviceName: postgres
     spec:
       containers:
         - env:
