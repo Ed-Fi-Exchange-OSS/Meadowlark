@@ -25,11 +25,15 @@ spec:
             - name: ALLOW__EXT_PROPERTY
               value: "true"
             - name: AUTHORIZATION_STORE_PLUGIN
-              value: '@edfi/meadowlark-mongodb-backend'
+              value: '@edfi/meadowlark-postgresql-backend'
+            - name: DOCUMENT_STORE_PLUGIN
+              value: '@edfi/meadowlark-postgresql-backend'
+            - name: LISTENER1_PLUGIN
+              value: '@edfi/meadowlark-opensearch-backend'
+            - name: QUERY_HANDLER_PLUGIN
+              value: '@edfi/meadowlark-opensearch-backend'
             - name: BEGIN_ALLOWED_SCHOOL_YEAR
               value: "2022"
-            - name: DOCUMENT_STORE_PLUGIN
-              value: '@edfi/meadowlark-mongodb-backend'
             - name: END_ALLOWED_SCHOOL_YEAR
               value: "2034"
             - name: FASTIFY_NUM_THREADS
@@ -38,8 +42,6 @@ spec:
               value: "3000"
             - name: FASTIFY_RATE_LIMIT
               value: "false"
-            - name: LISTENER1_PLUGIN
-              value: '@edfi/meadowlark-opensearch-backend'
             - name: LOG_LEVEL
               value: info
             - name: LOG_PRETTY_PRINT
@@ -50,7 +52,6 @@ spec:
               value: meadowlark
             - name: MEADOWLARK_STAGE
               value: local
-            - name: MONGO_URI
             - name: OAUTH_HARD_CODED_CREDENTIALS_ENABLED
               value: "true"
             - name: OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST
@@ -74,8 +75,6 @@ spec:
               value: abcdefgh1!
             - name: POSTGRES_USER
               value: postgres
-            - name: QUERY_HANDLER_PLUGIN
-              value: '@edfi/meadowlark-opensearch-backend'
           image: edfialliance/meadowlark-ed-fi-api
           livenessProbe:
             exec:
