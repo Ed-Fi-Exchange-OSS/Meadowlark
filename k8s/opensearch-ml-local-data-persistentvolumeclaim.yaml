@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
   labels:
-    io.kompose.service: opensearch-ml-local-data
+    serviceName: opensearch-ml-local-data
   name: opensearch-ml-local-data
 spec:
   accessModes:

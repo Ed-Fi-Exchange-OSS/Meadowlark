@@ -1,12 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: C:\Program Files\Kompose\kompose.exe convert -f docker-compose.yml
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: opensearch-ml-local
+    serviceName: opensearch-ml-local
   name: opensearch-ml-local
 spec:
   ports:
@@ -17,6 +13,6 @@ spec:
       port: 9601
       targetPort: 9600
   selector:
-    io.kompose.service: opensearch-ml-local
+    serviceName: opensearch-ml-local
 status:
   loadBalancer: {}
