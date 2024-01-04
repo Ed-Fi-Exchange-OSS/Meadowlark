@@ -82,12 +82,10 @@ describe('when accepting an incoming PUT request for a resource', () => {
         .expect(400)
         .then((response) => {
           expect(response.body).toMatchInlineSnapshot(`
-          {
-            "error": "Bad Request",
-            "message": "Client Error",
-            "statusCode": 400,
-          }
-        `);
+            {
+              "error": "Invalid authorization header",
+            }
+          `);
         });
     });
   });
@@ -97,6 +95,25 @@ describe('when accepting an incoming PUT request for a resource', () => {
       await baseURLRequest()
         .put('/v3.3b/ed-fi/students')
         .set({ 'Transfer-Encoding': 'gzip' })
+        .send({})
+        .expect(400)
+        .then((response) => {
+          expect(response.body).toMatchInlineSnapshot(`
+            {
+              "error": "Bad Request",
+              "message": "Client Error",
+              "statusCode": 400,
+            }
+          `);
+        });
+    });
+  });
+
+  describe('given it has a Transfer-Encoding of chunked', () => {
+    it('should respond with 400', async () => {
+      await baseURLRequest()
+        .put('/v3.3b/ed-fi/students')
+        .set({ 'Transfer-Encoding': 'chunked' })
         .send({})
         .expect(400)
         .then((response) => {
