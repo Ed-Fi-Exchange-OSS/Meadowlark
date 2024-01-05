@@ -14,26 +14,43 @@ spec:
   template:
     metadata:
       labels:
-        io.kompose.network/meadowlark-js-default: "true"
         serviceName: postgres
     spec:
       containers:
-        - env:
-            - name: POSTGRES_PASSWORD
-              value: abcdefgh1!
-            - name: POSTGRES_USER
-              value: postgres
-          image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
-          name: postgres-ml
-          ports:
-            - containerPort: 5432
-              hostPort: 5432
-              protocol: TCP
-          resources: {}
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: pgsql-ml-data
-      hostname: postgres
+      - name: postgres-ml
+        image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
+        ports:
+            - containerPort: 80
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-configmap
+                key: postgres-user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres-password
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-configmap
+                key: postgres-host
+          - name: MEADOWLARK_DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-configmap
+                key: postgres-dbname
+          - name: POSTGRES_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-configmap
+                key: postgres-port
+        resources: {}
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: pgsql-ml-data
       restartPolicy: Always
       volumes:
         - name: pgsql-ml-data

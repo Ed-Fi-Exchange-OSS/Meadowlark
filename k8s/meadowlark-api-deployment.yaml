@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    serviceName: meadowlark-api-ml-local-1
-  name: meadowlark-api-ml-local-1
+    serviceName: meadowlark-api
+  name: meadowlark-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      serviceName: meadowlark-api-ml-local-1
+      serviceName: meadowlark-api
   strategy: {}
   template:
     metadata:
       labels:
         io.kompose.network/meadowlark-js-default: "true"
-        serviceName: meadowlark-api-ml-local-1
+        serviceName: meadowlark-api
     spec:
       containers:
         - env:
@@ -69,12 +69,31 @@ spec:
               value: meadowlark_verify-only_key_1
             - name: OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH
               value: meadowlark_verify-only_secret_1
-            - name: POSTGRES_HOST
-              value: postgres
-            - name: POSTGRES_PASSWORD
-              value: abcdefgh1!
             - name: POSTGRES_USER
-              value: postgres
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: postgres-host
+            - name: MEADOWLARK_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: postgres-dbname
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: postgres-port
           image: edfialliance/meadowlark-ed-fi-api
           livenessProbe:
             exec:
@@ -83,12 +102,12 @@ spec:
             failureThreshold: 50
             periodSeconds: 30
             timeoutSeconds: 10
-          name: meadowlark-api-ml-local-1
+          name: meadowlark-api
           ports:
             - containerPort: 3000
               hostPort: 3000
               protocol: TCP
           resources: {}
-      hostname: meadowlark-api-ml-local-1
+      hostname: meadowlark-api
       restartPolicy: Always
 status: {}
