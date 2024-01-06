@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    serviceName: opensearch-service
+  name: opensearch-ml-local
+spec:
+  ports:
+    - port: 9200
+      targetPort: 9200
+  selector:
+    serviceName: opensearch
+status:
+  loadBalancer: {}

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    serviceName: opensearch
+  name: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      serviceName: opensearch
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        serviceName: opensearch
+    spec:
+      containers:
+      - name: opensearch-node1
+        image: opensearchproject/opensearch:2.7.0@sha256:55f1f67e7d3645aa838b63a589bce5645154ba275814e52d4638d371ca0f8cb5
+        ports:
+          - containerPort: 9200
+        env:
+          - name: DISABLE_INSTALL_DEMO_CONFIG
+            value: "true"
+          - name: DISABLE_SECURITY_PLUGIN
+            value: "true"
+          - name: OPENSEARCH_JAVA_OPTS
+            value: -Xms512m -Xmx512m
+          - name: bootstrap.memory_lock
+            value: "true"
+          - name: cluster.name
+            value: opensearch-cluster-ml-local
+          - name: discovery.type
+            value: single-node
+        livenessProbe:
+          exec:
+            command:
+              - curl -s http://localhost:9200/_cat/health >/dev/null || exit 1
+          failureThreshold: 50
+          periodSeconds: 30
+          timeoutSeconds: 10
+        resources:
+          limits:
+            memory: "2147483648"
+        volumeMounts:
+          - mountPath: /usr/share/opensearch/data
+            name: opensearch-data
+      hostname: opensearch
+      restartPolicy: Always
+      volumes:
+        - name: opensearch-data
+          persistentVolumeClaim:
+            claimName: opensearch-data
+status: {}

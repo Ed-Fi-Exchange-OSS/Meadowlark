@@ -48,8 +48,6 @@ spec:
               value: "false"
             - name: LOG_TO_FILE
               value: "true"
-            - name: MEADOWLARK_DATABASE_NAME
-              value: meadowlark
             - name: MEADOWLARK_STAGE
               value: local
             - name: OAUTH_HARD_CODED_CREDENTIALS_ENABLED
@@ -60,11 +58,20 @@ spec:
               value: http://localhost:3000/local/oauth/verify
             - name: OAUTH_SIGNING_KEY
             - name: OPENSEARCH_ENDPOINT
-              value: http://opensearch:9200
+              valueFrom:
+                configMapKeyRef:
+                  name: opensearch-configmap
+                  key: opensearch-endpoint
             - name: OPENSEARCH_PASSWORD
-              value: admin
+              valueFrom:
+                configMapKeyRef:
+                  name: opensearch-configmap
+                  key: opensearch-password
             - name: OPENSEARCH_USERNAME
-              value: admin
+              valueFrom:
+                configMapKeyRef:
+                  name: opensearch-configmap
+                  key: opensearch-user
             - name: OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH
               value: meadowlark_verify-only_key_1
             - name: OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH
