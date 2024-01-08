@@ -11,7 +11,8 @@ For local development, you need to use
 * After installing, run `minikube start` to setup minikube in your local
   environment.
 * Set the terminal in the */k8s* folder.
-* Run `kubectl apply -f .` to apply all or go file by file (`kubectl apply -f {file-name}`).
+* Run `kubectl apply -f .` to apply all or go file by file (`kubectl apply -f
+  {file-name}`).
 * After done, inspect with `kubectl get pods`, and verify that all pods have
   status **RUNNING** (This can take a couple of minutes).
 
@@ -28,12 +29,33 @@ To test this in the local environment, we need to open *tunnel* between the
 local network and the Kubernetes cluster. To do so, run `minikube service
 meadowlark-api --url`.
 
-Copy the URL and connect to Meadowlark
+Copy the URL and connect to Meadowlark.
 
-> [!CAUTION]
-> Current implementation is not able to connect to OpenSearch, this will be the next step.
+### View Logs
 
-### Kubernetes Architecture
+To get the logs from Meadowlark, verify that the flag `LOG_TO_FILE` is set to
+true. If saving to the default location, get the logs by:
+
+1. Get the pod id `kubectl get pods`.
+2. Run kubectl exec -it $POD_ID -- cat /var/log/meadowlark.log
+
+### Useful commands
+
+| Command                                         | Description                  |
+| ----------------------------------------------- | ---------------------------- |
+| `minikube start`                                | Start minikube cluster       |
+| `minikube delete`                               | Clean minikube cluster       |
+| `kubectl get pods`                              | Get all pods                 |
+| `kubectl get deployments`                       | Get all deployments          |
+| `kubectl get services`                          | Get all services             |
+| `kubectl describe service postgres`             | Get description of a service |
+| `kubectl exec -it POD_NAME -- psql -U postgres` | Execute a command in a pod   |
+
+> [!NOTE]
+> In Kubernetes you can reference another pod by IP address or by hostname,
+> where the host name is the name of the pod.
+
+## Kubernetes Architecture
 
 ```mermaid
 flowchart LR
