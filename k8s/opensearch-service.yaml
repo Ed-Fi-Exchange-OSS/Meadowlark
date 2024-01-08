@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     serviceName: opensearch-service
-  name: opensearch-ml-local
+  name: opensearch-service
 spec:
   ports:
     - port: 9200
