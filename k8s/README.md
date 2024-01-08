@@ -36,7 +36,6 @@ Copy the URL and connect to Meadowlark
 ### Kubernetes Architecture
 
 ```mermaid
-
 flowchart LR
     subgraph Kubernetes Network
         subgraph Configuration
@@ -44,16 +43,14 @@ flowchart LR
             CC[ConfigMap]
         end
         subgraph Pods
-            PP[PostgreSQL]
-            OP[OpenSearch]
             MP[Meadowlark API]
+            OP[OpenSearch]
+            PP[PostgreSQL]
         end
-        subgraph External Services
-            MS[Meadowlark Service]
-        end
-        subgraph Internal Services
+        subgraph Services
             PS[PostgreSQL Service]
             OS[OpenSearch Service]
+            MS[Meadowlark Service]
         end
         subgraph Persistent Volumes
             PV[PostgreSQL Volume]
