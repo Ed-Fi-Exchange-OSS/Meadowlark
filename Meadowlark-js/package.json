@@ -42,9 +42,12 @@
     "packages/meadowlark-utilities",
     "packages/meadowlark-core",
     "packages/meadowlark-authz-server",
-    "backends/*",
-    "services/*",
-    "tests/*"
+    "backends/meadowlark-elasticsearch-backend",
+    "backends/meadowlark-mongodb-backend",
+    "backends/meadowlark-opensearch-backend",
+    "backends/meadowlark-postgresql-backend",
+    "services/meadowlark-fastify",
+    "tests/e2e"
   ],
   "scripts": {
     "build": "lerna run build --stream",
