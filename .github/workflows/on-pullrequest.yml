@@ -55,7 +55,7 @@ jobs:
 
       - name: Update versions
         if: steps.versions.outputs.update-required
-        run: npx lerna@6.6.2 version prerelease --exact --no-git-tag-version --preid pre --yes
+        run: npx lerna version prerelease --exact --no-git-tag-version --preid pre --yes
 
       - name: Set Version
         if: steps.versions.outputs.update-required
