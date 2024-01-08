@@ -25,27 +25,27 @@ spec:
           - name: POSTGRES_USER
             valueFrom:
               configMapKeyRef:
-                name: postgres-configmap
+                name: app-configmap
                 key: postgres-user
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgres-secret
+                name: app-secret
                 key: postgres-password
           - name: POSTGRES_HOST
             valueFrom:
               configMapKeyRef:
-                name: postgres-configmap
+                name: app-configmap
                 key: postgres-host
           - name: MEADOWLARK_DATABASE_NAME
             valueFrom:
               configMapKeyRef:
-                name: postgres-configmap
+                name: app-configmap
                 key: postgres-dbname
           - name: POSTGRES_PORT
             valueFrom:
               configMapKeyRef:
-                name: postgres-configmap
+                name: app-configmap
                 key: postgres-port
         resources: {}
         volumeMounts:

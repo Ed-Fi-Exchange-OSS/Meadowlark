@@ -60,17 +60,17 @@ spec:
             - name: OPENSEARCH_ENDPOINT
               valueFrom:
                 configMapKeyRef:
-                  name: opensearch-configmap
+                  name: app-configmap
                   key: opensearch-endpoint
             - name: OPENSEARCH_PASSWORD
               valueFrom:
                 configMapKeyRef:
-                  name: opensearch-configmap
+                  name: app-configmap
                   key: opensearch-password
             - name: OPENSEARCH_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: opensearch-configmap
+                  name: app-configmap
                   key: opensearch-user
             - name: OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH
               value: meadowlark_verify-only_key_1
@@ -79,27 +79,27 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-configmap
+                  name: app-configmap
                   key: postgres-user
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
+                  name: app-secret
                   key: postgres-password
             - name: POSTGRES_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-configmap
+                  name: app-configmap
                   key: postgres-host
             - name: MEADOWLARK_DATABASE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-configmap
+                  name: app-configmap
                   key: postgres-dbname
             - name: POSTGRES_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-configmap
+                  name: app-configmap
                   key: postgres-port
           image: edfialliance/meadowlark-ed-fi-api
           livenessProbe:

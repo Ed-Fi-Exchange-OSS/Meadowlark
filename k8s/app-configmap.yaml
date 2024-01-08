@@ -1,8 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-    name: opensearch-configmap
+    name: app-configmap
 data:
+    postgres-user: postgres
+    postgres-host: postgres-service
+    postgres-port: "5432"
+    postgres-dbname: postgres
     opensearch-user: admin
     opensearch-password: admin
     opensearch-endpoint: http://opensearch-service:9200
