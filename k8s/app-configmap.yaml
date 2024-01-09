@@ -10,3 +10,5 @@ data:
     opensearch-user: admin
     opensearch-password: admin
     opensearch-endpoint: http://opensearch-service:9200
+    oauth-key: meadowlark_verify-only_key_1
+    oauth-secret: meadowlark_verify-only_secret_1

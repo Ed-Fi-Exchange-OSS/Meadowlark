@@ -37,7 +37,7 @@ To get the logs from Meadowlark, verify that the flag `LOG_TO_FILE` is set to
 true. If saving to the default location, get the logs by:
 
 1. Get the pod id `kubectl get pods`.
-2. Run kubectl exec -it $POD_ID -- cat /var/log/meadowlark.log
+2. Run `kubectl exec -it $POD_ID -- cat /var/log/meadowlark.log`
 
 ### Useful commands
 
