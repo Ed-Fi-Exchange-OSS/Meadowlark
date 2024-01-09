@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: app-configmap
+data:
+    postgres-user: postgres
+    postgres-host: postgres-service
+    postgres-port: "5432"
+    postgres-dbname: postgres
+    opensearch-user: admin
+    opensearch-password: admin
+    opensearch-endpoint: http://opensearch-service:9200
+    oauth-key: meadowlark_verify-only_key_1
+    oauth-secret: meadowlark_verify-only_secret_1

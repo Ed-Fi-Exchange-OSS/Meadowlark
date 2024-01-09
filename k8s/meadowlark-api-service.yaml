@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    serviceName: meadowlark-api
+  name: meadowlark-api
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+  selector:
+    serviceName: meadowlark-api
+status:
+  loadBalancer: {}
