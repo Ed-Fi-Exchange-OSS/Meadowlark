@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    serviceName: postgres
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      serviceName: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        serviceName: postgres
+    spec:
+      containers:
+      - name: postgres-ml
+        image: postgres:14.3-alpine@sha256:84c6ea4333ae18f25ea0fb18bb142156f2a2e545e0a779d93bbf08079e56bdaf
+        ports:
+            - containerPort: 80
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: postgres-user
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: postgres-password
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: postgres-host
+          - name: MEADOWLARK_DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: postgres-dbname
+          - name: POSTGRES_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: postgres-port
+        resources: {}
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: pgsql-ml-data
+      restartPolicy: Always
+      volumes:
+        - name: pgsql-ml-data
+          persistentVolumeClaim:
+            claimName: pgsql-ml-data
+status: {}

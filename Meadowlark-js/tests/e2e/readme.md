@@ -64,14 +64,14 @@ This is a special mode that will setup a group of containers in different ports
 (denoted with the names -test) and will not delete the containers after each
 run.
 
-- To setup, run: `npm run test:e2e:dev:setup`. This will configure the test
+* To setup, run: `npm run test:e2e:dev:setup`. This will configure the test
   containers
-- Set the environment variable `DEVELOPER_MODE=true`
-- Run `npm run test:e2e:jest:tc` to run the tests
-- Save the Admin Key and Secret (as specified in
+* Set the environment variable `DEVELOPER_MODE=true`
+* Run `npm run test:e2e:jest:tc` to run the tests
+* Save the Admin Key and Secret (as specified in
 [.env-e2e.example](./setup/.env-e2e.example)) to be able to run the tests
 without cleaning the environment
-- When done, run: `npm run test:e2e:dev:exit` or execute the
+* When done, run: `npm run test:e2e:dev:exit` or execute the
   `exit-dev-containers.ps1` script to clean the environment.
 
 > [!NOTE]  

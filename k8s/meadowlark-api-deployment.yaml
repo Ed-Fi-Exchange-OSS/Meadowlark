@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    serviceName: meadowlark-api
+  name: meadowlark-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      serviceName: meadowlark-api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/meadowlark-js-default: "true"
+        serviceName: meadowlark-api
+    spec:
+      containers:
+        - name: meadowlark-api
+          image: edfialliance/meadowlark-ed-fi-api
+          ports:
+            - containerPort: 3000
+              hostPort: 3000
+              protocol: TCP
+          env:
+            - name: ALLOW_OVERPOSTING
+              value: "false"
+            - name: ALLOW_TYPE_COERCION
+              value: "true"
+            - name: ALLOW__EXT_PROPERTY
+              value: "true"
+            - name: AUTHORIZATION_STORE_PLUGIN
+              value: "@edfi/meadowlark-postgresql-backend"
+            - name: DOCUMENT_STORE_PLUGIN
+              value: "@edfi/meadowlark-postgresql-backend"
+            - name: LISTENER1_PLUGIN
+              value: "@edfi/meadowlark-opensearch-backend"
+            - name: QUERY_HANDLER_PLUGIN
+              value: "@edfi/meadowlark-opensearch-backend"
+            - name: BEGIN_ALLOWED_SCHOOL_YEAR
+              value: "2022"
+            - name: END_ALLOWED_SCHOOL_YEAR
+              value: "2034"
+            - name: FASTIFY_NUM_THREADS
+              value: "10"
+            - name: FASTIFY_PORT
+              value: "3000"
+            - name: FASTIFY_RATE_LIMIT
+              value: "false"
+            - name: LOG_LEVEL
+              value: info
+            - name: LOG_PRETTY_PRINT
+              value: "false"
+            - name: LOG_TO_FILE
+              value: "true"
+            - name: MEADOWLARK_STAGE
+              value: local
+            - name: OAUTH_HARD_CODED_CREDENTIALS_ENABLED
+              value: "true"
+            - name: OAUTH_SERVER_ENDPOINT_FOR_OWN_TOKEN_REQUEST
+              value: http://localhost:3000/local/oauth/token
+            - name: OAUTH_SERVER_ENDPOINT_FOR_TOKEN_VERIFICATION
+              value: http://localhost:3000/local/oauth/verify
+            - name: OAUTH_SIGNING_KEY
+            - name: OPENSEARCH_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: opensearch-endpoint
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: opensearch-password
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: opensearch-user
+            - name: OWN_OAUTH_CLIENT_ID_FOR_CLIENT_AUTH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: oauth-key
+            - name: OWN_OAUTH_CLIENT_SECRET_FOR_CLIENT_AUTH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: oauth-secret
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: postgres-password
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-host
+            - name: MEADOWLARK_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-dbname
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: postgres-port
+          livenessProbe:
+            exec:
+              command:
+                - curl -s http://localhost:3000/local >/dev/null || exit 1
+            failureThreshold: 50
+            periodSeconds: 30
+            timeoutSeconds: 10
+          resources: {}
+      hostname: meadowlark-api
+      restartPolicy: Always
+status: {}
