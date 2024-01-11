@@ -1,11 +1,6 @@
-###
-
-GET http://localhost:3000/
-
 ### Test POST of descriptor
 
 POST http://localhost:3000/ed-fi/contentClassDescriptors/
-authorization: bearer 1234
 
 {
   "codeValue": "Presentation",
@@ -17,7 +12,6 @@ authorization: bearer 1234
 ### Test POST of an EducationContent
 
 POST http://localhost:3000/ed-fi/educationContents
-authorization: bearer 1234
 
 {
     "contentIdentifier": "933zsd4350",
@@ -28,9 +22,8 @@ authorization: bearer 1234
 }
 
 ### Test POST of an EducationContent with two overposted fields
-
+### Result is NoAdditionalPropertiesAllowed
 POST http://localhost:3000/ed-fi/educationContents
-authorization: bearer 1234
 
 {
     "contentIdentifier": "933zsd4350",
@@ -44,12 +37,109 @@ authorization: bearer 1234
     }
 }
 
-###
+#### Test POST of a Section
+POST http://localhost:3000/ed-fi/sections
 
-PUT http://localhost:3000/
+{
+    "sectionIdentifier": "c00v",
+    "courseOfferingReference": {
+        "localCourseCode": "abc",
+        "schoolId": 666,
+        "sessionName": "d",
+        "schoolYear": 2034
+    },
+    "locationReference": {
+      "classroomIdentificationCode": "1",
+      "schoolId": 2
+    },
+    "availableCreditTypeDescriptor": "k",
+    "classPeriods": [
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66,
+                "classPeriodName": "z1"
+            }
+        },
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66,
+                "classPeriodName": "z2"
+            }
+        }
+    ]
+}
 
-###
+#### Test POST of a Section with overposts in the classPeriods array
+#### Result is ArrayItemNotValid - too ambiguous, see below
+POST http://localhost:3000/ed-fi/sections
 
-DELETE http://localhost:3000/
+{
+    "sectionIdentifier": "c00v",
+    "courseOfferingReference": {
+        "localCourseCode": "abc",
+        "schoolId": 666,
+        "sessionName": "d",
+        "schoolYear": 2034
+    },
+    "locationReference": {
+      "classroomIdentificationCode": "1",
+      "schoolId": 2
+    },
+    "availableCreditTypeDescriptor": "k",
+    "classPeriods": [
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66,
+                "classPeriodName": "z1",
+                "scalarOverpost": "x"
+            }
+        },
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66,
+                "classPeriodName": "z2",
+                "objectOverpost": {
+                    "x": 1
+                }
+            }
+        }
+    ]
+}
 
-###
+#### Test POST of a Section with non-overpost error - missing classPeriodName in the classPeriods array
+#### Result is also ArrayItemNotValid - too ambiguous
+POST http://localhost:3000/ed-fi/sections
+
+{
+    "sectionIdentifier": "c00v",
+    "courseOfferingReference": {
+        "localCourseCode": "abc",
+        "schoolId": 666,
+        "sessionName": "d",
+        "schoolYear": 2034
+    },
+    "locationReference": {
+      "classroomIdentificationCode": "1",
+      "schoolId": 2
+    },
+    "availableCreditTypeDescriptor": "k",
+    "classPeriods": [
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66,
+                "classPeriodName": "z1"
+            }
+        },
+        {
+            "classPeriodReference":
+            {
+                "schoolId": 66
+            }
+        }
+    ]
+}
