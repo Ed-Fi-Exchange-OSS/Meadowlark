@@ -2,30 +2,46 @@
 
 GET http://localhost:3000/
 
-###
+### Test POST of descriptor
 
 POST http://localhost:3000/ed-fi/contentClassDescriptors/
 authorization: bearer 1234
 
 {
-    "contentIdentifier": "933zsd4350",
-    "namespace": "43210",
-    "shortDescription": "abc+",
-    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
-    "learningResourceMetadataURI": "21430"
+  "codeValue": "Presentation",
+  "shortDescription": "Presentation",
+  "description": "Presentation",
+  "namespace": "uri://ed-fi.org/ContentClassDescriptor"
 }
 
-###
+### Test POST of an EducationContent
 
-POST http://localhost:3000/ed-fi/schools
+POST http://localhost:3000/ed-fi/educationContents
 authorization: bearer 1234
 
 {
     "contentIdentifier": "933zsd4350",
     "namespace": "43210",
-    "shortDescription": "abc+",
+    "shortDescription": "abc",
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
     "learningResourceMetadataURI": "21430"
+}
+
+### Test POST of an EducationContent with two overposted fields
+
+POST http://localhost:3000/ed-fi/educationContents
+authorization: bearer 1234
+
+{
+    "contentIdentifier": "933zsd4350",
+    "namespace": "43210",
+    "shortDescription": "abc",
+    "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
+    "learningResourceMetadataURI": "21430",
+    "scalarOverpost": "x",
+    "objectOverpost": {
+      "x": 1
+    }
 }
 
 ###

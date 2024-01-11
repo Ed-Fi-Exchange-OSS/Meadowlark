@@ -3,6 +3,7 @@ using Meadowlark.Net.Core.Utility;
 using static Meadowlark.Net.Core.Middleware.ApiSchemaLoadingMiddleware;
 using static Meadowlark.Net.Core.Middleware.ParsePathMiddleware;
 using static Meadowlark.Net.Core.Middleware.ValidateEndpointMiddleware;
+using static Meadowlark.Net.Core.Middleware.ValidateDocumentMiddleware;
 
 namespace Meadowlark.Net.Core;
 
@@ -12,7 +13,7 @@ public static class FrontendFacade
   /**
    * Entry point for API upsert actions
    */
-  public static FrontendResponse UpsertCore(FrontendRequest frontendRequest)
+  public static async Task<FrontendResponse> UpsertCore(FrontendRequest frontendRequest)
   {
     try
     {
@@ -20,10 +21,11 @@ public static class FrontendFacade
         ApiSchema: No.ApiSchema, ResourceSchema: No.ResourceSchema);
       MiddlewareModel middlewareModel = new(RequestModel: requestModel, FrontendResponse: null);
 
-      var (finalRequestModel, frontendResponse) = middlewareModel
+      var (finalRequestModel, frontendResponse) = await middlewareModel
         .SendTo(LoadApiSchema)
         .AndThen(ParsePath)
-        .AndThen(EndpointValidation);
+        .AndThen(EndpointValidation)
+        .AndThen(DocumentValidation);
 
       return frontendResponse ?? new(StatusCode: 200, Body: $"Success: {finalRequestModel.ResourceInfo.ToString()}");
       // return frontendResponse ?? new(StatusCode: 500, Body: "FrontendResponse was null");

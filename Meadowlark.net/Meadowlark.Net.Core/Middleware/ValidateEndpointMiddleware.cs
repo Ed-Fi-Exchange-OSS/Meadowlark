@@ -6,7 +6,7 @@ namespace Meadowlark.Net.Core.Middleware;
 public static class ValidateEndpointMiddleware
 {
   /**
-   * Validates resource
+   * Validates resource endpoint exists
    */
   public static MiddlewareModel EndpointValidation(MiddlewareModel middlewareModel)
   {

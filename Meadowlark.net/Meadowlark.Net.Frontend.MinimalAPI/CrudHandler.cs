@@ -35,7 +35,7 @@ namespace Meadowlark.Net.Frontend.MinimalAPI
 
       FrontendRequest frontendRequest = new(Action: "POST", Body: body, Path: request.Path, TraceId: System.Guid.NewGuid().ToString());
 
-      var frontendResponse = UpsertCore(frontendRequest);
+      var frontendResponse = await UpsertCore(frontendRequest);
 
       return Results.Content(statusCode: frontendResponse.StatusCode, content: frontendResponse.Body);
     }
