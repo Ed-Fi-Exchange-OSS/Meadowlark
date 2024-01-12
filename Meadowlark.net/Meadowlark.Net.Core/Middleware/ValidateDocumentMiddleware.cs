@@ -18,7 +18,7 @@ public static class ValidateDocumentMiddleware
     // if the body is null, this middleware shouldn't be involved
     if (requestModel.FrontendRequest.Body == null) throw new Exception("requestModel.FrontendRequest.Body is null");
 
-    string[] errors = await ValidateDocument(requestModel.ResourceSchema, requestModel.FrontendRequest.Body);
+    string[] errors = ValidateDocument(requestModel.ResourceSchema, requestModel.FrontendRequest.Body);
 
     if (errors.Length > 0)
     {

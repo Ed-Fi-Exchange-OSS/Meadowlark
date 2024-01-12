@@ -72,7 +72,6 @@ POST http://localhost:3000/ed-fi/sections
 }
 
 #### Test POST of a Section with overposts in the classPeriods array
-#### Result is ArrayItemNotValid - too ambiguous, see below
 POST http://localhost:3000/ed-fi/sections
 
 {
@@ -111,7 +110,6 @@ POST http://localhost:3000/ed-fi/sections
 }
 
 #### Test POST of a Section with non-overpost error - missing classPeriodName in the classPeriods array
-#### Result is also ArrayItemNotValid - too ambiguous
 POST http://localhost:3000/ed-fi/sections
 
 {
