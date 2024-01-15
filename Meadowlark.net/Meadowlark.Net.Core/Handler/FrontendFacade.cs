@@ -28,7 +28,6 @@ public static class FrontendFacade
         .AndThen(DocumentValidation);
 
       return frontendResponse ?? new(StatusCode: 200, Body: $"Success: {finalRequestModel.ResourceInfo.ToString()}");
-      // return frontendResponse ?? new(StatusCode: 500, Body: "FrontendResponse was null");
     }
     catch (Exception)
     {

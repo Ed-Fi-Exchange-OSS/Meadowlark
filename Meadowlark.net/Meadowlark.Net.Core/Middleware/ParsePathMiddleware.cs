@@ -22,10 +22,7 @@ public static class ParsePathMiddleware
 
     Match? match = pathExpression.Match(path);
 
-    if (match == null)
-    {
-      return null;
-    }
+    if (match == null) return null;
 
     string? documentUuidValue = match.Groups["documentUuid"].Value;
     if (documentUuidValue == "") documentUuidValue = null;
