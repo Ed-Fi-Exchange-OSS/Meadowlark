@@ -9,6 +9,12 @@ POST http://localhost:3000/ed-fi/contentClassDescriptors/
   "namespace": "uri://ed-fi.org/ContentClassDescriptor"
 }
 
+### Test GET of descriptor
+
+GET http://localhost:3000/ed-fi/contentClassDescriptors/805e77ca-d917-4706-a0d4-8c36f2281d8b
+
+
+
 ### Test POST of an EducationContent
 
 POST http://localhost:3000/ed-fi/educationContents
@@ -20,6 +26,11 @@ POST http://localhost:3000/ed-fi/educationContents
     "contentClassDescriptor": "uri://ed-fi.org/ContentClassDescriptor#Presentation",
     "learningResourceMetadataURI": "21430"
 }
+
+### Test GET of an EducationContent
+
+GET http://localhost:3000/ed-fi/educationContents/2ddb19fb-9563-44d6-bced-b8218665258b
+
 
 ### Test POST of an EducationContent with two overposted fields
 ### Result is NoAdditionalPropertiesAllowed
