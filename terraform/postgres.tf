@@ -34,7 +34,7 @@ resource "kubernetes_service" "postgres" {
             app = kubernetes_deployment.postgres.spec.0.template.0.metadata.0.labels.app
         }
         port {
-            port = 5432
+            port = var.pg-port
         }
     }
 }
