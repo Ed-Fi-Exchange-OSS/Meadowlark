@@ -45,6 +45,11 @@ performance, Pipeclean Tests and Volume Tests.
 > to have the changes required for Meadowlark. Vinaya and/or StephenF can verify when to remove
 > this temporary note and use the `main` branch again.
 
+> [!NOTE]
+> Suite-3-Performance-Tests runs against the Northridge dataset, we have a Southridge dataset script
+> that uses a subset of the Northridge dataset. After running the performance tests, if there are
+> any errors regarding missing data, insert the data into Meadowlark and run again.
+
 - Follow steps to [setup performance suite](./SETUP-PERFORMANCE-SUITE.md).
 - Go to /src/edfi_performance_test folder and run `poetry install`.
 - Create a user in meadowlark with the role of `vendor`. Save key and secret.
