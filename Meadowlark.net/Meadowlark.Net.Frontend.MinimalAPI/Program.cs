@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 app.MapPost("/{**catchAll}", Upsert);
-app.MapGet("/", Get);
+app.MapGet("/{**catchAll}", GetById);
 app.MapPut("/", Update);
 app.MapDelete("/", DeleteIt);
 

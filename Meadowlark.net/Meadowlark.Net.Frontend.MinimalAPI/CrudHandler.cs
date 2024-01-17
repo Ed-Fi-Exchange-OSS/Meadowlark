@@ -29,11 +29,9 @@ namespace Meadowlark.Net.Frontend.MinimalAPI
      */
     public static async Task<IResult> Upsert(HttpRequest request)
     {
-      // respondWith(await meadowlarkUpsert(fromRequest(request)), reply);
-
       JObject? body = await ExtractJsonBodyFrom(request);
 
-      FrontendRequest frontendRequest = new(Action: "POST", Body: body, Path: request.Path, TraceId: System.Guid.NewGuid().ToString());
+      FrontendRequest frontendRequest = new(Action: "POST", Body: body, Path: request.Path, TraceId: Guid.NewGuid().ToString());
 
       var frontendResponse = await UpsertCore(frontendRequest);
 
@@ -43,11 +41,13 @@ namespace Meadowlark.Net.Frontend.MinimalAPI
     /**
      * Entry point for all API GET requests
      */
-    public static IResult Get(HttpRequest request)
+    public static async Task<IResult> GetById(HttpRequest request)
     {
-      // respondWith(await meadowlarkGet(fromRequest(request)), reply);
+      FrontendRequest frontendRequest = new(Action: "GET", Body: null, Path: request.Path, TraceId: Guid.NewGuid().ToString());
 
-      return Results.Ok(new { Message = "Get" });
+      var frontendResponse = await GetByIdCore(frontendRequest);
+
+      return Results.Content(statusCode: frontendResponse.StatusCode, content: frontendResponse.Body);
     }
 
     /**
