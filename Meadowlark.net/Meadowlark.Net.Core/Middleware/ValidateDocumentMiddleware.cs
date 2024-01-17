@@ -8,7 +8,7 @@ public static class ValidateDocumentMiddleware
   /**
    * Validates JSON document shape
    */
-  public static async Task<MiddlewareModel> DocumentValidation(MiddlewareModel middlewareModel)
+  public static MiddlewareModel DocumentValidation(MiddlewareModel middlewareModel)
   {
     var (requestModel, frontendResponse) = middlewareModel;
 
