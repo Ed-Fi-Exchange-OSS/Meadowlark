@@ -35,9 +35,9 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@edfi/metaed-core": "4.3.1-dev.3",
-    "@edfi/metaed-plugin-edfi-api-schema": "4.3.1-dev.3",
-    "@edfi/metaed-plugin-edfi-unified": "4.3.1-dev.3",
+    "@edfi/metaed-core": "4.3.1-dev.4",
+    "@edfi/metaed-plugin-edfi-api-schema": "4.3.1-dev.4",
+    "@edfi/metaed-plugin-edfi-unified": "4.3.1-dev.4",
     "@types/fs-extra": "^11.0.4",
     "@types/inflection": "^1.13.2",
     "@types/js-yaml": "^4.0.9",
