@@ -23,6 +23,21 @@ resource "kubernetes_deployment" "opensearch" {
           port {
             container_port = 9200
           }
+
+          env {
+            name  = "OPENSEARCH_ENDPOINT"
+            value = var.opensearch-endpoint
+          }
+
+          env {
+            name  = "OPENSEARCH_USERNAME"
+            value = var.opensearch-user
+          }
+
+          env {
+            name  = "OPENSEARCH_PASSWORD"
+            value = var.opensearch-password
+          }
         }
       }
     }

@@ -20,3 +20,5 @@ For local development, you need to use
 * Run `terraform plan` to create an execution plan, the result should show a message similar to:
 **Plan: 8 to add, 0 to change, 0 to destroy.**
 * Run `terraform apply -auto-approve` to run the execution plan without prompt for confirmation.
+
+* When done, finish by running `terraform destroy` and confirming the changes.

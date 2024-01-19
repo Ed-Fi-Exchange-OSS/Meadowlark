@@ -23,6 +23,31 @@ resource "kubernetes_deployment" "postgres" {
           port {
             container_port = 80
           }
+
+          env {
+            name  = "POSTGRES_USER"
+            value = var.postgres-user
+          }
+
+          env {
+            name  = "POSTGRES_PASSWORD"
+            value = var.postgres-password
+          }
+
+          env {
+            name  = "POSTGRES_HOST"
+            value = var.postgres-host
+          }
+
+          env {
+            name  = "MEADOWLARK_DATABASE_NAME"
+            value = var.postgres-dbname
+          }
+
+          env {
+            name  = "POSTGRES_PORT"
+            value = var.postgres-port
+          }
         }
       }
     }
@@ -39,7 +64,7 @@ resource "kubernetes_service" "postgres" {
       app = kubernetes_deployment.postgres.spec.0.template.0.metadata.0.labels.app
     }
     port {
-      port = var.pg-port
+      port = var.postgres-port
     }
   }
 }

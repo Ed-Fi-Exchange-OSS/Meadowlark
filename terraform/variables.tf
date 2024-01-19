@@ -1,27 +1,28 @@
-variable "pg-user" {
+variable "postgres-user" {
   description = "PostgreSQL user"
   type = string
   default = "postgres"
 }
 
-variable "pg-pass" {
+variable "postgres-password" {
   description = "PostgreSQL Password"
   type = string
+  default = "abcdefgh1!"
 }
 
-variable "pg-host" {
+variable "postgres-host" {
   description = "PostgreSQL user"
   type = string
   default = "postgres-service"
 }
 
-variable "pg-port" {
+variable "postgres-port" {
   description = "PostgreSQL Port"
   type = number
   default = 5432
 }
 
-variable "pg-dbname" {
+variable "postgres-dbname" {
   description = "PostgreSQL Database Name"
   type = string
   default = "postgres"
@@ -104,10 +105,4 @@ variable "query-handler-plugin" {
 variable "signing-key" {
   description = "OAuth Signing Key"
   type = string
-}
-
-variable "dbname" {
-  description = "Database Name"
-  type = string
-  default = "postgres"
 }
