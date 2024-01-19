@@ -26,6 +26,7 @@ import { logTheResponse } from '../middleware/ResponseLoggingMiddleware';
 import { equalityConstraintValidation } from '../middleware/ValidateEqualityConstraintMiddleware';
 import { timestampRequest } from '../middleware/TimestampRequestMiddleware';
 import { loadApiSchema } from '../middleware/ApiSchemaLoadingMiddleware';
+import { loadDescriptorsFromFile } from './DescriptorLoader';
 
 type MiddlewareStack = (model: MiddlewareModel) => Promise<MiddlewareModel>;
 
@@ -269,5 +270,27 @@ export async function closeConnection(): Promise<void> {
     await Connection.closeConnection();
   } catch (e) {
     writeErrorToLog(moduleName, '', 'closeConnection', 500, e);
+  }
+}
+
+/**
+ * Entry point for loading descriptors
+ */
+export async function loadDescriptors(frontendRequest: FrontendRequest): Promise<FrontendResponse> {
+  try {
+    await initialize();
+
+    const authorizeResponse: FrontendResponse | null = (await authorize({ frontendRequest, frontendResponse: null }))
+      .frontendResponse;
+
+    // if there is a response posted by authorize, there was an auth failure so we are done
+    if (authorizeResponse != null) return authorizeResponse;
+
+    await loadDescriptorsFromFile();
+
+    return { statusCode: 202 };
+  } catch (e) {
+    writeErrorToLog(moduleName, frontendRequest.traceId, 'loadDescriptors', 500, e);
+    return { statusCode: 500 };
   }
 }

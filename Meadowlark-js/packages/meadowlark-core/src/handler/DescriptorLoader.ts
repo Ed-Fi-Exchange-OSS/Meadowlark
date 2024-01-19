@@ -169,7 +169,7 @@ async function loadParsedDescriptors(descriptorData: XmlDescriptorData): Promise
   Logger.info(`${loadCount} descriptors loaded`, '-');
 }
 
-export async function loadDescriptors(): Promise<void> {
+export async function loadDescriptorsFromFile(): Promise<void> {
   Logger.info('Loading descriptors', 'n/a');
   await loadDocumentStore();
   const data: XmlDescriptorData = await readDescriptors(descriptorPath);

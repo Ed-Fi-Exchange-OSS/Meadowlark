@@ -50,8 +50,7 @@ export type { DocumentObjectKey } from './model/api-schema/DocumentObjectKey';
 export type { SemVer } from './model/api-schema/SemVer';
 
 // Handlers
-export { upsert, deleteIt, get, update, closeConnection } from './handler/FrontendFacade';
-export { loadDescriptors } from './handler/DescriptorLoader';
+export { upsert, deleteIt, get, update, loadDescriptors, closeConnection } from './handler/FrontendFacade';
 export {
   apiVersion,
   openApiUrlList,
