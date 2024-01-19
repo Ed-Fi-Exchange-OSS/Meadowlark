@@ -6,16 +6,16 @@
 /* istanbul ignore file */
 import { loadDescriptors as meadowlarkLoadDescriptors } from '@edfi/meadowlark-core';
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { respondWith, fromRequest } from './MeadowlarkConverter';
 
 /**
  * A trigger to call the loadDescriptors function via a Fastify endpoint.
  * Only available when the stage is explicitly set to "local".
  */
-export async function loadDescriptors(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export async function loadDescriptors(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   if (process.env.MEADOWLARK_STAGE !== 'local') {
     await reply.code(404).send('');
     return;
   }
-  await meadowlarkLoadDescriptors();
-  await reply.code(202).send('');
+  respondWith(await meadowlarkLoadDescriptors(fromRequest(request)), reply);
 }
