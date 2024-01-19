@@ -45,7 +45,8 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-abcdefgh1!}
-      LOG_TO_FILE: true
+      LOG_TO_FILE: ${LOG_TO_FILE:-true}
+      LOG_FILE_LOCATION: ${LOG_FILE_LOCATION:-/var/log/}
     restart: unless-stopped
     healthcheck: &ML_HEALTH
       test: curl -s http://localhost:3000/local >/dev/null || exit 1

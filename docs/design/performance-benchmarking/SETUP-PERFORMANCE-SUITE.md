@@ -19,9 +19,10 @@ Types of testing that can run with these tools:
 Steps to run against meadowlark:
 
 - Configure Meadowlark and verify that it's running.
-- Load Sample data with the Invoke-LoadGrandBend or Invoke-LoadPartialGrandBend
-  scripts (otherwise, the tests will fail without some expected descriptors and
-  education organization Ids).
+- Load Sample data with the Invoke-LoadSouthridge, which is a smaller set of the
+  Northridge data set that is required by the Suite-3-Performance-Testing (This
+  can be done with the Invoke-LoadGrandBend or Invoke-LoadPartialGrandBend
+  scripts, although some data might be missing).
 - Verify that the data has been loaded correctly through the API or from the
   database.
 - Clone the
