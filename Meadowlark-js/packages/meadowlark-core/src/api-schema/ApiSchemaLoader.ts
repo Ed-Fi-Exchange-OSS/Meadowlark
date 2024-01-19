@@ -12,7 +12,8 @@ import { ProjectNamespace } from '../model/api-schema/ProjectNamespace';
 
 const moduleName = 'ApiSchemaFinder';
 
-const dataStandard50pre1Path: string = path.resolve(__dirname, '../ds-schemas/DataStandard-5.0.0-pre.1.json');
+const dataStandard33bPath: string = path.resolve(__dirname, '../ds-schemas/DataStandard-3.3.1-b.json');
+// const dataStandard50Path: string = path.resolve(__dirname, '../ds-schemas/DataStandard-5.0.0.json');
 
 export const projectNamespaceEdfi: ProjectNamespace = 'ed-fi' as ProjectNamespace;
 
@@ -38,7 +39,7 @@ export async function findApiSchema(traceId: TraceId): Promise<ApiSchema> {
   if (apiSchemaCache != null) return apiSchemaCache;
 
   try {
-    return await loadApiSchemaFromFile(dataStandard50pre1Path, traceId);
+    return await loadApiSchemaFromFile(dataStandard33bPath, traceId);
   } catch (e) {
     writeErrorToLog(moduleName, traceId, 'getApiSchema', e);
   }

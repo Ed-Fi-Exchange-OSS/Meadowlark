@@ -1,7 +1,7 @@
 {
   "name": "@edfi/meadowlark-core",
   "main": "dist/index.js",
-  "version": "0.4.1-pre.6",
+  "version": "0.4.1-pre.7",
   "description": "Meadowlark core functionality",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
-    "@edfi/meadowlark-utilities": "0.4.1-pre.6",
+    "@edfi/meadowlark-utilities": "0.4.1-pre.7",
     "@isaacs/ttlcache": "^1.4.1",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
@@ -35,9 +35,9 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@edfi/metaed-core": "^4.3.0",
-    "@edfi/metaed-plugin-edfi-api-schema": "^4.3.0",
-    "@edfi/metaed-plugin-edfi-unified": "^4.3.0",
+    "@edfi/metaed-core": "4.3.1-dev.4",
+    "@edfi/metaed-plugin-edfi-api-schema": "4.3.1-dev.4",
+    "@edfi/metaed-plugin-edfi-unified": "4.3.1-dev.4",
     "@types/fs-extra": "^11.0.4",
     "@types/inflection": "^1.13.2",
     "@types/js-yaml": "^4.0.9",
