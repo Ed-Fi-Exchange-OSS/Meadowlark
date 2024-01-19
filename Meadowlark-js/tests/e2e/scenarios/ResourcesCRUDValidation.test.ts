@@ -73,9 +73,8 @@ describe('when performing crud operations', () => {
         expect(getResponse.body).toEqual(expect.objectContaining(resourceBody));
       });
 
-      it('returns 404 when getting a different resource', async () => {
-        const randomUuid: string = '274fa5ec-fb0b-4759-b0dc-f2858703f1a3';
-        const response = await getResourceByLocation(randomUuid);
+      it('returns 404 when the resource does not exist', async () => {
+        const response = await getResourceByLocation(`${createdResourceLocation.slice(0, -1)}F`);
         expect(response.statusCode).toEqual(404);
       });
 
