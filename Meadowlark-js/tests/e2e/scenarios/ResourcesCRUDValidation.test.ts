@@ -50,14 +50,6 @@ describe('when performing crud operations', () => {
     });
   });
 
-  describe('when getting a resource by ID that does not exist', () => {
-    it('returns 404', async () => {
-      const randomUuid: string = '274fa5ec-fb0b-4759-b0dc-f2858703f1a3';
-      const response = await getResourceByLocation(randomUuid);
-      expect(response.statusCode).toEqual(404);
-    });
-  });
-
   describe('when getting a resource by ID', () => {
     describe('given the resource exists', () => {
       let createdResourceLocation: string;
@@ -79,6 +71,12 @@ describe('when performing crud operations', () => {
 
       it('returns its body successfully.', () => {
         expect(getResponse.body).toEqual(expect.objectContaining(resourceBody));
+      });
+
+      it('returns 404 when getting a different resource', async () => {
+        const randomUuid: string = '274fa5ec-fb0b-4759-b0dc-f2858703f1a3';
+        const response = await getResourceByLocation(randomUuid);
+        expect(response.statusCode).toEqual(404);
       });
 
       it('should match the location', async () => {
