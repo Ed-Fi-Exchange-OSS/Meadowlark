@@ -26,8 +26,8 @@ This container has the type LoadBalancer, meaning that this is the entry point
 for the load balancer provider.
 
 To test this in the local environment, we need to open *tunnel* between the
-local network and the Kubernetes cluster. To do so, run `minikube service
-meadowlark-api --url`.
+local network and the Kubernetes cluster. To do so, run
+`minikube service meadowlark-api --url`.
 
 Copy the URL and connect to Meadowlark.
 
