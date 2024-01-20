@@ -22,6 +22,13 @@ message similar to: **Plan: 8 to add, 0 to change, 0 to destroy.**
 * Run `terraform apply -auto-approve` to run the execution plan without prompt
   for confirmation.
 
+> [!CAUTION]
+> After executing the *apply* command, the execution does not end.
+> This is an error with the current version but does not affect the
+> creation of the cluster.
+> Once all pods are in status **Running**, the execution of the apply
+> can be terminated and the steps can be continued.
+
 To test this in the local environment, we need to open *tunnel* between the
 local network and the Kubernetes cluster. To do so, run `minikube service
 meadowlark-api --url --namespace meadowlark`.
