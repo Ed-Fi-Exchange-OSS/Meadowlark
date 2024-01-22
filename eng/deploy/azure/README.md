@@ -131,7 +131,7 @@ $signingKey=$(az keyvault secret show --name "SigningKey" --vault-name "meadowla
 ### Enable Logging
 
 To save the logs to a file, for a summarized result, set the flag
-`SAVE_LOG_TO_FILE` to true, which will create a `meadowlark.log` file with the
+`LOG_TO_FILE` to true, which will create a `meadowlark.log` file with the
 logs.
 
 For a production deployment, it's recommended to send the logs to [Log
