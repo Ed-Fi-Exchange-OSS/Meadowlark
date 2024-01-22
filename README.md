@@ -1,5 +1,9 @@
 # Ed-Fi-Meadowlark
 
+> [!WARNING]
+> The Meadowlark project has been suspended. See [SUSPENDED.md](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/SUSPENDED.md)
+> for more information.
+
 <img alt="Meadowlark photo (c) Joel Chamberlain"
  src="https://raw.githubusercontent.com/Ed-Fi-Exchange-OSS/Meadowlark/main/images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png"
  align="right" width="300">
