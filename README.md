@@ -1,5 +1,7 @@
 # Ed-Fi-Meadowlark
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ed-Fi-Exchange-OSS/Meadowlark/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ed-Fi-Exchange-OSS/Meadowlark)
+
 > [!WARNING]
 > The Meadowlark project has been suspended. See [SUSPENDED.md](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/SUSPENDED.md)
 > for more information.
