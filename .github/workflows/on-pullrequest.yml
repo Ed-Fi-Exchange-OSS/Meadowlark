@@ -13,6 +13,8 @@ on:
       - ".github/**"
   workflow_dispatch:
 
+permissions: read-all
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -82,8 +84,6 @@ jobs:
     needs: upgrade
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: read
       security-events: write
 
     steps:
@@ -101,8 +101,6 @@ jobs:
     env:
       SRC_DIR: Meadowlark-js
     permissions:
-      actions: read
-      contents: read
       security-events: write
 
     steps:
