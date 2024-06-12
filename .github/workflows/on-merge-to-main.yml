@@ -9,6 +9,8 @@ on:
     branches:
       - main
 
+permissions: read-all
+
 env:
   API_URL: https://api.github.com/repos/${{ github.repository }}
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}

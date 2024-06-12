@@ -9,6 +9,8 @@ on:
     types:
       - prereleased
 
+permissions: read-all
+
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.PAT_ATTACH_TO_RELEASE }}
@@ -143,7 +145,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: azure-publish
     permissions:
-      actions: read
       contents: write
     outputs:
       sbom-hash-code: ${{ steps.sbom-hash-code.outputs.sbom-hash-code }}
@@ -191,7 +192,6 @@ jobs:
     needs:
       - sbom-create
     permissions:
-      actions: read
       contents: write
     steps:
       - name: Download the SBOM
@@ -228,7 +228,6 @@ jobs:
     name: Create Provenance
     needs: azure-publish
     permissions:
-      actions: read
       id-token: write
       contents: write
     uses: Ed-Fi-Alliance-OSS/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.5.0
