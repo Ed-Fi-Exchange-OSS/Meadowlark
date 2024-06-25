@@ -10,6 +10,8 @@ on:
     types:
       - released
 
+permissions: read-all
+
 env:
   ARTIFACTS_API_KEY: ${{ secrets.AZURE_ARTIFACTS_PERSONAL_ACCESS_TOKEN }}
   ARTIFACTS_USERNAME: ${{ vars.AZURE_ARTIFACTS_USER_NAME }}
