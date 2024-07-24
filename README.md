@@ -3,8 +3,9 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ed-Fi-Exchange-OSS/Meadowlark/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ed-Fi-Exchange-OSS/Meadowlark)
 
 > [!WARNING]
-> The Meadowlark project has been suspended. See [SUSPENDED.md](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/SUSPENDED.md)
-> for more information.
+> The Meadowlark project has been suspended and replaced with [Project Tanager](https://github.com/Ed-Fi-Alliance-OSS/Project-Tanager).
+> See [SUSPENDED.md](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/blob/main/SUSPENDED.md)
+> for more information on the status of Project Meadowlark.
 
 <img alt="Meadowlark photo (c) Joel Chamberlain"
  src="https://raw.githubusercontent.com/Ed-Fi-Exchange-OSS/Meadowlark/main/images/cropped-meadowlark-cc-by-nc-4.0-naturenerd_joel.png"
