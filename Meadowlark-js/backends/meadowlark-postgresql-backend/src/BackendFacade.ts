@@ -44,11 +44,11 @@ import { getSharedClient, closeSharedConnection } from './repository/Db';
 import * as SecurityMiddleware from './security/SecurityMiddleware';
 
 export async function deleteDocumentById(request: DeleteRequest): Promise<DeleteResult> {
-  const poolClient: PoolClient = await getSharedClient();
+  const poolClient1: PoolClient = await getSharedClient();
   try {
-    return Delete.deleteDocumentByDocumentUuid(request, poolClient);
+    return Delete.deleteDocumentByDocumentUuid(request, poolClient1);
   } finally {
-    poolClient.release();
+    poolClient1.release();
   }
 }
 
