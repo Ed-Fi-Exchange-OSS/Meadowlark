@@ -26,7 +26,7 @@
     "fast-memoize": "^2.5.2",
     "fs-extra": "^11.1.1",
     "inquirer": "^9.2.12",
-    "jsonpath-plus": "^7.2.0",
+    "jsonpath-plus": "^10.2.0",
     "njwt": "^2.0.0",
     "ramda": "0.29.1",
     "secure-random": "^1.1.2",
