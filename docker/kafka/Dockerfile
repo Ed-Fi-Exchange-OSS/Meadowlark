@@ -8,7 +8,7 @@ COPY --chown=gradle:gradle /ed-fi-kafka-connect-transforms /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle installDist --no-daemon
 
-FROM debezium/connect:2.3@sha256:dfa59c008a03f45c7b286d2874f2e6dbe04f3db6f26b6f01806c136abb07381a
+FROM debezium/connect:2.7.0-Final@sha256:a69c0bf30a269a0c53a98d9caf61a45f74a7bab18ebac6081a53af64ceba78b4
 LABEL maintainer="Ed-Fi Alliance, LLC and Contributors <techsupport@ed-fi.org>"
 
 ARG package=opensearch-connector-for-apache-kafka-3.1.0.tar

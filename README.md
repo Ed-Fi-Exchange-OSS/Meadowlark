@@ -14,14 +14,12 @@
 Project Meadowlark is a research and development effort to explore potential for use of new technologies, including managed
 cloud services, for starting up a "cloud native" Ed-Fi compatible API.
 
-
-- [Milestone 0.3.0](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/releases/tag/v0.3.0) has been released with Docker and
+* [Milestone 0.3.0](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/releases/tag/v0.3.0) has been released with Docker and
 real OAuth2 support.
-
-- [Milestone 0.4.0](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/releases/tag/v0.4.0) includes full PostgreSQL support,
+* [Milestone 0.4.0](https://github.com/Ed-Fi-Exchange-OSS/Meadowlark/releases/tag/v0.4.0) includes full PostgreSQL support,
 load balancer support with NGINX, instructions to use Kafka and performance evaluation.
 
-See [Project Meadowlark - Exploring Next Generation Technologies](https://techdocs.ed-fi.org/x/RwJqBw) in Tech Docs for more
+👀 See [Vision](./docs/VISION.md) in Tech Docs for more
 information on the background and design decisions for this project.
 
 ## Getting Started
