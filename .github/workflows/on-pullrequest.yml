@@ -34,7 +34,7 @@ jobs:
 
   upgrade:
     name: Upgrade packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: Meadowlark-js
@@ -82,7 +82,7 @@ jobs:
     name: Analyze Code Dependencies
     # Not mandatory, but better for this to go after the upgrade since it can change the code.
     needs: upgrade
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       security-events: write
 
@@ -97,7 +97,7 @@ jobs:
     name: Analyze Code
     # Not mandatory, but better for this to go after the upgrade since it can change the code.
     needs: upgrade
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       SRC_DIR: Meadowlark-js
     permissions:
@@ -137,7 +137,7 @@ jobs:
   lint:
     name: Lint
     needs: upgrade
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout repository
@@ -167,7 +167,7 @@ jobs:
   build:
     name: Build
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout repository
@@ -197,7 +197,7 @@ jobs:
   tests:
     name: ${{matrix.tests.type}} tests
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -288,7 +288,7 @@ jobs:
   end-to-end:
     name: End to End tests for ${{ matrix.store.db }} as store and ${{matrix.query_handler.provider}} as query handler
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:

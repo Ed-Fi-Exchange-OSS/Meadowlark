@@ -23,7 +23,7 @@ env:
 jobs:
   azure-publish:
     name: Publish to Azure Artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: Meadowlark-js
@@ -82,7 +82,7 @@ jobs:
 
   docker-publish:
     name: Publish to Docker Hub
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
       - azure-publish
     steps:
@@ -142,7 +142,7 @@ jobs:
 
   sbom-create:
     name: Create SBOM for NPM Packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: azure-publish
     permissions:
       contents: write
@@ -188,7 +188,7 @@ jobs:
 
   sbom-attach:
     name: Attach SBOM file
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
       - sbom-create
     permissions:
