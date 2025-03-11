@@ -38,7 +38,7 @@ describe('when accepting an incoming token request', () => {
     it('should respond with 400', async () => {
       await baseURLRequest()
         .post('/oauth/token')
-        .set({ 'Transfer-Encoding': 'chunked', 'Content-Length': 1 })
+        .set({ 'Transfer-Encoding': 'chunked', 'Content-Length': '1' })
         .send({})
         .expect(400)
         .then((response) => {
@@ -57,7 +57,7 @@ describe('when accepting an incoming token request', () => {
     it('should respond with 400', async () => {
       await baseURLRequest()
         .post('/oauth/token')
-        .set({ 'transfer-encoding': 'chunked', 'content-length': 1 })
+        .set({ 'transfer-encoding': 'chunked', 'content-length': '1' })
         .send({})
         .expect(400)
         .then((response) => {
@@ -132,7 +132,7 @@ describe('when accepting an incoming PUT request for a resource', () => {
     it('should respond with 400', async () => {
       await baseURLRequest()
         .put('/v3.3b/ed-fi/persons')
-        .set({ 'Transfer-Encoding': 'chunked', 'Content-Length': 1 })
+        .set({ 'Transfer-Encoding': 'chunked', 'Content-Length': '1' })
         .send({})
         .expect(400)
         .then((response) => {
@@ -151,7 +151,7 @@ describe('when accepting an incoming PUT request for a resource', () => {
     it('should respond with 400', async () => {
       await baseURLRequest()
         .put('/v3.3b/ed-fi/persons')
-        .set({ 'transfer-encoding': 'chunked', 'content-length': 1 })
+        .set({ 'transfer-encoding': 'chunked', 'content-length': '1' })
         .send({})
         .expect(400)
         .then((response) => {
